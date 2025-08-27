@@ -19,25 +19,28 @@ namespace gallus
 				{
 					font::ICON_FOLDER,
 					font::ICON_FILE_SCENE,
-					font::ICON_FILE_MATERIAL,
 					font::ICON_FILE_IMAGE,
 					font::ICON_FILE_AUDIO,
 					font::ICON_FILE_MUSIC,
 					font::ICON_FILE_VO,
 					font::ICON_FILE, // TODO: FIND ICON ANIMATION
-					font::ICON_FILE_MODEL,
 					font::ICON_FILE, // TODO: FIND ICON SHADER
 				};
 
-				ExplorerFileUIView::ExplorerFileUIView(ImGuiWindow& a_Window, gallus::editor::FileResource& a_FileResource, ExplorerFileUIView* a_pParent) : ImGuiUIView(a_Window),
+				ExplorerFileUIView::ExplorerFileUIView(ImGuiWindow& a_Window, gallus::editor::FileResource& a_FileResource, ExplorerFileUIView* a_pParent, bool a_bGetChildren) : ImGuiUIView(a_Window),
 					m_FileResource(a_FileResource),
 					m_pParent(a_pParent)
 				{
-					for (gallus::editor::FileResource& child : a_FileResource.GetChildren())
-					{
-						m_aChildren.emplace_back(a_Window, child, this);
-					}
+					SetDisplayName(m_FileResource.GetPath().filename().generic_string());
 					m_sIcon = RESOURCE_ICONS[(int) a_FileResource.GetAssetType()];
+
+					if (a_bGetChildren)
+					{
+						for (gallus::editor::FileResource& child : a_FileResource.GetChildren())
+						{
+							m_aChildren.emplace_back(a_Window, child, this);
+						}
+					}
 				}
 
 				const std::string& imgui::editor::ExplorerFileUIView::GetIcon() const
@@ -118,20 +121,18 @@ namespace gallus
 					}
 					ImGui::PopFont();
 
-					std::string name = m_FileResource.GetPath().filename().generic_string();
-
-					ImVec2 textSize = ImGui::CalcTextSize(name.c_str());
+					ImVec2 textSize = ImGui::CalcTextSize(m_sDisplayName.c_str());
 
 					verticalOffset = (buttonSize.y - textSize.y) / 2.0f;
 
 					ImGui::SetCursorPos(contentStartPos + ImVec2(m_Window.GetFontSize() * 1.5f, 0));
 
-					ImGui::Text(name.c_str());
+					ImGui::Text(m_sDisplayName.c_str());
 
 					ImGui::SetCursorPos(ImVec2(a_vInitialPos.x, a_vInitialPos.y + buttonSize.y));
 				}
 
-				void ExplorerFileUIView::RenderList(bool& a_bClicked, bool& a_bRightClicked, bool& a_bDoubleClicked, bool a_bSelected, bool a_bInContextMenu, const std::string a_sNameOverride)
+				void ExplorerFileUIView::RenderList(bool& a_bClicked, bool& a_bRightClicked, bool& a_bDoubleClicked, bool a_bSelected, bool a_bInContextMenu)
 				{
 					ImVec2 initialPos = ImGui::GetCursorPos();
 					ImVec2 buttonStart = ImGui::GetCursorScreenPos();
@@ -166,16 +167,14 @@ namespace gallus
 
 					ImGui::PopFont();
 
-					std::string name = a_sNameOverride.empty() ? m_FileResource.GetPath().filename().generic_string() : a_sNameOverride;
-
-					ImVec2 textSize = ImGui::CalcTextSize(name.c_str());
+					ImVec2 textSize = ImGui::CalcTextSize(m_sDisplayName.c_str());
 
 					verticalOffset = (buttonSize.y - textSize.y) / 2.0f;
 
 					ImVec2 textPos = contentStartPos + ImVec2(m_Window.GetFontSize() * 1.5f, 0);
 					ImGui::SetCursorPos(textPos);
 
-					ImGui::Text(name.c_str());
+					ImGui::Text(m_sDisplayName.c_str());
 
 					std::string assetType = gallus::editor::AssetTypeToString(m_FileResource.GetAssetType());
 
@@ -269,6 +268,23 @@ namespace gallus
 					for (const gallus::editor::FileResource& resource : m_FileResource.GetChildren())
 					{
 						if (resource.GetAssetType() == gallus::editor::AssetType::Folder)
+						{
+							return true;
+						}
+					}
+					return false;
+				}
+
+				bool ExplorerFileUIView::SearchForPath(const fs::path& a_Path, ExplorerFileUIView*& a_pExplorerFile)
+				{
+					if (m_FileResource.GetPath() == a_Path)
+					{
+						a_pExplorerFile = this;
+						return true;
+					}
+					for (ExplorerFileUIView& view : m_aChildren)
+					{
+						if (view.SearchForPath(a_Path, a_pExplorerFile))
 						{
 							return true;
 						}

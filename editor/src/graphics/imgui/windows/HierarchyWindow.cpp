@@ -35,7 +35,11 @@ namespace gallus
 				bool HierarchyWindow::Initialize()
 				{
 					core::TOOL->GetECS().OnEntitiesUpdated() += std::bind(&HierarchyWindow::UpdateEntities, this);
+
 					core::TOOL->GetECS().OnEntityComponentsUpdated() += std::bind(&HierarchyWindow::UpdateEntityComponents, this);
+
+					core::EDITOR_TOOL->GetEditor().GetSelectable().OnChanged() += std::bind(&HierarchyWindow::OnSelectableChanged, this, std::placeholders::_1, std::placeholders::_2);
+
 					return BaseWindow::Initialize();
 				}
 
@@ -43,7 +47,11 @@ namespace gallus
 				bool HierarchyWindow::Destroy()
 				{
 					core::TOOL->GetECS().OnEntitiesUpdated() -= std::bind(&HierarchyWindow::UpdateEntities, this);
+
 					core::TOOL->GetECS().OnEntityComponentsUpdated() -= std::bind(&HierarchyWindow::UpdateEntityComponents, this);
+
+					core::EDITOR_TOOL->GetEditor().GetSelectable().OnChanged() -= std::bind(&HierarchyWindow::OnSelectableChanged, this, std::placeholders::_1, std::placeholders::_2);
+
 					return BaseWindow::Destroy();
 				}
 
@@ -56,8 +64,6 @@ namespace gallus
 					// We refresh the assets that show up based on the search bar and the root directory.
 					if (m_bNeedsRefresh)
 					{
-						SetSelectable(nullptr);
-
 						m_aEntities.clear();
 						m_aFilteredEntities.clear();
 
@@ -79,6 +85,24 @@ namespace gallus
 							}
 						}
 
+						if (m_PreviousEntityID.IsValid())
+						{
+							auto prevEntityID = m_PreviousEntityID;
+							auto it = std::find_if(
+								m_aEntities.begin(),
+								m_aEntities.end(),
+								[prevEntityID](const HierarchyEntityUIView& view)
+								{
+									return view.GetEntityID() == prevEntityID;
+								}
+							);
+							SetSelectable(&(*it));
+						}
+						else
+						{
+							SetSelectable(nullptr);
+						}
+
 						m_bNeedsRefresh = false;
 					}
 
@@ -97,7 +121,11 @@ namespace gallus
 					if (ImGui::IconButton(
 						ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_CUBE), BUTTON_ID, "SPAWN_ENTITY_HIERARCHY").c_str(), m_Window.GetHeaderSize(), m_Window.GetIconFont()))
 					{
-						core::EDITOR_TOOL->SetSelectable(nullptr, nullptr);
+						const HierarchyEntityUIView* derivedPtr = dynamic_cast<const HierarchyEntityUIView*>(core::EDITOR_TOOL->GetEditor().GetSelectable().get());
+						if (derivedPtr)
+						{
+							core::EDITOR_TOOL->GetEditor().SetSelectable(nullptr, nullptr);
+						}
 
 						core::TOOL->GetECS().CreateEntity(core::TOOL->GetECS().GetUniqueName("New GameObject"));
 					}
@@ -164,7 +192,13 @@ namespace gallus
 							bool
 								clicked = false,
 								right_clicked = false;
-							view->RenderEntity(clicked, right_clicked, core::EDITOR_TOOL->GetSelectable() == view);
+
+							view->RenderEntity(
+								clicked,
+								right_clicked,
+								core::EDITOR_TOOL->GetEditor().GetSelectable().get() == view
+							);
+
 							if (clicked)
 							{
 								SetSelectable(view);
@@ -182,18 +216,30 @@ namespace gallus
 
 				void HierarchyWindow::UpdateEntityComponents()
 				{
-					//if (EntityUIView* derivedPtr = dynamic_cast<EntityUIView*>(core::ENGINE.GetEditor().GetSelectable()))
-					//{
-					//	core::ENGINE.GetEditor().GetSelectable()->Deselect();
-					//	core::ENGINE.GetEditor().GetSelectable()->Select();
-					//}
-
-					//core::ENGINE.GetEditor().SetDirty();
+					m_bNeedsRefresh = true;
 				}
 
 				void HierarchyWindow::SetSelectable(HierarchyEntityUIView* a_EntityView)
 				{
-					core::EDITOR_TOOL->SetSelectable(a_EntityView, a_EntityView ? new EntityInspectorView(m_Window, *a_EntityView) : nullptr);
+					core::EDITOR_TOOL->GetEditor().SetSelectable(a_EntityView, a_EntityView ? new EntityInspectorView(m_Window, *a_EntityView) : nullptr);
+				}
+
+				void HierarchyWindow::OnSelectableChanged(const EditorSelectable* oldVal, const EditorSelectable* newVal)
+				{
+					if (!newVal)
+					{
+						return;
+					}
+
+					const HierarchyEntityUIView* derivedPtr = dynamic_cast<const HierarchyEntityUIView*>(newVal);
+					if (!derivedPtr) // New selectable is NOT an entity, so we must reset the previous folder path.
+					{
+						m_PreviousEntityID.SetInvalid();
+					}
+					else // New selectable is an entity, set folder path.
+					{
+						m_PreviousEntityID = derivedPtr->GetEntityID();
+					}
 				}
 			}
 		}

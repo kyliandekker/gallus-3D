@@ -1,4 +1,4 @@
-#include "gameplay/systems/components/MeshComponent.h"
+#include "gameplay/systems/components/SpriteComponent.h"
 
 #include "graphics/dx12/Texture.h"
 #include "graphics/dx12/Mesh.h"
@@ -23,9 +23,9 @@ namespace gallus
 	namespace gameplay
 	{
 		//---------------------------------------------------------------------
-		// MeshComponent
+		// SpriteComponent
 		//---------------------------------------------------------------------
-		void MeshComponent::Init()
+		void SpriteComponent::Init()
 		{
 			m_pShader = core::TOOL->GetResourceAtlas().GetDefaultShader();
 			m_pTexture = core::TOOL->GetResourceAtlas().GetDefaultTexture();
@@ -33,25 +33,25 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		void MeshComponent::SetMesh(std::shared_ptr<graphics::dx12::Mesh> a_pMesh)
+		void SpriteComponent::SetMesh(std::shared_ptr<graphics::dx12::Mesh> a_pMesh)
 		{
 			m_pMesh = a_pMesh;
 		}
 
 		//---------------------------------------------------------------------
-		void MeshComponent::SetShader(std::shared_ptr<graphics::dx12::Shader> a_pShader)
+		void SpriteComponent::SetShader(std::shared_ptr<graphics::dx12::Shader> a_pShader)
 		{
 			m_pShader = a_pShader;
 		}
 
 		//---------------------------------------------------------------------
-		void MeshComponent::SetTexture(std::shared_ptr<graphics::dx12::Texture> a_pTexture)
+		void SpriteComponent::SetTexture(std::shared_ptr<graphics::dx12::Texture> a_pTexture)
 		{
 			m_pTexture = a_pTexture;
 		}
 
 		//---------------------------------------------------------------------
-		void MeshComponent::Render(std::shared_ptr<graphics::dx12::CommandList> a_pCommandList, const EntityID& a_EntityID, const graphics::dx12::Camera& a_Camera)
+		void SpriteComponent::Render(std::shared_ptr<graphics::dx12::CommandList> a_pCommandList, const EntityID& a_EntityID, const graphics::dx12::Camera& a_Camera)
 		{
 			const DirectX::XMMATRIX viewMatrix = a_Camera.GetViewMatrix();
 			const DirectX::XMMATRIX& projectionMatrix = a_Camera.GetProjectionMatrix();
@@ -79,11 +79,11 @@ namespace gallus
 			if (m_pMesh)
 			{
 				graphics::dx12::DX12Transform transform;
-				transform.SetScale({ 128.0f, 128.0f });
-				transform.SetPosition({ 300, 300 });
-				static float rot = 0;
-				rot += 0.1f;
-				transform.SetRotation(rot);
+				TransformSystem& transformSys = core::TOOL->GetECS().GetSystem<TransformSystem>();
+				if (transformSys.HasComponent(a_EntityID))
+				{
+					transform = transformSys.GetComponent(a_EntityID).Transform();
+				}
 				m_pMesh->Render(a_pCommandList, transform, viewMatrix, projectionMatrix);
 			}
 
@@ -94,7 +94,7 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		void MeshComponent::Serialize(rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator) const
+		void SpriteComponent::Serialize(rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator) const
 		{
 			if (!a_Document.IsObject())
 			{
@@ -133,7 +133,7 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		void MeshComponent::Deserialize(const rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator)
+		void SpriteComponent::Deserialize(const rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator)
 		{
 			if (!a_Document.IsObject())
 			{

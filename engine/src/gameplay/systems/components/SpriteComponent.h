@@ -26,9 +26,9 @@ namespace gallus
 		struct EntityID;
 
 		//---------------------------------------------------------------------
-		// MeshComponent
+		// SpriteComponent
 		//---------------------------------------------------------------------
-		class MeshComponent : public Component
+		class SpriteComponent : public Component
 		{
 		public:
 			void Init();

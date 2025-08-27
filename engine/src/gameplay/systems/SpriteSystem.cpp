@@ -1,4 +1,4 @@
-#include "gameplay/systems/MeshSystem.h"
+#include "gameplay/systems/SpriteSystem.h"
 
 #include "graphics/imgui/font_icon.h"
 #include "logger/Logger.h"
@@ -8,31 +8,31 @@ namespace gallus
 	namespace gameplay
 	{
 		//---------------------------------------------------------------------
-		// MeshSystem
+		// SpriteSystem
 		//---------------------------------------------------------------------
-		bool MeshSystem::Initialize()
+		bool SpriteSystem::Initialize()
 		{
 			LOG(LOGSEVERITY_INFO_SUCCESS, LOG_CATEGORY_ECS, "Mesh system initialized.");
 			return true;
 		}
 
 		//---------------------------------------------------------------------
-		std::string MeshSystem::GetPropertyName() const
+		std::string SpriteSystem::GetPropertyName() const
 		{
 			return "meshInfo";
 		}
 
 		//---------------------------------------------------------------------
-		std::string MeshSystem::GetSystemName() const
+		std::string SpriteSystem::GetSystemName() const
 		{
-			std::string name = "Mesh";
+			std::string name = "Sprite";
 #ifdef _EDITOR
 			name = std::string(font::ICON_CUBE) + " " + name;
 #endif // _EDITOR
 			return name;
 		}
 
-		void MeshSystem::Update(float a_fDeltaTime)
+		void SpriteSystem::Update(float a_fDeltaTime)
 		{}
 	}
 }

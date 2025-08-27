@@ -3,6 +3,7 @@
 #include "graphics/imgui/views/inspector/InspectorView.h"
 
 #include <string>
+#include <vector>
 
 namespace gallus
 {
@@ -19,6 +20,7 @@ namespace gallus
 			namespace editor
 			{
 				class HierarchyEntityUIView;
+				class ComponentBaseUIView;
 
 				/// <summary>
 				/// Class that displays entities in the inspector.
@@ -26,6 +28,8 @@ namespace gallus
 				class EntityInspectorView : public InspectorView
 				{
 				public:
+					~EntityInspectorView();
+
 					/// <summary>
 					/// Constructs an inspector view.
 					/// </summary>
@@ -44,7 +48,9 @@ namespace gallus
 					void Render();
 				protected:
 					HierarchyEntityUIView& m_HierarchyEntityUIView;
-					gameplay::Entity* m_Entity = nullptr;
+					gameplay::Entity* m_pEntity = nullptr;
+
+					std::vector<ComponentBaseUIView*> m_aComponents; /// A list of component UI views associated with this entity.
 				};
 			}
 		}

@@ -9,7 +9,7 @@
 #include "Shader.h"
 #include "Texture.h"
 #include "Mesh.h"
-#include "gameplay/systems/MeshSystem.h"
+#include "gameplay/systems/SpriteSystem.h"
 
 namespace gallus
 {
@@ -17,6 +17,8 @@ namespace gallus
 	{
 		namespace dx12
 		{
+			constexpr glm::ivec2 RENDER_TEX_SIZE = glm::ivec2(1920, 1080);
+
 			//---------------------------------------------------------------------
 			// DX12System2D
 			//---------------------------------------------------------------------
@@ -112,10 +114,10 @@ namespace gallus
 				m_bIsTearingSupported = CheckTearingSupport();
 
 #ifdef _EDITOR
-				m_Viewport = CD3DX12_VIEWPORT(0.0f, 0.0f, 1920.0f, 1080.0f);
-				m_ScissorRect = CD3DX12_RECT(0, 0, 1920.0f, 1080.0f);
+				m_Viewport = CD3DX12_VIEWPORT(0.0f, 0.0f, RENDER_TEX_SIZE.x, RENDER_TEX_SIZE.y);
+				m_ScissorRect = CD3DX12_RECT(0, 0, RENDER_TEX_SIZE.x, RENDER_TEX_SIZE.y);
 
-				m_Camera.Init(1920.0f, 1080.0f);
+				m_Camera.Init(RENDER_TEX_SIZE.x, RENDER_TEX_SIZE.y);
 #else
 				m_Viewport = CD3DX12_VIEWPORT(0.0f, 0.0f, static_cast<float>(m_vSize.x), static_cast<float>(m_vSize.y));
 				m_ScissorRect = CD3DX12_RECT(0, 0, static_cast<float>(m_vSize.x), static_cast<float>(m_vSize.y));
@@ -178,7 +180,7 @@ namespace gallus
 				}
 
 #ifdef _EDITOR
-				CreateRenderTexture(m_vSize);
+				CreateRenderTexture({ RENDER_TEX_SIZE.x, RENDER_TEX_SIZE.y });
 #endif // _EDITOR
 
 				m_eOnInitialize(*this);
@@ -661,10 +663,14 @@ namespace gallus
 				UpdateRenderTargetViews();
 
 				m_eOnResize(a_vPos, a_vSize);
-#ifdef _EDITOR
+#ifndef IMGUI_DISABLE
 				m_ImGuiWindow.Resize(a_vPos, a_vSize);
-				m_Viewport = CD3DX12_VIEWPORT(0.0f, 0.0f, 1920.0f, 1080.0f);
-				m_ScissorRect = CD3DX12_RECT(0, 0, 1920.0f, 1080.0f);
+#endif
+
+#ifdef _EDITOR
+				m_Viewport = CD3DX12_VIEWPORT(0.0f, 0.0f, RENDER_TEX_SIZE.x, RENDER_TEX_SIZE.y);
+				m_ScissorRect = CD3DX12_RECT(0, 0, RENDER_TEX_SIZE.x, RENDER_TEX_SIZE.y);
+				m_Camera.Init(RENDER_TEX_SIZE.x, RENDER_TEX_SIZE.y);
 #else
 				m_Viewport = CD3DX12_VIEWPORT(0.0f, 0.0f, static_cast<float>(a_vSize.x), static_cast<float>(a_vSize.y));
 				m_ScissorRect = CD3DX12_RECT(0, 0, static_cast<float>(a_vSize.x), static_cast<float>(a_vSize.y));
@@ -812,7 +818,7 @@ namespace gallus
 				a_pCommandList->GetCommandList()->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
 				// TODO: RENDER LOOP.
-				for (auto& pair : core::TOOL->GetECS().GetSystem<gameplay::MeshSystem>().GetComponents())
+				for (auto& pair : core::TOOL->GetECS().GetSystem<gameplay::SpriteSystem>().GetComponents())
 				{
 					pair.second.Render(a_pCommandList, pair.first, m_Camera);
 				}

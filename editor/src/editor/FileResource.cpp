@@ -52,7 +52,6 @@ namespace gallus
 		const std::unordered_map<std::string, std::vector<AssetType>> FILE_ATLAS =
 		{
 			{ ".scene", { AssetType::Scene } },
-			{ ".mat", { AssetType::Material } },
 			{ ".png", { AssetType::Texture } },
 			{ ".bmp", { AssetType::Texture } },
 			{ ".wav", { AssetType::Sound, AssetType::Song, AssetType::VO } },
@@ -133,7 +132,7 @@ namespace gallus
 						}
 
 						FileResource resource;
-						resource.m_Path = dirEntry.path();
+						resource.m_Path = dirEntry.path().lexically_normal();
 						resource.m_Parent = this;
 						resource.m_AssetType = assetType;
 						if (!hasMetadata)
@@ -146,7 +145,7 @@ namespace gallus
 					{
 						// Create the resource that will be added.
 						FileResource folderResource;
-						folderResource.m_Path = dirEntry.path();
+						folderResource.m_Path = dirEntry.path().lexically_normal();
 						folderResource.m_Parent = this;
 						folderResource.m_AssetType = AssetType::Folder;
 
@@ -193,6 +192,23 @@ namespace gallus
 			a_Document.Accept(writer);
 
 			return file::SaveFile(metaPath, core::Data(buffer.GetString(), buffer.GetSize()));
+		}
+
+		bool FileResource::SearchForPath(const fs::path& a_Path, FileResource*& a_pFileResource)
+		{
+			if (m_Path == a_Path)
+			{
+				a_pFileResource = this;
+				return true;
+			}
+			for (FileResource& view : m_aChildren)
+			{
+				if (view.SearchForPath(a_Path, a_pFileResource))
+				{
+					return true;
+				}
+			}
+			return false;
 		}
 	}
 }

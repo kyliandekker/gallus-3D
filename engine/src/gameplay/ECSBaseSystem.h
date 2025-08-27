@@ -111,6 +111,7 @@ namespace gallus
 					ComponentType t;
 					m_mComponents.insert(std::make_pair(a_ID, t));
 				}
+				core::TOOL->GetECS().OnEntityComponentsUpdated().invoke();
 				return &m_mComponents.at(a_ID);
 			}
 
@@ -189,7 +190,16 @@ namespace gallus
 			/// </summary>
 			virtual void UpdateComponents() override
 			{
-				// TODO: delete components.
+				size_t oldSize = m_mComponents.size();
+				std::erase_if(m_mComponents, [](auto& pair)
+					{
+						return pair.second.IsDestroyed();
+					});
+
+				if (oldSize != m_mComponents.size())
+				{
+					core::TOOL->GetECS().OnEntityComponentsUpdated().invoke();
+				}
 			}
 
 			/// <summary>

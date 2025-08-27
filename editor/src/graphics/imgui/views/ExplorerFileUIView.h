@@ -4,9 +4,10 @@
 #include "graphics/imgui/EditorSelectable.h"
 
 #include <imgui/imgui.h>
-
 #include <string>
 #include <vector>
+
+#include "utils/file_abstractions.h"
 
 namespace gallus
 {
@@ -25,7 +26,7 @@ namespace gallus
 				class ExplorerFileUIView : public ImGuiUIView, public EditorSelectable
 				{
 				public:
-					ExplorerFileUIView(ImGuiWindow& a_Window, gallus::editor::FileResource& a_FileResource, ExplorerFileUIView* a_pParent = nullptr);
+					ExplorerFileUIView(ImGuiWindow& a_Window, gallus::editor::FileResource& a_FileResource, ExplorerFileUIView* a_pParent = nullptr, bool a_bGetChildren = true);
 
 					/// <summary>
 					/// Retrieves the icon string for the resource.
@@ -69,8 +70,7 @@ namespace gallus
 					/// <param name="a_bDoubleClicked">Indicates if the resource was double-clicked.</param>
 					/// <param name="a_bSelected">Indicates if the resource is selected.</param>
 					/// <param name="a_bInContextMenu">Indicates if the resource is currently open in the context menu.</param>
-					/// <param name="a_sNameOverride">Possible name override.</param>
-					void RenderList(bool& a_bClicked, bool& a_bRightClicked, bool& a_bDoubleClicked, bool a_bSelected, bool a_bInContextMenu, const std::string a_sNameOverride = "");
+					void RenderList(bool& a_bClicked, bool& a_bRightClicked, bool& a_bDoubleClicked, bool a_bSelected, bool a_bInContextMenu);
 
 					/// <summary>
 					/// Renders the file resource in the UI in a grid way.
@@ -103,12 +103,25 @@ namespace gallus
 						return m_FileResource;
 					}
 
+					const gallus::editor::FileResource& GetFileResource() const
+					{
+						return m_FileResource;
+					}
+
 					ExplorerFileUIView* GetParent()
 					{
 						return m_pParent;
 					}
+
+					void SetDisplayName(const std::string& a_sDisplayName)
+					{
+						m_sDisplayName = a_sDisplayName;
+					}
+
+					bool SearchForPath(const fs::path& a_Path, ExplorerFileUIView*& a_pExplorerFile);
 				private:
 					gallus::editor::FileResource& m_FileResource;
+					std::string m_sDisplayName; /// The name that will be displayed in imgui.
 					std::string m_sIcon; /// The icon of the resource.
 					bool m_bIsFoldedOut = false; /// Whether the node is folded out.
 

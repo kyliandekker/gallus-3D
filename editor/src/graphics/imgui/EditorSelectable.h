@@ -10,7 +10,10 @@ namespace gallus
 			{
 				class EditorSelectable
 				{
+					virtual void RenderEditorSelectable()
+					{
 
+					}
 				};
 			}
 		}

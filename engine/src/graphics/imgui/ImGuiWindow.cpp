@@ -16,6 +16,7 @@
 #include "graphics/dx12/CommandQueue.h"
 #include "graphics/dx12/CommandList.h"
 #include "windows/BaseWindow.h"
+#include "modals/BaseModal.h"
 #include "themes.h"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -97,12 +98,12 @@ namespace gallus
 			bool ImGuiWindow::CreateContextDX12()
 			{
 				dx12::DX12System2D& dx12window = core::TOOL->GetDX12();
-				m_SrvIndex = dx12window.GetSRV().Allocate();
+				m_iSrvIndex = dx12window.GetSRV().Allocate();
 
 				if (!ImGui_ImplDX12_Init(dx12window.GetDevice().Get(), dx12::g_iBufferCount,
 					DXGI_FORMAT_R8G8B8A8_UNORM, dx12window.GetSRV().GetHeap().Get(),
-					dx12window.GetSRV().GetCPUHandle(m_SrvIndex),
-					dx12window.GetSRV().GetGPUHandle(m_SrvIndex)))
+					dx12window.GetSRV().GetCPUHandle(m_iSrvIndex),
+					dx12window.GetSRV().GetGPUHandle(m_iSrvIndex)))
 				{
 					LOG(LOGSEVERITY_ERROR, LOG_CATEGORY_EDITOR, "Failed creating DX12 context for ImGui.");
 					return false;
@@ -126,10 +127,10 @@ namespace gallus
 				UINT dpi = GetDpiForWindow(core::TOOL->GetWindow().GetHWnd()); // returns DPI, e.g., 96, 120, 144
 				float dp = dpi / 96.0f; // 96 is the default DPI (100%)
 
-				m_FontSize *= dp;
-				m_IconFontSize *= dp;
+				m_fFontSize *= dp;
+				m_fIconFontSize *= dp;
 
-				m_HeaderSize = ImVec2(m_FontSize * 3.0f, m_FontSize * 3.0f);
+				m_vHeaderSize = ImVec2(m_fFontSize * 3.0f, m_fFontSize * 3.0f);
 
 				// setup Dear ImGui style
 				ImGui::StyleColorsDark();
@@ -138,33 +139,33 @@ namespace gallus
 
 				ImFontConfig font_config_capital;
 				font_config_capital.FontDataOwnedByAtlas = false;
-				m_Capital = io.Fonts->AddFontFromMemoryTTF(&font::arial, sizeof(font::arial), m_FontSize * 2, &font_config_capital);
+				m_pCapital = io.Fonts->AddFontFromMemoryTTF(&font::arial, sizeof(font::arial), m_fFontSize * 2, &font_config_capital);
 
 				ImFontConfig font_config_icon_capital;
 				font_config_icon_capital.FontDataOwnedByAtlas = false;
-				m_CapitalIconFont = io.Fonts->AddFontFromMemoryTTF(&font::ICON, sizeof(font::ICON), m_HeaderSize.x * 0.75f, &font_config_icon_capital, icons_ranges_b);
+				m_pCapitalIconFont = io.Fonts->AddFontFromMemoryTTF(&font::ICON, sizeof(font::ICON), m_vHeaderSize.x * 0.75f, &font_config_icon_capital, icons_ranges_b);
 
 				ImFontConfig icons_config_b;
 				icons_config_b.FontDataOwnedByAtlas = false;
-				m_IconFont = io.Fonts->AddFontFromMemoryTTF(&font::ICON, sizeof(font::ICON), m_IconFontSize, &icons_config_b, icons_ranges_b);
+				m_pIconFont = io.Fonts->AddFontFromMemoryTTF(&font::ICON, sizeof(font::ICON), m_fIconFontSize, &icons_config_b, icons_ranges_b);
 
 				ImFontConfig small_icons_config_b;
 				small_icons_config_b.FontDataOwnedByAtlas = false;
-				m_SmallIconFont = io.Fonts->AddFontFromMemoryTTF(&font::ICON, sizeof(font::ICON), m_FontSize, &small_icons_config_b, icons_ranges_b);
+				m_pSmallIconFont = io.Fonts->AddFontFromMemoryTTF(&font::ICON, sizeof(font::ICON), m_fFontSize, &small_icons_config_b, icons_ranges_b);
 
 				ImFontConfig font_config_bold;
 				font_config_bold.FontDataOwnedByAtlas = false;
-				m_BoldFont = io.Fonts->AddFontFromMemoryTTF(&font::arialBold, sizeof(font::arialBold), m_FontSize, &font_config_bold);
+				m_pBoldFont = io.Fonts->AddFontFromMemoryTTF(&font::arialBold, sizeof(font::arialBold), m_fFontSize, &font_config_bold);
 
 				ImFontConfig font_config_default;
 				font_config_default.FontDataOwnedByAtlas = false;
-				m_DefaultFont = io.Fonts->AddFontFromMemoryTTF(&font::arial, sizeof(font::arial), m_FontSize, &font_config_default);
+				m_pDefaultFont = io.Fonts->AddFontFromMemoryTTF(&font::arial, sizeof(font::arial), m_fFontSize, &font_config_default);
 
 				ImFontConfig icons_config_m;
 				icons_config_m.MergeMode = true;
 				icons_config_m.PixelSnapH = true;
 				icons_config_m.FontDataOwnedByAtlas = false;
-				m_IconFontM = io.Fonts->AddFontFromMemoryTTF(&font::ICON, sizeof(font::ICON), m_FontSize, &icons_config_m, icons_ranges_b);
+				m_pIconFontM = io.Fonts->AddFontFromMemoryTTF(&font::ICON, sizeof(font::ICON), m_fFontSize, &icons_config_m, icons_ranges_b);
 
 				io.Fonts->Build();
 
@@ -239,7 +240,7 @@ namespace gallus
 				ImGui_ImplWin32_NewFrame();
 				ImGui::NewFrame();
 
-				ImGui::PushFont(m_IconFontM);
+				ImGui::PushFont(m_pIconFontM);
 
 				const ImGuiIO& io = ImGui::GetIO();
 
@@ -250,6 +251,11 @@ namespace gallus
 					{
 						window->Update();
 					}
+				}
+
+				for (BaseModal* modal : m_aModals)
+				{
+					modal->Update();
 				}
 
 				UpdateMouseCursor();
@@ -316,55 +322,65 @@ namespace gallus
 			//---------------------------------------------------------------------
 			ImFont* ImGuiWindow::GetCapitalFont()
 			{
-				return m_Capital;
+				return m_pCapital;
 			}
 
 			//---------------------------------------------------------------------
 			ImFont* ImGuiWindow::GetBigIconFont()
 			{
-				return m_CapitalIconFont;
+				return m_pCapitalIconFont;
 			}
 
 			//---------------------------------------------------------------------
 			ImFont* ImGuiWindow::GetIconFont()
 			{
-				return m_IconFont;
+				return m_pIconFont;
 			}
 
 			//---------------------------------------------------------------------
 			ImFont* ImGuiWindow::GetSmallIconFont()
 			{
-				return m_SmallIconFont;
+				return m_pSmallIconFont;
 			}
 
 			//---------------------------------------------------------------------
 			ImFont* ImGuiWindow::GetBoldFont()
 			{
-				return m_BoldFont;
+				return m_pBoldFont;
 			}
 
 			//---------------------------------------------------------------------
 			float ImGuiWindow::GetFontSize() const
 			{
-				return m_FontSize;
+				return m_fFontSize;
 			}
 
 			//---------------------------------------------------------------------
 			const ImVec2& ImGuiWindow::GetFramePadding() const
 			{
-				return m_FramePadding;
+				return m_vFramePadding;
 			}
 
 			//---------------------------------------------------------------------
 			const ImVec2& ImGuiWindow::GetWindowPadding() const
 			{
-				return m_WindowPadding;
+				return m_vWindowPadding;
 			}
 
 			//---------------------------------------------------------------------
 			const ImVec2& ImGuiWindow::GetHeaderSize() const
 			{
-				return m_HeaderSize;
+				return m_vHeaderSize;
+			}
+
+			//---------------------------------------------------------------------
+			BaseModal* ImGuiWindow::GetModal(int a_iIndex)
+			{
+				if (a_iIndex >= m_aModals.size())
+				{
+					return nullptr;
+				}
+				return m_aModals[a_iIndex];
 			}
 		}
 	}

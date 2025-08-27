@@ -49,7 +49,7 @@ namespace gallus
 					}
 				}
 
-				constexpr bool CROP = true;
+				constexpr bool CROP = false;
 				//---------------------------------------------------------------------
 				void SceneWindow::Render()
 				{

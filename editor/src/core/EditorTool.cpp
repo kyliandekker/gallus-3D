@@ -7,7 +7,7 @@ namespace gallus
 		//---------------------------------------------------------------------
 		// EditorTool
 		//---------------------------------------------------------------------
-		EditorTool::EditorTool() : Tool::Tool(), m_EditorSettings("editorsettings.settings")
+		EditorTool::EditorTool() : Tool::Tool()
 		{}
 
 		//---------------------------------------------------------------------
@@ -15,10 +15,9 @@ namespace gallus
 		{
 			Tool::Initialize(a_hInstance, a_sName);
 
-			m_AssetDatabase.Initialize();
-			m_AssetDatabase.Scan();
-
 			EDITOR_TOOL = this;
+
+			m_Editor.Initialize(true);
 
 			return true;
 		}
@@ -26,7 +25,7 @@ namespace gallus
 		//---------------------------------------------------------------------
 		bool EditorTool::Destroy()
 		{
-			m_AssetDatabase.Destroy();
+			m_Editor.Destroy();
 
 			return Tool::Destroy();
 		}

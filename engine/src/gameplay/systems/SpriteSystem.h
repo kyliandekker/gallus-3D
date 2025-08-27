@@ -1,16 +1,16 @@
 #pragma once
 
 #include "gameplay/ECSBaseSystem.h"
-#include "gameplay/systems/components/MeshComponent.h"
+#include "gameplay/systems/components/SpriteComponent.h"
 
 namespace gallus
 {
 	namespace gameplay
 	{
 		//---------------------------------------------------------------------
-		// MeshSystem
+		// SpriteSystem
 		//---------------------------------------------------------------------
-		class MeshSystem : public ECSBaseSystem<MeshComponent>
+		class SpriteSystem : public ECSBaseSystem<SpriteComponent>
 		{
 		public:
 			/// <summary>

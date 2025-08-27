@@ -72,6 +72,8 @@ namespace gallus
 			/// <returns>True if the saving was successful, otherwise false.</returns>
 			bool SaveMetadata(rapidjson::Document& a_Document, rapidjson::Document::AllocatorType& a_Allocator) const;
 
+			bool SearchForPath(const fs::path& a_Path, FileResource*& a_pFileResource);
+
 			std::vector<FileResource>& GetChildren()
 			{
 				return m_aChildren;

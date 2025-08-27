@@ -5,7 +5,7 @@
 #include "gameplay/ECSBaseSystem.h"
 
 #include "gameplay/systems/TransformSystem.h"
-#include "gameplay/systems/MeshSystem.h"
+#include "gameplay/systems/SpriteSystem.h"
 
 namespace gallus
 {
@@ -18,7 +18,7 @@ namespace gallus
 		{
 			// These systems are in order of initialization.
 			CreateSystem<TransformSystem>();
-			CreateSystem<MeshSystem>();
+			CreateSystem<SpriteSystem>();
 
 			for (AbstractECSSystem* system : m_aSystems)
 			{
@@ -50,7 +50,10 @@ namespace gallus
 			{
 				for (AbstractECSSystem* sys : m_aSystems)
 				{
-					sys->DeleteComponent(entity.GetEntityID());
+					if (entity.IsDestroyed())
+					{
+						sys->DeleteComponent(entity.GetEntityID());
+					}
 				}
 			}
 

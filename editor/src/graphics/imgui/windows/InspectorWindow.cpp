@@ -28,7 +28,9 @@ namespace gallus
 
 				void InspectorWindow::Render()
 				{
-					InspectorView* inspectorView = core::EDITOR_TOOL->GetInspectorView();
+					std::lock_guard<std::mutex> lock(core::EDITOR_TOOL->GetEditor().m_EditorMutex);
+
+					InspectorView* inspectorView = core::EDITOR_TOOL->GetEditor().GetInspectorView();
 					if (!inspectorView)
 					{
 						return;

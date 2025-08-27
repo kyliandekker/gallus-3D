@@ -1,11 +1,12 @@
 #pragma once
 
+#include "core/System.h"
+
 #include <glm/vec2.hpp>
 #include <wtypes.h>
 #include <string>
 #include <queue>
 
-#include "core/System.h"
 #include "core/Event.h"
 #include "WindowSettings.h"
 

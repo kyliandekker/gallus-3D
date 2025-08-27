@@ -60,7 +60,7 @@ namespace gallus
 				//---------------------------------------------------------------------
 				void ConsoleWindow::Render()
 				{
-					gallus::editor::EditorSettings& editorSettings = core::EDITOR_TOOL->GetEditorSettings();
+					gallus::editor::EditorSettings& editorSettings = core::EDITOR_TOOL->GetEditor().GetEditorSettings();
 
 					// Filter messages if need be.
 					if (m_NeedsRefresh)

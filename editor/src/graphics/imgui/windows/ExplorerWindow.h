@@ -9,6 +9,8 @@
 #include "graphics/imgui/windows/BaseWindow.h"
 #include "graphics/imgui/views/DataTypes/StringTextInput.h"
 #include "graphics/imgui/views/ExplorerFileUIView.h"
+#include "utils/file_abstractions.h"
+#include "core/Observable.h"
 
 namespace gallus
 {
@@ -52,6 +54,11 @@ namespace gallus
 					bool Destroy() override;
 
 					/// <summary>
+					/// Renders the explorer window.
+					/// </summary>
+					void Render() override;
+				private:
+					/// <summary>
 					/// Renders a folder in the explorer.
 					/// </summary>
 					/// <param name="a_Resource">Pointer to the file resource.</param>
@@ -59,16 +66,17 @@ namespace gallus
 					/// <param name="a_InitialPos">The starting pos for indent 0.</param>
 					void RenderFolder(ExplorerFileUIView& a_Resource, int a_Indent, const ImVec2& a_InitialPos);
 
-					/// <summary>
-					/// Renders the explorer window.
-					/// </summary>
-					void Render() override;
+					void SetSelectable(ExplorerFileUIView* a_pView);
 
 					/// <summary>
 					/// Callback function for when the scanning of the explorer has been completed.
 					/// </summary>
 					void OnScanCompleted();
-				private:
+
+					void OnSelectableChanged(const EditorSelectable* oldVal, const EditorSelectable* newVal);
+
+					void OnViewedFolderChanged(const ExplorerFileUIView* oldVal, const ExplorerFileUIView* newVal);
+
 					ExplorerViewMode m_ExplorerViewMode = ExplorerViewMode::ExplorerViewMode_List; // How are explorer resources shown?
 
 					bool m_bNeedsRescan = true; /// Whether the explorer needs to refresh the results shown in the explorer window.
@@ -77,9 +85,12 @@ namespace gallus
 					std::vector<ExplorerFileUIView> m_aExplorerItems;
 					std::vector<ExplorerFileUIView*> m_aFilteredExplorerItems;
 
-					ExplorerFileUIView* m_pViewedFolder = nullptr; /// Selected resource used for context menu.
+					core::Observable<ExplorerFileUIView*> m_pViewedFolder; /// Selected resource used for context menu.
 
 					SearchBarInput m_SearchBar; /// Search bar to filter specific explorer items in the explorer window.
+
+					fs::path m_PreviousSelectablePath;
+					fs::path m_PreviousViewedFolderPath;
 				};
 			}
 		}

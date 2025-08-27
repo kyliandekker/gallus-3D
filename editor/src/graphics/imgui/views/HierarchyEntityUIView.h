@@ -40,6 +40,11 @@ namespace gallus
 						return m_EntityID;
 					}
 
+					const gameplay::EntityID& GetEntityID() const
+					{
+						return m_EntityID;
+					}
+
 					const std::string& GetIcon()
 					{
 						return m_sIcon;

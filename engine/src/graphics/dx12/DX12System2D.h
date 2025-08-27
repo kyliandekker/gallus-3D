@@ -17,7 +17,7 @@
 #include "core/Event.h"
 #include "Camera.h"
 
-#include "gameplay/systems/components/MeshComponent.h"
+#include "gameplay/systems/components/SpriteComponent.h"
 
 #undef min
 #undef max
@@ -305,7 +305,7 @@ namespace gallus
 				std::shared_ptr<Texture> m_pRenderTexture = nullptr;
 #endif // _EDITOR
 
-				gameplay::MeshComponent m_MeshComponent;
+				gameplay::SpriteComponent m_MeshComponent;
 
 				Camera m_Camera;
 			};

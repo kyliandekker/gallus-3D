@@ -42,6 +42,7 @@ namespace gallus
 					void Render();
 				protected:
 					ExplorerFileUIView& m_ExplorerFileUIView;
+					ExplorerFileUIViewInfo* m_pExplorerFileUIViewInfo = nullptr;
 				};
 			}
 		}

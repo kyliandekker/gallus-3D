@@ -7,6 +7,7 @@
 
 #include <vector>
 
+#include "gameplay/EntityID.h"
 #include "graphics/imgui/views/DataTypes/StringTextInput.h"
 #include "graphics/imgui/views/HierarchyEntityUIView.h"
 
@@ -57,7 +58,7 @@ namespace gallus
 					/// Renders the hierarchy window.
 					/// </summary>
 					void Render() override;
-
+				private:
 					/// <summary>
 					/// Updates all the entities shown in the hierarchy window.
 					/// </summary>
@@ -69,9 +70,12 @@ namespace gallus
 					void UpdateEntityComponents();
 
 					void SetSelectable(HierarchyEntityUIView* a_EntityView);
-				private:
+
+					void OnSelectableChanged(const EditorSelectable* oldVal, const EditorSelectable* newVal);
+
 					bool m_bNeedsRefresh = true; /// Whether the hierarchy needs to refresh the results shown in the hierarchy window.
 
+					gameplay::EntityID m_PreviousEntityID;
 					std::vector<HierarchyEntityUIView> m_aEntities; /// List of entities shown in the hierarchy window.
 					std::vector<HierarchyEntityUIView*> m_aFilteredEntities; /// List of entities shown in the hierarchy window.
 					std::vector<std::string> m_aEntityIcons; /// List of entities shown in the hierarchy window.

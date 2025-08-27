@@ -15,12 +15,14 @@ namespace gallus
 			return true;
 		}
 
+		//---------------------------------------------------------------------
 		bool System::Destroy()
 		{
 			m_bRunning.store(false);
 			return true;
 		}
 
+		//---------------------------------------------------------------------
 		bool System::Running() const
 		{
 			return m_bRunning.load();
@@ -57,6 +59,7 @@ namespace gallus
 			}
 		}
 
+		//---------------------------------------------------------------------
 		void ThreadedSystem::ThreadEntry(std::promise<bool> promise)
 		{
 			bool success = false;
@@ -96,6 +99,7 @@ namespace gallus
 			Finalize();
 		}
 
+		//---------------------------------------------------------------------
 		bool ThreadedSystem::Destroy()
 		{
 			if (!m_Thread.joinable())

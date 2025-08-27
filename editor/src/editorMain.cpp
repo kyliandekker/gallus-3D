@@ -14,6 +14,7 @@
 #include "graphics/imgui/windows/SceneWindow.h"
 #include "graphics/imgui/windows/ExplorerWindow.h"
 #include "graphics/imgui/windows/InspectorWindow.h"
+#include "graphics/imgui/modals/FilePickerModal.h"
 
 int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR lpCmdLine, _In_ int nShowCmd)
 {
@@ -36,16 +37,19 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR lp
 	gallus::core::TOOL->SetSaveDirectory(saveDirPath);
 	gallus::core::TOOL->GetResourceAtlas().SetResourceFolder(assetPath);
 
-	gallus::core::TOOL->GetDX12().GetImGuiWindow().AddWindow(new gallus::graphics::imgui::MainWindowDock(gallus::core::TOOL->GetDX12().GetImGuiWindow()));
-	gallus::core::TOOL->GetDX12().GetImGuiWindow().AddWindow(new gallus::graphics::imgui::editor::ConsoleWindow(gallus::core::TOOL->GetDX12().GetImGuiWindow()));
-	gallus::core::TOOL->GetDX12().GetImGuiWindow().AddWindow(new gallus::graphics::imgui::editor::HierarchyWindow(gallus::core::TOOL->GetDX12().GetImGuiWindow()));
-	gallus::core::TOOL->GetDX12().GetImGuiWindow().AddWindow(new gallus::graphics::imgui::editor::SceneWindow(gallus::core::TOOL->GetDX12().GetImGuiWindow()));
-	gallus::core::TOOL->GetDX12().GetImGuiWindow().AddWindow(new gallus::graphics::imgui::editor::ExplorerWindow(gallus::core::TOOL->GetDX12().GetImGuiWindow()));
-	gallus::core::TOOL->GetDX12().GetImGuiWindow().AddWindow(new gallus::graphics::imgui::editor::InspectorWindow(gallus::core::TOOL->GetDX12().GetImGuiWindow()));
+	gallus::graphics::imgui::ImGuiWindow& imguiWindow = gallus::core::TOOL->GetDX12().GetImGuiWindow();
+	imguiWindow.AddWindow(new gallus::graphics::imgui::MainWindowDock(imguiWindow));
+	imguiWindow.AddWindow(new gallus::graphics::imgui::editor::ConsoleWindow(imguiWindow));
+	imguiWindow.AddWindow(new gallus::graphics::imgui::editor::HierarchyWindow(imguiWindow));
+	imguiWindow.AddWindow(new gallus::graphics::imgui::editor::SceneWindow(imguiWindow));
+	imguiWindow.AddWindow(new gallus::graphics::imgui::editor::ExplorerWindow(imguiWindow));
+	imguiWindow.AddWindow(new gallus::graphics::imgui::editor::InspectorWindow(imguiWindow));
+	auto* t = new gallus::graphics::imgui::editor::FilePickerModal(imguiWindow);
+	imguiWindow.AddModal(t);
 
 	gallus::core::TOOL->Initialize(hInstance, name);
 
-	gallus::core::TOOL->GetDX12().GetImGuiWindow().InitializeWindows();
+	imguiWindow.InitializeWindows();
 
 	// Load icons.
 	HICON hIconLarge = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));

@@ -2,9 +2,7 @@
 
 #include "core/Tool.h"
 #include "logger/Logger.h"
-
-#include "gameplay/systems/MeshSystem.h"
-#include "core/Tool.h"
+#include "gameplay/systems/SpriteSystem.h"
 
 namespace game
 {
@@ -75,7 +73,7 @@ namespace game
 	bool Game::Test()
 	{
 		auto entityId = gallus::core::TOOL->GetECS().CreateEntity("New Sprite");
-		gallus::gameplay::MeshComponent* meshComp = reinterpret_cast<gallus::gameplay::MeshComponent*>(gallus::core::TOOL->GetECS().GetSystem<gallus::gameplay::MeshSystem>().CreateBaseComponent(entityId));
+		gallus::gameplay::SpriteComponent* meshComp = reinterpret_cast<gallus::gameplay::SpriteComponent*>(gallus::core::TOOL->GetECS().GetSystem<gallus::gameplay::SpriteSystem>().CreateBaseComponent(entityId));
 		meshComp->SetMesh(gallus::core::TOOL->GetResourceAtlas().GetDefaultMesh());
 		meshComp->SetShader(gallus::core::TOOL->GetResourceAtlas().GetDefaultShader());
 		meshComp->SetTexture(gallus::core::TOOL->GetResourceAtlas().GetDefaultTexture());

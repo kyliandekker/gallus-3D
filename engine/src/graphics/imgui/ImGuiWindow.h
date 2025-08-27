@@ -28,6 +28,7 @@ namespace gallus
 		namespace imgui
 		{
 			class BaseWindow;
+			class BaseModal;
 
 			//---------------------------------------------------------------------
 			// ImGuiWindow
@@ -158,25 +159,33 @@ namespace gallus
 				{
 					m_aWindows.push_back(window);
 				}
+
+				void AddModal(BaseModal* modal)
+				{
+					m_aModals.push_back(modal);
+				}
+
+				BaseModal* GetModal(int a_iIndex);
 			private:
-				size_t m_SrvIndex = 0;
+				size_t m_iSrvIndex = 0;
 
-				ImFont* m_DefaultFont = nullptr;
-				ImFont* m_Capital = nullptr;
-				ImFont* m_CapitalIconFont = nullptr;
-				ImFont* m_BoldFont = nullptr;
-				ImFont* m_IconFont = nullptr;
-				ImFont* m_IconFontM = nullptr;
-				ImFont* m_SmallIconFont = nullptr;
+				ImFont* m_pDefaultFont = nullptr;
+				ImFont* m_pCapital = nullptr;
+				ImFont* m_pCapitalIconFont = nullptr;
+				ImFont* m_pBoldFont = nullptr;
+				ImFont* m_pIconFont = nullptr;
+				ImFont* m_pIconFontM = nullptr;
+				ImFont* m_pSmallIconFont = nullptr;
 
-				float m_FontSize = 15.0f; /// Default font size for ImGui.
-				float m_IconFontSize = 15.0f; /// Default font size for ImGui.
+				float m_fFontSize = 15.0f; /// Default font size for ImGui.
+				float m_fIconFontSize = 15.0f; /// Default font size for ImGui.
 
-				ImVec2 m_FramePadding = ImVec2(8, 8); /// Frame padding for ImGui elements.
-				ImVec2 m_WindowPadding = ImVec2(8, 8); /// Window padding for ImGui elements.
-				ImVec2 m_HeaderSize;
+				ImVec2 m_vFramePadding = ImVec2(8, 8); /// Frame padding for ImGui elements.
+				ImVec2 m_vWindowPadding = ImVec2(8, 8); /// Window padding for ImGui elements.
+				ImVec2 m_vHeaderSize;
 
 				std::vector<BaseWindow*> m_aWindows;
+				std::vector<BaseModal*> m_aModals;
 
 				friend dx12::DX12System2D;
 			};
