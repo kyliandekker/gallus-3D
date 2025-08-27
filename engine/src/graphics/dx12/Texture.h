@@ -26,7 +26,7 @@ namespace gallus
 				/// <summary>
 				/// Destroys the texture and sets it to invalid (it still exists in the texture atlas, however).
 				/// </summary>
-				void Destroy();
+				void Destroy() override;
 
 				/// <summary>
 				/// Checks whether the texture supports SRV.
@@ -129,7 +129,7 @@ namespace gallus
 
 				void SetSRVDesc(const D3D12_SHADER_RESOURCE_VIEW_DESC& a_SrvDesc);
 
-				bool IsValid() const override;
+				bool IsSrvIndexValid() const;
 
 				~Texture();
 			private:

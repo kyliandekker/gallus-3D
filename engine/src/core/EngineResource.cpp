@@ -40,6 +40,21 @@ namespace gallus
 		{}
 
 		//---------------------------------------------------------------------
+		void EngineResource::Destroy()
+		{
+			if (!m_bIsDestroyable)
+			{
+				return;
+			}
+
+			m_ResourceCategory = EngineResourceCategory::Unknown;
+			m_ResourceType = ResourceType::ResourceType_Unknown;
+			m_bIsDestroyable = true;
+			m_sName = "";
+			m_Path = "";
+		}
+
+		//---------------------------------------------------------------------
 		bool EngineResource::IsDestroyable() const
 		{
 			return m_bIsDestroyable;

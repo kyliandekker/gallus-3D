@@ -19,6 +19,19 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
+			void DX12Resource::Destroy()
+			{
+				if (!m_bIsDestroyable)
+				{
+					return;
+				}
+
+				m_wsName = L"";
+				m_FormatSupport = {};
+				EngineResource::Destroy();
+			}
+
+			//---------------------------------------------------------------------
 			DX12Resource::DX12Resource(const std::string& a_sName) : EngineResource(a_sName)
 			{
 				m_wsName = std::wstring(m_sName.begin(), m_sName.end());
@@ -68,7 +81,7 @@ namespace gallus
 			//---------------------------------------------------------------------
 			bool DX12Resource::IsValid() const
 			{
-				return (m_pResource != nullptr);
+				return m_pResource;
 			}
 
 			//---------------------------------------------------------------------

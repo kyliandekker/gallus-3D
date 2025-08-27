@@ -1,12 +1,12 @@
 #include "InspectorWindow.h"
 
 #include <imgui/imgui_helpers.h>
+#include <imgui/imgui_internal.h>
 
 #include "graphics/imgui/ImGuiWindow.h"
 #include "graphics/imgui/font_icon.h"
 #include "graphics/imgui/views/inspector/InspectorView.h"
 #include "core/EditorTool.h"
-#include <imgui/imgui_internal.h>
 
 namespace gallus
 {
@@ -16,6 +16,8 @@ namespace gallus
 		{
 			namespace editor
 			{
+				constexpr float PREVIEW_SECTION_SIZE = 300;
+
 				InspectorWindow::InspectorWindow(ImGuiWindow& a_Window) : BaseWindow(a_Window, ImGuiWindowFlags_NoCollapse, std::string(font::ICON_CIRCLE_INFO) + " Inspector", "Inspector"), m_NameInput(a_Window)
 				{
 					m_NameInput.Initialize("");
@@ -133,17 +135,34 @@ namespace gallus
 
 					ImGui::SetCursorPos(ImVec2(toolbarPos.x, toolbarPos.y + toolbarSize.y));
 
+					float previewSize = inspectorView->GetShowPreview() ? PREVIEW_SECTION_SIZE : 0;
+
 					ImGui::SetCursorPos(ImVec2(ImGui::GetCursorPos().x + m_Window.GetFramePadding().x, ImGui::GetCursorPos().y + m_Window.GetFramePadding().y));
 					if (ImGui::BeginChild(
 						ImGui::IMGUI_FORMAT_ID("", CHILD_ID, "INSPECTOR_VIEW").c_str(),
 						ImVec2(
 						ImGui::GetContentRegionAvail().x - m_Window.GetFramePadding().x,
-						ImGui::GetContentRegionAvail().y - m_Window.GetFramePadding().y),
+						(ImGui::GetContentRegionAvail().y - previewSize) - m_Window.GetFramePadding().y),
 						ImGuiChildFlags_Borders))
 					{
 						inspectorView->Render();
 					}
 					ImGui::EndChild();
+
+					if (inspectorView->GetShowPreview())
+					{
+						ImGui::SetCursorPos(ImVec2(ImGui::GetCursorPos().x + m_Window.GetFramePadding().x, ImGui::GetCursorPos().y));
+						if (ImGui::BeginChild(
+							ImGui::IMGUI_FORMAT_ID("", CHILD_ID, "INSPECTOR_VIEW_PREVIEW").c_str(),
+							ImVec2(
+							ImGui::GetContentRegionAvail().x - m_Window.GetFramePadding().x,
+							PREVIEW_SECTION_SIZE - m_Window.GetFramePadding().y),
+							ImGuiChildFlags_Borders))
+						{
+							inspectorView->RenderPreview();
+						}
+						ImGui::EndChild();
+					}
 
 					ImGui::PopStyleVar();
 					ImGui::PopStyleVar();

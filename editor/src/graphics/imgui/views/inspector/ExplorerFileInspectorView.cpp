@@ -3,6 +3,10 @@
 #include "graphics/imgui/views/ExplorerFileUIView.h"
 #include "editor/FileResource.h"
 #include "utils/file_abstractions.h"
+#include "editor/AssetType.h"
+
+#include "graphics/imgui/views/inspector/fileinfo/ExplorerFileUIViewInfo.h"
+#include "graphics/imgui/views/inspector/fileinfo/ExplorerSpriteUIViewInfo.h"
 
 namespace gallus
 {
@@ -19,6 +23,29 @@ namespace gallus
 					m_bShowRename = true;
 					m_bShowDelete = true;
 					m_bShowShowInExplorer = true;
+
+					switch (a_ExplorerFileUIView.GetFileResource().GetAssetType())
+					{
+						case gallus::editor::AssetType::Texture:
+						{
+							m_pExplorerFileUIViewInfo = new ExplorerSpriteUIViewInfo(m_Window, a_ExplorerFileUIView);
+							break;
+						}
+						default:
+						{
+							m_pExplorerFileUIViewInfo = new ExplorerFileUIViewInfo(m_Window, a_ExplorerFileUIView);
+							break;
+						}
+					}
+					m_bShowPreview = m_pExplorerFileUIViewInfo->GetShowPreview();
+				}
+
+				ExplorerFileInspectorView::~ExplorerFileInspectorView()
+				{
+					if (m_pExplorerFileUIViewInfo)
+					{
+						delete m_pExplorerFileUIViewInfo;
+					}
 				}
 
 				void ExplorerFileInspectorView::OnRename(const std::string& a_sName)
@@ -49,7 +76,18 @@ namespace gallus
 
 				void ExplorerFileInspectorView::Render()
 				{
-					ImGui::Text("Test");
+					if (m_pExplorerFileUIViewInfo)
+					{
+						m_pExplorerFileUIViewInfo->Render();
+					}
+				}
+
+				void ExplorerFileInspectorView::RenderPreview()
+				{
+					if (m_pExplorerFileUIViewInfo)
+					{
+						m_pExplorerFileUIViewInfo->RenderPreview();
+					}
 				}
 			}
 		}

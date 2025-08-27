@@ -15,6 +15,7 @@ namespace gallus
 			namespace editor
 			{
 				class ExplorerFileUIView;
+				class ExplorerFileUIViewInfo;
 
 				/// <summary>
 				/// Class that displays entities in the inspector.
@@ -29,6 +30,8 @@ namespace gallus
 					/// <param name="a_EntityID">The entity that will be shown in the view.</param>
 					ExplorerFileInspectorView(ImGuiWindow& a_Window, ExplorerFileUIView& a_ExplorerFileUIView);
 
+					virtual ~ExplorerFileInspectorView();
+
 					void OnRename(const std::string& a_sName) override;
 
 					void OnDelete() override;
@@ -39,7 +42,9 @@ namespace gallus
 
 					std::string GetIcon() const override;
 
-					void Render();
+					void Render() override;
+
+					void RenderPreview() override;
 				protected:
 					ExplorerFileUIView& m_ExplorerFileUIView;
 					ExplorerFileUIViewInfo* m_pExplorerFileUIViewInfo = nullptr;

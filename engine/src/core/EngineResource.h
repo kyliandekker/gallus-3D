@@ -9,6 +9,7 @@ namespace gallus
 	{
 		enum class EngineResourceCategory
 		{
+			Unknown, // Default.
 			Missing, // These are ESSENTIAL.
 			Editor, // This is stuff like a preview texture, render target, etc.
 			System, // This is more specific stuff like depth buffers, etc.
@@ -39,6 +40,8 @@ namespace gallus
 			/// Constructs an engine resource without any details.
 			/// </summary>
 			EngineResource() = default;
+
+			virtual void Destroy();
 
 			/// <summary>
 			/// Constructs an engine resource with a given name.
@@ -102,7 +105,7 @@ namespace gallus
 		protected:
 			bool m_bIsDestroyable = true; // Whether it is destroyable once created.
 
-			EngineResourceCategory m_ResourceCategory = EngineResourceCategory::Game;
+			EngineResourceCategory m_ResourceCategory = EngineResourceCategory::Unknown;
 			ResourceType m_ResourceType = ResourceType::ResourceType_Unknown;
 
 			std::string m_sName;

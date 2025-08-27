@@ -23,6 +23,8 @@ namespace gallus
 				ImGuiUIView(ImGuiWindow& a_Window) : m_Window(a_Window)
 				{}
 
+				virtual ~ImGuiUIView() = default;
+
 				/// <summary>
 				/// Renders the element.
 				/// </summary>

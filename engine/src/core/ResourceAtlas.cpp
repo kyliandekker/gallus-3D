@@ -28,7 +28,7 @@ namespace gallus
 			// Look for an empty slot.
 			for (size_t i = 0; i < a_aVector.size(); i++)
 			{
-				if (!a_aVector[i])
+				if (!a_aVector[i] || !a_aVector[i]->IsValid())
 				{
 					index = static_cast<int32_t>(i);
 					break;
@@ -61,11 +61,17 @@ namespace gallus
 		{
 			for (size_t i = 0; i < a_aVector.size(); i++)
 			{
-				if (a_aVector[i])
+				auto& res = a_aVector[i];
+				if (res)
 				{
-					if (a_aVector[i]->GetName() == a_sName || (!a_Path.empty() && a_Path == a_aVector[i]->GetPath()))
+					// Skip resources that are Editor or Missing
+					auto category = res->GetResourceCategory();
+					if (category == EngineResourceCategory::Missing)
+						continue;
+
+					if (res->GetName() == a_sName || (!a_Path.empty() && a_Path == res->GetPath()))
 					{
-						return i;
+						return static_cast<int32_t>(i);
 					}
 				}
 			}
@@ -178,11 +184,16 @@ namespace gallus
 		//---------------------------------------------------------------------
 		void ResourceAtlas::TransitionResources(std::shared_ptr<graphics::dx12::CommandList> a_CommandList)
 		{
-			for (std::shared_ptr<graphics::dx12::Texture> texture : m_aTextures)
+			for (size_t i = 0; i < m_aTextures.size(); i++)
 			{
-				if (texture && !texture->IsValid())
+				std::shared_ptr<graphics::dx12::Texture> texture = m_aTextures[i];
+				if (texture && !texture->IsSrvIndexValid())
 				{
 					texture->CreateSRV(a_CommandList);
+				}
+				if (texture && !texture->IsValid())
+				{
+					m_aTextures[i] = nullptr;
 				}
 			}
 		}

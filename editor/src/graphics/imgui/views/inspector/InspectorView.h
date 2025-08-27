@@ -27,6 +27,8 @@ namespace gallus
 					InspectorView(ImGuiWindow& a_Window) : ImGuiUIView(a_Window)
 					{}
 
+					virtual ~InspectorView() = default;
+
 					virtual void OnRename(const std::string& a_sName)
 					{}
 
@@ -46,6 +48,9 @@ namespace gallus
 						return "";
 					}
 
+					virtual void RenderPreview()
+					{}
+
 					bool GetShowRename() const
 					{
 						return m_bShowRename;
@@ -60,11 +65,17 @@ namespace gallus
 					{
 						return m_bShowShowInExplorer;
 					}
+
+					bool GetShowPreview() const
+					{
+						return m_bShowPreview;
+					}
 				protected:
 					bool
 						m_bShowRename = false,
 						m_bShowDelete = false,
-						m_bShowShowInExplorer = false;
+						m_bShowShowInExplorer = false,
+						m_bShowPreview = false;
 				};
 			}
 		}

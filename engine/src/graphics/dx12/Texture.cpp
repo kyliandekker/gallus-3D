@@ -17,18 +17,32 @@ namespace gallus
 			//---------------------------------------------------------------------
 			Texture::~Texture()
 			{
-				m_pResource.Reset();
+				if (m_pResource)
+				{
+					m_pResource.Reset();
+				}
+				if (m_pResourceUploadHeap)
+				{
+					m_pResourceUploadHeap.Reset();
+				}
 			}
 
 			//---------------------------------------------------------------------
 			void Texture::Destroy()
 			{
+				if (!m_bIsDestroyable)
+				{
+					return;
+				}
+
 				if (m_pResource)
 				{
 					core::TOOL->GetDX12().GetSRV().Deallocate(m_iSRVIndex);
 					m_pResource.Reset();
+					m_pResourceUploadHeap.Reset();
 					m_iSRVIndex = -1;
 				}
+				DX12Resource::Destroy();
 			}
 
 			//---------------------------------------------------------------------
@@ -232,9 +246,9 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			bool Texture::IsValid() const
+			bool Texture::IsSrvIndexValid() const
 			{
-				return m_pResource && m_iSRVIndex != -1;
+				return m_iSRVIndex != -1;
 			}
 		}
 	}

@@ -7,6 +7,7 @@
 #include "editor/EditorSettings.h"
 #include "editor/AssetDatabase.h"
 #include "core/Observable.h"
+#include "graphics/imgui/views/inspector/InspectorView.h"
 
 namespace gallus
 {
@@ -17,7 +18,6 @@ namespace gallus
 			namespace editor
 			{
 				class EditorSelectable;
-				class InspectorView;
 			}
 		}
 	}
