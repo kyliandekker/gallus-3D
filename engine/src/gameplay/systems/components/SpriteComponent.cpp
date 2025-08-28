@@ -66,7 +66,7 @@ namespace gallus
 				return;
 			}
 
-			if (m_pTexture && m_pTexture->IsValid())
+			if (m_pTexture && m_pTexture->CanBeDrawn())
 			{
 				m_pTexture->Bind(a_pCommandList);
 			}

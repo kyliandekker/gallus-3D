@@ -11,6 +11,8 @@ namespace gallus
 		namespace dx12
 		{
 			//---------------------------------------------------------------------
+			// Shader
+			//---------------------------------------------------------------------
 			void Shader::Bind(std::shared_ptr<CommandList> a_CommandList)
 			{
 				a_CommandList->GetCommandList()->SetPipelineState(m_pPipelineState.Get());

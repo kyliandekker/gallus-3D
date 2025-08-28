@@ -15,6 +15,8 @@ namespace gallus
 		namespace dx12
 		{
 			//---------------------------------------------------------------------
+			// Texture
+			//---------------------------------------------------------------------
 			Texture::~Texture()
 			{
 				if (m_pResource)
@@ -249,6 +251,12 @@ namespace gallus
 			bool Texture::IsSrvIndexValid() const
 			{
 				return m_iSRVIndex != -1;
+			}
+
+			//---------------------------------------------------------------------
+			bool Texture::CanBeDrawn() const
+			{
+				return IsSrvIndexValid() && IsValid();
 			}
 		}
 	}

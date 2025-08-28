@@ -14,19 +14,31 @@ namespace gallus
 	{
 		namespace imgui
 		{
+			//---------------------------------------------------------------------
+			// BaseModal
+			//---------------------------------------------------------------------
 			BaseModal::BaseModal(ImGuiWindow& a_Window, const std::string& a_sName, const std::string& a_sWindowID, bool a_bFullScreen) : ImGuiUIView(a_Window), m_sName(a_sName), m_sWindowID(a_sWindowID)
 			{}
 
+			//---------------------------------------------------------------------
+			bool BaseModal::Initialize()
+			{
+				return true;
+			}
+
+			//---------------------------------------------------------------------
 			bool BaseModal::ModalBegin()
 			{
 				return ImGui::BeginPopupModal(ImGui::IMGUI_FORMAT_ID(m_sName, POPUP_WINDOW_ID, m_sWindowID).c_str(), &m_bShow, ImGuiWindowFlags_Modal | ImGuiWindowFlags_AlwaysAutoResize);
 			}
 
+			//---------------------------------------------------------------------
 			void BaseModal::ModalEnd()
 			{
 				ImGui::EndPopup();
 			}
 
+			//---------------------------------------------------------------------
 			void BaseModal::Update()
 			{
 				if (!m_bShow)
@@ -57,11 +69,13 @@ namespace gallus
 				ImGui::PopStyleVar();
 			}
 
+			//---------------------------------------------------------------------
 			void BaseModal::Show()
 			{
 				m_bShow = true;
 			}
 
+			//---------------------------------------------------------------------
 			void BaseModal::Hide()
 			{
 				m_bShow = false;

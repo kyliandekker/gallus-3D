@@ -28,41 +28,124 @@ namespace gallus
 		//---------------------------------------------------------------------
 		// ResourceAtlas
 		//---------------------------------------------------------------------
+		/// <summary>
+		/// Centralized manager for loading, storing, and retrieving graphics resources
+		/// (textures, shaders, and meshes). Provides caching to avoid duplicate loads.
+		/// </summary>
 		class ResourceAtlas
 		{
 		public:
+			/// <summary>
+			/// Retrieves a resource from the given vector, or loads it if not found.
+			/// </summary>
+			/// <typeparam name="T">The resource type (e.g., Texture, Shader, Mesh).</typeparam>
+			/// <param name="a_vVector">Vector containing cached resources.</param>
+			/// <param name="a_sName">The resource name identifier.</param>
+			/// <param name="a_Path">The filesystem path to the resource.</param>
+			/// <returns>Shared pointer to the resource.</returns>
 			template<class T>
 			std::shared_ptr<T> GetResource(std::vector<std::shared_ptr<T>>& a_vVector, const std::string& a_sName, const fs::path& a_Path);
 
+			/// <summary>
+			/// Checks whether a resource already exists in the given vector.
+			/// </summary>
+			/// <typeparam name="T">The resource type.</typeparam>
+			/// <param name="a_vVector">Vector containing cached resources.</param>
+			/// <param name="a_sName">The resource name identifier.</param>
+			/// <param name="a_Path">The filesystem path to the resource.</param>
+			/// <returns>
+			/// The index of the resource if found, otherwise -1.
+			/// </returns>
 			template<class T>
 			int32_t HasResource(std::vector<std::shared_ptr<T>>& a_vVector, const std::string& a_sName, const fs::path& a_Path);
 
+			/// <summary>
+			/// Loads a texture by name from the resource folder.
+			/// </summary>
 			std::shared_ptr<graphics::dx12::Texture> LoadTexture(const std::string& a_sName, std::shared_ptr<graphics::dx12::CommandList> a_pCommandList);
+
+			/// <summary>
+			/// Loads a texture using a provided Direct3D resource description.
+			/// </summary>
 			std::shared_ptr<graphics::dx12::Texture> LoadTextureByDescription(const std::string& a_sName, D3D12_RESOURCE_DESC& a_Description);
+
+			/// <summary>
+			/// Creates an empty texture resource with the given name.
+			/// </summary>
 			std::shared_ptr<graphics::dx12::Texture> LoadTextureEmpty(const std::string& a_sName);
+
+			/// <summary>
+			/// Checks whether a texture with the given name is already loaded.
+			/// </summary>
 			bool HasTexture(const std::string& a_sName);
 
+			/// <summary>
+			/// Loads a shader composed of a vertex shader and pixel shader.
+			/// </summary>
 			std::shared_ptr<graphics::dx12::Shader> LoadShader(const std::string& a_sVertexShader, const std::string& a_sPixelShader);
+
+			/// <summary>
+			/// Checks whether a shader with the given name is already loaded.
+			/// </summary>
 			bool HasShader(const std::string& a_sName);
 
+			/// <summary>
+			/// Loads a mesh by name from the resource folder.
+			/// </summary>
 			std::shared_ptr<graphics::dx12::Mesh> LoadMesh(const std::string& a_sName, std::shared_ptr<graphics::dx12::CommandList> a_pCommandList);
+
+			/// <summary>
+			/// Checks whether a mesh with the given name is already loaded.
+			/// </summary>
 			bool HasMesh(const std::string& a_sName);
 
+			/// <summary>
+			/// Retrieves the default shader (used as fallback).
+			/// </summary>
 			std::shared_ptr<graphics::dx12::Shader> GetDefaultShader();
+
+			/// <summary>
+			/// Retrieves the default texture (used as fallback).
+			/// </summary>
 			std::shared_ptr<graphics::dx12::Texture> GetDefaultTexture();
+
+			/// <summary>
+			/// Retrieves the default mesh (used as fallback).
+			/// </summary>
 			std::shared_ptr<graphics::dx12::Mesh> GetDefaultMesh();
 
+			/// <summary>
+			/// Transitions all loaded resources to the appropriate state
+			/// for use on the GPU.
+			/// </summary>
 			void TransitionResources(std::shared_ptr<graphics::dx12::CommandList> a_pCommandList);
 
+			/// <summary>
+			/// Gets the list of loaded textures.
+			/// </summary>
 			const std::vector<std::shared_ptr<graphics::dx12::Texture>>& GetTextures() const;
+
+			/// <summary>
+			/// Gets the list of loaded shaders.
+			/// </summary>
 			const std::vector<std::shared_ptr<graphics::dx12::Shader>>& GetShaders() const;
+
+			/// <summary>
+			/// Gets the list of loaded meshes.
+			/// </summary>
 			const std::vector<std::shared_ptr<graphics::dx12::Mesh>>& GetMeshes() const;
 
+			/// <summary>
+			/// Sets the folder used to resolve resource paths.
+			/// </summary>
 			void SetResourceFolder(const std::string& a_sResourceFolder)
 			{
 				m_sResourceFolder = a_sResourceFolder;
 			}
 
+			/// <summary>
+			/// Gets the current resource folder path.
+			/// </summary>
 			const std::string& GetResourceFolder() const
 			{
 				return m_sResourceFolder;

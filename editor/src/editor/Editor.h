@@ -15,10 +15,7 @@ namespace gallus
 	{
 		namespace imgui
 		{
-			namespace editor
-			{
-				class EditorSelectable;
-			}
+			class EditorSelectable;
 		}
 	}
 	namespace editor
@@ -77,7 +74,7 @@ namespace gallus
 			/// Retrieves the currently selected item.
 			/// </summary>
 			/// <returns>Pointer to the current selectable (can be null).</returns>
-			core::Observable<graphics::imgui::editor::EditorSelectable*>& GetSelectable()
+			core::Observable<graphics::imgui::EditorSelectable*>& GetSelectable()
 			{
 				return m_pSelectable;
 			}
@@ -87,7 +84,7 @@ namespace gallus
 			/// </summary>
 			/// <param name="a_pSelectable">.The new selectable (can be null).</param>
 			/// <param name="a_pInspectorView">The new inspector view (can be null).</param>
-			void SetSelectable(graphics::imgui::editor::EditorSelectable* a_pSelectable, graphics::imgui::editor::InspectorView* a_pInspectorView)
+			void SetSelectable(graphics::imgui::EditorSelectable* a_pSelectable, graphics::imgui::InspectorView* a_pInspectorView)
 			{
 				if (m_pInspectorView)
 				{
@@ -102,7 +99,7 @@ namespace gallus
 			/// Retrieves the currently inspector view.
 			/// </summary>
 			/// <returns>Pointer to the current inspector view (can be null).</returns>
-			graphics::imgui::editor::InspectorView* GetInspectorView()
+			graphics::imgui::InspectorView* GetInspectorView()
 			{
 				return m_pInspectorView;
 			}
@@ -130,8 +127,8 @@ namespace gallus
 			editor::EditorSettings m_EditorSettings;
 			editor::AssetDatabase m_AssetDatabase;
 
-			core::Observable<graphics::imgui::editor::EditorSelectable*> m_pSelectable;
-			graphics::imgui::editor::InspectorView* m_pInspectorView = nullptr;
+			core::Observable<graphics::imgui::EditorSelectable*> m_pSelectable;
+			graphics::imgui::InspectorView* m_pInspectorView = nullptr;
 		};
 	}
 }

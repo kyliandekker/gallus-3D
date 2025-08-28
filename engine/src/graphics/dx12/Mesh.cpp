@@ -18,9 +18,13 @@ namespace gallus
 	{
 		namespace dx12
 		{
+			//---------------------------------------------------------------------
+			// Mesh
+			//---------------------------------------------------------------------
 			Mesh::Mesh() : EngineResource()
 			{}
 
+			//---------------------------------------------------------------------
 			void Mesh::Render(std::shared_ptr<CommandList> a_pCommandList, const DX12Transform& a_Transform, const DirectX::XMMATRIX& a_CameraView, const DirectX::XMMATRIX& a_CameraProjection)
 			{
 				for (MeshPartData* meshData : m_aMeshData)
@@ -37,6 +41,7 @@ namespace gallus
 				}
 			}
 
+			//---------------------------------------------------------------------
 			bool Mesh::LoadByName(const std::string& a_sName, const std::shared_ptr<CommandList> a_pCommandList)
 			{
 				m_sName = a_sName;
@@ -77,6 +82,7 @@ namespace gallus
 				return true;
 			}
 
+			//---------------------------------------------------------------------
 			bool Mesh::IsValid() const
 			{
 				return !m_aMeshData.empty();

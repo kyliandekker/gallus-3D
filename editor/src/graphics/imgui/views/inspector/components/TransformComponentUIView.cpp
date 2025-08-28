@@ -1,3 +1,4 @@
+#ifndef IMGUI_DISABLE
 #ifdef _EDITOR
 
 #include "TransformComponentUIView.h"
@@ -22,59 +23,57 @@ namespace gallus
 	{
 		namespace imgui
 		{
-			namespace editor
+			std::string TransformComponentUIView::GetName() const
 			{
-				std::string TransformComponentUIView::GetName() const
+				return m_System.GetSystemName();
+			}
+
+			void TransformComponentUIView::RenderInner()
+			{
+				float fontSize = m_Window.GetFontSize();
+
+				ImGui::DisplayHeader(m_Window.GetBoldFont(), "Position");
+				ImGui::Indent();
+				ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(fontSize / 2, fontSize / 2));
+				ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0);
+				ImGui::PushItemWidth(75);
+
+				m_PositionView.SetValue(m_Component.Transform().GetPosition());
+				if (m_PositionView.Render("TRANSFORM_POSITION_INSPECTOR"))
 				{
-					return m_System.GetSystemName();
+					m_Component.Transform().SetPosition(m_PositionView.GetValue());
+					//core::ENGINE.GetEditor().SetDirty();
 				}
 
-				void TransformComponentUIView::RenderInner()
+				ImGui::Unindent();
+				ImGui::DisplayHeader(m_Window.GetBoldFont(), "Rotation");
+				ImGui::Indent();
+
+				float val = m_Component.Transform().GetRotation();
+				if (ImGui::DragFloat(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "TRANSFORM_ROT_INSPECTOR").c_str(), &val, 1.0f))
 				{
-					float fontSize = m_Window.GetFontSize();
-
-					ImGui::DisplayHeader(m_Window.GetBoldFont(), "Position");
-					ImGui::Indent();
-					ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(fontSize / 2, fontSize / 2));
-					ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0);
-					ImGui::PushItemWidth(75);
-
-					m_PositionView.SetValue(m_Component.Transform().GetPosition());
-					if (m_PositionView.Render("TRANSFORM_POSITION_INSPECTOR"))
-					{
-						m_Component.Transform().SetPosition(m_PositionView.GetValue());
-						//core::ENGINE.GetEditor().SetDirty();
-					}
-
-					ImGui::Unindent();
-					ImGui::DisplayHeader(m_Window.GetBoldFont(), "Rotation");
-					ImGui::Indent();
-
-					float val = m_Component.Transform().GetRotation();
-					if (ImGui::DragFloat(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "TRANSFORM_ROT_INSPECTOR").c_str(), &val, 1.0f))
-					{
-						m_Component.Transform().SetRotation(val);
-					}
-
-					ImGui::Unindent();
-					ImGui::DisplayHeader(m_Window.GetBoldFont(), "Scale");
-					ImGui::Indent();
-
-					m_ScaleView.SetValue(m_Component.Transform().GetScale());
-					if (m_ScaleView.Render("TRANSFORM_SCALE_INSPECTOR"))
-					{
-						m_Component.Transform().SetScale(m_ScaleView.GetValue());
-						//core::ENGINE.GetEditor().SetDirty();
-					}
-
-					ImGui::PopItemWidth();
-					ImGui::PopStyleVar();
-					ImGui::PopStyleVar();
-					ImGui::Unindent();
+					m_Component.Transform().SetRotation(val);
 				}
+
+				ImGui::Unindent();
+				ImGui::DisplayHeader(m_Window.GetBoldFont(), "Scale");
+				ImGui::Indent();
+
+				m_ScaleView.SetValue(m_Component.Transform().GetScale());
+				if (m_ScaleView.Render("TRANSFORM_SCALE_INSPECTOR"))
+				{
+					m_Component.Transform().SetScale(m_ScaleView.GetValue());
+					//core::ENGINE.GetEditor().SetDirty();
+				}
+
+				ImGui::PopItemWidth();
+				ImGui::PopStyleVar();
+				ImGui::PopStyleVar();
+				ImGui::Unindent();
 			}
 		}
 	}
 }
 
 #endif // _EDITOR
+#endif // IMGUI_DISABLE

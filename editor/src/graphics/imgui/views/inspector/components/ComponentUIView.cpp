@@ -1,3 +1,4 @@
+#ifndef IMGUI_DISABLE
 #ifdef _EDITOR
 
 #include "ComponentUIView.h"
@@ -21,61 +22,59 @@ namespace gallus
 	{
 		namespace imgui
 		{
-			namespace editor
+			void ComponentBaseUIView::RenderBaseComponent(gameplay::Component& a_Component, gameplay::AbstractECSSystem& a_System)
 			{
-				void ComponentBaseUIView::RenderBaseComponent(gameplay::Component& a_Component, gameplay::AbstractECSSystem& a_System)
+				ImGui::SetNextItemOpen(m_FoldedOut);
+				ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0);
+				m_FoldedOut = ImGui::CollapsingHeader(ImGui::IMGUI_FORMAT_ID(GetName(), FOLDOUT_ID, string_extensions::StringToUpper(GetName()) + "_INSPECTOR").c_str());
+				if (m_FoldedOut)
 				{
-					ImGui::SetNextItemOpen(m_FoldedOut);
+					ImGui::SetCursorPosY(ImGui::GetCursorPosY() + m_Window.GetWindowPadding().y);
+
+					ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
 					ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0);
-					m_FoldedOut = ImGui::CollapsingHeader(ImGui::IMGUI_FORMAT_ID(GetName(), FOLDOUT_ID, string_extensions::StringToUpper(GetName()) + "_INSPECTOR").c_str());
-					if (m_FoldedOut)
+
+					ImVec2 size = m_Window.GetHeaderSize();
+					if (ImGui::IconButton(ImGui::IMGUI_FORMAT_ID(font::ICON_COPY, BUTTON_ID, string_extensions::StringToUpper(GetName()) + "_COPY_HIERARCHY").c_str(), size, m_Window.GetIconFont()))
 					{
-						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + m_Window.GetWindowPadding().y);
+						rapidjson::Document document;
+						document.SetObject();
+						a_Component.Serialize(document, document.GetAllocator());
 
-						ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
-						ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0);
+						rapidjson::StringBuffer buffer;
+						rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
+						document.Accept(writer);
 
-						ImVec2 size = m_Window.GetHeaderSize();
-						if (ImGui::IconButton(ImGui::IMGUI_FORMAT_ID(font::ICON_COPY, BUTTON_ID, string_extensions::StringToUpper(GetName()) + "_COPY_HIERARCHY").c_str(), size, m_Window.GetIconFont()))
-						{
-							rapidjson::Document document;
-							document.SetObject();
-							a_Component.Serialize(document, document.GetAllocator());
-
-							rapidjson::StringBuffer buffer;
-							rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
-							document.Accept(writer);
-
-							//core::Data data(buffer.GetString(), buffer.GetSize());
-							//core::TOOL.GetEditor().SetClipboard(data);
-						}
-						ImGui::SameLine();
-						if (ImGui::IconButton(ImGui::IMGUI_FORMAT_ID(font::ICON_PASTE, BUTTON_ID, string_extensions::StringToUpper(GetName()) + "_PASTE_HIERARCHY").c_str(), size, m_Window.GetIconFont()))
-						{
-							rapidjson::Document document;
-							document.SetObject();
-	/*						core::Data data = core::ENGINE.GetEditor().GetClipboard();
-							document.Parse(reinterpret_cast<char*>(data.data()), data.size());
-							a_Component.Deserialize(document, document.GetAllocator());*/
-						}
-						ImGui::SameLine();
-						if (ImGui::IconButton(ImGui::IMGUI_FORMAT_ID(font::ICON_DELETE, BUTTON_ID, string_extensions::StringToUpper(GetName()) + "_DELETE_HIERARCHY").c_str(), size, m_Window.GetIconFont()))
-						{
-							a_System.DeleteComponent(m_EntityID);
-						}
-
-						ImGui::PopStyleVar();
-						ImGui::PopStyleVar();
-
-						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + m_Window.GetWindowPadding().y);
-
-						RenderInner();
+						//core::Data data(buffer.GetString(), buffer.GetSize());
+						//core::TOOL.GetEditor().SetClipboard(data);
 					}
+					ImGui::SameLine();
+					if (ImGui::IconButton(ImGui::IMGUI_FORMAT_ID(font::ICON_PASTE, BUTTON_ID, string_extensions::StringToUpper(GetName()) + "_PASTE_HIERARCHY").c_str(), size, m_Window.GetIconFont()))
+					{
+						rapidjson::Document document;
+						document.SetObject();
+/*						core::Data data = core::ENGINE.GetEditor().GetClipboard();
+						document.Parse(reinterpret_cast<char*>(data.data()), data.size());
+						a_Component.Deserialize(document, document.GetAllocator());*/
+					}
+					ImGui::SameLine();
+					if (ImGui::IconButton(ImGui::IMGUI_FORMAT_ID(font::ICON_DELETE, BUTTON_ID, string_extensions::StringToUpper(GetName()) + "_DELETE_HIERARCHY").c_str(), size, m_Window.GetIconFont()))
+					{
+						a_System.DeleteComponent(m_EntityID);
+					}
+
 					ImGui::PopStyleVar();
+					ImGui::PopStyleVar();
+
+					ImGui::SetCursorPosY(ImGui::GetCursorPosY() + m_Window.GetWindowPadding().y);
+
+					RenderInner();
 				}
+				ImGui::PopStyleVar();
 			}
 		}
 	}
 }
 
 #endif // _EDITOR
+#endif // IMGUI_DISABLE

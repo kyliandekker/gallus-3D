@@ -15,15 +15,20 @@ namespace gallus
 	{
 		namespace imgui
 		{
+			//---------------------------------------------------------------------
+			// StringTextInput
+			//---------------------------------------------------------------------
 			StringTextInput::StringTextInput(ImGuiWindow& a_Window) : ImGuiUIView(a_Window)
 			{}
 
+			//---------------------------------------------------------------------
 			void StringTextInput::Initialize(const std::string& a_InitialValue, size_t a_BufferSize)
 			{
 				m_Data = core::Data(a_BufferSize);
 				SetString(a_InitialValue);
 			}
 
+			//---------------------------------------------------------------------
 			void StringTextInput::SetString(const std::string& a_String)
 			{
 				if (a_String.size() == 0)
@@ -35,11 +40,13 @@ namespace gallus
 				strncpy_s(reinterpret_cast<char*>(m_Data.data()), m_Data.size(), a_String.c_str(), a_String.size());
 			}
 
+			//---------------------------------------------------------------------
 			std::string StringTextInput::GetString()
 			{
 				return std::string(reinterpret_cast<char*>(m_Data.data()));
 			}
 
+			//---------------------------------------------------------------------
 			bool StringTextInput::Render(const char* a_Label, ImGuiInputTextFlags flags)
 			{
 				ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 16);
@@ -54,9 +61,13 @@ namespace gallus
 				return success;
 			}
 
+			//---------------------------------------------------------------------
+			// SearchBarInput
+			//---------------------------------------------------------------------
 			SearchBarInput::SearchBarInput(ImGuiWindow& a_Window) : StringTextInput(a_Window)
 			{}
 
+			//---------------------------------------------------------------------
 			bool SearchBarInput::Render(const char* a_Label, const ImVec2& a_Size, float a_Padding)
 			{
 				ImVec2 cursorPos = ImGui::GetCursorScreenPos();

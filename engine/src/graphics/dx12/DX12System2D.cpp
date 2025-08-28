@@ -42,7 +42,7 @@ namespace gallus
 			//---------------------------------------------------------------------
 			bool DX12System2D::InitThreadWorker()
 			{
-#if _DEBUGs
+#if _DEBUG
 				// Always enable the debug layer before doing anything DX12 related
 				// so all possible errors generated while creating DX12 objects
 				// are caught by the debug layer.
@@ -59,7 +59,7 @@ namespace gallus
 				{
 					debugController1->SetEnableGPUBasedValidation(TRUE);
 				}
-#endif // _DEBUGs
+#endif // _DEBUG
 				// Get the adapter.
 				if (!GetAdapter(false))
 				{
@@ -233,9 +233,9 @@ namespace gallus
 			{
 				Microsoft::WRL::ComPtr<IDXGIFactory4> dxgiFactory;
 				UINT createFactoryFlags = 0;
-#if defined(_DEBUGs)
-				createFactoryFlags = DXGI_CREATE_FACTORY_DEBUGs;
-#endif // _DEBUGs
+#if defined(_DEBUG)
+				createFactoryFlags = DXGI_CREATE_FACTORY_DEBUG;
+#endif // _DEBUG
 
 				if (FAILED(CreateDXGIFactory2(createFactoryFlags, IID_PPV_ARGS(&dxgiFactory))))
 				{
@@ -301,7 +301,7 @@ namespace gallus
 				//    NAME_D3D12_OBJECT(d3d12Device2);
 
 				// Enable debug messages in debug mode.
-#ifdef _DEBUGs
+#ifdef _DEBUG
 				Microsoft::WRL::ComPtr<ID3D12InfoQueue> pInfoQueue;
 				if (SUCCEEDED(m_pDevice.As(&pInfoQueue)))
 				{
@@ -339,7 +339,7 @@ namespace gallus
 						return false;
 					}
 				}
-#endif // _DEBUGs
+#endif // _DEBUG
 
 				return true;
 			}
@@ -372,9 +372,9 @@ namespace gallus
 			{
 				Microsoft::WRL::ComPtr<IDXGIFactory4> dxgiFactory4;
 				UINT createFactoryFlags = 0;
-#ifdef _DEBUGs
-				createFactoryFlags = DXGI_CREATE_FACTORY_DEBUGs;
-#endif // _DEBUGs
+#ifdef _DEBUG
+				createFactoryFlags = DXGI_CREATE_FACTORY_DEBUG;
+#endif // _DEBUG
 
 				if (FAILED(CreateDXGIFactory2(createFactoryFlags, IID_PPV_ARGS(&dxgiFactory4))))
 				{

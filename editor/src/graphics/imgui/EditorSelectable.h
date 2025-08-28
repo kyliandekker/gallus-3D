@@ -1,3 +1,6 @@
+#ifndef IMGUI_DISABLE
+#ifdef _EDITOR
+
 #pragma once
 
 namespace gallus
@@ -6,16 +9,16 @@ namespace gallus
 	{
 		namespace imgui
 		{
-			namespace editor
+			class EditorSelectable
 			{
-				class EditorSelectable
+				virtual void RenderEditorSelectable()
 				{
-					virtual void RenderEditorSelectable()
-					{
 
-					}
-				};
-			}
+				}
+			};
 		}
 	}
 }
+
+#endif // _EDITOR
+#endif // IMGUI_DISABLE

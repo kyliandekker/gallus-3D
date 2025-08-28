@@ -65,9 +65,20 @@ namespace gallus
 				if (res)
 				{
 					// Skip resources that are Editor or Missing
-					auto category = res->GetResourceCategory();
-					if (category == EngineResourceCategory::Missing)
+					if (res->GetResourceCategory() == EngineResourceCategory::Missing)
+					{
 						continue;
+					}
+
+					if (res->IsLocked())
+					{
+						continue;
+					}
+
+					if (res->IsUnique())
+					{
+						continue;
+					}
 
 					if (res->GetName() == a_sName || (!a_Path.empty() && a_Path == res->GetPath()))
 					{
@@ -190,10 +201,6 @@ namespace gallus
 				if (texture && !texture->IsSrvIndexValid())
 				{
 					texture->CreateSRV(a_CommandList);
-				}
-				if (texture && !texture->IsValid())
-				{
-					m_aTextures[i] = nullptr;
 				}
 			}
 		}

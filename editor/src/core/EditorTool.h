@@ -5,17 +5,6 @@
 
 namespace gallus
 {
-	namespace graphics
-	{
-		namespace imgui
-		{
-			namespace editor
-			{
-				class EditorSelectable;
-				class InspectorView;
-			}
-		}
-	}
 	namespace core
 	{
 		//---------------------------------------------------------------------

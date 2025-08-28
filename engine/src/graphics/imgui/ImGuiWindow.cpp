@@ -59,12 +59,13 @@ namespace gallus
 			//---------------------------------------------------------------------
 			bool ImGuiWindow::InitializeWindows()
 			{
-				if (!m_aWindows.empty())
+				for (BaseWindow* window : m_aWindows)
 				{
-					for (BaseWindow* window : m_aWindows)
-					{
-						window->Initialize();
-					}
+					window->Initialize();
+				}
+				for (BaseModal* window : m_aModals)
+				{
+					window->Initialize();
 				}
 				return true;
 			}
@@ -268,6 +269,7 @@ namespace gallus
 				ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), a_pCommandList->GetCommandList().Get());
 			}
 
+			//---------------------------------------------------------------------
 			void ImGuiWindow::UpdateMouseCursor()
 			{
 				if (ImGui::IsAnyItemHovered())

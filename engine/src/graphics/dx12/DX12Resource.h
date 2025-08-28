@@ -27,6 +27,9 @@ namespace gallus
 				/// </summary>
 				DX12Resource() = default;
 
+				/// <summary>
+				/// Destroys the dx12 resource.
+				/// </summary>
 				void Destroy() override;
 
 				/// <summary>

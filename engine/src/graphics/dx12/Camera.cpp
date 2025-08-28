@@ -6,14 +6,19 @@ namespace gallus
 	{
 		namespace dx12
 		{
+			//---------------------------------------------------------------------
+			// Camera
+			//---------------------------------------------------------------------
 			Camera::Camera()
 			{}
 
+			//---------------------------------------------------------------------
 			void Camera::Init(float a_fWidth, float a_fHeight)
 			{
 				SetProjection(a_fWidth, a_fHeight, -1.0f, 1.0f);
 			}
 
+			//---------------------------------------------------------------------
 			void Camera::SetProjection(float a_fWidth, float a_fHeight, float a_fNearPlane, float a_fFarPlane)
 			{
 				m_ProjectionMatrix = DirectX::XMMatrixOrthographicOffCenterLH(
@@ -23,16 +28,19 @@ namespace gallus
 				);
 			}
 
+			//---------------------------------------------------------------------
 			DX12Transform& Camera::GetTransform()
 			{
 				return m_Transform;
 			}
 
+			//---------------------------------------------------------------------
 			const DX12Transform& Camera::GetTransform() const
 			{
 				return m_Transform;
 			}
 
+			//---------------------------------------------------------------------
 			DirectX::XMMATRIX Camera::GetViewMatrix() const
 			{
 				const DirectX::XMFLOAT2& pos = m_Transform.GetPosition();
@@ -48,7 +56,7 @@ namespace gallus
 				return DirectX::XMMatrixInverse(nullptr, world);
 			}
 
-
+			//---------------------------------------------------------------------
 			DirectX::XMMATRIX Camera::GetProjectionMatrix() const
 			{
 				return m_ProjectionMatrix;

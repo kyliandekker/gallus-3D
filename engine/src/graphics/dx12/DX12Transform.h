@@ -63,7 +63,6 @@ namespace gallus
 				/// </summary>
 				/// <param name="worldMatrix">A XMMATRIX containing the world matrix for the transform.</param>
 				void SetWorldMatrix(const DirectX::XMMATRIX& a_WorldMatrix);
-
 			private:
 				DirectX::XMFLOAT2 m_vPosition = { 0, 0 };
 				float m_fRotationDegrees = 0.0f; // rotation around Z axis

@@ -97,6 +97,9 @@ namespace gallus
 				/// </summary>
 				void OnRenderTargetCleaned();
 
+				/// <summary>
+				/// Updates the mouse cursor when hovering, clicking, etc.
+				/// </summary>
 				void UpdateMouseCursor();
 			public:
 				void Render(std::shared_ptr<dx12::CommandList> a_pCommandList);
@@ -155,16 +158,28 @@ namespace gallus
 				/// <returns>A vector containing the header font size.</returns>
 				const ImVec2& GetHeaderSize() const;
 
-				void AddWindow(BaseWindow* window)
+				/// <summary>
+				/// Adds a window to the render queue.
+				/// </summary>
+				/// <param name="a_pWindow">The window to add.</param>
+				void AddWindow(BaseWindow* a_pWindow)
 				{
-					m_aWindows.push_back(window);
+					m_aWindows.push_back(a_pWindow);
 				}
 
-				void AddModal(BaseModal* modal)
+				/// <summary>
+				/// Adds a modal to the render queue.
+				/// </summary>
+				/// <param name="a_pModal">The modal to add.</param>
+				void AddModal(BaseModal* a_pModal)
 				{
-					m_aModals.push_back(modal);
+					m_aModals.push_back(a_pModal);
 				}
 
+				/// <summary>
+				/// Retrieves a modal by index.
+				/// </summary>
+				/// <returns>Pointer to the modal, nullptr if not present.</returns>
 				BaseModal* GetModal(int a_iIndex);
 			private:
 				size_t m_iSrvIndex = 0;
@@ -177,7 +192,7 @@ namespace gallus
 				ImFont* m_pIconFontM = nullptr;
 				ImFont* m_pSmallIconFont = nullptr;
 
-				float m_fFontSize = 15.0f; /// Default font size for ImGui.
+				float m_fFontSize = 17.5f; /// Default font size for ImGui.
 				float m_fIconFontSize = 15.0f; /// Default font size for ImGui.
 
 				ImVec2 m_vFramePadding = ImVec2(8, 8); /// Frame padding for ImGui elements.

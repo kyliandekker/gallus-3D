@@ -1,3 +1,6 @@
+#ifndef IMGUI_DISABLE
+#ifdef _EDITOR
+
 #include "ExplorerFileInspectorView.h"
 
 #include "graphics/imgui/views/ExplorerFileUIView.h"
@@ -16,80 +19,79 @@ namespace gallus
 		{
 			class ImGuiWindow;
 
-			namespace editor
+			ExplorerFileInspectorView::ExplorerFileInspectorView(ImGuiWindow& a_Window, ExplorerFileUIView& a_ExplorerFileUIView) : InspectorView(a_Window), m_ExplorerFileUIView(a_ExplorerFileUIView)
 			{
-				ExplorerFileInspectorView::ExplorerFileInspectorView(ImGuiWindow& a_Window, ExplorerFileUIView& a_ExplorerFileUIView) : InspectorView(a_Window), m_ExplorerFileUIView(a_ExplorerFileUIView)
-				{
-					m_bShowRename = true;
-					m_bShowDelete = true;
-					m_bShowShowInExplorer = true;
+				m_bShowRename = true;
+				m_bShowDelete = true;
+				m_bShowShowInExplorer = true;
 
-					switch (a_ExplorerFileUIView.GetFileResource().GetAssetType())
+				switch (a_ExplorerFileUIView.GetFileResource().GetAssetType())
+				{
+					case gallus::editor::AssetType::Texture:
 					{
-						case gallus::editor::AssetType::Texture:
-						{
-							m_pExplorerFileUIViewInfo = new ExplorerSpriteUIViewInfo(m_Window, a_ExplorerFileUIView);
-							break;
-						}
-						default:
-						{
-							m_pExplorerFileUIViewInfo = new ExplorerFileUIViewInfo(m_Window, a_ExplorerFileUIView);
-							break;
-						}
+						m_pExplorerFileUIViewInfo = new ExplorerSpriteUIViewInfo(m_Window, a_ExplorerFileUIView);
+						break;
 					}
-					m_bShowPreview = m_pExplorerFileUIViewInfo->GetShowPreview();
-				}
-
-				ExplorerFileInspectorView::~ExplorerFileInspectorView()
-				{
-					if (m_pExplorerFileUIViewInfo)
+					default:
 					{
-						delete m_pExplorerFileUIViewInfo;
+						m_pExplorerFileUIViewInfo = new ExplorerFileUIViewInfo(m_Window, a_ExplorerFileUIView);
+						break;
 					}
 				}
+				m_bShowPreview = m_pExplorerFileUIViewInfo->GetShowPreview();
+			}
 
-				void ExplorerFileInspectorView::OnRename(const std::string& a_sName)
+			ExplorerFileInspectorView::~ExplorerFileInspectorView()
+			{
+				if (m_pExplorerFileUIViewInfo)
 				{
-					m_ExplorerFileUIView.GetFileResource().Rename(a_sName);
+					delete m_pExplorerFileUIViewInfo;
 				}
+			}
 
-				void ExplorerFileInspectorView::OnDelete()
+			void ExplorerFileInspectorView::OnRename(const std::string& a_sName)
+			{
+				m_ExplorerFileUIView.GetFileResource().Rename(a_sName);
+			}
+
+			void ExplorerFileInspectorView::OnDelete()
+			{
+				m_ExplorerFileUIView.GetFileResource().Delete();
+			}
+
+			void ExplorerFileInspectorView::OnShowInExplorer()
+			{
+				file::OpenInExplorer(m_ExplorerFileUIView.GetFileResource().GetPath().parent_path().lexically_normal());
+			}
+
+			std::string ExplorerFileInspectorView::GetName() const
+			{
+				return m_ExplorerFileUIView.GetFileResource().GetPath().filename().generic_string();
+			}
+
+			std::string ExplorerFileInspectorView::GetIcon() const
+			{
+				return m_ExplorerFileUIView.GetIcon();
+			}
+
+			void ExplorerFileInspectorView::Render()
+			{
+				if (m_pExplorerFileUIViewInfo)
 				{
-					m_ExplorerFileUIView.GetFileResource().Delete();
+					m_pExplorerFileUIViewInfo->Render();
 				}
+			}
 
-				void ExplorerFileInspectorView::OnShowInExplorer()
+			void ExplorerFileInspectorView::RenderPreview()
+			{
+				if (m_pExplorerFileUIViewInfo)
 				{
-					file::OpenInExplorer(m_ExplorerFileUIView.GetFileResource().GetPath().parent_path().lexically_normal());
-				}
-
-				std::string ExplorerFileInspectorView::GetName() const
-				{
-					return m_ExplorerFileUIView.GetFileResource().GetPath().filename().generic_string();
-				}
-
-
-				std::string ExplorerFileInspectorView::GetIcon() const
-				{
-					return m_ExplorerFileUIView.GetIcon();
-				}
-
-				void ExplorerFileInspectorView::Render()
-				{
-					if (m_pExplorerFileUIViewInfo)
-					{
-						m_pExplorerFileUIViewInfo->Render();
-					}
-				}
-
-				void ExplorerFileInspectorView::RenderPreview()
-				{
-					if (m_pExplorerFileUIViewInfo)
-					{
-						m_pExplorerFileUIViewInfo->RenderPreview();
-					}
+					m_pExplorerFileUIViewInfo->RenderPreview();
 				}
 			}
 		}
 	}
 }
+
+#endif // _EDITOR
+#endif // IMGUI_DISABLE

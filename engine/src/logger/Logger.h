@@ -88,8 +88,8 @@ namespace gallus
 
 	namespace logger
 	{
-/// 0 = full path, 1 = filename, 2 = stem, 3 = parent path + filename
-#define LOG_SHORT_FILENAMES 3
+		/// 0 = full path, 1 = filename, 2 = stem, 3 = parent path + filename
+		#define LOG_SHORT_FILENAMES 3
 
 //---------------------------------------------------------------------
 // LoggerMessage

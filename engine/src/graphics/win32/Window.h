@@ -154,6 +154,9 @@ namespace gallus
 				/// <returns>Reference to the event queue.</returns>
 				std::queue<WindowsMsg>& GetEventQueue();
 
+				/// <summary>
+				/// Saves window settings.
+				/// </summary>
 				void SaveSettings();
 
 				std::mutex g_EventMutex;

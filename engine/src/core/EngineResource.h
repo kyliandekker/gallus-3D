@@ -41,6 +41,9 @@ namespace gallus
 			/// </summary>
 			EngineResource() = default;
 
+			/// <summary>
+			/// Destroys an engine resource.
+			/// </summary>
 			virtual void Destroy();
 
 			/// <summary>
@@ -66,6 +69,30 @@ namespace gallus
 			/// </summary>
 			/// <param name="a_bIsDestroyable">The destroyable state.</param>
 			void SetIsDestroyable(bool a_bIsDestroyable);
+
+			/// <summary>
+			/// Returns whether the resource is locked.
+			/// </summary>
+			/// <returns>True if the resource is locked, false otherwise.</returns>
+			bool IsLocked() const;
+
+			/// <summary>
+			/// Sets whether the resource is locked.
+			/// </summary>
+			/// <param name="a_bIsLocked">The locked state.</param>
+			void SetIsLocked(bool a_bIsLocked);
+
+			/// <summary>
+			/// Returns whether the resource is unique.
+			/// </summary>
+			/// <returns>True if the resource is unique, false otherwise.</returns>
+			bool IsUnique() const;
+
+			/// <summary>
+			/// Sets whether the resource is unique.
+			/// </summary>
+			/// <param name="a_bIsUnique">The unique state.</param>
+			void SetIsUnique(bool a_bIsUnique);
 
 			/// <summary>
 			/// Sets the resource category of the engine resource.
@@ -104,6 +131,8 @@ namespace gallus
 			const std::filesystem::path& GetPath() const;
 		protected:
 			bool m_bIsDestroyable = true; // Whether it is destroyable once created.
+			bool m_bIsLocked = false; // Whether the resource can be overridden in the atlas.
+			bool m_bIsUnique = false; // Whether the resource can be shared in the atlas.
 
 			EngineResourceCategory m_ResourceCategory = EngineResourceCategory::Unknown;
 			ResourceType m_ResourceType = ResourceType::ResourceType_Unknown;

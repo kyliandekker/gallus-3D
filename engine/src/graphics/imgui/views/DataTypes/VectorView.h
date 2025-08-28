@@ -15,6 +15,9 @@ namespace gallus
 	{
 		namespace imgui
 		{
+			//---------------------------------------------------------------------
+			// Vector2View
+			//---------------------------------------------------------------------
 			/// <summary>
 			/// A UI view for rendering and interacting with vectors.
 			/// Can be used for both glm-based types and ImVec types.
@@ -76,6 +79,9 @@ namespace gallus
 				T m_Value; /// The current value of the vector.
 			};
 
+			//---------------------------------------------------------------------
+			// Vector3View
+			//---------------------------------------------------------------------
 			/// <summary>
 			/// A UI view for rendering and interacting with vectors.
 			/// Can be used for both glm-based types and ImVec types.

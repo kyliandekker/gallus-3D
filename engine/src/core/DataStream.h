@@ -28,24 +28,27 @@ namespace gallus
 		class DataStream : public Data
 		{
 		public:
+			/// <summary>
+			/// Constructs a data stream without any details.
+			/// </summary>
 			DataStream() = default;
 
 			/// <summary>
-			/// Constructs a DataStream object with the specified raw data and size.
+			/// Constructs a data stream with the specified raw data and size.
 			/// </summary>
 			/// <param name="a_pData">Pointer to the raw data.</param>
 			/// <param name="a_iSize">Size of the data in bytes.</param>
 			DataStream(void* a_pData, size_t a_iSize);
 
 			/// <summary>
-			/// Constructs a DataStream object with the specified character data and size.
+			/// Constructs a data stream with the specified character data and size.
 			/// </summary>
 			/// <param name="a_pData">Pointer to the character data.</param>
 			/// <param name="a_iSize">Size of the data in bytes.</param>
 			DataStream(const char* a_pData, size_t a_iSize);
 
 			/// <summary>
-			/// Constructs a DataStream object with a specified size, allocating memory.
+			/// Constructs a data stream with a specified size, allocating memory.
 			/// </summary>
 			/// <param name="a_iSize">Size of the data in bytes.</param>
 			DataStream(size_t a_iSize);

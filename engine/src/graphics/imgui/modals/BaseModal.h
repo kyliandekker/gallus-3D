@@ -14,6 +14,12 @@ namespace gallus
 		{
 			class ImGuiWindow;
 
+			//---------------------------------------------------------------------
+			// BaseModal
+			//---------------------------------------------------------------------
+			/// <summary>
+			/// Base modal with functions that can be overridden for specific behaviour.
+			/// </summary>
 			class BaseModal : public ImGuiUIView
 			{
 			public:
@@ -25,6 +31,12 @@ namespace gallus
 				/// <param name="a_sWindowID">The ID of the window.</param>
 				/// <param name="a_bFullScreen">Whether the window is full screen or not.</param>
 				BaseModal(ImGuiWindow& a_Window, const std::string& a_sName, const std::string& a_sWindowID, bool a_bFullScreen = false);
+
+				/// <summary>
+				/// Initializes all behaviours and values for the window.
+				/// </summary>
+				/// <returns>True if initialization is successful, otherwise false.</returns>
+				virtual bool Initialize();
 
 				/// <summary>
 				/// Renders the modal.

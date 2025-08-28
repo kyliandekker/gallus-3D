@@ -15,6 +15,9 @@ namespace gallus
 	{
 		namespace imgui
 		{
+			//---------------------------------------------------------------------
+			// StringTextInput
+			//---------------------------------------------------------------------
 			/// <summary>
 			/// A simple text input field for string values in the ImGui interface.
 			/// </summary>
@@ -62,6 +65,9 @@ namespace gallus
 				core::Data m_Data;
 			};
 
+			//---------------------------------------------------------------------
+			// SearchBarInput
+			//---------------------------------------------------------------------
 			/// <summary>
 			/// A specialized version of StringTextInput for a search bar input field.
 			/// </summary>

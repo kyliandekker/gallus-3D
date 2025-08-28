@@ -1,3 +1,8 @@
+#ifndef IMGUI_DISABLE
+#ifdef _EDITOR
+
+#pragma once
+
 #include "ExplorerFileUIViewInfo.h"
 
 #include <imgui/imgui.h>
@@ -11,13 +16,13 @@ namespace gallus
 	{
 		namespace imgui
 		{
-			namespace editor
+			void ExplorerFileUIViewInfo::Render()
 			{
-				void ExplorerFileUIViewInfo::Render()
-				{
-					RenderSpecific();
-				}
+				RenderSpecific();
 			}
 		}
 	}
 }
+
+#endif // _EDITOR
+#endif // IMGUI_DISABLE

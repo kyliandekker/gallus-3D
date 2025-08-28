@@ -20,6 +20,12 @@ namespace gallus
 			class CommandList;
 			class ResourceAtlas;
 
+			//---------------------------------------------------------------------
+			// Texture
+			//---------------------------------------------------------------------
+			/// <summary>
+			/// Represents a GPU texture.
+			/// </summary>
 			class Texture : public DX12Resource
 			{
 			public:
@@ -125,11 +131,29 @@ namespace gallus
 				/// <returns></returns>
 				bool UploadTexture(const D3D12_HEAP_PROPERTIES& a_UploadHeapProperties, const D3D12_RESOURCE_DESC& a_BufferDescription);
 
+				/// <summary>
+				/// Retrieves the upload heap resource used for this texture.
+				/// </summary>
+				/// <returns>Shared pointer to the upload resource.</returns>
 				Microsoft::WRL::ComPtr<ID3D12Resource>& GetUploadResource();
 
+				/// <summary>
+				/// Sets the SRV description for the texture.
+				/// </summary>
+				/// <param name="a_SrvDesc">Shader Resource View description.</param>
 				void SetSRVDesc(const D3D12_SHADER_RESOURCE_VIEW_DESC& a_SrvDesc);
 
+				/// <summary>
+				/// Checks whether the SRV index is valid.
+				/// </summary>
+				/// <returns>True if valid, false otherwise.</returns>
 				bool IsSrvIndexValid() const;
+
+				/// <summary>
+				/// Checks whether the texture can be drawn/rendered.
+				/// </summary>
+				/// <returns>True if drawable, false otherwise.</returns>
+				bool CanBeDrawn() const;
 
 				~Texture();
 			private:

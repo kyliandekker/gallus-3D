@@ -39,12 +39,12 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR lp
 
 	gallus::graphics::imgui::ImGuiWindow& imguiWindow = gallus::core::TOOL->GetDX12().GetImGuiWindow();
 	imguiWindow.AddWindow(new gallus::graphics::imgui::MainWindowDock(imguiWindow));
-	imguiWindow.AddWindow(new gallus::graphics::imgui::editor::ConsoleWindow(imguiWindow));
-	imguiWindow.AddWindow(new gallus::graphics::imgui::editor::HierarchyWindow(imguiWindow));
-	imguiWindow.AddWindow(new gallus::graphics::imgui::editor::SceneWindow(imguiWindow));
-	imguiWindow.AddWindow(new gallus::graphics::imgui::editor::ExplorerWindow(imguiWindow));
-	imguiWindow.AddWindow(new gallus::graphics::imgui::editor::InspectorWindow(imguiWindow));
-	auto* t = new gallus::graphics::imgui::editor::FilePickerModal(imguiWindow);
+	imguiWindow.AddWindow(new gallus::graphics::imgui::ConsoleWindow(imguiWindow));
+	imguiWindow.AddWindow(new gallus::graphics::imgui::HierarchyWindow(imguiWindow));
+	imguiWindow.AddWindow(new gallus::graphics::imgui::SceneWindow(imguiWindow));
+	imguiWindow.AddWindow(new gallus::graphics::imgui::ExplorerWindow(imguiWindow));
+	imguiWindow.AddWindow(new gallus::graphics::imgui::InspectorWindow(imguiWindow));
+	auto* t = new gallus::graphics::imgui::FilePickerModal(imguiWindow);
 	imguiWindow.AddModal(t);
 
 	gallus::core::TOOL->Initialize(hInstance, name);

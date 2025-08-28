@@ -67,6 +67,30 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
+		bool EngineResource::IsLocked() const
+		{
+			return m_bIsLocked;
+		}
+
+		//---------------------------------------------------------------------
+		void EngineResource::SetIsLocked(bool a_bIsLocked)
+		{
+			m_bIsLocked = a_bIsLocked;
+		}
+
+		//---------------------------------------------------------------------
+		bool EngineResource::IsUnique() const
+		{
+			return m_bIsUnique;
+		}
+
+		//---------------------------------------------------------------------
+		void EngineResource::SetIsUnique(bool a_bIsUnique)
+		{
+			m_bIsUnique = a_bIsUnique;
+		}
+
+		//---------------------------------------------------------------------
 		void EngineResource::SetResourceCategory(EngineResourceCategory a_ResourceCategory)
 		{
 			m_ResourceCategory = a_ResourceCategory;

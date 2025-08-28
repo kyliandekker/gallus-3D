@@ -20,21 +20,21 @@ namespace gallus
 			Data() = default;
 
 			/// <summary>
-			/// Constructs a Data object with the specified raw data and size.
+			/// Constructs a data object with the specified raw data and size.
 			/// </summary>
 			/// <param name="a_pData">Pointer to the raw data.</param>
 			/// <param name="a_iSize">Size of the data in bytes.</param>
 			Data(const void* a_pData, size_t a_iSize);
 
 			/// <summary>
-			/// Constructs a Data object with the specified character data and size.
+			/// Constructs a data object with the specified character data and size.
 			/// </summary>
 			/// <param name="a_pData">Pointer to the character data.</param>
 			/// <param name="a_iSize">Size of the data in bytes.</param>
 			Data(const char* a_pData, size_t a_iSize);
 
 			/// <summary>
-			/// Constructs a Data object with a specified size, allocating memory.
+			/// Constructs a data object with a specified size, allocating memory.
 			/// </summary>
 			/// <param name="a_iSize">Size of the data in bytes.</param>
 			Data(size_t a_iSize);
@@ -42,26 +42,26 @@ namespace gallus
 			/// <summary>
 			/// Copy constructor.
 			/// </summary>
-			/// <param name="a_Rhs">The Data object to copy from.</param>
+			/// <param name="a_Rhs">The data object to copy from.</param>
 			Data(const Data& a_Rhs);
 
 			/// <summary>
 			/// Copy assignment operator.
 			/// </summary>
-			/// <param name="a_Other">The Data object to copy from.</param>
+			/// <param name="a_Other">The data object to copy from.</param>
 			/// <returns>A reference to the current instance.</returns>
 			Data& operator=(const Data& a_Other);
 
 			/// <summary>
 			/// Move constructor.
 			/// </summary>
-			/// <param name="a_Rhs">The Data object to copy from.</param>
+			/// <param name="a_Rhs">The data object to copy from.</param>
 			Data(Data&& a_Other) noexcept;
 
 			/// <summary>
 			/// Move assignment operator.
 			/// </summary>
-			/// <param name="a_Other">The Data object to copy from.</param>
+			/// <param name="a_Other">The data object to copy from.</param>
 			/// <returns>A reference to the current instance.</returns>
 			Data& operator=(Data&& a_Other) noexcept;
 
@@ -80,7 +80,7 @@ namespace gallus
 			}
 
 			/// <summary>
-			/// Checks whether the Data object is empty (contains no data).
+			/// Checks whether the data object is empty (contains no data).
 			/// </summary>
 			/// <returns>True if empty, otherwise false.</returns>
 			bool empty() const

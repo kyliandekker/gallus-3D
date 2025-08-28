@@ -6,12 +6,17 @@ namespace gallus
 	{
 		namespace dx12
 		{
+			//---------------------------------------------------------------------
+			// VertexBuffer
+			//---------------------------------------------------------------------
 			VertexBuffer::VertexBuffer(const std::string& a_sName) : Buffer(a_sName)
 			{}
 
+			//---------------------------------------------------------------------
 			VertexBuffer::~VertexBuffer()
 			{}
 
+			//---------------------------------------------------------------------
 			void VertexBuffer::CreateViews(size_t a_iNumElements, size_t a_iElementSize)
 			{
 				m_iNumVertices = a_iNumElements;
@@ -22,16 +27,19 @@ namespace gallus
 				m_VertexBufferView.StrideInBytes = static_cast<UINT>(m_iVertexStride);
 			}
 
+			//---------------------------------------------------------------------
 			D3D12_VERTEX_BUFFER_VIEW& VertexBuffer::GetVertexBufferView()
 			{
 				return m_VertexBufferView;
 			}
 
+			//---------------------------------------------------------------------
 			size_t VertexBuffer::GetNumVertices() const
 			{
 				return m_iNumVertices;
 			}
 
+			//---------------------------------------------------------------------
 			size_t VertexBuffer::GetVertexStride() const
 			{
 				return m_iVertexStride;
