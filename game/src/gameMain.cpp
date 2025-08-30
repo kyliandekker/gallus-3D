@@ -22,10 +22,12 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR lp
 	SetCurrentDirectoryW(path.c_str());
 
 	// Initialize systems.
-	std::string name = "Professor Layton and the Shitty Game Engine";
-	std::string saveDirPath = gallus::file::GetAppDataPath().generic_string() + "/professor-layton";
+	std::string name = "2D Game";
+	std::string saveDirPath = gallus::file::GetAppDataPath().generic_string() + "/tool";
+	std::string assetPath = "./data/assets/";
 	gallus::core::TOOL = new gallus::core::Tool();
 	gallus::core::TOOL->SetSaveDirectory(saveDirPath);
+	gallus::core::TOOL->GetResourceAtlas().SetResourceFolder(assetPath);
 
 	gallus::core::TOOL->Initialize(hInstance, name);
 

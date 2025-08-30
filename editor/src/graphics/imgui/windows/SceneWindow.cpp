@@ -7,7 +7,7 @@
 
 #include "graphics/imgui/font_icon.h"
 #include "graphics/imgui/ImGuiWindow.h"
-#include "core/Tool.h"
+#include "core/EditorTool.h"
 #include "graphics/dx12/Texture.h"
 
 namespace gallus
@@ -34,7 +34,7 @@ namespace gallus
                     return;
                 }
 
-                std::shared_ptr<gallus::graphics::dx12::Texture> renderTexture = core::TOOL->GetDX12().GetRenderTexture();
+                std::shared_ptr<gallus::graphics::dx12::Texture> renderTexture = core::EDITOR_TOOL->GetDX12().GetRenderTexture();
                 if (!renderTexture || !renderTexture->IsValid())
                     return;
 
@@ -83,7 +83,6 @@ namespace gallus
                     imageSize
                 );
 
-// Draw border around the texture
                 ImU32 borderColor = IM_COL32(255, 255, 255, 255); // white border
                 float borderThickness = 2.0f;
                 ImGui::GetWindowDrawList()->AddRect(
