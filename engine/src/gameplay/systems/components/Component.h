@@ -15,6 +15,9 @@ namespace gallus
 		public:
 			virtual ~Component() = default;
 
+			virtual void Init()
+			{}
+
 			/// <summary>
 			/// Serialized the component to a json document.
 			/// </summary>

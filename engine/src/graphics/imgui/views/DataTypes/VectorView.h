@@ -80,6 +80,70 @@ namespace gallus
 			};
 
 			//---------------------------------------------------------------------
+			// IVector2View
+			//---------------------------------------------------------------------
+			/// <summary>
+			/// A UI view for rendering and interacting with vectors.
+			/// Can be used for both glm-based types and ImVec types.
+			/// </summary>
+			/// <typeparam name="T">The type of the color, such as glm::vec2 or ImVec.</typeparam>
+			template <class T>
+			class IVector2View : public ImGuiUIView
+			{
+			public:
+				/// <summary>
+				/// Constructs a IVector2View that renders a vector.
+				/// </summary>
+				/// <param name="a_Window">The ImGui window for rendering the view.</param>
+				IVector2View(ImGuiWindow& a_Window) : ImGuiUIView(a_Window)
+				{}
+
+				/// <summary>
+				/// Sets the value of the 2D vector. Updates the value if it's different from the current one.
+				/// </summary>
+				/// <param name="a_Value">The new vector value to set.</param>
+				void SetValue(const T& a_Value)
+				{
+					m_Value = a_Value;
+				}
+
+				/// <summary>
+				/// Retrieves the current vector value.
+				/// </summary>
+				/// <returns>The current vector value.</returns>
+				const T& GetValue() const
+				{
+					return m_Value;
+				}
+
+				/// <summary>
+				/// Empty render method (implemented because base class is pure).
+				/// </summary>
+				void Render() override
+				{}
+
+				/// <summary>
+				/// Renders the 2D vector as draggable float inputs in ImGui (X and Y components).
+				/// </summary>
+				/// <param name="a_Label">The label displayed next to the input fields.</param>
+				virtual uint8_t Render(const char* a_Label)
+				{
+					ImGui::AlignTextToFramePadding();
+					ImGui::Text("X");
+					ImGui::SameLine();
+					bool changedValueX = ImGui::DragInt(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, std::string("X_") + a_Label).c_str(), &m_Value.x, 1.0f);
+					ImGui::SameLine();
+					ImGui::Text("Y");
+					ImGui::SameLine();
+					bool changedValueY = ImGui::DragInt(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, std::string("Y_") + a_Label).c_str(), &m_Value.y, 1.0f);
+
+					return changedValueX ? 1 : (changedValueY ? 2 : 0);
+				}
+			protected:
+				T m_Value; /// The current value of the vector.
+			};
+
+			//---------------------------------------------------------------------
 			// Vector3View
 			//---------------------------------------------------------------------
 			/// <summary>

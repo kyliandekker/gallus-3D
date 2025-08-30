@@ -94,7 +94,14 @@ namespace gallus
 								return view.GetEntityID() == prevEntityID;
 							}
 						);
-						SetSelectable(&(*it));
+						if (it != m_aEntities.end())
+						{
+							SetSelectable(&(*it));
+						}
+						else
+						{
+							SetSelectable(nullptr);
+						}
 					}
 					else
 					{
@@ -116,16 +123,11 @@ namespace gallus
 
 				float topPosY = ImGui::GetCursorPosY();
 
+				bool spawnEntity = false;
 				if (ImGui::IconButton(
 					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_CUBE), BUTTON_ID, "SPAWN_ENTITY_HIERARCHY").c_str(), m_Window.GetHeaderSize(), m_Window.GetIconFont()))
 				{
-					const HierarchyEntityUIView* derivedPtr = dynamic_cast<const HierarchyEntityUIView*>(core::EDITOR_TOOL->GetEditor().GetSelectable().get());
-					if (derivedPtr)
-					{
-						core::EDITOR_TOOL->GetEditor().SetSelectable(nullptr, nullptr);
-					}
-
-					core::TOOL->GetECS().CreateEntity(core::TOOL->GetECS().GetUniqueName("New GameObject"));
+					spawnEntity = true;
 				}
 				ImGui::SameLine();
 
@@ -205,6 +207,17 @@ namespace gallus
 					ImGui::PopStyleVar();
 				}
 				ImGui::EndChild();
+
+				if (spawnEntity)
+				{
+					const HierarchyEntityUIView* derivedPtr = dynamic_cast<const HierarchyEntityUIView*>(core::EDITOR_TOOL->GetEditor().GetSelectable().get());
+					if (derivedPtr)
+					{
+						core::EDITOR_TOOL->GetEditor().SetSelectable(nullptr, nullptr);
+					}
+
+					core::TOOL->GetECS().CreateEntity(core::TOOL->GetECS().GetUniqueName("New GameObject"));
+				}
 			}
 
 			void HierarchyWindow::UpdateEntities()

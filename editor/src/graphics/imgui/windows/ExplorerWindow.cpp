@@ -127,7 +127,7 @@ namespace gallus
 						{
 							view.SearchForPath(m_PreviousSelectablePath, viewedFolder);
 						}
-						SetSelectable(&(*viewedFolder));
+						SetSelectable(viewedFolder);
 					}
 					else
 					{
@@ -145,16 +145,11 @@ namespace gallus
 
 				float topPosY = ImGui::GetCursorPosY();
 
+				bool doRescan = false;
 				if (ImGui::IconButton(
 					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_REFRESH), BUTTON_ID, "RESCAN_EXPLORER").c_str(), m_Window.GetHeaderSize(), m_Window.GetIconFont(), ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent)))
 				{
-					const ExplorerFileUIView* derivedPtr = dynamic_cast<const ExplorerFileUIView*>(core::EDITOR_TOOL->GetEditor().GetSelectable().get());
-					if (derivedPtr)
-					{
-						core::EDITOR_TOOL->GetEditor().SetSelectable(nullptr, nullptr);
-					}
-
-					core::EDITOR_TOOL->GetEditor().GetAssetDatabase().Rescan();
+					doRescan = true;
 				}
 
 				ImGui::SameLine();
@@ -311,6 +306,17 @@ namespace gallus
 				ImGui::EndChild();
 				ImGui::PopStyleVar();
 				ImGui::PopStyleVar();
+
+				if (doRescan)
+				{
+					const ExplorerFileUIView* derivedPtr = dynamic_cast<const ExplorerFileUIView*>(core::EDITOR_TOOL->GetEditor().GetSelectable().get());
+					if (derivedPtr)
+					{
+						core::EDITOR_TOOL->GetEditor().SetSelectable(nullptr, nullptr);
+					}
+
+					core::EDITOR_TOOL->GetEditor().GetAssetDatabase().Rescan();
+				}
 			}
 
 			void ExplorerWindow::SetSelectable(ExplorerFileUIView* a_pView)

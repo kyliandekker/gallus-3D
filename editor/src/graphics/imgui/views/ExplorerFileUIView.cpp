@@ -144,7 +144,7 @@ namespace gallus
 				{
 					a_bClicked = true;
 				}
-				a_bDoubleClicked = ImGui::IsMouseDoubleClicked(0);
+				a_bDoubleClicked = ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0);
 				a_bRightClicked = ImGui::IsItemHovered() && ImGui::IsMouseClicked(1);
 
 				ImVec2 buttonEnd = ImVec2(buttonStart.x + buttonSize.x, buttonStart.y + buttonSize.y);

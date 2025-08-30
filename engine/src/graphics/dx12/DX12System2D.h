@@ -185,7 +185,7 @@ namespace gallus
 				/// <summary>
 				/// Renders the DX12 stuff to the screen.
 				/// </summary>
-				void Render3D(std::shared_ptr<CommandQueue> a_pCommandQueue, std::shared_ptr<CommandList> a_pCommandList, D3D12_CPU_DESCRIPTOR_HANDLE a_RTVHandle);
+				void Render2D(std::shared_ptr<CommandQueue> a_pCommandQueue, std::shared_ptr<CommandList> a_pCommandList, D3D12_CPU_DESCRIPTOR_HANDLE a_RTVHandle);
 
 				/// <summary>
 				/// PResents everything to the DX12 render loop.

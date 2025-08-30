@@ -84,7 +84,12 @@ namespace gallus
 				{
 					transform = transformSys.GetComponent(a_EntityID).Transform();
 				}
-				m_pMesh->Render(a_pCommandList, transform, viewMatrix, projectionMatrix);
+				const DirectX::XMMATRIX world = DirectX::XMMatrixScaling(static_cast<float>(m_vSize.x) * transform.GetScale().x,
+					static_cast<float>(m_vSize.y) * transform.GetScale().y, 1.0f)
+					* transform.GetRotationMatrix()
+					* transform.GetPositionMatrix();
+				const DirectX::XMMATRIX mvpMatrix = world * viewMatrix * projectionMatrix;
+				m_pMesh->Render(a_pCommandList, mvpMatrix);
 			}
 
 			if (m_pTexture && m_pTexture->IsValid())

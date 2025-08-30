@@ -52,11 +52,10 @@ namespace gallus
 				/// <returns>A XMFLOAT2 containing the scale.</returns>
 				const DirectX::XMFLOAT2& GetScale() const;
 
-				/// <summary>
-				/// Retrieves the world matrix.
-				/// </summary>
-				/// <returns>A XMMATRIX containing the world matrix for the transform.</returns>
-				const DirectX::XMMATRIX GetWorldMatrix() const;
+				const DirectX::XMMATRIX GetScaleMatrix() const;
+				const DirectX::XMMATRIX GetRotationMatrix() const;
+				const DirectX::XMMATRIX GetPositionMatrix() const;
+				const DirectX::XMMATRIX GetMatrix() const;
 
 				/// <summary>
 				/// Sets the world matrix.

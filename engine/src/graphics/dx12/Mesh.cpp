@@ -25,7 +25,7 @@ namespace gallus
 			{}
 
 			//---------------------------------------------------------------------
-			void Mesh::Render(std::shared_ptr<CommandList> a_pCommandList, const DX12Transform& a_Transform, const DirectX::XMMATRIX& a_CameraView, const DirectX::XMMATRIX& a_CameraProjection)
+			void Mesh::Render(std::shared_ptr<CommandList> a_pCommandList, const DirectX::XMMATRIX& a_MVP)
 			{
 				for (MeshPartData* meshData : m_aMeshData)
 				{
@@ -34,8 +34,7 @@ namespace gallus
 					a_pCommandList->GetCommandList()->IASetIndexBuffer(&meshData->m_IndexBuffer.GetIndexBufferView());
 
 					// Update the MVP matrix
-					const DirectX::XMMATRIX mvpMatrix = a_Transform.GetWorldMatrix() * a_CameraView * a_CameraProjection;
-					a_pCommandList->GetCommandList()->SetGraphicsRoot32BitConstants(0, sizeof(DirectX::XMMATRIX) / 4, &mvpMatrix, 0);
+					a_pCommandList->GetCommandList()->SetGraphicsRoot32BitConstants(0, sizeof(DirectX::XMMATRIX) / 4, &a_MVP, 0);
 
 					a_pCommandList->GetCommandList()->DrawIndexedInstanced(static_cast<UINT>(meshData->m_aIndices.size()), 1, 0, 0, 0);
 				}

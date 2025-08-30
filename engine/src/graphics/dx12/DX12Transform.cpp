@@ -53,26 +53,30 @@ namespace gallus
 				return m_vScale;
 			}
 
-			//---------------------------------------------------------------------
-			const DirectX::XMMATRIX DX12Transform::GetWorldMatrix() const
+			const DirectX::XMMATRIX DX12Transform::GetScaleMatrix() const
 			{
-				const DirectX::XMFLOAT2 origin = { 0.5f, 0.5f };
-				const DirectX::XMMATRIX originMatrix = DirectX::XMMatrixTranslation(origin.x, origin.y, 0.0f);
-				const DirectX::XMMATRIX negativeOriginMatrix = DirectX::XMMatrixTranslation(-origin.x, -origin.y, 0.0f);
+				return DirectX::XMMatrixScaling(m_vScale.x, m_vScale.y, 1.0f);
+			}
 
+			const DirectX::XMMATRIX DX12Transform::GetRotationMatrix() const
+			{
+				const float radians = DirectX::XMConvertToRadians(m_fRotationDegrees);
+				return DirectX::XMMatrixRotationZ(radians);
+			}
+
+			const DirectX::XMMATRIX DX12Transform::GetPositionMatrix() const
+			{
+				return DirectX::XMMatrixTranslation(m_vPosition.x, m_vPosition.y, 0.0f);
+			}
+
+			const DirectX::XMMATRIX DX12Transform::GetMatrix() const
+			{
 				const DirectX::XMMATRIX scaleMatrix = DirectX::XMMatrixScaling(m_vScale.x, m_vScale.y, 1.0f);
 				const float radians = DirectX::XMConvertToRadians(m_fRotationDegrees);
 				const DirectX::XMMATRIX rotationMatrix = DirectX::XMMatrixRotationZ(radians);
 				const DirectX::XMMATRIX translationMatrix = DirectX::XMMatrixTranslation(m_vPosition.x, m_vPosition.y, 0.0f);
 
-				return negativeOriginMatrix * rotationMatrix * scaleMatrix * translationMatrix * originMatrix;
-
-				//const DirectX::XMMATRIX scaleMatrix = DirectX::XMMatrixScaling(m_vScale.x, m_vScale.y, 1.0f);
-				//const float radians = DirectX::XMConvertToRadians(m_fRotationDegrees);
-				//const DirectX::XMMATRIX rotationMatrix = DirectX::XMMatrixRotationZ(radians);
-				//const DirectX::XMMATRIX translationMatrix = DirectX::XMMatrixTranslation(m_vPosition.x, m_vPosition.y, 0.0f);
-
-				//return scaleMatrix * rotationMatrix * translationMatrix;
+				return scaleMatrix * rotationMatrix * translationMatrix;
 			}
 
 			//---------------------------------------------------------------------

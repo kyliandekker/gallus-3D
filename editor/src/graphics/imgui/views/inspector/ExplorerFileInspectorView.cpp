@@ -10,6 +10,7 @@
 
 #include "graphics/imgui/views/inspector/fileinfo/ExplorerFileUIViewInfo.h"
 #include "graphics/imgui/views/inspector/fileinfo/ExplorerSpriteUIViewInfo.h"
+#include "core/EditorTool.h"
 
 namespace gallus
 {
@@ -57,6 +58,8 @@ namespace gallus
 			void ExplorerFileInspectorView::OnDelete()
 			{
 				m_ExplorerFileUIView.GetFileResource().Delete();
+
+				core::EDITOR_TOOL->GetEditor().GetAssetDatabase().Rescan();
 			}
 
 			void ExplorerFileInspectorView::OnShowInExplorer()

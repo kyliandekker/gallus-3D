@@ -37,6 +37,7 @@ namespace gallus
 				system->Destroy();
 				delete system;
 			}
+			m_aSystems.clear();
 			LOG(LOGSEVERITY_SUCCESS, LOG_CATEGORY_ECS, "ECS destroyed.");
 			return System::Destroy();
 		}

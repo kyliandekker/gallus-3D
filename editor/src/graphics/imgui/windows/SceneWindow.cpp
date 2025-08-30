@@ -12,72 +12,95 @@
 
 namespace gallus
 {
-	namespace graphics
-	{
-		namespace imgui
-		{
-				//---------------------------------------------------------------------
-				// HierarchyWindow
-				//---------------------------------------------------------------------
-			SceneWindow::SceneWindow(ImGuiWindow& a_Window) : BaseWindow(a_Window, ImGuiWindowFlags_NoCollapse, std::string(font::ICON_SCENE) + " Scene", "Scene")
-			{}
+    namespace graphics
+    {
+        namespace imgui
+        {
+            //---------------------------------------------------------------------
+            // HierarchyWindow
+            //---------------------------------------------------------------------
+            SceneWindow::SceneWindow(ImGuiWindow& a_Window) : BaseWindow(a_Window, ImGuiWindowFlags_NoCollapse, std::string(font::ICON_SCENE) + " Scene", "Scene")
+            {}
 
-			//---------------------------------------------------------------------
-			SceneWindow::~SceneWindow()
-			{}
+            //---------------------------------------------------------------------
+            SceneWindow::~SceneWindow()
+            {}
 
-			void CalculateUVs(float a_TextureAspect, const ImVec2& a_TextureSize, const ImVec2& a_Size, ImVec2& a_UV0, ImVec2& a_UV1)
-			{
-				float regionAspect = a_Size.x / a_Size.y;
+            //---------------------------------------------------------------------
+            void SceneWindow::Render()
+            {
+                std::shared_ptr<gallus::graphics::dx12::Texture> renderTexture = core::TOOL->GetDX12().GetRenderTexture();
+                if (!renderTexture || !renderTexture->IsValid())
+                    return;
 
-				a_UV0 = ImVec2(0.0f, 0.0f);
-				a_UV1 = ImVec2(1.0f, 1.0f);
+                ImVec2 windowSize = ImGui::GetContentRegionAvail();
+                ImVec2 textureSize = ImVec2(
+                    static_cast<float>(renderTexture->GetSize().x),
+                    static_cast<float>(renderTexture->GetSize().y)
+                );
 
-				if (a_TextureAspect > regionAspect)
-				{
-					float newWidth = regionAspect / a_TextureAspect;
-					a_UV0.x = (1.0f - newWidth) * 0.5f;
-					a_UV1.x = 1.0f - a_UV0.x;
-				}
-				else
-				{
-					float newHeight = a_TextureAspect / regionAspect;
-					a_UV0.y = (1.0f - newHeight) * 0.5f;
-					a_UV1.y = 1.0f - a_UV0.y;
-				}
-			}
+                // Static variables for zoom and pan
+                static float zoom = 1.0f;
+                static ImVec2 panOffset(0.0f, 0.0f);
 
-			constexpr bool CROP = false;
-			//---------------------------------------------------------------------
-			void SceneWindow::Render()
-			{
-				if (!core::TOOL->GetDX12().GetRenderTexture()->IsValid())
-				{
-					return;
-				}
+                // Begin scrollable child region
+                ImGui::BeginChild("SceneScroll", windowSize, true,
+                    ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 
-				ImVec2 availableSize = ImGui::GetContentRegionAvail();
-				ImVec2 textureSize = ImVec2(static_cast<float>(core::TOOL->GetDX12().GetRenderTexture()->GetSize().x),
-					static_cast<float>(core::TOOL->GetDX12().GetRenderTexture()->GetSize().y));
+                ImVec2 childPos = ImGui::GetCursorScreenPos(); // top-left corner of child
 
-				// Calculate the UVs to make sure the scene does not stretch.
-				float textureAspect = textureSize.x / textureSize.y;
-				ImVec2 uv0, uv1;
-				CalculateUVs(textureAspect, textureSize, availableSize, uv0, uv1);
+                ImVec2 mouseLocal = ImGui::GetIO().MousePos - childPos; // mouse relative to child
 
-				if (CROP)
-				{
-					ImGui::Image((ImTextureID) core::TOOL->GetDX12().GetRenderTexture()->GetGPUHandle().ptr,
-						availableSize, uv0, uv1);
-				}
-				else
-				{
-					ImGui::Image((ImTextureID) core::TOOL->GetDX12().GetRenderTexture()->GetGPUHandle().ptr,
-						availableSize);
-				}
-			}
-		}
-	}
+                // Zoom with mouse wheel
+                if (ImGui::IsWindowHovered())
+                {
+                    float wheel = ImGui::GetIO().MouseWheel;
+                    if (wheel != 0.0f)
+                    {
+                        ImVec2 beforeZoom = (mouseLocal - panOffset) / zoom;
+                        zoom = std::clamp(zoom * (wheel > 0 ? 1.1f : 0.9f), 0.05f, 4.0f);
+                        panOffset = mouseLocal - beforeZoom * zoom;
+                    }
+                }
+
+                // Pan with middle mouse button
+                if ((ImGui::IsWindowHovered() && ImGui::IsMouseDragging(ImGuiMouseButton_Middle)) || (ImGui::IsWindowHovered() && ImGui::IsMouseDragging(ImGuiMouseButton_Right)))
+                {
+                    panOffset += ImGui::GetIO().MouseDelta;
+                }
+
+                // Draw the texture
+                ImVec2 imagePos = panOffset;
+                ImVec2 imageSize = ImVec2(textureSize.x * zoom, textureSize.y * zoom);
+                ImGui::SetCursorPos(imagePos);
+                ImGui::Image(
+                    (ImTextureID) renderTexture->GetGPUHandle().ptr,
+                    imageSize
+                );
+
+// Draw border around the texture
+                ImU32 borderColor = IM_COL32(255, 255, 255, 255); // white border
+                float borderThickness = 2.0f;
+                ImGui::GetWindowDrawList()->AddRect(
+                    childPos + imagePos,
+                    childPos + imagePos + imageSize,
+                    borderColor,
+                    0.0f, // rounding
+                    0,    // flags
+                    borderThickness
+                );
+
+                ImGui::EndChild();
+
+                // Optional reset
+                if (ImGui::IsKeyPressed(ImGuiKey_R))
+                {
+                    zoom = 1.0f;
+                    panOffset = ImVec2(0.0f, 0.0f);
+                }
+            }
+        }
+    }
 }
 
 #endif // _EDITOR

@@ -112,7 +112,9 @@ namespace gallus
 					m_mComponents.insert(std::make_pair(a_ID, t));
 				}
 				core::TOOL->GetECS().OnEntityComponentsUpdated().invoke();
-				return &m_mComponents.at(a_ID);
+				Component& comp = m_mComponents.at(a_ID);
+				comp.Init();
+				return &comp;
 			}
 
 			/// <summary>

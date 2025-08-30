@@ -31,7 +31,7 @@ namespace gallus
 		class SpriteComponent : public Component
 		{
 		public:
-			void Init();
+			void Init() override;
 
 			/// <summary>
 			/// Sets the mesh used by the mesh component.
@@ -78,6 +78,16 @@ namespace gallus
 				return m_pTexture;
 			}
 
+			const DirectX::XMINT2& GetSize() const
+			{
+				return m_vSize;
+			}
+
+			void SetSize(const DirectX::XMINT2& a_vSize)
+			{
+				m_vSize = a_vSize;
+			}
+
 			/// <summary>
 			/// Renders the mesh.
 			/// </summary>
@@ -103,6 +113,8 @@ namespace gallus
 			std::shared_ptr<graphics::dx12::Mesh> m_pMesh = nullptr;
 			std::shared_ptr<graphics::dx12::Shader> m_pShader = nullptr;
 			std::shared_ptr<graphics::dx12::Texture> m_pTexture = nullptr;
+
+			DirectX::XMINT2 m_vSize = { -1, -1 };
 		};
 	}
 }

@@ -749,7 +749,7 @@ namespace gallus
 				//------------------------------------------
 				// RENDER GAME
 				//------------------------------------------
-				Render3D(commandQueue, commandList, currentRtv);
+				Render2D(commandQueue, commandList, currentRtv);
 
 				//------------------------------------------
 				// EDITOR ONLY
@@ -803,7 +803,7 @@ namespace gallus
 #endif // IMGUI_DISABLE
 
 			//---------------------------------------------------------------------
-			void DX12System2D::Render3D(std::shared_ptr<CommandQueue> a_pCommandQueue, std::shared_ptr<CommandList> a_pCommandList, D3D12_CPU_DESCRIPTOR_HANDLE a_RTVHandle)
+			void DX12System2D::Render2D(std::shared_ptr<CommandQueue> a_pCommandQueue, std::shared_ptr<CommandList> a_pCommandList, D3D12_CPU_DESCRIPTOR_HANDLE a_RTVHandle)
 			{
 				core::TOOL->GetResourceAtlas().TransitionResources(a_pCommandList);
 

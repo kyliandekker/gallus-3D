@@ -78,6 +78,9 @@ namespace gallus
 
 			void EntityInspectorView::Render()
 			{
+				std::lock_guard<std::recursive_mutex> lock(core::TOOL->GetECS().m_EntityMutex);
+
+				m_pEntity = core::TOOL->GetECS().GetEntity(m_HierarchyEntityUIView.GetEntityID());
 				if (!m_pEntity)
 				{
 					return;

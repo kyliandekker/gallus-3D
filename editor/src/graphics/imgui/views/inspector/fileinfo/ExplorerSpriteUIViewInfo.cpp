@@ -39,9 +39,86 @@ namespace gallus
 					m_pPreviewTexture->Destroy();
 				}
 			}
+            
+            int GetFormatChannelCount(DXGI_FORMAT format)
+            {
+                switch (format)
+                {
+                    // 1 channel
+                    case DXGI_FORMAT_R32_FLOAT:
+                    case DXGI_FORMAT_R32_UINT:
+                    case DXGI_FORMAT_R32_SINT:
+                    case DXGI_FORMAT_R16_FLOAT:
+                    case DXGI_FORMAT_R16_UNORM:
+                    case DXGI_FORMAT_R16_UINT:
+                    case DXGI_FORMAT_R16_SNORM:
+                    case DXGI_FORMAT_R16_SINT:
+                    case DXGI_FORMAT_R8_UNORM:
+                    case DXGI_FORMAT_R8_UINT:
+                    case DXGI_FORMAT_R8_SNORM:
+                    case DXGI_FORMAT_R8_SINT:
+                        return 1;
+
+                    // 2 channels
+                    case DXGI_FORMAT_R32G32_FLOAT:
+                    case DXGI_FORMAT_R32G32_UINT:
+                    case DXGI_FORMAT_R32G32_SINT:
+                    case DXGI_FORMAT_R16G16_FLOAT:
+                    case DXGI_FORMAT_R16G16_UNORM:
+                    case DXGI_FORMAT_R16G16_UINT:
+                    case DXGI_FORMAT_R16G16_SNORM:
+                    case DXGI_FORMAT_R16G16_SINT:
+                    case DXGI_FORMAT_R8G8_UNORM:
+                    case DXGI_FORMAT_R8G8_UINT:
+                    case DXGI_FORMAT_R8G8_SNORM:
+                    case DXGI_FORMAT_R8G8_SINT:
+                        return 2;
+
+                    // 3 channels (rare, often unused — many APIs avoid 3-component formats)
+                    case DXGI_FORMAT_R32G32B32_FLOAT:
+                    case DXGI_FORMAT_R32G32B32_UINT:
+                    case DXGI_FORMAT_R32G32B32_SINT:
+                        return 3;
+
+                    // 4 channels
+                    case DXGI_FORMAT_R32G32B32A32_FLOAT:
+                    case DXGI_FORMAT_R32G32B32A32_UINT:
+                    case DXGI_FORMAT_R32G32B32A32_SINT:
+                    case DXGI_FORMAT_R16G16B16A16_FLOAT:
+                    case DXGI_FORMAT_R16G16B16A16_UNORM:
+                    case DXGI_FORMAT_R16G16B16A16_UINT:
+                    case DXGI_FORMAT_R16G16B16A16_SNORM:
+                    case DXGI_FORMAT_R16G16B16A16_SINT:
+                    case DXGI_FORMAT_R8G8B8A8_UNORM:
+                    case DXGI_FORMAT_R8G8B8A8_UINT:
+                    case DXGI_FORMAT_R8G8B8A8_SNORM:
+                    case DXGI_FORMAT_R8G8B8A8_SINT:
+                    case DXGI_FORMAT_B8G8R8A8_UNORM:
+                    case DXGI_FORMAT_B8G8R8A8_UNORM_SRGB:
+                        return 4;
+
+                    default:
+                        return 0; // Unknown/unsupported format
+                }
+            }
 
 			void ExplorerSpriteUIViewInfo::RenderSpecific()
-			{}
+			{
+				if (m_pPreviewTexture)
+				{
+					ImGui::DisplayHeader(m_Window.GetBoldFont(), "Width: ");
+					ImGui::SameLine();
+					ImGui::Text(std::to_string(m_pPreviewTexture->GetResourceDesc().Width).c_str());
+
+					ImGui::DisplayHeader(m_Window.GetBoldFont(), "Height: ");
+					ImGui::SameLine();
+					ImGui::Text(std::to_string(m_pPreviewTexture->GetResourceDesc().Height).c_str());
+
+					ImGui::DisplayHeader(m_Window.GetBoldFont(), "Channels: ");
+					ImGui::SameLine();
+					ImGui::Text(std::to_string(GetFormatChannelCount(m_pPreviewTexture->GetResourceDesc().Format)).c_str());
+				}
+			}
 
 			void ExplorerSpriteUIViewInfo::RenderPreview()
 			{

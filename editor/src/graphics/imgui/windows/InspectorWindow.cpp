@@ -71,9 +71,11 @@ namespace gallus
 
 							// Offset = half the difference between child height and text height
 							float verticalOffset = (childSize.y - textSize.y) * 0.5f;
+							float horizontalOffset = (childSize.x - textSize.x) * 0.5f;
 
 							ImVec2 pos = ImGui::GetCursorPos();
 							pos.y += verticalOffset;
+							pos.x += horizontalOffset;
 
 							ImGui::SetCursorPos(pos);
 							ImGui::TextUnformatted(icon.c_str());
@@ -120,12 +122,13 @@ namespace gallus
 					}
 					ImGui::SameLine();
 				}
+				bool deleteView = false;
 				if (inspectorView->GetShowDelete())
 				{
 					if (ImGui::TextButton(
 						ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_DELETE), BUTTON_ID, "DELETE_INSPECTOR").c_str(), m_Window.GetHeaderSize()))
 					{
-						inspectorView->OnDelete();
+						deleteView = true;
 					}
 					ImGui::SameLine();
 				}
@@ -167,6 +170,11 @@ namespace gallus
 
 				ImGui::PopStyleVar();
 				ImGui::PopStyleVar();
+
+				if (deleteView)
+				{
+					inspectorView->OnDelete();
+				}
 			}
 		}
 	}
