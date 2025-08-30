@@ -1,4 +1,4 @@
-#include "DX12ShaderBind.h"
+﻿#include "DX12ShaderBind.h"
 
 #include "core/Tool.h"
 #include "graphics/dx12/CommandList.h"
@@ -31,6 +31,24 @@ namespace gallus
 				CD3DX12_RASTERIZER_DESC rasterDesc(D3D12_DEFAULT);
 				rasterDesc.CullMode = D3D12_CULL_MODE_NONE;
 
+				// Build the raw blend desc
+				D3D12_BLEND_DESC blendDesc = {};
+				blendDesc.AlphaToCoverageEnable = FALSE;
+				blendDesc.IndependentBlendEnable = FALSE;
+
+				D3D12_RENDER_TARGET_BLEND_DESC rtBlendDesc = {};
+				rtBlendDesc.BlendEnable = TRUE;
+				rtBlendDesc.LogicOpEnable = FALSE;
+				rtBlendDesc.SrcBlend = D3D12_BLEND_ONE;                  // premultiplied alpha
+				rtBlendDesc.DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+				rtBlendDesc.BlendOp = D3D12_BLEND_OP_ADD;
+				rtBlendDesc.SrcBlendAlpha = D3D12_BLEND_ONE;
+				rtBlendDesc.DestBlendAlpha = D3D12_BLEND_INV_SRC_ALPHA;
+				rtBlendDesc.BlendOpAlpha = D3D12_BLEND_OP_ADD;
+				rtBlendDesc.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+
+				blendDesc.RenderTarget[0] = rtBlendDesc;
+
 				struct PipelineStateStream
 				{
 					CD3DX12_PIPELINE_STATE_STREAM_ROOT_SIGNATURE pRootSignature;
@@ -41,6 +59,7 @@ namespace gallus
 					CD3DX12_PIPELINE_STATE_STREAM_DEPTH_STENCIL_FORMAT DSVFormat;
 					CD3DX12_PIPELINE_STATE_STREAM_RENDER_TARGET_FORMATS RTVFormats;
 					CD3DX12_PIPELINE_STATE_STREAM_RASTERIZER RasterizerState;
+					CD3DX12_PIPELINE_STATE_STREAM_BLEND_DESC BlendState;
 				} pipelineStateStream;
 
 				D3D12_RT_FORMAT_ARRAY rtvFormats = {};
@@ -55,6 +74,7 @@ namespace gallus
 				pipelineStateStream.DSVFormat = DXGI_FORMAT_UNKNOWN;
 				pipelineStateStream.RTVFormats = rtvFormats;
 				pipelineStateStream.RasterizerState = rasterDesc;
+				pipelineStateStream.BlendState = CD3DX12_BLEND_DESC(blendDesc);
 
 				D3D12_PIPELINE_STATE_STREAM_DESC pipelineStateStreamDesc = {
 					sizeof(PipelineStateStream), &pipelineStateStream

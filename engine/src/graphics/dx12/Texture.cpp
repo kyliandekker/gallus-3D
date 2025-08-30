@@ -177,6 +177,16 @@ namespace gallus
 
 				size_t memorySize = static_cast<size_t>(width) * height * 4;
 				core::Data data = core::Data(imageData, memorySize);
+				 
+				// OPTION: Do the alpha fix here.
+				//for (int i = 0; i < width * height; i++)
+				//{
+				//	unsigned char* pixel = &data[i * 4]; // RGBA
+				//	float a = pixel[3] / 255.0f;
+				//	pixel[0] = (unsigned char) (pixel[0] * a);
+				//	pixel[1] = (unsigned char) (pixel[1] * a);
+				//	pixel[2] = (unsigned char) (pixel[2] * a);
+				//}
 
 				stbi_image_free(imageData);
 
