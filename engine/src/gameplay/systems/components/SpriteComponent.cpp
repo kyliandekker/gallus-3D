@@ -2,6 +2,7 @@
 
 #include "graphics/dx12/Texture.h"
 #include "graphics/dx12/Mesh.h"
+#include "graphics/dx12/DX12ShaderBind.h"
 #include "graphics/dx12/Shader.h"
 #include "graphics/dx12/DX12Transform.h"
 #include "core/Tool.h"
@@ -27,27 +28,35 @@ namespace gallus
 		//---------------------------------------------------------------------
 		void SpriteComponent::Init()
 		{
-			m_pShader = core::TOOL->GetResourceAtlas().GetDefaultShader();
-			m_pTexture = core::TOOL->GetResourceAtlas().GetDefaultTexture();
-			m_pMesh = core::TOOL->GetResourceAtlas().GetDefaultMesh();
+			m_pShaderBind = core::TOOL->GetResourceAtlas().GetDefaultShaderBind().get();
+			m_pTexture = core::TOOL->GetResourceAtlas().GetDefaultTexture().get();
+			m_pMesh = core::TOOL->GetResourceAtlas().GetDefaultMesh().get();
 		}
 
 		//---------------------------------------------------------------------
-		void SpriteComponent::SetMesh(std::shared_ptr<graphics::dx12::Mesh> a_pMesh)
+		void SpriteComponent::SetMesh(graphics::dx12::Mesh* a_pMesh)
 		{
 			m_pMesh = a_pMesh;
 		}
 
 		//---------------------------------------------------------------------
-		void SpriteComponent::SetShader(std::shared_ptr<graphics::dx12::Shader> a_pShader)
+		void SpriteComponent::SetShader(graphics::dx12::DX12ShaderBind* a_pShaderBind)
 		{
-			m_pShader = a_pShader;
+			m_pShaderBind = a_pShaderBind;
 		}
 
 		//---------------------------------------------------------------------
-		void SpriteComponent::SetTexture(std::shared_ptr<graphics::dx12::Texture> a_pTexture)
+		void SpriteComponent::SetTexture(graphics::dx12::Texture* a_pTexture)
 		{
 			m_pTexture = a_pTexture;
+		}
+
+		void SpriteComponent::SetSizeToSpriteSize()
+		{
+			if (m_pTexture)
+			{
+				SetSize({ static_cast<int32_t>(m_pTexture->GetResourceDesc().Width), static_cast<int32_t>(m_pTexture->GetResourceDesc().Height) });
+			}
 		}
 
 		//---------------------------------------------------------------------
@@ -71,12 +80,12 @@ namespace gallus
 				m_pTexture->Bind(a_pCommandList);
 			}
 
-			if (m_pShader)
+			if (m_pShaderBind && m_pShaderBind->IsValid())
 			{
-				m_pShader->Bind(a_pCommandList);
+				m_pShaderBind->Bind(a_pCommandList);
 			}
 
-			if (m_pMesh)
+			if (m_pMesh && m_pShaderBind->IsValid())
 			{
 				graphics::dx12::DX12Transform transform;
 				TransformSystem& transformSys = core::TOOL->GetECS().GetSystem<TransformSystem>();
@@ -106,33 +115,33 @@ namespace gallus
 				return;
 			}
 
-			std::string texPath = m_pTexture->GetName();
-			std::string meshPath = m_pMesh->GetName();
-			std::string vertexShaderPath = m_pShader->GetVertexPath();
-			std::string pixelShaderPath = m_pShader->GetPixelPath();
+			std::string tex = m_pTexture->GetName();
+			std::string mesh = m_pMesh->GetName();
+			std::string pixelShader = m_pShaderBind->GetVertexShader()->GetName();
+			std::string vertexShader = m_pShaderBind->GetPixelShader()->GetName();
 			a_Document.AddMember(
 				JSON_MESH_COMPONENT_TEX_VAR,
-				rapidjson::Value(texPath.c_str(), a_Allocator),
+				rapidjson::Value(tex.c_str(), a_Allocator),
 				a_Allocator
 			);
 
 			a_Document.AddMember(JSON_MESH_COMPONENT_SHADER_VAR, rapidjson::Value().SetObject(), a_Allocator);
 
 			a_Document[JSON_MESH_COMPONENT_SHADER_VAR].AddMember(
-				JSON_MESH_COMPONENT_SHADER_VERTEX_VAR,
-				rapidjson::Value(vertexShaderPath.c_str(), a_Allocator),
+				JSON_MESH_COMPONENT_SHADER_PIXEL_VAR,
+				rapidjson::Value(pixelShader.c_str(), a_Allocator),
 				a_Allocator
 			);
 
 			a_Document[JSON_MESH_COMPONENT_SHADER_VAR].AddMember(
-				JSON_MESH_COMPONENT_SHADER_PIXEL_VAR,
-				rapidjson::Value(pixelShaderPath.c_str(), a_Allocator),
+				JSON_MESH_COMPONENT_SHADER_VERTEX_VAR,
+				rapidjson::Value(vertexShader.c_str(), a_Allocator),
 				a_Allocator
 			);
 
 			a_Document.AddMember(
 				JSON_MESH_COMPONENT_MESH_VAR,
-				rapidjson::Value(meshPath.c_str(), a_Allocator),
+				rapidjson::Value(mesh.c_str(), a_Allocator),
 				a_Allocator
 			);
 		}
@@ -145,39 +154,42 @@ namespace gallus
 				return;
 			}
 
-			std::string texPath;
-			std::string meshPath;
-			std::string shaderPathVertex;
-			std::string shaderPathPixel;
+			std::string tex;
+			std::string mesh;
+			std::string pixelShader;
+			std::string vertexShader;
 			if (a_Document.HasMember(JSON_MESH_COMPONENT_TEX_VAR) && a_Document[JSON_MESH_COMPONENT_TEX_VAR].IsString())
 			{
-				texPath = a_Document[JSON_MESH_COMPONENT_TEX_VAR].GetString();
+				tex = a_Document[JSON_MESH_COMPONENT_TEX_VAR].GetString();
 			}
 
 			if (a_Document.HasMember(JSON_MESH_COMPONENT_SHADER_VAR) && a_Document[JSON_MESH_COMPONENT_SHADER_VAR].IsString())
 			{
-				shaderPathVertex = a_Document[JSON_MESH_COMPONENT_SHADER_VAR].GetString();
-				shaderPathPixel = a_Document[JSON_MESH_COMPONENT_SHADER_VAR].GetString();
+				pixelShader = a_Document[JSON_MESH_COMPONENT_SHADER_VAR].GetString();
+				vertexShader = a_Document[JSON_MESH_COMPONENT_SHADER_VAR].GetString();
 			}
 
 			if (a_Document.HasMember(JSON_MESH_COMPONENT_MESH_VAR) && a_Document[JSON_MESH_COMPONENT_MESH_VAR].IsString())
 			{
-				meshPath = a_Document[JSON_MESH_COMPONENT_MESH_VAR].GetString();
+				mesh = a_Document[JSON_MESH_COMPONENT_MESH_VAR].GetString();
 			}
 
 			std::shared_ptr<graphics::dx12::CommandQueue> cCommandQueue = core::TOOL->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
 			std::shared_ptr<graphics::dx12::CommandList> cCommandList = cCommandQueue->GetCommandList();
-			if (!meshPath.empty())
+			if (!mesh.empty())
 			{
-				SetMesh(core::TOOL->GetResourceAtlas().LoadMesh(meshPath, cCommandList));
+				SetMesh(core::TOOL->GetResourceAtlas().LoadMesh(mesh, cCommandList).get());
 			}
-			if (!texPath.empty())
+			if (!tex.empty())
 			{
-				SetTexture(core::TOOL->GetResourceAtlas().LoadTexture(texPath, cCommandList));
+				SetTexture(core::TOOL->GetResourceAtlas().LoadTexture(tex, cCommandList).get());
 			}
-			if (!shaderPathVertex.empty() && !shaderPathPixel.empty())
+			if (!vertexShader.empty() && !pixelShader.empty())
 			{
-				SetShader(core::TOOL->GetResourceAtlas().LoadShader(shaderPathVertex, shaderPathPixel));
+				SetShader(core::TOOL->GetResourceAtlas().LoadShaderBind(
+					core::TOOL->GetResourceAtlas().LoadPixelShader(pixelShader).get(),
+					core::TOOL->GetResourceAtlas().LoadVertexShader(vertexShader).get()
+				).get());
 			}
 			cCommandQueue->ExecuteCommandList(cCommandList);
 			cCommandQueue->Flush();

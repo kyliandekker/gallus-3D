@@ -3,6 +3,9 @@
 #include "core/Tool.h"
 #include "logger/Logger.h"
 #include "gameplay/systems/SpriteSystem.h"
+#include "gameplay/systems/TransformSystem.h"
+#include "graphics/dx12/CommandQueue.h"
+#include "graphics/dx12/CommandList.h"
 
 namespace game
 {
@@ -72,11 +75,18 @@ namespace game
 	//---------------------------------------------------------------------
 	bool Game::Test()
 	{
+		auto cCommandQueue = gallus::core::TOOL->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
+		auto cCommandList = cCommandQueue->GetCommandList();
+
 		auto entityId = gallus::core::TOOL->GetECS().CreateEntity("New Sprite");
 		gallus::gameplay::SpriteComponent* meshComp = reinterpret_cast<gallus::gameplay::SpriteComponent*>(gallus::core::TOOL->GetECS().GetSystem<gallus::gameplay::SpriteSystem>().CreateBaseComponent(entityId));
-		meshComp->SetMesh(gallus::core::TOOL->GetResourceAtlas().GetDefaultMesh());
-		meshComp->SetShader(gallus::core::TOOL->GetResourceAtlas().GetDefaultShader());
-		meshComp->SetTexture(gallus::core::TOOL->GetResourceAtlas().GetDefaultTexture());
+		meshComp->SetMesh(gallus::core::TOOL->GetResourceAtlas().GetDefaultMesh().get());
+		meshComp->SetShader(gallus::core::TOOL->GetResourceAtlas().GetDefaultShaderBind().get());
+		meshComp->SetTexture(gallus::core::TOOL->GetResourceAtlas().LoadTexture("tex_layton.png", cCommandList).get());
+		meshComp->SetSizeToSpriteSize();
+		gallus::gameplay::TransformComponent* transformComp = reinterpret_cast<gallus::gameplay::TransformComponent*>(gallus::core::TOOL->GetECS().GetSystem<gallus::gameplay::TransformSystem>().CreateBaseComponent(entityId));
+		cCommandQueue->ExecuteCommandList(cCommandList);
+		cCommandQueue->Flush();
 
 		return true;
 	}

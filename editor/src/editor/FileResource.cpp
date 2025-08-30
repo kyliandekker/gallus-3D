@@ -56,7 +56,7 @@ namespace gallus
 			{ ".bmp", { AssetType::Texture } },
 			{ ".wav", { AssetType::Sound, AssetType::Song, AssetType::VO } },
 			{ ".anim", { AssetType::Animation } },
-			{ ".hlsl", { AssetType::Shader } },
+			{ ".hlsl", { AssetType::PixelShader, AssetType::VertexShader } },
 		};
 
 		//---------------------------------------------------------------------

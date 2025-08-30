@@ -17,9 +17,17 @@ namespace gallus
 				{
 					return "Texture";
 				}
-				case ResourceType::ResourceType_Shader:
+				case ResourceType::ResourceType_PixelShader:
 				{
-					return "Shader";
+					return "Pixel Shader";
+				}
+				case ResourceType::ResourceType_VertexShader:
+				{
+					return "Vertex Shader";
+				}
+				case ResourceType::ResourceType_ShaderBind:
+				{
+					return "Shader Bind";
 				}
 				case ResourceType::ResourceType_Mesh:
 				{

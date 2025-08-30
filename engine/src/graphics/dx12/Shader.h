@@ -5,7 +5,6 @@
 
 #include <string>
 #include <wrl.h>
-#include <memory>
 
 #include "utils/file_abstractions.h"
 
@@ -33,12 +32,6 @@ namespace gallus
 				Shader() = default;
 
 				/// <summary>
-				/// Binds the shader pipeline state to the given command list for rendering.
-				/// </summary>
-				/// <param name="a_pCommandList">The command list used to bind the shader.</param>
-				void Bind(std::shared_ptr<CommandList> a_pCommandList);
-
-				/// <summary>
 				/// Compiles a shader from a source file using the specified entry point and target profile.
 				/// </summary>
 				/// <param name="a_sFilePath">The path to the shader source file.</param>
@@ -48,45 +41,85 @@ namespace gallus
 				static Microsoft::WRL::ComPtr<ID3DBlob> CompileShader(const fs::path& a_sFilePath, const std::string& a_sEntryPoint, const std::string& a_sTarget);
 
 				/// <summary>
-				/// Checks if the shader has been successfully created and is valid for rendering.
+				/// Loads and compiles shaders using logical resource names, resolving them through the engine’s resource system.
 				/// </summary>
-				/// <returns>True if the shader has a valid pipeline state object, false otherwise.</returns>
-				bool IsValid() const
+				/// <param name="a_sShader">The resource name of the shader.</param>
+				/// <returns>True if loading and compilation were successful, false otherwise.</returns>
+				virtual bool LoadByName(const std::string& a_sShader);
+
+				/// <summary>
+				/// Loads and compiles shaders directly from file paths.
+				/// </summary>
+				/// <param name="a_ShaderPath">The file path to the shader source.</param>
+				/// <returns>True if loading and compilation were successful, false otherwise.</returns>
+				virtual bool LoadByPath(const fs::path& a_ShaderPath);
+
+				const Microsoft::WRL::ComPtr<ID3DBlob> GetShaderBlob() const
 				{
-					return m_pPipelineState.Get();
-				};
+					return m_pShaderBlob;
+				}
 
 				/// <summary>
-				/// Gets the file path of the currently bound pixel shader.
+				/// Returns whether the resource is a valid resource.
 				/// </summary>
-				/// <returns>Reference to the pixel shader path string.</returns>
-				const std::string& GetPixelPath() const;
+				/// <returns>True if the resource was valid, false otherwise.</returns>
+				bool IsValid() const override
+				{
+					return m_pShaderBlob;
+				}
+			protected:
+				Microsoft::WRL::ComPtr<ID3DBlob> m_pShaderBlob = nullptr;
 
+				friend class ResourceAtlas;
+			};
+
+			class PixelShader : public Shader
+			{
+			public:
 				/// <summary>
-				/// Gets the file path of the currently bound vertex shader.
+				/// Constructs an empty pixel shader resource.
 				/// </summary>
-				/// <returns>Reference to the vertex shader path string.</returns>
-				const std::string& GetVertexPath() const;
+				PixelShader() = default;
 
 				/// <summary>
 				/// Loads and compiles shaders using logical resource names, resolving them through the engine’s resource system.
 				/// </summary>
-				/// <param name="a_sVertexShader">The resource name of the vertex shader.</param>
-				/// <param name="a_sPixelShader">The resource name of the pixel shader.</param>
+				/// <param name="a_sShader">The resource name of the pixel shader.</param>
 				/// <returns>True if loading and compilation were successful, false otherwise.</returns>
-				bool LoadByName(const std::string& a_sVertexShader, const std::string& a_sPixelShader);
+				bool LoadByName(const std::string& a_sPixelShader) override;
 
 				/// <summary>
-				/// Loads and compiles shaders directly from file paths, then creates the pipeline state object.
+				/// Loads and compiles shaders directly from file paths.
 				/// </summary>
-				/// <param name="a_VertexShaderPath">The file path to the vertex shader source.</param>
 				/// <param name="a_PixelShaderPath">The file path to the pixel shader source.</param>
 				/// <returns>True if loading and compilation were successful, false otherwise.</returns>
-				bool LoadByPath(const fs::path& a_VertexShaderPath, const fs::path& a_PixelShaderPath);
-			private:
-				Microsoft::WRL::ComPtr<ID3D12PipelineState> m_pPipelineState = nullptr;
-				std::string m_sPixelName;
+				bool LoadByPath(const fs::path& a_PixelShaderPath) override;
+			protected:
+				friend class ResourceAtlas;
+			};
 
+			class VertexShader : public Shader
+			{
+			public:
+				/// <summary>
+				/// Constructs an empty pixel shader resource.
+				/// </summary>
+				VertexShader() = default;
+
+				/// <summary>
+				/// Loads and compiles shaders using logical resource names, resolving them through the engine’s resource system.
+				/// </summary>
+				/// <param name="a_sShader">The resource name of the vertex shader.</param>
+				/// <returns>True if loading and compilation were successful, false otherwise.</returns>
+				bool LoadByName(const std::string& a_sVertexShader) override;
+
+				/// <summary>
+				/// Loads and compiles shaders directly from file paths.
+				/// </summary>
+				/// <param name="a_VertexShaderPath">The file path to the vertex shader source.</param>
+				/// <returns>True if loading and compilation were successful, false otherwise.</returns>
+				bool LoadByPath(const fs::path& a_VertexShaderPath) override;
+			protected:
 				friend class ResourceAtlas;
 			};
 		}

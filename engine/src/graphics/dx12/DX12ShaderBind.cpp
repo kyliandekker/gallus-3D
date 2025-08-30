@@ -1,0 +1,103 @@
+#include "DX12ShaderBind.h"
+
+#include "core/Tool.h"
+#include "graphics/dx12/CommandList.h"
+#include "logger/Logger.h"
+#include "graphics/dx12/Shader.h"
+
+namespace gallus
+{
+	namespace graphics
+	{
+		namespace dx12
+		{
+			//---------------------------------------------------------------------
+			DX12ShaderBind::DX12ShaderBind()
+			{
+				m_ResourceType = core::ResourceType::ResourceType_ShaderBind;
+			}
+
+			//---------------------------------------------------------------------
+			DX12ShaderBind::DX12ShaderBind(const PixelShader* a_PixelShader, const VertexShader* a_VertexShader) :
+				m_pPixelShader(a_PixelShader),
+				m_pVertexShader(a_VertexShader)
+			{
+				m_ResourceType = core::ResourceType::ResourceType_ShaderBind;
+			}
+
+			//---------------------------------------------------------------------
+			bool DX12ShaderBind::CreatePipelineState()
+			{
+				CD3DX12_RASTERIZER_DESC rasterDesc(D3D12_DEFAULT);
+				rasterDesc.CullMode = D3D12_CULL_MODE_NONE;
+
+				struct PipelineStateStream
+				{
+					CD3DX12_PIPELINE_STATE_STREAM_ROOT_SIGNATURE pRootSignature;
+					CD3DX12_PIPELINE_STATE_STREAM_INPUT_LAYOUT InputLayout;
+					CD3DX12_PIPELINE_STATE_STREAM_PRIMITIVE_TOPOLOGY PrimitiveTopologyType;
+					CD3DX12_PIPELINE_STATE_STREAM_VS VS;
+					CD3DX12_PIPELINE_STATE_STREAM_PS PS;
+					CD3DX12_PIPELINE_STATE_STREAM_DEPTH_STENCIL_FORMAT DSVFormat;
+					CD3DX12_PIPELINE_STATE_STREAM_RENDER_TARGET_FORMATS RTVFormats;
+					CD3DX12_PIPELINE_STATE_STREAM_RASTERIZER RasterizerState;
+				} pipelineStateStream;
+
+				D3D12_RT_FORMAT_ARRAY rtvFormats = {};
+				rtvFormats.NumRenderTargets = 1;
+				rtvFormats.RTFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+
+				pipelineStateStream.pRootSignature = core::TOOL->GetDX12().GetRootSignature().Get();
+				pipelineStateStream.InputLayout = { g_aInputLayout, _countof(g_aInputLayout) };
+				pipelineStateStream.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+				pipelineStateStream.PS = CD3DX12_SHADER_BYTECODE(m_pPixelShader->GetShaderBlob().Get());
+				pipelineStateStream.VS = CD3DX12_SHADER_BYTECODE(m_pVertexShader->GetShaderBlob().Get());
+				pipelineStateStream.DSVFormat = DXGI_FORMAT_UNKNOWN;
+				pipelineStateStream.RTVFormats = rtvFormats;
+				pipelineStateStream.RasterizerState = rasterDesc;
+
+				D3D12_PIPELINE_STATE_STREAM_DESC pipelineStateStreamDesc = {
+					sizeof(PipelineStateStream), &pipelineStateStream
+				};
+				if (FAILED(core::TOOL->GetDX12().GetDevice()->CreatePipelineState(&pipelineStateStreamDesc, IID_PPV_ARGS(&m_pPipelineState))))
+				{
+					LOG(LOGSEVERITY_ERROR, LOG_CATEGORY_DX12, "Failed creating pipeline state.");
+					return false;
+				}
+
+				return false;
+			}
+
+			//---------------------------------------------------------------------
+			void DX12ShaderBind::Bind(std::shared_ptr<CommandList> a_pCommandList)
+			{
+				a_pCommandList->GetCommandList()->SetPipelineState(m_pPipelineState.Get());
+				a_pCommandList->GetCommandList()->SetGraphicsRootSignature(core::TOOL->GetDX12().GetRootSignature().Get()); // Set the existing root signature
+			}
+
+			//---------------------------------------------------------------------
+			bool DX12ShaderBind::HasPixelShader(const PixelShader* a_PixelShader)
+			{
+				return m_pPixelShader == a_PixelShader;
+			}
+
+			//---------------------------------------------------------------------
+			bool DX12ShaderBind::HasVertexShader(const VertexShader* a_VertexShader)
+			{
+				return m_pVertexShader == a_VertexShader;
+			}
+
+			//---------------------------------------------------------------------
+			const PixelShader* DX12ShaderBind::GetPixelShader()
+			{
+				return m_pPixelShader;
+			}
+
+			//---------------------------------------------------------------------
+			const VertexShader* DX12ShaderBind::GetVertexShader()
+			{
+				return m_pVertexShader;
+			}
+		}
+	}
+}

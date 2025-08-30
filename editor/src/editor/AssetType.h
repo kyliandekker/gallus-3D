@@ -18,7 +18,8 @@ namespace gallus
 			Song,
 			VO,
 			Animation,
-			Shader
+			PixelShader,
+			VertexShader,
 		};
 
 		/// <summary>
@@ -54,9 +55,13 @@ namespace gallus
 				{
 					return "Animation File";
 				}
-				case AssetType::Shader:
+				case AssetType::PixelShader:
 				{
-					return "Shader File";
+					return "Pixel Shader File";
+				}
+				case AssetType::VertexShader:
+				{
+					return "Vertex Shader File";
 				}
 				default:
 				{

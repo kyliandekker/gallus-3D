@@ -16,7 +16,7 @@ namespace gallus
 
 			class DX12Transform;
 			class Texture;
-			class Shader;
+			class DX12ShaderBind;
 			class Mesh;
 			class Camera;
 		}
@@ -37,25 +37,27 @@ namespace gallus
 			/// Sets the mesh used by the mesh component.
 			/// </summary>
 			/// <param name="a_Mesh">Reference to the mesh that the mesh component will use.</param>
-			void SetMesh(std::shared_ptr<graphics::dx12::Mesh> a_pMesh);
+			void SetMesh(graphics::dx12::Mesh* a_pMesh);
 
 			/// <summary>
 			/// Sets the shader used by the mesh component.
 			/// </summary>
-			/// <param name="a_Shader">Reference to the shader that the mesh component will use.</param>
-			void SetShader(std::shared_ptr<graphics::dx12::Shader> a_pShader);
+			/// <param name="a_Shader">Reference to the shader bind that the mesh component will use.</param>
+			void SetShader(graphics::dx12::DX12ShaderBind* a_pShaderBind);
 
 			/// <summary>
 			/// Sets the texture used by the mesh component.
 			/// </summary>
 			/// <param name="a_Texture">Reference to the texture that the mesh component will use.</param>
-			void SetTexture(std::shared_ptr<graphics::dx12::Texture> a_pTexture);
+			void SetTexture(graphics::dx12::Texture* a_pTexture);
+
+			void SetSizeToSpriteSize();
 
 			/// <summary>
 			/// Retrieves the mesh used by the mesh component.
 			/// </summary>
 			/// <returns>Pointer to the mesh if the mesh exists, otherwise nullptr.</returns>
-			std::shared_ptr<graphics::dx12::Mesh> GetMesh() const
+			graphics::dx12::Mesh* GetMesh() const
 			{
 				return m_pMesh;
 			}
@@ -64,16 +66,16 @@ namespace gallus
 			/// Retrieves the shader used by the mesh component.
 			/// </summary>
 			/// <returns>Pointer to the mesh if the mesh exists, otherwise nullptr.</returns>
-			std::shared_ptr<graphics::dx12::Shader> GetShader()
+			graphics::dx12::DX12ShaderBind* GetShader()
 			{
-				return m_pShader;
+				return m_pShaderBind;
 			}
 
 			/// <summary>
 			/// Retrieves the texture used by the mesh component.
 			/// </summary>
 			/// <returns>Pointer to the mesh if the mesh exists, otherwise nullptr.</returns>
-			std::shared_ptr<graphics::dx12::Texture> GetTexture()
+			graphics::dx12::Texture* GetTexture()
 			{
 				return m_pTexture;
 			}
@@ -110,9 +112,9 @@ namespace gallus
 			/// <param name="a_Allocator">The allocator used by the json document.</param>
 			void Deserialize(const rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator) override;
 		private:
-			std::shared_ptr<graphics::dx12::Mesh> m_pMesh = nullptr;
-			std::shared_ptr<graphics::dx12::Shader> m_pShader = nullptr;
-			std::shared_ptr<graphics::dx12::Texture> m_pTexture = nullptr;
+			graphics::dx12::Mesh* m_pMesh = nullptr;
+			graphics::dx12::DX12ShaderBind* m_pShaderBind = nullptr;
+			graphics::dx12::Texture* m_pTexture = nullptr;
 
 			DirectX::XMINT2 m_vSize = { -1, -1 };
 		};

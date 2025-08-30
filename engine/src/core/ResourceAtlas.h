@@ -14,7 +14,9 @@ namespace gallus
 		namespace dx12
 		{
 			class Texture;
-			class Shader;
+			class PixelShader;
+			class VertexShader;
+			class DX12ShaderBind;
 			class Mesh;
 
 			class CommandList;
@@ -80,14 +82,29 @@ namespace gallus
 			bool HasTexture(const std::string& a_sName);
 
 			/// <summary>
-			/// Loads a shader composed of a vertex shader and pixel shader.
+			/// Loads a pixel shader.
 			/// </summary>
-			std::shared_ptr<graphics::dx12::Shader> LoadShader(const std::string& a_sVertexShader, const std::string& a_sPixelShader);
+			std::shared_ptr<graphics::dx12::PixelShader> LoadPixelShader(const std::string& a_sName);
 
 			/// <summary>
-			/// Checks whether a shader with the given name is already loaded.
+			/// Loads a vertex shader.
 			/// </summary>
-			bool HasShader(const std::string& a_sName);
+			std::shared_ptr<graphics::dx12::VertexShader> LoadVertexShader(const std::string& a_sName);
+
+			/// <summary>
+			/// Checks whether a pixel shader with the given name is already loaded.
+			/// </summary>
+			bool HasPixelShader(const std::string& a_sName);
+
+			/// <summary>
+			/// Checks whether a vertex shader with the given name is already loaded.
+			/// </summary>
+			bool HasVertexShader(const std::string& a_sName);
+
+			/// <summary>
+			/// Loads a shader bind.
+			/// </summary>
+			std::shared_ptr<graphics::dx12::DX12ShaderBind> LoadShaderBind(const graphics::dx12::PixelShader* a_PixelShader, const graphics::dx12::VertexShader* a_VertexShader);
 
 			/// <summary>
 			/// Loads a mesh by name from the resource folder.
@@ -100,9 +117,19 @@ namespace gallus
 			bool HasMesh(const std::string& a_sName);
 
 			/// <summary>
-			/// Retrieves the default shader (used as fallback).
+			/// Retrieves the default pixel shader (used as fallback).
 			/// </summary>
-			std::shared_ptr<graphics::dx12::Shader> GetDefaultShader();
+			std::shared_ptr<graphics::dx12::PixelShader> GetDefaultPixelShader();
+
+			/// <summary>
+			/// Retrieves the default vertex shader (used as fallback).
+			/// </summary>
+			std::shared_ptr<graphics::dx12::VertexShader> GetDefaultVertexShader();
+
+			/// <summary>
+			/// Retrieves the default shader bind (used as fallback).
+			/// </summary>
+			std::shared_ptr<graphics::dx12::DX12ShaderBind> GetDefaultShaderBind();
 
 			/// <summary>
 			/// Retrieves the default texture (used as fallback).
@@ -126,9 +153,19 @@ namespace gallus
 			const std::vector<std::shared_ptr<graphics::dx12::Texture>>& GetTextures() const;
 
 			/// <summary>
-			/// Gets the list of loaded shaders.
+			/// Gets the list of loaded pixel shaders.
 			/// </summary>
-			const std::vector<std::shared_ptr<graphics::dx12::Shader>>& GetShaders() const;
+			const std::vector<std::shared_ptr<graphics::dx12::PixelShader>>& GetPixelShaders() const;
+
+			/// <summary>
+			/// Gets the list of loaded vertex shaders.
+			/// </summary>
+			const std::vector<std::shared_ptr<graphics::dx12::VertexShader>>& GetVertexShaders() const;
+
+			/// <summary>
+			/// Gets the list of shader binds.
+			/// </summary>
+			const std::vector<std::shared_ptr<graphics::dx12::DX12ShaderBind>>& GetShaderBinds() const;
 
 			/// <summary>
 			/// Gets the list of loaded meshes.
@@ -152,7 +189,9 @@ namespace gallus
 			}
 		private:
 			std::vector<std::shared_ptr<graphics::dx12::Texture>> m_aTextures;
-			std::vector<std::shared_ptr<graphics::dx12::Shader>> m_aShaders;
+			std::vector<std::shared_ptr<graphics::dx12::PixelShader>> m_aPixelShaders;
+			std::vector<std::shared_ptr<graphics::dx12::VertexShader>> m_aVertexShaders;
+			std::vector<std::shared_ptr<graphics::dx12::DX12ShaderBind>> m_aShaderBinds;
 			std::vector<std::shared_ptr<graphics::dx12::Mesh>> m_aMeshes;
 
 			std::string m_sResourceFolder;

@@ -4,6 +4,7 @@
 
 #include "graphics/dx12/Texture.h"
 #include "graphics/dx12/Shader.h"
+#include "graphics/dx12/DX12ShaderBind.h"
 #include "graphics/dx12/Mesh.h"
 #include "graphics/dx12/CommandList.h"
 
@@ -130,27 +131,67 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		std::shared_ptr<graphics::dx12::Shader> ResourceAtlas::LoadShader(const std::string& a_sVertexShader, const std::string& a_sPixelShader)
+		std::shared_ptr<graphics::dx12::PixelShader> ResourceAtlas::LoadPixelShader(const std::string& a_sName)
 		{
-			std::shared_ptr<graphics::dx12::Shader> shader = GetResource(m_aShaders, a_sVertexShader, fs::path());
+			std::shared_ptr<graphics::dx12::PixelShader> shader = GetResource(m_aPixelShaders, a_sName, fs::path());
 			if (!shader->IsValid())
 			{
 //#ifdef _EDITOR
-				fs::path vertexShaderPath = fs::path(m_sResourceFolder + "/shaders/" + a_sVertexShader).lexically_normal();
-				fs::path pixelShaderPath = fs::path(m_sResourceFolder + "/shaders/" + a_sPixelShader).lexically_normal();
-//
-				shader->LoadByPath(vertexShaderPath, pixelShaderPath);
+				fs::path pixelShaderPath = fs::path(m_sResourceFolder + "/shaders/" + a_sName).lexically_normal();
+
+				shader->LoadByPath(pixelShaderPath);
 //#else
-//				shader->LoadByName(a_sVertexShader, a_sPixelShader);
+//				shader->LoadByName(a_sName);
 //#endif // _EDITOR
 			}
 			return shader;
 		}
 
 		//---------------------------------------------------------------------
-		bool ResourceAtlas::HasShader(const std::string& a_sName)
+		std::shared_ptr<graphics::dx12::VertexShader> ResourceAtlas::LoadVertexShader(const std::string& a_sName)
 		{
-			return HasResource(m_aShaders, a_sName, fs::path());
+			std::shared_ptr<graphics::dx12::VertexShader> shader = GetResource(m_aVertexShaders, a_sName, fs::path());
+			if (!shader->IsValid())
+			{
+//#ifdef _EDITOR
+				fs::path vertexShaderPath = fs::path(m_sResourceFolder + "/shaders/" + a_sName).lexically_normal();
+
+				shader->LoadByPath(vertexShaderPath);
+//#else
+//				shader->LoadByName(a_sName);
+//#endif // _EDITOR
+			}
+			return shader;
+		}
+
+		//---------------------------------------------------------------------
+		bool ResourceAtlas::HasPixelShader(const std::string& a_sName)
+		{
+			return HasResource(m_aPixelShaders, a_sName, fs::path());
+		}
+
+		//---------------------------------------------------------------------
+		bool ResourceAtlas::HasVertexShader(const std::string& a_sName)
+		{
+			return HasResource(m_aVertexShaders, a_sName, fs::path());
+		}
+
+		//---------------------------------------------------------------------
+		std::shared_ptr<graphics::dx12::DX12ShaderBind> ResourceAtlas::LoadShaderBind(const graphics::dx12::PixelShader* a_PixelShader, const graphics::dx12::VertexShader* a_VertexShader)
+		{
+			for (std::shared_ptr<graphics::dx12::DX12ShaderBind>& shaderBind : m_aShaderBinds)
+			{
+				if (shaderBind->HasPixelShader(a_PixelShader) && shaderBind->HasVertexShader(a_VertexShader))
+				{
+					return shaderBind;
+				}
+			}
+
+			std::shared_ptr<graphics::dx12::DX12ShaderBind> shaderBind = std::make_shared<graphics::dx12::DX12ShaderBind>(a_PixelShader, a_VertexShader);
+			shaderBind->CreatePipelineState();
+			m_aShaderBinds.push_back(shaderBind);
+
+			return shaderBind;
 		}
 
 		//---------------------------------------------------------------------
@@ -171,9 +212,21 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		std::shared_ptr<graphics::dx12::Shader> ResourceAtlas::GetDefaultShader()
+		std::shared_ptr<graphics::dx12::PixelShader> ResourceAtlas::GetDefaultPixelShader()
 		{
-			return m_aShaders[MISSING];
+			return m_aPixelShaders[MISSING];
+		}
+
+		//---------------------------------------------------------------------
+		std::shared_ptr<graphics::dx12::VertexShader> ResourceAtlas::GetDefaultVertexShader()
+		{
+			return m_aVertexShaders[MISSING];
+		}
+
+		//---------------------------------------------------------------------
+		std::shared_ptr<graphics::dx12::DX12ShaderBind> ResourceAtlas::GetDefaultShaderBind()
+		{
+			return m_aShaderBinds[MISSING];
 		}
 
 		//---------------------------------------------------------------------
@@ -212,9 +265,21 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		const std::vector<std::shared_ptr<graphics::dx12::Shader>>& ResourceAtlas::GetShaders() const
+		const std::vector<std::shared_ptr<graphics::dx12::PixelShader>>& ResourceAtlas::GetPixelShaders() const
 		{
-			return m_aShaders;
+			return m_aPixelShaders;
+		}
+
+		//---------------------------------------------------------------------
+		const std::vector<std::shared_ptr<graphics::dx12::VertexShader>>& ResourceAtlas::GetVertexShaders() const
+		{
+			return m_aVertexShaders;
+		}
+
+		//---------------------------------------------------------------------
+		const std::vector<std::shared_ptr<graphics::dx12::DX12ShaderBind>>& ResourceAtlas::GetShaderBinds() const
+		{
+			return m_aShaderBinds;
 		}
 
 		//---------------------------------------------------------------------

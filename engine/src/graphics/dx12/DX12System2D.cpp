@@ -197,9 +197,14 @@ namespace gallus
 				texture->SetResourceCategory(core::EngineResourceCategory::Missing);
 				texture->SetIsDestroyable(false);
 
-				std::shared_ptr<Shader> shader = core::TOOL->GetResourceAtlas().LoadShader("vertexShader.hlsl", "pixelShader.hlsl"); // Default shader.
-				shader->SetResourceCategory(core::EngineResourceCategory::Missing);
-				shader->SetIsDestroyable(false);
+				std::shared_ptr<PixelShader> pixelShader = core::TOOL->GetResourceAtlas().LoadPixelShader("pixelShader.hlsl"); // Default shader.
+				std::shared_ptr<VertexShader> vertexShader = core::TOOL->GetResourceAtlas().LoadVertexShader("vertexShader.hlsl"); // Default shader.
+				pixelShader->SetResourceCategory(core::EngineResourceCategory::Missing);
+				pixelShader->SetIsDestroyable(false);
+				vertexShader->SetResourceCategory(core::EngineResourceCategory::Missing);
+				vertexShader->SetIsDestroyable(false);
+
+				std::shared_ptr<DX12ShaderBind> shaderBind = core::TOOL->GetResourceAtlas().LoadShaderBind(pixelShader.get(), vertexShader.get()); // Default shader.
 
 				std::shared_ptr<Mesh> mesh = core::TOOL->GetResourceAtlas().LoadMesh("generic_mesh", cCommandList); // Default mesh.
 				mesh->SetResourceCategory(core::EngineResourceCategory::Missing);
@@ -207,11 +212,6 @@ namespace gallus
 
 				uint64_t fenceValue = cCommandQueue->ExecuteCommandList(cCommandList);
 				cCommandQueue->WaitForFenceValue(fenceValue);
-
-				m_MeshComponent.Init();
-				m_MeshComponent.SetTexture(texture);
-				m_MeshComponent.SetShader(shader);
-				m_MeshComponent.SetMesh(mesh);
 
 				UpdateRenderTargetViews();
 #ifndef IMGUI_DISABLE

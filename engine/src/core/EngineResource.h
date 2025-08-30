@@ -20,7 +20,9 @@ namespace gallus
 		{
 			ResourceType_Unknown, // THIS SHOULD NEVER HAPPEN IF ONE IS ALLOCATED.
 			ResourceType_Texture,
-			ResourceType_Shader,
+			ResourceType_PixelShader,
+			ResourceType_VertexShader,
+			ResourceType_ShaderBind,
 			ResourceType_Mesh,
 			ResourceType_Material,
 		};
