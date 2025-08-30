@@ -87,6 +87,12 @@ namespace gallus
 					return false;
 				}
 
+				auto desc = m_pResource->GetDesc();
+				if (desc.Width == 0 || desc.Height == 0)
+				{
+					return false;
+				}
+
 				CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
 					m_pResource.Get(),
 					D3D12_RESOURCE_STATE_COPY_DEST,

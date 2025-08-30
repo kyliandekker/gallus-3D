@@ -81,6 +81,11 @@ namespace gallus
 
 			void ExplorerWindow::Render()
 			{
+				if (!core::EDITOR_TOOL)
+				{
+					return;
+				}
+
 				if (m_bNeedsRescan)
 				{
 					m_pViewedFolder = nullptr;

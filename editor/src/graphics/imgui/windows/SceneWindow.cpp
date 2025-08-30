@@ -29,6 +29,11 @@ namespace gallus
             //---------------------------------------------------------------------
             void SceneWindow::Render()
             {
+                if (!core::EDITOR_TOOL)
+                {
+                    return;
+                }
+
                 std::shared_ptr<gallus::graphics::dx12::Texture> renderTexture = core::TOOL->GetDX12().GetRenderTexture();
                 if (!renderTexture || !renderTexture->IsValid())
                     return;

@@ -56,6 +56,11 @@ namespace gallus
 			//---------------------------------------------------------------------
 			void HierarchyWindow::Render()
 			{
+				if (!core::EDITOR_TOOL)
+				{
+					return;
+				}
+
 				std::lock_guard<std::recursive_mutex> lock(core::TOOL->GetECS().m_EntityMutex);
 
 				// This needs to be done at the start of the frame to avoid errors.

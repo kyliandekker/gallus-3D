@@ -31,6 +31,11 @@ namespace gallus
 
 			void InspectorWindow::Render()
 			{
+				if (!core::EDITOR_TOOL)
+				{
+					return;
+				}
+
 				std::lock_guard<std::mutex> lock(core::EDITOR_TOOL->GetEditor().m_EditorMutex);
 
 				InspectorView* inspectorView = core::EDITOR_TOOL->GetEditor().GetInspectorView();
