@@ -10,6 +10,7 @@
 #include "graphics/dx12/Mesh.h"
 #include "graphics/dx12/Texture.h"
 #include "graphics/dx12/Shader.h"
+#include "graphics/dx12/DX12ShaderBind.h"
 
 #include "graphics/dx12/CommandList.h"
 #include "graphics/dx12/CommandQueue.h"
@@ -32,6 +33,72 @@ namespace gallus
 
 			void SpriteComponentUIView::RenderInner()
 			{
+				ImGui::DisplayHeader(m_Window.GetBoldFont(), "Pixel Shader");
+
+				if (ImGui::IconButton(ImGui::IMGUI_FORMAT_ID(font::ICON_FILE_IMAGE, BUTTON_ID, "MESH_COMPONENT_PIXEL_SHADER").c_str(), m_Window.GetHeaderSize(), m_Window.GetIconFont()))
+				{
+					FilePickerModal* modal = dynamic_cast<FilePickerModal*>(m_Window.GetModal(0));
+
+					if (modal)
+					{
+						modal->SetData(
+							[this](int success, gallus::editor::FileResource& resource)
+							{
+								if (success == 1)
+								{
+									m_Component.SetShader(
+										core::TOOL->GetResourceAtlas().LoadShaderBind(
+											core::TOOL->GetResourceAtlas().LoadPixelShader(resource.GetPath().filename().generic_string()).get(),
+											m_Component.GetShader()->GetVertexShader()
+									).get());
+								}
+							},
+							std::vector<gallus::editor::AssetType>{ gallus::editor::AssetType::PixelShader }
+						);
+						modal->Show();
+					}
+				}
+				ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+				ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+				ImGui::Text(m_Component.GetShader() ? std::string(m_Component.GetShader()->GetPixelShader()->GetName().begin(), m_Component.GetShader()->GetPixelShader()->GetName().end()).c_str() : "None");
+				ImGui::PopItemFlag();
+				ImGui::PopStyleVar();
+
+				ImGui::NewLine();
+
+				ImGui::DisplayHeader(m_Window.GetBoldFont(), "Vertex Shader");
+
+				if (ImGui::IconButton(ImGui::IMGUI_FORMAT_ID(font::ICON_FILE_IMAGE, BUTTON_ID, "MESH_COMPONENT_VERTEX_SHADER").c_str(), m_Window.GetHeaderSize(), m_Window.GetIconFont()))
+				{
+					FilePickerModal* modal = dynamic_cast<FilePickerModal*>(m_Window.GetModal(0));
+
+					if (modal)
+					{
+						modal->SetData(
+							[this](int success, gallus::editor::FileResource& resource)
+							{
+								if (success == 1)
+								{
+									m_Component.SetShader(
+										core::TOOL->GetResourceAtlas().LoadShaderBind(
+											m_Component.GetShader()->GetPixelShader(), 
+											core::TOOL->GetResourceAtlas().LoadVertexShader(resource.GetPath().filename().generic_string()).get()
+									).get());
+								}
+							},
+							std::vector<gallus::editor::AssetType>{ gallus::editor::AssetType::VertexShader }
+						);
+						modal->Show();
+					}
+				}
+				ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+				ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+				ImGui::Text(m_Component.GetShader() ? std::string(m_Component.GetShader()->GetVertexShader()->GetName().begin(), m_Component.GetShader()->GetVertexShader()->GetName().end()).c_str() : "None");
+				ImGui::PopItemFlag();
+				ImGui::PopStyleVar();
+
+				ImGui::NewLine();
+
 				ImGui::DisplayHeader(m_Window.GetBoldFont(), "Texture");
 
 				if (ImGui::IconButton(ImGui::IMGUI_FORMAT_ID(font::ICON_FILE_IMAGE, BUTTON_ID, "MESH_COMPONENT_TEXTURE").c_str(), m_Window.GetHeaderSize(), m_Window.GetIconFont()))
@@ -64,6 +131,8 @@ namespace gallus
 				ImGui::Text(m_Component.GetTexture() ? std::string(m_Component.GetTexture()->GetName().begin(), m_Component.GetTexture()->GetName().end()).c_str() : "None");
 				ImGui::PopItemFlag();
 				ImGui::PopStyleVar();
+
+				ImGui::NewLine();
 
 				float fontSize = m_Window.GetFontSize();
 				ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(fontSize / 2, fontSize / 2));

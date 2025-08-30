@@ -71,7 +71,7 @@ namespace gallus
 				ImVec2 initialPos = ImGui::GetCursorPos();
 				ImGui::SetCursorPos(ImVec2(initialPos.x + m_Window.GetFramePadding().x, initialPos.y + m_Window.GetFramePadding().y));
 
-				float childSize = ImGui::GetContentRegionAvail().x / 2;
+				float childSize = (m_pPreviewTexture->CanBeDrawn()) ? (ImGui::GetContentRegionAvail().x / 2) : 0;
 
 				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, m_Window.GetWindowPadding());
 				ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(m_Window.GetFramePadding().x * 2, m_Window.GetFramePadding().y * 2));
@@ -118,32 +118,36 @@ namespace gallus
 					}
 				}
 				ImGui::EndChild();
-				ImGui::SameLine();
-				if (ImGui::BeginChild(
-					ImGui::IMGUI_FORMAT_ID("", CHILD_ID, "FILES_EXPLORER_FILE_PICKER_PREVIEW_MODAL").c_str(),
-					ImVec2(
-					childSize - m_Window.GetFramePadding().x,
-					ImGui::GetContentRegionAvail().y - m_Window.GetFramePadding().y
-					),
-					ImGuiChildFlags_Borders
-					))
+
+				if (childSize > 0)
 				{
-					if (m_pPreviewTexture && m_pPreviewTexture->CanBeDrawn())
+					ImGui::SameLine();
+					if (ImGui::BeginChild(
+						ImGui::IMGUI_FORMAT_ID("", CHILD_ID, "FILES_EXPLORER_FILE_PICKER_PREVIEW_MODAL").c_str(),
+						ImVec2(
+						childSize - m_Window.GetFramePadding().x,
+						ImGui::GetContentRegionAvail().y - m_Window.GetFramePadding().y
+						),
+						ImGuiChildFlags_Borders
+						))
 					{
-						const float height_new = ImGui::GetContentRegionAvail().y;
-						const float width = (m_pPreviewTexture->GetResourceDesc().Width * (1.0f / m_pPreviewTexture->GetResourceDesc().Height * height_new));
+						if (m_pPreviewTexture && m_pPreviewTexture->CanBeDrawn())
+						{
+							const float height_new = ImGui::GetContentRegionAvail().y;
+							const float width = (m_pPreviewTexture->GetResourceDesc().Width * (1.0f / m_pPreviewTexture->GetResourceDesc().Height * height_new));
 
-						float offset = (ImGui::GetContentRegionAvail().x - width) / 2;
-						ImGui::SetCursorPosX(ImGui::GetCursorPosX() + offset);
-						ImVec2 image_pos = ImGui::GetCursorScreenPos();
-						ImGui::Image((ImTextureID) m_pPreviewTexture->GetGPUHandle().ptr, ImVec2(width, height_new));
+							float offset = (ImGui::GetContentRegionAvail().x - width) / 2;
+							ImGui::SetCursorPosX(ImGui::GetCursorPosX() + offset);
+							ImVec2 image_pos = ImGui::GetCursorScreenPos();
+							ImGui::Image((ImTextureID) m_pPreviewTexture->GetGPUHandle().ptr, ImVec2(width, height_new));
 
-						// Draw border
-						ImDrawList* draw_list = ImGui::GetForegroundDrawList();
-						draw_list->AddRect(image_pos, ImVec2(image_pos.x + width, image_pos.y + height_new), ImGui::GetColorU32(ImGui::GetStyle().Colors[ImGuiCol_Border])); // White border
+							// Draw border
+							ImDrawList* draw_list = ImGui::GetForegroundDrawList();
+							draw_list->AddRect(image_pos, ImVec2(image_pos.x + width, image_pos.y + height_new), ImGui::GetColorU32(ImGui::GetStyle().Colors[ImGuiCol_Border])); // White border
+						}
 					}
+					ImGui::EndChild();
 				}
-				ImGui::EndChild();
 
 				ImGui::PopStyleVar();
 				ImGui::PopStyleVar();
@@ -175,6 +179,8 @@ namespace gallus
 
 			void FilePickerModal::SetData(const std::function<void(int, gallus::editor::FileResource&)>& a_Callback, const std::vector<gallus::editor::AssetType>& a_aFileTypes)
 			{
+				m_pPreviewTexture->Destroy();
+
 				m_pSelectedFileResource = nullptr;
 				m_Callback = nullptr;
 
