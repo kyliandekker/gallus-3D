@@ -249,6 +249,30 @@ namespace gallus
 				m_WindowSettings.Save();
 			}
 
+			void Window::SetResizingAllowed(bool a_bResizingAllowed)
+			{
+				LONG style = GetWindowLong(m_hWnd, GWL_STYLE);
+
+				if (a_bResizingAllowed)
+				{
+					style |= WS_THICKFRAME;     // Allow resizing border
+					style |= WS_MAXIMIZEBOX;    // Allow maximize button
+				}
+				else
+				{
+					style &= ~WS_THICKFRAME;    // Disable resizing
+					style &= ~WS_MAXIMIZEBOX;   // Disable maximize button
+				}
+
+				SetWindowLong(m_hWnd, GWL_STYLE, style);
+
+				// Apply the changes
+				SetWindowPos(
+					m_hWnd, nullptr, 0, 0, 0, 0,
+					SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED
+				);
+			}
+
 			//---------------------------------------------------------------------
 			bool Window::InitThreadWorker()
 			{

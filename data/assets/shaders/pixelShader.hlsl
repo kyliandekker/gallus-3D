@@ -11,5 +11,7 @@ float4 main(PSInput input) : SV_TARGET
 {
     float4 color = spriteTexture.Sample(samplerState, input.uv);
 
-    return color;// float4(input.uv, 0, 1); 
+    color.rgb *= color.a;
+	
+    return color; 
 }

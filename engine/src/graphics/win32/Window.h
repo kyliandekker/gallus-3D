@@ -159,6 +159,8 @@ namespace gallus
 				/// </summary>
 				void SaveSettings();
 
+				void SetResizingAllowed(bool a_bResizingAllowed);
+
 				std::mutex g_EventMutex;
 			protected:
 				bool Sleep() const override

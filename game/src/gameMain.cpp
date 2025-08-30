@@ -23,7 +23,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR lp
 
 	// Initialize systems.
 	std::string name = "2D Game";
-	std::string saveDirPath = gallus::file::GetAppDataPath().generic_string() + "/tool";
+	std::string saveDirPath = gallus::file::GetAppDataPath().generic_string() + "/game";
 	std::string assetPath = "./data/assets/";
 	gallus::core::TOOL = new gallus::core::Tool();
 	gallus::core::TOOL->SetSaveDirectory(saveDirPath);
@@ -36,6 +36,8 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR lp
 	HICON hIconSmall = (HICON) LoadImage(hInstance, MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON, 16, 16, 0); // 16x16
 	SendMessage(gallus::core::TOOL->GetWindow().GetHWnd(), WM_SETICON, ICON_BIG, (LPARAM) hIconLarge);
 	SendMessage(gallus::core::TOOL->GetWindow().GetHWnd(), WM_SETICON, ICON_SMALL, (LPARAM) hIconSmall);
+	gallus::core::TOOL->GetWindow().SetSize({ 960, 540 });
+	gallus::core::TOOL->GetWindow().SetResizingAllowed(false);
 
 	// Loop.
 	game::GAME.Initialize();
