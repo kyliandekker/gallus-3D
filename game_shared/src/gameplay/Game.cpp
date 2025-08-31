@@ -20,13 +20,13 @@ namespace game
 
 		if (!LoadTextures())
 		{
-			LOG(gallus::LOGSEVERITY_ERROR, LOG_CATEGORY_ENGINE, "Failed loading textures.");
+			LOG(gallus::LOGSEVERITY_ERROR, LOG_CATEGORY_GAME, "Failed loading textures.");
 			return false;
 		}
 
 		if (!LoadSounds())
 		{
-			LOG(gallus::LOGSEVERITY_ERROR, LOG_CATEGORY_ENGINE, "Failed loading sounds.");
+			LOG(gallus::LOGSEVERITY_ERROR, LOG_CATEGORY_GAME, "Failed loading sounds.");
 			return false;
 		}
 
@@ -34,7 +34,7 @@ namespace game
 
 		System::Initialize();
 
-		LOG(gallus::LOGSEVERITY_INFO, LOG_CATEGORY_ENGINE, "Initialized game.");
+		LOG(gallus::LOGSEVERITY_INFO, LOG_CATEGORY_GAME, "Initialized game.");
 
 		return true;
 	}

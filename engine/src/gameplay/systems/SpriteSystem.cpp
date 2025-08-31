@@ -19,7 +19,7 @@ namespace gallus
 		//---------------------------------------------------------------------
 		std::string SpriteSystem::GetPropertyName() const
 		{
-			return "meshInfo";
+			return "sprite";
 		}
 
 		//---------------------------------------------------------------------
@@ -27,7 +27,7 @@ namespace gallus
 		{
 			std::string name = "Sprite";
 #ifdef _EDITOR
-			name = std::string(font::ICON_CUBE) + " " + name;
+			name = std::string(font::ICON_IMAGE) + " " + name;
 #endif // _EDITOR
 			return name;
 		}

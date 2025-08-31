@@ -38,7 +38,9 @@ namespace gallus
 				/// </summary>
 				void Render() override;
 
-				void DrawGizmos(const ImVec2& a_SceneStartPos, const ImVec2& a_Size);
+				void DrawGizmos(const ImVec2& a_vSceneStartPos, const ImVec2& a_vSize, float a_fZoom, const ImVec2& a_vPanOffset);
+				void DrawBoundsGizmo(const ImVec2& a_vScenePos, float a_fZoom, const ImVec2& a_vPanOffset);
+				void DrawViewportPanel();
 				void DrawTransformGizmo();
 			};
 		}
