@@ -35,6 +35,8 @@ namespace gallus
 				/// <returns>A reference to the icon string.</returns>
 				const std::string& GetIcon() const;
 
+				void SetIcon();
+
 				/// <summary>
 				/// Sets the icon string for the resource.
 				/// </summary>

@@ -25,16 +25,16 @@ namespace gallus
 				font::ICON_FILE_MUSIC,
 				font::ICON_FILE_VO,
 				font::ICON_FILE, // TODO: FIND ICON ANIMATION
-				font::ICON_FILE, // TODO: FIND ICON SHADER
-				font::ICON_FILE, // TODO: FIND ICON SHADER
+				font::ICON_FILE_SETTINGS, // TODO: FIND ICON SHADER
+				font::ICON_FILE_SETTINGS, // TODO: FIND ICON SHADER
 			};
 
 			ExplorerFileUIView::ExplorerFileUIView(ImGuiWindow& a_Window, gallus::editor::FileResource& a_FileResource, ExplorerFileUIView* a_pParent, bool a_bGetChildren) : ImGuiUIView(a_Window),
 				m_FileResource(a_FileResource),
 				m_pParent(a_pParent)
 			{
+				SetIcon();
 				SetDisplayName(m_FileResource.GetPath().filename().generic_string());
-				m_sIcon = RESOURCE_ICONS[(int) a_FileResource.GetAssetType()];
 
 				if (a_bGetChildren)
 				{
@@ -45,7 +45,12 @@ namespace gallus
 				}
 			}
 
-			const std::string& imgui::ExplorerFileUIView::GetIcon() const
+			void ExplorerFileUIView::SetIcon()
+			{
+				m_sIcon = RESOURCE_ICONS[(int) m_FileResource.GetAssetType()];
+			}
+
+			const std::string& ExplorerFileUIView::GetIcon() const
 			{
 				return m_sIcon;
 			}
