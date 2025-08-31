@@ -6,6 +6,7 @@
 #include "gameplay/systems/TransformSystem.h"
 #include "graphics/dx12/CommandQueue.h"
 #include "graphics/dx12/CommandList.h"
+#include "graphics/dx12/Texture.h"
 
 namespace game
 {
@@ -83,8 +84,8 @@ namespace game
 		meshComp->SetMesh(gallus::core::TOOL->GetResourceAtlas().GetDefaultMesh().get());
 		meshComp->SetShader(gallus::core::TOOL->GetResourceAtlas().GetDefaultShaderBind().get());
 		meshComp->SetTexture(gallus::core::TOOL->GetResourceAtlas().LoadTexture("tex_layton.png", cCommandList).get());
-		meshComp->SetSizeToSpriteSize();
 		gallus::gameplay::TransformComponent* transformComp = reinterpret_cast<gallus::gameplay::TransformComponent*>(gallus::core::TOOL->GetECS().GetSystem<gallus::gameplay::TransformSystem>().CreateBaseComponent(entityId));
+		transformComp->Transform().SetScale({ static_cast<float>(meshComp->GetTexture()->GetResourceDesc().Width), static_cast<float>(meshComp->GetTexture()->GetResourceDesc().Height)});
 		cCommandQueue->ExecuteCommandList(cCommandList);
 		cCommandQueue->Flush();
 

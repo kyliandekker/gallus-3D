@@ -66,6 +66,17 @@ namespace gallus
 					//core::ENGINE.GetEditor().SetDirty();
 				}
 
+				ImGui::Unindent();
+				ImGui::DisplayHeader(m_Window.GetBoldFont(), "Pivot");
+				ImGui::Indent();
+
+				m_PivotView.SetValue(m_Component.Transform().GetPivot());
+				if (m_PivotView.Render("TRANSFORM_PIVOT_INSPECTOR", 0.01f, -0.5f, 0.5f))
+				{
+					m_Component.Transform().SetPivot(m_PivotView.GetValue());
+					//core::ENGINE.GetEditor().SetDirty();
+				}
+
 				ImGui::PopItemWidth();
 				ImGui::PopStyleVar();
 				ImGui::PopStyleVar();

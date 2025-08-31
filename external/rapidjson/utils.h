@@ -74,4 +74,34 @@ namespace rapidjson
 		a_Value = a_Document[a_Key.c_str()].GetInt();
 		return true;
     }
+
+	// Helper to set or add a string member
+	inline void SetOrAddMember(Value& obj, const char* name, const char* value, Document::AllocatorType& allocator)
+	{
+		if (obj.HasMember(name))
+		{
+			obj[name].SetString(value, allocator);
+		}
+		else
+		{
+			Value key(name, allocator);        // copy the key string
+			Value val(value, allocator);       // copy the value string
+			obj.AddMember(key, val, allocator);
+		}
+	}
+
+	// Overload for int
+	inline void SetOrAddMember(Value& obj, const char* name, int value, Document::AllocatorType& allocator)
+	{
+		if (obj.HasMember(name))
+		{
+			obj[name].SetInt(value);
+		}
+		else
+		{
+			Value key(name, allocator);
+			obj.AddMember(key, value, allocator);
+		}
+	}
+
 }

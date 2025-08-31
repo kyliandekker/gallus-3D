@@ -61,17 +61,17 @@ namespace gallus
 				/// <summary>
 				/// Renders the 2D vector as draggable float inputs in ImGui (X and Y components).
 				/// </summary>
-				/// <param name="a_Label">The label displayed next to the input fields.</param>
-				virtual uint8_t Render(const char* a_Label)
+				/// <param name="a_sLabel">The label displayed next to the input fields.</param>
+				virtual uint8_t Render(const char* a_sLabel, float a_fSpeed = 1.0f, float a_fMin = -900, float a_fMax = 900)
 				{
 					ImGui::AlignTextToFramePadding();
 					ImGui::Text("X");
 					ImGui::SameLine();
-					bool changedValueX = ImGui::DragFloat(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, std::string("X_") + a_Label).c_str(), &m_Value.x, 1.0f);
+					bool changedValueX = ImGui::DragFloat(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, std::string("X_") + a_sLabel).c_str(), &m_Value.x, a_fSpeed, a_fMin, a_fMax);
 					ImGui::SameLine();
 					ImGui::Text("Y");
 					ImGui::SameLine();
-					bool changedValueY = ImGui::DragFloat(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, std::string("Y_") + a_Label).c_str(), &m_Value.y, 1.0f);
+					bool changedValueY = ImGui::DragFloat(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, std::string("Y_") + a_sLabel).c_str(), &m_Value.y, a_fSpeed, a_fMin, a_fMax);
 
 					return changedValueX ? 1 : (changedValueY ? 2 : 0);
 				}

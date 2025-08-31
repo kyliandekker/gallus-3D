@@ -19,7 +19,7 @@ namespace gallus
 				/// <summary>
 				/// Sets the position of the transform.
 				/// </summary>
-				/// <param name="a_Position">A XMFLOAT2 containing the position.</param>
+				/// <param name="a_vPosition">A XMFLOAT2 containing the position.</param>
 				void SetPosition(const DirectX::XMFLOAT2& a_vPosition);
 
 				/// <summary>
@@ -31,8 +31,14 @@ namespace gallus
 				/// <summary>
 				/// Sets the scale of the transform.
 				/// </summary>
-				/// <param name="a_Position">A XMFLOAT2 containing the scale.</param>
+				/// <param name="a_vScale">A XMFLOAT2 containing the scale.</param>
 				void SetScale(const DirectX::XMFLOAT2& a_vScale);
+
+				/// <summary>
+				/// Sets the pivot of the transform.
+				/// </summary>
+				/// <param name="a_vPivot">A XMFLOAT2 containing the pivot.</param>
+				void SetPivot(const DirectX::XMFLOAT2& a_vPivot);
 
 				/// <summary>
 				/// Retrieves the position of the transform.
@@ -52,10 +58,23 @@ namespace gallus
 				/// <returns>A XMFLOAT2 containing the scale.</returns>
 				const DirectX::XMFLOAT2& GetScale() const;
 
-				const DirectX::XMMATRIX GetScaleMatrix() const;
-				const DirectX::XMMATRIX GetRotationMatrix() const;
-				const DirectX::XMMATRIX GetPositionMatrix() const;
+				/// <summary>
+				/// Retrieves the pivot of the transform.
+				/// </summary>
+				/// <returns>A XMFLOAT2 containing the pivot.</returns>
+				const DirectX::XMFLOAT2& GetPivot() const;
+
+				/// <summary>
+				/// Retrieves the world matrix.
+				/// </summary>
+				/// <returns>A XMMATRIX containing the world matrix for the transform.</returns>
 				const DirectX::XMMATRIX GetWorldMatrix() const;
+
+				/// <summary>
+				/// Retrieves the world matrix.
+				/// </summary>
+				/// <returns>A XMMATRIX containing the world matrix for the transform.</returns>
+				const DirectX::XMMATRIX GetWorldMatrixWithPivot() const;
 
 				/// <summary>
 				/// Sets the world matrix.
@@ -66,6 +85,7 @@ namespace gallus
 				DirectX::XMFLOAT2 m_vPosition = { 0, 0 };
 				float m_fRotationDegrees = 0.0f; // rotation around Z axis
 				DirectX::XMFLOAT2 m_vScale = { 1, 1 };
+				DirectX::XMFLOAT2 m_vPivot = { 0.0f, 0.0f };
 			};
 		}
 	}

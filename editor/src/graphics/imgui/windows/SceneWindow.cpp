@@ -127,7 +127,7 @@ namespace gallus
                 ImGuizmo::SetRect(a_vSceneStartPos.x + a_vPanOffset.x, a_vSceneStartPos.y + a_vPanOffset.y, a_vSize.x * a_fZoom, a_vSize.y * a_fZoom);
 
                 DrawTransformGizmo();
-                DrawBoundsGizmo(a_vSceneStartPos, a_fZoom, a_vPanOffset);
+                // DrawBoundsGizmo(a_vSceneStartPos, a_fZoom, a_vPanOffset);
             }
 
             void SceneWindow::DrawBoundsGizmo(const ImVec2& a_vScenePos, float a_fZoom, const ImVec2& a_vPanOffset)
@@ -138,7 +138,7 @@ namespace gallus
                 }
 
                 DirectX::XMFLOAT2 spritePos;
-                DirectX::XMINT2 spriteSize;
+                DirectX::XMFLOAT2 spriteSize;
                 const HierarchyEntityUIView* entity = dynamic_cast<const HierarchyEntityUIView*>(core::EDITOR_TOOL->GetEditor().GetSelectable().get());
                 if (!entity)
                 {
@@ -160,9 +160,7 @@ namespace gallus
 
                 auto& transformComponent = core::TOOL->GetECS().GetSystem<gameplay::TransformSystem>().GetComponent(entity->GetEntityID());
                 spritePos = transformComponent.Transform().GetPosition();
-
-                auto& spriteComponent = core::TOOL->GetECS().GetSystem<gameplay::SpriteSystem>().GetComponent(entity->GetEntityID());
-                spriteSize = spriteComponent.GetSize();
+                spriteSize = transformComponent.Transform().GetScale();
 
                 ImDrawList* drawList = ImGui::GetWindowDrawList();
 
@@ -172,7 +170,7 @@ namespace gallus
                 ImVec2 topLeft = a_vScenePos + zoomedSpritePos + a_vPanOffset;
                 ImVec2 bottomRight = topLeft + zoomedSpriteSize;
 
-                ImU32 color = IM_COL32(255, 255, 255, 100); 
+                ImU32 color = IM_COL32(255, 255, 255, 100);
                 float thickness = 2.0f;
 
                 // Draw rectangle
@@ -244,7 +242,7 @@ namespace gallus
                 }
 
                 transformComponent.Transform().SetPosition(spritePos);
-                spriteComponent.SetSize(spriteSize);
+                transformComponent.Transform().SetScale(spritePos);
             }
 
             void SceneWindow::DrawViewportPanel()
@@ -293,12 +291,12 @@ namespace gallus
                         currentOperation = ImGuizmo::SCALE;
                     }
 
-                    bool isBounds = currentOperation == ImGuizmo::SPRITE_BOUNDS;
-                    if (ImGui::IconCheckboxButton(
-                        ImGui::IMGUI_FORMAT_ID(font::ICON_SCALE, BUTTON_ID, "BOUNDS").c_str(), &isBounds, m_Window.GetHeaderSize(), m_Window.GetIconFont(), isBounds ? ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent) : ImGui::GetStyleColorVec4(ImGuiCol_Text)))
-                    {
-                        currentOperation = ImGuizmo::SPRITE_BOUNDS;
-                    }
+                    //bool isBounds = currentOperation == ImGuizmo::SPRITE_BOUNDS;
+                    //if (ImGui::IconCheckboxButton(
+                    //    ImGui::IMGUI_FORMAT_ID(font::ICON_SCALE, BUTTON_ID, "BOUNDS").c_str(), &isBounds, m_Window.GetHeaderSize(), m_Window.GetIconFont(), isBounds ? ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent) : ImGui::GetStyleColorVec4(ImGuiCol_Text)))
+                    //{
+                    //    currentOperation = ImGuizmo::SPRITE_BOUNDS;
+                    //}
 
                     ImGui::PopStyleVar();
                     ImGui::PopStyleVar();
@@ -319,52 +317,54 @@ namespace gallus
 
             void SceneWindow::DrawTransformGizmo()
             {
+                std::lock_guard<std::recursive_mutex> lock(core::TOOL->GetECS().m_EntityMutex);
+
                 const HierarchyEntityUIView* entity = dynamic_cast<const HierarchyEntityUIView*>(core::EDITOR_TOOL->GetEditor().GetSelectable().get());
-                if (entity)
+                if (!entity)
                 {
-                    std::lock_guard<std::recursive_mutex> lock(core::TOOL->GetECS().m_EntityMutex);
+                    return;
+                }
 
-                    ImGui::SetItemAllowOverlap();
+                ImGui::SetItemAllowOverlap();
 
-                    DirectX::XMMATRIX objectMat;
-                    if (core::TOOL->GetECS().GetSystem<gameplay::TransformSystem>().HasComponent(entity->GetEntityID()))
-                    {
-                        auto& transformComponent = core::TOOL->GetECS().GetSystem<gameplay::TransformSystem>().GetComponent(entity->GetEntityID());
-                        objectMat = transformComponent.Transform().GetWorldMatrix();
-                    }
-                    else
-                    {
-                        return;
-                    }
+                auto& transformComponent = core::TOOL->GetECS().GetSystem<gameplay::TransformSystem>().GetComponent(entity->GetEntityID());
+                DirectX::XMMATRIX pivotOffset = DirectX::XMMatrixTranslation(transformComponent.Transform().GetPivot().x, transformComponent.Transform().GetPivot().y, 0.0f);
+                DirectX::XMMATRIX objectMat = transformComponent.Transform().GetWorldMatrix();
+                objectMat = objectMat * pivotOffset;;
 
-                    // Get transformation matrices
-                    DirectX::XMMATRIX viewMat = core::TOOL->GetDX12().GetCamera().GetViewMatrix();
-                    DirectX::XMMATRIX projMat = core::TOOL->GetDX12().GetCamera().GetProjectionMatrix();
+                // Get transformation matrices
+                DirectX::XMMATRIX viewMat = core::TOOL->GetDX12().GetCamera().GetViewMatrix();
+                const DirectX::XMMATRIX& projMat = core::TOOL->GetDX12().GetCamera().GetProjectionMatrix();
 
-                    // Convert DirectX matrices to float[16] format for ImGuizmo
-                    float gizmoMatrix[16];
-                    DirectX::XMStoreFloat4x4(reinterpret_cast<DirectX::XMFLOAT4X4*>(gizmoMatrix), objectMat);
+                // Convert DirectX matrices to float[16] format for ImGuizmo
+                float objectFloat[16];
+                DirectX::XMStoreFloat4x4(reinterpret_cast<DirectX::XMFLOAT4X4*>(objectFloat), objectMat);
+                float viewFloat[16];
+                DirectX::XMStoreFloat4x4(reinterpret_cast<DirectX::XMFLOAT4X4*>(viewFloat), viewMat);
+                float projFloat[16];
+                DirectX::XMStoreFloat4x4(reinterpret_cast<DirectX::XMFLOAT4X4*>(projFloat), projMat);
 
-                    if (ImGui::IsKeyPressed(ImGuiKey_T) || ImGui::IsKeyPressed(ImGuiKey_P)) currentOperation = ImGuizmo::TRANSLATE;
-                    if (ImGui::IsKeyPressed(ImGuiKey_R)) currentOperation = ImGuizmo::ROTATE;
-                    if (ImGui::IsKeyPressed(ImGuiKey_S)) currentOperation = ImGuizmo::SCALE;
+                if (ImGui::IsKeyPressed(ImGuiKey_T) || ImGui::IsKeyPressed(ImGuiKey_P)) currentOperation = ImGuizmo::TRANSLATE;
+                if (ImGui::IsKeyPressed(ImGuiKey_R)) currentOperation = ImGuizmo::ROTATE;
+                if (ImGui::IsKeyPressed(ImGuiKey_S)) currentOperation = ImGuizmo::SCALE;
 
-                    bool useSnap = ImGui::IsKeyDown(ImGuiKey_LeftShift);
-                    float snap = useSnap ? 1.0f : 0.0f;
+                bool useSnap = ImGui::IsKeyDown(ImGuiKey_LeftShift);
+                float snap = useSnap ? 1.0f : 0.0f;
 
-                    // Render the gizmo (check if manipulation occurred)
-                    if (ImGuizmo::Manipulate(reinterpret_cast<float*>(&viewMat),
-                        reinterpret_cast<float*>(&projMat),
-                        currentOperation,
-                        ImGuizmo::LOCAL,
-                        gizmoMatrix, 0, &snap))
-                    {
-                        auto& transformComponent = core::TOOL->GetECS().GetSystem<gameplay::TransformSystem>().GetComponent(entity->GetEntityID());
-                        objectMat = XMLoadFloat4x4(reinterpret_cast<DirectX::XMFLOAT4X4*>(gizmoMatrix));
-                        transformComponent.Transform().SetWorldMatrix(objectMat);
+                // Render the gizmo (check if manipulation occurred)
+                if (ImGuizmo::Manipulate(
+                    viewFloat,
+                    projFloat,
+                    currentOperation,
+                    ImGuizmo::LOCAL,
+                    objectFloat, 0, &snap))
+                {
+                    DirectX::XMMATRIX result = DirectX::XMLoadFloat4x4(reinterpret_cast<DirectX::XMFLOAT4X4*>(objectFloat));
+                    result = result * DirectX::XMMatrixInverse(nullptr, pivotOffset);
 
-                        //core::TOOL->GetEditor().SetDirty();
-                    }
+                    transformComponent.Transform().SetWorldMatrix(result);
+
+                    //core::TOOL->GetEditor().SetDirty();
                 }
             }
         }

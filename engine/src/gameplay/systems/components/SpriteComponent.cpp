@@ -52,31 +52,6 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		void SpriteComponent::SetSizeToSpriteSize()
-		{
-			if (m_pTexture)
-			{
-				SetSize({ static_cast<int32_t>(m_pTexture->GetResourceDesc().Width), static_cast<int32_t>(m_pTexture->GetResourceDesc().Height) });
-			}
-		}
-
-		//---------------------------------------------------------------------
-		DirectX::XMMATRIX SpriteComponent::GetWorldMatrix(const EntityID& a_EntityID)
-		{
-			graphics::dx12::DX12Transform transform;
-			TransformSystem& transformSys = core::TOOL->GetECS().GetSystem<TransformSystem>();
-			if (transformSys.HasComponent(a_EntityID))
-			{
-				transform = transformSys.GetComponent(a_EntityID).Transform();
-			}
-			const DirectX::XMMATRIX world = DirectX::XMMatrixScaling(static_cast<float>(m_vSize.x) * transform.GetScale().x,
-				static_cast<float>(m_vSize.y) * transform.GetScale().y, 1.0f)
-				* transform.GetRotationMatrix()
-				* transform.GetPositionMatrix();
-			return world;
-		}
-
-		//---------------------------------------------------------------------
 		void SpriteComponent::Render(std::shared_ptr<graphics::dx12::CommandList> a_pCommandList, const EntityID& a_EntityID, const graphics::dx12::Camera& a_Camera)
 		{
 			const DirectX::XMMATRIX viewMatrix = a_Camera.GetViewMatrix();
@@ -104,7 +79,13 @@ namespace gallus
 
 			if (m_pMesh && m_pMesh->IsValid())
 			{
-				DirectX::XMMATRIX mvpMatrix = GetWorldMatrix(a_EntityID) * viewMatrix * projectionMatrix;
+				graphics::dx12::DX12Transform transform;
+				TransformSystem& transformSys = core::TOOL->GetECS().GetSystem<TransformSystem>();
+				if (transformSys.HasComponent(a_EntityID))
+				{
+					transform = transformSys.GetComponent(a_EntityID).Transform();
+				}
+				DirectX::XMMATRIX mvpMatrix = transform.GetWorldMatrixWithPivot() * viewMatrix * projectionMatrix;
 				m_pMesh->Render(a_pCommandList, mvpMatrix);
 			}
 

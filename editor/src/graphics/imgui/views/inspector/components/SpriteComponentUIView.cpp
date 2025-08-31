@@ -148,14 +148,6 @@ namespace gallus
 
 				ImGui::PopStyleVar();
 				ImGui::PopStyleVar();
-
-				ImGui::NewLine();
-
-				if (ImGui::Button(ImGui::IMGUI_FORMAT_ID("Set Size To Sprite Size", BUTTON_ID, "SPRITE_COMPONENT_SET_SPRITE_SIZE").c_str()))
-				{
-					m_Component.SetSizeToSpriteSize();
-					//core::ENGINE.GetEditor().SetDirty();
-				}
 			}
 
 			std::string SpriteComponentUIView::GetName() const

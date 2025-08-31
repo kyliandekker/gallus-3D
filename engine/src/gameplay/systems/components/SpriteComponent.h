@@ -51,8 +51,6 @@ namespace gallus
 			/// <param name="a_Texture">Reference to the texture that the mesh component will use.</param>
 			void SetTexture(graphics::dx12::Texture* a_pTexture);
 
-			void SetSizeToSpriteSize();
-
 			/// <summary>
 			/// Retrieves the mesh used by the mesh component.
 			/// </summary>
@@ -80,18 +78,6 @@ namespace gallus
 				return m_pTexture;
 			}
 
-			const DirectX::XMINT2& GetSize() const
-			{
-				return m_vSize;
-			}
-
-			void SetSize(const DirectX::XMINT2& a_vSize)
-			{
-				m_vSize = a_vSize;
-			}
-
-			DirectX::XMMATRIX GetWorldMatrix(const EntityID& a_EntityID);
-
 			/// <summary>
 			/// Renders the mesh.
 			/// </summary>
@@ -117,8 +103,6 @@ namespace gallus
 			graphics::dx12::Mesh* m_pMesh = nullptr;
 			graphics::dx12::DX12ShaderBind* m_pShaderBind = nullptr;
 			graphics::dx12::Texture* m_pTexture = nullptr;
-
-			DirectX::XMINT2 m_vSize = { -1, -1 };
 		};
 	}
 }

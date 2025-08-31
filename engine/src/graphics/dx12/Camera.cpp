@@ -57,7 +57,7 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			DirectX::XMMATRIX Camera::GetProjectionMatrix() const
+			const DirectX::XMMATRIX& Camera::GetProjectionMatrix() const
 			{
 				return m_ProjectionMatrix;
 			}

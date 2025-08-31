@@ -74,6 +74,8 @@ namespace gallus
 
 			bool SearchForPath(const fs::path& a_Path, FileResource*& a_pFileResource);
 
+			bool GetMetaData(rapidjson::Document& a_Document) const;
+
 			std::vector<FileResource>& GetChildren()
 			{
 				return m_aChildren;

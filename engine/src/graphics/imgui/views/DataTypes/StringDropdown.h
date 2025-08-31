@@ -76,8 +76,8 @@ namespace gallus
 				/// <returns>True if the drop-down menu is open, otherwise false.</returns>
 				bool Render(const char* a_Label)
 				{
-					bool b = ImGui::BeginCombo(a_Label, ToString(GetValue()).c_str());
-					if (b)
+					bool b = false;
+					if (ImGui::BeginCombo(a_Label, ToString(GetValue()).c_str()))
 					{
 						for (size_t n = 0; n < m_Options.size(); n++)
 						{
@@ -85,6 +85,7 @@ namespace gallus
 							if (ImGui::Selectable(ToString(m_Options[n]).c_str(), is_selected))
 							{
 								m_Selected = n;
+								b = true;
 							}
 
 							if (is_selected)

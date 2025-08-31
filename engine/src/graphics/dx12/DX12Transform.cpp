@@ -36,6 +36,12 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
+			void DX12Transform::SetPivot(const DirectX::XMFLOAT2& a_vPivot)
+			{
+				m_vPivot = a_vPivot;
+			}
+
+			//---------------------------------------------------------------------
 			const DirectX::XMFLOAT2& DX12Transform::GetPosition() const
 			{
 				return m_vPosition;
@@ -53,30 +59,36 @@ namespace gallus
 				return m_vScale;
 			}
 
-			const DirectX::XMMATRIX DX12Transform::GetScaleMatrix() const
+			//---------------------------------------------------------------------
+			const DirectX::XMFLOAT2& DX12Transform::GetPivot() const
 			{
-				return DirectX::XMMatrixScaling(m_vScale.x, m_vScale.y, 1.0f);
+				return m_vPivot;
 			}
 
-			const DirectX::XMMATRIX DX12Transform::GetRotationMatrix() const
-			{
-				const float radians = DirectX::XMConvertToRadians(m_fRotationDegrees);
-				return DirectX::XMMatrixRotationZ(radians);
-			}
-
-			const DirectX::XMMATRIX DX12Transform::GetPositionMatrix() const
-			{
-				return DirectX::XMMatrixTranslation(m_vPosition.x, m_vPosition.y, 0.0f);
-			}
-
+			//---------------------------------------------------------------------
 			const DirectX::XMMATRIX DX12Transform::GetWorldMatrix() const
 			{
-				const DirectX::XMMATRIX scaleMatrix = DirectX::XMMatrixScaling(m_vScale.x, m_vScale.y, 1.0f);
-				const float radians = DirectX::XMConvertToRadians(m_fRotationDegrees);
-				const DirectX::XMMATRIX rotationMatrix = DirectX::XMMatrixRotationZ(radians);
-				const DirectX::XMMATRIX translationMatrix = DirectX::XMMatrixTranslation(m_vPosition.x, m_vPosition.y, 0.0f);
+				DirectX::XMMATRIX scaleMatrix = DirectX::XMMatrixScaling(m_vScale.x, m_vScale.y, 1.0f);
+				float radians = DirectX::XMConvertToRadians(m_fRotationDegrees);
+				DirectX::XMMATRIX rotationMatrix = DirectX::XMMatrixRotationZ(radians);
+				DirectX::XMMATRIX translationMatrix = DirectX::XMMatrixTranslation(m_vPosition.x, m_vPosition.y, 0.0f);
 
 				return scaleMatrix * rotationMatrix * translationMatrix;
+			}
+
+			//---------------------------------------------------------------------
+			const DirectX::XMMATRIX DX12Transform::GetWorldMatrixWithPivot() const
+			{
+				DirectX::XMMATRIX scaleMatrix = DirectX::XMMatrixScaling(m_vScale.x, m_vScale.y, 1.0f);
+				float radians = DirectX::XMConvertToRadians(m_fRotationDegrees);
+				DirectX::XMMATRIX rotationMatrix = DirectX::XMMatrixRotationZ(radians);
+				DirectX::XMMATRIX translationMatrix = DirectX::XMMatrixTranslation(m_vPosition.x, m_vPosition.y, 0.0f);
+
+				DirectX::XMMATRIX pivotTranslation = DirectX::XMMatrixTranslation(m_vPivot.x, m_vPivot.y, 0.0f);
+				DirectX::XMMATRIX invPivotTranslation = DirectX::XMMatrixTranslation(-m_vPivot.x, -m_vPivot.y, 0.0f);
+
+				// World = Translation * Pivot * Rotation * Scale * InversePivot
+				return invPivotTranslation * scaleMatrix * rotationMatrix * pivotTranslation * translationMatrix;
 			}
 
 			//---------------------------------------------------------------------
@@ -98,7 +110,9 @@ namespace gallus
 				m_fRotationDegrees = DirectX::XMConvertToDegrees(radians);
 
 				if (m_fRotationDegrees < 0.0f)
+				{
 					m_fRotationDegrees += 360.0f;
+				}
 			}
 		}
 	}

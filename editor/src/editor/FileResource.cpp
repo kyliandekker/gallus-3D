@@ -60,28 +60,6 @@ namespace gallus
 		};
 
 		//---------------------------------------------------------------------
-		bool loadMetadata(const fs::path a_Path, rapidjson::Document& a_Document)
-		{
-			core::DataStream data;
-			fs::path metaPath = a_Path.generic_string() + ".meta";
-			if (!file::LoadFile(metaPath, data))
-			{
-				LOGF(LOGSEVERITY_ERROR, LOG_CATEGORY_EDITOR, "Failed loading meta file '%s'.", metaPath.generic_string().c_str());
-				return false;
-			}
-
-			a_Document.Parse(reinterpret_cast<char*>(data.data()), data.size());
-
-			if (a_Document.HasParseError())
-			{
-				LOGF(LOGSEVERITY_ERROR, LOG_CATEGORY_EDITOR, "Failed loading data in meta file '%s'.", metaPath.generic_string().c_str());
-				return false;
-			}
-
-			return true;
-		}
-
-		//---------------------------------------------------------------------
 		bool FileResource::Scan()
 		{
 			if (!fs::exists(m_Path))
@@ -121,9 +99,14 @@ namespace gallus
 						// Use default asset type if not set.
 						AssetType assetType = it->second[0];
 
+						FileResource resource;
+						resource.m_Path = dirEntry.path().lexically_normal();
+						resource.m_Parent = this;
+						resource.m_AssetType = assetType;
+
 						rapidjson::Document document;
 						document.SetObject();
-						bool hasMetadata = loadMetadata(dirEntry.path(), document);
+						bool hasMetadata = resource.GetMetaData(document);
 						if (hasMetadata)
 						{
 							int iAssetType = 0;
@@ -131,10 +114,6 @@ namespace gallus
 							assetType = static_cast<AssetType>(iAssetType);
 						}
 
-						FileResource resource;
-						resource.m_Path = dirEntry.path().lexically_normal();
-						resource.m_Parent = this;
-						resource.m_AssetType = assetType;
 						if (!hasMetadata)
 						{
 							resource.SaveMetadata(document, document.GetAllocator());
@@ -185,13 +164,34 @@ namespace gallus
 			fs::path metaPath = m_Path.generic_string() + ".meta";
 
 			int assetType = (int) m_AssetType;
-			a_Document.AddMember(JSON_FILE_RESOURCE_ASSETTYPE_VAR, assetType, a_Allocator);
+			rapidjson::SetOrAddMember(a_Document, JSON_FILE_RESOURCE_ASSETTYPE_VAR, assetType, a_Allocator);
 
 			rapidjson::StringBuffer buffer;
 			rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
 			a_Document.Accept(writer);
 
 			return file::SaveFile(metaPath, core::Data(buffer.GetString(), buffer.GetSize()));
+		}
+
+		bool FileResource::GetMetaData(rapidjson::Document& a_Document) const
+		{
+			core::DataStream data;
+			fs::path metaPath = m_Path.generic_string() + ".meta";
+			if (!file::LoadFile(metaPath, data))
+			{
+				LOGF(LOGSEVERITY_ERROR, LOG_CATEGORY_EDITOR, "Failed loading meta file '%s'.", metaPath.generic_string().c_str());
+				return false;
+			}
+
+			a_Document.Parse(reinterpret_cast<char*>(data.data()), data.size());
+
+			if (a_Document.HasParseError())
+			{
+				LOGF(LOGSEVERITY_ERROR, LOG_CATEGORY_EDITOR, "Failed loading data in meta file '%s'.", metaPath.generic_string().c_str());
+				return false;
+			}
+
+			return true;
 		}
 
 		bool FileResource::SearchForPath(const fs::path& a_Path, FileResource*& a_pFileResource)

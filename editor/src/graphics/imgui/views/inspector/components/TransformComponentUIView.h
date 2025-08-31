@@ -36,7 +36,8 @@ namespace gallus
 				/// <param name="a_System">The TransformSystem responsible for managing the TransformComponent.</param>
 				TransformComponentUIView(ImGuiWindow& a_Window, gameplay::EntityID& a_EntityID, gameplay::TransformComponent& a_TransformComponent, gameplay::TransformSystem& a_System) : ComponentUIView(a_Window, a_EntityID, a_TransformComponent, a_System),
 					m_PositionView(a_Window),
-					m_ScaleView(a_Window)
+					m_ScaleView(a_Window),
+					m_PivotView(a_Window)
 				{}
 			private:
 				/// <summary>
@@ -53,7 +54,8 @@ namespace gallus
 				/// UI elements for displaying and editing the position, rotation, and scale as glm::vec3.
 				Vector2View<DirectX::XMFLOAT2>
 					m_PositionView,
-					m_ScaleView;
+					m_ScaleView,
+					m_PivotView;
 			};
 		}
 	}

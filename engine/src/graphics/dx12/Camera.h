@@ -68,7 +68,7 @@ namespace gallus
 				/// Returns the current projection matrix of the camera.
 				/// </summary>
 				/// <returns>The projection matrix used for rendering.</returns>
-				DirectX::XMMATRIX GetProjectionMatrix() const;
+				const DirectX::XMMATRIX& GetProjectionMatrix() const;
 			private:
 				DX12Transform m_Transform;
 				DirectX::XMMATRIX m_ProjectionMatrix;
