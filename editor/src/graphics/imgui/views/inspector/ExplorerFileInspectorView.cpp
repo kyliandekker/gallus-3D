@@ -10,6 +10,7 @@
 
 #include "graphics/imgui/views/inspector/fileinfo/ExplorerFileUIViewInfo.h"
 #include "graphics/imgui/views/inspector/fileinfo/ExplorerSpriteUIViewInfo.h"
+#include "graphics/imgui/views/inspector/fileinfo/ExplorerShaderUIViewInfo.h"
 #include "core/EditorTool.h"
 
 namespace gallus
@@ -31,6 +32,12 @@ namespace gallus
 					case gallus::editor::AssetType::Texture:
 					{
 						m_pExplorerFileUIViewInfo = new ExplorerSpriteUIViewInfo(m_Window, a_ExplorerFileUIView);
+						break;
+					}
+					case gallus::editor::AssetType::PixelShader:
+					case gallus::editor::AssetType::VertexShader:
+					{
+						m_pExplorerFileUIViewInfo = new ExplorerShaderUIViewInfo(m_Window, a_ExplorerFileUIView);
 						break;
 					}
 					default:
