@@ -102,7 +102,6 @@ namespace gallus
 						FileResource resource;
 						resource.m_Path = dirEntry.path().lexically_normal();
 						resource.m_Parent = this;
-						resource.m_AssetType = assetType;
 
 						rapidjson::Document document;
 						document.SetObject();
@@ -113,6 +112,7 @@ namespace gallus
 							rapidjson::GetInt(document, JSON_FILE_RESOURCE_ASSETTYPE_VAR, iAssetType);
 							assetType = static_cast<AssetType>(iAssetType);
 						}
+						resource.m_AssetType = assetType;
 
 						if (!hasMetadata)
 						{

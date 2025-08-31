@@ -1,7 +1,7 @@
-﻿#ifndef IMGUI_DISABLE
+#ifndef IMGUI_DISABLE
 #ifdef _EDITOR
 
-#include "ExplorerShaderUIViewInfo.h"
+#include "ExplorerAudioUIViewInfo.h"
 
 #include <imgui/imgui.h>
 #include <imgui/imgui_helpers.h>
@@ -16,20 +16,21 @@ namespace gallus
     {
         namespace imgui
         {
-            ExplorerShaderUIViewInfo::ExplorerShaderUIViewInfo(ImGuiWindow& a_Window, ExplorerFileUIView& a_ExplorerFileUIView) : ExplorerFileUIViewInfo(a_Window, a_ExplorerFileUIView),
+            ExplorerAudioUIViewInfo::ExplorerAudioUIViewInfo(ImGuiWindow& a_Window, ExplorerFileUIView& a_ExplorerFileUIView) : ExplorerFileUIViewInfo(a_Window, a_ExplorerFileUIView),
                 m_AssetTypeDropdown(a_Window)
             {
                 m_AssetTypeDropdown.Initialize(
                     m_ExplorerFileUIView.GetFileResource().GetAssetType(),
                     {
-                        editor::AssetType::PixelShader,
-                        editor::AssetType::VertexShader,
+                        editor::AssetType::Sound,
+                        editor::AssetType::Song,
+                        editor::AssetType::VO,
                     },
                     editor::AssetTypeToString
-                );
+                    );
             }
 
-            void ExplorerShaderUIViewInfo::RenderSpecific()
+            void ExplorerAudioUIViewInfo::RenderSpecific()
             {
                 ImGui::DisplayHeader(m_Window.GetBoldFont(), "Type: ");
                 ImGui::SameLine();
