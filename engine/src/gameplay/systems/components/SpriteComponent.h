@@ -90,6 +90,8 @@ namespace gallus
 				m_vSize = a_vSize;
 			}
 
+			DirectX::XMMATRIX GetWorldMatrix(const EntityID& a_EntityID);
+
 			/// <summary>
 			/// Renders the mesh.
 			/// </summary>

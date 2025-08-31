@@ -89,6 +89,11 @@ namespace gallus
 				{
 					return m_aFenceValues[GetCurrentBackBufferIndex()];
 				}
+
+				Camera& GetCamera()
+				{
+					return m_Camera;
+				}
 			protected:
 				bool Sleep() const override
 				{

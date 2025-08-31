@@ -51,12 +51,29 @@ namespace gallus
 			m_pTexture = a_pTexture;
 		}
 
+		//---------------------------------------------------------------------
 		void SpriteComponent::SetSizeToSpriteSize()
 		{
 			if (m_pTexture)
 			{
 				SetSize({ static_cast<int32_t>(m_pTexture->GetResourceDesc().Width), static_cast<int32_t>(m_pTexture->GetResourceDesc().Height) });
 			}
+		}
+
+		//---------------------------------------------------------------------
+		DirectX::XMMATRIX SpriteComponent::GetWorldMatrix(const EntityID& a_EntityID)
+		{
+			graphics::dx12::DX12Transform transform;
+			TransformSystem& transformSys = core::TOOL->GetECS().GetSystem<TransformSystem>();
+			if (transformSys.HasComponent(a_EntityID))
+			{
+				transform = transformSys.GetComponent(a_EntityID).Transform();
+			}
+			const DirectX::XMMATRIX world = DirectX::XMMatrixScaling(static_cast<float>(m_vSize.x) * transform.GetScale().x,
+				static_cast<float>(m_vSize.y) * transform.GetScale().y, 1.0f)
+				* transform.GetRotationMatrix()
+				* transform.GetPositionMatrix();
+			return world;
 		}
 
 		//---------------------------------------------------------------------
@@ -85,19 +102,9 @@ namespace gallus
 				m_pShaderBind->Bind(a_pCommandList);
 			}
 
-			if (m_pMesh && m_pShaderBind->IsValid())
+			if (m_pMesh && m_pMesh->IsValid())
 			{
-				graphics::dx12::DX12Transform transform;
-				TransformSystem& transformSys = core::TOOL->GetECS().GetSystem<TransformSystem>();
-				if (transformSys.HasComponent(a_EntityID))
-				{
-					transform = transformSys.GetComponent(a_EntityID).Transform();
-				}
-				const DirectX::XMMATRIX world = DirectX::XMMatrixScaling(static_cast<float>(m_vSize.x) * transform.GetScale().x,
-					static_cast<float>(m_vSize.y) * transform.GetScale().y, 1.0f)
-					* transform.GetRotationMatrix()
-					* transform.GetPositionMatrix();
-				const DirectX::XMMATRIX mvpMatrix = world * viewMatrix * projectionMatrix;
+				DirectX::XMMATRIX mvpMatrix = GetWorldMatrix(a_EntityID) * viewMatrix * projectionMatrix;
 				m_pMesh->Render(a_pCommandList, mvpMatrix);
 			}
 

@@ -37,6 +37,9 @@ namespace gallus
 				/// Renders the console window.
 				/// </summary>
 				void Render() override;
+
+				void DrawGizmos(const ImVec2& a_SceneStartPos, const ImVec2& a_Size);
+				void DrawTransformGizmo();
 			};
 		}
 	}

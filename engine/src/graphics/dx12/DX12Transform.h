@@ -55,7 +55,7 @@ namespace gallus
 				const DirectX::XMMATRIX GetScaleMatrix() const;
 				const DirectX::XMMATRIX GetRotationMatrix() const;
 				const DirectX::XMMATRIX GetPositionMatrix() const;
-				const DirectX::XMMATRIX GetMatrix() const;
+				const DirectX::XMMATRIX GetWorldMatrix() const;
 
 				/// <summary>
 				/// Sets the world matrix.
