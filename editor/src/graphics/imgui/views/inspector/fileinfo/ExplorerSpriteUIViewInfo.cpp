@@ -34,10 +34,7 @@ namespace gallus
 
 			ExplorerSpriteUIViewInfo::~ExplorerSpriteUIViewInfo()
 			{
-				if (m_pPreviewTexture)
-				{
-					m_pPreviewTexture->Destroy();
-				}
+				
 			}
             
             int GetFormatChannelCount(DXGI_FORMAT format)

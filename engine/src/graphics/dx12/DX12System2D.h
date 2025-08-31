@@ -80,6 +80,15 @@ namespace gallus
 				/// </summary>
 				/// <returns>True if destruction succeeds, otherwise false.</returns>
 				bool Destroy() override;
+
+				/// <summary>
+				/// Retrieves the current back buffer fence value.
+				/// </summary>
+				/// <returns>Integer representing the back buffer fence value.</returns>
+				uint64_t GetCurrentFenceValue() const
+				{
+					return m_aFenceValues[GetCurrentBackBufferIndex()];
+				}
 			protected:
 				bool Sleep() const override
 				{

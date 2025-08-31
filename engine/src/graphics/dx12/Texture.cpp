@@ -7,6 +7,7 @@
 #include "logger/Logger.h"
 #include "graphics/dx12/CommandList.h"
 #include "core/Data.h"
+#include "graphics/dx12/CommandQueue.h"
 
 namespace gallus
 {
@@ -19,19 +20,17 @@ namespace gallus
 			//---------------------------------------------------------------------
 			Texture::~Texture()
 			{
-				if (m_pResource)
-				{
-					m_pResource.Reset();
-				}
-				if (m_pResourceUploadHeap)
-				{
-					m_pResourceUploadHeap.Reset();
-				}
+				Destroy();
 			}
 
 			//---------------------------------------------------------------------
 			void Texture::Destroy()
 			{
+				std::shared_ptr<CommandQueue> commandQueue = core::TOOL->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_DIRECT);
+
+				uint64_t fenceVal = core::TOOL->GetDX12().GetCurrentFenceValue();
+				commandQueue->WaitForFenceValue(core::TOOL->GetDX12().GetCurrentFenceValue());
+
 				if (m_pResource)
 				{
 					core::TOOL->GetDX12().GetSRV().Deallocate(m_iSRVIndex);
