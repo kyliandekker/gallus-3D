@@ -32,11 +32,6 @@ namespace gallus
 			//---------------------------------------------------------------------
 			void Texture::Destroy()
 			{
-				if (!m_bIsDestroyable)
-				{
-					return;
-				}
-
 				if (m_pResource)
 				{
 					core::TOOL->GetDX12().GetSRV().Deallocate(m_iSRVIndex);
@@ -165,6 +160,12 @@ namespace gallus
 				if (m_pResource && !m_bIsDestroyable)
 				{
 					return false;
+				}
+
+				if (m_iSRVIndex != -1)
+				{
+					core::TOOL->GetDX12().GetSRV().Deallocate(m_iSRVIndex);
+					m_iSRVIndex = -1;
 				}
 
 				int width, height, channels;

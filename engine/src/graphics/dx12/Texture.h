@@ -17,8 +17,8 @@ namespace gallus
 	{
 		namespace dx12
 		{
+			class DX12System2D;
 			class CommandList;
-			class ResourceAtlas;
 
 			//---------------------------------------------------------------------
 			// Texture
@@ -157,7 +157,7 @@ namespace gallus
 
 				~Texture();
 			private:
-				friend ResourceAtlas;
+				friend DX12System2D;
 
 				Microsoft::WRL::ComPtr<ID3D12Resource> m_pResourceUploadHeap = nullptr;
 				int32_t m_iSRVIndex = -1;

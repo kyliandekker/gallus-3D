@@ -99,7 +99,7 @@ namespace gallus
 
 							if (view->GetFileResource().GetAssetType() == gallus::editor::AssetType::Texture && m_pPreviewTexture)
 							{
-								m_pPreviewTexture->Destroy();
+								//m_pPreviewTexture->Destroy();
 
 								auto cCommandQueue = core::TOOL->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
 								auto cCommandList = cCommandQueue->GetCommandList();
