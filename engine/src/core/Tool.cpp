@@ -1,7 +1,9 @@
 #include "Tool.h"
 
-#include "logger/Logger.h"
 #include <glm/vec2.hpp>
+
+// logger includes
+#include "logger/Logger.h"
 
 namespace gallus
 {

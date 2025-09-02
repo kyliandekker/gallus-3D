@@ -2,10 +2,15 @@
 
 #include <d3d12.h>
 
+// core includes
 #include "core/Tool.h" 
-#include "graphics/dx12/DX12System2D.h"
-#include "CommandList.h"
+
+// logger includes
 #include "logger/Logger.h"
+
+// graphics includes
+#include "graphics/dx12/DX12System2D.h"
+#include "graphics/dx12/CommandList.h"
 
 namespace gallus
 {

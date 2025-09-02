@@ -1,8 +1,9 @@
 #include "graphics/win32/Window.h"
 
-#include "logger/Logger.h"
-
 #include <iostream>
+
+// logger includes
+#include "logger/Logger.h"
 
 namespace gallus
 {
@@ -153,7 +154,21 @@ namespace gallus
 			//---------------------------------------------------------------------
 			void Window::SetTitle(const std::string& a_sTitle)
 			{
-				::SetWindowTextA(m_hWnd, a_sTitle.c_str());
+				m_sTitle = a_sTitle;
+				SetTitleInternal("");
+			}
+
+			//---------------------------------------------------------------------
+			void Window::AddTitle(const std::string& a_sTitle)
+			{
+				SetTitleInternal(a_sTitle);
+			}
+
+			//---------------------------------------------------------------------
+			void Window::SetTitleInternal(const std::string& a_sTitle)
+			{
+				std::string title = m_sTitle + a_sTitle.c_str();
+				::SetWindowTextA(m_hWnd, title.c_str());
 			}
 
 			//---------------------------------------------------------------------
@@ -229,7 +244,7 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			SimpleEvent<>& Window::OnQuit()
+			const SimpleEvent<>& Window::OnQuit() const
 			{
 				return m_OnQuit;
 			}

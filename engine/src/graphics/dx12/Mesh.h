@@ -8,7 +8,10 @@
 #include <cstdint>
 #include <memory>
 
+// utils includes
 #include "utils/file_abstractions.h"
+
+// graphics includes
 #include "graphics/dx12/DX12Transform.h"
 #include "graphics/dx12/IndexBuffer.h"
 #include "graphics/dx12/VertexBuffer.h"
@@ -38,8 +41,15 @@ namespace gallus
 			/// Represents a part of a mesh, containing vertices, indices, and GPU buffers.
 			/// Useful for meshes that are split into sub-meshes or materials.
 			/// </summary>
-			struct MeshPartData
+			class MeshPartData
 			{
+			public:
+				MeshPartData(
+					std::vector<VertexPosUV> a_aVertices,
+					std::vector<uint16_t> a_aIndices) :
+					m_aVertices(a_aVertices), m_aIndices(a_aIndices)
+				{}
+
 				std::vector<VertexPosUV> m_aVertices;
 				std::vector<uint16_t> m_aIndices;
 
@@ -48,6 +58,25 @@ namespace gallus
 
 				Microsoft::WRL::ComPtr<ID3D12Resource> m_pIntermediateVertexBuffer;
 				Microsoft::WRL::ComPtr<ID3D12Resource> m_pIntermediateIndexBuffer;
+			};
+
+			enum class PRIMITIVES
+			{
+				SQUARE,
+			};
+			inline std::vector<MeshPartData> s_PRIMITIVES = {
+				MeshPartData(
+					{
+						{ DirectX::XMFLOAT2(-0.5f, -0.5f), DirectX::XMFLOAT2(0.0f, 0.0f) },
+						{ DirectX::XMFLOAT2(0.5f, -0.5f), DirectX::XMFLOAT2(1.0f, 0.0f) },
+						{ DirectX::XMFLOAT2(-0.5f, 0.5f), DirectX::XMFLOAT2(0.0f, 1.0f) },
+						{ DirectX::XMFLOAT2(0.5f, 0.5f), DirectX::XMFLOAT2(1.0f, 1.0f) }
+					},
+					{
+						0, 1, 2,
+						2, 1, 3
+					}
+				)
 			};
 
 			class CommandList;
@@ -86,9 +115,11 @@ namespace gallus
 				/// <param name="a_sName">The name of the mesh to load.</param>
 				/// <param name="a_pCommandList">The command list used for uploading resources to the GPU.</param>
 				/// <returns>True if loading was successful, false otherwise.</returns>
-				bool LoadByName(const std::string& a_sName, const std::shared_ptr<CommandList> a_pCommandList);
+				bool LoadByName(const std::string& a_sName);
+
+				void SetMeshData(const MeshPartData& a_aData, const std::shared_ptr<CommandList> a_pCommandList);
 			private:
-				std::vector<MeshPartData*> m_aMeshData;
+				std::vector<MeshPartData> m_aMeshData;
 			};
 		}
 	}

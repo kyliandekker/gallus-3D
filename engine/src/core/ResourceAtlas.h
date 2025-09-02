@@ -109,7 +109,7 @@ namespace gallus
 			/// <summary>
 			/// Loads a mesh by name from the resource folder.
 			/// </summary>
-			std::shared_ptr<graphics::dx12::Mesh> LoadMesh(const std::string& a_sName, std::shared_ptr<graphics::dx12::CommandList> a_pCommandList);
+			std::shared_ptr<graphics::dx12::Mesh> LoadMesh(const std::string& a_sName);
 
 			/// <summary>
 			/// Checks whether a mesh with the given name is already loaded.

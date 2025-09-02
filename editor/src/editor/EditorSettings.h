@@ -2,6 +2,8 @@
 
 #include "core/Settings.h"
 
+#include <glm/vec2.hpp>
+
 namespace gallus
 {
 	namespace editor
@@ -128,28 +130,40 @@ namespace gallus
 			bool GetShowAwesome() const;
 
 			/// <summary>
-			/// Sets whether lighting it enabled.
+			/// Sets the scene zoom.
 			/// </summary>
-			/// <param name="a_bUseLighting">True to enable lighting, otherwise false.</param>
-			void SetUseLighting(bool a_bUseLighting);
+			/// <param name="a_fSceneZoom">The amount of zoom.</param>
+			void SetSceneZoom(float a_fSceneZoom);
 
 			/// <summary>
-			/// Checks if lighting is enabled.
+			/// Determines how much the scene window is zoomed in.
 			/// </summary>
-			/// <returns>True if lighting is enabled, otherwise false.</returns>
-			bool GetUseLighting() const;
+			/// <returns>Float representing the zoom.</returns>
+			float GetSceneZoom() const;
 
 			/// <summary>
-			/// Sets whether grid it enabled.
+			/// Sets the scene pan offset.
 			/// </summary>
-			/// <param name="a_bUseGrid">True to enable grid, otherwise false.</param>
-			void SetUseGrid(bool a_bUseGrid);
+			/// <param name="a_vScenePanOffset">The offset of the scene window.</param>
+			void SetScenePanOffset(const glm::vec2& a_vScenePanOffset);
 
 			/// <summary>
-			/// Checks if grid is enabled.
+			/// Determines the offset of the scene window.
 			/// </summary>
-			/// <returns>True if grid is enabled, otherwise false.</returns>
-			bool GetUseGrid() const;
+			/// <returns>Vector representing the offset.</returns>
+			const glm::vec2& GetScenePanOffset() const;
+
+			/// <summary>
+			/// Sets the scene operation.
+			/// </summary>
+			/// <param name="a_iLastSceneOperation">The index of the scene operation.</param>
+			void SetLastSceneOperation(int a_iLastSceneOperation);
+
+			/// <summary>
+			/// Determines the operation used in the scene for object transformation.
+			/// </summary>
+			/// <returns>Integer representing the scene operation index.</returns>
+			int GetLastSceneOperation() const;
 		private:
 			/// <summary>
 			/// Virtual method for loading specific vars.
@@ -173,9 +187,9 @@ namespace gallus
 			bool m_bShowInfoSuccess = true; /// Visibility toggle for combined info-success messages.
 			bool m_bShowAwesome = true; /// Visibility toggle for "awesome" log messages.
 
-			bool m_bUseLighting = true; /// Toggle for enabling lighting.
-			bool m_bUseGrid = true; /// Toggle for enabling grid.
-
+			float m_fSceneZoom = 1.0f;
+			glm::vec2 m_vScenePanOffset = glm::vec2(0.0f, 0.0f);
+			int m_iLastSceneOperation = 7;
 		};
 	}
 }

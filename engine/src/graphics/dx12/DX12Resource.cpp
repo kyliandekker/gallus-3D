@@ -1,8 +1,13 @@
 #include "DX12Resource.h"
 
+// core includes
 #include "core/Tool.h" 
-#include "graphics/dx12/DX12System2D.h"
+
+// logger includes
 #include "logger/Logger.h"
+
+// graphics includes
+#include "graphics/dx12/DX12System2D.h"
 
 namespace gallus
 {

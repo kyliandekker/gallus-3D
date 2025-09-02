@@ -7,8 +7,11 @@
 #include <string>
 #include <queue>
 
+// core includes
 #include "core/Event.h"
-#include "WindowSettings.h"
+
+// gameplay includes
+#include "graphics/win32/WindowSettings.h"
 
 #if defined(CreateWindow)
 #undef CreateWindow
@@ -101,6 +104,12 @@ namespace gallus
 				void SetTitle(const std::string& a_sTitle);
 
 				/// <summary>
+				/// Adds to the window title.
+				/// </summary>
+				/// <param name="a_sTitle">The title for the window.</param>
+				void AddTitle(const std::string& a_sTitle);
+
+				/// <summary>
 				/// Retrieves the real (physical) size of the window.
 				/// </summary>
 				/// <returns>A 2D vector representing the width and height of the window.</returns>
@@ -146,7 +155,7 @@ namespace gallus
 				/// Retrieves the on quit event.
 				/// </summary>
 				/// <returns>Reference to the on quit event.</returns>
-				SimpleEvent<>& OnQuit();
+				const SimpleEvent<>& OnQuit() const;
 
 				/// <summary>
 				/// Retrieves the event queue.
@@ -168,6 +177,12 @@ namespace gallus
 					return true;
 				}
 			private:
+				/// <summary>
+				/// Sets the window title.
+				/// </summary>
+				/// <param name="a_sTitle">The title for the window.</param>
+				void SetTitleInternal(const std::string& a_sTitle);
+
 				LPTSTR m_Cursor = IDC_ARROW;
 
 				/// <summary>
@@ -205,6 +220,8 @@ namespace gallus
 				WNDCLASSEX m_Wc = WNDCLASSEX();
 				HINSTANCE m_hInstance = NULL;
 				RECT m_WindowRect;
+
+				std::string m_sTitle;
 
 				bool m_bFullScreen = false;
 			};

@@ -2,7 +2,8 @@
 
 #include <string>
 
-#include "EntityID.h"
+// gameplay includes
+#include "gameplay/EntityID.h"
 
 namespace gallus
 {

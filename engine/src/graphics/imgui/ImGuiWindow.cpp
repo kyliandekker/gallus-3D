@@ -6,18 +6,22 @@
 #include <imgui/backends/imgui_impl_dx12.h>
 #include <imgui/imgui_internal.h>
 
+// core includes
 #include "core/Tool.h"
-#include "logger/Logger.h"
-#include "font_arial.h"
-#include "font_icon.h"
 
+// logger includes
+#include "logger/Logger.h"
+
+// graphics includes
 #include "graphics/win32/Window.h"
 #include "graphics/dx12/DX12System2D.h"
 #include "graphics/dx12/CommandQueue.h"
 #include "graphics/dx12/CommandList.h"
-#include "windows/BaseWindow.h"
-#include "modals/BaseModal.h"
-#include "themes.h"
+#include "graphics/imgui/font_arial.h"
+#include "graphics/imgui/font_icon.h"
+#include "graphics/imgui/themes.h"
+#include "graphics/imgui/windows/BaseWindow.h"
+#include "graphics/imgui/modals/BaseModal.h"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 

@@ -20,7 +20,7 @@ namespace gallus
 		/// The listener is added only if it has not been added previously.
 		/// </summary>
 		/// <param name="a_Listener">The listener function to add.</param>
-		void operator+=(const std::function<void(Args...)>& a_Listener)
+		void operator+=(const std::function<void(Args...)>& a_Listener) const
 		{
 			auto it = std::find_if(m_Listeners.begin(), m_Listeners.end(),
 				[&](const std::function<void(Args...)>& other)
@@ -40,7 +40,7 @@ namespace gallus
 		/// If the listener is not found, no action is taken.
 		/// </summary>
 		/// <param name="a_Listener">The listener function to remove.</param>
-		void operator-=(const std::function<void(Args...)>& a_Listener)
+		void operator-=(const std::function<void(Args...)>& a_Listener) const
 		{
 			auto it = std::find_if(m_Listeners.begin(), m_Listeners.end(),
 				[&](const std::function<void(Args...)>& other)
@@ -58,7 +58,7 @@ namespace gallus
 		/// Invokes all the listeners with the provided arguments.
 		/// </summary>
 		/// <param name="args">The arguments to pass to the listeners when the event is triggered.</param>
-		void operator()(Args... args) const
+		void operator()(Args... args)
 		{
 			invoke(args...);
 		}
@@ -67,7 +67,7 @@ namespace gallus
 		/// Invokes all the listeners with the provided arguments.
 		/// </summary>
 		/// <param name="args">The arguments to pass to the listeners when the event is triggered.</param>
-		void invoke(Args... args) const
+		void invoke(Args... args)
 		{
 			for (auto& listener : m_Listeners)
 			{
@@ -87,7 +87,7 @@ namespace gallus
 		}
 
 	private:
-		std::vector<std::function<void(Args...)>> m_Listeners; /// The list of listeners subscribed to the event.
+		 mutable std::vector<std::function<void(Args...)>> m_Listeners; /// The list of listeners subscribed to the event.
 	};
 
 	//---------------------------------------------------------------------
@@ -106,7 +106,7 @@ namespace gallus
 		/// Replaces the existing listener if one is already present.
 		/// </summary>
 		/// <param name="a_Listener">The listener function to add.</param>
-		void operator+=(const std::function<void(Args...)>& a_Listener)
+		void operator+=(const std::function<void(Args...)>& a_Listener) const
 		{
 			m_Listener = a_Listener;
 		}
@@ -115,7 +115,7 @@ namespace gallus
 		/// Removes the listener from the event.
 		/// </summary>
 		/// <param name="a_Listener">The listener function to remove.</param>
-		void operator-=(const std::function<void(Args...)>& a_Listener)
+		void operator-=(const std::function<void(Args...)>& a_Listener) const
 		{
 			m_Listener = nullptr;
 		}
@@ -150,6 +150,6 @@ namespace gallus
 		}
 
 	private:
-		std::function<void(Args...)> m_Listener; /// The single listener for the event.
+		mutable std::function<void(Args...)> m_Listener; /// The single listener for the event.
 	};
 }

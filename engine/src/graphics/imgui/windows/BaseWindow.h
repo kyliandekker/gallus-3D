@@ -1,6 +1,6 @@
-#pragma once
-
 #ifndef IMGUI_DISABLE
+
+#pragma once
 
 #include "graphics/imgui/views/ImGuiUIView.h"
 

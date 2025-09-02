@@ -74,7 +74,7 @@ namespace gallus
 			/// Retrieves the currently selected item.
 			/// </summary>
 			/// <returns>Pointer to the current selectable (can be null).</returns>
-			core::Observable<graphics::imgui::EditorSelectable*>& GetSelectable()
+			const core::Observable<graphics::imgui::EditorSelectable*>& GetSelectable() const
 			{
 				return m_pSelectable;
 			}

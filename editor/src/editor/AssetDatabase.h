@@ -48,7 +48,7 @@ namespace gallus
 			/// <returns>A reference to the root folder.</returns>
 			FileResource& GetRoot();
 
-			SimpleEvent<>& GetOnScanCompleted()
+			const SimpleEvent<>& GetOnScanCompleted() const
 			{
 				return m_eOnScanCompleted;
 			}

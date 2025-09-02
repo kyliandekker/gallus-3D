@@ -4,10 +4,17 @@
 
 #include <wtypes.h>
 
-#include "utils/file_abstractions.h"
+// core includes
 #include "core/ResourceAtlas.h"
+
+// utils includes
+#include "utils/file_abstractions.h"
+
+// graphics includes
 #include "graphics/dx12/DX12System2D.h"
 #include "graphics/win32/Window.h"
+
+// gameplay includes
 #include "gameplay/EntityComponentSystem.h"
 
 namespace gallus

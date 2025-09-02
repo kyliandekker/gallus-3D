@@ -1,11 +1,10 @@
-#pragma once
-
 #ifndef IMGUI_DISABLE
+
+#pragma once
 
 #include "core/System.h"
 
 #include <imgui/imgui.h>
-
 #include <wtypes.h>
 #include <memory>
 #include <vector>

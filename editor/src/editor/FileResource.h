@@ -11,6 +11,10 @@
 
 namespace gallus
 {
+	namespace core
+	{
+		class Data;
+	}
 	namespace editor
 	{
 		//---------------------------------------------------------------------
@@ -75,6 +79,8 @@ namespace gallus
 			bool SearchForPath(const fs::path& a_Path, FileResource*& a_pFileResource);
 
 			bool GetMetaData(rapidjson::Document& a_Document) const;
+
+			bool GetFileData(core::Data& a_Data) const;
 
 			std::vector<FileResource>& GetChildren()
 			{

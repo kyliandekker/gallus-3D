@@ -3,18 +3,26 @@
 #include <filesystem>
 #include <ShellScalingApi.h>
 
-#include "utils/file_abstractions.h"
-#include "core/EditorTool.h"
-#include "gameplay/Game.h"
+// core includes
 #include "resource.h"
 
+// utils includes
+#include "utils/file_abstractions.h"
+
+// graphics includes
 #include "graphics/imgui/windows/MainWindowDock.h"
-#include "graphics/imgui/windows/ConsoleWindow.h"
-#include "graphics/imgui/windows/HierarchyWindow.h"
-#include "graphics/imgui/windows/SceneWindow.h"
-#include "graphics/imgui/windows/ExplorerWindow.h"
-#include "graphics/imgui/windows/InspectorWindow.h"
-#include "graphics/imgui/modals/FilePickerModal.h"
+
+// gameplay includes
+#include "gameplay/Game.h"
+
+// editor includes
+#include "editor/core/EditorTool.h"
+#include "editor/graphics/imgui/windows/ConsoleWindow.h"
+#include "editor/graphics/imgui/windows/HierarchyWindow.h"
+#include "editor/graphics/imgui/windows/SceneWindow.h"
+#include "editor/graphics/imgui/windows/ExplorerWindow.h"
+#include "editor/graphics/imgui/windows/InspectorWindow.h"
+#include "editor/graphics/imgui/modals/FilePickerModal.h"
 
 int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR lpCmdLine, _In_ int nShowCmd)
 {
@@ -58,8 +66,8 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR lp
 	SendMessage(gallus::core::TOOL->GetWindow().GetHWnd(), WM_SETICON, ICON_SMALL, (LPARAM) hIconSmall);
 
 	// Game
-	game::GAME.Initialize();
-	game::GAME.Loop();
+	gallus::gameplay::GAME.Initialize();
+	gallus::gameplay::GAME.Loop();
 
 	// Destroy the tool after loop ends.
 	gallus::core::TOOL->Destroy();

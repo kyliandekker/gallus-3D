@@ -8,10 +8,18 @@
 #include <rapidjson/prettywriter.h>
 #include <unordered_map>
 
-#include "AssetType.h"
+// core includes
 #include "core/DataStream.h"
+
+// logger includes
 #include "logger/Logger.h"
-#include "AssetDatabase.h"
+
+// utils includes
+#include "utils/file_abstractions.h"
+
+// editor includes
+#include "editor/AssetType.h"
+#include "editor/AssetDatabase.h"
 
 #define JSON_FILE_RESOURCE_ASSETTYPE_VAR "assetType"
 
@@ -173,6 +181,7 @@ namespace gallus
 			return file::SaveFile(metaPath, core::Data(buffer.GetString(), buffer.GetSize()));
 		}
 
+		//---------------------------------------------------------------------
 		bool FileResource::GetMetaData(rapidjson::Document& a_Document) const
 		{
 			core::DataStream data;
@@ -194,6 +203,13 @@ namespace gallus
 			return true;
 		}
 
+		//---------------------------------------------------------------------
+		bool FileResource::GetFileData(core::Data& a_Data) const
+		{
+			return file::LoadFile(m_Path, a_Data);
+		}
+
+		//---------------------------------------------------------------------
 		bool FileResource::SearchForPath(const fs::path& a_Path, FileResource*& a_pFileResource)
 		{
 			if (m_Path == a_Path)

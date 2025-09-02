@@ -6,19 +6,23 @@
 #include <rapidjson/utils.h>
 #include <string>
 
-#define JSON_CONSOLE_VAR "console"
-#define JSON_CONSOLE_SCROLLTOBOTTOM_VAR "scrollToBottom"
-#define JSON_CONSOLE_INFO_VAR "info"
-#define JSON_CONSOLE_TEST_VAR "test"
-#define JSON_CONSOLE_WARNING_VAR "warning"
-#define JSON_CONSOLE_ERROR_VAR "error"
-#define JSON_CONSOLE_ASSERT_VAR "assert"
-#define JSON_CONSOLE_SUCCESS_VAR "success"
-#define JSON_CONSOLE_INFOSUCCESS_VAR "infoSuccess"
-#define JSON_CONSOLE_AWESOME_VAR "awesome"
+#define JSON_EDITOR_SETTINGS_CONSOLE_VAR "console"
+#define JSON_EDITOR_SETTINGS_CONSOLE_SCROLL_TO_BOTTOM_VAR "scrollToBottom"
+#define JSON_EDITOR_SETTINGS_CONSOLE_INFO_VAR "info"
+#define JSON_EDITOR_SETTINGS_CONSOLE_TEST_VAR "test"
+#define JSON_EDITOR_SETTINGS_CONSOLE_WARNING_VAR "warning"
+#define JSON_EDITOR_SETTINGS_CONSOLE_ERROR_VAR "error"
+#define JSON_EDITOR_SETTINGS_CONSOLE_ASSERT_VAR "assert"
+#define JSON_EDITOR_SETTINGS_CONSOLE_SUCCESS_VAR "success"
+#define JSON_EDITOR_SETTINGS_CONSOLE_INFOSUCCESS_VAR "infoSuccess"
+#define JSON_EDITOR_SETTINGS_CONSOLE_AWESOME_VAR "awesome"
 
-#define JSON_USE_LIGHTING_VAR "useLighting"
-#define JSON_USE_GRID_VAR "useGrid"
+#define JSON_EDITOR_SETTINGS_SCENE_VAR "scene"
+#define JSON_EDITOR_SETTINGS_SCENE_ZOOM "zoom"
+#define JSON_EDITOR_SETTINGS_SCENE_PAN_OFFSET "panOffset"
+#define JSON_EDITOR_SETTINGS_SCENE_PAN_OFFSET_X "x"
+#define JSON_EDITOR_SETTINGS_SCENE_PAN_OFFSET_Y "y"
+#define JSON_EDITOR_SETTINGS_SCENE_LAST_OPERATION "lastOperation"
 
 namespace gallus
 {
@@ -29,32 +33,29 @@ namespace gallus
         //---------------------------------------------------------------------
         bool EditorSettings::LoadVars(const rapidjson::Document& a_Document)
         {
-
-            if (a_Document.HasMember(JSON_CONSOLE_VAR) && a_Document[JSON_CONSOLE_VAR].IsObject())
+            if (a_Document.HasMember(JSON_EDITOR_SETTINGS_CONSOLE_VAR) && a_Document[JSON_EDITOR_SETTINGS_CONSOLE_VAR].IsObject())
             {
-                // Scroll to Bottom
-                GetBool(a_Document[JSON_CONSOLE_VAR], JSON_CONSOLE_SCROLLTOBOTTOM_VAR, m_bScrollToBottom);
+                GetBool(a_Document[JSON_EDITOR_SETTINGS_CONSOLE_VAR], JSON_EDITOR_SETTINGS_CONSOLE_SCROLL_TO_BOTTOM_VAR, m_bScrollToBottom);
 
-                GetBool(a_Document[JSON_CONSOLE_VAR], JSON_CONSOLE_ASSERT_VAR, m_bShowAssert);
-                GetBool(a_Document[JSON_CONSOLE_VAR], JSON_CONSOLE_ERROR_VAR, m_bShowError);
-                GetBool(a_Document[JSON_CONSOLE_VAR], JSON_CONSOLE_WARNING_VAR, m_bShowWarning);
-                GetBool(a_Document[JSON_CONSOLE_VAR], JSON_CONSOLE_INFO_VAR, m_bShowInfo);
-                GetBool(a_Document[JSON_CONSOLE_VAR], JSON_CONSOLE_TEST_VAR, m_bShowTest);
-                GetBool(a_Document[JSON_CONSOLE_VAR], JSON_CONSOLE_SUCCESS_VAR, m_bShowSuccess);
-                GetBool(a_Document[JSON_CONSOLE_VAR], JSON_CONSOLE_INFOSUCCESS_VAR, m_bShowInfoSuccess);
-                GetBool(a_Document[JSON_CONSOLE_VAR], JSON_CONSOLE_AWESOME_VAR, m_bShowAwesome);
+                GetBool(a_Document[JSON_EDITOR_SETTINGS_CONSOLE_VAR], JSON_EDITOR_SETTINGS_CONSOLE_ASSERT_VAR, m_bShowAssert);
+                GetBool(a_Document[JSON_EDITOR_SETTINGS_CONSOLE_VAR], JSON_EDITOR_SETTINGS_CONSOLE_ERROR_VAR, m_bShowError);
+                GetBool(a_Document[JSON_EDITOR_SETTINGS_CONSOLE_VAR], JSON_EDITOR_SETTINGS_CONSOLE_WARNING_VAR, m_bShowWarning);
+                GetBool(a_Document[JSON_EDITOR_SETTINGS_CONSOLE_VAR], JSON_EDITOR_SETTINGS_CONSOLE_INFO_VAR, m_bShowInfo);
+                GetBool(a_Document[JSON_EDITOR_SETTINGS_CONSOLE_VAR], JSON_EDITOR_SETTINGS_CONSOLE_TEST_VAR, m_bShowTest);
+                GetBool(a_Document[JSON_EDITOR_SETTINGS_CONSOLE_VAR], JSON_EDITOR_SETTINGS_CONSOLE_SUCCESS_VAR, m_bShowSuccess);
+                GetBool(a_Document[JSON_EDITOR_SETTINGS_CONSOLE_VAR], JSON_EDITOR_SETTINGS_CONSOLE_INFOSUCCESS_VAR, m_bShowInfoSuccess);
+                GetBool(a_Document[JSON_EDITOR_SETTINGS_CONSOLE_VAR], JSON_EDITOR_SETTINGS_CONSOLE_AWESOME_VAR, m_bShowAwesome);
             }
 
-            // Use lighting
-            if (a_Document.HasMember(JSON_USE_LIGHTING_VAR) && a_Document[JSON_USE_LIGHTING_VAR].IsBool())
+            if (a_Document.HasMember(JSON_EDITOR_SETTINGS_SCENE_VAR) && a_Document[JSON_EDITOR_SETTINGS_SCENE_VAR].IsObject())
             {
-                GetBool(a_Document, JSON_USE_LIGHTING_VAR, m_bUseLighting);
-            }
-
-            // Use grid
-            if (a_Document.HasMember(JSON_USE_GRID_VAR) && a_Document[JSON_USE_GRID_VAR].IsBool())
-            {
-                GetBool(a_Document, JSON_USE_GRID_VAR, m_bUseGrid);
+                GetFloat(a_Document[JSON_EDITOR_SETTINGS_SCENE_VAR], JSON_EDITOR_SETTINGS_SCENE_ZOOM, m_fSceneZoom);
+                if (a_Document[JSON_EDITOR_SETTINGS_SCENE_VAR].HasMember(JSON_EDITOR_SETTINGS_SCENE_PAN_OFFSET) && a_Document[JSON_EDITOR_SETTINGS_SCENE_VAR][JSON_EDITOR_SETTINGS_SCENE_PAN_OFFSET].IsObject())
+                {
+                    GetFloat(a_Document[JSON_EDITOR_SETTINGS_SCENE_VAR][JSON_EDITOR_SETTINGS_SCENE_PAN_OFFSET], JSON_EDITOR_SETTINGS_SCENE_PAN_OFFSET_X, m_vScenePanOffset.x);
+                    GetFloat(a_Document[JSON_EDITOR_SETTINGS_SCENE_VAR][JSON_EDITOR_SETTINGS_SCENE_PAN_OFFSET], JSON_EDITOR_SETTINGS_SCENE_PAN_OFFSET_Y, m_vScenePanOffset.y);
+                }
+                GetInt(a_Document[JSON_EDITOR_SETTINGS_SCENE_VAR], JSON_EDITOR_SETTINGS_SCENE_LAST_OPERATION, m_iLastSceneOperation);
             }
 
             return true;
@@ -63,19 +64,29 @@ namespace gallus
         //---------------------------------------------------------------------
         bool EditorSettings::SaveVars(rapidjson::Document& a_Document, rapidjson::Document::AllocatorType& a_Allocator) const
         {
-            a_Document.AddMember(JSON_CONSOLE_VAR, rapidjson::Value().SetObject(), a_Allocator);
-            a_Document[JSON_CONSOLE_VAR].AddMember(JSON_CONSOLE_SCROLLTOBOTTOM_VAR, m_bScrollToBottom, a_Allocator);
-            a_Document[JSON_CONSOLE_VAR].AddMember(JSON_CONSOLE_ASSERT_VAR, m_bShowAssert, a_Allocator);
-            a_Document[JSON_CONSOLE_VAR].AddMember(JSON_CONSOLE_ERROR_VAR, m_bShowError, a_Allocator);
-            a_Document[JSON_CONSOLE_VAR].AddMember(JSON_CONSOLE_WARNING_VAR, m_bShowWarning, a_Allocator);
-            a_Document[JSON_CONSOLE_VAR].AddMember(JSON_CONSOLE_INFO_VAR, m_bShowInfo, a_Allocator);
-            a_Document[JSON_CONSOLE_VAR].AddMember(JSON_CONSOLE_TEST_VAR, m_bShowTest, a_Allocator);
-            a_Document[JSON_CONSOLE_VAR].AddMember(JSON_CONSOLE_SUCCESS_VAR, m_bShowSuccess, a_Allocator);
-            a_Document[JSON_CONSOLE_VAR].AddMember(JSON_CONSOLE_INFOSUCCESS_VAR, m_bShowInfoSuccess, a_Allocator);
-            a_Document[JSON_CONSOLE_VAR].AddMember(JSON_CONSOLE_AWESOME_VAR, m_bShowAwesome, a_Allocator);
+            rapidjson::Document consoleDoc;
+            consoleDoc.SetObject();
+            consoleDoc.AddMember(JSON_EDITOR_SETTINGS_CONSOLE_SCROLL_TO_BOTTOM_VAR, m_bScrollToBottom, a_Allocator);
+            consoleDoc.AddMember(JSON_EDITOR_SETTINGS_CONSOLE_ASSERT_VAR, m_bShowAssert, a_Allocator);
+            consoleDoc.AddMember(JSON_EDITOR_SETTINGS_CONSOLE_ERROR_VAR, m_bShowError, a_Allocator);
+            consoleDoc.AddMember(JSON_EDITOR_SETTINGS_CONSOLE_WARNING_VAR, m_bShowWarning, a_Allocator);
+            consoleDoc.AddMember(JSON_EDITOR_SETTINGS_CONSOLE_INFO_VAR, m_bShowInfo, a_Allocator);
+            consoleDoc.AddMember(JSON_EDITOR_SETTINGS_CONSOLE_TEST_VAR, m_bShowTest, a_Allocator);
+            consoleDoc.AddMember(JSON_EDITOR_SETTINGS_CONSOLE_SUCCESS_VAR, m_bShowSuccess, a_Allocator);
+            consoleDoc.AddMember(JSON_EDITOR_SETTINGS_CONSOLE_INFOSUCCESS_VAR, m_bShowInfoSuccess, a_Allocator);
+            consoleDoc.AddMember(JSON_EDITOR_SETTINGS_CONSOLE_AWESOME_VAR, m_bShowAwesome, a_Allocator);
+            a_Document.AddMember(JSON_EDITOR_SETTINGS_CONSOLE_VAR, consoleDoc, a_Allocator);
 
-            a_Document.AddMember(JSON_USE_LIGHTING_VAR, m_bUseLighting, a_Allocator);
-            a_Document.AddMember(JSON_USE_GRID_VAR, m_bUseGrid, a_Allocator);
+            rapidjson::Document sceneDoc;
+            sceneDoc.SetObject();
+            sceneDoc.AddMember(JSON_EDITOR_SETTINGS_SCENE_ZOOM, m_fSceneZoom, a_Allocator);
+            rapidjson::Document scenePanOffsetDoc;
+            scenePanOffsetDoc.SetObject();
+            scenePanOffsetDoc.AddMember(JSON_EDITOR_SETTINGS_SCENE_PAN_OFFSET_X, m_vScenePanOffset.x, a_Allocator);
+            scenePanOffsetDoc.AddMember(JSON_EDITOR_SETTINGS_SCENE_PAN_OFFSET_Y, m_vScenePanOffset.y, a_Allocator);
+            sceneDoc.AddMember(JSON_EDITOR_SETTINGS_SCENE_PAN_OFFSET, scenePanOffsetDoc, a_Allocator);
+            sceneDoc.AddMember(JSON_EDITOR_SETTINGS_SCENE_LAST_OPERATION, m_iLastSceneOperation, a_Allocator);
+            a_Document.AddMember(JSON_EDITOR_SETTINGS_SCENE_VAR, sceneDoc, a_Allocator);
 
             return true;
         }
@@ -189,27 +200,39 @@ namespace gallus
         }
 
         //---------------------------------------------------------------------
-        void EditorSettings::SetUseLighting(bool a_bUseLighting)
+        void EditorSettings::SetSceneZoom(float a_fSceneZoom)
         {
-            m_bUseLighting = a_bUseLighting;
+            m_fSceneZoom = a_fSceneZoom;
         }
 
         //---------------------------------------------------------------------
-        bool EditorSettings::GetUseLighting() const
+        float EditorSettings::GetSceneZoom() const
         {
-            return m_bUseGrid;
+            return m_fSceneZoom;
         }
 
         //---------------------------------------------------------------------
-        void EditorSettings::SetUseGrid(bool a_bUseGrid)
+        void EditorSettings::SetScenePanOffset(const glm::vec2& a_vScenePanOffset)
         {
-            m_bUseGrid = a_bUseGrid;
+            m_vScenePanOffset = a_vScenePanOffset;
         }
 
         //---------------------------------------------------------------------
-        bool EditorSettings::GetUseGrid() const
+        const glm::vec2& EditorSettings::GetScenePanOffset() const
         {
-            return m_bUseGrid;
+            return m_vScenePanOffset;
+        }
+
+        //---------------------------------------------------------------------
+        void EditorSettings::SetLastSceneOperation(int a_iLastSceneOperation)
+        {
+            m_iLastSceneOperation = a_iLastSceneOperation;
+        }
+
+        //---------------------------------------------------------------------
+        int EditorSettings::GetLastSceneOperation() const
+        {
+            return m_iLastSceneOperation;
         }
     }
 }

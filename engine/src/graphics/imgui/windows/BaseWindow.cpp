@@ -5,9 +5,14 @@
 #include <imgui/imgui.h>
 #include <imgui/imgui_helpers.h>
 
-#include "utils/string_extensions.h"
-#include "../ImGuiWindow.h"
+// core includes
 #include "core/Tool.h"
+
+// utils includes
+#include "utils/string_extensions.h"
+
+// graphics includes
+#include "graphics/imgui/ImGuiWindow.h"
 
 namespace gallus
 {

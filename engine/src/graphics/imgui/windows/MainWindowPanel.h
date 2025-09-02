@@ -1,6 +1,6 @@
-#pragma once
-
 #ifndef IMGUI_DISABLE
+
+#pragma once
 
 #include "BaseWindow.h"
 

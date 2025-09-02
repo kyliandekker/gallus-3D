@@ -1,12 +1,13 @@
-#pragma once
-
 #ifndef IMGUI_DISABLE
+
+#pragma once
 
 #include "graphics/imgui/views/ImGuiUIView.h"
 
 #include <string>
 #include <imgui/imgui.h>
 
+// core includes
 #include "core/Data.h"
 
 namespace gallus

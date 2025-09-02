@@ -3,10 +3,15 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
+// core includes
 #include "core/Tool.h"
-#include "logger/Logger.h"
-#include "graphics/dx12/CommandList.h"
 #include "core/Data.h"
+
+// logger includes
+#include "logger/Logger.h"
+
+// graphics includes
+#include "graphics/dx12/CommandList.h"
 #include "graphics/dx12/CommandQueue.h"
 
 namespace gallus
@@ -204,7 +209,11 @@ namespace gallus
 				textureDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
 				textureDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
 
-				CreateResource(textureDesc, m_sName);
+				if (!CreateResource(textureDesc, m_sName))
+				{
+					LOG(LOGSEVERITY_ERROR, LOG_CATEGORY_DX12, "Failed creating resource.");
+					return false;
+				}
 
 				const UINT64 uploadBufferSize = GetRequiredIntermediateSize(m_pResource.Get(), 0, 1);
 				const CD3DX12_HEAP_PROPERTIES uploadHeapProperties(D3D12_HEAP_TYPE_UPLOAD);

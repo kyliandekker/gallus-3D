@@ -2,9 +2,10 @@
 
 #include "graphics/dx12/DX12PCH.h"
 
-#include "gameplay/systems/components/Component.h"
-
 #include <memory>
+
+// gameplay includes
+#include "gameplay/systems/components/Component.h"
 
 namespace gallus
 {

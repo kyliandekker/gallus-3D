@@ -1,6 +1,6 @@
-#pragma once
-
 #ifdef _EDITOR
+
+#pragma once
 
 #include "graphics/imgui/views/ImGuiUIView.h"
 

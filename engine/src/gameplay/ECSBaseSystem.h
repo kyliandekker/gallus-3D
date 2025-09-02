@@ -8,9 +8,12 @@
 #include <string>
 #include <vector>
 
+// core includes
+#include "core/Tool.h"
+
+// gameplay includes
 #include "gameplay/EntityID.h"
 #include "gameplay/systems/components/Component.h"
-#include "core/Tool.h"
 
 namespace gallus
 {
@@ -57,7 +60,7 @@ namespace gallus
 			/// <summary>
 			/// Updates the components in the system.
 			/// </summary>
-			virtual void UpdateComponents() = 0;
+			virtual void UpdateComponents(float a_fDeltaTime) = 0;
 
 			/// <summary>
 			/// Checks whether an entity is using the system.
@@ -190,7 +193,7 @@ namespace gallus
 			/// <summary>
 			/// Updates the system's components.
 			/// </summary>
-			virtual void UpdateComponents() override
+			virtual void UpdateComponents(float a_fDeltaTime) override
 			{
 				size_t oldSize = m_mComponents.size();
 				std::erase_if(m_mComponents, [](auto& pair)

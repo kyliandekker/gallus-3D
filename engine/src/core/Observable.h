@@ -1,6 +1,7 @@
 ﻿#pragma once
 
-#include "Event.h" // your gallus::Event definition
+// core includes
+#include "core/Event.h" // your gallus::Event definition
 
 namespace gallus
 {
@@ -96,14 +97,14 @@ namespace gallus
 			/// The event provides the old and new values as arguments.
 			/// </summary>
 			/// <returns>A reference to the <see cref="Event"/>.</returns>
-			Event<const T, const T&>& OnChanged()
+			const Event<const T, const T>& OnChanged() const
 			{
 				return OnChange;
 			}
 
 		private:
 			T m_Value{};
-			Event<const T, const T&> OnChange;
+			mutable Event<const T, const T> OnChange;
 		};
 	}
 }

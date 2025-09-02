@@ -1,94 +1,111 @@
-#include "Game.h"
+﻿#include "Game.h"
 
+// core includes
 #include "core/Tool.h"
+
+// logger includes
 #include "logger/Logger.h"
-#include "gameplay/systems/SpriteSystem.h"
-#include "gameplay/systems/TransformSystem.h"
+
+// graphics includes
 #include "graphics/dx12/CommandQueue.h"
 #include "graphics/dx12/CommandList.h"
 #include "graphics/dx12/Texture.h"
 
-namespace game
+// gameplay includes
+#include "gameplay/systems/SpriteSystem.h"
+#include "gameplay/systems/TransformSystem.h"
+
+namespace gallus
 {
-	//---------------------------------------------------------------------
-	// Game
-	//---------------------------------------------------------------------
-	bool Game::Initialize()
+	namespace gameplay
 	{
-		LOG(gallus::LOGSEVERITY_INFO, LOG_CATEGORY_GAME, "Initializing game.");
-
-		gallus::core::TOOL->GetWindow().OnQuit() += std::bind(&Game::Shutdown, this);
-
-		if (!LoadTextures())
+		//---------------------------------------------------------------------
+		// Game
+		//---------------------------------------------------------------------
+		bool Game::Initialize()
 		{
-			LOG(gallus::LOGSEVERITY_ERROR, LOG_CATEGORY_GAME, "Failed loading textures.");
+			LOG(LOGSEVERITY_INFO, LOG_CATEGORY_GAME, "Initializing game.");
+
+			core::TOOL->GetWindow().OnQuit() += std::bind(&Game::Shutdown, this);
+
+			if (!LoadTextures())
+			{
+				LOG(LOGSEVERITY_ERROR, LOG_CATEGORY_GAME, "Failed loading textures.");
+				return false;
+			}
+
+			if (!LoadSounds())
+			{
+				LOG(LOGSEVERITY_ERROR, LOG_CATEGORY_GAME, "Failed loading sounds.");
+				return false;
+			}
+
+			Test();
+
+			System::Initialize();
+
+			LOG(LOGSEVERITY_INFO, LOG_CATEGORY_GAME, "Initialized game.");
+
+			return true;
+		}
+
+		//---------------------------------------------------------------------
+		bool Game::Destroy()
+		{
 			return false;
 		}
 
-		if (!LoadSounds())
+		//---------------------------------------------------------------------
+		constexpr double FIXED_TIMESTEP = 1.0 / 60.0; // 60 FPS -> 16.66 ms
+		void Game::Loop()
 		{
-			LOG(gallus::LOGSEVERITY_ERROR, LOG_CATEGORY_GAME, "Failed loading sounds.");
-			return false;
+			using clock = std::chrono::high_resolution_clock;
+			auto previous = clock::now();
+			double lag = 0.0;
+
+			while (m_bRunning.load())
+			{
+				if (m_bStarted)
+				{
+					auto current = clock::now();
+					std::chrono::duration<double> elapsed = current - previous;
+					previous = current;
+					lag += elapsed.count();
+
+					// Run fixed updates (catch up if needed)
+					while (lag >= FIXED_TIMESTEP)
+					{
+						core::TOOL->GetECS().Update(FIXED_TIMESTEP);
+						lag -= FIXED_TIMESTEP;
+					}
+
+					std::this_thread::sleep_for(std::chrono::milliseconds(1));
+				}
+			}
 		}
 
-		Test();
-
-		System::Initialize();
-
-		LOG(gallus::LOGSEVERITY_INFO, LOG_CATEGORY_GAME, "Initialized game.");
-
-		return true;
-	}
-
-	//---------------------------------------------------------------------
-	bool Game::Destroy()
-	{
-		return false;
-	}
-
-	//---------------------------------------------------------------------
-	void Game::Loop()
-	{
-		while (m_bRunning.load())
+		//---------------------------------------------------------------------
+		void Game::Shutdown()
 		{
-			gallus::core::TOOL->GetECS().Update(0.0f);
+			m_bRunning.store(false);
 		}
-	}
 
-	//---------------------------------------------------------------------
-	void Game::Shutdown()
-	{
-		m_bRunning.store(false);
-	}
+		//---------------------------------------------------------------------
+		bool Game::LoadTextures()
+		{
+			return true;
+		}
 
-	//---------------------------------------------------------------------
-	bool Game::LoadTextures()
-	{
-		return true;
-	}
+		//---------------------------------------------------------------------
+		bool Game::LoadSounds()
+		{
+			return true;
+		}
 
-	//---------------------------------------------------------------------
-	bool Game::LoadSounds()
-	{
-		return true;
-	}
-
-	//---------------------------------------------------------------------
-	bool Game::Test()
-	{
-		auto cCommandQueue = gallus::core::TOOL->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
-		auto cCommandList = cCommandQueue->GetCommandList();
-
-		auto entityId = gallus::core::TOOL->GetECS().CreateEntity("New Sprite");
-		gallus::gameplay::SpriteComponent* meshComp = reinterpret_cast<gallus::gameplay::SpriteComponent*>(gallus::core::TOOL->GetECS().GetSystem<gallus::gameplay::SpriteSystem>().CreateBaseComponent(entityId));
-		meshComp->SetMesh(gallus::core::TOOL->GetResourceAtlas().GetDefaultMesh().get());
-		meshComp->SetShader(gallus::core::TOOL->GetResourceAtlas().GetDefaultShaderBind().get());
-		meshComp->SetTexture(gallus::core::TOOL->GetResourceAtlas().LoadTexture("tex_layton.png", cCommandList).get());
-		gallus::gameplay::TransformComponent* transformComp = reinterpret_cast<gallus::gameplay::TransformComponent*>(gallus::core::TOOL->GetECS().GetSystem<gallus::gameplay::TransformSystem>().CreateBaseComponent(entityId));
-		transformComp->Transform().SetScale({ static_cast<float>(meshComp->GetTexture()->GetResourceDesc().Width), static_cast<float>(meshComp->GetTexture()->GetResourceDesc().Height)});
-		cCommandQueue->ExecuteCommandList(cCommandList);
-		cCommandQueue->Flush();
-
-		return true;
+		//---------------------------------------------------------------------
+		bool Game::Test()
+		{
+			return true;
+		}
 	}
 }

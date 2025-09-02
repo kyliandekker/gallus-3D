@@ -9,7 +9,10 @@
 #include <mutex>
 #include <chrono>
 
+// core includes
 #include "core/Event.h"
+
+// utils includes
 #include "utils/file_abstractions.h"
 
 namespace gallus
@@ -201,7 +204,7 @@ namespace gallus
 			/// Retrieves the on message logged event.
 			/// </summary>
 			/// <returns>Reference to the on quit event.</returns>
-			SimpleEvent<LoggerMessage>& OnMessageLogged();
+			const SimpleEvent<LoggerMessage>& OnMessageLogged() const;
 		protected:
 			bool Sleep() const override;
 		private:

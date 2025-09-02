@@ -247,7 +247,7 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		SimpleEvent<LoggerMessage>& Logger::OnMessageLogged()
+		const SimpleEvent<LoggerMessage>& Logger::OnMessageLogged() const
 		{
 			return m_eOnMessageLogged;
 		}

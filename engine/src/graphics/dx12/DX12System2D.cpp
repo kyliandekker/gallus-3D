@@ -1,14 +1,20 @@
 #include "DX12System2D.h"
 
-#include "logger/Logger.h"
-#include "graphics/win32/Window.h"
-#include "CommandQueue.h"
-#include "CommandList.h"
+// core includes
 #include "core/Tool.h"
 
-#include "Shader.h"
-#include "Texture.h"
-#include "Mesh.h"
+// logger includes
+#include "logger/Logger.h"
+
+// graphics includes
+#include "graphics/win32/Window.h"
+#include "graphics/dx12/CommandQueue.h"
+#include "graphics/dx12/CommandList.h"
+#include "graphics/dx12/Shader.h"
+#include "graphics/dx12/Texture.h"
+#include "graphics/dx12/Mesh.h"
+
+// gameplay includes
 #include "gameplay/systems/SpriteSystem.h"
 
 namespace gallus
@@ -206,7 +212,9 @@ namespace gallus
 
 				std::shared_ptr<DX12ShaderBind> shaderBind = core::TOOL->GetResourceAtlas().LoadShaderBind(pixelShader.get(), vertexShader.get()); // Default shader.
 
-				std::shared_ptr<Mesh> mesh = core::TOOL->GetResourceAtlas().LoadMesh("generic_mesh", cCommandList); // Default mesh.
+				std::shared_ptr<Mesh> mesh = core::TOOL->GetResourceAtlas().LoadMesh("square"); // Default mesh.
+				MeshPartData& squarePrimitive = s_PRIMITIVES[(int)PRIMITIVES::SQUARE];
+				mesh->SetMeshData(squarePrimitive, cCommandList);
 				mesh->SetResourceCategory(core::EngineResourceCategory::Missing);
 				mesh->SetIsDestroyable(false);
 

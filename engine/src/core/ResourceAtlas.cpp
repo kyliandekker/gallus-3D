@@ -2,6 +2,7 @@
 
 #include <algorithm>
 
+// graphics includes
 #include "graphics/dx12/Texture.h"
 #include "graphics/dx12/Shader.h"
 #include "graphics/dx12/DX12ShaderBind.h"
@@ -65,17 +66,6 @@ namespace gallus
 				auto& res = a_aVector[i];
 				if (res)
 				{
-					// Skip resources that are Editor or Missing
-					if (res->GetResourceCategory() == EngineResourceCategory::Missing)
-					{
-						continue;
-					}
-
-					if (res->IsLocked())
-					{
-						continue;
-					}
-
 					if (res->IsUnique())
 					{
 						continue;
@@ -195,12 +185,12 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		std::shared_ptr<graphics::dx12::Mesh> ResourceAtlas::LoadMesh(const std::string& a_sName, std::shared_ptr<graphics::dx12::CommandList> a_pCommandList)
+		std::shared_ptr<graphics::dx12::Mesh> ResourceAtlas::LoadMesh(const std::string& a_sName)
 		{
 			std::shared_ptr<graphics::dx12::Mesh> mesh = GetResource(m_aMeshes, a_sName, fs::path());
 			if (!mesh->IsValid())
 			{
-				mesh->LoadByName(a_sName, a_pCommandList);
+				mesh->LoadByName(a_sName);
 			}
 			return mesh;
 		}

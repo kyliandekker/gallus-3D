@@ -8,7 +8,6 @@
 #include <string>
 #include <algorithm>
 #include <functional>
-
 #include <imgui/imgui.h>
 
 namespace gallus

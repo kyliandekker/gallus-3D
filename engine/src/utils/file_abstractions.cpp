@@ -4,6 +4,7 @@
 #include <windows.h>
 #include <ShlObj_core.h>
 
+// core includes
 #include "core/DataStream.h"
 
 namespace gallus

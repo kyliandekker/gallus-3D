@@ -6,10 +6,15 @@
 #include <rapidjson/prettywriter.h>
 #include <rapidjson/utils.h>
 
+// core includes
 #include "core/Tool.h"
 #include "core/DataStream.h"
-#include "utils/file_abstractions.h"
+
+// logger includes
 #include "logger/Logger.h"
+
+// utils includes
+#include "utils/file_abstractions.h"
 
 #define DEFAULT_SIZE_X 400
 #define DEFAULT_SIZE_Y 800

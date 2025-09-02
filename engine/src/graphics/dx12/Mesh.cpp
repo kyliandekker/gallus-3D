@@ -4,10 +4,17 @@
 #include <filesystem>
 #include <format>
 
+// core includes
 #include "core/Tool.h"
-#include "utils/file_abstractions.h"
 #include "core/DataStream.h"
+
+// logger includes
 #include "logger/Logger.h"
+
+// utils includes
+#include "utils/file_abstractions.h"
+
+// graphics includes
 #include "graphics/dx12/Texture.h"
 #include "graphics/dx12/Shader.h"
 #include "graphics/dx12/CommandList.h"
@@ -27,58 +34,56 @@ namespace gallus
 			//---------------------------------------------------------------------
 			void Mesh::Render(std::shared_ptr<CommandList> a_pCommandList, const DirectX::XMMATRIX& a_MVP)
 			{
-				for (MeshPartData* meshData : m_aMeshData)
+				for (MeshPartData& meshData : m_aMeshData)
 				{
 					a_pCommandList->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-					a_pCommandList->GetCommandList()->IASetVertexBuffers(0, 1, &meshData->m_VertexBuffer.GetVertexBufferView());
-					a_pCommandList->GetCommandList()->IASetIndexBuffer(&meshData->m_IndexBuffer.GetIndexBufferView());
+					a_pCommandList->GetCommandList()->IASetVertexBuffers(0, 1, &meshData.m_VertexBuffer.GetVertexBufferView());
+					a_pCommandList->GetCommandList()->IASetIndexBuffer(&meshData.m_IndexBuffer.GetIndexBufferView());
 
 					// Update the MVP matrix
 					a_pCommandList->GetCommandList()->SetGraphicsRoot32BitConstants(0, sizeof(DirectX::XMMATRIX) / 4, &a_MVP, 0);
 
-					a_pCommandList->GetCommandList()->DrawIndexedInstanced(static_cast<UINT>(meshData->m_aIndices.size()), 1, 0, 0, 0);
+					a_pCommandList->GetCommandList()->DrawIndexedInstanced(static_cast<UINT>(meshData.m_aIndices.size()), 1, 0, 0, 0);
 				}
 			}
 
 			//---------------------------------------------------------------------
-			bool Mesh::LoadByName(const std::string& a_sName, const std::shared_ptr<CommandList> a_pCommandList)
+			bool Mesh::LoadByName(const std::string& a_sName)
 			{
 				m_sName = a_sName;
-
-				MeshPartData* meshData = new MeshPartData();
-				m_aMeshData.push_back(meshData);
-
-				meshData->m_aVertices = {
-					{ DirectX::XMFLOAT2(-0.5f, -0.5f), DirectX::XMFLOAT2(0.0f, 0.0f) },
-					{ DirectX::XMFLOAT2(0.5f, -0.5f), DirectX::XMFLOAT2(1.0f, 0.0f) },
-					{ DirectX::XMFLOAT2(-0.5f, 0.5f), DirectX::XMFLOAT2(0.0f, 1.0f) },
-					{ DirectX::XMFLOAT2(0.5f, 0.5f), DirectX::XMFLOAT2(1.0f, 1.0f) }
-				};
-
-				meshData->m_aIndices = {
-					0, 1, 2,
-					2, 1, 3
-				};
-
-					// Upload vertex buffer data.
-				a_pCommandList->UpdateBufferResource(
-					&meshData->m_VertexBuffer.GetResource(), &meshData->m_pIntermediateVertexBuffer,
-					meshData->m_aVertices.size(), sizeof(VertexPosUV), meshData->m_aVertices.data());
-
-				// Create the vertex buffer view.
-				meshData->m_VertexBuffer.CreateViews(meshData->m_aVertices.size(), sizeof(VertexPosUV));
-
-				// Upload index buffer data.
-				a_pCommandList->UpdateBufferResource(
-					&meshData->m_IndexBuffer.GetResource(), &meshData->m_pIntermediateIndexBuffer,
-					meshData->m_aIndices.size(), sizeof(uint16_t), meshData->m_aIndices.data());
-
-				// Create index buffer view.
-				meshData->m_IndexBuffer.CreateViews(meshData->m_aIndices.size(), sizeof(uint16_t));
 
 				m_ResourceType = core::ResourceType::ResourceType_Mesh;
 
 				return true;
+			}
+
+			//---------------------------------------------------------------------
+			void Mesh::SetMeshData(const MeshPartData& a_aData, const std::shared_ptr<CommandList> a_pCommandList)
+			{
+				if (!m_bIsDestroyable)
+				{
+					return;
+				}
+
+				size_t index = m_aMeshData.size();
+				m_aMeshData.push_back(a_aData);
+				MeshPartData& data = m_aMeshData[index];
+
+				// Upload vertex buffer data.
+				a_pCommandList->UpdateBufferResource(
+					&data.m_VertexBuffer.GetResource(), &data.m_pIntermediateVertexBuffer,
+					data.m_aVertices.size(), sizeof(VertexPosUV), data.m_aVertices.data());
+
+				// Create the vertex buffer view.
+				data.m_VertexBuffer.CreateViews(data.m_aVertices.size(), sizeof(VertexPosUV));
+
+				// Upload index buffer data.
+				a_pCommandList->UpdateBufferResource(
+					&data.m_IndexBuffer.GetResource(), &data.m_pIntermediateIndexBuffer,
+					data.m_aIndices.size(), sizeof(uint16_t), data.m_aIndices.data());
+
+				// Create index buffer view.
+				data.m_IndexBuffer.CreateViews(data.m_aIndices.size(), sizeof(uint16_t));
 			}
 
 			//---------------------------------------------------------------------

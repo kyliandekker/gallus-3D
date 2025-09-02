@@ -2,78 +2,85 @@
 
 #include "core/System.h"
 
+// gameplay includes
 #include "gameplay/Scene.h"
 
-namespace game
+namespace gallus
 {
-	//---------------------------------------------------------------------
-	// Game
-	//---------------------------------------------------------------------
-	/// <summary>
-	/// Game that handles all the specific entities, scenes, textures, etc.
-	/// </summary>
-	class Game : public gallus::core::System
+	namespace gameplay
 	{
-	public:
-		Game() = default;
-
+		//---------------------------------------------------------------------
+		// Game
+		//---------------------------------------------------------------------
 		/// <summary>
-		/// Initializes the engine and all necessary subsystems with the specified parameters.
+		/// Game that handles all the specific entities, scenes, textures, etc.
 		/// </summary>
-		/// <returns>True if the engine initializes successfully, otherwise false.</returns>
-		virtual bool Initialize();
-
-		/// <summary>
-		/// Shuts down the engine and cleans up all subsystems.
-		/// </summary>
-		/// <returns>True if the destruction is successful, otherwise false.</returns>
-		virtual bool Destroy() override;
-
-		/// <summary>
-		/// Main loop of the game.
-		/// </summary>
-		void Loop();
-
-		/// <summary>
-		/// Retrieves the scene.
-		/// </summary>
-		/// <returns>Returns a reference to the scene (can be null).</returns>
-		gallus::gameplay::Scene& GetScene()
+		class Game : public gallus::core::System
 		{
-			return m_Scene;
-		}
+		public:
+			Game() = default;
 
-		/// <summary>
-		/// Sets current scene.
-		/// </summary>
-		/// <param name="a_Scene">The new scene.</param>
-		void SetScene(gallus::gameplay::Scene& a_Scene)
-		{
-			m_Scene = a_Scene;
-		}
-	private:
-		/// <summary>
-		/// Callback for closing the window.
-		/// </summary>
-		void Shutdown();
+			/// <summary>
+			/// Initializes the engine and all necessary subsystems with the specified parameters.
+			/// </summary>
+			/// <returns>True if the engine initializes successfully, otherwise false.</returns>
+			virtual bool Initialize();
 
-		/// <summary>
-		/// Loads all textures.
-		/// </summary>
-		bool LoadTextures();
+			/// <summary>
+			/// Shuts down the engine and cleans up all subsystems.
+			/// </summary>
+			/// <returns>True if the destruction is successful, otherwise false.</returns>
+			virtual bool Destroy() override;
 
-		/// <summary>
-		/// Loads all sounds.
-		/// </summary>
-		bool LoadSounds();
+			/// <summary>
+			/// Main loop of the game.
+			/// </summary>
+			void Loop();
 
-		/// <summary>
-		/// Testing purposes.
-		/// </summary>
-		bool Test();
+			/// <summary>
+			/// Retrieves the scene.
+			/// </summary>
+			/// <returns>Returns a reference to the scene.</returns>
+			gallus::gameplay::Scene& GetScene()
+			{
+				return m_Scene;
+			}
 
-		// There can only be one scene and setting a new one cleans up the old one automatically.
-		gallus::gameplay::Scene m_Scene;
-	};
-	extern inline Game GAME = {};
+			bool IsStarted() const
+			{
+				return m_bStarted;
+			}
+
+			void SetIsStarted(bool a_bStarted)
+			{
+				m_bStarted = a_bStarted;
+			}
+		private:
+			/// <summary>
+			/// Callback for closing the window.
+			/// </summary>
+			void Shutdown();
+
+			/// <summary>
+			/// Loads all textures.
+			/// </summary>
+			bool LoadTextures();
+
+			/// <summary>
+			/// Loads all sounds.
+			/// </summary>
+			bool LoadSounds();
+
+			/// <summary>
+			/// Testing purposes.
+			/// </summary>
+			bool Test();
+
+			// There can only be one scene and setting a new one cleans up the old one automatically.
+			gallus::gameplay::Scene m_Scene;
+
+			bool m_bStarted = false;
+		};
+		extern inline Game GAME = {};
+	}
 }

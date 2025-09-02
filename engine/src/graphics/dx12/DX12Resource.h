@@ -1,8 +1,7 @@
 #pragma once
 
-#include "core/EngineResource.h"
-
 #include "DX12PCH.h"
+#include "core/EngineResource.h"
 
 #include <string>
 #include <filesystem>

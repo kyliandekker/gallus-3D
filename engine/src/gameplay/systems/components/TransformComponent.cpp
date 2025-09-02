@@ -1,7 +1,6 @@
 #include "gameplay/systems/components/TransformComponent.h"
 
 #include <rapidjson/utils.h>
-
 #include <DirectXMath.h>
 
 #define JSON_ENTITY_TRANSFORM_COMPONENT_POSITION_VAR "position"
@@ -34,8 +33,6 @@ namespace gallus
 
 			a_Document[JSON_ENTITY_TRANSFORM_COMPONENT_POSITION_VAR].AddMember(JSON_ENTITY_TRANSFORM_COMPONENT_X_VAR, m_Transform.GetPosition().x, a_Allocator);
 			a_Document[JSON_ENTITY_TRANSFORM_COMPONENT_POSITION_VAR].AddMember(JSON_ENTITY_TRANSFORM_COMPONENT_Y_VAR, m_Transform.GetPosition().y, a_Allocator);
-
-			a_Document.AddMember(JSON_ENTITY_TRANSFORM_COMPONENT_ROTATION_VAR, rapidjson::Value().SetObject(), a_Allocator);
 
 			a_Document.AddMember(JSON_ENTITY_TRANSFORM_COMPONENT_ROTATION_VAR, m_Transform.GetRotation(), a_Allocator);
 

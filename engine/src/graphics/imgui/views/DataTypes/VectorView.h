@@ -2,7 +2,7 @@
 
 #ifdef _EDITOR
 
-#include "../ImGuiUIView.h"
+#include "graphics/imgui/views/ImGuiUIView.h"
 
 #include <cstdint>
 #include <imgui/imgui.h>

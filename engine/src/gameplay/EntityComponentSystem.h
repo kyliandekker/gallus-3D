@@ -6,8 +6,11 @@
 #include <string>
 #include <mutex>
 
-#include "Entity.h"
+// core includes
 #include "core/Event.h"
+
+// gameplay includes
+#include "gameplay/Entity.h"
 
 namespace gallus
 {
@@ -39,32 +42,7 @@ namespace gallus
 			/// <summary>
 			/// Updates the system.
 			/// </summary>
-			/// <param name="a_fDeltaTime">The time that has passed since the last frame.</param>
-			void Update(const float& a_fDeltaTime);
-
-			/// <summary>
-			/// Retrieves the current play state of the ECS. The ECS can be started and paused at the same time.
-			/// </summary>
-			/// <returns>True if the ECS is paused, otherwise false.</returns>
-			bool IsPaused() const;
-
-			/// <summary>
-			/// Sets the play state of the ECS.
-			/// </summary>
-			/// <param name="a_bPaused">True to pause the ECS, false to unpause it.</param>
-			void SetPaused(bool a_bPaused);
-
-			/// <summary>
-			/// Retrieves the current starting state of the ECS. The ECS can be started and paused at the same time.
-			/// </summary>
-			/// <returns>True if the ECS has started, otherwise false.</returns>
-			bool HasStarted() const;
-
-			/// <summary>
-			/// Sets the starting state of the ECS.
-			/// </summary>
-			/// <param name="a_bPaused">True to start the ECS, false to stop it.</param>
-			void SetStarted(bool a_bStarted);
+			void Update(float a_fDeltaTime);
 
 			/// <summary>
 			/// Creates an entity.
@@ -170,12 +148,12 @@ namespace gallus
 
 			mutable std::recursive_mutex m_EntityMutex;
 
-			SimpleEvent<>& OnEntitiesUpdated()
+			const SimpleEvent<>& OnEntitiesUpdated() const
 			{
 				return m_eOnEntitiesUpdated;
 			}
 
-			SimpleEvent<>& OnEntityComponentsUpdated()
+			const SimpleEvent<>& OnEntityComponentsUpdated() const
 			{
 				return m_eOnEntityComponentsUpdated;
 			}
@@ -186,12 +164,6 @@ namespace gallus
 			std::vector<AbstractECSSystem*> m_aSystems;
 			std::vector<Entity> m_aEntities;
 			unsigned int m_iNextID = 0;
-			bool m_bPaused = false;
-#ifdef _EDITOR
-			bool m_bStarted = false;
-#else
-			bool m_bStarted = true;
-#endif // __EDITOR__
 		};
 	}
 }

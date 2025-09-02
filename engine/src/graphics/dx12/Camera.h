@@ -2,7 +2,8 @@
 
 #include "DX12PCH.h"
 
-#include "DX12Transform.h"
+// graphics includes
+#include "graphics/dx12/DX12Transform.h"
 
 namespace gallus
 {

@@ -5,10 +5,15 @@
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/prettywriter.h>
 
+// core includes
 #include "core/Tool.h"
 #include "core/DataStream.h"
-#include "utils/file_abstractions.h"
+
+// logger includes
 #include "logger/Logger.h"
+
+// utils includes
+#include "utils/file_abstractions.h"
 
 namespace gallus
 {

@@ -42,6 +42,8 @@ namespace gallus
 			m_AssetDatabase.Initialize();
 			m_AssetDatabase.Scan();
 
+			m_EditorSettings.Load();
+
 			LOG(LOGSEVERITY_SUCCESS, LOG_CATEGORY_EDITOR, "Initialized editor.");
 
 			return true;

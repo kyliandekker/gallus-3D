@@ -1,16 +1,19 @@
 #include "gameplay/systems/components/SpriteComponent.h"
 
+// core includes
+#include "core/Tool.h"
+
+// graphics includes
 #include "graphics/dx12/Texture.h"
 #include "graphics/dx12/Mesh.h"
 #include "graphics/dx12/DX12ShaderBind.h"
 #include "graphics/dx12/Shader.h"
 #include "graphics/dx12/DX12Transform.h"
-#include "core/Tool.h"
-
-#include "gameplay/systems/TransformSystem.h"
-
 #include "graphics/dx12/CommandList.h"
 #include "graphics/dx12/CommandQueue.h"
+
+// gameplay includes
+#include "gameplay/systems/TransformSystem.h"
 
 #define JSON_MESH_COMPONENT_TEX_VAR "texture"
 #define JSON_MESH_COMPONENT_MESH_VAR "mesh"
@@ -166,7 +169,7 @@ namespace gallus
 			std::shared_ptr<graphics::dx12::CommandList> cCommandList = cCommandQueue->GetCommandList();
 			if (!mesh.empty())
 			{
-				SetMesh(core::TOOL->GetResourceAtlas().LoadMesh(mesh, cCommandList).get());
+				SetMesh(core::TOOL->GetResourceAtlas().LoadMesh(mesh).get());
 			}
 			if (!tex.empty())
 			{

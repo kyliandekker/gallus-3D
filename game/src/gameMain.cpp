@@ -40,8 +40,8 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR lp
 	gallus::core::TOOL->GetWindow().SetResizingAllowed(false);
 
 	// Loop.
-	game::GAME.Initialize();
-	game::GAME.Loop();
+	gallus::gameplay::GAME.Initialize();
+	gallus::gameplay::GAME.Loop();
 
 	// Destroy the tool after loop ends.
 	gallus::core::TOOL->Destroy();

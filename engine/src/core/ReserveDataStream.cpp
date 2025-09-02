@@ -3,7 +3,8 @@
 #include <vcruntime_string.h>
 #include <corecrt_malloc.h>
 
-#include "Memory.h"
+// core includes
+#include "core/Memory.h"
 
 namespace gallus
 {

@@ -1,11 +1,12 @@
 #ifndef IMGUI_DISABLE
 
-#include "graphics/imgui/views/DataTypes/StringTextInput.h"
+#include "StringTextInput.h"
 
 #include <imgui/imgui_internal.h>
 #include <imgui/imgui.h>
 #include <imgui/imgui_helpers.h>
 
+// graphics includes
 #include "graphics/imgui/ImGuiWindow.h"
 #include "graphics/imgui/font_icon.h"
 

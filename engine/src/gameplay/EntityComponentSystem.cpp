@@ -1,9 +1,10 @@
 #include "gameplay/EntityComponentSystem.h"
 
+// logger includes
 #include "logger/Logger.h"
 
+// gameplay includes
 #include "gameplay/ECSBaseSystem.h"
-
 #include "gameplay/systems/TransformSystem.h"
 #include "gameplay/systems/SpriteSystem.h"
 
@@ -43,7 +44,7 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		void EntityComponentSystem::Update(const float& a_fDeltaTime)
+		void EntityComponentSystem::Update(float a_fDeltaTime)
 		{
 			std::lock_guard<std::recursive_mutex> lock(m_EntityMutex);
 
@@ -77,48 +78,8 @@ namespace gallus
 			// Delete components if applicable.
 			for (auto& sys : m_aSystems)
 			{
-				sys->UpdateComponents();
+				sys->UpdateComponents(a_fDeltaTime);
 			}
-
-			if (!m_bStarted)
-			{
-				return;
-			}
-
-			if (m_bPaused)
-			{
-				return;
-			}
-
-			for (auto& sys : m_aSystems)
-			{
-				sys->Update(a_fDeltaTime);
-			}
-
-		}
-
-		//---------------------------------------------------------------------
-		bool EntityComponentSystem::IsPaused() const
-		{
-			return m_bPaused;
-		}
-
-		//---------------------------------------------------------------------
-		void EntityComponentSystem::SetPaused(bool a_bPaused)
-		{
-			m_bPaused = a_bPaused;
-		}
-
-		//---------------------------------------------------------------------
-		bool EntityComponentSystem::HasStarted() const
-		{
-			return m_bStarted;
-		}
-
-		//---------------------------------------------------------------------
-		void EntityComponentSystem::SetStarted(bool a_bStarted)
-		{
-			m_bStarted = a_bStarted;
 		}
 
 		//---------------------------------------------------------------------
