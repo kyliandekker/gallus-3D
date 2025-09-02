@@ -5,6 +5,7 @@
 #include <imgui/backends/imgui_impl_win32.h>
 #include <imgui/backends/imgui_impl_dx12.h>
 #include <imgui/imgui_internal.h>
+#include <imgui/implot.h>
 
 // core includes
 #include "core/Tool.h"
@@ -43,6 +44,7 @@ namespace gallus
 			{
 				IMGUI_CHECKVERSION();
 				ImGui::CreateContext();
+				ImPlot::CreateContext();
 
 				m_IniPath = fs::path(core::TOOL->GetSaveDirectory().generic_string() + "/imgui.ini").generic_string();
 				ImGuiIO& io = ImGui::GetIO();
@@ -79,6 +81,7 @@ namespace gallus
 			{
 				ImGui_ImplDX12_Shutdown();
 				ImGui_ImplWin32_Shutdown();
+				ImPlot::DestroyContext();
 				ImGui::DestroyContext();
 
 				LOG(LOGSEVERITY_SUCCESS, LOG_CATEGORY_EDITOR, "Destroyed ImGui.");
@@ -179,7 +182,65 @@ namespace gallus
 				ImGuiStyle& style = ImGui::GetStyle();
 				ImVec4* colors = style.Colors;
 
-				SetOwnDark(style, colors);
+				ImVec4 accentColor = ImVec4(0.42f, 0.34f, 0.83f, 1.00f);
+				ImVec4 accentColorText = ImVec4(0.5f, 0.44f, 0.93f, 1.00f);
+
+				colors[ImGuiCol_Text] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
+				colors[ImGuiCol_TextDisabled] = ImVec4(0.24f, 0.24f, 0.24f, 1.00f);
+				colors[ImGuiCol_WindowBg] = ImVec4(0.14f, 0.14f, 0.14f, 1.00f);
+				colors[ImGuiCol_ChildBg] = ImVec4(0.14f, 0.14f, 0.14f, 1.00f);
+				colors[ImGuiCol_PopupBg] = ImVec4(0.14f, 0.14f, 0.14f, 1.0f);
+				colors[ImGuiCol_Border] = ImVec4(0.43f, 0.43f, 0.50f, 0.50f);
+				colors[ImGuiCol_BorderShadow] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+				colors[ImGuiCol_FrameBg] = ImVec4(0.20f, 0.20f, 0.20f, 1.00f);
+				colors[ImGuiCol_FrameBgHovered] = ImVec4(0.24f, 0.24f, 0.24f, 1.00f);
+				colors[ImGuiCol_FrameBgActive] = ImVec4(0.24f, 0.24f, 0.24f, 1.00f);
+				colors[ImGuiCol_TitleBg] = ImVec4(0.14f, 0.14f, 0.14f, 1.00f);
+				colors[ImGuiCol_TitleBgActive] = ImVec4(0.14f, 0.14f, 0.14f, 1.00f);
+				colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.14f, 0.14f, 0.14f, 1.00f);
+				colors[ImGuiCol_MenuBarBg] = ImVec4(0.20f, 0.20f, 0.20f, 1.00f);
+				colors[ImGuiCol_ScrollbarBg] = ImVec4(0.14f, 0.14f, 0.14f, 1.00f);
+				colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.24f, 0.24f, 0.24f, 1.00f);
+				colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.24f, 0.24f, 0.24f, 1.00f);
+				colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.24f, 0.24f, 0.24f, 1.00f);
+				colors[ImGuiCol_CheckMark] = ImVec4(0.86f, 0.93f, 0.89f, 1.00f);
+				colors[ImGuiCol_SliderGrab] = ImVec4(0.24f, 0.24f, 0.24f, 1.00f);
+				colors[ImGuiCol_SliderGrabActive] = ImVec4(0.24f, 0.24f, 0.24f, 1.00f);
+				colors[ImGuiCol_Button] = ImVec4(0.20f, 0.20f, 0.20f, 1.00f);
+				colors[ImGuiCol_ButtonHovered] = ImVec4(0.24f, 0.24f, 0.24f, 1.00f);
+				colors[ImGuiCol_ButtonActive] = ImVec4(0.15f, 0.15f, 0.15f, 1.00f);
+				colors[ImGuiCol_Header] = ImVec4(0.24f, 0.24f, 0.24f, 1.00f);
+				colors[ImGuiCol_HeaderHovered] = ImVec4(accentColor.x, accentColor.y, accentColor.z, 0.5f);
+				//colors[ImGuiCol_HeaderActive] = ImVec4(0.24f, 0.24f, 0.24f, 1.00f);
+				colors[ImGuiCol_HeaderActive] = accentColor;
+				colors[ImGuiCol_Separator] = ImVec4(0.43f, 0.43f, 0.50f, 0.50f);
+				colors[ImGuiCol_SeparatorHovered] = ImVec4(0.43f, 0.43f, 0.50f, 0.50f);
+				colors[ImGuiCol_SeparatorActive] = ImVec4(0.43f, 0.43f, 0.50f, 0.50f);
+				colors[ImGuiCol_ResizeGrip] = ImVec4(0.24f, 0.24f, 0.24f, 1.00f);
+				colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.24f, 0.24f, 0.24f, 1.00f);
+				colors[ImGuiCol_ResizeGripActive] = ImVec4(0.24f, 0.24f, 0.24f, 1.00f);
+				colors[ImGuiCol_Tab] = ImVec4(0.14f, 0.14f, 0.14f, 1.00f);
+				colors[ImGuiCol_TabHovered] = ImVec4(0.24f, 0.24f, 0.24f, 1.00f);
+				colors[ImGuiCol_TabActive] = accentColor;
+				colors[ImGuiCol_TabUnfocused] = ImVec4(0.14f, 0.14f, 0.14f, 1.00f);
+				colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.24f, 0.24f, 0.24f, 1.00f);
+				colors[ImGuiCol_PlotLines] = ImVec4(0.86f, 0.93f, 0.89f, 1.00f);
+				colors[ImGuiCol_PlotLinesHovered] = ImVec4(0.86f, 0.93f, 0.89f, 1.00f);
+				colors[ImGuiCol_PlotHistogram] = ImVec4(0.86f, 0.93f, 0.89f, 1.00f);
+				colors[ImGuiCol_PlotHistogramHovered] = ImVec4(0.86f, 0.93f, 0.89f, 1.00f);
+				colors[ImGuiCol_TextSelectedBg] = ImVec4(0.24f, 0.24f, 0.24f, 1.00f);
+				colors[ImGuiCol_DragDropTarget] = ImVec4(0.86f, 0.93f, 0.89f, 1.00f);
+				colors[ImGuiCol_NavHighlight] = ImVec4(0.86f, 0.93f, 0.89f, 1.00f);
+				colors[ImGuiCol_NavWindowingHighlight] = ImVec4(0.86f, 0.93f, 0.89f, 1.00f);
+				colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.14f, 0.14f, 0.14f, 1.00f);
+				colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.14f, 0.14f, 0.14f, 1.00f);
+				colors[ImGuiCol_TextColorAccent] = accentColorText;
+#ifndef _RENDER_TEX
+				float transparency = 0.4;
+				ImGui::GetStyle().Colors[ImGuiCol_FrameBg].w = transparency;
+				ImGui::GetStyle().Colors[ImGuiCol_WindowBg].w = transparency;
+				ImGui::GetStyle().Colors[ImGuiCol_ChildBg].w = transparency;
+#endif // _RENDER_TEX
 
 				style.WindowBorderSize = 1;
 				style.WindowRounding = 0;
@@ -201,6 +262,10 @@ namespace gallus
 				style.GrabRounding = 8;
 				style.LogSliderDeadzone = 4;
 				style.FramePadding = ImVec2(0, 0);
+
+				ImPlotStyle& pStyle = ImPlot::GetStyle();
+				colors = pStyle.Colors;
+				colors[ImPlotCol_Line] = accentColor;
 			}
 
 			//---------------------------------------------------------------------

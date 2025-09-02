@@ -31,16 +31,16 @@ file(GLOB_RECURSE HEADERS ${CMAKE_SOURCE_DIR}/game/src/*.h)
 file(GLOB_RECURSE SOURCES ${CMAKE_SOURCE_DIR}/game/src/*.cpp)
 
 # Define executable.
-add_executable(${PROJECT_NAME} WIN32 ${HEADERS} ${ICON} ${SOURCES} ${DX12} ${TINY_GLTF})
+add_executable(game WIN32 ${HEADERS} ${ICON} ${SOURCES} ${DX12} ${TINY_GLTF})
 
 # Define preprocessor definitions for different configurations
-target_compile_definitions(${PROJECT_NAME} PRIVATE
+target_compile_definitions(game PRIVATE
     "$<$<CONFIG:${DEBUG}>:${PREDEFINITIONS_GAME_DEBUG}>"
     "$<$<CONFIG:${RELEASE}>:${PREDEFINITIONS_GAME_RELEASE}>"
 )
 
 # Include directories
-target_include_directories(${PROJECT_NAME} PUBLIC
+target_include_directories(game PUBLIC
     ${CMAKE_SOURCE_DIR}/engine/src
     ${CMAKE_SOURCE_DIR}/game_shared/src
     ${CMAKE_SOURCE_DIR}/game/src
@@ -48,34 +48,34 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 )
 
 # Set C++ standard
-set_target_properties(${PROJECT_NAME} PROPERTIES
+set_target_properties(game PROPERTIES
     CXX_STANDARD 20
 )
 
-target_link_libraries(${PROJECT_NAME} PRIVATE
+target_link_libraries(game PRIVATE
     Shcore.lib dxgi.lib d3d12.lib d3dcompiler.lib dxguid.lib Shlwapi.lib engine_noimgui.lib game_shared.lib
 )
-target_link_libraries(${PROJECT_NAME} PRIVATE engine_noimgui)
-target_link_libraries(editor PRIVATE game_shared)
-target_link_directories(${PROJECT_NAME} PRIVATE
+target_link_libraries(game PRIVATE engine_noimgui)
+target_link_libraries(game PRIVATE game_shared)
+target_link_directories(game PRIVATE
     "${CMAKE_SOURCE_DIR}/../$<CONFIG>"
 )
 
 if(MSVC)
-    target_compile_options(${PROJECT_NAME} PRIVATE
+    target_compile_options(game PRIVATE
         "$<$<CONFIG:${DEBUG}>:/Od>"   # Disable optimizations for Debug
         "$<$<CONFIG:${RELEASE}>:/O2>"  # Enable optimizations for Release
     )
 endif()
 
 # For GCC/Clang (if applicable), set optimization level to 0 for debugging
-target_compile_options(${PROJECT_NAME} PRIVATE
+target_compile_options(game PRIVATE
     "$<$<CONFIG:${DEBUG}>:-O0>"  # Disable optimizations for Debug
     "$<$<CONFIG:${RELEASE}>:-O2>"  # Optimize for Release
 )
 
 if(MSVC)
-    target_compile_options(${PROJECT_NAME} PRIVATE
+    target_compile_options(game PRIVATE
         "$<$<CONFIG:${DEBUG}>:/MTd>"
         "$<$<CONFIG:${RELEASE}>:/MT>"
     )
@@ -83,8 +83,8 @@ endif()
 
 if(MSVC)
     # Set Debug Information Format (/ZI) for Debug configuration
-    set_property(TARGET ${PROJECT_NAME} APPEND_STRING PROPERTY COMPILE_OPTIONS "/ZI")
+    set_property(TARGET game APPEND_STRING PROPERTY COMPILE_OPTIONS "/ZI")
 
     # Set the Linker Debug flag for /DEBUG (for Debug configurations)
-    set_property(TARGET ${PROJECT_NAME} APPEND_STRING PROPERTY LINK_OPTIONS "/DEBUG")
+    set_property(TARGET game APPEND_STRING PROPERTY LINK_OPTIONS "/DEBUG")
 endif()

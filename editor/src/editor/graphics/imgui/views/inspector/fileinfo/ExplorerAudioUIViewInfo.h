@@ -36,6 +36,8 @@ namespace gallus
 				/// <param name="a_Window">The ImGui window for rendering the view.</param>
 				/// <param name="a_ExplorerFileUIView">The explorer file ui view.</param>
 				ExplorerAudioUIViewInfo(ImGuiWindow& a_Window, ExplorerFileUIView& a_ExplorerFileUIView);
+
+				virtual ~ExplorerAudioUIViewInfo();
 			protected:
 				/// <summary>
 				/// Renders the file UI in the editor.
@@ -43,7 +45,20 @@ namespace gallus
 				/// file-specific details.
 				void RenderSpecific() override;
 
+				/// <summary>
+				/// Renders the file UI in the editor preview section.
+				/// This function can be overridden by derived classes to render
+				/// file-specific details.
+				void RenderPreview() override;
+
+				bool LoadAudioData();
+
 				StringDropdown<editor::AssetType> m_AssetTypeDropdown; /// Drop down UI element for selecting asset types.
+
+				double* m_LeftSamples = nullptr;
+				double* m_RightSamples = nullptr;
+				size_t m_NumSamples = 0;
+				size_t m_RNumSamples = 0;
 			};
 		}
 	}

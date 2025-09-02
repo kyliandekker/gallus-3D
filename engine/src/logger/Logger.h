@@ -28,6 +28,7 @@ namespace gallus
 #define LOG_CATEGORY_DX12 "DX12"
 #define LOG_CATEGORY_EDITOR "EDITOR"
 #define LOG_CATEGORY_ECS "ECS"
+#define LOG_CATEGORY_AUDIO "AUDIO"
 #define LOG_CATEGORY_TEST "TEST"
 
 #define ASSERT_LEVEL gallus::LogSeverity::LOGSEVERITY_ASSERT

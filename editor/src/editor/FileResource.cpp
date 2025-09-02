@@ -188,7 +188,7 @@ namespace gallus
 			fs::path metaPath = m_Path.generic_string() + ".meta";
 			if (!file::LoadFile(metaPath, data))
 			{
-				LOGF(LOGSEVERITY_ERROR, LOG_CATEGORY_EDITOR, "Failed loading meta file '%s'.", metaPath.generic_string().c_str());
+				LOGF(LOGSEVERITY_ERROR, LOG_CATEGORY_EDITOR, "Failed loading meta file \"%s\".", metaPath.generic_string().c_str());
 				return false;
 			}
 
@@ -196,7 +196,7 @@ namespace gallus
 
 			if (a_Document.HasParseError())
 			{
-				LOGF(LOGSEVERITY_ERROR, LOG_CATEGORY_EDITOR, "Failed loading data in meta file '%s'.", metaPath.generic_string().c_str());
+				LOGF(LOGSEVERITY_ERROR, LOG_CATEGORY_EDITOR, "Failed loading data in meta file \"%s\".", metaPath.generic_string().c_str());
 				return false;
 			}
 
