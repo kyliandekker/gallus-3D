@@ -7,6 +7,8 @@
 
 #include <memory>
 
+#include "graphics/imgui/views/DataTypes/StringDropdown.h"
+
 namespace gallus
 {
 	namespace graphics
@@ -14,6 +16,7 @@ namespace gallus
 		namespace dx12
 		{
 			class Texture;
+			enum class TextureType;
 		}
 
 		namespace imgui
@@ -51,6 +54,8 @@ namespace gallus
 				void RenderPreview() override;
 
 				std::shared_ptr<graphics::dx12::Texture> m_pPreviewTexture = nullptr;
+
+				StringDropdown<graphics::dx12::TextureType> m_TextureTypeDropdown; /// Drop down UI element for selecting asset types.
 			};
 		}
 	}

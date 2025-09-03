@@ -45,6 +45,11 @@ namespace gallus
 			void SetAssetType(AssetType a_AssetType);
 
 			/// <summary>
+			/// Saves the file.
+			/// </summary>
+			void Save();
+
+			/// <summary>
 			/// Retrieves the parent.
 			/// </summary>
 			/// Pointer to the parent resource if that resource exists, otherwise nullptr.

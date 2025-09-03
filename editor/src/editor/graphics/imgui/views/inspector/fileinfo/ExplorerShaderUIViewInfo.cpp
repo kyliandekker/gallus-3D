@@ -41,10 +41,6 @@ namespace gallus
                 if (m_AssetTypeDropdown.Render(ImGui::IMGUI_FORMAT_ID("", COMBO_ID, "ASSETTYPE_SHADER_FILE_INSPECTOR").c_str()))
                 {
                     m_ExplorerFileUIView.GetFileResource().SetAssetType(m_AssetTypeDropdown.GetValue());
-                    rapidjson::Document doc;
-                    doc.SetObject();
-                    m_ExplorerFileUIView.GetFileResource().GetMetaData(doc);
-                    m_ExplorerFileUIView.GetFileResource().SaveMetadata(doc, doc.GetAllocator());
                 }
                 ImGui::PopStyleVar();
             }

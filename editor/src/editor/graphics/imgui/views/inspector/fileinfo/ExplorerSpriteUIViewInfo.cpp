@@ -27,9 +27,19 @@ namespace gallus
 	{
 		namespace imgui
 		{
-			ExplorerSpriteUIViewInfo::ExplorerSpriteUIViewInfo(ImGuiWindow& a_Window, ExplorerFileUIView& a_ExplorerFileUIView) : ExplorerFileUIViewInfo(a_Window, a_ExplorerFileUIView)
+			ExplorerSpriteUIViewInfo::ExplorerSpriteUIViewInfo(ImGuiWindow& a_Window, ExplorerFileUIView& a_ExplorerFileUIView) : ExplorerFileUIViewInfo(a_Window, a_ExplorerFileUIView),
+                m_TextureTypeDropdown(a_Window)
 			{
 				m_bShowPreview = true;
+
+                m_TextureTypeDropdown.Initialize(
+                    graphics::dx12::TextureType::Texture2D,
+                    {
+                        graphics::dx12::TextureType::Texture2D,
+                        graphics::dx12::TextureType::SpriteSheet,
+                    },
+                    graphics::dx12::TextureTypeToString
+                    );
 
 				auto cCommandQueue = core::TOOL->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
 				auto cCommandList = cCommandQueue->GetCommandList();
@@ -122,6 +132,16 @@ namespace gallus
 					ImGui::SameLine();
 					ImGui::Text(std::to_string(GetFormatChannelCount(m_pPreviewTexture->GetResourceDesc().Format)).c_str());
 				}
+
+                ImGui::DisplayHeader(m_Window.GetBoldFont(), "Type: ");
+                ImGui::SameLine();
+                ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(m_Window.GetFramePadding().x, 0));
+                ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+                if (m_TextureTypeDropdown.Render(ImGui::IMGUI_FORMAT_ID("", COMBO_ID, "ASSETTYPE_SHADER_FILE_INSPECTOR").c_str()))
+                {
+                    //m_ExplorerFileUIView.GetFileResource().SetAssetType(m_TextureTypeDropdown.GetValue());
+                }
+                ImGui::PopStyleVar();
 			}
 
 			void ExplorerSpriteUIViewInfo::RenderPreview()

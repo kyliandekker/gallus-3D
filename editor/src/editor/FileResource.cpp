@@ -49,6 +49,16 @@ namespace gallus
 		void FileResource::SetAssetType(AssetType a_AssetType)
 		{
 			m_AssetType = a_AssetType;
+
+			Save();
+		}
+
+		//---------------------------------------------------------------------
+		void FileResource::Save()
+		{
+			rapidjson::Document doc;
+			GetMetaData(doc);
+			SaveMetadata(doc, doc.GetAllocator());
 		}
 
 		//---------------------------------------------------------------------
@@ -156,8 +166,6 @@ namespace gallus
 
 			fs::rename(m_Path, newPath);
 			m_Path = newPath;
-
-			// TODO: Rescan.
 		}
 
 		//---------------------------------------------------------------------
@@ -192,6 +200,8 @@ namespace gallus
 				return false;
 			}
 
+			a_Document = rapidjson::Document();
+			a_Document.SetObject();
 			a_Document.Parse(reinterpret_cast<char*>(data.data()), data.size());
 
 			if (a_Document.HasParseError())
