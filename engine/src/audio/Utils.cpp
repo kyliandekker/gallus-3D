@@ -2,14 +2,14 @@
 #include <string.h>
 #include "Defines.h"
 
-namespace uaudio
+namespace gallus
 {
 	namespace utils
 	{
-		void reverseBytes(unsigned char* start, int size)
+		void reverseBytes(unsigned char* a_pStart, int a_pSize)
 		{
-			unsigned char* lo = start;
-			unsigned char* hi = start + size - 1;
+			unsigned char* lo = a_pStart;
+			unsigned char* hi = a_pStart + a_pSize - 1;
 			unsigned char swap;
 			while (lo < hi)
 			{
@@ -19,15 +19,15 @@ namespace uaudio
 			}
 		}
 
-		int chunkcmp(unsigned char* chunkID1, const char* chunkID2)
+		int chunkcmp(unsigned char* a_pChunkId, unsigned char* a_pChunkId2)
 		{
-			int b = strncmp(reinterpret_cast<const char*>(chunkID1), chunkID2, wave_reader::CHUNK_ID_SIZE);
+			int b = strncmp(reinterpret_cast<const char*>(a_pChunkId), reinterpret_cast<const char*>(a_pChunkId2), audio::CHUNK_ID_SIZE);
 			return b;
 		}
 
-		int chunkcmp(unsigned char* chunkID1, unsigned char* chunkID2)
+		int chunkcmp(const char* a_pChunkId, const char* a_pChunkId2)
 		{
-			int b = strncmp(reinterpret_cast<const char*>(chunkID1), reinterpret_cast<const char*>(chunkID2), wave_reader::CHUNK_ID_SIZE);
+			int b = strncmp(a_pChunkId, a_pChunkId2, audio::CHUNK_ID_SIZE);
 			return b;
 		}
 	}

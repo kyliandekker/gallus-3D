@@ -77,18 +77,15 @@ namespace gallus
 		//---------------------------------------------------------------------
 		bool DataStream::Read(void* a_Data, size_t a_DataSize, size_t a_Size)
 		{
-			if (m_iPos == m_iSize || m_iPos + a_Size > m_iSize)
+			size_t totalSize = a_DataSize * a_Size;
+
+			if (m_iPos + totalSize > m_iSize)
 			{
 				return false;
 			}
 
-			if (a_DataSize < a_Size)
-			{
-				return false;
-			}
-
-			memcpy(a_Data, addAs(m_pData, m_iPos), a_Size);
-			Seek(a_Size, SEEK_CUR);
+			memcpy(a_Data, addAs(m_pData, m_iPos), totalSize);
+			Seek(totalSize, SEEK_CUR);
 			return true;
 		}
 

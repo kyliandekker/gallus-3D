@@ -2,9 +2,9 @@
 
 #include <cstdint>
 
-namespace uaudio
+namespace gallus
 {
-	namespace wave_reader
+	namespace audio
 	{
 		constexpr uint32_t CHUNK_ID_SIZE = 4;
 

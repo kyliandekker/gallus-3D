@@ -25,7 +25,7 @@ namespace gallus
 			//---------------------------------------------------------------------
 			// Window
 			//---------------------------------------------------------------------
-			Window::Window() : m_WindowSettings("windowsettings.config")
+			Window::Window() : m_WindowSettings("windowsettings.settings")
 			{}
 
 			//---------------------------------------------------------------------

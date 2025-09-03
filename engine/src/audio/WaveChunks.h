@@ -35,9 +35,9 @@
 // https://sites.google.com/site/musicgapi/technical-documents/wav-file-format
 // https://code.google.com/archive/p/awesome-wav/wikis/WAVFormat.wiki
 
-namespace uaudio
+namespace gallus
 {
-	namespace wave_reader
+	namespace audio
 	{
 		/*
 		** The RIFF chunk goes a little something like this: TOTAL SIZE: 8 (chunkid and chunksize) + 4

@@ -2,11 +2,11 @@
 
 #include <cstring>
 
-#include "./Utils.h"
+#include "core/Memory.h"
 
-namespace uaudio
+namespace gallus
 {
-	namespace wave_reader
+	namespace audio
 	{
 		RIFF_Chunk::RIFF_Chunk(RIFF_Chunk* a_DataBuffer) : ChunkHeader(a_DataBuffer)
 		{
@@ -34,7 +34,7 @@ namespace uaudio
 			if (a_DataBuffer != nullptr)
 			{
 				// data is a pointer to everything after the data header.
-				data = reinterpret_cast<unsigned char*>(utils::add(a_DataBuffer, sizeof(DATA_Chunk) - sizeof(data)));
+				data = reinterpret_cast<unsigned char*>(core::add(a_DataBuffer, sizeof(DATA_Chunk) - sizeof(data)));
 			}
 		}
 
@@ -90,7 +90,7 @@ namespace uaudio
 				num_cue_points = a_DataBuffer->num_cue_points;
 
 				// cue_points is a pointer to everything after the cue_chunk header and the num_cue_points field.
-				cue_points = reinterpret_cast<CUE_Point*>(utils::add(a_DataBuffer, sizeof(CUE_Chunk) - sizeof(cue_points)));
+				cue_points = reinterpret_cast<CUE_Point*>(core::add(a_DataBuffer, sizeof(CUE_Chunk) - sizeof(cue_points)));
 			}
 		}
 
@@ -109,7 +109,7 @@ namespace uaudio
 				sampler_data = a_DataBuffer->sampler_data;
 
 				// samples is a pointer to the smpl_chunk header and everything before the samples field.
-				samples = reinterpret_cast<SMPL_Sample_Loop*>(utils::add(a_DataBuffer, sizeof(SMPL_Chunk) - sizeof(samples)));
+				samples = reinterpret_cast<SMPL_Sample_Loop*>(core::add(a_DataBuffer, sizeof(SMPL_Chunk) - sizeof(samples)));
 			}
 		}
 

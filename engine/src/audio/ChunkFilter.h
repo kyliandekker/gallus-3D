@@ -2,9 +2,9 @@
 
 #include <cstdint>
 
-namespace uaudio
+namespace gallus
 {
-	namespace wave_reader
+	namespace audio
 	{
 		/*
 		 * This is a filter for the wave file loader. If you want to only get specific chunks, use this.
@@ -23,8 +23,8 @@ namespace uaudio
 
 			const char* operator [](size_t i) const;
 		private:
-			size_t m_Size = 0;
-			const char* m_Data = nullptr;
+			size_t m_iSize = 0;
+			const char* m_pData = nullptr;
 		};
 	}
 }

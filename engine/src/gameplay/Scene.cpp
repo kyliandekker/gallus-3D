@@ -35,7 +35,9 @@ namespace gallus
 		//---------------------------------------------------------------------
 		bool Scene::LoadData()
 		{
+#ifdef _EDITOR
 			m_fIsDirty = false;
+#endif // _EDITOR
 
 			rapidjson::Document document;
 			document.Parse(m_Data.dataAs<const char>(), m_Data.size());
@@ -100,10 +102,13 @@ namespace gallus
 				}
 			}
 
+#ifdef _EDITOR
 			m_fIsDirty = true;
+#endif // _EDITOR
 			return true;
 		}
 
+#ifdef _EDITOR
 		//---------------------------------------------------------------------
 		bool Scene::SaveData()
 		{
@@ -157,6 +162,7 @@ namespace gallus
 			m_fIsDirty = false;
 			return true;
 		}
+#endif // _EDITOR
 
 		//---------------------------------------------------------------------
 		void Scene::SetData(const core::Data& a_Data)
@@ -170,6 +176,7 @@ namespace gallus
 			return m_Data;
 		}
 
+#ifdef _EDITOR
 		//---------------------------------------------------------------------
 		const fs::path& Scene::GetScenePath() const
 		{
@@ -193,5 +200,6 @@ namespace gallus
 		{
 			m_fIsDirty = a_fIsDirty;
 		}
+#endif // _EDITOR
 	}
 }

@@ -4,9 +4,9 @@
 
 #include "./Defines.h"
 
-namespace uaudio
+namespace gallus
 {
-	namespace wave_reader
+	namespace audio
 	{
 #pragma pack(push, 1)
 		/*
@@ -24,8 +24,8 @@ namespace uaudio
 			ChunkHeader(const ChunkHeader& rhs);
 			ChunkHeader(ChunkHeader* a_DataBuffer);
 
-			unsigned char chunk_id[wave_reader::CHUNK_ID_SIZE] = {};
-			unsigned char chunkSize[sizeof(uint32_t)] = {};
+			char m_aChunkId[audio::CHUNK_ID_SIZE] = {};
+			char m_aChunkSize[sizeof(uint32_t)] = {};
 
 			uint32_t ChunkSize(bool isBigEndian = false) const;
 			void SetChunkSize(uint32_t chunk_size, bool toBigEndian = false);
