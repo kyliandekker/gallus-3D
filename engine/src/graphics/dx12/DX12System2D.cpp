@@ -558,6 +558,9 @@ namespace gallus
 				// CBV at register b0 (Model-View-Projection Matrix)
 				rootParameters[RootParameters::CBV].InitAsConstants(sizeof(DirectX::XMMATRIX) / 4, 0, 0, D3D12_SHADER_VISIBILITY_VERTEX);
 
+				// b1: Sprite UV rect
+				rootParameters[SPRITE_UV].InitAsConstants(4, 1); 
+
 				// Texture SRV at register t0 (binds a texture)
 				rootParameters[RootParameters::TEX_SRV].InitAsDescriptorTable(1, &descriptorRanges[0], D3D12_SHADER_VISIBILITY_PIXEL);
 

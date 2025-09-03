@@ -21,6 +21,52 @@ namespace gallus
 			class DX12System2D;
 			class CommandList;
 
+			enum class TextureType
+			{
+				Texture2D,
+				SpriteSheet
+			};
+
+
+			/// <summary>
+			/// Converts a texture type enumeration value to its corresponding string representation.
+			/// </summary>
+			/// <param name="a_TextureType">The texture type to convert.</param>
+			/// <returns>A string representing the specified texture type.</returns>
+			inline std::string TextureTypeToString(TextureType a_TextureType)
+			{
+				switch (a_TextureType)
+				{
+					case TextureType::Texture2D:
+					{
+						return "Sprite";
+					}
+					case TextureType::SpriteSheet:
+					{
+						return "Sprite Sheet";
+					}
+					default:
+					{
+						return "";
+					}
+				}
+			}
+
+			struct SpriteRect
+			{
+				int x;      // pixel X (top-left)
+				int y;      // pixel Y (top-left)
+				int width;
+				int height;
+			};
+
+			class SpriteUV
+			{
+			public:
+				glm::vec2 uv0 = { 0.0f, 0.0f }; // top-left
+				glm::vec2 uv1 = { 1.0f, 1.0f }; // bottom-right
+			};
+
 			//---------------------------------------------------------------------
 			// Texture
 			//---------------------------------------------------------------------
@@ -156,13 +202,25 @@ namespace gallus
 				/// <returns>True if drawable, false otherwise.</returns>
 				bool CanBeDrawn() const;
 
+				void AddSpriteRect(const SpriteRect& a_Rect);
+
+				void SetCurrentSprite(int m_iCurrentSpriteIndex);
+
 				~Texture();
 			private:
+				int m_iCurrentSpriteIndex;
+				SpriteUV GetSpriteUV(int a_iIndex) const;
+
 				friend DX12System2D;
 
 				Microsoft::WRL::ComPtr<ID3D12Resource> m_pResourceUploadHeap = nullptr;
 				int32_t m_iSRVIndex = -1;
 				D3D12_SHADER_RESOURCE_VIEW_DESC m_SrvDesc;
+
+				TextureType m_TextureType = TextureType::Texture2D;
+
+				SpriteUV m_CurrentUV;
+				std::vector<SpriteRect> m_aSpriteRects;
 			};
 		}
 	}

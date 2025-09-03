@@ -105,6 +105,22 @@ namespace gallus
 		//---------------------------------------------------------------------
 		bool Game::Test()
 		{
+			auto cCommandQueue = gallus::core::TOOL->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
+			auto cCommandList = cCommandQueue->GetCommandList();
+
+			auto entityId = gallus::core::TOOL->GetECS().CreateEntity("New Sprite");
+			gallus::gameplay::SpriteComponent* meshComp = reinterpret_cast<gallus::gameplay::SpriteComponent*>(gallus::core::TOOL->GetECS().GetSystem<gallus::gameplay::SpriteSystem>().CreateBaseComponent(entityId));
+			meshComp->SetMesh(gallus::core::TOOL->GetResourceAtlas().GetDefaultMesh().get());
+			meshComp->SetShader(gallus::core::TOOL->GetResourceAtlas().GetDefaultShaderBind().get());
+			auto tex = gallus::core::TOOL->GetResourceAtlas().LoadTexture("tex_layton_sprites.png", cCommandList);
+			tex->AddSpriteRect({ 0, 0, 74, 190 });
+			tex->SetCurrentSprite(0);
+			meshComp->SetTexture(tex.get());
+			gallus::gameplay::TransformComponent* transformComp = reinterpret_cast<gallus::gameplay::TransformComponent*>(gallus::core::TOOL->GetECS().GetSystem<gallus::gameplay::TransformSystem>().CreateBaseComponent(entityId));
+			transformComp->Transform().SetScale({ static_cast<float>(meshComp->GetTexture()->GetResourceDesc().Width), static_cast<float>(meshComp->GetTexture()->GetResourceDesc().Height) });
+			cCommandQueue->ExecuteCommandList(cCommandList);
+			cCommandQueue->Flush();
+
 			return true;
 		}
 	}

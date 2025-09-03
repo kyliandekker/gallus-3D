@@ -53,8 +53,9 @@ namespace gallus
 			enum RootParameters
 			{
 				CBV = 0,                // ConstantBuffer<ModelViewProjection> ModelViewProjectionCB : register(b0);
-				TEX_SRV = 1,            // Texture2D texture0 : register(t0);
-				NumRootParameters = 2
+				SPRITE_UV = 1,    // b1: Sprite rect UVs (float2 uv0, float2 uv1)
+				TEX_SRV = 2,            // Texture2D texture0 : register(t0);
+				NumRootParameters = 3
 			};
 
 			//---------------------------------------------------------------------

@@ -111,7 +111,23 @@ namespace gallus
 
 				CD3DX12_GPU_DESCRIPTOR_HANDLE gpuHandle = core::TOOL->GetDX12().GetSRV().GetGPUHandle(m_iSRVIndex);
 
-				a_pCommandList->GetCommandList()->SetGraphicsRootDescriptorTable(1, gpuHandle);
+				a_pCommandList->GetCommandList()->SetGraphicsRootDescriptorTable(RootParameters::TEX_SRV, gpuHandle);
+
+				if (m_TextureType == TextureType::SpriteSheet)
+				{
+					// Bind sprite UV rect at b1
+					SpriteUV uv = GetSpriteUV(m_iCurrentSpriteIndex);
+					float uvData[4] = { uv.uv0.x, uv.uv0.y, uv.uv1.x, uv.uv1.y };
+					a_pCommandList->GetCommandList()->SetGraphicsRoot32BitConstants(RootParameters::SPRITE_UV, 4, uvData, 0);
+				}
+				else
+				{
+					SpriteUV uv;
+					uv.uv0 = { 0.0f, 0.0f }; // top-left
+					uv.uv1 = { 1.0f, 1.0f }; // bottom-right
+					float uvData[4] = { uv.uv0.x, uv.uv0.y, uv.uv1.x, uv.uv1.y };
+					a_pCommandList->GetCommandList()->SetGraphicsRoot32BitConstants(RootParameters::SPRITE_UV, 4, uvData, 0);
+				}
 			}
 
 			//---------------------------------------------------------------------
@@ -183,16 +199,6 @@ namespace gallus
 				size_t memorySize = static_cast<size_t>(width) * height * 4;
 				core::Data data = core::Data(imageData, memorySize);
 				 
-				// OPTION: Do the alpha fix here.
-				//for (int i = 0; i < width * height; i++)
-				//{
-				//	unsigned char* pixel = &data[i * 4]; // RGBA
-				//	float a = pixel[3] / 255.0f;
-				//	pixel[0] = (unsigned char) (pixel[0] * a);
-				//	pixel[1] = (unsigned char) (pixel[1] * a);
-				//	pixel[2] = (unsigned char) (pixel[2] * a);
-				//}
-
 				stbi_image_free(imageData);
 
 				m_sName = a_Path.filename().generic_string();
@@ -282,6 +288,42 @@ namespace gallus
 			bool Texture::CanBeDrawn() const
 			{
 				return IsSrvIndexValid() && IsValid();
+			}
+
+			//---------------------------------------------------------------------
+			void Texture::AddSpriteRect(const SpriteRect& a_Rect)
+			{
+				m_TextureType = TextureType::SpriteSheet;
+				m_aSpriteRects.push_back(a_Rect);
+			}
+
+			//---------------------------------------------------------------------
+			SpriteUV Texture::GetSpriteUV(int a_iIndex) const
+			{
+				SpriteUV uv;
+
+				if (a_iIndex < 0 || a_iIndex >= static_cast<int>(m_aSpriteRects.size()))
+				{
+					return uv;
+				}
+
+				const auto& r = m_aSpriteRects[a_iIndex];
+				glm::ivec2 size = GetSize(); // returns {width, height} of texture
+
+				float u0 = static_cast<float>(r.x) / size.x;
+				float v0 = static_cast<float>(r.y) / size.y;
+				float u1 = static_cast<float>(r.x + r.width) / size.x;
+				float v1 = static_cast<float>(r.y + r.height) / size.y;
+
+				uv.uv0 = { u0, v0 };
+				uv.uv1 = { u1, v1 };
+				return uv;
+			}
+
+			//---------------------------------------------------------------------
+			void Texture::SetCurrentSprite(int a_iIndex)
+			{
+				m_iCurrentSpriteIndex = a_iIndex;
 			}
 		}
 	}
