@@ -104,4 +104,38 @@ namespace rapidjson
 		}
 	}
 
+	inline void SetOrAddMember(
+		rapidjson::Value& obj,
+		const char* name,
+		rapidjson::Value& value,
+		rapidjson::Document::AllocatorType& allocator)
+	{
+		if (obj.HasMember(name))
+		{
+			obj[name] = value; // overwrite with new object/array/value
+		}
+		else
+		{
+			rapidjson::Value key(name, allocator);
+			obj.AddMember(key, value, allocator);
+		}
+	}
+
+	// For arrays specifically (still rapidjson::Value&, but for clarity)
+	inline void SetOrAddArrayMember(
+		rapidjson::Value& obj,
+		const char* name,
+		rapidjson::Value& array,
+		rapidjson::Document::AllocatorType& allocator)
+	{
+		if (obj.HasMember(name))
+		{
+			obj[name] = array;
+		}
+		else
+		{
+			rapidjson::Value key(name, allocator);
+			obj.AddMember(key, array, allocator);
+		}
+	}
 }

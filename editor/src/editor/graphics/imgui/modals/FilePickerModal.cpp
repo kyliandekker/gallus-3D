@@ -99,7 +99,7 @@ namespace gallus
 						{
 							m_pSelectedFileResource = view;
 
-							if (view->GetFileResource().GetAssetType() == gallus::editor::AssetType::Texture)
+							if (view->GetFileResource().GetMetaData().GetAssetType() == gallus::editor::AssetType::Texture)
 							{
 								LoadTexture(view->GetFileResource().GetPath().filename().generic_string());
 							}
@@ -155,7 +155,7 @@ namespace gallus
 				{
 					for (gallus::editor::AssetType assetType : a_aFileTypes)
 					{
-						if (fileResource.GetAssetType() == assetType)
+						if (fileResource.GetMetaData().GetAssetType() == assetType)
 						{
 							a_aResources.emplace_back(a_Window, fileResource);
 						}

@@ -16,10 +16,13 @@
 #include "graphics/dx12/Texture.h"
 #include "graphics/dx12/CommandQueue.h"
 #include "graphics/dx12/CommandList.h"
+#include "graphics/imgui/font_icon.h"
 
 // editor includes
 #include "editor/FileResource.h"
 #include "editor/graphics/imgui/views/ExplorerFileUIView.h"
+#include "editor/metadata/TextureMetaData.h"
+#include "editor/graphics/imgui/modals/SpriteEditorModal.h"
 
 namespace gallus
 {
@@ -32,8 +35,9 @@ namespace gallus
 			{
 				m_bShowPreview = true;
 
+                editor::TextureMetaData& metaData = m_ExplorerFileUIView.GetFileResource().GetMetaData<editor::TextureMetaData>();
                 m_TextureTypeDropdown.Initialize(
-                    graphics::dx12::TextureType::Texture2D,
+                    metaData.GetTextureType(),
                     {
                         graphics::dx12::TextureType::Texture2D,
                         graphics::dx12::TextureType::SpriteSheet,
@@ -133,15 +137,33 @@ namespace gallus
 					ImGui::Text(std::to_string(GetFormatChannelCount(m_pPreviewTexture->GetResourceDesc().Format)).c_str());
 				}
 
+                editor::TextureMetaData& metaData = m_ExplorerFileUIView.GetFileResource().GetMetaData<editor::TextureMetaData>();
+
                 ImGui::DisplayHeader(m_Window.GetBoldFont(), "Type: ");
                 ImGui::SameLine();
                 ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(m_Window.GetFramePadding().x, 0));
                 ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
                 if (m_TextureTypeDropdown.Render(ImGui::IMGUI_FORMAT_ID("", COMBO_ID, "ASSETTYPE_SHADER_FILE_INSPECTOR").c_str()))
                 {
-                    //m_ExplorerFileUIView.GetFileResource().SetAssetType(m_TextureTypeDropdown.GetValue());
+                    metaData.SetTextureType(m_TextureTypeDropdown.GetValue());
+                    metaData.Save();
                 }
                 ImGui::PopStyleVar();
+
+                ImGui::NewLine();
+
+                float width = ImGui::GetContentRegionAvail().x;
+                if (metaData.GetTextureType() == graphics::dx12::TextureType::SpriteSheet && ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_IMAGE + std::string(" Open Sprite Editor"), BUTTON_ID, "OPEN_SPRITE_EDITOR_INSPECTOR").c_str(), ImVec2(width, 0)))
+                {
+                    SpriteEditorModal* modal = dynamic_cast<SpriteEditorModal*>(m_Window.GetModal(1));
+                    if (modal)
+                    {
+                        modal->SetData(
+                            metaData
+                        );
+                        modal->Show();
+                    }
+                }
 			}
 
 			void ExplorerSpriteUIViewInfo::RenderPreview()
@@ -157,7 +179,7 @@ namespace gallus
 					ImGui::Image((ImTextureID) m_pPreviewTexture->GetGPUHandle().ptr, ImVec2(width, height_new));
 
 					// Draw border
-					ImDrawList* draw_list = ImGui::GetForegroundDrawList();
+					ImDrawList* draw_list = ImGui::GetWindowDrawList();
 					draw_list->AddRect(image_pos, ImVec2(image_pos.x + width, image_pos.y + height_new), ImGui::GetColorU32(ImGui::GetStyle().Colors[ImGuiCol_Border])); // White border
 				}
 			}

@@ -6,8 +6,12 @@
 #include <string>
 #include <rapidjson/document.h>
 
+// utils includes
 #include "utils/file_abstractions.h"
-#include "AssetType.h"
+
+// editor includes
+#include "editor/AssetType.h"
+#include "editor/metadata/MetaData.h"
 
 namespace gallus
 {
@@ -24,6 +28,8 @@ namespace gallus
 		{
 			friend class AssetDatabase;
 		public:
+			FileResource();
+
 			~FileResource();
 
 			/// <summary>
@@ -31,23 +37,6 @@ namespace gallus
 			/// </summary>
 			/// <returns>The path of the resource.</returns>
 			const fs::path& GetPath() const;
-
-			/// <summary>
-			/// Retrieves the type of asset resource.
-			/// </summary>
-			/// <returns>AssetType containing information about what type of asset resource it is.</returns>
-			AssetType GetAssetType() const;
-
-			/// <summary>
-			/// Sets the asset type.
-			/// </summary>
-			/// <param name="a_AssetType">The asset type it will be set to.</param>
-			void SetAssetType(AssetType a_AssetType);
-
-			/// <summary>
-			/// Saves the file.
-			/// </summary>
-			void Save();
 
 			/// <summary>
 			/// Retrieves the parent.
@@ -74,28 +63,48 @@ namespace gallus
 			void Delete();
 
 			/// <summary>
-			/// Saves the metadata to its meta file.
+			/// Searches for a path inside the file resource and children.
 			/// </summary>
-			/// <param name="a_Document">The data to save.</param>
-			/// <param name="a_Allocator">The allocator of the document.</param>
-			/// <returns>True if the saving was successful, otherwise false.</returns>
-			bool SaveMetadata(rapidjson::Document& a_Document, rapidjson::Document::AllocatorType& a_Allocator) const;
-
+			/// <returns>True if the found, otherwise false.</returns>
 			bool SearchForPath(const fs::path& a_Path, FileResource*& a_pFileResource);
 
-			bool GetMetaData(rapidjson::Document& a_Document) const;
-
+			/// <summary>
+			/// Returns the file data.
+			/// </summary>
+			/// <returns>True if the successful, otherwise false.</returns>
 			bool GetFileData(core::Data& a_Data) const;
 
 			std::vector<FileResource>& GetChildren()
 			{
 				return m_aChildren;
 			}
+
+			MetaData& GetMetaData()
+			{
+				return *m_MetaData;
+			}
+
+			const MetaData& GetMetaData() const
+			{
+				return *m_MetaData;
+			}
+
+			template<typename T>
+			T& GetMetaData()
+			{
+				return *(static_cast<T*>(m_MetaData));
+			}
+
+			template<typename T>
+			const T& GetMetaData() const
+			{
+				return *(static_cast<T*>(m_MetaData));
+			}
 		protected:
 			std::vector<FileResource> m_aChildren; /// Child resources (only used for folders).
+			MetaData* m_MetaData = nullptr;
 
 			fs::path m_Path; /// The path of the resource.
-			AssetType m_AssetType = AssetType::Folder; /// The asset type of the resource.
 			FileResource* m_Parent = nullptr; // The parent of the resource.
 		};
 	}

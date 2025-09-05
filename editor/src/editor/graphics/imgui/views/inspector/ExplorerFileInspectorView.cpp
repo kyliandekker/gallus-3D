@@ -31,7 +31,7 @@ namespace gallus
 				m_bShowDelete = true;
 				m_bShowShowInExplorer = true;
 
-				switch (a_ExplorerFileUIView.GetFileResource().GetAssetType())
+				switch (a_ExplorerFileUIView.GetFileResource().GetMetaData().GetAssetType())
 				{
 					case gallus::editor::AssetType::Texture:
 					{

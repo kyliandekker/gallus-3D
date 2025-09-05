@@ -3,9 +3,6 @@
 #include "FileResource.h"
 
 #include <rapidjson/document.h>
-#include <rapidjson/utils.h>
-#include <rapidjson/stringbuffer.h>
-#include <rapidjson/prettywriter.h>
 #include <unordered_map>
 
 // core includes
@@ -20,8 +17,8 @@
 // editor includes
 #include "editor/AssetType.h"
 #include "editor/AssetDatabase.h"
-
-#define JSON_FILE_RESOURCE_ASSETTYPE_VAR "assetType"
+#include "editor/metadata/MetaData.h"
+#include "editor/metadata/TextureMetaData.h"
 
 namespace gallus
 {
@@ -30,35 +27,19 @@ namespace gallus
 		//---------------------------------------------------------------------
 		// FileResource
 		//---------------------------------------------------------------------
-		FileResource::~FileResource()
+		FileResource::FileResource()
 		{}
+
+		//---------------------------------------------------------------------
+		FileResource::~FileResource()
+		{
+			delete m_MetaData;
+		}
 
 		//---------------------------------------------------------------------
 		const fs::path& FileResource::GetPath() const
 		{
 			return m_Path;
-		}
-
-		//---------------------------------------------------------------------
-		AssetType FileResource::GetAssetType() const
-		{
-			return m_AssetType;
-		}
-
-		//---------------------------------------------------------------------
-		void FileResource::SetAssetType(AssetType a_AssetType)
-		{
-			m_AssetType = a_AssetType;
-
-			Save();
-		}
-
-		//---------------------------------------------------------------------
-		void FileResource::Save()
-		{
-			rapidjson::Document doc;
-			GetMetaData(doc);
-			SaveMetadata(doc, doc.GetAllocator());
 		}
 
 		//---------------------------------------------------------------------
@@ -85,10 +66,13 @@ namespace gallus
 				return false;
 			}
 
-			// Scan the folder.
-			if (m_AssetType == AssetType::Folder)
+			m_aChildren.clear();
+			m_aChildren.reserve(20);
+
+			if (fs::is_directory(m_Path))
 			{
-				m_aChildren.clear();
+				m_MetaData = new MetaData(*this);
+				m_MetaData->SetAssetType(AssetType::Folder);
 
 				// Go through each file/folder and check their status.
 				fs::directory_iterator ds = fs::directory_iterator(m_Path, std::filesystem::directory_options::skip_permission_denied);
@@ -101,7 +85,6 @@ namespace gallus
 						continue;
 					}
 
-					// If it is not a directory, it is a file and needs to get past the meta checks.
 					if (!fs::is_directory(dirEntry.path()))
 					{
 						std::string extension = dirEntry.path().extension().generic_string();
@@ -111,43 +94,54 @@ namespace gallus
 						{
 							continue;
 						}
+					}
 
+					FileResource resource = FileResource();
+					resource.m_Path = dirEntry.path().lexically_normal();
+					resource.m_Parent = this;
+					m_aChildren.push_back(resource);
+				}
+			}
+			else
+			{
+				m_MetaData = new MetaData(*this);
+				if (!m_MetaData->Exists())
+				{
+					std::string extension = m_Path.extension().generic_string();
+
+					// Get the extension. If the extension is not recognized, it will just be ignored.
+					if (FILE_ATLAS.find(extension) != FILE_ATLAS.end())
+					{
 						auto it = FILE_ATLAS.find(extension);
 
-						// Use default asset type if not set.
-						AssetType assetType = it->second[0];
-
-						FileResource resource;
-						resource.m_Path = dirEntry.path().lexically_normal();
-						resource.m_Parent = this;
-
-						rapidjson::Document document;
-						document.SetObject();
-						bool hasMetadata = resource.GetMetaData(document);
-						if (hasMetadata)
-						{
-							int iAssetType = 0;
-							rapidjson::GetInt(document, JSON_FILE_RESOURCE_ASSETTYPE_VAR, iAssetType);
-							assetType = static_cast<AssetType>(iAssetType);
-						}
-						resource.m_AssetType = assetType;
-
-						if (!hasMetadata)
-						{
-							resource.SaveMetadata(document, document.GetAllocator());
-						}
-						m_aChildren.push_back(resource);
+						m_MetaData->SetAssetType(it->second[0]);
+						m_MetaData->Save();
 					}
-					else
+				}
+				else
+				{
+					// TODO: This is awful.
+
+					rapidjson::Document doc = m_MetaData->Load();
+					m_MetaData->LoadMetaData(doc);
+					AssetType assetType = m_MetaData->GetAssetType();
+
+					switch (assetType)
 					{
-						// Create the resource that will be added.
-						FileResource folderResource;
-						folderResource.m_Path = dirEntry.path().lexically_normal();
-						folderResource.m_Parent = this;
-						folderResource.m_AssetType = AssetType::Folder;
+						case AssetType::Texture:
+						{
+							delete m_MetaData;
+							m_MetaData = new TextureMetaData(*this);
+							break;
+						}
+						default:
+						{
 
-						m_aChildren.push_back(folderResource);
+							break;
+						}
 					}
+					doc = m_MetaData->Load();
+					m_MetaData->LoadMetaData(doc);
 				}
 			}
 
@@ -172,45 +166,6 @@ namespace gallus
 		void FileResource::Delete()
 		{
 			fs::remove(m_Path.c_str());
-		}
-
-		//---------------------------------------------------------------------
-		bool FileResource::SaveMetadata(rapidjson::Document& a_Document, rapidjson::Document::AllocatorType& a_Allocator) const
-		{
-			fs::path metaPath = m_Path.generic_string() + ".meta";
-
-			int assetType = (int) m_AssetType;
-			rapidjson::SetOrAddMember(a_Document, JSON_FILE_RESOURCE_ASSETTYPE_VAR, assetType, a_Allocator);
-
-			rapidjson::StringBuffer buffer;
-			rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
-			a_Document.Accept(writer);
-
-			return file::SaveFile(metaPath, core::Data(buffer.GetString(), buffer.GetSize()));
-		}
-
-		//---------------------------------------------------------------------
-		bool FileResource::GetMetaData(rapidjson::Document& a_Document) const
-		{
-			core::DataStream data;
-			fs::path metaPath = m_Path.generic_string() + ".meta";
-			if (!file::LoadFile(metaPath, data))
-			{
-				LOGF(LOGSEVERITY_ERROR, LOG_CATEGORY_EDITOR, "Failed loading meta file \"%s\".", metaPath.generic_string().c_str());
-				return false;
-			}
-
-			a_Document = rapidjson::Document();
-			a_Document.SetObject();
-			a_Document.Parse(reinterpret_cast<char*>(data.data()), data.size());
-
-			if (a_Document.HasParseError())
-			{
-				LOGF(LOGSEVERITY_ERROR, LOG_CATEGORY_EDITOR, "Failed loading data in meta file \"%s\".", metaPath.generic_string().c_str());
-				return false;
-			}
-
-			return true;
 		}
 
 		//---------------------------------------------------------------------

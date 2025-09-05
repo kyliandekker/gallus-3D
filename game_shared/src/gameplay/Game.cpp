@@ -105,6 +105,7 @@ namespace gallus
 		//---------------------------------------------------------------------
 		bool Game::Test()
 		{
+			/*
 			auto cCommandQueue = gallus::core::TOOL->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
 			auto cCommandList = cCommandQueue->GetCommandList();
 
@@ -119,7 +120,7 @@ namespace gallus
 			gallus::gameplay::TransformComponent* transformComp = reinterpret_cast<gallus::gameplay::TransformComponent*>(gallus::core::TOOL->GetECS().GetSystem<gallus::gameplay::TransformSystem>().CreateBaseComponent(entityId));
 			transformComp->Transform().SetScale({ static_cast<float>(meshComp->GetTexture()->GetResourceDesc().Width), static_cast<float>(meshComp->GetTexture()->GetResourceDesc().Height) });
 			cCommandQueue->ExecuteCommandList(cCommandList);
-			cCommandQueue->Flush();
+			cCommandQueue->Flush();*/
 
 			return true;
 		}

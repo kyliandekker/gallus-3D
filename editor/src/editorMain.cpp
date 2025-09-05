@@ -23,6 +23,7 @@
 #include "editor/graphics/imgui/windows/ExplorerWindow.h"
 #include "editor/graphics/imgui/windows/InspectorWindow.h"
 #include "editor/graphics/imgui/modals/FilePickerModal.h"
+#include "editor/graphics/imgui/modals/SpriteEditorModal.h"
 
 int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR lpCmdLine, _In_ int nShowCmd)
 {
@@ -52,8 +53,8 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR lp
 	imguiWindow.AddWindow(new gallus::graphics::imgui::SceneWindow(imguiWindow));
 	imguiWindow.AddWindow(new gallus::graphics::imgui::ExplorerWindow(imguiWindow));
 	imguiWindow.AddWindow(new gallus::graphics::imgui::InspectorWindow(imguiWindow));
-	auto* t = new gallus::graphics::imgui::FilePickerModal(imguiWindow);
-	imguiWindow.AddModal(t);
+	imguiWindow.AddModal(new gallus::graphics::imgui::FilePickerModal(imguiWindow));
+	imguiWindow.AddModal(new gallus::graphics::imgui::SpriteEditorModal(imguiWindow));
 
 	gallus::core::TOOL->Initialize(hInstance, name);
 

@@ -75,7 +75,7 @@ namespace gallus
 				{
 					for (ExplorerFileUIView& child : a_Resource.GetChildren())
 					{
-						if (child.GetFileResource().GetAssetType() == gallus::editor::AssetType::Folder)
+						if (child.GetFileResource().GetMetaData().GetAssetType() == gallus::editor::AssetType::Folder)
 						{
 							RenderFolder(child, a_Indent + 1, ImGui::GetCursorPos());
 						}
@@ -297,7 +297,7 @@ namespace gallus
 									}
 								}
 
-								if (double_clicked && view->GetFileResource().GetAssetType() == gallus::editor::AssetType::Folder)
+								if (double_clicked && view->GetFileResource().GetMetaData().GetAssetType() == gallus::editor::AssetType::Folder)
 								{
 									m_pViewedFolder = view;
 									m_bNeedsRefresh = true;
