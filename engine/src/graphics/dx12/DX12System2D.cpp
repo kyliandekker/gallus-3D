@@ -565,13 +565,21 @@ namespace gallus
 				rootParameters[RootParameters::TEX_SRV].InitAsDescriptorTable(1, &descriptorRanges[0], D3D12_SHADER_VISIBILITY_PIXEL);
 
 				// Define static sampler at register s0 (replaces the removed descriptor table sampler)
-				const CD3DX12_STATIC_SAMPLER_DESC staticSamplers[] = {
+				const CD3DX12_STATIC_SAMPLER_DESC staticSamplers[] =
+				{
 					CD3DX12_STATIC_SAMPLER_DESC(
-						0,  // Register s0
-						D3D12_FILTER_MIN_MAG_MIP_POINT,  // Bilinear filtering
-						D3D12_TEXTURE_ADDRESS_MODE_WRAP,
-						D3D12_TEXTURE_ADDRESS_MODE_WRAP,
-						D3D12_TEXTURE_ADDRESS_MODE_WRAP
+						0,                              // Register s0
+						D3D12_FILTER_MIN_MAG_MIP_POINT, // nearest-neighbor
+						D3D12_TEXTURE_ADDRESS_MODE_CLAMP,
+						D3D12_TEXTURE_ADDRESS_MODE_CLAMP,
+						D3D12_TEXTURE_ADDRESS_MODE_CLAMP,
+						0.0f,                           // Mip LOD bias
+						0,                              // max anisotropy (ignored for point)
+						D3D12_COMPARISON_FUNC_ALWAYS,
+						D3D12_STATIC_BORDER_COLOR_OPAQUE_BLACK,
+						0.0f,                           // MinLOD
+						0.0f,                           // MaxLOD -> force top mip only
+						D3D12_SHADER_VISIBILITY_PIXEL
 					)
 				};
 

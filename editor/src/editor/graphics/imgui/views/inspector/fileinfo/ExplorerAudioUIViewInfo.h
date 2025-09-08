@@ -17,7 +17,7 @@
 
 namespace gallus
 {
-	namespace editor
+	namespace resources
 	{
 		enum class AssetType;
 	}
@@ -59,7 +59,7 @@ namespace gallus
 
 				bool LoadAudioData();
 
-				StringDropdown<editor::AssetType> m_AssetTypeDropdown; /// Drop down UI element for selecting asset types.
+				StringDropdown<resources::AssetType> m_AssetTypeDropdown; /// Drop down UI element for selecting asset types.
 
 				core::Data 
 					m_LeftSamples,

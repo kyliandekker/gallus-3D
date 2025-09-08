@@ -99,7 +99,7 @@ namespace gallus
 						{
 							m_pSelectedFileResource = view;
 
-							if (view->GetFileResource().GetMetaData().GetAssetType() == gallus::editor::AssetType::Texture)
+							if (view->GetFileResource().GetMetaData().GetAssetType() == gallus::resources::AssetType::Texture)
 							{
 								LoadTexture(view->GetFileResource().GetPath().filename().generic_string());
 							}
@@ -149,11 +149,11 @@ namespace gallus
 				ImGui::PopStyleVar();
 			}
 
-			void RecursiveFind(gallus::editor::FileResource& a_File, std::vector<gallus::editor::AssetType>& a_aFileTypes, std::vector<ExplorerFileUIView>& a_aResources, ImGuiWindow& a_Window)
+			void RecursiveFind(gallus::editor::FileResource& a_File, std::vector<gallus::resources::AssetType>& a_aFileTypes, std::vector<ExplorerFileUIView>& a_aResources, ImGuiWindow& a_Window)
 			{
 				for (gallus::editor::FileResource& fileResource : a_File.GetChildren())
 				{
-					for (gallus::editor::AssetType assetType : a_aFileTypes)
+					for (gallus::resources::AssetType assetType : a_aFileTypes)
 					{
 						if (fileResource.GetMetaData().GetAssetType() == assetType)
 						{
@@ -173,7 +173,7 @@ namespace gallus
 				BaseModal::Show();
 			}
 
-			void FilePickerModal::SetData(const std::function<void(int, gallus::editor::FileResource&)>& a_Callback, const std::vector<gallus::editor::AssetType>& a_aFileTypes)
+			void FilePickerModal::SetData(const std::function<void(int, gallus::editor::FileResource&)>& a_Callback, const std::vector<gallus::resources::AssetType>& a_aFileTypes)
 			{
 				m_pSelectedFileResource = nullptr;
 				m_Callback = nullptr;

@@ -8,7 +8,7 @@
 #include "editor/FileResource.h"
 #include "graphics/imgui/ImGuiWindow.h"
 #include "graphics/imgui/font_icon.h"
-#include "editor/AssetType.h"
+#include "resources/AssetType.h"
 
 namespace gallus
 {
@@ -183,7 +183,7 @@ namespace gallus
 
 				ImGui::Text(m_sDisplayName.c_str());
 
-				std::string assetType = gallus::editor::AssetTypeToString(m_FileResource.GetMetaData().GetAssetType());
+				std::string assetType = gallus::resources::AssetTypeToString(m_FileResource.GetMetaData().GetAssetType());
 
 				textSize = ImGui::CalcTextSize(assetType.c_str());
 
@@ -274,7 +274,7 @@ namespace gallus
 			{
 				for (const gallus::editor::FileResource& resource : m_FileResource.GetChildren())
 				{
-					if (resource.GetMetaData().GetAssetType() == gallus::editor::AssetType::Folder)
+					if (resource.GetMetaData().GetAssetType() == gallus::resources::AssetType::Folder)
 					{
 						return true;
 					}

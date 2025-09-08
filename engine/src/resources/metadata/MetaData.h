@@ -2,19 +2,20 @@
 
 #include <rapidjson/document.h>
 
-// editor includes
-#include "editor/AssetType.h"
+// utils includes
+#include "utils/file_abstractions.h"
+
+// resources includes
+#include "resources/AssetType.h"
 
 namespace gallus
 {
-	namespace editor
+	namespace resources
 	{
-		class FileResource;
-		
 		class MetaData
 		{
 		public:
-			MetaData(FileResource& a_FileResource);
+			MetaData();
 
 			/// <summary>
 			/// Retrieves the type of asset resource.
@@ -31,7 +32,7 @@ namespace gallus
 			/// <summary>
 			/// Loads all the metadata.
 			/// </summary>
-			rapidjson::Document Load() const;
+			rapidjson::Document Load(const fs::path& a_Path) const;
 			
 			/// <summary>
 			/// Generates all the metadata.
@@ -41,7 +42,7 @@ namespace gallus
 			/// <summary>
 			/// Saves all the metadata.
 			/// </summary>
-			bool Save() const;
+			bool Save(const fs::path& a_Path) const;
 			
 			/// <summary>
 			/// Saves all the metadata.
@@ -51,16 +52,9 @@ namespace gallus
 			/// <summary>
 			/// Returns whether the meta file exists.
 			/// </summary>
-			bool Exists() const;
-
-			FileResource& GetFileResource()
-			{
-				return m_FileResource;
-			}
+			bool Exists(const fs::path& a_Path) const;
 		protected:
 			AssetType m_AssetType = AssetType::Folder; /// The asset type of the resource.
-			
-			FileResource& m_FileResource;
 		};
 	}
 }

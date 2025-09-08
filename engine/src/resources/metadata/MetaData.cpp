@@ -13,20 +13,16 @@
 // logger includes
 #include "logger/Logger.h"
 
-// editor includes
-#include "editor/FileResource.h"
-
 #define JSON_META_DATA_FILE_RESOURCE_ASSET_TYPE_VAR "assetType"
 
 namespace gallus
 {
-	namespace editor
+	namespace resources
 	{
 		//---------------------------------------------------------------------
 		// MetaData
 		//---------------------------------------------------------------------
-		MetaData::MetaData(FileResource& a_FileResource) :
-			m_FileResource(a_FileResource)
+		MetaData::MetaData()
 		{}
 
 		//---------------------------------------------------------------------
@@ -41,13 +37,14 @@ namespace gallus
 			m_AssetType = a_AssetType;
 		}
 
-		rapidjson::Document MetaData::Load() const
+		//---------------------------------------------------------------------
+		rapidjson::Document MetaData::Load(const fs::path& a_Path) const
 		{
 			rapidjson::Document document = rapidjson::Document();
 			document.SetObject();
 
 			core::DataStream data;
-			fs::path metaPath = m_FileResource.GetPath().generic_string() + ".meta";
+			fs::path metaPath = a_Path.generic_string() + ".meta";
 			if (!file::LoadFile(metaPath, data))
 			{
 				LOGF(LOGSEVERITY_ERROR, LOG_CATEGORY_EDITOR, "Failed loading meta file \"%s\".", metaPath.generic_string().c_str());
@@ -68,7 +65,9 @@ namespace gallus
 		//---------------------------------------------------------------------
 		rapidjson::Document MetaData::GenerateMetaData() const
 		{
-			rapidjson::Document doc = Load();
+			// TODO: Currently it will overwrite every other data.
+			rapidjson::Document doc;
+			doc.SetObject();
 			
 			int assetType = (int) m_AssetType;
 			rapidjson::SetOrAddMember(doc, JSON_META_DATA_FILE_RESOURCE_ASSET_TYPE_VAR, assetType, doc.GetAllocator());
@@ -77,9 +76,9 @@ namespace gallus
 		}
 		
 		//---------------------------------------------------------------------
-		bool MetaData::Save() const
+		bool MetaData::Save(const fs::path& a_Path) const
 		{
-			fs::path metaPath = m_FileResource.GetPath().generic_string() + ".meta";
+			fs::path metaPath = a_Path.generic_string() + ".meta";
 
 			rapidjson::Document doc = GenerateMetaData();
 			rapidjson::StringBuffer buffer;
@@ -92,19 +91,17 @@ namespace gallus
 		//---------------------------------------------------------------------
 		bool MetaData::LoadMetaData(rapidjson::Document& a_Document)
 		{
-			rapidjson::Document doc = Load();
-
 			int iAssetType = 0;
-			rapidjson::GetInt(doc, JSON_META_DATA_FILE_RESOURCE_ASSET_TYPE_VAR, iAssetType);
+			rapidjson::GetInt(a_Document, JSON_META_DATA_FILE_RESOURCE_ASSET_TYPE_VAR, iAssetType);
 			m_AssetType = static_cast<AssetType>(iAssetType);
 
 			return true;
 		}
 
 		//---------------------------------------------------------------------
-		bool MetaData::Exists() const
+		bool MetaData::Exists(const fs::path& a_Path) const
 		{
-			fs::path metaPath = m_FileResource.GetPath().generic_string() + ".meta";
+			fs::path metaPath = a_Path.generic_string() + ".meta";
 			return fs::exists(metaPath) && !fs::is_directory(metaPath);
 		}
 	}

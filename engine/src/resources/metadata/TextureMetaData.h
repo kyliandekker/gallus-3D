@@ -8,14 +8,12 @@
 
 namespace gallus
 {
-	namespace editor
+	namespace resources
 	{
-		class FileResource;
-
 		class TextureMetaData : public MetaData
 		{
 		public:
-			TextureMetaData(FileResource& a_FileResource);
+			TextureMetaData();
 
 			/// <summary>
 			/// Retrieves the type of texture resource.
@@ -28,6 +26,11 @@ namespace gallus
 			/// </summary>
 			/// <param name="a_TextureType">The texture type it will be set to.</param>
 			void SetTextureType(graphics::dx12::TextureType a_TextureType);
+
+			std::vector<graphics::dx12::SpriteRect>& GetSprites()
+			{
+				return m_aSprites;
+			}
 
 			/// <summary>
 			/// Generates all the metadata.
@@ -42,12 +45,6 @@ namespace gallus
 			graphics::dx12::TextureType m_TextureType;
 
 			std::vector<graphics::dx12::SpriteRect> m_aSprites = {
-				{
-					3,
-					0,
-					200,
-					300
-				}
 			};
 		};
 	}

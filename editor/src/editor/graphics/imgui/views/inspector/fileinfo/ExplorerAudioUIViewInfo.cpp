@@ -39,11 +39,11 @@ namespace gallus
                 m_AssetTypeDropdown.Initialize(
                     m_ExplorerFileUIView.GetFileResource().GetMetaData().GetAssetType(),
                     {
-                        editor::AssetType::Sound,
-                        editor::AssetType::Song,
-                        editor::AssetType::VO,
+                        resources::AssetType::Sound,
+                        resources::AssetType::Song,
+                        resources::AssetType::VO,
                     },
-                    editor::AssetTypeToString
+                    resources::AssetTypeToString
                     );
 
                 m_bShowPreview = true;
@@ -69,7 +69,7 @@ namespace gallus
                 {
                     m_ExplorerFileUIView.GetFileResource().GetMetaData().SetAssetType(m_AssetTypeDropdown.GetValue());
                     m_ExplorerFileUIView.SetIcon();
-                    m_ExplorerFileUIView.GetFileResource().GetMetaData().Save();
+                    m_ExplorerFileUIView.GetFileResource().GetMetaData().Save(m_ExplorerFileUIView.GetFileResource().GetPath());
                 }
                 ImGui::PopStyleVar();
 

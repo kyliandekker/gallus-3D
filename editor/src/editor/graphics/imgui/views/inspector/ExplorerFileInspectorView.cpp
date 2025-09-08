@@ -9,7 +9,7 @@
 // editor includes
 #include "editor/core/EditorTool.h"
 #include "editor/FileResource.h"
-#include "editor/AssetType.h"
+#include "resources/AssetType.h"
 #include "editor/graphics/imgui/views/ExplorerFileUIView.h"
 #include "editor/graphics/imgui/views/inspector/fileinfo/ExplorerFileUIViewInfo.h"
 #include "editor/graphics/imgui/views/inspector/fileinfo/ExplorerSpriteUIViewInfo.h"
@@ -33,25 +33,25 @@ namespace gallus
 
 				switch (a_ExplorerFileUIView.GetFileResource().GetMetaData().GetAssetType())
 				{
-					case gallus::editor::AssetType::Texture:
+					case gallus::resources::AssetType::Texture:
 					{
 						m_pExplorerFileUIViewInfo = new ExplorerSpriteUIViewInfo(m_Window, a_ExplorerFileUIView);
 						break;
 					}
-					case gallus::editor::AssetType::PixelShader:
-					case gallus::editor::AssetType::VertexShader:
+					case gallus::resources::AssetType::PixelShader:
+					case gallus::resources::AssetType::VertexShader:
 					{
 						m_pExplorerFileUIViewInfo = new ExplorerShaderUIViewInfo(m_Window, a_ExplorerFileUIView);
 						break;
 					}
-					case gallus::editor::AssetType::Sound:
-					case gallus::editor::AssetType::Song:
-					case gallus::editor::AssetType::VO:
+					case gallus::resources::AssetType::Sound:
+					case gallus::resources::AssetType::Song:
+					case gallus::resources::AssetType::VO:
 					{
 						m_pExplorerFileUIViewInfo = new ExplorerAudioUIViewInfo(m_Window, a_ExplorerFileUIView);
 						break;
 					}
-					case gallus::editor::AssetType::Scene:
+					case gallus::resources::AssetType::Scene:
 					{
 						m_pExplorerFileUIViewInfo = new ExplorerSceneUIViewInfo(m_Window, a_ExplorerFileUIView);
 						break;

@@ -25,10 +25,10 @@ namespace gallus
                 m_AssetTypeDropdown.Initialize(
                     m_ExplorerFileUIView.GetFileResource().GetMetaData().GetAssetType(),
                     {
-                        editor::AssetType::PixelShader,
-                        editor::AssetType::VertexShader,
+                        resources::AssetType::PixelShader,
+                        resources::AssetType::VertexShader,
                     },
-                    editor::AssetTypeToString
+                    resources::AssetTypeToString
                 );
             }
 

@@ -72,7 +72,7 @@ namespace gallus
 
 			if (m_pTexture && m_pTexture->CanBeDrawn())
 			{
-				m_pTexture->Bind(a_pCommandList);
+				m_pTexture->Bind(a_pCommandList, m_iSpriteIndex);
 			}
 
 			if (m_pShaderBind && m_pShaderBind->IsValid())

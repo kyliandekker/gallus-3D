@@ -99,11 +99,14 @@ namespace gallus
 			std::string logFilename(50, '\0');
 			std::strftime(&logFilename[0], logFilename.size(), "./log-%Y-%m-%d %H-%M-%S.log", &buf);  // Changed colon to dash
 
-			fopen_s(&s_pLogFile, logFilename.c_str(), "wb");
-			if (!s_pLogFile)
+			if (LOG_TO_FILE)
 			{
-				LOG(LOGSEVERITY_SUCCESS, CATEGORY_LOGGER, "Failed initializing logger: Could not create log file.");
-				return false;
+				fopen_s(&s_pLogFile, logFilename.c_str(), "wb");
+				if (!s_pLogFile)
+				{
+					LOG(LOGSEVERITY_SUCCESS, CATEGORY_LOGGER, "Failed initializing logger: Could not create log file.");
+					return false;
+				}
 			}
 
 			LOG(LOGSEVERITY_SUCCESS, CATEGORY_LOGGER, "Initialized logger.");
@@ -123,7 +126,7 @@ namespace gallus
 				s_pConsole = nullptr;
 			}
 #endif // _DEBUG
-			if (s_pLogFile)
+			if (LOG_TO_FILE && s_pLogFile)
 			{
 				fclose(s_pLogFile);
 				s_pLogFile = nullptr;
@@ -156,7 +159,7 @@ namespace gallus
 		//---------------------------------------------------------------------
 		Logger::~Logger()
 		{
-			if (s_pLogFile)
+			if (LOG_TO_FILE && s_pLogFile)
 			{
 				fclose(s_pLogFile);
 				s_pLogFile = nullptr;
@@ -198,7 +201,7 @@ namespace gallus
 					LogSeverityToString(lm.GetSeverity()) + "] " + lm.GetRawMessage() + "\"" +
 					fileName + "\" on line " + std::to_string(lm.GetLine()) + "\n";
 
-				if (s_pLogFile)
+				if (LOG_TO_FILE && s_pLogFile)
 				{
 					fprintf(s_pLogFile, message.c_str());
 				}

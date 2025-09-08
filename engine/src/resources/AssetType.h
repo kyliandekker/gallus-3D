@@ -4,7 +4,7 @@
 
 namespace gallus
 {
-	namespace editor
+	namespace resources
 	{
 		/// <summary>
 		/// Represents the various types of assets used within the engine.

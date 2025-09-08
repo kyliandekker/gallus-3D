@@ -11,13 +11,17 @@
 #include <memory>
 
 #include "graphics/imgui/views/DataTypes/StringTextInput.h"
-#include "editor/AssetType.h"
+#include "resources/AssetType.h"
 
 namespace gallus
 {
-	namespace editor
+	namespace resources
 	{
 		class TextureMetaData;
+	}
+	namespace editor
+	{
+		class FileResource;
 	}
 	namespace graphics
 	{
@@ -52,12 +56,29 @@ namespace gallus
 				/// <summary>
 				/// Sets the data of the sprite editor modal.
 				/// </summary>
-				/// <param name="a_TextureMetaData">The texture meta data.</param>
-				void SetData(editor::TextureMetaData& a_TextureMetaData);
+				/// <param name="a_FileResource">The sprite file.</param>
+				void SetData(editor::FileResource& a_FileResource);
 			private:
+				void RenderToolbar();
+				void HandleGlobalControls(const ImVec2& a_vWindowSize);
+				void RenderRect(int8_t a_iIndex, const ImVec2& a_vImgMin, const ImVec2& a_vImgMax);
+				void HandleRectSelection(int8_t a_iIndex, const ImVec2& a_vImgMin, const ImVec2& a_vImgMax);
+				void GetSpriteMinMax(int8_t a_iIndex, ImVec2& a_vMin, ImVec2& a_vMax, const ImVec2& a_vImgMin, const ImVec2& a_vImgMax);
+				bool InteractWithRect(const ImVec2& a_vImgMin, const ImVec2& a_vImgMax);
+				void DrawRectInteraction(const ImVec2& a_vImgMin, const ImVec2& a_vImgMax);
+
+				int8_t m_iCurrentSprite = -1;
+
+				float m_fZoom = 1.0f;
+				ImVec2 m_vPanOffset = ImVec2(0.0f, 0.0f);
+				bool m_bDragging = false;
+				bool m_bResizing = false;
+				int8_t m_iDragIndex = -1;
+
 				std::shared_ptr<graphics::dx12::Texture> m_pPreviewTexture = nullptr;
 
-				editor::TextureMetaData* m_pTextureMetaData;
+				resources::TextureMetaData* m_pTextureMetaData = nullptr;
+				editor::FileResource* m_FileResource = nullptr;
 			};
 		}
 	}

@@ -10,8 +10,8 @@
 #include "utils/file_abstractions.h"
 
 // editor includes
-#include "editor/AssetType.h"
-#include "editor/metadata/MetaData.h"
+#include "resources/AssetType.h"
+#include "resources/metadata/MetaData.h"
 
 namespace gallus
 {
@@ -79,12 +79,12 @@ namespace gallus
 				return m_aChildren;
 			}
 
-			MetaData& GetMetaData()
+			resources::MetaData& GetMetaData()
 			{
 				return *m_MetaData;
 			}
 
-			const MetaData& GetMetaData() const
+			const resources::MetaData& GetMetaData() const
 			{
 				return *m_MetaData;
 			}
@@ -102,7 +102,7 @@ namespace gallus
 			}
 		protected:
 			std::vector<FileResource> m_aChildren; /// Child resources (only used for folders).
-			MetaData* m_MetaData = nullptr;
+			resources::MetaData* m_MetaData = nullptr;
 
 			fs::path m_Path; /// The path of the resource.
 			FileResource* m_Parent = nullptr; // The parent of the resource.

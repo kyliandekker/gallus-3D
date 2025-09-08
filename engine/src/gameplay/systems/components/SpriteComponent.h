@@ -79,6 +79,16 @@ namespace gallus
 				return m_pTexture;
 			}
 
+			int8_t GetSpriteIndex()
+			{
+				return m_iSpriteIndex;
+			}
+
+			void SetSpriteIndex(int8_t a_iSpriteIndex)
+			{
+				m_iSpriteIndex = a_iSpriteIndex;
+			}
+
 			/// <summary>
 			/// Renders the mesh.
 			/// </summary>
@@ -104,6 +114,7 @@ namespace gallus
 			graphics::dx12::Mesh* m_pMesh = nullptr;
 			graphics::dx12::DX12ShaderBind* m_pShaderBind = nullptr;
 			graphics::dx12::Texture* m_pTexture = nullptr;
+			int8_t m_iSpriteIndex = 0;
 		};
 	}
 }

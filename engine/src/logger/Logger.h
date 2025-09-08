@@ -32,6 +32,7 @@ namespace gallus
 #define LOG_CATEGORY_TEST "TEST"
 
 #define ASSERT_LEVEL gallus::LogSeverity::LOGSEVERITY_ASSERT
+	constexpr bool LOG_TO_FILE = false;
 // NOTE: This one is out of the other namespaces so they can be easily used in other classes.
 	typedef enum LogSeverity
 	{
@@ -95,12 +96,12 @@ namespace gallus
 		/// 0 = full path, 1 = filename, 2 = stem, 3 = parent path + filename
 		#define LOG_SHORT_FILENAMES 3
 
-//---------------------------------------------------------------------
-// LoggerMessage
-//---------------------------------------------------------------------
-/// <summary>
-/// Represents the logger message with variables for location, category and severity.
-/// </summary>
+		//---------------------------------------------------------------------
+		// LoggerMessage
+		//---------------------------------------------------------------------
+		/// <summary>
+		/// Represents the logger message with variables for location, category and severity.
+		/// </summary>
 		class LoggerMessage
 		{
 		public:

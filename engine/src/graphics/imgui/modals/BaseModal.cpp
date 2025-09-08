@@ -51,7 +51,7 @@ namespace gallus
 
 				ImVec2 center = ImVec2(ImGui::GetIO().DisplaySize.x * 0.5f, ImGui::GetIO().DisplaySize.y * 0.5f);
 				ImVec2 size = ImGui::GetIO().DisplaySize; // Adjust as needed
-				size = ImVec2(size.x * 0.5f, size.y * 0.5f);
+				size = ImVec2(size.x * 0.75f, size.y * 0.75f);
 
 				// Calculate the position of the top-left corner
 				ImVec2 pos = ImVec2(center.x - size.x * 0.5f, center.y - size.y * 0.5f);

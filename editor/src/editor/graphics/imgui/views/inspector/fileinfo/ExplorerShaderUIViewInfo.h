@@ -11,7 +11,7 @@
 
 namespace gallus
 {
-	namespace editor
+	namespace resources
 	{
 		enum class AssetType;
 	}
@@ -43,7 +43,7 @@ namespace gallus
 				/// file-specific details.
 				void RenderSpecific() override;
 
-				StringDropdown<editor::AssetType> m_AssetTypeDropdown; /// Drop down UI element for selecting asset types.
+				StringDropdown<resources::AssetType> m_AssetTypeDropdown; /// Drop down UI element for selecting asset types.
 			};
 		}
 	}

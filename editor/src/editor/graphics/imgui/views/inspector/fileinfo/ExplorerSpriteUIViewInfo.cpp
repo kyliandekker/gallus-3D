@@ -21,7 +21,7 @@
 // editor includes
 #include "editor/FileResource.h"
 #include "editor/graphics/imgui/views/ExplorerFileUIView.h"
-#include "editor/metadata/TextureMetaData.h"
+#include "resources/metadata/TextureMetaData.h"
 #include "editor/graphics/imgui/modals/SpriteEditorModal.h"
 
 namespace gallus
@@ -35,7 +35,7 @@ namespace gallus
 			{
 				m_bShowPreview = true;
 
-                editor::TextureMetaData& metaData = m_ExplorerFileUIView.GetFileResource().GetMetaData<editor::TextureMetaData>();
+                resources::TextureMetaData& metaData = m_ExplorerFileUIView.GetFileResource().GetMetaData<resources::TextureMetaData>();
                 m_TextureTypeDropdown.Initialize(
                     metaData.GetTextureType(),
                     {
@@ -137,7 +137,7 @@ namespace gallus
 					ImGui::Text(std::to_string(GetFormatChannelCount(m_pPreviewTexture->GetResourceDesc().Format)).c_str());
 				}
 
-                editor::TextureMetaData& metaData = m_ExplorerFileUIView.GetFileResource().GetMetaData<editor::TextureMetaData>();
+                resources::TextureMetaData& metaData = m_ExplorerFileUIView.GetFileResource().GetMetaData<resources::TextureMetaData>();
 
                 ImGui::DisplayHeader(m_Window.GetBoldFont(), "Type: ");
                 ImGui::SameLine();
@@ -146,7 +146,7 @@ namespace gallus
                 if (m_TextureTypeDropdown.Render(ImGui::IMGUI_FORMAT_ID("", COMBO_ID, "ASSETTYPE_SHADER_FILE_INSPECTOR").c_str()))
                 {
                     metaData.SetTextureType(m_TextureTypeDropdown.GetValue());
-                    metaData.Save();
+                    metaData.Save(m_ExplorerFileUIView.GetFileResource().GetPath());
                 }
                 ImGui::PopStyleVar();
 
@@ -159,30 +159,94 @@ namespace gallus
                     if (modal)
                     {
                         modal->SetData(
-                            metaData
+                            m_ExplorerFileUIView.GetFileResource()
                         );
                         modal->Show();
                     }
                 }
 			}
 
-			void ExplorerSpriteUIViewInfo::RenderPreview()
-			{
-				if (m_pPreviewTexture && m_pPreviewTexture->CanBeDrawn())
-				{
-					const float height_new = ImGui::GetContentRegionAvail().y;
-					const float width = (m_pPreviewTexture->GetResourceDesc().Width * (1.0f / m_pPreviewTexture->GetResourceDesc().Height * height_new));
+            void ExplorerSpriteUIViewInfo::RenderPreview()
+            {
+                if (!m_pPreviewTexture || !m_pPreviewTexture->CanBeDrawn())
+                    return;
 
-					float offset = (ImGui::GetContentRegionAvail().x - width) / 2;
-					ImGui::SetCursorPosX(ImGui::GetCursorPosX() + offset);
-					ImVec2 image_pos = ImGui::GetCursorScreenPos();
-					ImGui::Image((ImTextureID) m_pPreviewTexture->GetGPUHandle().ptr, ImVec2(width, height_new));
+                // Get TextureMetaData
+                resources::TextureMetaData& metaData = m_ExplorerFileUIView.GetFileResource().GetMetaData<resources::TextureMetaData>();
+                const auto& sprites = metaData.GetSprites();
 
-					// Draw border
-					ImDrawList* draw_list = ImGui::GetWindowDrawList();
-					draw_list->AddRect(image_pos, ImVec2(image_pos.x + width, image_pos.y + height_new), ImGui::GetColorU32(ImGui::GetStyle().Colors[ImGuiCol_Border])); // White border
-				}
-			}
+                static int currentSpriteIndex = 0;
+                const int maxIndex = static_cast<int>(sprites.size());
+
+                // Navigation buttons
+                if (ImGui::Button("Prev"))
+                {
+                    currentSpriteIndex--;
+                    if (currentSpriteIndex < 0) currentSpriteIndex = maxIndex; // wrap around
+                }
+                ImGui::SameLine();
+                if (ImGui::Button("Next"))
+                {
+                    currentSpriteIndex++;
+                    if (currentSpriteIndex > maxIndex) currentSpriteIndex = 0; // wrap around
+                }
+
+                ImGui::Text("Showing sprite %d/%d", currentSpriteIndex, maxIndex);
+                ImGui::Separator();
+
+                // Available region (minus padding)
+                ImVec2 avail = ImGui::GetContentRegionAvail();
+                ImVec2 padding = ImVec2();
+                avail.x -= padding.x * 2.0f;
+                avail.y -= padding.y * 2.0f;
+
+                // Sprite dimensions
+                float spriteW = 0.0f;
+                float spriteH = 0.0f;
+                ImVec2 uv0, uv1;
+
+                if (currentSpriteIndex == 0)
+                {
+                    // Full texture
+                    spriteW = static_cast<float>(m_pPreviewTexture->GetResourceDesc().Width);
+                    spriteH = static_cast<float>(m_pPreviewTexture->GetResourceDesc().Height);
+                    uv0 = { 0.0f, 0.0f };
+                    uv1 = { 1.0f, 1.0f };
+                }
+                else
+                {
+                    // Sprite rect
+                    const auto& sprite = sprites[currentSpriteIndex - 1];
+                    spriteW = static_cast<float>(sprite.width);
+                    spriteH = static_cast<float>(sprite.height);
+
+                    const float texWidth = static_cast<float>(m_pPreviewTexture->GetResourceDesc().Width);
+                    const float texHeight = static_cast<float>(m_pPreviewTexture->GetResourceDesc().Height);
+
+                    uv0 = { sprite.x / texWidth, sprite.y / texHeight };                              // top-left
+                    uv1 = { (sprite.x + sprite.width) / texWidth, (sprite.y + sprite.height) / texHeight }; // bottom-right
+                }
+
+                // Fit inside available space (keep aspect ratio)
+                float scale = std::min(avail.x / spriteW, avail.y / spriteH);
+                float drawW = spriteW * scale;
+                float drawH = spriteH * scale;
+
+                // Center horizontally
+                float cursorX = ImGui::GetCursorPosX() + (avail.x - drawW) * 0.5f;
+                ImGui::SetCursorPosX(cursorX);
+
+                // Draw image
+                ImVec2 image_pos = ImGui::GetCursorScreenPos();
+                ImGui::Image((ImTextureID) m_pPreviewTexture->GetGPUHandle().ptr, ImVec2(drawW, drawH), uv0, uv1);
+
+                // Draw border
+                ImDrawList* draw_list = ImGui::GetWindowDrawList();
+                draw_list->AddRect(image_pos, ImVec2(image_pos.x + drawW, image_pos.y + drawH),
+                    ImGui::GetColorU32(ImGui::GetStyle().Colors[ImGuiCol_Border]));
+            }
+
+
 		}
 	}
 }

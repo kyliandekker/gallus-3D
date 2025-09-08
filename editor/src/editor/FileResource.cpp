@@ -15,10 +15,10 @@
 #include "utils/file_abstractions.h"
 
 // editor includes
-#include "editor/AssetType.h"
+#include "resources/AssetType.h"
 #include "editor/AssetDatabase.h"
-#include "editor/metadata/MetaData.h"
-#include "editor/metadata/TextureMetaData.h"
+#include "resources/metadata/MetaData.h"
+#include "resources/metadata/TextureMetaData.h"
 
 namespace gallus
 {
@@ -48,14 +48,14 @@ namespace gallus
 			return m_Parent;
 		}
 
-		const std::unordered_map<std::string, std::vector<AssetType>> FILE_ATLAS =
+		const std::unordered_map<std::string, std::vector<resources::AssetType>> FILE_ATLAS =
 		{
-			{ ".scene", { AssetType::Scene } },
-			{ ".png", { AssetType::Texture } },
-			{ ".bmp", { AssetType::Texture } },
-			{ ".wav", { AssetType::Sound, AssetType::Song, AssetType::VO } },
-			{ ".anim", { AssetType::Animation } },
-			{ ".hlsl", { AssetType::PixelShader, AssetType::VertexShader } },
+			{ ".scene", { resources::AssetType::Scene } },
+			{ ".png", { resources::AssetType::Texture } },
+			{ ".bmp", { resources::AssetType::Texture } },
+			{ ".wav", { resources::AssetType::Sound, resources::AssetType::Song, resources::AssetType::VO } },
+			{ ".anim", { resources::AssetType::Animation } },
+			{ ".hlsl", { resources::AssetType::PixelShader, resources::AssetType::VertexShader } },
 		};
 
 		//---------------------------------------------------------------------
@@ -71,8 +71,8 @@ namespace gallus
 
 			if (fs::is_directory(m_Path))
 			{
-				m_MetaData = new MetaData(*this);
-				m_MetaData->SetAssetType(AssetType::Folder);
+				m_MetaData = new resources::MetaData();
+				m_MetaData->SetAssetType(resources::AssetType::Folder);
 
 				// Go through each file/folder and check their status.
 				fs::directory_iterator ds = fs::directory_iterator(m_Path, std::filesystem::directory_options::skip_permission_denied);
@@ -104,8 +104,8 @@ namespace gallus
 			}
 			else
 			{
-				m_MetaData = new MetaData(*this);
-				if (!m_MetaData->Exists())
+				m_MetaData = new resources::MetaData();
+				if (!m_MetaData->Exists(m_Path))
 				{
 					std::string extension = m_Path.extension().generic_string();
 
@@ -115,32 +115,31 @@ namespace gallus
 						auto it = FILE_ATLAS.find(extension);
 
 						m_MetaData->SetAssetType(it->second[0]);
-						m_MetaData->Save();
+						m_MetaData->Save(m_Path);
 					}
 				}
 				else
 				{
 					// TODO: This is awful.
 
-					rapidjson::Document doc = m_MetaData->Load();
+					rapidjson::Document doc = m_MetaData->Load(m_Path);
 					m_MetaData->LoadMetaData(doc);
-					AssetType assetType = m_MetaData->GetAssetType();
+					resources::AssetType assetType = m_MetaData->GetAssetType();
 
 					switch (assetType)
 					{
-						case AssetType::Texture:
+						case resources::AssetType::Texture:
 						{
 							delete m_MetaData;
-							m_MetaData = new TextureMetaData(*this);
+							m_MetaData = new resources::TextureMetaData();
 							break;
 						}
 						default:
 						{
-
 							break;
 						}
 					}
-					doc = m_MetaData->Load();
+					doc = m_MetaData->Load(m_Path);
 					m_MetaData->LoadMetaData(doc);
 				}
 			}

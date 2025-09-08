@@ -14,6 +14,8 @@
 #include "graphics/dx12/CommandList.h"
 #include "graphics/dx12/CommandQueue.h"
 
+#include "resources/metadata/TextureMetaData.h"
+
 namespace gallus
 {
 	namespace graphics
@@ -105,7 +107,7 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			void Texture::Bind(std::shared_ptr<CommandList> a_pCommandList)
+			void Texture::Bind(std::shared_ptr<CommandList> a_pCommandList, int8_t a_iSpriteIndex)
 			{
 				a_pCommandList->GetCommandList()->SetDescriptorHeaps(1, core::TOOL->GetDX12().GetSRV().GetHeap().GetAddressOf());
 
@@ -113,10 +115,10 @@ namespace gallus
 
 				a_pCommandList->GetCommandList()->SetGraphicsRootDescriptorTable(RootParameters::TEX_SRV, gpuHandle);
 
-				if (m_TextureType == TextureType::SpriteSheet)
+				if (m_TextureType == TextureType::SpriteSheet && a_iSpriteIndex < m_aSpriteRects.size())
 				{
 					// Bind sprite UV rect at b1
-					SpriteUV uv = GetSpriteUV(m_iCurrentSpriteIndex);
+					SpriteUV uv = GetSpriteUV(a_iSpriteIndex);
 					float uvData[4] = { uv.uv0.x, uv.uv0.y, uv.uv1.x, uv.uv1.y };
 					a_pCommandList->GetCommandList()->SetGraphicsRoot32BitConstants(RootParameters::SPRITE_UV, 4, uvData, 0);
 				}
@@ -196,6 +198,29 @@ namespace gallus
 					return false;
 				}
 
+				// Premultiply alpha: p.rgb = (p.rgb * p.a) / 255
+				size_t pixelCount = static_cast<size_t>(width) * static_cast<size_t>(height);
+				for (size_t i = 0; i < pixelCount; ++i)
+				{
+					uint8_t* px = imageData + i * 4;
+					uint8_t a = px[3];
+					if (a == 255)
+					{
+						continue;
+					}
+					if (a == 0)
+					{
+						px[0] = 0;
+						px[1] = 0;
+						px[2] = 0;
+						continue;
+					}
+					// integer premultiply with rounding
+					px[0] = static_cast<uint8_t>((px[0] * a + 127) / 255);
+					px[1] = static_cast<uint8_t>((px[1] * a + 127) / 255);
+					px[2] = static_cast<uint8_t>((px[2] * a + 127) / 255);
+				}
+
 				size_t memorySize = static_cast<size_t>(width) * height * 4;
 				core::Data data = core::Data(imageData, memorySize);
 				 
@@ -242,6 +267,8 @@ namespace gallus
 				SetSRVDesc(srvDesc);
 
 				m_ResourceType = core::ResourceType::ResourceType_Texture;
+
+				LoadMetaData();
 
 				LOGF(LOGSEVERITY_INFO_SUCCESS, LOG_CATEGORY_DX12, "Successfully loaded texture: \"%s\".", a_Path.generic_string().c_str());
 				return true;
@@ -298,6 +325,17 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
+			void Texture::LoadMetaData()
+			{
+				resources::TextureMetaData metaData;
+				rapidjson::Document doc = metaData.Load(m_Path);
+				metaData.LoadMetaData(doc);
+
+				m_aSpriteRects = metaData.GetSprites();
+				m_TextureType = metaData.GetTextureType();
+			}
+
+			//---------------------------------------------------------------------
 			SpriteUV Texture::GetSpriteUV(int a_iIndex) const
 			{
 				SpriteUV uv;
@@ -310,20 +348,14 @@ namespace gallus
 				const auto& r = m_aSpriteRects[a_iIndex];
 				glm::ivec2 size = GetSize(); // returns {width, height} of texture
 
-				float u0 = static_cast<float>(r.x) / size.x;
-				float v0 = static_cast<float>(r.y) / size.y;
-				float u1 = static_cast<float>(r.x + r.width) / size.x;
-				float v1 = static_cast<float>(r.y + r.height) / size.y;
+				float u0 = (static_cast<float>(r.x) + 0.5f) / static_cast<float>(size.x);
+				float v0 = (static_cast<float>(r.y) + 0.5f) / static_cast<float>(size.y);
+				float u1 = (static_cast<float>(r.x + r.width) - 0.5f) / static_cast<float>(size.x);
+				float v1 = (static_cast<float>(r.y + r.height) - 0.5f) / static_cast<float>(size.y);
 
 				uv.uv0 = { u0, v0 };
 				uv.uv1 = { u1, v1 };
 				return uv;
-			}
-
-			//---------------------------------------------------------------------
-			void Texture::SetCurrentSprite(int a_iIndex)
-			{
-				m_iCurrentSpriteIndex = a_iIndex;
 			}
 		}
 	}

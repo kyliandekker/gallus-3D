@@ -17,7 +17,7 @@
 
 // editor includes
 #include "editor/core/EditorTool.h"
-#include "editor/AssetType.h"
+#include "resources/AssetType.h"
 #include "editor/FileResource.h"
 #include "editor/graphics/imgui/modals/FilePickerModal.h"
 
@@ -81,7 +81,7 @@ namespace gallus
 									).get());
 								}
 							},
-							std::vector<gallus::editor::AssetType>{ gallus::editor::AssetType::PixelShader }
+							std::vector<gallus::resources::AssetType>{ gallus::resources::AssetType::PixelShader }
 						);
 						modal->Show();
 					}
@@ -113,7 +113,7 @@ namespace gallus
 									gameplay::GAME.GetScene().SetIsDirty(true);
 								}
 							},
-							std::vector<gallus::editor::AssetType>{ gallus::editor::AssetType::VertexShader }
+							std::vector<gallus::resources::AssetType>{ gallus::resources::AssetType::VertexShader }
 						);
 						modal->Show();
 					}
@@ -145,9 +145,18 @@ namespace gallus
 									gameplay::GAME.GetScene().SetIsDirty(true);
 								}
 							},
-							std::vector<gallus::editor::AssetType>{ gallus::editor::AssetType::Texture }
+							std::vector<gallus::resources::AssetType>{ gallus::resources::AssetType::Texture }
 						);
 						modal->Show();
+					}
+				}
+
+				if (m_Component.GetTexture() && m_Component.GetTexture()->GetTextureType() == graphics::dx12::TextureType::SpriteSheet)
+				{
+					int spriteIndex = m_Component.GetSpriteIndex();
+					if (ImGui::DragInt(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "MESH_COMPONENT_CURRENT_SPRITE_INDEX").c_str(), &spriteIndex, 1, 0, m_Component.GetTexture()->GetSpriteRectsSize()))
+					{
+						m_Component.SetSpriteIndex(spriteIndex);
 					}
 				}
 

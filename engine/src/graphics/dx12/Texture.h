@@ -122,7 +122,8 @@ namespace gallus
 				/// Binds the texture to the pipeline (causing it to be rendered).
 				/// </summary>
 				/// <param name="a_pCommandList">The command list that will be used.</param>
-				void Bind(std::shared_ptr<CommandList> a_pCommandList);
+				/// <param name="a_iSpriteIndex">The sprite index that is used in the sprite sheet (optional).</param>
+				void Bind(std::shared_ptr<CommandList> a_pCommandList, int8_t a_iSpriteIndex);
 
 				/// <summary>
 				/// Unbinds the texture from the pipeline.
@@ -204,11 +205,20 @@ namespace gallus
 
 				void AddSpriteRect(const SpriteRect& a_Rect);
 
-				void SetCurrentSprite(int m_iCurrentSpriteIndex);
+				void LoadMetaData();
+
+				TextureType GetTextureType() const
+				{
+					return m_TextureType;
+				}
+
+				size_t GetSpriteRectsSize() const
+				{
+					return m_aSpriteRects.size();
+				}
 
 				~Texture();
 			private:
-				int m_iCurrentSpriteIndex;
 				SpriteUV GetSpriteUV(int a_iIndex) const;
 
 				friend DX12System2D;
