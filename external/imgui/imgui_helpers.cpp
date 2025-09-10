@@ -40,6 +40,7 @@ namespace ImGui
 		return b;
 	}
 
+
 	bool TextButton(const char* a_Label, const ImVec2& a_Size, const ImVec4& a_Color)
 	{
 		ImVec2 pos = ImGui::GetCursorScreenPos(); // Get the top-left corner of the button
@@ -125,6 +126,42 @@ namespace ImGui
 	{
 		std::string full_id = a_Text + a_ID + a_IDName;
 		return full_id;
+	}
+
+	bool FoldOutButton(const std::string& a_ID, bool* a_pValue, const ImVec2& a_Size)
+	{
+		// Split visible text from ImGui ID
+		std::string visibleText = a_ID;
+		size_t hashPos = a_ID.find("##");
+		std::string internalID = a_ID;
+		if (hashPos != std::string::npos)
+		{
+			visibleText = a_ID.substr(0, hashPos);
+			internalID = a_ID.substr(hashPos); // include ## for ImGui
+		}
+
+		ImVec2 buttonPos = ImGui::GetCursorScreenPos();
+
+		// Draw invisible button using only the internal ID
+		bool clicked = ImGui::Button(internalID.c_str(), a_Size);
+
+		// Draw border
+		ImVec2 pos = ImGui::GetItemRectMin();
+		ImVec2 max = ImGui::GetItemRectMax();
+		ImDrawList* draw_list = ImGui::GetWindowDrawList();
+		draw_list->AddRect(pos, max, ImGui::GetColorU32(ImGuiCol_Border), 0.0f, 0, ImGui::GetStyle().FrameBorderSize);
+
+		// Draw left-aligned visible text
+		ImVec2 textPos = buttonPos;
+		textPos.x += ImGui::GetStyle().FramePadding.x;
+		textPos.y += ImGui::GetStyle().FramePadding.y;
+		draw_list->AddText(textPos, ImGui::GetColorU32(ImGuiCol_Text), visibleText.c_str());
+
+		// Toggle value
+		if (clicked)
+			*a_pValue = !(*a_pValue);
+
+		return *a_pValue;
 	}
 }
 

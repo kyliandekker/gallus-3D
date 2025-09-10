@@ -182,8 +182,11 @@ namespace gallus
 				ImGuiStyle& style = ImGui::GetStyle();
 				ImVec4* colors = style.Colors;
 
-				ImVec4 accentColor = ImVec4(0.42f, 0.34f, 0.83f, 1.00f);
-				ImVec4 accentColorText = ImVec4(0.5f, 0.44f, 0.93f, 1.00f);
+				//ImVec4 accentColor = ImVec4(0.42f, 0.34f, 0.83f, 1.00f);
+				//ImVec4 accentColorText = ImVec4(0.5f, 0.44f, 0.93f, 1.00f);
+
+				ImVec4 accentColor = ImVec4(0.71f, 0.32f, 0.08f, 1.00f);
+				ImVec4 accentColorText = ImVec4(0.71f, 0.32f, 0.08f, 1.00f);
 
 				colors[ImGuiCol_Text] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
 				colors[ImGuiCol_TextDisabled] = ImVec4(0.24f, 0.24f, 0.24f, 1.00f);

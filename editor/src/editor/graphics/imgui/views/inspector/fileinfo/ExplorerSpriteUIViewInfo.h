@@ -53,6 +53,8 @@ namespace gallus
 				/// file-specific details.
 				void RenderPreview() override;
 
+				int m_iCurrentSpriteIndex = 0;
+
 				std::shared_ptr<graphics::dx12::Texture> m_pPreviewTexture = nullptr;
 
 				StringDropdown<graphics::dx12::TextureType> m_TextureTypeDropdown; /// Drop down UI element for selecting asset types.

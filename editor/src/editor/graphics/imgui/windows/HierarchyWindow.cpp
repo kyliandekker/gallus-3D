@@ -127,6 +127,13 @@ namespace gallus
 					m_bNeedsRefresh = false;
 				}
 
+				bool wasEmptyScene = gameplay::GAME.GetScene().GetScenePath().empty();
+				if (wasEmptyScene)
+				{
+					ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+					ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+				}
+
 				ImVec2 toolbarSize = ImVec2(ImGui::GetContentRegionAvail().x, m_Window.GetHeaderSize().y);
 				ImGui::BeginToolbar(toolbarSize);
 
@@ -235,6 +242,12 @@ namespace gallus
 
 					core::TOOL->GetECS().CreateEntity(core::TOOL->GetECS().GetUniqueName("New GameObject"));
 					gameplay::GAME.GetScene().SetIsDirty(true);
+				}
+
+				if (wasEmptyScene)
+				{
+					ImGui::PopItemFlag();
+					ImGui::PopStyleVar();
 				}
 			}
 

@@ -64,6 +64,8 @@ namespace ImGui
 	/// A formatted string combining the base text, ID, and name in a manner suitable for ImGui.
 	/// </returns>
 	std::string IMGUI_FORMAT_ID(const std::string& a_Text, const char* a_ID, const std::string& a_IDName);
+
+	bool FoldOutButton(const std::string& a_ID, bool* a_pValue, const ImVec2& a_Size = ImVec2(0, 0));
 }
 
 #endif

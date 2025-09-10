@@ -47,11 +47,37 @@ namespace gallus
                     return;
                 }
 
+                if (gameplay::GAME.GetScene().GetScenePath().empty())
+                {
+                    std::shared_ptr<gallus::graphics::dx12::Texture> logo = core::EDITOR_TOOL->GetResourceAtlas().GetLogo();
+
+                    ImVec2 windowSize = ImGui::GetContentRegionAvail();
+                    ImVec2 textureSize = ImVec2(
+                        static_cast<float>(logo->GetSize().x),
+                        static_cast<float>(logo->GetSize().y)
+                    );
+
+                    // Calculate centered position
+                    ImVec2 cursorPos = ImGui::GetCursorPos();
+                    ImVec2 centeredPos = ImVec2(
+                        cursorPos.x + (windowSize.x - textureSize.x) * 0.5f,
+                        cursorPos.y + (windowSize.y - textureSize.y) * 0.5f
+                    );
+
+                    // Move cursor and draw image
+                    ImGui::SetCursorPos(centeredPos);
+                    ImGui::Image((ImTextureID) logo->GetGPUHandle().ptr, textureSize);
+
+                    return;
+                }
+
                 DrawViewportPanel();
 
                 std::shared_ptr<gallus::graphics::dx12::Texture> renderTexture = core::EDITOR_TOOL->GetDX12().GetRenderTexture();
                 if (!renderTexture || !renderTexture->IsValid())
+                {
                     return;
+                }
 
                 ImVec2 windowSize = ImGui::GetContentRegionAvail();
                 ImVec2 textureSize = ImVec2(

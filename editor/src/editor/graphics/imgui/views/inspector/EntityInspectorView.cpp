@@ -98,6 +98,9 @@ namespace gallus
 
 				for (ComponentBaseUIView* component : m_aComponents)
 				{
+					ImGui::SetCursorPosX(0);
+					float width = ImGui::GetContentRegionAvail().x + (m_Window.GetFramePadding().x * 2);
+					ImGui::SetNextItemWidth(width);
 					component->Render();
 					ImGui::SetCursorPosY(ImGui::GetCursorPosY() + m_Window.GetWindowPadding().y);
 				}

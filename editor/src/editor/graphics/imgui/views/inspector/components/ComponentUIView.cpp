@@ -24,10 +24,12 @@ namespace gallus
 		{
 			void ComponentBaseUIView::RenderBaseComponent(gameplay::Component& a_Component, gameplay::AbstractECSSystem& a_System)
 			{
-				ImGui::SetNextItemOpen(m_FoldedOut);
+				float width = ImGui::GetContentRegionAvail().x + (m_Window.GetFramePadding().x * 2);
 				ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0);
-				m_FoldedOut = ImGui::CollapsingHeader(ImGui::IMGUI_FORMAT_ID(GetName(), FOLDOUT_ID, string_extensions::StringToUpper(GetName()) + "_INSPECTOR").c_str());
-				if (m_FoldedOut)
+				if (ImGui::FoldOutButton(
+					ImGui::IMGUI_FORMAT_ID(
+					std::string((m_FoldedOut ? font::ICON_FOLDED_OUT : font::ICON_FOLDED_IN) + GetName()),
+					FOLDOUT_ID, string_extensions::StringToUpper(GetName()) + "_INSPECTOR"), &m_FoldedOut, ImVec2(width, 0)))
 				{
 					ImGui::SetCursorPosY(ImGui::GetCursorPosY() + m_Window.GetWindowPadding().y);
 

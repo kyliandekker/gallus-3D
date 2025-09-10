@@ -203,6 +203,10 @@ namespace gallus
 				texture->SetResourceCategory(core::EngineResourceCategory::Missing);
 				texture->SetIsDestroyable(false);
 
+				std::shared_ptr<Texture> logo = core::TOOL->GetResourceAtlas().LoadTexture("icon.png", cCommandList); // Logo.
+				logo->SetResourceCategory(core::EngineResourceCategory::System);
+				logo->SetIsDestroyable(false);
+
 				std::shared_ptr<PixelShader> pixelShader = core::TOOL->GetResourceAtlas().LoadPixelShader("pixelShader.hlsl"); // Default shader.
 				std::shared_ptr<VertexShader> vertexShader = core::TOOL->GetResourceAtlas().LoadVertexShader("vertexShader.hlsl"); // Default shader.
 				pixelShader->SetResourceCategory(core::EngineResourceCategory::Missing);

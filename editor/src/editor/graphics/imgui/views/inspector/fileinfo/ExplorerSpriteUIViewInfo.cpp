@@ -171,41 +171,17 @@ namespace gallus
                 if (!m_pPreviewTexture || !m_pPreviewTexture->CanBeDrawn())
                     return;
 
-                // Get TextureMetaData
-                resources::TextureMetaData& metaData = m_ExplorerFileUIView.GetFileResource().GetMetaData<resources::TextureMetaData>();
-                const auto& sprites = metaData.GetSprites();
-
-                static int currentSpriteIndex = 0;
-                const int maxIndex = static_cast<int>(sprites.size());
-
-                // Navigation buttons
-                if (ImGui::Button("Prev"))
-                {
-                    currentSpriteIndex--;
-                    if (currentSpriteIndex < 0) currentSpriteIndex = maxIndex; // wrap around
-                }
-                ImGui::SameLine();
-                if (ImGui::Button("Next"))
-                {
-                    currentSpriteIndex++;
-                    if (currentSpriteIndex > maxIndex) currentSpriteIndex = 0; // wrap around
-                }
-
-                ImGui::Text("Showing sprite %d/%d", currentSpriteIndex, maxIndex);
-                ImGui::Separator();
-
-                // Available region (minus padding)
-                ImVec2 avail = ImGui::GetContentRegionAvail();
-                ImVec2 padding = ImVec2();
-                avail.x -= padding.x * 2.0f;
-                avail.y -= padding.y * 2.0f;
-
                 // Sprite dimensions
                 float spriteW = 0.0f;
                 float spriteH = 0.0f;
                 ImVec2 uv0, uv1;
 
-                if (currentSpriteIndex == 0)
+                // Get TextureMetaData
+                resources::TextureMetaData& metaData = m_ExplorerFileUIView.GetFileResource().GetMetaData<resources::TextureMetaData>();
+                const auto& sprites = metaData.GetSprites();
+
+                ImVec2 texturePos = ImGui::GetCursorPos();
+                if (m_pPreviewTexture->GetTextureType() == graphics::dx12::TextureType::Texture2D)
                 {
                     // Full texture
                     spriteW = static_cast<float>(m_pPreviewTexture->GetResourceDesc().Width);
@@ -215,8 +191,7 @@ namespace gallus
                 }
                 else
                 {
-                    // Sprite rect
-                    const auto& sprite = sprites[currentSpriteIndex - 1];
+                    const auto& sprite = sprites[m_iCurrentSpriteIndex];
                     spriteW = static_cast<float>(sprite.width);
                     spriteH = static_cast<float>(sprite.height);
 
@@ -227,6 +202,13 @@ namespace gallus
                     uv1 = { (sprite.x + sprite.width) / texWidth, (sprite.y + sprite.height) / texHeight }; // bottom-right
                 }
 
+                ImGui::SetCursorPos(texturePos);
+                // Available region (minus padding)
+                ImVec2 avail = ImGui::GetContentRegionAvail();
+                ImVec2 padding = ImVec2();
+                avail.x -= padding.x * 2.0f;
+                avail.y -= padding.y * 2.0f;
+
                 // Fit inside available space (keep aspect ratio)
                 float scale = std::min(avail.x / spriteW, avail.y / spriteH);
                 float drawW = spriteW * scale;
@@ -234,6 +216,9 @@ namespace gallus
 
                 // Center horizontally
                 float cursorX = ImGui::GetCursorPosX() + (avail.x - drawW) * 0.5f;
+                ImGui::SetCursorPosX(cursorX);
+
+                // Center horizontally
                 ImGui::SetCursorPosX(cursorX);
 
                 // Draw image
@@ -244,9 +229,37 @@ namespace gallus
                 ImDrawList* draw_list = ImGui::GetWindowDrawList();
                 draw_list->AddRect(image_pos, ImVec2(image_pos.x + drawW, image_pos.y + drawH),
                     ImGui::GetColorU32(ImGui::GetStyle().Colors[ImGuiCol_Border]));
+                
+                if (m_pPreviewTexture->GetTextureType() == graphics::dx12::TextureType::SpriteSheet)
+                {
+                    ImVec2 buttonPos = image_pos;
+                    buttonPos.y += m_Window.GetFramePadding().y;
+                    buttonPos.x += m_Window.GetFramePadding().x;
+                    ImGui::SetCursorScreenPos(buttonPos);
+                    // Navigation buttons
+                    if (ImGui::Button("Prev"))
+                    {
+                        m_iCurrentSpriteIndex--;
+                        if (m_iCurrentSpriteIndex < 0) m_iCurrentSpriteIndex = sprites.size() - 1; // wrap around
+                    }
+                    ImGui::SameLine();
+                    if (ImGui::Button("Next"))
+                    {
+                        m_iCurrentSpriteIndex++;
+                        if (m_iCurrentSpriteIndex >= sprites.size()) m_iCurrentSpriteIndex = 0; // wrap around
+                    }
+
+                    ImVec2 textPos = image_pos;
+                    textPos.x += drawW;
+                    std::string indexText = std::to_string(m_iCurrentSpriteIndex) + "/" + std::to_string(sprites.size() - 1);
+                    textPos.x -= ImGui::CalcTextSize(indexText.c_str()).x;
+                    textPos.x -= m_Window.GetFramePadding().x;
+                    textPos.y += m_Window.GetFramePadding().y;
+                    ImGui::SetCursorScreenPos(textPos);
+                    ImGui::Text(indexText.c_str());
+                }
+
             }
-
-
 		}
 	}
 }
