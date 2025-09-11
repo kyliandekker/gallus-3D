@@ -35,6 +35,8 @@ namespace gallus
 			char m_TextureName[128];
 			SpriteComponentUIView::SpriteComponentUIView(ImGuiWindow& a_Window, gameplay::EntityID& a_EntityID, gameplay::SpriteComponent& a_SpriteComponent, gameplay::SpriteSystem& a_System) : ComponentUIView(a_Window, a_EntityID, a_SpriteComponent, a_System), m_SizeView(a_Window)
 			{
+				m_bShowPreview = true;
+				m_iPreviewPriority = 4;
 			}
 
 			void SpriteComponentUIView::RenderInner()
@@ -87,6 +89,8 @@ namespace gallus
 					}
 				}
 
+				ImGui::SetCursorPosY(ImGui::GetCursorPosY() + m_Window.GetFramePadding().y);
+
 				ImGui::AlignTextToFramePadding();
 				ImGui::DisplayHeader(m_Window.GetBoldFont(), "Vertex Shader: ");
 				ImGui::SameLine();
@@ -118,6 +122,8 @@ namespace gallus
 						modal->Show();
 					}
 				}
+
+				ImGui::SetCursorPosY(ImGui::GetCursorPosY() + m_Window.GetFramePadding().y);
 
 				ImGui::AlignTextToFramePadding();
 				ImGui::DisplayHeader(m_Window.GetBoldFont(), "Texture: ");
@@ -153,8 +159,10 @@ namespace gallus
 
 				if (m_Component.GetTexture() && m_Component.GetTexture()->GetTextureType() == graphics::dx12::TextureType::SpriteSheet)
 				{
+					ImGui::SetCursorPosY(ImGui::GetCursorPosY() + m_Window.GetFramePadding().y);
+
 					int spriteIndex = m_Component.GetSpriteIndex();
-					if (ImGui::DragInt(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "MESH_COMPONENT_CURRENT_SPRITE_INDEX").c_str(), &spriteIndex, 1, 0, m_Component.GetTexture()->GetSpriteRectsSize()))
+					if (ImGui::DragInt(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "MESH_COMPONENT_CURRENT_SPRITE_INDEX").c_str(), &spriteIndex, 1, 0, m_Component.GetTexture()->GetSpriteRectsSize() - 1))
 					{
 						m_Component.SetSpriteIndex(spriteIndex);
 					}
@@ -167,6 +175,70 @@ namespace gallus
 			std::string SpriteComponentUIView::GetName() const
 			{
 				return m_System.GetSystemName();
+			}
+
+			void SpriteComponentUIView::RenderPreview()
+			{
+				if (!m_Component.GetTexture() || !m_Component.GetTexture()->CanBeDrawn())
+				{
+					return;
+				}
+
+				// Sprite dimensions
+				float spriteW = 0.0f;
+				float spriteH = 0.0f;
+				ImVec2 uv0, uv1;
+
+				// Get TextureMetaData
+				ImVec2 texturePos = ImGui::GetCursorPos();
+				if (m_Component.GetTexture()->GetTextureType() == graphics::dx12::TextureType::Texture2D)
+				{
+					// Full texture
+					spriteW = static_cast<float>(m_Component.GetTexture()->GetResourceDesc().Width);
+					spriteH = static_cast<float>(m_Component.GetTexture()->GetResourceDesc().Height);
+					uv0 = { 0.0f, 0.0f };
+					uv1 = { 1.0f, 1.0f };
+				}
+				else
+				{
+					const auto& sprite = m_Component.GetTexture()->GetSpriteRect(m_Component.GetSpriteIndex());
+					spriteW = static_cast<float>(sprite.width);
+					spriteH = static_cast<float>(sprite.height);
+
+					const float texWidth = static_cast<float>(m_Component.GetTexture()->GetResourceDesc().Width);
+					const float texHeight = static_cast<float>(m_Component.GetTexture()->GetResourceDesc().Height);
+
+					uv0 = { sprite.x / texWidth, sprite.y / texHeight };                              // top-left
+					uv1 = { (sprite.x + sprite.width) / texWidth, (sprite.y + sprite.height) / texHeight }; // bottom-right
+				}
+
+				ImGui::SetCursorPos(texturePos);
+				// Available region (minus padding)
+				ImVec2 avail = ImGui::GetContentRegionAvail();
+				ImVec2 padding = ImVec2();
+				avail.x -= padding.x * 2.0f;
+				avail.y -= padding.y * 2.0f;
+
+				// Fit inside available space (keep aspect ratio)
+				float scale = std::min(avail.x / spriteW, avail.y / spriteH);
+				float drawW = spriteW * scale;
+				float drawH = spriteH * scale;
+
+				// Center horizontally
+				float cursorX = ImGui::GetCursorPosX() + (avail.x - drawW) * 0.5f;
+				ImGui::SetCursorPosX(cursorX);
+
+				// Center horizontally
+				ImGui::SetCursorPosX(cursorX);
+
+				// Draw image
+				ImVec2 image_pos = ImGui::GetCursorScreenPos();
+				ImGui::Image((ImTextureID) m_Component.GetTexture()->GetGPUHandle().ptr, ImVec2(drawW, drawH), uv0, uv1);
+
+				// Draw border
+				ImDrawList* draw_list = ImGui::GetWindowDrawList();
+				draw_list->AddRect(image_pos, ImVec2(image_pos.x + drawW, image_pos.y + drawH),
+					ImGui::GetColorU32(ImGui::GetStyle().Colors[ImGuiCol_Border]));
 			}
 		}
 	}

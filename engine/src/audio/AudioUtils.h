@@ -1,4 +1,5 @@
 #include <cstdint>
+#include <string>
 
 namespace gallus
 {
@@ -9,5 +10,25 @@ namespace gallus
 	namespace audio
 	{
 		bool ToSample(core::Data& a_Data, unsigned char* a_pAudioData, size_t a_iBuffersize, uint16_t a_iBitsPerSample, uint16_t a_iBlockAlign, uint16_t a_iAudioFormat, size_t a_iNumSamples, bool a_bLeft = true);
+
+		float PosToMilliseconds(uint32_t m_Pos, uint32_t a_ByteRate);
+
+		float PosToSeconds(uint32_t m_Pos, uint32_t a_ByteRate);
+
+		uint32_t SecondsToPos(float m_Seconds, uint32_t a_ByteRate);
+
+		uint32_t MillisecondsToPos(float m_Milliseconds, uint32_t a_ByteRate);
+
+		float SecondsToMilliseconds(float m_Seconds);
+
+		float MillisecondsToSeconds(float m_Milliseconds);
+
+		uint32_t SecondsToHours(float m_Seconds);
+
+		uint32_t SecondsToMinutes(float m_Seconds);
+
+		float GetDuration(uint32_t a_ChunkSize, uint32_t a_ByteRate);
+
+		std::string FormatDuration(float a_Duration, bool a_Milliseconds);
 	}
 }

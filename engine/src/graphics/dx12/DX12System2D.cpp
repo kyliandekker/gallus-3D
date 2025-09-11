@@ -840,7 +840,7 @@ namespace gallus
 				ID3D12DescriptorHeap* descriptorHeaps[] = { m_SRV.GetHeap().Get() };
 				a_pCommandList->GetCommandList()->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
-				// TODO: RENDER LOOP.
+				std::lock_guard<std::recursive_mutex> lock(core::TOOL->GetECS().m_EntityMutex);
 				for (auto& pair : core::TOOL->GetECS().GetSystem<gameplay::SpriteSystem>().GetComponents())
 				{
 					pair.second.Render(a_pCommandList, pair.first, m_Camera);

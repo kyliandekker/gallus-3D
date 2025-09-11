@@ -217,6 +217,16 @@ namespace gallus
 					return m_aSpriteRects.size();
 				}
 
+				SpriteRect GetSpriteRect(int8_t a_iIndex)
+				{
+					if (a_iIndex >= m_aSpriteRects.size())
+					{
+						return SpriteRect();
+					}
+
+					return m_aSpriteRects[a_iIndex];
+				}
+
 				~Texture();
 			private:
 				SpriteUV GetSpriteUV(int a_iIndex) const;

@@ -24,55 +24,31 @@ namespace gallus
 		{
 			void ComponentBaseUIView::RenderBaseComponent(gameplay::Component& a_Component, gameplay::AbstractECSSystem& a_System)
 			{
-				float width = ImGui::GetContentRegionAvail().x + (m_Window.GetFramePadding().x * 2);
+				ImVec2 size = m_Window.GetHeaderSize();
+
+				float width = ImGui::GetContentRegionAvail().x + m_Window.GetFramePadding().x;
+				width -= size.x;
 				ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0);
-				if (ImGui::FoldOutButton(
+				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+				ImGui::FoldOutButton(
 					ImGui::IMGUI_FORMAT_ID(
-					std::string((m_FoldedOut ? font::ICON_FOLDED_OUT : font::ICON_FOLDED_IN) + GetName()),
-					FOLDOUT_ID, string_extensions::StringToUpper(GetName()) + "_INSPECTOR"), &m_FoldedOut, ImVec2(width, 0)))
+					std::string((m_bFoldedOut ? font::ICON_FOLDED_OUT : font::ICON_FOLDED_IN) + GetName()),
+					FOLDOUT_ID, string_extensions::StringToUpper(GetName()) + "_INSPECTOR"), &m_bFoldedOut, ImVec2(width, size.y));
+				ImGui::SameLine();
+				if (ImGui::IconButton(ImGui::IMGUI_FORMAT_ID(font::ICON_DELETE, BUTTON_ID, string_extensions::StringToUpper(GetName()) + "_DELETE_HIERARCHY").c_str(), size, m_Window.GetIconFont()))
+				{
+					a_System.DeleteComponent(m_EntityID);
+				}
+				ImGui::PopStyleVar();
+				ImGui::PopStyleVar();
+				if (m_bFoldedOut)
 				{
 					ImGui::SetCursorPosY(ImGui::GetCursorPosY() + m_Window.GetWindowPadding().y);
 
-					ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
-					ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0);
-
-					ImVec2 size = m_Window.GetHeaderSize();
-					if (ImGui::IconButton(ImGui::IMGUI_FORMAT_ID(font::ICON_COPY, BUTTON_ID, string_extensions::StringToUpper(GetName()) + "_COPY_HIERARCHY").c_str(), size, m_Window.GetIconFont()))
-					{
-						rapidjson::Document document;
-						document.SetObject();
-						a_Component.Serialize(document, document.GetAllocator());
-
-						rapidjson::StringBuffer buffer;
-						rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
-						document.Accept(writer);
-
-						//core::Data data(buffer.GetString(), buffer.GetSize());
-						//core::TOOL.GetEditor().SetClipboard(data);
-					}
-					ImGui::SameLine();
-					if (ImGui::IconButton(ImGui::IMGUI_FORMAT_ID(font::ICON_PASTE, BUTTON_ID, string_extensions::StringToUpper(GetName()) + "_PASTE_HIERARCHY").c_str(), size, m_Window.GetIconFont()))
-					{
-						rapidjson::Document document;
-						document.SetObject();
-/*						core::Data data = core::ENGINE.GetEditor().GetClipboard();
-						document.Parse(reinterpret_cast<char*>(data.data()), data.size());
-						a_Component.Deserialize(document, document.GetAllocator());*/
-					}
-					ImGui::SameLine();
-					if (ImGui::IconButton(ImGui::IMGUI_FORMAT_ID(font::ICON_DELETE, BUTTON_ID, string_extensions::StringToUpper(GetName()) + "_DELETE_HIERARCHY").c_str(), size, m_Window.GetIconFont()))
-					{
-						a_System.DeleteComponent(m_EntityID);
-					}
-
-					ImGui::PopStyleVar();
-					ImGui::PopStyleVar();
-
-					ImGui::SetCursorPosY(ImGui::GetCursorPosY() + m_Window.GetWindowPadding().y);
-
+					ImGui::Indent();
 					RenderInner();
+					ImGui::Unindent();
 				}
-				ImGui::PopStyleVar();
 			}
 		}
 	}

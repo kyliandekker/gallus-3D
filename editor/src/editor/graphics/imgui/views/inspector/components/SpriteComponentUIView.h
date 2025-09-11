@@ -15,6 +15,10 @@ namespace gallus
 {
 	namespace graphics
 	{
+		namespace dx12
+		{
+			class Texture;
+		}
 		namespace imgui
 		{
 			/// <summary>
@@ -32,6 +36,8 @@ namespace gallus
 				/// <param name="a_SpriteComponent">The SpriteComponent to display and edit.</param>
 				/// <param name="a_System">The SpriteSystem responsible for managing the SpriteComponent.</param>
 				SpriteComponentUIView(ImGuiWindow& a_Window, gameplay::EntityID& a_EntityID, gameplay::SpriteComponent& a_SpriteComponent, gameplay::SpriteSystem& a_System);
+
+				void RenderPreview() override;
 			private:
 				/// <summary>
 				/// Render the inner part of the UI, including position, rotation, scale, and color.

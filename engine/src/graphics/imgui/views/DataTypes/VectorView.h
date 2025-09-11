@@ -68,6 +68,7 @@ namespace gallus
 					ImGui::Text("X");
 					ImGui::SameLine();
 					bool changedValueX = ImGui::DragFloat(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, std::string("X_") + a_sLabel).c_str(), &m_Value.x, a_fSpeed, a_fMin, a_fMax);
+					ImGui::AlignTextToFramePadding();
 					ImGui::SameLine();
 					ImGui::Text("Y");
 					ImGui::SameLine();
@@ -133,6 +134,7 @@ namespace gallus
 					ImGui::SameLine();
 					bool changedValueX = ImGui::DragInt(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, std::string("X_") + a_Label).c_str(), &m_Value.x, 1.0f);
 					ImGui::SameLine();
+					ImGui::AlignTextToFramePadding();
 					ImGui::Text("Y");
 					ImGui::SameLine();
 					bool changedValueY = ImGui::DragInt(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, std::string("Y_") + a_Label).c_str(), &m_Value.y, 1.0f);
@@ -176,6 +178,7 @@ namespace gallus
 				{
 					uint8_t changedValueXY = Vector2View<T>::Render(a_Label);
 					ImGui::SameLine();
+					ImGui::AlignTextToFramePadding();
 					ImGui::Text("Z");
 					ImGui::SameLine();
 					bool changedValueZ = ImGui::DragFloat(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, std::string("Z_") + a_Label).c_str(), &this->m_Value.z, 0.1f);

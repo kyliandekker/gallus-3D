@@ -75,7 +75,8 @@ namespace gallus
 
                 audio::FMT_Chunk fmt_chunk;
                 audio::WAVE_READER_RESULT result = m_SongData.GetChunkFromData(fmt_chunk, audio::FMT_CHUNK_ID);
-                if (!(WAVEREADERFAILED(result)))
+                bool hasFmt = !(WAVEREADERFAILED(result));
+                if (hasFmt)
                 {
                     ImGui::NewLine();
 
@@ -98,13 +99,23 @@ namespace gallus
 
                 audio::DATA_Chunk data_chunk;
                 result = m_SongData.GetChunkFromData(data_chunk, audio::DATA_CHUNK_ID);
-                if (!(WAVEREADERFAILED(result)))
+                bool hasData = !(WAVEREADERFAILED(result));
+                if (hasData)
                 {
                     ImGui::NewLine();
 
                     ImGui::DisplayHeader(m_Window.GetBoldFont(), "Data Size: ");
                     ImGui::SameLine();
                     ImGui::Text(std::to_string(data_chunk.ChunkSize()).c_str());
+                }
+
+                if (hasFmt && hasData)
+                {
+                    ImGui::DisplayHeader(m_Window.GetBoldFont(), "Song Length: ");
+                    ImGui::SameLine();
+                    ImGui::Text(
+                        audio::FormatDuration(audio::PosToSeconds(data_chunk.ChunkSize(), fmt_chunk.byteRate), true).c_str()
+                    );
                 }
             }
 

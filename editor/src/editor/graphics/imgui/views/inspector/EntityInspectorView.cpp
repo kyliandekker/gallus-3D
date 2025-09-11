@@ -58,6 +58,14 @@ namespace gallus
 				{
 					m_aComponents.push_back(new SpriteComponentUIView(m_Window, entityId, spriteSystem.GetComponent(entityId), spriteSystem));
 				}
+
+				for (const ComponentBaseUIView* component : m_aComponents)
+				{
+					if (component->ShowPreview())
+					{
+						m_bShowPreview = true;
+					}
+				}
 			}
 
 			void EntityInspectorView::OnRename(const std::string& a_sName)
@@ -80,7 +88,6 @@ namespace gallus
 				return m_pEntity ? m_pEntity->GetName() : "";
 			}
 
-
 			std::string EntityInspectorView::GetIcon() const
 			{
 				return m_HierarchyEntityUIView.GetIcon();
@@ -96,10 +103,11 @@ namespace gallus
 					return;
 				}
 
+				ImGui::SetCursorPosY(0);
 				for (ComponentBaseUIView* component : m_aComponents)
 				{
 					ImGui::SetCursorPosX(0);
-					float width = ImGui::GetContentRegionAvail().x + (m_Window.GetFramePadding().x * 2);
+					float width = ImGui::GetContentRegionAvail().x + m_Window.GetFramePadding().x;
 					ImGui::SetNextItemWidth(width);
 					component->Render();
 					ImGui::SetCursorPosY(ImGui::GetCursorPosY() + m_Window.GetWindowPadding().y);
@@ -120,14 +128,10 @@ namespace gallus
 				gameplay::EntityID& entityId = m_pEntity->GetEntityID();
 
 				gameplay::EntityComponentSystem& ecs = core::TOOL->GetECS();
-				ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(m_Window.GetFramePadding().x * 2, m_Window.GetFramePadding().y * 2));
+				ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, m_Window.GetFramePadding());
 				ImGui::SetNextWindowSize(ImVec2(width, 0));
 				if (ImGui::BeginPopup(ImGui::IMGUI_FORMAT_ID("", POPUP_WINDOW_ID, "ADD_COMPONENT_MENU_INSPECTOR").c_str()))
 				{
-					ImVec4 textColor = ImGui::GetStyleColorVec4(ImGuiCol_Text);
-					textColor.w = 0.5f;
-					ImGui::TextColored(textColor, "Add a Component"); // TODO: Add this icon back.
-
 					for (auto system : core::TOOL->GetECS().GetSystems())
 					{
 						if (system->HasComponent(entityId))
@@ -144,6 +148,23 @@ namespace gallus
 					ImGui::EndPopup();
 				}
 				ImGui::PopStyleVar();
+			}
+
+			void EntityInspectorView::RenderPreview()
+			{
+				ComponentBaseUIView* view = nullptr;
+				for (ComponentBaseUIView* component : m_aComponents)
+				{
+					if (component->ShowPreview() && (!view || component->GetPreviewPriority() > view->GetPreviewPriority()))
+					{
+						view = component;
+					}
+				}
+
+				if (view)
+				{
+					view->RenderPreview();
+				}
 			}
 		}
 	}

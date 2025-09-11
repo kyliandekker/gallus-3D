@@ -129,17 +129,33 @@ namespace gallus
 					{
 						if (m_pPreviewTexture && m_pPreviewTexture->CanBeDrawn())
 						{
-							const float height_new = ImGui::GetContentRegionAvail().y;
-							const float width = (m_pPreviewTexture->GetResourceDesc().Width * (1.0f / m_pPreviewTexture->GetResourceDesc().Height * height_new));
+							const float spriteW = m_pPreviewTexture->GetResourceDesc().Width;
+							const float spriteH = m_pPreviewTexture->GetResourceDesc().Height;
 
-							float offset = (ImGui::GetContentRegionAvail().x - width) / 2;
-							ImGui::SetCursorPosX(ImGui::GetCursorPosX() + offset);
+							ImVec2 avail = ImGui::GetContentRegionAvail();
+							ImVec2 padding = ImVec2();
+							avail.x -= padding.x * 2.0f;
+							avail.y -= padding.y * 2.0f;
+
+							// Fit inside available space (keep aspect ratio)
+							float scale = std::min(avail.x / spriteW, avail.y / spriteH);
+							float drawW = spriteW * scale;
+							float drawH = spriteH * scale;
+
+							// Center horizontally
+							float cursorX = ImGui::GetCursorPosX() + (avail.x - drawW) * 0.5f;
+							ImGui::SetCursorPosX(cursorX);
+
+							// Center horizontally
+							ImGui::SetCursorPosX(cursorX);
+
 							ImVec2 image_pos = ImGui::GetCursorScreenPos();
-							ImGui::Image((ImTextureID) m_pPreviewTexture->GetGPUHandle().ptr, ImVec2(width, height_new));
+							ImGui::Image((ImTextureID) m_pPreviewTexture->GetGPUHandle().ptr, ImVec2(drawW, drawH));
 
 							// Draw border
-							ImDrawList* draw_list = ImGui::GetForegroundDrawList();
-							draw_list->AddRect(image_pos, ImVec2(image_pos.x + width, image_pos.y + height_new), ImGui::GetColorU32(ImGui::GetStyle().Colors[ImGuiCol_Border])); // White border
+							ImDrawList* draw_list = ImGui::GetWindowDrawList();
+							draw_list->AddRect(image_pos, ImVec2(image_pos.x + drawW, image_pos.y + drawH),
+								ImGui::GetColorU32(ImGui::GetStyle().Colors[ImGuiCol_Border]));
 						}
 					}
 					ImGui::EndChild();

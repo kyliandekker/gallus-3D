@@ -46,7 +46,9 @@ namespace gallus
 
 				std::string GetIcon() const override;
 
-				void Render();
+				void Render() override;
+
+				void RenderPreview() override;
 			protected:
 				HierarchyEntityUIView& m_HierarchyEntityUIView;
 				gameplay::Entity* m_pEntity = nullptr;

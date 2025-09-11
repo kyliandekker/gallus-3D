@@ -182,12 +182,17 @@ namespace gallus
 				ImGuiStyle& style = ImGui::GetStyle();
 				ImVec4* colors = style.Colors;
 
-				//ImVec4 accentColor = ImVec4(0.42f, 0.34f, 0.83f, 1.00f);
-				//ImVec4 accentColorText = ImVec4(0.5f, 0.44f, 0.93f, 1.00f);
+#define BESTGAMEEVER 1
 
+#ifdef PURPLEBURGLARALARM
+				ImVec4 accentColor = ImVec4(0.42f, 0.34f, 0.83f, 1.00f);
+#elif BESTGAMEEVER
 				ImVec4 accentColor = ImVec4(0.71f, 0.32f, 0.08f, 1.00f);
-				ImVec4 accentColorText = ImVec4(0.71f, 0.32f, 0.08f, 1.00f);
-
+#elif BLUTARCH
+				ImVec4 accentColor = ImVec4(0.35f, 0.5f, 0.6f, 1.00f);
+#elif REDMOND
+				ImVec4 accentColor = ImVec4(0.63f, 0.36f, 0.32f, 1.00f);
+#endif
 				colors[ImGuiCol_Text] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
 				colors[ImGuiCol_TextDisabled] = ImVec4(0.24f, 0.24f, 0.24f, 1.00f);
 				colors[ImGuiCol_WindowBg] = ImVec4(0.14f, 0.14f, 0.14f, 1.00f);
@@ -237,7 +242,7 @@ namespace gallus
 				colors[ImGuiCol_NavWindowingHighlight] = ImVec4(0.86f, 0.93f, 0.89f, 1.00f);
 				colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.14f, 0.14f, 0.14f, 1.00f);
 				colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.14f, 0.14f, 0.14f, 1.00f);
-				colors[ImGuiCol_TextColorAccent] = accentColorText;
+				colors[ImGuiCol_TextColorAccent] = accentColor;
 #ifndef _RENDER_TEX
 				float transparency = 0.4;
 				ImGui::GetStyle().Colors[ImGuiCol_FrameBg].w = transparency;

@@ -258,7 +258,6 @@ namespace gallus
                     ImGui::SetCursorScreenPos(textPos);
                     ImGui::Text(indexText.c_str());
                 }
-
             }
 		}
 	}

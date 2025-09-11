@@ -7,6 +7,8 @@
 
 #include <string>
 
+#include "core/Tool.h"
+
 namespace gallus
 {
 	namespace gameplay
@@ -52,6 +54,19 @@ namespace gallus
 				/// <param name="a_Component">The component to be rendered.</param>
 				/// <param name="a_System">The system managing the component.</param>
 				void RenderBaseComponent(gameplay::Component& a_Component, gameplay::AbstractECSSystem& a_System);
+
+				bool ShowPreview() const
+				{
+					return m_bShowPreview;
+				}
+
+				int GetPreviewPriority() const
+				{
+					return m_iPreviewPriority;
+				}
+
+				virtual void RenderPreview()
+				{}
 			protected:
 				gameplay::EntityID& m_EntityID; // Reference to the entity's ID. Used for associating the component with an entity.
 
@@ -67,9 +82,11 @@ namespace gallus
 				virtual std::string GetName() const
 				{
 					return "";
-				};
+				}
 
-				bool m_FoldedOut = true; /// Indicates whether the component UI is folded out or not.
+				bool m_bFoldedOut = true; /// Indicates whether the component UI is folded out or not.
+				bool m_bShowPreview = true; /// Indicates whether the component renders a preview or not.
+				int m_iPreviewPriority = 0;
 			};
 
 			/// <summary>
@@ -98,6 +115,8 @@ namespace gallus
 				/// </summary>
 				void Render() override
 				{
+					std::lock_guard<std::recursive_mutex> lock(core::TOOL->GetECS().m_EntityMutex);
+
 					RenderBaseComponent(m_Component, m_System);
 				}
 
