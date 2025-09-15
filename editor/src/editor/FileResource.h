@@ -79,26 +79,26 @@ namespace gallus
 				return m_aChildren;
 			}
 
-			resources::MetaData& GetMetaData()
+			resources::MetaData* GetMetaData()
 			{
-				return *m_MetaData;
+				return m_MetaData;
 			}
 
-			const resources::MetaData& GetMetaData() const
+			const resources::MetaData* GetMetaData() const
 			{
-				return *m_MetaData;
-			}
-
-			template<typename T>
-			T& GetMetaData()
-			{
-				return *(static_cast<T*>(m_MetaData));
+				return m_MetaData;
 			}
 
 			template<typename T>
-			const T& GetMetaData() const
+			T* GetMetaData()
 			{
-				return *(static_cast<T*>(m_MetaData));
+				return static_cast<T*>(m_MetaData);
+			}
+
+			template<typename T>
+			const T* GetMetaData() const
+			{
+				return static_cast<T*>(m_MetaData);
 			}
 		protected:
 			std::vector<FileResource> m_aChildren; /// Child resources (only used for folders).

@@ -46,6 +46,11 @@ namespace gallus
 					return m_pPipelineState.Get();
 				};
 
+				ID3D12PipelineState* GetPipelineState()
+				{
+					return m_pPipelineState.Get();
+				}
+
 				bool HasPixelShader(const PixelShader* a_PixelShader);
 				bool HasVertexShader(const VertexShader* a_VertexShader);
 

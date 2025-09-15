@@ -94,8 +94,3 @@ if(MSVC)
     # Set the Linker Debug flag for /DEBUG (for Debug configurations)
     set_property(TARGET editor APPEND_STRING PROPERTY LINK_OPTIONS "/DEBUG")
 endif()
-
-add_custom_command(TARGET editor POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E echo "Copying data from ${CMAKE_SOURCE_DIR}/data/ to $<TARGET_FILE_DIR:editor>/data"
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/data $<TARGET_FILE_DIR:editor>/data
-)

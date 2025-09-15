@@ -9,6 +9,8 @@
 #include "graphics/dx12/Mesh.h"
 #include "graphics/dx12/CommandList.h"
 
+#include "core/Data.h"
+
 namespace gallus
 {
 	namespace core
@@ -87,7 +89,7 @@ namespace gallus
 			if (!texture->IsValid())
 			{
 //#ifdef _EDITOR
-				fs::path texturePath = fs::path(m_sResourceFolder + "/textures/" + a_sName).lexically_normal();
+				fs::path texturePath = fs::path(m_ResourceFolder.generic_string() + "/textures/" + a_sName).lexically_normal();
 				texture->LoadByPath(texturePath, a_pCommandList);
 //#else
 //				texture->LoadByName(a_sName, a_pCommandList);
@@ -127,7 +129,7 @@ namespace gallus
 			if (!shader->IsValid())
 			{
 //#ifdef _EDITOR
-				fs::path pixelShaderPath = fs::path(m_sResourceFolder + "/shaders/" + a_sName).lexically_normal();
+				fs::path pixelShaderPath = fs::path(m_ResourceFolder.generic_string() + "/shaders/" + a_sName).lexically_normal();
 
 				shader->LoadByPath(pixelShaderPath);
 //#else
@@ -144,7 +146,7 @@ namespace gallus
 			if (!shader->IsValid())
 			{
 //#ifdef _EDITOR
-				fs::path vertexShaderPath = fs::path(m_sResourceFolder + "/shaders/" + a_sName).lexically_normal();
+				fs::path vertexShaderPath = fs::path(m_ResourceFolder.generic_string() + "/shaders/" + a_sName).lexically_normal();
 
 				shader->LoadByPath(vertexShaderPath);
 //#else
@@ -185,6 +187,18 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
+		core::Data ResourceAtlas::LoadScene(const std::string& a_sName)
+		{
+			core::Data data;
+//#ifdef _EDITOR
+			file::LoadFile(m_ResourceFolder.generic_string() + "/scenes/" + a_sName, data);
+//#else
+//				shader->LoadByName(a_sName);
+//#endif // _EDITOR
+			return data;
+		}
+
+		//---------------------------------------------------------------------
 		std::shared_ptr<graphics::dx12::Mesh> ResourceAtlas::LoadMesh(const std::string& a_sName)
 		{
 			std::shared_ptr<graphics::dx12::Mesh> mesh = GetResource(m_aMeshes, a_sName, fs::path());
@@ -220,13 +234,15 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
+		std::shared_ptr<graphics::dx12::DX12ShaderBind> ResourceAtlas::GetRenderTexShaderBind()
+		{
+			return m_aShaderBinds[RENDER_TEX];
+		}
+
+		//---------------------------------------------------------------------
 		std::shared_ptr<graphics::dx12::Texture> ResourceAtlas::GetDefaultTexture()
 		{
-#ifdef _EDITOR
 			return m_aTextures[MISSING + 1];
-#else
-			return m_aTextures[MISSING];
-#endif // _EDITOR
 		}
 
 		//---------------------------------------------------------------------

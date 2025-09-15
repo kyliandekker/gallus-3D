@@ -25,6 +25,37 @@
 #include "editor/graphics/imgui/modals/FilePickerModal.h"
 #include "editor/graphics/imgui/modals/SpriteEditorModal.h"
 
+std::string getCommandArg(const std::string& args, const std::string& argName, const std::string& defaultVal)
+{
+	std::string val = defaultVal;
+
+	std::string search = argName + "=";
+	size_t pos = args.find(search);
+	if (pos != std::string::npos)
+	{
+		size_t start = pos + search.size();
+
+		if (args[start] == '"')
+		{
+			size_t end = args.find('"', start + 1);
+			if (end != std::string::npos)
+			{
+				val = args.substr(start + 1, end - start - 1);
+			}
+		}
+		else
+		{
+			size_t end = args.find(' ', start);
+			if (end == std::string::npos)
+				val = args.substr(start);
+			else
+				val = args.substr(start, end - start);
+		}
+	}
+
+	return val;
+}
+
 int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR lpCmdLine, _In_ int nShowCmd)
 {
 	SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE);
@@ -38,10 +69,14 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR lp
 	fs::current_path(path);
 	SetCurrentDirectoryW(path.c_str());
 
+	std::wstring wstr = lpCmdLine;
+	std::string cmdLine(wstr.begin(), wstr.end());
+
+	std::string assetPath = getCommandArg(cmdLine, "assetPath", "./data/assets/");
+
 	// Initialize systems.
 	std::string name = "Gallus 2D Engine";
 	std::string saveDirPath = gallus::file::GetAppDataPath().generic_string() + "/tool";
-	std::string assetPath = "./data/assets/";
 	gallus::core::TOOL = new gallus::core::EditorTool();
 	gallus::core::TOOL->SetSaveDirectory(saveDirPath);
 	gallus::core::TOOL->GetResourceAtlas().SetResourceFolder(assetPath);

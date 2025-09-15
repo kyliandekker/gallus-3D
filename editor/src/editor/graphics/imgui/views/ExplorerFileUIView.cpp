@@ -47,7 +47,11 @@ namespace gallus
 
 			void ExplorerFileUIView::SetIcon()
 			{
-				m_sIcon = RESOURCE_ICONS[(int) m_FileResource.GetMetaData().GetAssetType()];
+				if (!m_FileResource.GetMetaData())
+				{
+					return;
+				}
+				m_sIcon = RESOURCE_ICONS[(int) m_FileResource.GetMetaData()->GetAssetType()];
 			}
 
 			const std::string& ExplorerFileUIView::GetIcon() const
@@ -183,7 +187,7 @@ namespace gallus
 
 				ImGui::Text(m_sDisplayName.c_str());
 
-				std::string assetType = gallus::resources::AssetTypeToString(m_FileResource.GetMetaData().GetAssetType());
+				std::string assetType = gallus::resources::AssetTypeToString(m_FileResource.GetMetaData()->GetAssetType());
 
 				textSize = ImGui::CalcTextSize(assetType.c_str());
 
@@ -274,7 +278,7 @@ namespace gallus
 			{
 				for (const gallus::editor::FileResource& resource : m_FileResource.GetChildren())
 				{
-					if (resource.GetMetaData().GetAssetType() == gallus::resources::AssetType::Folder)
+					if (resource.GetMetaData() && resource.GetMetaData()->GetAssetType() == gallus::resources::AssetType::Folder)
 					{
 						return true;
 					}

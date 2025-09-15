@@ -150,7 +150,7 @@ namespace gallus
                 ImGui::EndChild();
 
                 // Optional reset
-                if (ImGui::IsKeyPressed(ImGuiKey_R))
+                if (ImGui::IsKeyPressed(ImGuiKey_R) && ImGui::IsKeyDown(ImGuiKey_LeftCtrl))
                 {
                     core::EDITOR_TOOL->GetEditor().GetEditorSettings().SetSceneZoom(1.0f);
                     core::EDITOR_TOOL->GetEditor().GetEditorSettings().SetScenePanOffset(glm::vec2(0));

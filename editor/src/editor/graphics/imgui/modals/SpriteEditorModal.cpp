@@ -514,7 +514,7 @@ namespace gallus
 			void SpriteEditorModal::SetData(editor::FileResource& a_FileResource)
 			{
                 m_FileResource = &a_FileResource;
-				m_pTextureMetaData = &a_FileResource.GetMetaData<resources::TextureMetaData>();
+				m_pTextureMetaData = a_FileResource.GetMetaData<resources::TextureMetaData>();
 				LoadTexture(m_FileResource->GetPath().filename().generic_string());
 			}
 		}

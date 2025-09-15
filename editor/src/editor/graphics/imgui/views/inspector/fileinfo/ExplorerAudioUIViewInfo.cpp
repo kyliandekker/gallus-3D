@@ -37,7 +37,7 @@ namespace gallus
                 m_AssetTypeDropdown(a_Window)
             {
                 m_AssetTypeDropdown.Initialize(
-                    m_ExplorerFileUIView.GetFileResource().GetMetaData().GetAssetType(),
+                    m_ExplorerFileUIView.GetFileResource().GetMetaData()->GetAssetType(),
                     {
                         resources::AssetType::Sound,
                         resources::AssetType::Song,
@@ -67,9 +67,9 @@ namespace gallus
                 ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
                 if (m_AssetTypeDropdown.Render(ImGui::IMGUI_FORMAT_ID("", COMBO_ID, "ASSETTYPE_AUDIO_FILE_INSPECTOR").c_str()))
                 {
-                    m_ExplorerFileUIView.GetFileResource().GetMetaData().SetAssetType(m_AssetTypeDropdown.GetValue());
+                    m_ExplorerFileUIView.GetFileResource().GetMetaData()->SetAssetType(m_AssetTypeDropdown.GetValue());
                     m_ExplorerFileUIView.SetIcon();
-                    m_ExplorerFileUIView.GetFileResource().GetMetaData().Save(m_ExplorerFileUIView.GetFileResource().GetPath());
+                    m_ExplorerFileUIView.GetFileResource().GetMetaData()->Save(m_ExplorerFileUIView.GetFileResource().GetPath());
                 }
                 ImGui::PopStyleVar();
 

@@ -35,9 +35,9 @@ namespace gallus
 			{
 				m_bShowPreview = true;
 
-                resources::TextureMetaData& metaData = m_ExplorerFileUIView.GetFileResource().GetMetaData<resources::TextureMetaData>();
+                resources::TextureMetaData* metaData = m_ExplorerFileUIView.GetFileResource().GetMetaData<resources::TextureMetaData>();
                 m_TextureTypeDropdown.Initialize(
-                    metaData.GetTextureType(),
+                    metaData->GetTextureType(),
                     {
                         graphics::dx12::TextureType::Texture2D,
                         graphics::dx12::TextureType::SpriteSheet,
@@ -137,7 +137,7 @@ namespace gallus
 					ImGui::Text(std::to_string(GetFormatChannelCount(m_pPreviewTexture->GetResourceDesc().Format)).c_str());
 				}
 
-                resources::TextureMetaData& metaData = m_ExplorerFileUIView.GetFileResource().GetMetaData<resources::TextureMetaData>();
+                resources::TextureMetaData* metaData = m_ExplorerFileUIView.GetFileResource().GetMetaData<resources::TextureMetaData>();
 
                 ImGui::DisplayHeader(m_Window.GetBoldFont(), "Type: ");
                 ImGui::SameLine();
@@ -145,15 +145,15 @@ namespace gallus
                 ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
                 if (m_TextureTypeDropdown.Render(ImGui::IMGUI_FORMAT_ID("", COMBO_ID, "ASSETTYPE_SHADER_FILE_INSPECTOR").c_str()))
                 {
-                    metaData.SetTextureType(m_TextureTypeDropdown.GetValue());
-                    metaData.Save(m_ExplorerFileUIView.GetFileResource().GetPath());
+                    metaData->SetTextureType(m_TextureTypeDropdown.GetValue());
+                    metaData->Save(m_ExplorerFileUIView.GetFileResource().GetPath());
                 }
                 ImGui::PopStyleVar();
 
                 ImGui::NewLine();
 
                 float width = ImGui::GetContentRegionAvail().x;
-                if (metaData.GetTextureType() == graphics::dx12::TextureType::SpriteSheet && ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_IMAGE + std::string(" Open Sprite Editor"), BUTTON_ID, "OPEN_SPRITE_EDITOR_INSPECTOR").c_str(), ImVec2(width, 0)))
+                if (metaData->GetTextureType() == graphics::dx12::TextureType::SpriteSheet && ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_IMAGE + std::string(" Open Sprite Editor"), BUTTON_ID, "OPEN_SPRITE_EDITOR_INSPECTOR").c_str(), ImVec2(width, 0)))
                 {
                     SpriteEditorModal* modal = dynamic_cast<SpriteEditorModal*>(m_Window.GetModal(1));
                     if (modal)
@@ -177,8 +177,8 @@ namespace gallus
                 ImVec2 uv0, uv1;
 
                 // Get TextureMetaData
-                resources::TextureMetaData& metaData = m_ExplorerFileUIView.GetFileResource().GetMetaData<resources::TextureMetaData>();
-                const auto& sprites = metaData.GetSprites();
+                resources::TextureMetaData* metaData = m_ExplorerFileUIView.GetFileResource().GetMetaData<resources::TextureMetaData>();
+                const auto& sprites = metaData->GetSprites();
 
                 ImVec2 texturePos = ImGui::GetCursorPos();
                 if (m_pPreviewTexture->GetTextureType() == graphics::dx12::TextureType::Texture2D)

@@ -273,9 +273,7 @@ namespace gallus
 				/// </summary>
 				void UpdateRenderTargetViews();
 
-#ifdef _EDITOR
 				std::shared_ptr<Texture> GetRenderTexture();
-#endif // _EDITOR
 
 				SimpleEvent<DX12System2D&> m_eOnInitialize;
 				SimpleEvent<std::shared_ptr<dx12::CommandList>> m_eOnRender;
@@ -287,9 +285,7 @@ namespace gallus
 				bool BeforeInitialize(std::shared_ptr<CommandQueue> a_pCommandQueue, std::shared_ptr<CommandList> a_pCommandList);
 				bool AfterInitialize(std::shared_ptr<CommandQueue> a_pCommandQueue, std::shared_ptr<CommandList> a_pCommandList);
 
-#ifdef _EDITOR
 				void CreateRenderTexture(const glm::ivec2& a_vSize);
-#endif // _EDITOR
 
 				void AfterResize(const glm::ivec2& a_vSize);
 
@@ -323,9 +319,7 @@ namespace gallus
 #ifndef IMGUI_DISABLE
 				imgui::ImGuiWindow m_ImGuiWindow;
 #endif // IMGUI_DISABLE
-#ifdef _EDITOR
 				std::shared_ptr<Texture> m_pRenderTexture = nullptr;
-#endif // _EDITOR
 
 				Camera m_Camera;
 			};

@@ -105,6 +105,9 @@ namespace gallus
 		//---------------------------------------------------------------------
 		bool Game::Test()
 		{
+			m_Scene.SetData(core::TOOL->GetResourceAtlas().LoadScene("main.scene"));
+			m_Scene.LoadData();
+
 			/*
 			auto cCommandQueue = gallus::core::TOOL->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
 			auto cCommandList = cCommandQueue->GetCommandList();

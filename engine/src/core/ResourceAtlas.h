@@ -26,6 +26,7 @@ namespace gallus
 	{
 		constexpr uint32_t MAX_RESOURCES = 64;
 		constexpr uint32_t MISSING = 0;
+		constexpr uint32_t RENDER_TEX = 1;
 		constexpr uint32_t LOGO = 1;
 
 		//---------------------------------------------------------------------
@@ -108,6 +109,11 @@ namespace gallus
 			std::shared_ptr<graphics::dx12::DX12ShaderBind> LoadShaderBind(const graphics::dx12::PixelShader* a_PixelShader, const graphics::dx12::VertexShader* a_VertexShader);
 
 			/// <summary>
+			/// Loads a scene.
+			/// </summary>
+			core::Data LoadScene(const std::string& a_sName);
+
+			/// <summary>
 			/// Loads a mesh by name from the resource folder.
 			/// </summary>
 			std::shared_ptr<graphics::dx12::Mesh> LoadMesh(const std::string& a_sName);
@@ -131,6 +137,11 @@ namespace gallus
 			/// Retrieves the default shader bind (used as fallback).
 			/// </summary>
 			std::shared_ptr<graphics::dx12::DX12ShaderBind> GetDefaultShaderBind();
+
+			/// <summary>
+			/// Retrieves the default shader bind (used as fallback).
+			/// </summary>
+			std::shared_ptr<graphics::dx12::DX12ShaderBind> GetRenderTexShaderBind();
 
 			/// <summary>
 			/// Retrieves the default texture (used as fallback).
@@ -181,17 +192,17 @@ namespace gallus
 			/// <summary>
 			/// Sets the folder used to resolve resource paths.
 			/// </summary>
-			void SetResourceFolder(const std::string& a_sResourceFolder)
+			void SetResourceFolder(const fs::path& a_sResourceFolder)
 			{
-				m_sResourceFolder = a_sResourceFolder;
+				m_ResourceFolder = a_sResourceFolder;
 			}
 
 			/// <summary>
 			/// Gets the current resource folder path.
 			/// </summary>
-			const std::string& GetResourceFolder() const
+			const fs::path& GetResourceFolder() const
 			{
-				return m_sResourceFolder;
+				return m_ResourceFolder;
 			}
 		private:
 			std::vector<std::shared_ptr<graphics::dx12::Texture>> m_aTextures;
@@ -200,7 +211,7 @@ namespace gallus
 			std::vector<std::shared_ptr<graphics::dx12::DX12ShaderBind>> m_aShaderBinds;
 			std::vector<std::shared_ptr<graphics::dx12::Mesh>> m_aMeshes;
 
-			std::string m_sResourceFolder;
+			fs::path m_ResourceFolder;
 		};
 	}
 }

@@ -11,6 +11,7 @@
 #include "graphics/dx12/CommandQueue.h"
 #include "graphics/dx12/CommandList.h"
 #include "graphics/dx12/Shader.h"
+#include "graphics/dx12/DX12ShaderBind.h"
 #include "graphics/dx12/Texture.h"
 #include "graphics/dx12/Mesh.h"
 
@@ -119,17 +120,10 @@ namespace gallus
 
 				m_bIsTearingSupported = CheckTearingSupport();
 
-#ifdef _EDITOR
-				m_Viewport = CD3DX12_VIEWPORT(0.0f, 0.0f, RENDER_TEX_SIZE.x, RENDER_TEX_SIZE.y);
-				m_ScissorRect = CD3DX12_RECT(0, 0, RENDER_TEX_SIZE.x, RENDER_TEX_SIZE.y);
-
-				m_Camera.Init(RENDER_TEX_SIZE.x, RENDER_TEX_SIZE.y);
-#else
+				m_Camera.Init(m_vSize.x, m_vSize.y);
 				m_Viewport = CD3DX12_VIEWPORT(0.0f, 0.0f, static_cast<float>(m_vSize.x), static_cast<float>(m_vSize.y));
 				m_ScissorRect = CD3DX12_RECT(0, 0, static_cast<float>(m_vSize.x), static_cast<float>(m_vSize.y));
 
-				m_Camera.Init(m_vSize.x, m_vSize.y);
-#endif // _EDITOR
 				m_Camera.GetTransform().SetPosition({ 0.0f, 0.0f });
 
 				if (!DirectX::XMVerifyCPUSupport())
@@ -185,9 +179,7 @@ namespace gallus
 					return false;
 				}
 
-#ifdef _EDITOR
 				CreateRenderTexture({ RENDER_TEX_SIZE.x, RENDER_TEX_SIZE.y });
-#endif // _EDITOR
 
 				m_eOnInitialize(*this);
 #ifndef IMGUI_DISABLE
@@ -216,6 +208,15 @@ namespace gallus
 
 				std::shared_ptr<DX12ShaderBind> shaderBind = core::TOOL->GetResourceAtlas().LoadShaderBind(pixelShader.get(), vertexShader.get()); // Default shader.
 
+				std::shared_ptr<PixelShader> renderTexPixelShader = core::TOOL->GetResourceAtlas().LoadPixelShader("renderTexPixelShader.hlsl"); // Default shader.
+				std::shared_ptr<VertexShader> renderTexVertexShader = core::TOOL->GetResourceAtlas().LoadVertexShader("renderTexVertexShader.hlsl"); // Default shader.
+				renderTexPixelShader->SetResourceCategory(core::EngineResourceCategory::Missing);
+				renderTexPixelShader->SetIsDestroyable(false);
+				renderTexVertexShader->SetResourceCategory(core::EngineResourceCategory::Missing);
+				renderTexVertexShader->SetIsDestroyable(false);
+
+				std::shared_ptr<DX12ShaderBind> renderTexShaderBind = core::TOOL->GetResourceAtlas().LoadShaderBind(renderTexPixelShader.get(), renderTexVertexShader.get()); // Render Tex shader.
+
 				std::shared_ptr<Mesh> mesh = core::TOOL->GetResourceAtlas().LoadMesh("square"); // Default mesh.
 				MeshPartData& squarePrimitive = s_PRIMITIVES[(int)PRIMITIVES::SQUARE];
 				mesh->SetMeshData(squarePrimitive, cCommandList);
@@ -226,6 +227,18 @@ namespace gallus
 				cCommandQueue->WaitForFenceValue(fenceValue);
 
 				UpdateRenderTargetViews();
+
+				CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(m_RTV.GetCPUDescriptorHandleForHeapStart());
+				rtvHandle.Offset(m_pDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV) * g_iBufferCount);
+
+				// Create RTV for custom render target texture
+				if (m_pRenderTexture->GetResource())
+				{
+					m_pDevice->CreateRenderTargetView(m_pRenderTexture->GetResource().Get(), nullptr, rtvHandle);
+				}
+
+				Resize({}, m_vSize);
+				
 #ifndef IMGUI_DISABLE
 				m_ImGuiWindow.OnRenderTargetCreated(dCommandList);
 #endif // IMGUI_DISABLE
@@ -405,7 +418,7 @@ namespace gallus
 				swapChainDesc.SampleDesc = { 1, 0 };
 				swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 				swapChainDesc.BufferCount = g_iBufferCount;
-				swapChainDesc.Scaling = DXGI_SCALING_STRETCH;
+				swapChainDesc.Scaling = DXGI_SCALING_NONE;
 				swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 				swapChainDesc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
 				// It is recommended to always allow tearing if tearing support is available.
@@ -449,9 +462,7 @@ namespace gallus
 			{
 				size_t numBuffers = g_iBufferCount;
 
-#ifdef _EDITOR
 				numBuffers++;
-#endif // _EDITOR
 
 				D3D12_DESCRIPTOR_HEAP_DESC rtvHeapDesc = {};
 				rtvHeapDesc.NumDescriptors = static_cast<UINT>(numBuffers);
@@ -495,15 +506,6 @@ namespace gallus
 			{
 				CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(m_RTV.GetCPUDescriptorHandleForHeapStart());
 
-#ifdef _EDITOR
-				// Create RTV for custom render target texture
-				if (m_pRenderTexture->GetResource())
-				{
-					m_pDevice->CreateRenderTargetView(m_pRenderTexture->GetResource().Get(), nullptr, rtvHandle);
-				}
-				rtvHandle.Offset(m_pDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV));
-#endif // _EDITOR
-
 				for (int i = 0; i < g_iBufferCount; ++i)
 				{
 					Microsoft::WRL::ComPtr<ID3D12Resource> backBuffer;
@@ -522,12 +524,10 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-#ifdef _EDITOR
 			std::shared_ptr<Texture> DX12System2D::GetRenderTexture()
 			{
 				return m_pRenderTexture;
 			}
-#endif // _EDITOR
 
 			//---------------------------------------------------------------------
 			bool DX12System2D::CreateCommandQueues()
@@ -689,16 +689,10 @@ namespace gallus
 #ifndef IMGUI_DISABLE
 				m_ImGuiWindow.Resize(a_vPos, a_vSize);
 #endif
-
-#ifdef _EDITOR
-				m_Viewport = CD3DX12_VIEWPORT(0.0f, 0.0f, RENDER_TEX_SIZE.x, RENDER_TEX_SIZE.y);
-				m_ScissorRect = CD3DX12_RECT(0, 0, RENDER_TEX_SIZE.x, RENDER_TEX_SIZE.y);
-				m_Camera.Init(RENDER_TEX_SIZE.x, RENDER_TEX_SIZE.y);
-#else
 				m_Viewport = CD3DX12_VIEWPORT(0.0f, 0.0f, static_cast<float>(a_vSize.x), static_cast<float>(a_vSize.y));
 				m_ScissorRect = CD3DX12_RECT(0, 0, static_cast<float>(a_vSize.x), static_cast<float>(a_vSize.y));
+
 				m_Camera.Init(a_vSize.x, a_vSize.y);
-#endif // _EDITOR
 
 				m_vSize = glm::vec2(a_vSize.x, a_vSize.y);
 			}
@@ -720,13 +714,10 @@ namespace gallus
 			{
 				size_t backBufferStart = 0;
 
-#ifdef _EDITOR
 				if (a_bUseRenderTexture && m_pRenderTexture->IsValid())
 				{
-					return m_RTV.GetCPUHandle(0);
+					return m_RTV.GetCPUHandle(g_iBufferCount);
 				}
-				backBufferStart++;
-#endif // _EDITOR
 
 				return m_RTV.GetCPUHandle(backBufferStart + m_iCurrentBackBufferIndex);
 			}
@@ -741,51 +732,77 @@ namespace gallus
 
 				ProcessWindowEvents();
 
-				std::shared_ptr<CommandQueue> commandQueue = GetCommandQueue(D3D12_COMMAND_LIST_TYPE_DIRECT);
-				std::shared_ptr<CommandList> commandList = commandQueue->GetCommandList();
+				auto commandQueue = GetCommandQueue(D3D12_COMMAND_LIST_TYPE_DIRECT);
+				auto commandList = commandQueue->GetCommandList();
 
-				UINT currentBackBufferIndex = GetCurrentBackBufferIndex();
-				const Microsoft::WRL::ComPtr<ID3D12Resource>& backBuffer = GetCurrentBackBuffer();
+				auto backBuffer = GetCurrentBackBuffer();
+				UINT backIndex = GetCurrentBackBufferIndex();
+				const FLOAT clearColor[] = { 0, 0, 0, 1 };
 
-				commandList->TransitionResource(backBuffer,
-					D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
+				// Keep RTV handles outside of scopes
+				D3D12_CPU_DESCRIPTOR_HANDLE backRtv;  // For back buffer
 
-				const FLOAT clearColor[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+				// 1. Render 2D scene into RenderTexture
+				if (m_pRenderTexture->CanBeDrawn())
+				{
+					// Transition RenderTexture -> RTV
+					commandList->TransitionResource(
+						m_pRenderTexture->GetResource(),
+						D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
+						D3D12_RESOURCE_STATE_RENDER_TARGET);
 
-				D3D12_CPU_DESCRIPTOR_HANDLE currentRtv;
+					// Get RTV for render texture
+					D3D12_CPU_DESCRIPTOR_HANDLE rtRtv = GetCurrentRenderTargetView(true);
 
-				D3D12_CPU_DESCRIPTOR_HANDLE rtv = GetCurrentRenderTargetView(false);
-				commandList->GetCommandList()->ClearRenderTargetView(rtv, clearColor, 0, nullptr);
+					// Clear render texture
+					commandList->GetCommandList()->ClearRenderTargetView(rtRtv, clearColor, 0, nullptr);
 
-				currentRtv = rtv;
-#ifdef _EDITOR
-				commandList->TransitionResource(m_pRenderTexture->GetResource(),
-					D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
+					// Set RTV
+					commandList->GetCommandList()->OMSetRenderTargets(1, &rtRtv, FALSE, nullptr);
+
+					// Draw your 2D content
+					Render2D(commandQueue, commandList, rtRtv);
+
+					// Transition RenderTexture -> SRV
+					commandList->TransitionResource(
+						m_pRenderTexture->GetResource(),
+						D3D12_RESOURCE_STATE_RENDER_TARGET,
+						D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+				}
+
+				// Transition back buffer -> RTV
+				commandList->TransitionResource(
+					backBuffer,
+					D3D12_RESOURCE_STATE_PRESENT,
 					D3D12_RESOURCE_STATE_RENDER_TARGET);
 
-				D3D12_CPU_DESCRIPTOR_HANDLE editorRtv = GetCurrentRenderTargetView(true);
-				commandList->GetCommandList()->ClearRenderTargetView(editorRtv, clearColor, 0, nullptr);
+				// Get back buffer RTV
+				backRtv = GetCurrentRenderTargetView(false);
+				commandList->GetCommandList()->ClearRenderTargetView(backRtv, clearColor, 0, nullptr);
+				commandList->GetCommandList()->OMSetRenderTargets(1, &backRtv, FALSE, nullptr);
+#ifndef _EDITOR
+				{
+					// Bind pipeline + root signature
+					commandList->GetCommandList()->SetPipelineState(
+						core::TOOL->GetResourceAtlas().GetRenderTexShaderBind()->GetPipelineState());
+					commandList->GetCommandList()->SetGraphicsRootSignature(
+						core::TOOL->GetDX12().GetRootSignature().Get());
 
-				currentRtv = editorRtv;
+					// Bind render texture SRV to the correct root parameter
+					m_pRenderTexture->Bind(commandList, 2);
+
+					commandList->GetCommandList()->RSSetViewports(1, &m_Viewport);
+					commandList->GetCommandList()->RSSetScissorRects(1, &m_ScissorRect);
+
+					// Draw fullscreen quad (shader-generated)
+					commandList->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+					commandList->GetCommandList()->IASetVertexBuffers(0, 0, nullptr);
+					commandList->GetCommandList()->DrawInstanced(4, 1, 0, 0);
+				}
 #endif // _EDITOR
 
-				//------------------------------------------
-				// RENDER GAME
-				//------------------------------------------
-				Render2D(commandQueue, commandList, currentRtv);
-
-				//------------------------------------------
-				// EDITOR ONLY
-				//------------------------------------------
 #ifdef _EDITOR
-				currentRtv = rtv;
-
-				// Transition back to SRV for ImGui usage
-				commandList->TransitionResource(m_pRenderTexture->GetResource(),
-					D3D12_RESOURCE_STATE_RENDER_TARGET,
-					D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-
-				RenderUI(commandQueue, commandList, currentRtv);
+				RenderUI(commandQueue, commandList, backRtv);
 #endif // _EDITOR
 
 				Present(commandQueue, commandList);
@@ -804,7 +821,7 @@ namespace gallus
 						const win32::WindowsMsg& event = m_pWindow->GetEventQueue().front();
 						m_pWindow->GetEventQueue().pop();
 
-						if (event.msg == WM_EXITSIZEMOVE || event.msg == WM_SIZE)
+						if (event.msg == WM_EXITSIZEMOVE)
 						{
 							Resize(m_pWindow->GetPosition(), m_pWindow->GetRealSize());
 						}
@@ -834,8 +851,18 @@ namespace gallus
 
 				a_pCommandList->GetCommandList()->SetGraphicsRootSignature(m_pRootSignature.Get());
 
-				a_pCommandList->GetCommandList()->RSSetViewports(1, &m_Viewport);
-				a_pCommandList->GetCommandList()->RSSetScissorRects(1, &m_ScissorRect);
+				D3D12_VIEWPORT rtViewport{};
+				rtViewport.TopLeftX = 0.0f;
+				rtViewport.TopLeftY = 0.0f;
+				rtViewport.Width = static_cast<float>(RENDER_TEX_SIZE.x);
+				rtViewport.Height = static_cast<float>(RENDER_TEX_SIZE.y);
+				rtViewport.MinDepth = 0.0f;
+				rtViewport.MaxDepth = 1.0f;
+
+				CD3DX12_RECT rtScissor(0, 0, RENDER_TEX_SIZE.x, RENDER_TEX_SIZE.y);
+
+				a_pCommandList->GetCommandList()->RSSetViewports(1, &rtViewport);
+				a_pCommandList->GetCommandList()->RSSetScissorRects(1, &rtScissor);
 
 				ID3D12DescriptorHeap* descriptorHeaps[] = { m_SRV.GetHeap().Get() };
 				a_pCommandList->GetCommandList()->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
@@ -900,7 +927,6 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-#ifdef _EDITOR
 			void DX12System2D::CreateRenderTexture(const glm::ivec2& a_vSize)
 			{
 				if (m_pRenderTexture && m_pRenderTexture->GetResource())
@@ -921,7 +947,6 @@ namespace gallus
 
 				m_pRenderTexture = core::TOOL->GetResourceAtlas().LoadTextureByDescription("RenderTexture", texDesc);
 			}
-#endif // _EDITOR
 		}
 	}
 }
