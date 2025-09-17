@@ -55,6 +55,11 @@ namespace gallus
 			{
 				m_bStarted = a_bStarted;
 			}
+
+			/// <summary>
+			/// Testing purposes.
+			/// </summary>
+			bool StartUp();
 		private:
 			/// <summary>
 			/// Callback for closing the window.
@@ -70,11 +75,6 @@ namespace gallus
 			/// Loads all sounds.
 			/// </summary>
 			bool LoadSounds();
-
-			/// <summary>
-			/// Testing purposes.
-			/// </summary>
-			bool Test();
 
 			// There can only be one scene and setting a new one cleans up the old one automatically.
 			gallus::gameplay::Scene m_Scene;

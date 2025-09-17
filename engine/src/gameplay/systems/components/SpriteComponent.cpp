@@ -16,6 +16,8 @@
 #include "gameplay/systems/TransformSystem.h"
 
 #define JSON_MESH_COMPONENT_TEX_VAR "texture"
+#define JSON_MESH_COMPONENT_TEX_NAME_VAR "name"
+#define JSON_MESH_COMPONENT_TEX_SPRITE_INDEX_VAR "spriteIndex"
 #define JSON_MESH_COMPONENT_MESH_VAR "mesh"
 #define JSON_MESH_COMPONENT_SHADER_VAR "shader"
 #define JSON_MESH_COMPONENT_SHADER_PIXEL_VAR "pixel"
@@ -110,9 +112,16 @@ namespace gallus
 			std::string mesh = m_pMesh->GetName();
 			std::string pixelShader = m_pShaderBind->GetVertexShader()->GetName();
 			std::string vertexShader = m_pShaderBind->GetPixelShader()->GetName();
-			a_Document.AddMember(
-				JSON_MESH_COMPONENT_TEX_VAR,
+			a_Document.AddMember(JSON_MESH_COMPONENT_TEX_VAR, rapidjson::Value().SetObject(), a_Allocator);
+			a_Document[JSON_MESH_COMPONENT_TEX_VAR];
+			a_Document[JSON_MESH_COMPONENT_TEX_VAR].AddMember(
+				JSON_MESH_COMPONENT_TEX_NAME_VAR,
 				rapidjson::Value(tex.c_str(), a_Allocator),
+				a_Allocator
+			);
+			a_Document[JSON_MESH_COMPONENT_TEX_VAR].AddMember(
+				JSON_MESH_COMPONENT_TEX_SPRITE_INDEX_VAR,
+				m_iSpriteIndex,
 				a_Allocator
 			);
 
@@ -149,9 +158,16 @@ namespace gallus
 			std::string mesh;
 			std::string pixelShader;
 			std::string vertexShader;
-			if (a_Document.HasMember(JSON_MESH_COMPONENT_TEX_VAR) && a_Document[JSON_MESH_COMPONENT_TEX_VAR].IsString())
+			if (a_Document.HasMember(JSON_MESH_COMPONENT_TEX_VAR) && a_Document[JSON_MESH_COMPONENT_TEX_VAR].IsObject())
 			{
-				tex = a_Document[JSON_MESH_COMPONENT_TEX_VAR].GetString();
+				if (a_Document[JSON_MESH_COMPONENT_TEX_VAR].HasMember(JSON_MESH_COMPONENT_TEX_NAME_VAR) && a_Document[JSON_MESH_COMPONENT_TEX_VAR][JSON_MESH_COMPONENT_TEX_NAME_VAR].IsString())
+				{
+					tex = a_Document[JSON_MESH_COMPONENT_TEX_VAR][JSON_MESH_COMPONENT_TEX_NAME_VAR].GetString();
+				}
+				if (a_Document[JSON_MESH_COMPONENT_TEX_VAR].HasMember(JSON_MESH_COMPONENT_TEX_SPRITE_INDEX_VAR) && a_Document[JSON_MESH_COMPONENT_TEX_VAR][JSON_MESH_COMPONENT_TEX_SPRITE_INDEX_VAR].IsInt())
+				{
+					m_iSpriteIndex = a_Document[JSON_MESH_COMPONENT_TEX_VAR][JSON_MESH_COMPONENT_TEX_SPRITE_INDEX_VAR].GetInt();
+				}
 			}
 
 			if (a_Document.HasMember(JSON_MESH_COMPONENT_SHADER_VAR) && a_Document[JSON_MESH_COMPONENT_SHADER_VAR].IsString())

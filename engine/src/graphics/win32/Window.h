@@ -110,30 +110,6 @@ namespace gallus
 				void AddTitle(const std::string& a_sTitle);
 
 				/// <summary>
-				/// Retrieves the real (physical) size of the window.
-				/// </summary>
-				/// <returns>A 2D vector representing the width and height of the window.</returns>
-				glm::ivec2 GetRealSize() const;
-
-				/// <summary>
-				/// Retrieves the position of the window on the screen.
-				/// </summary>
-				/// <returns>A 2D vector representing the x and y position of the window.</returns>
-				glm::ivec2 GetPosition() const;
-
-				/// <summary>
-				/// Sets the size of the window.
-				/// </summary>
-				/// <param name="a_vSize">The size of the window</param>
-				void SetSize(const glm::ivec2& a_vSize);
-
-				/// <summary>
-				/// Sets the position of the window.
-				/// </summary>
-				/// <param name="a_vPosition">The position the window will be rendered at.</param>
-				void SetPosition(const glm::ivec2& a_vPosition);
-
-				/// <summary>
 				/// Retrieves the handle to the window.
 				/// </summary>
 				/// <returns>A reference to the window handle (HWND).</returns>
@@ -171,7 +147,32 @@ namespace gallus
 				void SetResizingAllowed(bool a_bResizingAllowed);
 
 				std::mutex g_EventMutex;
+
+				/// <summary>
+				/// Retrieves the real (physical) size of the window.
+				/// </summary>
+				/// <returns>A 2D vector representing the width and height of the window.</returns>
+				glm::ivec2 GetRealSize() const;
+
+				/// <summary>
+				/// Retrieves the position of the window on the screen.
+				/// </summary>
+				/// <returns>A 2D vector representing the x and y position of the window.</returns>
+				glm::ivec2 GetPosition() const;
+
 			protected:
+				/// <summary>
+				/// Sets the size of the window.
+				/// </summary>
+				/// <param name="a_vSize">The size of the window</param>
+				void SetSize(const glm::ivec2& a_vSize);
+
+				/// <summary>
+				/// Sets the position of the window.
+				/// </summary>
+				/// <param name="a_vPosition">The position the window will be rendered at.</param>
+				void SetPosition(const glm::ivec2& a_vPosition);
+
 				bool Sleep() const override
 				{
 					return true;

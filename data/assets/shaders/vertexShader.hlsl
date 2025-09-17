@@ -1,24 +1,4 @@
-cbuffer Transform : register(b0)
-{
-    float4x4 WorldViewProj;
-}
-
-cbuffer SpriteUV : register(b1)
-{
-    float4 uv; // xy = uv0, zw = uv1
-}
-
-struct VSInput
-{
-    float2 pos : POSITION; 
-    float2 uv  : TEXCOORD0;
-};
-
-struct PSInput
-{
-    float4 pos : SV_POSITION;
-    float2 uv  : TEXCOORD0;
-};
+#include "Common.hlsl"
 
 PSInput main(VSInput input)
 {

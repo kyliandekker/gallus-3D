@@ -11,12 +11,43 @@
                     },
                     "rotation": 15.064814567565918,
                     "scale": {
-                        "x": 284.39996337890627,
-                        "y": 919.5599975585938
+                        "x": 800.0,
+                        "y": 800.0
                     }
                 },
                 "sprite": {
-                    "texture": "tex_layton.png",
+                    "texture": {
+                        "name": "tex_goomba_sprites.png",
+                        "spriteIndex": 4
+                    },
+                    "shader": {
+                        "pixel": "vertexShader.hlsl",
+                        "vertex": "pixelShader.hlsl"
+                    },
+                    "mesh": "square"
+                }
+            }
+        },
+        {
+            "name": "New GameObject (1)",
+            "isActive": true,
+            "components": {
+                "transform": {
+                    "position": {
+                        "x": 443.87847900390627,
+                        "y": 549.4612426757813
+                    },
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 600.0,
+                        "y": 600.0
+                    }
+                },
+                "sprite": {
+                    "texture": {
+                        "name": "tex_goomba_sprites.png",
+                        "spriteIndex": 0
+                    },
                     "shader": {
                         "pixel": "vertexShader.hlsl",
                         "vertex": "pixelShader.hlsl"
