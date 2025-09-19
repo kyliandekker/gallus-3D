@@ -8,6 +8,8 @@
 #include <windows.h>
 #include <iostream>
 
+#include "core/ArgProcessor.h"
+
 #define CATEGORY_LOGGER "LOGGER"
 
 namespace gallus
@@ -70,6 +72,10 @@ namespace gallus
 		//---------------------------------------------------------------------
 		bool Logger::InitThreadWorker()
 		{
+			m_AssertLevel = core::ARGS.GetArgument<LogSeverity>(ASSERT_LEVEL_ARG);
+			m_bLogToFile = core::ARGS.GetArgument<bool>(LOG_TO_FILE_ARG);
+			m_LogType = core::ARGS.GetArgument<LogType>(LOG_TYPE_ARG);
+
 			// Terminal/Console initialization for debug builds.
 #ifdef _DEBUG
 			AllocConsole();
@@ -99,7 +105,7 @@ namespace gallus
 			std::string logFilename(50, '\0');
 			std::strftime(&logFilename[0], logFilename.size(), "./log-%Y-%m-%d %H-%M-%S.log", &buf);  // Changed colon to dash
 
-			if (LOG_TO_FILE)
+			if (m_bLogToFile)
 			{
 				fopen_s(&s_pLogFile, logFilename.c_str(), "wb");
 				if (!s_pLogFile)
@@ -126,7 +132,7 @@ namespace gallus
 				s_pConsole = nullptr;
 			}
 #endif // _DEBUG
-			if (LOG_TO_FILE && s_pLogFile)
+			if (m_bLogToFile && s_pLogFile)
 			{
 				fclose(s_pLogFile);
 				s_pLogFile = nullptr;
@@ -159,7 +165,7 @@ namespace gallus
 		//---------------------------------------------------------------------
 		Logger::~Logger()
 		{
-			if (LOG_TO_FILE && s_pLogFile)
+			if (m_bLogToFile && s_pLogFile)
 			{
 				fclose(s_pLogFile);
 				s_pLogFile = nullptr;
@@ -201,7 +207,7 @@ namespace gallus
 					LogSeverityToString(lm.GetSeverity()) + "] " + lm.GetRawMessage() + "\"" +
 					fileName + "\" on line " + std::to_string(lm.GetLine()) + "\n";
 
-				if (LOG_TO_FILE && s_pLogFile)
+				if (m_bLogToFile && s_pLogFile)
 				{
 					fprintf(s_pLogFile, message.c_str());
 				}

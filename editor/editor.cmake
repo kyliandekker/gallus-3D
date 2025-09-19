@@ -42,7 +42,6 @@ target_compile_definitions(editor PRIVATE
 # Include directories
 target_include_directories(editor PUBLIC
     ${CMAKE_SOURCE_DIR}/engine/src
-    ${CMAKE_SOURCE_DIR}/game_shared/src
     ${CMAKE_SOURCE_DIR}/editor/src
     ${CMAKE_SOURCE_DIR}/external
 )
@@ -59,10 +58,9 @@ set_target_properties(editor PROPERTIES
 )
 
 target_link_libraries(editor PRIVATE
-    Shcore.lib dxgi.lib d3d12.lib d3dcompiler.lib dxguid.lib Shlwapi.lib engine.lib game_shared.lib
+    Shcore.lib dxgi.lib d3d12.lib d3dcompiler.lib dxguid.lib Shlwapi.lib engine.lib
 )
 target_link_libraries(editor PRIVATE engine)
-target_link_libraries(editor PRIVATE game_shared)
 target_link_directories(editor PRIVATE
     "${CMAKE_SOURCE_DIR}/../$<CONFIG>"
 )

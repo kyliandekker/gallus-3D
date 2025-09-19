@@ -17,15 +17,6 @@ namespace gallus
 		//---------------------------------------------------------------------
 		bool EntityComponentSystem::Initialize()
 		{
-			// These systems are in order of initialization.
-			CreateSystem<TransformSystem>();
-			CreateSystem<SpriteSystem>();
-
-			for (AbstractECSSystem* system : m_aSystems)
-			{
-				system->Initialize();
-			}
-
 			LOG(LOGSEVERITY_SUCCESS, LOG_CATEGORY_ECS, "ECS initialized.");
 			return System::Initialize();
 		}
@@ -44,7 +35,7 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		void EntityComponentSystem::Update(float a_fDeltaTime)
+		void EntityComponentSystem::Update(float a_fDeltaTime, bool a_bUpdateRealtime)
 		{
 			std::lock_guard<std::recursive_mutex> lock(m_EntityMutex);
 
@@ -75,10 +66,17 @@ namespace gallus
 				m_eOnEntityComponentsUpdated();
 			}
 
-			// Delete components if applicable.
 			for (auto& sys : m_aSystems)
 			{
-				sys->UpdateComponents(a_fDeltaTime);
+				sys->UpdateComponents();
+			}
+
+			if (a_bUpdateRealtime)
+			{
+				for (auto& sys : m_aSystems)
+				{
+					sys->UpdateComponentsRealtime(a_fDeltaTime);
+				}
 			}
 		}
 

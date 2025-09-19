@@ -1,6 +1,7 @@
 #pragma once
 
 #include "graphics/dx12/DX12PCH.h"
+#include "core/System.h"
 
 #include <vector>
 #include <memory>
@@ -36,9 +37,21 @@ namespace gallus
 		/// Centralized manager for loading, storing, and retrieving graphics resources
 		/// (textures, shaders, and meshes). Provides caching to avoid duplicate loads.
 		/// </summary>
-		class ResourceAtlas
+		class ResourceAtlas : public core::System
 		{
 		public:
+			/// <summary>
+			/// Initializes the system, setting up necessary resources.
+			/// </summary>
+			/// <returns>True if the initialization was successful, otherwise false.</returns>
+			bool Initialize() override;
+
+			/// <summary>
+			/// Destroys the system, releasing resources and performing necessary cleanup.
+			/// </summary>
+			/// <returns>True if the destruction was successful, otherwise false.</returns>
+			bool Destroy() override;
+
 			/// <summary>
 			/// Retrieves a resource from the given vector, or loads it if not found.
 			/// </summary>

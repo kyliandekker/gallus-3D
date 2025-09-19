@@ -90,16 +90,6 @@ namespace gallus
 						0, 0, 1, &subresourceData);
 				}
 			}
-
-			//---------------------------------------------------------------------
-			void CommandList::TransitionResource(Microsoft::WRL::ComPtr<ID3D12Resource> a_pResource, D3D12_RESOURCE_STATES a_BeforeState, D3D12_RESOURCE_STATES a_AfterState)
-			{
-				CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-					a_pResource.Get(),
-					a_BeforeState, a_AfterState);
-
-				m_pCommandList->ResourceBarrier(1, &barrier);
-			}
 		}
 	}
 }

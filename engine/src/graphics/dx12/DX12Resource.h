@@ -12,6 +12,7 @@ namespace gallus
 	{
 		namespace dx12
 		{
+			class CommandList;
 			//---------------------------------------------------------------------
 			// DX12Resource
 			//---------------------------------------------------------------------
@@ -97,10 +98,13 @@ namespace gallus
 				/// Sets the format support.
 				/// </summary>
 				void CheckFeatureSupport();
+
+				void Transition(std::shared_ptr<CommandList> a_pCommandList, D3D12_RESOURCE_STATES a_NewState);
 			protected:
 				D3D12_FEATURE_DATA_FORMAT_SUPPORT m_FormatSupport{};
 				Microsoft::WRL::ComPtr<ID3D12Resource> m_pResource = nullptr;
 				std::wstring m_wsName;
+				D3D12_RESOURCE_STATES m_CurrentState = D3D12_RESOURCE_STATE_COMMON;
 
 				friend class ResourceAtlas;
 			};

@@ -83,26 +83,27 @@ namespace gallus
 			//---------------------------------------------------------------------
 			bool Texture::CreateSRV(std::shared_ptr<CommandList> a_pCommandList)
 			{
-				if (m_iSRVIndex != -1 || !m_pResource)
+				if (!m_pResource)
 				{
 					return false;
 				}
 
-				auto desc = m_pResource->GetDesc();
-				if (desc.Width == 0 || desc.Height == 0)
+				// Only create SRV once
+				if (m_iSRVIndex == -1)
 				{
-					return false;
+					m_iSRVIndex = static_cast<int32_t>(core::TOOL->GetDX12().GetSRV().Allocate());
+					core::TOOL->GetDX12().GetDevice()->CreateShaderResourceView(
+						m_pResource.Get(),
+						&m_SrvDesc,
+						core::TOOL->GetDX12().GetSRV().GetCPUHandle(m_iSRVIndex)
+					);
 				}
 
-				CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-					m_pResource.Get(),
-					D3D12_RESOURCE_STATE_COPY_DEST,
-					D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-				a_pCommandList->GetCommandList()->ResourceBarrier(1, &barrier);
-
-				m_iSRVIndex = static_cast<int32_t>(core::TOOL->GetDX12().GetSRV().Allocate());
-				core::TOOL->GetDX12().GetDevice()->CreateShaderResourceView(m_pResource.Get(), &m_SrvDesc, core::TOOL->GetDX12().GetSRV().GetCPUHandle(m_iSRVIndex));
-
+				// Only transition if not already in PIXEL_SHADER_RESOURCE
+				if (m_CurrentState != D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE)
+				{
+					Transition(a_pCommandList, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+				}
 				return true;
 			}
 
@@ -117,7 +118,6 @@ namespace gallus
 
 				if (m_TextureType == TextureType::SpriteSheet && a_iSpriteIndex < m_aSpriteRects.size())
 				{
-					// Bind sprite UV rect at b1
 					SpriteUV uv = GetSpriteUV(a_iSpriteIndex);
 					float uvData[4] = { uv.uv0.x, uv.uv0.y, uv.uv1.x, uv.uv1.y };
 					a_pCommandList->GetCommandList()->SetGraphicsRoot32BitConstants(RootParameters::SPRITE_UV, 4, uvData, 0);
@@ -125,8 +125,8 @@ namespace gallus
 				else
 				{
 					SpriteUV uv;
-					uv.uv0 = { 0.0f, 0.0f }; // top-left
-					uv.uv1 = { 1.0f, 1.0f }; // bottom-right
+					uv.uv0 = { 0.0f, 0.0f }; 
+					uv.uv1 = { 1.0f, 1.0f }; 
 					float uvData[4] = { uv.uv0.x, uv.uv0.y, uv.uv1.x, uv.uv1.y };
 					a_pCommandList->GetCommandList()->SetGraphicsRoot32BitConstants(RootParameters::SPRITE_UV, 4, uvData, 0);
 				}

@@ -7,6 +7,7 @@
 #include "core/Tool.h"
 #include "resource.h"
 #include "core/ArgProcessor.h"
+#include "logger/Logger.h"
 
 // utils includes
 #include "utils/file_abstractions.h"
@@ -36,17 +37,12 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR lp
 	gallus::core::TOOL = new gallus::core::Tool();
 	gallus::core::TOOL->SetSaveDirectory(saveDirPath);
 
-	// Set args
-	std::vector<gallus::core::BaseArg*> args = gallus::core::ArgProcessor::GetArguments(cmdLine);
-	for (const gallus::core::BaseArg* arg : args)
-	{
-		if (arg->GetName() == ASSET_PATH_ARG)
-		{
-			const gallus::core::Arg<std::string>* strArg = dynamic_cast<const gallus::core::Arg<std::string>*>(arg);
-			gallus::core::TOOL->GetResourceAtlas().SetResourceFolder(strArg->GetValue());
-		}
-	}
+	gallus::core::ARGS.AddArgument<std::string>(ASSET_PATH_ARG, "./data/assets/");
+	gallus::core::ARGS.AddArgument<gallus::LogSeverity>(ASSERT_LEVEL_ARG, gallus::LogSeverity::LOGSEVERITY_ERROR);
+	gallus::core::ARGS.AddArgument<bool>(LOG_TO_FILE_ARG, false);
+	gallus::core::ARGS.AddArgument<gallus::logger::LogType>(LOG_TO_FILE_ARG, gallus::logger::LogType::LOGTYPE_WITH_PARENT_FOLDER);
 
+	gallus::core::ARGS.ProcessArguments(cmdLine);
 	gallus::core::TOOL->Initialize(hInstance, name);
 
 	// Load icons.
@@ -56,9 +52,8 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR lp
 	SendMessage(gallus::core::TOOL->GetWindow().GetHWnd(), WM_SETICON, ICON_SMALL, (LPARAM) hIconSmall);
 
 	// Loop.
-	gallus::gameplay::GAME.Initialize();
-	gallus::gameplay::GAME.StartUp();
-	gallus::gameplay::GAME.Loop();
+	gallus::gameplay::GAME->Initialize();
+	gallus::gameplay::GAME->Loop();
 
 	// Destroy the tool after loop ends.
 	gallus::core::TOOL->Destroy();

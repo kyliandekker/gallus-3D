@@ -42,6 +42,7 @@ namespace gallus
 			class CommandQueue;
 			class CommandList;
 			class Texture;
+			class DX12Resource;
 
 			// Create the vertex input layout
 			const D3D12_INPUT_ELEMENT_DESC g_aInputLayout[] = {
@@ -170,7 +171,7 @@ namespace gallus
 				/// Retrieves the current back buffer.
 				/// </summary>
 				/// <returns>ComPtr to the current back buffer.</returns>
-				const Microsoft::WRL::ComPtr<ID3D12Resource>& GetCurrentBackBuffer() const;
+				const std::shared_ptr<DX12Resource>& GetCurrentBackBuffer() const;
 
 				/// <summary>
 				/// Retrieves the current back buffer index.
@@ -307,7 +308,7 @@ namespace gallus
 				Microsoft::WRL::ComPtr<ID3D12RootSignature> m_pRootSignature = nullptr;
 
 				Microsoft::WRL::ComPtr<IDXGISwapChain4> m_pSwapChain = nullptr;
-				Microsoft::WRL::ComPtr<ID3D12Resource> m_BackBuffers[g_iBufferCount];
+				std::shared_ptr<DX12Resource> m_BackBuffers[g_iBufferCount];
 
 				UINT m_iCurrentBackBufferIndex = 0;
 

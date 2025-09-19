@@ -61,8 +61,9 @@ namespace gallus
 			{
 				if (m_bFullScreen)
 				{
+					ImGuiViewport* viewport = ImGui::GetMainViewport();
 					ImGui::SetNextWindowPos(ImVec2(0, 0));
-					ImGui::SetNextWindowSize(ImVec2(m_vSize.x, m_vSize.y));
+					ImGui::SetNextWindowSize(viewport->Size);
 				}
 
 				bool showRender = false;

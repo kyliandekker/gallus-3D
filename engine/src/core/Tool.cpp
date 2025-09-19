@@ -2,6 +2,8 @@
 
 #include <glm/vec2.hpp>
 
+#include "ArgProcessor.h"
+
 // logger includes
 #include "logger/Logger.h"
 
@@ -15,7 +17,6 @@ namespace gallus
 		bool Tool::Initialize(HINSTANCE a_hInstance, const std::string& a_sName)
 		{
 			TOOL = this;
-
 #ifdef _TEST
 			std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 #endif // _TEST
@@ -24,6 +25,8 @@ namespace gallus
 			logger::LOGGER.Initialize(true);
 
 			LOG(LOGSEVERITY_INFO, LOG_CATEGORY_ENGINE, "Initializing tool.");
+
+			m_ResourceAtlas.Initialize();
 
 			// We initialize the window first and set the size and title after it has been created.
 			m_Window.Initialize(true, a_hInstance);
@@ -64,6 +67,8 @@ namespace gallus
 			m_DX12.Destroy();
 
 			m_Window.Destroy();
+
+			m_ResourceAtlas.Destroy();
 
 			// Destroy the logger last so we can see possible error messages from other systems.
 			logger::LOGGER.Destroy();

@@ -64,7 +64,7 @@ namespace gallus
 				/// <summary>
 				/// Update loop for the window. This is where all ImGui interaction should be like buttons, etc.
 				/// </summary>
-				void Update();
+				virtual void Update();
 
 				/// <summary>
 				/// Sets the size of the window.

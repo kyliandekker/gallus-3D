@@ -46,7 +46,7 @@ namespace gallus
 				return shaderBlob;
 			}
 
-			// TODO: This does nothing right now.
+			// TODO: This is for loading from the shader file (library of all shaders that would get compiled). For now it is unused since we just use the editor.
 			//---------------------------------------------------------------------
 			bool Shader::LoadByName(const std::string& a_sShader)
 			{

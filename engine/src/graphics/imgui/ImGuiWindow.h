@@ -196,6 +196,7 @@ namespace gallus
 
 				ImVec2 m_vFramePadding = ImVec2(8, 8); /// Frame padding for ImGui elements.
 				ImVec2 m_vWindowPadding = ImVec2(8, 8); /// Window padding for ImGui elements.
+				ImVec2 m_vItemSpacing = ImVec2(5, 5); /// Window padding for ImGui elements.
 				ImVec2 m_vHeaderSize;
 
 				std::vector<BaseWindow*> m_aWindows;

@@ -78,7 +78,7 @@ namespace gallus
 				if (ImGui::Checkbox(ImGui::IMGUI_FORMAT_ID("", CHECKBOX_ID, string_extensions::StringToUpper(entity->GetName()) + "_HIERARCHY").c_str(), &temp))
 				{
 					entity->SetIsActive(temp);
-					gameplay::GAME.GetScene().SetIsDirty(true);
+					gameplay::GAME->GetScene().SetIsDirty(true);
 				}
 				ImGui::PopStyleVar();
 

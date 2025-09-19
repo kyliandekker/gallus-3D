@@ -6,6 +6,9 @@
 #include <imgui/imgui.h>
 #include <imgui/imgui_helpers.h>
 
+// core includes
+#include "core/Data.h"
+
 // graphics includes
 #include "graphics/imgui/ImGuiWindow.h"
 #include "graphics/imgui/font_icon.h"
@@ -34,9 +37,9 @@ namespace gallus
 				{
 					core::Data data;
 					m_ExplorerFileUIView.GetFileResource().GetFileData(data);
-					gameplay::GAME.GetScene().SetData(data);
-					gameplay::GAME.GetScene().SetScenePath(m_ExplorerFileUIView.GetFileResource().GetPath());
-					gameplay::GAME.GetScene().LoadData();
+					gameplay::GAME->GetScene().SetData(data);
+					gameplay::GAME->GetScene().SetScenePath(m_ExplorerFileUIView.GetFileResource().GetPath());
+					gameplay::GAME->GetScene().LoadData();
 				}
 			}
 		}

@@ -34,8 +34,5 @@ namespace gallus
 #endif // _EDITOR
 			return name;
 		}
-
-		void TransformSystem::Update(float a_fDeltaTime)
-		{}
 	}
 }

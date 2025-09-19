@@ -4,6 +4,25 @@
             "name": "New GameObject",
             "isActive": true,
             "components": {
+                "sprite": {
+                    "texture": {
+                        "name": "tex_goomba_sprites.png",
+                        "spriteIndex": 4,
+                        "name": "tex_goomba_sprites.png",
+                        "spriteIndex": 4
+                    },
+                    "shader": {
+                        "pixel": "vertexShader.hlsl",
+                        "vertex": "pixelShader.hlsl",
+                        "pixel": "vertexShader.hlsl",
+                        "vertex": "pixelShader.hlsl"
+                    },
+                    "mesh": "square",
+                    "texture": {},
+                    "shader": {},
+                    "mesh": "square"
+                },
+                "sprite": {},
                 "transform": {
                     "position": {
                         "x": 1079.3211669921876,
@@ -14,17 +33,6 @@
                         "x": 800.0,
                         "y": 800.0
                     }
-                },
-                "sprite": {
-                    "texture": {
-                        "name": "tex_goomba_sprites.png",
-                        "spriteIndex": 4
-                    },
-                    "shader": {
-                        "pixel": "vertexShader.hlsl",
-                        "vertex": "pixelShader.hlsl"
-                    },
-                    "mesh": "square"
                 }
             }
         },
@@ -32,6 +40,25 @@
             "name": "New GameObject (1)",
             "isActive": true,
             "components": {
+                "sprite": {
+                    "texture": {
+                        "name": "tex_goomba_sprites.png",
+                        "spriteIndex": 0,
+                        "name": "tex_goomba_sprites.png",
+                        "spriteIndex": 0
+                    },
+                    "shader": {
+                        "pixel": "vertexShader.hlsl",
+                        "vertex": "pixelShader.hlsl",
+                        "pixel": "vertexShader.hlsl",
+                        "vertex": "pixelShader.hlsl"
+                    },
+                    "mesh": "square",
+                    "texture": {},
+                    "shader": {},
+                    "mesh": "square"
+                },
+                "sprite": {},
                 "transform": {
                     "position": {
                         "x": 443.87847900390627,
@@ -43,17 +70,7 @@
                         "y": 600.0
                     }
                 },
-                "sprite": {
-                    "texture": {
-                        "name": "tex_goomba_sprites.png",
-                        "spriteIndex": 0
-                    },
-                    "shader": {
-                        "pixel": "vertexShader.hlsl",
-                        "vertex": "pixelShader.hlsl"
-                    },
-                    "mesh": "square"
-                }
+                "player": {}
             }
         }
     ]

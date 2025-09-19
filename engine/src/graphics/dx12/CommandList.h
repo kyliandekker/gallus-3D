@@ -44,14 +44,6 @@ namespace gallus
 				/// <param name="a_BufferData">Pointer to the data that will be put in the resource.</param>
 				/// <param name="a_Flags">Flags that will be put in the resource.</param>
 				void UpdateBufferResource(ID3D12Resource** a_pDestinationResource, ID3D12Resource** a_pIntermediateResource, size_t a_NumElements, size_t a_ElementSize, const void* a_BufferData, D3D12_RESOURCE_FLAGS a_Flags = D3D12_RESOURCE_FLAG_NONE);
-
-				/// <summary>
-				/// Updates the buffer resource.
-				/// </summary>
-				/// <param name="a_pResource">The resource that needs to be transitioned.</param>
-				/// <param name="a_BeforeState">The current resource state.</param>
-				/// <param name="a_AfterState">The new resource state.</param>
-				void TransitionResource(Microsoft::WRL::ComPtr<ID3D12Resource> a_pResource, D3D12_RESOURCE_STATES a_BeforeState, D3D12_RESOURCE_STATES a_AfterState);
 			private:
 				Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> m_pCommandList;
 			};

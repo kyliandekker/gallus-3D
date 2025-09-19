@@ -37,7 +37,6 @@ set(PREDEFINITIONS_GAME_DEBUG ${PREDEFINITIONS_DEBUG_SHARED} ${PREDEFINITIONS_GA
 set(PREDEFINITIONS_GAME_RELEASE ${PREDEFINITIONS_RELEASE_SHARED} ${PREDEFINITIONS_GAME})
 
 include(engine/engine.cmake)
-include(game_shared/game_shared.cmake)
 include(editor/editor.cmake)
 include(game/game.cmake)
 

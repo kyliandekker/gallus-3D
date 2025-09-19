@@ -128,6 +128,10 @@ namespace gallus
 #if LOG_DX12 == 1
 				LOG(LOGSEVERITY_INFO_SUCCESS, LOG_CATEGORY_DX12, "Verified DirectX Math support.");
 #endif // LOG_DX!2
+				for (size_t i = 0; i < g_iBufferCount; i++)
+				{
+					m_BackBuffers[i] = std::make_shared<DX12Resource>("BackBuffer_" + std::to_string(i));
+				}
 
 				// Create the swap chain.
 				if (!CreateSwapChain())
@@ -506,7 +510,7 @@ namespace gallus
 
 					m_pDevice->CreateRenderTargetView(backBuffer.Get(), nullptr, m_RTV.GetCPUHandle(i));
 
-					m_BackBuffers[i] = backBuffer;
+					m_BackBuffers[i]->SetResource(backBuffer);
 				}
 
 				//if (m_pRenderTexture->GetResource())
@@ -651,7 +655,7 @@ namespace gallus
 				Flush();
 				for (int i = 0; i < g_iBufferCount; ++i)
 				{
-					m_BackBuffers[i].Reset();  // This will release the old resource properly
+					m_BackBuffers[i]->GetResource().Reset();  // This will release the old resource properly
 				}
 
 #ifndef IMGUI_DISABLE
@@ -688,7 +692,7 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			const Microsoft::WRL::ComPtr<ID3D12Resource>& DX12System2D::GetCurrentBackBuffer() const
+			const std::shared_ptr<DX12Resource>& DX12System2D::GetCurrentBackBuffer() const
 			{
 				return m_BackBuffers[m_iCurrentBackBufferIndex];
 			}
@@ -736,10 +740,7 @@ namespace gallus
 				if (m_pRenderTexture->CanBeDrawn())
 				{
 					// Transition RenderTexture -> RTV
-					commandList->TransitionResource(
-						m_pRenderTexture->GetResource(),
-						D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
-						D3D12_RESOURCE_STATE_RENDER_TARGET);
+					m_pRenderTexture->Transition(commandList, D3D12_RESOURCE_STATE_RENDER_TARGET);
 
 					// Render onto the render tex rtv (true arg does this).
 					D3D12_CPU_DESCRIPTOR_HANDLE rtRtv = GetCurrentRenderTargetView(true);
@@ -748,16 +749,10 @@ namespace gallus
 
 					Render2D(commandQueue, commandList, rtRtv);
 
-					commandList->TransitionResource(
-						m_pRenderTexture->GetResource(),
-						D3D12_RESOURCE_STATE_RENDER_TARGET,
-						D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+					m_pRenderTexture->Transition(commandList, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 				}
 
-				commandList->TransitionResource(
-					backBuffer,
-					D3D12_RESOURCE_STATE_PRESENT,
-					D3D12_RESOURCE_STATE_RENDER_TARGET);
+				backBuffer->Transition(commandList, D3D12_RESOURCE_STATE_RENDER_TARGET);
 
 				// back buffer rtv.
 				backRtv = GetCurrentRenderTargetView(false);
@@ -862,11 +857,11 @@ namespace gallus
 			void DX12System2D::Present(std::shared_ptr<CommandQueue> a_pCommandQueue, std::shared_ptr<CommandList> a_pCommandList)
 			{
 				const UINT currentBackBufferIndex = GetCurrentBackBufferIndex();
-				const Microsoft::WRL::ComPtr<ID3D12Resource>& backBuffer = GetCurrentBackBuffer();
+				const std::shared_ptr<DX12Resource>& backBuffer = GetCurrentBackBuffer();
 
 				// Present
 				{
-					a_pCommandList->TransitionResource(backBuffer, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+					backBuffer->Transition(a_pCommandList, D3D12_RESOURCE_STATE_PRESENT);
 
 					m_aFenceValues[currentBackBufferIndex] = a_pCommandQueue->ExecuteCommandList(a_pCommandList);
 

@@ -42,7 +42,6 @@ target_compile_definitions(game PRIVATE
 # Include directories
 target_include_directories(game PUBLIC
     ${CMAKE_SOURCE_DIR}/engine/src
-    ${CMAKE_SOURCE_DIR}/game_shared/src
     ${CMAKE_SOURCE_DIR}/game/src
     ${CMAKE_SOURCE_DIR}/external
 )
@@ -53,10 +52,9 @@ set_target_properties(game PROPERTIES
 )
 
 target_link_libraries(game PRIVATE
-    Shcore.lib dxgi.lib d3d12.lib d3dcompiler.lib dxguid.lib Shlwapi.lib engine_noimgui.lib game_shared.lib
+    Shcore.lib dxgi.lib d3d12.lib d3dcompiler.lib dxguid.lib Shlwapi.lib engine_noimgui.lib
 )
 target_link_libraries(game PRIVATE engine_noimgui)
-target_link_libraries(game PRIVATE game_shared)
 target_link_directories(game PRIVATE
     "${CMAKE_SOURCE_DIR}/../$<CONFIG>"
 )

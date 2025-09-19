@@ -32,12 +32,6 @@ namespace gallus
 			/// </summary>
 			/// <returns>A string containing the name of the system.</returns>
 			std::string GetSystemName() const override;
-
-			/// <summary>
-			/// Updates the system.
-			/// </summary>
-			/// <param name="a_fDeltaTime">The time that has passed since the last frame.</param>
-			void Update(float a_fDeltaTime) override;
 		};
 	}
 }

@@ -8,6 +8,7 @@
 
 // graphics includes
 #include "graphics/dx12/DX12System2D.h"
+#include "graphics/dx12/CommandList.h"
 
 namespace gallus
 {
@@ -149,6 +150,21 @@ namespace gallus
 				{
 					LOGF(LOGSEVERITY_ERROR, LOG_CATEGORY_DX12, "Failed checking feature support.");
 					return;
+				}
+			}
+
+			//---------------------------------------------------------------------
+			void DX12Resource::Transition(std::shared_ptr<CommandList> a_pCommandList, D3D12_RESOURCE_STATES a_NewState)
+			{
+				if (m_CurrentState != a_NewState)
+				{
+					CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+						m_pResource.Get(),
+						m_CurrentState, 
+						a_NewState);
+					a_pCommandList->GetCommandList()->ResourceBarrier(1, &barrier);
+
+					m_CurrentState = a_NewState;
 				}
 			}
 		}

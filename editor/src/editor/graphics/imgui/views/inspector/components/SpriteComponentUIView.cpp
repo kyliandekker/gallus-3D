@@ -114,7 +114,7 @@ namespace gallus
 											core::TOOL->GetResourceAtlas().LoadVertexShader(resource.GetPath().filename().generic_string()).get()
 									).get());
 									
-									gameplay::GAME.GetScene().SetIsDirty(true);
+									gameplay::GAME->GetScene().SetIsDirty(true);
 								}
 							},
 							std::vector<gallus::resources::AssetType>{ gallus::resources::AssetType::VertexShader }
@@ -148,7 +148,7 @@ namespace gallus
 									cCommandQueue->ExecuteCommandList(cCommandList);
 									cCommandQueue->Flush();
 
-									gameplay::GAME.GetScene().SetIsDirty(true);
+									gameplay::GAME->GetScene().SetIsDirty(true);
 								}
 							},
 							std::vector<gallus::resources::AssetType>{ gallus::resources::AssetType::Texture }

@@ -36,6 +36,7 @@ namespace gallus
 
 				ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(fontSize / 2, fontSize / 2));
 				ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0);
+				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, m_Window.GetFramePadding());
 				ImGui::AlignTextToFramePadding();
 				ImGui::DisplayHeader(m_Window.GetBoldFont(), "Position: ");
 				ImGui::SameLine();
@@ -45,7 +46,7 @@ namespace gallus
 				if (m_PositionView.Render("TRANSFORM_POSITION_INSPECTOR"))
 				{
 					m_Component.Transform().SetPosition(m_PositionView.GetValue());
-					gameplay::GAME.GetScene().SetIsDirty(true);
+					gameplay::GAME->GetScene().SetIsDirty(true);
 				}
 
 				ImGui::AlignTextToFramePadding();
@@ -66,18 +67,19 @@ namespace gallus
 				if (m_ScaleView.Render("TRANSFORM_SCALE_INSPECTOR"))
 				{
 					m_Component.Transform().SetScale(m_ScaleView.GetValue());
-					gameplay::GAME.GetScene().SetIsDirty(true);
+					gameplay::GAME->GetScene().SetIsDirty(true);
 				}
 
 				ImGui::AlignTextToFramePadding();
 				ImGui::DisplayHeader(m_Window.GetBoldFont(), "Pivot: ");
 				ImGui::SameLine();
 
+				ImGui::PopStyleVar();
 				m_PivotView.SetValue(m_Component.Transform().GetPivot());
 				if (m_PivotView.Render("TRANSFORM_PIVOT_INSPECTOR", 0.01f, -0.5f, 0.5f))
 				{
 					m_Component.Transform().SetPivot(m_PivotView.GetValue());
-					gameplay::GAME.GetScene().SetIsDirty(true);
+					gameplay::GAME->GetScene().SetIsDirty(true);
 				}
 
 				ImGui::PopItemWidth();

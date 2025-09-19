@@ -31,9 +31,6 @@ namespace gallus
 #define LOG_CATEGORY_AUDIO "AUDIO"
 #define LOG_CATEGORY_TEST "TEST"
 
-#define ASSERT_LEVEL gallus::LogSeverity::LOGSEVERITY_ASSERT
-	constexpr bool LOG_TO_FILE = false;
-// NOTE: This one is out of the other namespaces so they can be easily used in other classes.
 	typedef enum LogSeverity
 	{
 		LOGSEVERITY_ASSERT,
@@ -93,8 +90,13 @@ namespace gallus
 
 	namespace logger
 	{
-		/// 0 = full path, 1 = filename, 2 = stem, 3 = parent path + filename
-		#define LOG_SHORT_FILENAMES 3
+		enum LogType
+		{
+			LOGTYPE_FULL_PATH,
+			LOGTYPE_FILENAME,
+			LOGTYPE_STEM,
+			LOGTYPE_WITH_PARENT_FOLDER,
+		};
 
 		//---------------------------------------------------------------------
 		// LoggerMessage
@@ -207,6 +209,16 @@ namespace gallus
 			/// </summary>
 			/// <returns>Reference to the on quit event.</returns>
 			const SimpleEvent<LoggerMessage>& OnMessageLogged() const;
+
+			bool LogToFile() const
+			{
+				return m_bLogToFile;
+			}
+
+			LogSeverity GetAssertLevel() const
+			{
+				return m_AssertLevel;
+			}
 		protected:
 			bool Sleep() const override;
 		private:
@@ -226,6 +238,10 @@ namespace gallus
 			std::queue<LoggerMessage> m_Messages; /// Queue of messages that will be logged.
 			mutable std::mutex m_MessagesMutex; /// The mutex used for synchronization between the threads for stopping or initializing.
 			std::condition_variable m_MessageCondVar; /// Used for lazy thread.
+
+			LogSeverity m_AssertLevel = LogSeverity::LOGSEVERITY_ERROR;
+			bool m_bLogToFile = false;
+			LogType m_LogType = LogType::LOGTYPE_WITH_PARENT_FOLDER;
 		};
 		inline extern Logger LOGGER = {};
 	}
@@ -235,7 +251,7 @@ namespace gallus
 #define LOGF(a_Severity, a_sCategory, a_sMessage, ...)\
 do{\
 	gallus::logger::LOGGER.LogF(a_Severity, a_sCategory, a_sMessage, __FILE__, __LINE__, __VA_ARGS__);\
-	if (a_Severity <= ASSERT_LEVEL)\
+	if (a_Severity <= gallus::logger::LOGGER.GetAssertLevel())\
 		assert(false);\
 } while (0)
 
@@ -243,7 +259,7 @@ do{\
 #define LOG(a_Severity, a_sCategory, a_sMessage)\
 do{\
 	gallus::logger::LOGGER.Log(a_Severity, a_sCategory, a_sMessage, __FILE__, __LINE__);\
-	if (a_Severity <= ASSERT_LEVEL)\
+	if (a_Severity <= gallus::logger::LOGGER.GetAssertLevel())\
 		assert(false);\
 } while (0)
 

@@ -2,14 +2,17 @@
 
 #include <algorithm>
 
+#include "core/Data.h"
+#include "core/ArgProcessor.h"
+
+#include "logger/Logger.h"
+
 // graphics includes
 #include "graphics/dx12/Texture.h"
 #include "graphics/dx12/Shader.h"
 #include "graphics/dx12/DX12ShaderBind.h"
 #include "graphics/dx12/Mesh.h"
 #include "graphics/dx12/CommandList.h"
-
-#include "core/Data.h"
 
 namespace gallus
 {
@@ -80,6 +83,23 @@ namespace gallus
 				}
 			}
 			return -1;
+		}
+
+		//---------------------------------------------------------------------
+		bool ResourceAtlas::Initialize()
+		{
+			std::string resourceFolder = core::ARGS.GetArgument<std::string>(ASSET_PATH_ARG);
+			m_ResourceFolder = resourceFolder;
+
+			LOG(LOGSEVERITY_SUCCESS, LOG_CATEGORY_ECS, "Resource atlas initialized.");
+			return System::Initialize();
+		}
+
+		//---------------------------------------------------------------------
+		bool ResourceAtlas::Destroy()
+		{
+			LOG(LOGSEVERITY_SUCCESS, LOG_CATEGORY_ECS, "Resource atlas destroyed.");
+			return System::Destroy();
 		}
 
 		//---------------------------------------------------------------------

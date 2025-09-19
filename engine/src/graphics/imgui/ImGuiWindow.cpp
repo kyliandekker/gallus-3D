@@ -253,6 +253,7 @@ namespace gallus
 				style.WindowBorderSize = 1;
 				style.WindowRounding = 0;
 				style.WindowPadding = ImVec2(0, 0);
+				style.ItemSpacing = m_vFramePadding;
 				style.ItemInnerSpacing = ImVec2(0, 0);
 				style.TouchExtraPadding = ImVec2(0.00f, 0.00f);
 				style.IndentSpacing = 25;

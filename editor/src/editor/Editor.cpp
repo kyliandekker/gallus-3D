@@ -1,15 +1,17 @@
 #include "Editor.h"
 
+#include <iostream>
+
 #include "logger/Logger.h"
 
-#include <iostream>
+#include "editor/graphics/imgui/ComponentFactory.h"
 
 namespace gallus
 {
 	namespace editor
 	{
 		//---------------------------------------------------------------------
-		// Window
+		// Editor
 		//---------------------------------------------------------------------
 		Editor::Editor() : core::ThreadedSystem::ThreadedSystem(), 
 			m_EditorSettings("editorsettings.settings")
@@ -19,6 +21,9 @@ namespace gallus
 		bool Editor::Initialize(bool a_bWait)
 		{
 			LOG(LOGSEVERITY_INFO, LOG_CATEGORY_EDITOR, "Initializing editor.");
+
+			gallus::editor::RegisterComponents();
+
 			return ThreadedSystem::Initialize(a_bWait);
 		}
 

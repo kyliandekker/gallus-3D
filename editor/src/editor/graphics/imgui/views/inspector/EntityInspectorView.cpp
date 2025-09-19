@@ -3,23 +3,24 @@
 
 #include "EntityInspectorView.h"
 
+#include <typeindex>
+#include <unordered_map>
+#include <imgui/imgui_helpers.h>
+
 // core includes
 #include "core/Tool.h"
 
 // graphics includes
 #include "graphics/imgui/font_icon.h"
 
-// gameplay includes
-#include "gameplay/systems/TransformSystem.h"
-#include "gameplay/systems/SpriteSystem.h"
-
 // editor includes
-#include "editor/graphics/imgui/views/inspector/components/TransformComponentUIView.h"
-#include "editor/graphics/imgui/views/inspector/components/SpriteComponentUIView.h"
 #include "editor/graphics/imgui/views/HierarchyEntityUIView.h"
+#include "editor/graphics/imgui/ComponentFactory.h"
+#include "editor/graphics/imgui/views/inspector/components/ComponentUIView.h"
 
 // game includes
 #include "gameplay/Game.h"
+#include "gameplay/ECSBaseSystem.h"
 
 namespace gallus
 {
@@ -46,17 +47,12 @@ namespace gallus
 					return;
 				}
 
-				gameplay::EntityComponentSystem& ecs = core::TOOL->GetECS();
-				gameplay::TransformSystem& transformSystem = ecs.GetSystem<gameplay::TransformSystem>();
-				gameplay::SpriteSystem& spriteSystem = ecs.GetSystem<gameplay::SpriteSystem>();
 				gameplay::EntityID& entityId = m_pEntity->GetEntityID();
-				if (transformSystem.HasComponent(entityId))
+
+				for (auto& [type, factory] : g_UIFactories)
 				{
-					m_aComponents.push_back(new TransformComponentUIView(m_Window, entityId, transformSystem.GetComponent(entityId), transformSystem));
-				}
-				if (spriteSystem.HasComponent(m_pEntity->GetEntityID()))
-				{
-					m_aComponents.push_back(new SpriteComponentUIView(m_Window, entityId, spriteSystem.GetComponent(entityId), spriteSystem));
+					if (auto* view = factory(m_Window, entityId))
+						m_aComponents.push_back(view);
 				}
 
 				for (const ComponentBaseUIView* component : m_aComponents)
@@ -73,14 +69,14 @@ namespace gallus
 				if (m_pEntity)
 				{
 					m_pEntity->SetName(a_sName);
-					gameplay::GAME.GetScene().SetIsDirty(true);
+					gameplay::GAME->GetScene().SetIsDirty(true);
 				}
 			}
 
 			void EntityInspectorView::OnDelete()
 			{
 				core::TOOL->GetECS().DeleteEntity(m_HierarchyEntityUIView.GetEntityID());
-				gameplay::GAME.GetScene().SetIsDirty(true);
+				gameplay::GAME->GetScene().SetIsDirty(true);
 			}
 
 			std::string EntityInspectorView::GetName() const
@@ -103,18 +99,21 @@ namespace gallus
 					return;
 				}
 
-				ImGui::SetCursorPosY(0);
+				if (!m_aComponents.empty())
+				{
+					ImGui::SetCursorPosY(0);
+				}
+				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
 				for (ComponentBaseUIView* component : m_aComponents)
 				{
 					ImGui::SetCursorPosX(0);
 					float width = ImGui::GetContentRegionAvail().x + m_Window.GetFramePadding().x;
 					ImGui::SetNextItemWidth(width);
 					component->Render();
-					ImGui::SetCursorPosY(ImGui::GetCursorPosY() + m_Window.GetWindowPadding().y);
+					ImGui::SetCursorPosY(ImGui::GetCursorPosY() + m_Window.GetFramePadding().y);
 				}
 
 				float width = ImGui::GetContentRegionAvail().x;
-				// TODO: Add these icons back. font::ICON_COMPONENT (puzzle)
 				if (ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_FOLDER + std::string(" Add Component"), BUTTON_ID, "ADD_COMPONENT_INSPECTOR").c_str(), ImVec2(width, 0)))
 				{
 					ImVec2 buttonPos = ImGui::GetItemRectMin();
@@ -124,6 +123,7 @@ namespace gallus
 
 					ImGui::OpenPopup(ImGui::IMGUI_FORMAT_ID("", POPUP_WINDOW_ID, "ADD_COMPONENT_MENU_INSPECTOR").c_str());
 				}
+				ImGui::PopStyleVar();
 
 				gameplay::EntityID& entityId = m_pEntity->GetEntityID();
 
@@ -132,7 +132,7 @@ namespace gallus
 				ImGui::SetNextWindowSize(ImVec2(width, 0));
 				if (ImGui::BeginPopup(ImGui::IMGUI_FORMAT_ID("", POPUP_WINDOW_ID, "ADD_COMPONENT_MENU_INSPECTOR").c_str()))
 				{
-					for (auto system : core::TOOL->GetECS().GetSystems())
+					for (gameplay::AbstractECSSystem* system : core::TOOL->GetECS().GetSystems())
 					{
 						if (system->HasComponent(entityId))
 						{

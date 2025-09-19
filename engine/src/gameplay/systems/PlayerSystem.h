@@ -3,16 +3,16 @@
 #include "gameplay/ECSBaseSystem.h"
 
 // gameplay includes
-#include "gameplay/systems/components/SpriteComponent.h"
+#include "gameplay/systems/components/PlayerComponent.h"
 
 namespace gallus
 {
 	namespace gameplay
 	{
 		//---------------------------------------------------------------------
-		// SpriteSystem
+		// PlayerSystem
 		//---------------------------------------------------------------------
-		class SpriteSystem : public ECSBaseSystem<SpriteComponent>
+		class PlayerSystem : public ECSBaseSystem<PlayerComponent>
 		{
 		public:
 			/// <summary>
@@ -32,6 +32,8 @@ namespace gallus
 			/// </summary>
 			/// <returns>A string containing the name of the system.</returns>
 			std::string GetSystemName() const override;
+
+			void UpdateComponentsRealtime(float a_fDeltaTime) override;
 		};
 	}
 }

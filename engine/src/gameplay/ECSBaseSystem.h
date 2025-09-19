@@ -52,15 +52,14 @@ namespace gallus
 			virtual void DeleteComponent(const EntityID& a_ID) = 0;
 
 			/// <summary>
-			/// Updates the system.
-			/// </summary>
-			/// <param name="a_fDeltaTime">The time that has passed since the last frame.</param>
-			virtual void Update(float a_fDeltaTime) = 0;
-
-			/// <summary>
 			/// Updates the components in the system.
 			/// </summary>
-			virtual void UpdateComponents(float a_fDeltaTime) = 0;
+			virtual void UpdateComponents() = 0;
+
+			/// <summary>
+			/// Updates the system's components.
+			/// </summary>
+			virtual void UpdateComponentsRealtime(float a_fDeltaTime) = 0;
 
 			/// <summary>
 			/// Checks whether an entity is using the system.
@@ -193,7 +192,7 @@ namespace gallus
 			/// <summary>
 			/// Updates the system's components.
 			/// </summary>
-			virtual void UpdateComponents(float a_fDeltaTime) override
+			void UpdateComponents() override
 			{
 				size_t oldSize = m_mComponents.size();
 				std::erase_if(m_mComponents, [](auto& pair)
@@ -205,6 +204,13 @@ namespace gallus
 				{
 					core::TOOL->GetECS().OnEntityComponentsUpdated().invoke();
 				}
+			}
+
+			/// <summary>
+			/// Updates the system's components.
+			/// </summary>
+			virtual void UpdateComponentsRealtime(float a_fDeltaTime) override
+			{
 			}
 
 			/// <summary>

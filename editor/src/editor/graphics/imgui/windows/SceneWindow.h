@@ -25,18 +25,23 @@ namespace gallus
 			{
 			public:
 				/// <summary>
-				/// Constructs a console window.
+				/// Constructs a scene window.
 				/// </summary>
 				/// <param name="a_Window">The ImGui window for rendering the view.</param>
 				SceneWindow(ImGuiWindow& a_Window);
 
 				/// <summary>
-				/// Cleans up and destroys the console window.
+				/// Cleans up and destroys the scene window.
 				/// </summary>
 				~SceneWindow();
 
 				/// <summary>
-				/// Renders the console window.
+				/// Update loop for the window. This is where all ImGui interaction should be like buttons, etc.
+				/// </summary>
+				void Update() override;
+
+				/// <summary>
+				/// Renders the scene window.
 				/// </summary>
 				void Render() override;
 			private:
@@ -48,6 +53,26 @@ namespace gallus
 				float m_fZoom = 1.0f;
 				ImVec2 m_vPanOffset = ImVec2(0.0f, 0.0f);
 				ImGuizmo::OPERATION m_CurrentOperation = ImGuizmo::TRANSLATE;
+			};
+
+			class FullSceneWindow : public SceneWindow
+			{
+			public:
+				/// <summary>
+				/// Constructs a scene window.
+				/// </summary>
+				/// <param name="a_Window">The ImGui window for rendering the view.</param>
+				FullSceneWindow(ImGuiWindow& a_Window);
+
+				/// <summary>
+				/// Update loop for the window. This is where all ImGui interaction should be like buttons, etc.
+				/// </summary>
+				void Update() override;
+
+				/// <summary>
+				/// Renders the scene window.
+				/// </summary>
+				void Render() override;
 			};
 		}
 	}

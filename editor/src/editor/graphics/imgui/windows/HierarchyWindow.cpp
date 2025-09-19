@@ -47,7 +47,7 @@ namespace gallus
 
 				core::EDITOR_TOOL->GetEditor().GetSelectable().OnChanged() += std::bind(&HierarchyWindow::OnSelectableChanged, this, std::placeholders::_1, std::placeholders::_2);
 				
-				gameplay::GAME.GetScene().IsDirty().OnChanged() += std::bind(&HierarchyWindow::OnSceneDirty, this, std::placeholders::_1, std::placeholders::_2);
+				gameplay::GAME->GetScene().IsDirty().OnChanged() += std::bind(&HierarchyWindow::OnSceneDirty, this, std::placeholders::_1, std::placeholders::_2);
 
 				return BaseWindow::Initialize();
 			}
@@ -127,7 +127,7 @@ namespace gallus
 					m_bNeedsRefresh = false;
 				}
 
-				bool wasEmptyScene = gameplay::GAME.GetScene().GetScenePath().empty();
+				bool wasEmptyScene = gameplay::GAME->GetScene().GetScenePath().empty();
 				if (wasEmptyScene)
 				{
 					ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
@@ -150,7 +150,7 @@ namespace gallus
 				}
 				ImGui::SameLine();
 
-				bool wasDirty = gameplay::GAME.GetScene().IsDirty() && !gameplay::GAME.IsStarted() && !gameplay::GAME.GetScene().GetScenePath().empty();
+				bool wasDirty = gameplay::GAME->GetScene().IsDirty() && !gameplay::GAME->IsStarted() && !gameplay::GAME->GetScene().GetScenePath().empty();
 				if (!wasDirty)
 				{
 					ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
@@ -160,7 +160,7 @@ namespace gallus
 				if (ImGui::IconButton(
 					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_SAVE), BUTTON_ID, "SAVE_HIERARCHY").c_str(), m_Window.GetHeaderSize(), m_Window.GetIconFont(), ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent)))
 				{
-					gameplay::GAME.GetScene().SaveData();
+					gameplay::GAME->GetScene().SaveData();
 				}
 
 				ImVec2 endPos = ImGui::GetCursorPos();
@@ -173,7 +173,7 @@ namespace gallus
 
 				if (ImGui::IsKeyDown(ImGuiMod_Ctrl) && ImGui::IsKeyPressed(ImGuiKey_S) && wasDirty)
 				{
-					gameplay::GAME.GetScene().SaveData();
+					gameplay::GAME->GetScene().SaveData();
 				}
 
 				ImGui::PopStyleVar();
@@ -241,7 +241,7 @@ namespace gallus
 					}
 
 					core::TOOL->GetECS().CreateEntity(core::TOOL->GetECS().GetUniqueName("New GameObject"));
-					gameplay::GAME.GetScene().SetIsDirty(true);
+					gameplay::GAME->GetScene().SetIsDirty(true);
 				}
 
 				if (wasEmptyScene)
@@ -286,7 +286,7 @@ namespace gallus
 
 			void HierarchyWindow::OnSceneDirty(const bool oldVal, const bool newVal)
 			{
-				std::string name = (newVal ? "*" : "") + gameplay::GAME.GetScene().GetScenePath().filename().generic_string();
+				std::string name = (newVal ? "*" : "") + gameplay::GAME->GetScene().GetScenePath().filename().generic_string();
 				std::string title = " - (" + name + ")";
 
 				core::EDITOR_TOOL->GetWindow().AddTitle(title);

@@ -40,6 +40,16 @@ namespace gallus
             {}
 
             //---------------------------------------------------------------------
+            void SceneWindow::Update()
+            {
+                if (gameplay::GAME->IsStarted() && !gameplay::GAME->IsPaused())
+                {
+                    return;
+                }
+                BaseWindow::Update();
+            }
+
+            //---------------------------------------------------------------------
             void SceneWindow::Render()
             {
                 if (!core::EDITOR_TOOL)
@@ -47,29 +57,32 @@ namespace gallus
                     return;
                 }
 
-                if (gameplay::GAME.GetScene().GetScenePath().empty())
+                ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+                ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0);
+
+                ImVec2 toolbarSize = ImVec2(ImGui::GetContentRegionAvail().x, m_Window.GetHeaderSize().y);
+                ImGui::BeginToolbar(toolbarSize);
+
+                bool isStarted = gameplay::GAME->IsStarted();
+                if (ImGui::CheckboxButton(
+                    ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_PLAY), BUTTON_ID, "PLAY_SCENE").c_str(), &isStarted, m_Window.GetHeaderSize()))
                 {
-                    std::shared_ptr<gallus::graphics::dx12::Texture> logo = core::EDITOR_TOOL->GetResourceAtlas().GetLogo();
-
-                    ImVec2 windowSize = ImGui::GetContentRegionAvail();
-                    ImVec2 textureSize = ImVec2(
-                        static_cast<float>(logo->GetSize().x),
-                        static_cast<float>(logo->GetSize().y)
-                    );
-
-                    // Calculate centered position
-                    ImVec2 cursorPos = ImGui::GetCursorPos();
-                    ImVec2 centeredPos = ImVec2(
-                        cursorPos.x + (windowSize.x - textureSize.x) * 0.5f,
-                        cursorPos.y + (windowSize.y - textureSize.y) * 0.5f
-                    );
-
-                    // Move cursor and draw image
-                    ImGui::SetCursorPos(centeredPos);
-                    ImGui::Image((ImTextureID) logo->GetGPUHandle().ptr, textureSize);
-
-                    return;
+                    core::EDITOR_TOOL->GetEditor().SetSelectable(nullptr, nullptr);
+                    gameplay::GAME->GetScene().LoadData();
+                    gameplay::GAME->SetIsStarted(isStarted);
                 }
+                ImGui::SameLine();
+                bool isPaused = gameplay::GAME->IsPaused();
+                if (ImGui::CheckboxButton(
+                    ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_PAUSE), BUTTON_ID, "PAUSE_SCENE").c_str(), &isPaused, m_Window.GetHeaderSize()))
+                {
+                    gameplay::GAME->SetIsPaused(isPaused);
+                }
+
+                ImGui::EndToolbar(ImVec2(0, 0));
+
+                ImGui::PopStyleVar();
+                ImGui::PopStyleVar();
 
                 DrawViewportPanel();
 
@@ -94,7 +107,7 @@ namespace gallus
                 m_CurrentOperation = (ImGuizmo::OPERATION) core::EDITOR_TOOL->GetEditor().GetEditorSettings().GetLastSceneOperation();
 
                 // Begin scrollable child region
-                ImGui::BeginChild("SceneScroll", windowSize, true,
+                ImGui::BeginChild("SceneScroll", windowSize, 0,
                     ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 
                 ImVec2 childPos = ImGui::GetCursorScreenPos(); // top-left corner of child
@@ -158,6 +171,7 @@ namespace gallus
                 }
             }
 
+            //---------------------------------------------------------------------
             void SceneWindow::DrawGizmos(const ImVec2& a_vSceneStartPos, const ImVec2& a_vSize)
             {
                 ImGuizmo::BeginFrame();
@@ -171,6 +185,7 @@ namespace gallus
                 // DrawBoundsGizmo(a_vSceneStartPos, m_fZoom, m_vPanOffset);
             }
 
+            //---------------------------------------------------------------------
             void SceneWindow::DrawBoundsGizmo(const ImVec2& a_vScenePos)
             {
                 if (m_CurrentOperation != ImGuizmo::OPERATION::SPRITE_BOUNDS)
@@ -286,6 +301,7 @@ namespace gallus
                 transformComponent.Transform().SetScale(spritePos);
             }
 
+            //---------------------------------------------------------------------
             void SceneWindow::DrawViewportPanel()
             {
                 ImGuiWindowFlags toolbarFlags =
@@ -411,6 +427,7 @@ namespace gallus
                 ImGui::PopStyleColor();
             }
 
+            //---------------------------------------------------------------------
             void SceneWindow::DrawTransformGizmo()
             {
                 std::lock_guard<std::recursive_mutex> lock(core::TOOL->GetECS().m_EntityMutex);
@@ -480,8 +497,109 @@ namespace gallus
 
                     transformComponent.Transform().SetWorldMatrix(result);
 
-					gameplay::GAME.GetScene().SetIsDirty(true);
+					gameplay::GAME->GetScene().SetIsDirty(true);
                 }
+            }
+
+            //---------------------------------------------------------------------
+            FullSceneWindow::FullSceneWindow(ImGuiWindow& a_Window) : SceneWindow(a_Window)
+            {
+                m_sWindowID = "FullScene";
+                m_sName = "FullScene";
+                m_Flags |= ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings;
+            }
+
+            //---------------------------------------------------------------------
+            void FullSceneWindow::Update()
+            {
+                m_bFullScreen = true;
+                if (!gameplay::GAME->IsStarted() || gameplay::GAME->IsPaused())
+                {
+                    return;
+                }
+
+                BaseWindow::Update();
+            }
+
+            //---------------------------------------------------------------------
+            void FullSceneWindow::Render()
+            {
+                if (!core::EDITOR_TOOL)
+                {
+                    return;
+                }
+
+                if (ImGui::IsKeyDown(ImGuiKey_Escape))
+                {
+                    core::EDITOR_TOOL->GetEditor().SetSelectable(nullptr, nullptr);
+                    gameplay::GAME->GetScene().LoadData();
+                    gameplay::GAME->SetIsStarted(false);
+                }
+
+                ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+                ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0);
+
+                ImVec2 startToolbarPos = ImGui::GetCursorPos();
+                ImVec2 toolbarSize = ImVec2(ImGui::GetContentRegionAvail().x, m_Window.GetHeaderSize().y);
+                ImGui::BeginToolbar(toolbarSize);
+
+                bool isStarted = gameplay::GAME->IsStarted();
+                if (ImGui::CheckboxButton(
+                    ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_PLAY), BUTTON_ID, "PLAY_FULL_SCENE").c_str(), &isStarted, m_Window.GetHeaderSize()))
+                {
+                    core::EDITOR_TOOL->GetEditor().SetSelectable(nullptr, nullptr);
+                    gameplay::GAME->GetScene().LoadData();
+                    gameplay::GAME->SetIsStarted(isStarted);
+                }
+                ImGui::SameLine();
+                bool isPaused = gameplay::GAME->IsPaused();
+                if (ImGui::CheckboxButton(
+                    ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_PAUSE), BUTTON_ID, "PAUSE_FULL_SCENE").c_str(), &isPaused, m_Window.GetHeaderSize()))
+                {
+                    gameplay::GAME->SetIsPaused(isPaused);
+                }
+
+                ImGui::EndToolbar(ImVec2(0, 0));
+                ImGui::SetCursorPos(ImVec2(startToolbarPos.x, startToolbarPos.y + toolbarSize.y + m_Window.GetFramePadding().y));
+
+                ImGui::PopStyleVar();
+                ImGui::PopStyleVar();
+
+                std::shared_ptr<gallus::graphics::dx12::Texture> renderTexture = core::EDITOR_TOOL->GetDX12().GetRenderTexture();
+                if (!renderTexture || !renderTexture->IsValid())
+                {
+                    return;
+                }
+
+                // Available region (minus padding)
+                ImVec2 avail = ImGui::GetContentRegionAvail() - ImVec2(0, m_Window.GetFramePadding().y);
+                ImVec2 padding = ImVec2();
+                avail.x -= padding.x * 2.0f;
+                avail.y -= padding.y * 2.0f;
+
+                // Fit inside available space (keep aspect ratio)
+                float scale = std::min(avail.x / renderTexture->GetSize().x, avail.y / renderTexture->GetSize().y);
+                float drawW = renderTexture->GetSize().x * scale;
+                float drawH = renderTexture->GetSize().y * scale;
+
+                // Center horizontally
+                float cursorX = ImGui::GetCursorPosX() + (avail.x - drawW) * 0.5f;
+                ImGui::SetCursorPosX(cursorX);
+
+                // Center horizontally
+                ImGui::SetCursorPosX(cursorX);
+
+                // Draw the texture
+                ImVec2 image_pos = ImGui::GetCursorScreenPos();
+                ImGui::Image(
+                    (ImTextureID) renderTexture->GetGPUHandle().ptr,
+                    ImVec2(drawW, drawH)
+                );
+
+                // Draw border
+                ImDrawList* draw_list = ImGui::GetWindowDrawList();
+                draw_list->AddRect(image_pos, ImVec2(image_pos.x + drawW, image_pos.y + drawH),
+                    ImGui::GetColorU32(ImGui::GetStyle().Colors[ImGuiCol_Border]));
             }
         }
     }

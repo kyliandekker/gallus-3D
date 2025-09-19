@@ -18,8 +18,6 @@ namespace gallus
 		class Game : public gallus::core::System
 		{
 		public:
-			Game() = default;
-
 			/// <summary>
 			/// Initializes the engine and all necessary subsystems with the specified parameters.
 			/// </summary>
@@ -56,31 +54,27 @@ namespace gallus
 				m_bStarted = a_bStarted;
 			}
 
-			/// <summary>
-			/// Testing purposes.
-			/// </summary>
-			bool StartUp();
+			bool IsPaused() const
+			{
+				return m_bPaused;
+			}
+
+			void SetIsPaused(bool a_bPaused)
+			{
+				m_bPaused = a_bPaused;
+			}
 		private:
 			/// <summary>
 			/// Callback for closing the window.
 			/// </summary>
 			void Shutdown();
 
-			/// <summary>
-			/// Loads all textures.
-			/// </summary>
-			bool LoadTextures();
-
-			/// <summary>
-			/// Loads all sounds.
-			/// </summary>
-			bool LoadSounds();
-
 			// There can only be one scene and setting a new one cleans up the old one automatically.
 			gallus::gameplay::Scene m_Scene;
 
 			bool m_bStarted = false;
+			bool m_bPaused = false;
 		};
-		extern inline Game GAME = {};
+		inline extern Game* GAME = nullptr;
 	}
 }

@@ -35,6 +35,11 @@ namespace gallus
 		//---------------------------------------------------------------------
 		bool Scene::LoadData()
 		{
+			if (m_Data.empty())
+			{
+				return false;
+			}
+
 #ifdef _EDITOR
 			m_fIsDirty = false;
 #endif // _EDITOR

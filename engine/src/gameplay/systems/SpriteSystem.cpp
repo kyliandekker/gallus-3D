@@ -34,8 +34,5 @@ namespace gallus
 #endif // _EDITOR
 			return name;
 		}
-
-		void SpriteSystem::Update(float a_fDeltaTime)
-		{}
 	}
 }

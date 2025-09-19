@@ -202,8 +202,6 @@ namespace gallus
                     uv1 = { (sprite.x + sprite.width) / texWidth, (sprite.y + sprite.height) / texHeight }; // bottom-right
                 }
 
-                ImGui::SetCursorPos(texturePos);
-                // Available region (minus padding)
                 ImVec2 avail = ImGui::GetContentRegionAvail();
                 ImVec2 padding = ImVec2();
                 avail.x -= padding.x * 2.0f;

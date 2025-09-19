@@ -42,7 +42,7 @@ namespace gallus
 			/// <summary>
 			/// Updates the system.
 			/// </summary>
-			void Update(float a_fDeltaTime);
+			void Update(float a_fDeltaTime, bool a_bUpdateRealtime = false);
 
 			/// <summary>
 			/// Creates an entity.
@@ -96,6 +96,14 @@ namespace gallus
 			template <class T>
 			T& CreateSystem()
 			{
+				for (AbstractECSSystem* sys : m_aSystems)
+				{
+					T* result = dynamic_cast<T*>(sys);
+					if (result)
+					{
+						return *result;
+					}
+				}
 				T* system = new T();
 				m_aSystems.push_back(system);
 				return *system;

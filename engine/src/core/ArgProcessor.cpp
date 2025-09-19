@@ -1,19 +1,18 @@
 #include "ArgProcessor.h"
 
+#include "logger/Logger.h"
+
 namespace gallus
 {
 	namespace core
 	{
-		BaseArg::BaseArg(const std::string& a_sName) : m_sName(a_sName)
-		{}
-
         bool hasCommandArg(const std::string& args, const std::string& argName)
         {
             std::string search = argName + "=";
             return args.find(search) != std::string::npos;
         }
 
-        std::string getCommandArg(const std::string& args, const std::string& argName, const std::string& defaultVal)
+        std::string getCommandArgStr(const std::string& args, const std::string& argName, const std::string& defaultVal)
         {
             if (!hasCommandArg(args, argName))
             {
@@ -57,15 +56,21 @@ namespace gallus
             }
         }
 
-		std::vector<BaseArg*> ArgProcessor::GetArguments(const std::string& a_sArgs)
+        int getCommandArgInt(const std::string& args, const std::string& argName, const int& defaultVal)
+        {
+            return std::stoi(getCommandArgStr(args, argName, std::to_string(defaultVal)));
+        }
+
+		void ArgProcessor::ProcessArguments(const std::string& a_sArgs)
 		{
-            std::vector<BaseArg*> args;
-            if (hasCommandArg(a_sArgs, ASSET_PATH_ARG))
+            for (auto& arg : m_aArgs)
             {
-                std::string assetPath = getCommandArg(a_sArgs, ASSET_PATH_ARG, "./data/assets/");
-                args.push_back(new Arg<std::string>(ASSET_PATH_ARG, assetPath));
+                if (hasCommandArg(a_sArgs, arg->GetName()))
+                {
+                    std::string value = getCommandArgStr(a_sArgs, arg->GetName(), arg->GetValueAsString());
+                    arg->SetValueFromString(value);
+                }
             }
-            return args;
 		}
 	}
 }
