@@ -54,7 +54,7 @@ namespace gallus
 				ImGui::SameLine();
 
 				float val = m_Component.Transform().GetRotation();
-				if (ImGui::DragFloat(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "TRANSFORM_ROT_INSPECTOR").c_str(), &val, 1.0f))
+				if (ImGui::DragFloat(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "TRANSFORM_ROT_INSPECTOR").c_str(), &val, 1.0f, -999999999, 99999999999))
 				{
 					m_Component.Transform().SetRotation(val);
 				}

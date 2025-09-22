@@ -62,7 +62,7 @@ namespace gallus
 				/// Renders the 2D vector as draggable float inputs in ImGui (X and Y components).
 				/// </summary>
 				/// <param name="a_sLabel">The label displayed next to the input fields.</param>
-				virtual uint8_t Render(const char* a_sLabel, float a_fSpeed = 1.0f, float a_fMin = -900, float a_fMax = 900)
+				virtual uint8_t Render(const char* a_sLabel, float a_fSpeed = 1.0f, float a_fMin = -999999999999999, float a_fMax = 9999999999999999)
 				{
 					ImGui::AlignTextToFramePadding();
 					ImGui::Text("X");

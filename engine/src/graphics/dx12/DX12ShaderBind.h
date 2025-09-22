@@ -29,6 +29,9 @@ namespace gallus
 				/// </summary>
 				DX12ShaderBind(const PixelShader* a_PixelShader, const VertexShader* a_VertexShader);
 
+				/// <summary>
+				/// Creates the pipe line state.
+				/// </summary>
 				bool CreatePipelineState();
 
 				/// <summary>
@@ -46,19 +49,43 @@ namespace gallus
 					return m_pPipelineState.Get();
 				};
 
+				/// <summary>
+				/// Returns the pipe line state.
+				/// </summary>
+				/// <returns>Pointer to the pipe line state (can be nullptr).</returns>
 				ID3D12PipelineState* GetPipelineState()
 				{
 					return m_pPipelineState.Get();
 				}
 
+				/// <summary>
+				/// Checks the resource has a given pixel shader.
+				/// </summary>
+				/// <param name="a_PixelShader">The pixel shader to check.</param>
+				/// <returns>True if the resource has a pixel shader, false otherwise.</returns>
 				bool HasPixelShader(const PixelShader* a_PixelShader);
+
+				/// <summary>
+				/// Checks the resource has a given vertex shader.
+				/// </summary>
+				/// <param name="a_PixelShader">The vertex shader to check.</param>
+				/// <returns>True if the resource has a vertex shader, false otherwise.</returns>
 				bool HasVertexShader(const VertexShader* a_VertexShader);
 
+				/// <summary>
+				/// Returns the pixel shader used in the shader bind.
+				/// </summary>
+				/// <returns>Pointer to the pixel shader (can be nullptr).</returns>
 				const PixelShader* GetPixelShader();
+
+				/// <summary>
+				/// Returns the vertex shader used in the shader bind.
+				/// </summary>
+				/// <returns>Pointer to the vertex shader (can be nullptr).</returns>
 				const VertexShader* GetVertexShader();
 			private:
-				const PixelShader* m_pPixelShader;
-				const VertexShader* m_pVertexShader;
+				const PixelShader* m_pPixelShader = nullptr;
+				const VertexShader* m_pVertexShader = nullptr;
 
 				Microsoft::WRL::ComPtr<ID3D12PipelineState> m_pPipelineState = nullptr;
 			};

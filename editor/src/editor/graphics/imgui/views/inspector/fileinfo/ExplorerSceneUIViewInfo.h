@@ -43,5 +43,11 @@ namespace gallus
 	}
 }
 
+#include "resources/AssetType.h"
+
+REGISTER_EXPLORER_UI(std::vector<gallus::resources::AssetType>{
+	gallus::resources::AssetType::Scene
+}, gallus::graphics::imgui::ExplorerSceneUIViewInfo);
+
 #endif // _EDITOR
 #endif // IMGUI_DISABLE

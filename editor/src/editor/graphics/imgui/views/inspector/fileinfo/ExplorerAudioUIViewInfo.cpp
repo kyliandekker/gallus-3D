@@ -33,6 +33,9 @@ namespace gallus
     {
         namespace imgui
         {
+            //---------------------------------------------------------------------
+            // ExplorerAudioUIViewInfo
+            //---------------------------------------------------------------------
             ExplorerAudioUIViewInfo::ExplorerAudioUIViewInfo(ImGuiWindow& a_Window, ExplorerFileUIView& a_ExplorerFileUIView) : ExplorerFileUIViewInfo(a_Window, a_ExplorerFileUIView),
                 m_AssetTypeDropdown(a_Window)
             {
@@ -55,10 +58,11 @@ namespace gallus
                 }
             }
 
+            //---------------------------------------------------------------------
             ExplorerAudioUIViewInfo::~ExplorerAudioUIViewInfo()
-            {
-            }
+            { }
 
+            //---------------------------------------------------------------------
             void ExplorerAudioUIViewInfo::RenderSpecific()
             {
                 ImGui::DisplayHeader(m_Window.GetBoldFont(), "Type: ");
@@ -82,19 +86,19 @@ namespace gallus
 
                     ImGui::DisplayHeader(m_Window.GetBoldFont(), "Bits per Sample: ");
                     ImGui::SameLine();
-                    ImGui::Text(std::to_string(fmt_chunk.bitsPerSample).c_str());
+                    ImGui::Text(std::to_string(fmt_chunk.m_iBitsPerSample).c_str());
 
                     ImGui::DisplayHeader(m_Window.GetBoldFont(), "Channels: ");
                     ImGui::SameLine();
-                    ImGui::Text(std::to_string(fmt_chunk.numChannels).c_str());
+                    ImGui::Text(std::to_string(fmt_chunk.m_iNumChannels).c_str());
 
                     ImGui::DisplayHeader(m_Window.GetBoldFont(), "Sample Rate: ");
                     ImGui::SameLine();
-                    ImGui::Text(std::to_string(fmt_chunk.sampleRate).c_str());
+                    ImGui::Text(std::to_string(fmt_chunk.m_iSampleRate).c_str());
 
                     ImGui::DisplayHeader(m_Window.GetBoldFont(), "Byte Rate: ");
                     ImGui::SameLine();
-                    ImGui::Text(std::to_string(fmt_chunk.byteRate).c_str());
+                    ImGui::Text(std::to_string(fmt_chunk.m_iByteRate).c_str());
                 }
 
                 audio::DATA_Chunk data_chunk;
@@ -114,11 +118,12 @@ namespace gallus
                     ImGui::DisplayHeader(m_Window.GetBoldFont(), "Song Length: ");
                     ImGui::SameLine();
                     ImGui::Text(
-                        audio::FormatDuration(audio::PosToSeconds(data_chunk.ChunkSize(), fmt_chunk.byteRate), true).c_str()
+                        audio::FormatDuration(audio::PosToSeconds(data_chunk.ChunkSize(), fmt_chunk.m_iByteRate), true).c_str()
                     );
                 }
             }
 
+            //---------------------------------------------------------------------
             void ExplorerAudioUIViewInfo::RenderPreview()
             {
                 if (m_LeftSamples.empty() || m_RightSamples.empty())
@@ -147,8 +152,8 @@ namespace gallus
                     ImPlot::SetupAxis(ImAxis_X1, "", ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_NoTickMarks | ImPlotAxisFlags_NoTickLabels | ImPlotAxisFlags_NoGridLines);
                     ImPlot::SetupAxis(ImAxis_Y1, "", ImPlotAxisFlags_LockMin | ImPlotAxisFlags_LockMax | ImPlotAxisFlags_NoTickMarks | ImPlotAxisFlags_NoTickLabels);
                     ImPlot::SetupAxisLimits(ImAxis_Y1, -1.f, 1.f, ImPlotCond_Always);
-                    ImPlot::SetupAxisLimits(ImAxis_X1, 0, static_cast<double>(m_NumSamples));
-                    ImPlot::PlotLine("Waveform", m_LeftSamples.dataAs<double>(), static_cast<int>(m_NumSamples));
+                    ImPlot::SetupAxisLimits(ImAxis_X1, 0, static_cast<double>(m_iNumSamples));
+                    ImPlot::PlotLine("Waveform", m_LeftSamples.dataAs<double>(), static_cast<int>(m_iNumSamples));
 
                     ImPlot::EndPlot();
                 }
@@ -157,14 +162,15 @@ namespace gallus
                     ImPlot::SetupAxis(ImAxis_X1, "", ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_NoTickMarks | ImPlotAxisFlags_NoTickLabels | ImPlotAxisFlags_NoGridLines);
                     ImPlot::SetupAxis(ImAxis_Y1, "", ImPlotAxisFlags_LockMin | ImPlotAxisFlags_LockMax | ImPlotAxisFlags_NoTickMarks | ImPlotAxisFlags_NoTickLabels);
                     ImPlot::SetupAxisLimits(ImAxis_Y1, -1.f, 1.f, ImPlotCond_Always);
-                    ImPlot::SetupAxisLimits(ImAxis_X1, 0, static_cast<double>(m_NumSamples));
-                    ImPlot::PlotLine("Waveform", m_RightSamples.dataAs<double>(), static_cast<int>(m_NumSamples));
+                    ImPlot::SetupAxisLimits(ImAxis_X1, 0, static_cast<double>(m_iNumSamples));
+                    ImPlot::PlotLine("Waveform", m_RightSamples.dataAs<double>(), static_cast<int>(m_iNumSamples));
 
                     ImPlot::EndPlot();
                 }
                 ImPlot::PopStyleVar(10);
             }
 
+            //---------------------------------------------------------------------
             constexpr int MAX_SAMPLES = 70560;
             bool ExplorerAudioUIViewInfo::LoadAudioData()
             {
@@ -200,23 +206,23 @@ namespace gallus
                     return false;
                 }
 
-                if (fmt_chunk.bitsPerSample != audio::WAVE_BITS_PER_SAMPLE_8 && fmt_chunk.bitsPerSample != audio::WAVE_BITS_PER_SAMPLE_16 && fmt_chunk.bitsPerSample != audio::WAVE_BITS_PER_SAMPLE_24 && fmt_chunk.bitsPerSample != audio::WAVE_BITS_PER_SAMPLE_32 && fmt_chunk.bitsPerSample != audio::WAVE_BITS_PER_SAMPLE_64)
+                if (fmt_chunk.m_iBitsPerSample != audio::WAVE_BITS_PER_SAMPLE_8 && fmt_chunk.m_iBitsPerSample != audio::WAVE_BITS_PER_SAMPLE_16 && fmt_chunk.m_iBitsPerSample != audio::WAVE_BITS_PER_SAMPLE_24 && fmt_chunk.m_iBitsPerSample != audio::WAVE_BITS_PER_SAMPLE_32 && fmt_chunk.m_iBitsPerSample != audio::WAVE_BITS_PER_SAMPLE_64)
                 {
                     return false;
                 }
-                if (fmt_chunk.numChannels * fmt_chunk.bitsPerSample / 8 != fmt_chunk.blockAlign)
+                if (fmt_chunk.m_iNumChannels * fmt_chunk.m_iBitsPerSample / 8 != fmt_chunk.m_iBlockAlign)
                 {
                     return false;
                 }
-                if (fmt_chunk.sampleRate * fmt_chunk.numChannels * fmt_chunk.bitsPerSample / 8 != fmt_chunk.byteRate)
+                if (fmt_chunk.m_iSampleRate * fmt_chunk.m_iNumChannels * fmt_chunk.m_iBitsPerSample / 8 != fmt_chunk.m_iByteRate)
                 {
                     return false;
                 }
-                if (fmt_chunk.numChannels > audio::WAVE_CHANNELS_STEREO)
+                if (fmt_chunk.m_iNumChannels > audio::WAVE_CHANNELS_STEREO)
                 {
                     return false;
                 }
-                if (fmt_chunk.numChannels < audio::WAVE_CHANNELS_MONO)
+                if (fmt_chunk.m_iNumChannels < audio::WAVE_CHANNELS_MONO)
                 {
                     return false;
                 }
@@ -230,14 +236,16 @@ namespace gallus
 
                 uint32_t data_chunk_size = 0;
                 m_SongData.GetChunkSize(data_chunk_size, audio::DATA_CHUNK_ID);
-                m_RNumSamples = data_chunk_size / fmt_chunk.blockAlign;
-                m_NumSamples = m_RNumSamples;
-                if (m_NumSamples > MAX_SAMPLES)
+                m_iRNumSamples = data_chunk_size / fmt_chunk.m_iBlockAlign;
+                m_iNumSamples = m_iRNumSamples;
+                if (m_iNumSamples > MAX_SAMPLES)
                 {
-                    m_NumSamples = MAX_SAMPLES;
+                    m_iNumSamples = MAX_SAMPLES;
                 }
-                audio::ToSample(m_LeftSamples, data_chunk.data, data_chunk_size, fmt_chunk.bitsPerSample, fmt_chunk.blockAlign, fmt_chunk.audioFormat, m_NumSamples, true);
-                audio::ToSample(m_RightSamples, data_chunk.data, data_chunk_size, fmt_chunk.bitsPerSample, fmt_chunk.blockAlign, fmt_chunk.audioFormat, m_NumSamples, false);
+                audio::ToSample(m_LeftSamples, data_chunk.m_pData, data_chunk_size, fmt_chunk.m_iBitsPerSample, fmt_chunk.m_iBlockAlign, fmt_chunk.m_iAudioFormat, m_iNumSamples, true);
+                audio::ToSample(m_RightSamples, data_chunk.m_pData, data_chunk_size, fmt_chunk.m_iBitsPerSample, fmt_chunk.m_iBlockAlign, fmt_chunk.m_iAudioFormat, m_iNumSamples, false);
+
+                return true;
             }
         }
     }

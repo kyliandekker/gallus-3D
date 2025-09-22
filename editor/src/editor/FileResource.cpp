@@ -51,8 +51,8 @@ namespace gallus
 		const std::unordered_map<std::string, std::vector<resources::AssetType>> FILE_ATLAS =
 		{
 			{ ".scene", { resources::AssetType::Scene } },
-			{ ".png", { resources::AssetType::Texture } },
-			{ ".bmp", { resources::AssetType::Texture } },
+			{ ".png", { resources::AssetType::Sprite } },
+			{ ".bmp", { resources::AssetType::Sprite } },
 			{ ".wav", { resources::AssetType::Sound, resources::AssetType::Song, resources::AssetType::VO } },
 			{ ".anim", { resources::AssetType::Animation } },
 			{ ".hlsl", { resources::AssetType::PixelShader, resources::AssetType::VertexShader } },
@@ -128,7 +128,7 @@ namespace gallus
 
 					switch (assetType)
 					{
-						case resources::AssetType::Texture:
+						case resources::AssetType::Sprite:
 						{
 							delete m_MetaData;
 							m_MetaData = new resources::TextureMetaData();

@@ -15,6 +15,7 @@ namespace gallus
 			//---------------------------------------------------------------------
 			void Camera::Init(float a_fWidth, float a_fHeight)
 			{
+				m_vSize = { static_cast<int>(a_fWidth), static_cast<int>(a_fHeight) };
 				SetProjection(a_fWidth, a_fHeight, -1.0f, 1.0f);
 			}
 

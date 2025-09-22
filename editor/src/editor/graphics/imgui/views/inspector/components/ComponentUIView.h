@@ -23,6 +23,9 @@ namespace gallus
 		{
 			class ImGuiWindow;
 
+			//---------------------------------------------------------------------
+			// ComponentBaseUIView
+			//---------------------------------------------------------------------
 			/// <summary>
 			/// Base class for rendering components in the ImGui editor UI. 
 			/// Provides common functionality for rendering and interacting with 
@@ -131,6 +134,47 @@ namespace gallus
 		}
 	}
 }
+
+#pragma region REGISTER_COMPONENT_UI_CODE
+
+#include <functional>
+#include <typeindex>
+#include <unordered_map>
+
+using ComponentUIFactory = std::function<
+	gallus::graphics::imgui::ComponentBaseUIView* (
+		gallus::graphics::imgui::ImGuiWindow&,
+		gallus::gameplay::EntityID&
+		)>;
+
+inline auto& GetComponentUIFactoryRegistry()
+{
+	static std::unordered_map<std::type_index, ComponentUIFactory> registry;
+	return registry;
+}
+
+struct ComponentUIRegistrar
+{
+	ComponentUIRegistrar(std::type_index type, ComponentUIFactory factory)
+	{
+		GetComponentUIFactoryRegistry()[type] = std::move(factory);
+	}
+};
+
+#define REGISTER_COMPONENT_UI(ComponentType, UIViewType, SystemType) \
+    static ComponentUIRegistrar _reg_##__COUNTER__( \
+        typeid(ComponentType), \
+        [](gallus::graphics::imgui::ImGuiWindow& window, gallus::gameplay::EntityID& entityId) \
+            -> gallus::graphics::imgui::ComponentBaseUIView* { \
+            auto& sys = gallus::core::TOOL->GetECS().GetSystem<SystemType>(); \
+            if (sys.HasComponent(entityId)) { \
+                auto& comp = sys.GetComponent(entityId); \
+                return new UIViewType(window, entityId, comp, sys); \
+            } \
+            return nullptr; \
+        });
+
+#pragma endregion REGISTER_COMPONENT_UI_CODE
 
 #endif // _EDITOR
 #endif // IMGUI_DISABLE

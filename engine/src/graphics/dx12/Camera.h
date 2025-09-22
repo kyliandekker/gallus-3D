@@ -70,7 +70,13 @@ namespace gallus
 				/// </summary>
 				/// <returns>The projection matrix used for rendering.</returns>
 				const DirectX::XMMATRIX& GetProjectionMatrix() const;
+
+				const DirectX::XMINT2& GetSize() const
+				{
+					return m_vSize;
+				}
 			private:
+				DirectX::XMINT2 m_vSize;
 				DX12Transform m_Transform;
 				DirectX::XMMATRIX m_ProjectionMatrix;
 			};

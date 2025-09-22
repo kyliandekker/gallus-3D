@@ -99,6 +99,11 @@ namespace gallus
 				/// </summary>
 				void CheckFeatureSupport();
 
+				/// <summary>
+				/// Transitions the resource into a new state.
+				/// </summary>
+				/// <param name="a_pCommandList">The command list.</param>
+				/// <param name="a_NewState">The new state.</param>
 				void Transition(std::shared_ptr<CommandList> a_pCommandList, D3D12_RESOURCE_STATES a_NewState);
 			protected:
 				D3D12_FEATURE_DATA_FORMAT_SUPPORT m_FormatSupport{};

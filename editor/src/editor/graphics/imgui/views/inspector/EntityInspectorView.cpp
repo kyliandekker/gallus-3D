@@ -15,7 +15,6 @@
 
 // editor includes
 #include "editor/graphics/imgui/views/HierarchyEntityUIView.h"
-#include "editor/graphics/imgui/ComponentFactory.h"
 #include "editor/graphics/imgui/views/inspector/components/ComponentUIView.h"
 
 // game includes
@@ -28,6 +27,9 @@ namespace gallus
 	{
 		namespace imgui
 		{
+			//---------------------------------------------------------------------
+			// EntityInspectorView
+			//---------------------------------------------------------------------
 			EntityInspectorView::~EntityInspectorView()
 			{
 				for (ComponentBaseUIView* view : m_aComponents)
@@ -36,6 +38,7 @@ namespace gallus
 				}
 			}
 
+			//---------------------------------------------------------------------
 			EntityInspectorView::EntityInspectorView(ImGuiWindow& a_Window, HierarchyEntityUIView& a_HierarchyEntityUIView) : InspectorView(a_Window), m_HierarchyEntityUIView(a_HierarchyEntityUIView)
 			{
 				m_bShowRename = true;
@@ -49,10 +52,12 @@ namespace gallus
 
 				gameplay::EntityID& entityId = m_pEntity->GetEntityID();
 
-				for (auto& [type, factory] : g_UIFactories)
+				for (auto& [type, factory] : GetComponentUIFactoryRegistry())
 				{
 					if (auto* view = factory(m_Window, entityId))
+					{
 						m_aComponents.push_back(view);
+					}
 				}
 
 				for (const ComponentBaseUIView* component : m_aComponents)
@@ -64,6 +69,7 @@ namespace gallus
 				}
 			}
 
+			//---------------------------------------------------------------------
 			void EntityInspectorView::OnRename(const std::string& a_sName)
 			{
 				if (m_pEntity)
@@ -73,22 +79,26 @@ namespace gallus
 				}
 			}
 
+			//---------------------------------------------------------------------
 			void EntityInspectorView::OnDelete()
 			{
 				core::TOOL->GetECS().DeleteEntity(m_HierarchyEntityUIView.GetEntityID());
 				gameplay::GAME->GetScene().SetIsDirty(true);
 			}
 
+			//---------------------------------------------------------------------
 			std::string EntityInspectorView::GetName() const
 			{
 				return m_pEntity ? m_pEntity->GetName() : "";
 			}
 
+			//---------------------------------------------------------------------
 			std::string EntityInspectorView::GetIcon() const
 			{
 				return m_HierarchyEntityUIView.GetIcon();
 			}
 
+			//---------------------------------------------------------------------
 			void EntityInspectorView::Render()
 			{
 				std::lock_guard<std::recursive_mutex> lock(core::TOOL->GetECS().m_EntityMutex);
@@ -150,6 +160,7 @@ namespace gallus
 				ImGui::PopStyleVar();
 			}
 
+			//---------------------------------------------------------------------
 			void EntityInspectorView::RenderPreview()
 			{
 				ComponentBaseUIView* view = nullptr;

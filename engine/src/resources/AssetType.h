@@ -13,7 +13,7 @@ namespace gallus
 		{
 			Folder,
 			Scene,
-			Texture,
+			Sprite,
 			Sound,
 			Song,
 			VO,
@@ -35,9 +35,9 @@ namespace gallus
 				{
 					return "Scene File";
 				}
-				case AssetType::Texture:
+				case AssetType::Sprite:
 				{
-					return "Texture File";
+					return "Sprite File";
 				}
 				case AssetType::Sound:
 				{

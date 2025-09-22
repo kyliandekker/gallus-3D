@@ -63,5 +63,11 @@ namespace gallus
 	}
 }
 
+#include "resources/AssetType.h"
+
+REGISTER_EXPLORER_UI(std::vector<gallus::resources::AssetType>{
+	gallus::resources::AssetType::Sprite
+}, gallus::graphics::imgui::ExplorerSpriteUIViewInfo);
+
 #endif // _EDITOR
 #endif // IMGUI_DISABLE

@@ -124,8 +124,8 @@ namespace ImGui
 
 	std::string IMGUI_FORMAT_ID(const std::string& a_Text, const char* a_ID, const std::string& a_IDName)
 	{
-		std::string full_id = a_Text + a_ID + a_IDName;
-		return full_id;
+		std::string fullId = a_Text + a_ID + a_IDName;
+		return fullId;
 	}
 
 	bool FoldOutButton(const std::string& a_ID, bool* a_pValue, const ImVec2& a_Size)
@@ -159,7 +159,9 @@ namespace ImGui
 
 		// Toggle value
 		if (clicked)
+		{
 			*a_pValue = !(*a_pValue);
+		}
 
 		return *a_pValue;
 	}

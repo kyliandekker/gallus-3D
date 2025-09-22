@@ -99,7 +99,7 @@ namespace gallus
 						{
 							m_pSelectedFileResource = view;
 
-							if (view->GetFileResource().GetMetaData()->GetAssetType() == gallus::resources::AssetType::Texture)
+							if (view->GetFileResource().GetMetaData()->GetAssetType() == gallus::resources::AssetType::Sprite)
 							{
 								LoadTexture(view->GetFileResource().GetPath().filename().generic_string());
 							}

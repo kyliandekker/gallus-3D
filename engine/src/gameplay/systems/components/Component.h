@@ -15,6 +15,9 @@ namespace gallus
 		public:
 			virtual ~Component() = default;
 
+			/// <summary>
+			/// Initializes the component.
+			/// </summary>
 			virtual void Init()
 			{}
 
@@ -32,11 +35,18 @@ namespace gallus
 			/// <param name="a_Allocator">The allocator used by the json document.</param>
 			virtual void Deserialize(const rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator) = 0;
 
+			/// <summary>
+			/// Checks whether the component is destroyed.
+			/// </summary>
+			/// <returns>True if the component has been destroyed, false otherwise.</returns>
 			bool IsDestroyed() const
 			{
 				return m_bIsDestroyed;
 			}
 
+			/// <summary>
+			/// Marks the component as destroyed.
+			/// </summary>
 			void Destroy()
 			{
 				m_bIsDestroyed = true;

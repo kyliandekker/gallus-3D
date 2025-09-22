@@ -7,9 +7,12 @@
 
 #include <DirectXMath.h>
 
+// graphics includes
+#include "graphics/imgui/views/DataTypes/VectorView.h"
+
+// gameplay includes
 #include "gameplay/systems/SpriteSystem.h"
 #include "gameplay/systems/components/SpriteComponent.h"
-#include "graphics/imgui/views/DataTypes/VectorView.h"
 
 namespace gallus
 {
@@ -57,6 +60,12 @@ namespace gallus
 		}
 	}
 }
+
+REGISTER_COMPONENT_UI(
+	gallus::gameplay::SpriteComponent,
+	gallus::graphics::imgui::SpriteComponentUIView,
+	gallus::gameplay::SpriteSystem
+)
 
 #endif // _EDITOR
 #endif // IMGUI_DISABLE

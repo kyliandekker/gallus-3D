@@ -1,4 +1,4 @@
-#include "gameplay/systems/components/SpriteComponent.h"
+﻿#include "gameplay/systems/components/SpriteComponent.h"
 
 // core includes
 #include "core/Tool.h"
@@ -57,10 +57,91 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
+		bool CheckVisibility(const gallus::graphics::dx12::DX12Transform& a_Transform, const graphics::dx12::Camera& a_Camera)
+		{
+			const DirectX::XMFLOAT2& pos = a_Transform.GetPosition();
+			const DirectX::XMFLOAT2& scale = a_Transform.GetScale();
+			const DirectX::XMFLOAT2& pivot = a_Transform.GetPivot();
+			float rotation = a_Transform.GetRotation();
+
+			DirectX::XMFLOAT2 corners[4] = {
+				{ (-0.5f) * scale.x, (-0.5f) * scale.y }, // top-left
+				{ (0.5f) * scale.x, (-0.5f) * scale.y }, // top-right
+				{ (0.5f) * scale.x, (0.5f) * scale.y }, // bottom-right
+				{ (-0.5f) * scale.x, (0.5f) * scale.y }  // bottom-left
+			};
+
+			// Rotate corners around pivot and translate to world position
+			float cosR = cos(rotation);
+			float sinR = sin(rotation);
+
+			for (int i = 0; i < 4; ++i)
+			{
+				// relative to pivot
+				float x = corners[i].x - pivot.x * scale.x;
+				float y = corners[i].y - pivot.y * scale.y;
+
+				// rotate
+				float rx = x * cosR - y * sinR;
+				float ry = x * sinR + y * cosR;
+
+				// translate to world
+				corners[i].x = rx + pos.x;
+				corners[i].y = ry + pos.y;
+			}
+
+			// Compute AABB of rotated rectangle
+			float minX = corners[0].x, maxX = corners[0].x;
+			float minY = corners[0].y, maxY = corners[0].y;
+
+			for (int i = 1; i < 4; ++i)
+			{
+				if (corners[i].x < minX)
+				{
+					minX = corners[i].x;
+				}
+				if (corners[i].x > maxX)
+				{
+					maxX = corners[i].x;
+				}
+				if (corners[i].y < minY)
+				{
+					minY = corners[i].y;
+				}
+				if (corners[i].y > maxY)
+				{
+					maxY = corners[i].y;
+				}
+			}
+
+			// Check visibility
+			if (maxX < 0.0f || minX > a_Camera.GetSize().x ||
+				maxY < 0.0f || minY > a_Camera.GetSize().y)
+			{
+				return false;
+			}
+
+			return true;
+		}
+
+		//---------------------------------------------------------------------
 		void SpriteComponent::Render(std::shared_ptr<graphics::dx12::CommandList> a_pCommandList, const EntityID& a_EntityID, const graphics::dx12::Camera& a_Camera)
 		{
 			const DirectX::XMMATRIX viewMatrix = a_Camera.GetViewMatrix();
 			const DirectX::XMMATRIX& projectionMatrix = a_Camera.GetProjectionMatrix();
+
+			graphics::dx12::DX12Transform transform;
+			TransformSystem& transformSys = core::TOOL->GetECS().GetSystem<TransformSystem>();
+			if (transformSys.HasComponent(a_EntityID))
+			{
+				transform = transformSys.GetComponent(a_EntityID).Transform();
+			}
+			DirectX::XMMATRIX mvpMatrix = transform.GetWorldMatrixWithPivot() * viewMatrix * projectionMatrix;
+
+			if (!CheckVisibility(transform, a_Camera))
+			{
+				return;
+			}
 
 			if (!core::TOOL->GetECS().GetEntity(a_EntityID))
 			{
@@ -84,13 +165,6 @@ namespace gallus
 
 			if (m_pMesh && m_pMesh->IsValid())
 			{
-				graphics::dx12::DX12Transform transform;
-				TransformSystem& transformSys = core::TOOL->GetECS().GetSystem<TransformSystem>();
-				if (transformSys.HasComponent(a_EntityID))
-				{
-					transform = transformSys.GetComponent(a_EntityID).Transform();
-				}
-				DirectX::XMMATRIX mvpMatrix = transform.GetWorldMatrixWithPivot() * viewMatrix * projectionMatrix;
 				m_pMesh->Render(a_pCommandList, mvpMatrix);
 			}
 

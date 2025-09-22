@@ -6,16 +6,14 @@
 // utils includes
 #include "utils/file_abstractions.h"
 
+// resource includes
+#include "resources/AssetType.h"
+
 // editor includes
 #include "editor/core/EditorTool.h"
 #include "editor/FileResource.h"
-#include "resources/AssetType.h"
 #include "editor/graphics/imgui/views/ExplorerFileUIView.h"
 #include "editor/graphics/imgui/views/inspector/fileinfo/ExplorerFileUIViewInfo.h"
-#include "editor/graphics/imgui/views/inspector/fileinfo/ExplorerSpriteUIViewInfo.h"
-#include "editor/graphics/imgui/views/inspector/fileinfo/ExplorerShaderUIViewInfo.h"
-#include "editor/graphics/imgui/views/inspector/fileinfo/ExplorerAudioUIViewInfo.h"
-#include "editor/graphics/imgui/views/inspector/fileinfo/ExplorerSceneUIViewInfo.h"
 
 namespace gallus
 {
@@ -25,13 +23,23 @@ namespace gallus
 		{
 			class ImGuiWindow;
 
+			//---------------------------------------------------------------------
+			// ExplorerFileInspectorView
+			//---------------------------------------------------------------------
 			ExplorerFileInspectorView::ExplorerFileInspectorView(ImGuiWindow& a_Window, ExplorerFileUIView& a_ExplorerFileUIView) : InspectorView(a_Window), m_ExplorerFileUIView(a_ExplorerFileUIView)
 			{
 				m_bShowRename = true;
 				m_bShowDelete = true;
 				m_bShowShowInExplorer = true;
 
-				switch (a_ExplorerFileUIView.GetFileResource().GetMetaData()->GetAssetType())
+				resources::AssetType assetType = a_ExplorerFileUIView.GetFileResource().GetMetaData()->GetAssetType();
+				
+				if (auto it = GetExplorerUIFactoryRegistry().find(assetType); it != GetExplorerUIFactoryRegistry().end())
+				{
+					m_pExplorerFileUIViewInfo = it->second(m_Window, a_ExplorerFileUIView);
+				}
+
+				/*switch (a_ExplorerFileUIView.GetFileResource().GetMetaData()->GetAssetType())
 				{
 					case gallus::resources::AssetType::Texture:
 					{
@@ -61,10 +69,17 @@ namespace gallus
 						m_pExplorerFileUIViewInfo = new ExplorerFileUIViewInfo(m_Window, a_ExplorerFileUIView);
 						break;
 					}
+				}*/
+
+				if (!m_pExplorerFileUIViewInfo)
+				{
+					return;
 				}
+
 				m_bShowPreview = m_pExplorerFileUIViewInfo->GetShowPreview();
 			}
 
+			//---------------------------------------------------------------------
 			ExplorerFileInspectorView::~ExplorerFileInspectorView()
 			{
 				if (m_pExplorerFileUIViewInfo)
@@ -73,11 +88,13 @@ namespace gallus
 				}
 			}
 
+			//---------------------------------------------------------------------
 			void ExplorerFileInspectorView::OnRename(const std::string& a_sName)
 			{
 				m_ExplorerFileUIView.GetFileResource().Rename(a_sName);
 			}
 
+			//---------------------------------------------------------------------
 			void ExplorerFileInspectorView::OnDelete()
 			{
 				m_ExplorerFileUIView.GetFileResource().Delete();
@@ -85,21 +102,25 @@ namespace gallus
 				core::EDITOR_TOOL->GetEditor().GetAssetDatabase().Rescan();
 			}
 
+			//---------------------------------------------------------------------
 			void ExplorerFileInspectorView::OnShowInExplorer()
 			{
 				file::OpenInExplorer(m_ExplorerFileUIView.GetFileResource().GetPath().parent_path().lexically_normal());
 			}
 
+			//---------------------------------------------------------------------
 			std::string ExplorerFileInspectorView::GetName() const
 			{
 				return m_ExplorerFileUIView.GetFileResource().GetPath().filename().generic_string();
 			}
 
+			//---------------------------------------------------------------------
 			std::string ExplorerFileInspectorView::GetIcon() const
 			{
 				return m_ExplorerFileUIView.GetIcon();
 			}
 
+			//---------------------------------------------------------------------
 			void ExplorerFileInspectorView::Render()
 			{
 				if (m_pExplorerFileUIViewInfo)
@@ -108,6 +129,7 @@ namespace gallus
 				}
 			}
 
+			//---------------------------------------------------------------------
 			void ExplorerFileInspectorView::RenderPreview()
 			{
 				if (m_pExplorerFileUIViewInfo)

@@ -22,6 +22,9 @@ namespace gallus
 	{
 		namespace imgui
 		{
+			//---------------------------------------------------------------------
+			// ComponentBaseUIView
+			//---------------------------------------------------------------------
 			void ComponentBaseUIView::RenderBaseComponent(gameplay::Component& a_Component, gameplay::AbstractECSSystem& a_System)
 			{
 				ImVec2 size = m_Window.GetHeaderSize();

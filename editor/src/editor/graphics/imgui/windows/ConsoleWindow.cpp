@@ -71,7 +71,7 @@ namespace gallus
 				gallus::editor::EditorSettings& editorSettings = core::EDITOR_TOOL->GetEditor().GetEditorSettings();
 
 				// Filter messages if need be.
-				if (m_NeedsRefresh)
+				if (m_bNeedsRefresh)
 				{
 					std::vector<bool> filters =
 					{
@@ -88,18 +88,18 @@ namespace gallus
 					// Mutex to ensure new messages cannot be added.
 					std::lock_guard<std::mutex> lock(MESSAGE_MUTEX);
 
-					m_NeedsRefresh = false;
-					m_FilteredMessages.clear();
+					m_bNeedsRefresh = false;
+					m_aFilteredMessages.clear();
 
 					std::string searchString = string_extensions::StringToLower(m_SearchBar.GetString());
-					for (size_t i = 0; i < m_Messages.size(); i++)
+					for (size_t i = 0; i < m_aMessages.size(); i++)
 					{
-						auto& message = m_Messages[i];
+						auto& message = m_aMessages[i];
 						if (filters[message.GetSeverity()])
 						{
 							if (searchString.empty() || ((string_extensions::StringToLower(message.GetRawMessage()).find(searchString) != std::string::npos) || (string_extensions::StringToLower(message.GetCategory()).find(searchString) != std::string::npos)))
 							{
-								m_FilteredMessages.push_back(i);
+								m_aFilteredMessages.push_back(i);
 							}
 						}
 					}
@@ -118,8 +118,8 @@ namespace gallus
 					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_CLEAR), BUTTON_ID, "CLEAR_CONSOLE").c_str(), m_Window.GetHeaderSize()))
 				{
 					std::lock_guard<std::mutex> lock(MESSAGE_MUTEX);
-					m_FilteredMessages.clear();
-					m_Messages.clear();
+					m_aFilteredMessages.clear();
+					m_aMessages.clear();
 				}
 				ImGui::PopFont();
 
@@ -130,7 +130,7 @@ namespace gallus
 				{
 					editorSettings.SetScrollToBottom(scrollToBottom);
 					editorSettings.Save();
-					m_NeedsRefresh = true;
+					m_bNeedsRefresh = true;
 				}
 
 				ImGui::SameLine();
@@ -140,7 +140,7 @@ namespace gallus
 				{
 					editorSettings.SetShowInfo(showInfo);
 					editorSettings.Save();
-					m_NeedsRefresh = true;
+					m_bNeedsRefresh = true;
 				}
 
 				ImGui::SameLine();
@@ -150,7 +150,7 @@ namespace gallus
 				{
 					editorSettings.SetShowTest(showTest);
 					editorSettings.Save();
-					m_NeedsRefresh = true;
+					m_bNeedsRefresh = true;
 				}
 
 				ImGui::SameLine();
@@ -160,7 +160,7 @@ namespace gallus
 				{
 					editorSettings.SetShowWarning(showWarning);
 					editorSettings.Save();
-					m_NeedsRefresh = true;
+					m_bNeedsRefresh = true;
 				}
 
 				ImGui::SameLine();
@@ -170,7 +170,7 @@ namespace gallus
 				{
 					editorSettings.SetShowError(showError);
 					editorSettings.Save();
-					m_NeedsRefresh = true;
+					m_bNeedsRefresh = true;
 				}
 
 				ImGui::SameLine();
@@ -180,7 +180,7 @@ namespace gallus
 				{
 					editorSettings.SetShowAssert(showAssert);
 					editorSettings.Save();
-					m_NeedsRefresh = true;
+					m_bNeedsRefresh = true;
 				}
 
 				ImGui::SameLine();
@@ -190,7 +190,7 @@ namespace gallus
 				{
 					editorSettings.SetShowSuccess(showSuccess);
 					editorSettings.Save();
-					m_NeedsRefresh = true;
+					m_bNeedsRefresh = true;
 				}
 
 				ImGui::SameLine();
@@ -200,7 +200,7 @@ namespace gallus
 				{
 					editorSettings.SetShowInfoSuccess(showInfoSuccess);
 					editorSettings.Save();
-					m_NeedsRefresh = true;
+					m_bNeedsRefresh = true;
 				}
 
 				ImGui::SameLine();
@@ -210,7 +210,7 @@ namespace gallus
 				{
 					editorSettings.SetShowAwesome(showAwesome);
 					editorSettings.Save();
-					m_NeedsRefresh = true;
+					m_bNeedsRefresh = true;
 				}
 
 				ImVec2 endPos = ImGui::GetCursorPos();
@@ -224,7 +224,7 @@ namespace gallus
 				ImGui::SetCursorPos(searchBarPos);
 				if (m_SearchBar.Render(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "SEARCHBAR_CONSOLE").c_str(), ImVec2(searchbarWidth, toolbarSize.y), inputPadding))
 				{
-					m_NeedsRefresh = true;
+					m_bNeedsRefresh = true;
 				}
 
 				ImGui::SetCursorPos(endPos);
@@ -248,11 +248,11 @@ namespace gallus
 
 					ImGui::PushTextWrapPos();
 					std::lock_guard<std::mutex> lock(MESSAGE_MUTEX);
-					for (size_t i = 0; i < m_FilteredMessages.size(); i++)
+					for (size_t i = 0; i < m_aFilteredMessages.size(); i++)
 					{
 						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + (m_Window.GetFramePadding().x * 2));
 
-						auto& message = m_Messages[m_FilteredMessages[i]];
+						auto& message = m_aMessages[m_aFilteredMessages[i]];
 
 						ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (m_Window.GetFramePadding().x * 2));
 						ImVec4 color = colors_arr[message.GetSeverity()];
@@ -288,7 +288,7 @@ namespace gallus
 						ImGui::TextColored(ImGui::GetStyleColorVec4(ImGuiCol_HeaderActive), message.GetCategory().c_str());
 						ImGui::PopFont();
 
-						if (i < m_FilteredMessages.size() - 1)
+						if (i < m_aFilteredMessages.size() - 1)
 						{
 							ImGui::Separator();
 						}
@@ -318,17 +318,11 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			void ConsoleWindow::Clear()
-			{
-
-			}
-
-			//---------------------------------------------------------------------
 			void ConsoleWindow::AddMessage(const logger::LoggerMessage& a_Message)
 			{
 				std::lock_guard<std::mutex> lock(MESSAGE_MUTEX);
-				m_Messages.push_back(a_Message);
-				m_NeedsRefresh = true;
+				m_aMessages.push_back(a_Message);
+				m_bNeedsRefresh = true;
 			}
 
 			//---------------------------------------------------------------------

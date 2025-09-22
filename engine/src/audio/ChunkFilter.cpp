@@ -6,10 +6,10 @@ namespace gallus
 {
 	namespace audio
 	{
-		ChunkFilter::ChunkFilter(const char* a_Filter, size_t a_Size)
+		ChunkFilter::ChunkFilter(const char* a_pData, size_t a_iSize)
         {
-			m_pData = a_Filter;
-			m_iSize = a_Size;
+			m_pData = a_pData;
+			m_iSize = a_iSize;
         }
 
 		const char* ChunkFilter::data() const

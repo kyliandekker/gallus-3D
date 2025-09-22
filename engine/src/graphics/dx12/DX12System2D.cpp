@@ -170,24 +170,12 @@ namespace gallus
 				std::shared_ptr<CommandQueue> cCommandQueue = GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
 				std::shared_ptr<CommandList> cCommandList = cCommandQueue->GetCommandList();
 
-				// Used for creating stuff like root signature, etc.
-				if (!BeforeInitialize(dCommandQueue, dCommandList))
-				{
-					LOG(LOGSEVERITY_ERROR, LOG_CATEGORY_DX12, "Failed before initialization could succeed.");
-					return false;
-				}
-
 				CreateRenderTexture({ RENDER_TEX_SIZE.x, RENDER_TEX_SIZE.y });
 
 				m_eOnInitialize(*this);
 #ifndef IMGUI_DISABLE
 				m_ImGuiWindow.Initialize();
 #endif // IMGUI_DISABLE
-				if (!AfterInitialize(dCommandQueue, dCommandList))
-				{
-					LOG(LOGSEVERITY_ERROR, LOG_CATEGORY_DX12, "Failed after initialization.");
-					return false;
-				}
 
 				std::shared_ptr<Texture> texture = core::TOOL->GetResourceAtlas().LoadTexture("tex_missing.png", cCommandList); // Default texture.
 				texture->SetResourceCategory(core::EngineResourceCategory::Missing);
@@ -625,18 +613,6 @@ namespace gallus
 					return false;
 				}
 
-				return true;
-			}
-
-			//---------------------------------------------------------------------
-			bool DX12System2D::BeforeInitialize(std::shared_ptr<CommandQueue> a_pCommandQueue, std::shared_ptr<CommandList> a_pCommandList)
-			{
-				return true;
-			}
-
-			//---------------------------------------------------------------------
-			bool DX12System2D::AfterInitialize(std::shared_ptr<CommandQueue> a_pCommandQueue, std::shared_ptr<CommandList> a_pCommandList)
-			{
 				return true;
 			}
 

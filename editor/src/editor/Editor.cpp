@@ -4,8 +4,6 @@
 
 #include "logger/Logger.h"
 
-#include "editor/graphics/imgui/ComponentFactory.h"
-
 namespace gallus
 {
 	namespace editor
@@ -21,8 +19,6 @@ namespace gallus
 		bool Editor::Initialize(bool a_bWait)
 		{
 			LOG(LOGSEVERITY_INFO, LOG_CATEGORY_EDITOR, "Initializing editor.");
-
-			gallus::editor::RegisterComponents();
 
 			return ThreadedSystem::Initialize(a_bWait);
 		}

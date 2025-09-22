@@ -16,7 +16,7 @@ namespace gallus
 			ChunkFilter()
 			{ }
 
-			ChunkFilter(const char* a_Filter, size_t a_Size);
+			ChunkFilter(const char* a_pData, size_t a_iSize);
 
 			const char* data() const;
 			size_t size() const;

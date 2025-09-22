@@ -7,15 +7,15 @@
 
 #include <DirectXMath.h>
 
+// graphics includes
 #include "graphics/imgui/views/DataTypes/VectorView.h"
+
+// gameplay includes
+#include "gameplay/systems/TransformSystem.h"
+#include "gameplay/systems/components/TransformComponent.h"
 
 namespace gallus
 {
-	namespace gameplay
-	{
-		class TransformComponent;
-		class TransformSystem;
-	}
 	namespace graphics
 	{
 		namespace imgui
@@ -60,6 +60,12 @@ namespace gallus
 		}
 	}
 }
+
+REGISTER_COMPONENT_UI(
+	gallus::gameplay::TransformComponent,
+	gallus::graphics::imgui::TransformComponentUIView,
+	gallus::gameplay::TransformSystem
+)
 
 #endif // _EDITOR
 #endif // IMGUI_DISABLE

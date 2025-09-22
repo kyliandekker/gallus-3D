@@ -151,7 +151,7 @@ namespace gallus
 									gameplay::GAME->GetScene().SetIsDirty(true);
 								}
 							},
-							std::vector<gallus::resources::AssetType>{ gallus::resources::AssetType::Texture }
+							std::vector<gallus::resources::AssetType>{ gallus::resources::AssetType::Sprite }
 						);
 						modal->Show();
 					}

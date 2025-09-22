@@ -5,13 +5,12 @@
 
 #include "ComponentUIView.h"
 
+// gameplay includes
+#include "gameplay/systems/PlayerSystem.h"
+#include "gameplay/systems/components/PlayerComponent.h"
+
 namespace gallus
 {
-	namespace gameplay
-	{
-		class PlayerComponent;
-		class PlayerSystem;
-	}
 	namespace graphics
 	{
 		namespace imgui
@@ -47,6 +46,12 @@ namespace gallus
 		}
 	}
 }
+
+REGISTER_COMPONENT_UI(
+	gallus::gameplay::PlayerComponent,
+	gallus::graphics::imgui::PlayerComponentUIView,
+	gallus::gameplay::PlayerSystem
+)
 
 #endif // _EDITOR
 #endif // IMGUI_DISABLE

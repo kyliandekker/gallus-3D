@@ -29,8 +29,8 @@ namespace gallus
 			class ExplorerFileUIView;
 
 			/// <summary>
-			/// Base class for rendering shader files in the ImGui editor UI. 
-			/// Provides common functionality for rendering and interacting with shader files.
+			/// Base class for rendering audio files in the ImGui editor UI. 
+			/// Provides common functionality for rendering and interacting with audio files.
 			/// </summary>
 			class ExplorerAudioUIViewInfo : public ExplorerFileUIViewInfo
 			{
@@ -64,13 +64,21 @@ namespace gallus
 				core::Data 
 					m_LeftSamples,
 					m_RightSamples;
-				size_t m_NumSamples = 0;
-				size_t m_RNumSamples = 0;
+				size_t m_iNumSamples = 0;
+				size_t m_iRNumSamples = 0;
 				audio::ChunkCollection m_SongData;
 			};
 		}
 	}
 }
+
+#include "resources/AssetType.h"
+
+REGISTER_EXPLORER_UI((std::vector<gallus::resources::AssetType>{
+	gallus::resources::AssetType::Song,
+	gallus::resources::AssetType::VO,
+	gallus::resources::AssetType::Sound
+}), gallus::graphics::imgui::ExplorerAudioUIViewInfo);
 
 #endif // _EDITOR
 #endif // IMGUI_DISABLE

@@ -93,6 +93,10 @@ namespace gallus
 					return m_aFenceValues[GetCurrentBackBufferIndex()];
 				}
 
+				/// <summary>
+				/// Retrieves the camera.
+				/// </summary>
+				/// <returns>Reference to the camera.</returns>
 				Camera& GetCamera()
 				{
 					return m_Camera;
@@ -280,11 +284,23 @@ namespace gallus
 				SimpleEvent<std::shared_ptr<dx12::CommandList>> m_eOnRender;
 				SimpleEvent<const glm::ivec2&, const glm::ivec2&> m_eOnResize;
 			protected:
+				/// <summary>
+				/// Creates the command queues.
+				/// </summary>
+				/// <returns>True if creation was successful, otherwise false.</returns>
 				bool CreateCommandQueues();
+
+				/// <summary>
+				/// Creates the views (rtv, srv, etc).
+				/// </summary>
+				/// <returns>True if creation was successful, otherwise false.</returns>
 				bool CreateViews();
+
+				/// <summary>
+				/// Creates the root signature.
+				/// </summary>
+				/// <returns>True if creation was successful, otherwise false.</returns>
 				bool CreateRootSignature();
-				bool BeforeInitialize(std::shared_ptr<CommandQueue> a_pCommandQueue, std::shared_ptr<CommandList> a_pCommandList);
-				bool AfterInitialize(std::shared_ptr<CommandQueue> a_pCommandQueue, std::shared_ptr<CommandList> a_pCommandList);
 
 				void CreateRenderTexture(const glm::ivec2& a_vSize);
 
