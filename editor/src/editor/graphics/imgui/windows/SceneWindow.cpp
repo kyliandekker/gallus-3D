@@ -78,6 +78,14 @@ namespace gallus
                 {
                     gameplay::GAME->SetIsPaused(isPaused);
                 }
+                ImGui::SameLine();
+                bool drawBounds = core::EDITOR_TOOL->GetEditor().GetEditorSettings().GetDrawBounds();
+                if (ImGui::CheckboxButton(
+                    ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_CUBE), BUTTON_ID, "DRAW_BOUNDS_SCENE").c_str(), &drawBounds, m_Window.GetHeaderSize()))
+                {
+                    core::EDITOR_TOOL->GetEditor().GetEditorSettings().SetDrawBounds(drawBounds);
+                    core::EDITOR_TOOL->GetEditor().GetEditorSettings().Save();
+                }
 
                 ImGui::EndToolbar(ImVec2(0, 0));
 
@@ -146,6 +154,11 @@ namespace gallus
                     (ImTextureID) renderTexture->GetGPUHandle().ptr,
                     imageSize
                 );
+
+                if (drawBounds)
+                {
+                    ShowSpriteBounds(imageScreenPos, textureSize);
+                }
 
                 DrawGizmos(imageScreenPos, textureSize);
 
@@ -299,6 +312,71 @@ namespace gallus
 
                 transformComponent.Transform().SetPosition(spritePos);
                 transformComponent.Transform().SetScale(spritePos);
+            }
+
+            //---------------------------------------------------------------------
+            void SceneWindow::ShowSpriteBounds(const ImVec2& a_vScenePos, const ImVec2& a_vSize)
+            {
+                ImDrawList* drawList = ImGui::GetWindowDrawList();
+                ImVec2 mouseScreen = ImGui::GetMousePos();
+
+                std::lock_guard<std::recursive_mutex> lock(core::TOOL->GetECS().m_EntityMutex);
+
+                for (auto entity : core::TOOL->GetECS().GetEntities())
+                {
+                    if (!core::TOOL->GetECS().GetSystem<gameplay::TransformSystem>().HasComponent(entity.GetEntityID()))
+                        continue;
+                    if (!core::TOOL->GetECS().GetSystem<gameplay::SpriteSystem>().HasComponent(entity.GetEntityID()))
+                        continue;
+
+                    auto& transform = core::TOOL->GetECS().GetSystem<gameplay::TransformSystem>().GetComponent(entity.GetEntityID());
+
+                    const DirectX::XMFLOAT2& pos = transform.Transform().GetPosition();
+                    const DirectX::XMFLOAT2& scale = transform.Transform().GetScale();
+                    const DirectX::XMFLOAT2& pivot = transform.Transform().GetPivot(); // -0.5 .. 0.5
+                    float rotation = transform.Transform().GetRotation(); // in radians or degrees?
+
+                    // Convert position to screen space with pan and zoom
+                    ImVec2 spritePos = a_vScenePos + m_vPanOffset + ImVec2(pos.x * m_fZoom, pos.y * m_fZoom);
+                    ImVec2 scaledSize = ImVec2(scale.x * m_fZoom, scale.y * m_fZoom);
+
+                    // Define corners centered on sprite origin
+                    ImVec2 corners[4] = {
+                        ImVec2(-0.5f * scaledSize.x, -0.5f * scaledSize.y), // top-left
+                        ImVec2(0.5f * scaledSize.x, -0.5f * scaledSize.y), // top-right
+                        ImVec2(0.5f * scaledSize.x, 0.5f * scaledSize.y), // bottom-right
+                        ImVec2(-0.5f * scaledSize.x, 0.5f * scaledSize.y)  // bottom-left
+                    };
+
+                    // Precompute sin/cos for rotation
+                    float rotationRad = DirectX::XMConvertToRadians(rotation); // assuming rotation is degrees
+                    float cosR = cosf(rotationRad);
+                    float sinR = sinf(rotationRad);
+
+                    // Rotate corners around pivot and translate to screen space
+                    for (int i = 0; i < 4; ++i)
+                    {
+                        // offset relative to pivot
+                        float x = corners[i].x - (pivot.x * scaledSize.x);
+                        float y = corners[i].y - (pivot.y * scaledSize.y);
+
+                        // rotate
+                        float rx = x * cosR - y * sinR;
+                        float ry = x * sinR + y * cosR;
+
+                        // translate to spritePos (pivot position in screen space)
+                        corners[i].x = rx + spritePos.x;
+                        corners[i].y = ry + spritePos.y;
+                    }
+
+                    // Draw bounding box polyline
+                    drawList->AddPolyline(corners, 4, IM_COL32(255, 255, 0, 255), true, 2.0f);
+
+                    // Draw pivot point (pivot position)
+                    drawList->AddCircleFilled(spritePos, 4.0f, IM_COL32(0, 255, 0, 255));
+
+                    // Mouse cursor debugging, picking logic can be added here similarly if needed...
+                }
             }
 
             //---------------------------------------------------------------------

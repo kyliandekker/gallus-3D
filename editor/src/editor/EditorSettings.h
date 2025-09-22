@@ -164,6 +164,18 @@ namespace gallus
 			/// </summary>
 			/// <returns>Integer representing the scene operation index.</returns>
 			int GetLastSceneOperation() const;
+
+			/// <summary>
+			/// Sets whether bounds should be drawn.
+			/// </summary>
+			/// <param name="a_bDrawBounds">True if bounds should be shown, false otherwise.</param>
+			void SetDrawBounds(bool a_bDrawBounds);
+
+			/// <summary>
+			/// Returns whether bounds should be drawn.
+			/// </summary>
+			/// <returns>True if bounds should be drawn, otherwise false.</returns>
+			bool GetDrawBounds() const;
 		private:
 			/// <summary>
 			/// Virtual method for loading specific vars.
@@ -178,15 +190,16 @@ namespace gallus
 			bool SaveVars(rapidjson::Document& a_Document, rapidjson::Document::AllocatorType& a_Allocator) const override;
 
 			bool m_bScrollToBottom = false; /// Auto-scroll setting for the console.
-			bool m_bShowInfo = true; /// Visibility toggle for info log messages.
-			bool m_bShowTest = true; /// Visibility toggle for test log messages.
-			bool m_bShowWarning = true; /// Visibility toggle for warning log messages.
-			bool m_bShowError = true; /// Visibility toggle for error log messages.
-			bool m_bShowAssert = true; /// Visibility toggle for assertion log messages.
-			bool m_bShowSuccess = true; /// Visibility toggle for success log messages.
-			bool m_bShowInfoSuccess = true; /// Visibility toggle for combined info-success messages.
-			bool m_bShowAwesome = true; /// Visibility toggle for "awesome" log messages.
+			bool m_bShowInfo = true; /// Check for info log messages.
+			bool m_bShowTest = true; /// Check for test log messages.
+			bool m_bShowWarning = true; /// Check for warning log messages.
+			bool m_bShowError = true; /// Check for error log messages.
+			bool m_bShowAssert = true; /// Check for assertion log messages.
+			bool m_bShowSuccess = true; /// Check for success log messages.
+			bool m_bShowInfoSuccess = true; /// Check for combined info-success messages.
+			bool m_bShowAwesome = true; /// Check for "awesome" log messages.
 
+			bool m_bDrawBounds = true; /// Check for drawing bounds in the scene view.
 			float m_fSceneZoom = 1.0f;
 			glm::vec2 m_vScenePanOffset = glm::vec2(0.0f, 0.0f);
 			int m_iLastSceneOperation = 7;

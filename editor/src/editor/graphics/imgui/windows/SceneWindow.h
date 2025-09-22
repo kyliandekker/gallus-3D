@@ -47,6 +47,7 @@ namespace gallus
 			private:
 				void DrawGizmos(const ImVec2& a_vSceneStartPos, const ImVec2& a_vSize);
 				void DrawBoundsGizmo(const ImVec2& a_vScenePos);
+				void ShowSpriteBounds(const ImVec2& a_vScenePos, const ImVec2& a_vSize);
 				void DrawViewportPanel();
 				void DrawTransformGizmo();
 
