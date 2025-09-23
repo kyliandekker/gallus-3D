@@ -185,13 +185,13 @@ namespace gallus
 #define BESTGAMEEVER 1
 
 #ifdef PURPLEBURGLARALARM
-				ImVec4 accentColor = ImVec4(0.42f, 0.34f, 0.83f, 1.00f);
+				m_vAccentColor = ImVec4(0.42f, 0.34f, 0.83f, 1.00f);
 #elif BESTGAMEEVER
-				ImVec4 accentColor = ImVec4(0.71f, 0.32f, 0.08f, 1.00f);
+				m_vAccentColor = ImVec4(0.71f, 0.32f, 0.08f, 1.00f);
 #elif BLUTARCH
-				ImVec4 accentColor = ImVec4(0.35f, 0.5f, 0.6f, 1.00f);
+				m_vAccentColor = ImVec4(0.35f, 0.5f, 0.6f, 1.00f);
 #elif REDMOND
-				ImVec4 accentColor = ImVec4(0.63f, 0.36f, 0.32f, 1.00f);
+				m_vAccentColor = ImVec4(0.63f, 0.36f, 0.32f, 1.00f);
 #endif
 				colors[ImGuiCol_Text] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
 				colors[ImGuiCol_TextDisabled] = ImVec4(0.24f, 0.24f, 0.24f, 1.00f);
@@ -218,9 +218,9 @@ namespace gallus
 				colors[ImGuiCol_ButtonHovered] = ImVec4(0.24f, 0.24f, 0.24f, 1.00f);
 				colors[ImGuiCol_ButtonActive] = ImVec4(0.15f, 0.15f, 0.15f, 1.00f);
 				colors[ImGuiCol_Header] = ImVec4(0.24f, 0.24f, 0.24f, 1.00f);
-				colors[ImGuiCol_HeaderHovered] = ImVec4(accentColor.x, accentColor.y, accentColor.z, 0.5f);
+				colors[ImGuiCol_HeaderHovered] = ImVec4(m_vAccentColor.x, m_vAccentColor.y, m_vAccentColor.z, 0.5f);
 				//colors[ImGuiCol_HeaderActive] = ImVec4(0.24f, 0.24f, 0.24f, 1.00f);
-				colors[ImGuiCol_HeaderActive] = accentColor;
+				colors[ImGuiCol_HeaderActive] = m_vAccentColor;
 				colors[ImGuiCol_Separator] = ImVec4(0.43f, 0.43f, 0.50f, 0.50f);
 				colors[ImGuiCol_SeparatorHovered] = ImVec4(0.43f, 0.43f, 0.50f, 0.50f);
 				colors[ImGuiCol_SeparatorActive] = ImVec4(0.43f, 0.43f, 0.50f, 0.50f);
@@ -229,7 +229,7 @@ namespace gallus
 				colors[ImGuiCol_ResizeGripActive] = ImVec4(0.24f, 0.24f, 0.24f, 1.00f);
 				colors[ImGuiCol_Tab] = ImVec4(0.14f, 0.14f, 0.14f, 1.00f);
 				colors[ImGuiCol_TabHovered] = ImVec4(0.24f, 0.24f, 0.24f, 1.00f);
-				colors[ImGuiCol_TabActive] = accentColor;
+				colors[ImGuiCol_TabActive] = m_vAccentColor;
 				colors[ImGuiCol_TabUnfocused] = ImVec4(0.14f, 0.14f, 0.14f, 1.00f);
 				colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.24f, 0.24f, 0.24f, 1.00f);
 				colors[ImGuiCol_PlotLines] = ImVec4(0.86f, 0.93f, 0.89f, 1.00f);
@@ -242,7 +242,7 @@ namespace gallus
 				colors[ImGuiCol_NavWindowingHighlight] = ImVec4(0.86f, 0.93f, 0.89f, 1.00f);
 				colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.14f, 0.14f, 0.14f, 1.00f);
 				colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.14f, 0.14f, 0.14f, 1.00f);
-				colors[ImGuiCol_TextColorAccent] = accentColor;
+				colors[ImGuiCol_TextColorAccent] = m_vAccentColor;
 #ifndef _RENDER_TEX
 				float transparency = 0.4;
 				ImGui::GetStyle().Colors[ImGuiCol_FrameBg].w = transparency;
@@ -274,7 +274,7 @@ namespace gallus
 
 				ImPlotStyle& pStyle = ImPlot::GetStyle();
 				colors = pStyle.Colors;
-				colors[ImPlotCol_Line] = accentColor;
+				colors[ImPlotCol_Line] = m_vAccentColor;
 			}
 
 			//---------------------------------------------------------------------

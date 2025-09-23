@@ -158,6 +158,15 @@ namespace gallus
 				const ImVec2& GetHeaderSize() const;
 
 				/// <summary>
+				/// Retrieves the accent (main) color of the application.
+				/// </summary>
+				/// <returns>A vector containing the color.</returns>
+				const ImVec4& GetAccentColor() const
+				{
+					return m_vAccentColor;
+				}
+
+				/// <summary>
 				/// Adds a window to the render queue.
 				/// </summary>
 				/// <param name="a_pWindow">The window to add.</param>
@@ -198,6 +207,8 @@ namespace gallus
 				ImVec2 m_vWindowPadding = ImVec2(8, 8); /// Window padding for ImGui elements.
 				ImVec2 m_vItemSpacing = ImVec2(5, 5); /// Window padding for ImGui elements.
 				ImVec2 m_vHeaderSize;
+
+				ImVec4 m_vAccentColor;
 
 				std::vector<BaseWindow*> m_aWindows;
 				std::vector<BaseModal*> m_aModals;

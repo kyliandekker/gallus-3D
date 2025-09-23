@@ -5,6 +5,9 @@
 
 #include "ComponentUIView.h"
 
+// graphics includes
+#include "graphics/imgui/views/DataTypes/VectorView.h"
+
 // gameplay includes
 #include "gameplay/systems/CollisionSystem.h"
 #include "gameplay/systems/components/ColliderComponent.h"
@@ -29,8 +32,12 @@ namespace gallus
 				/// <param name="a_EntityID">The entity ID associated with the transform component.</param>
 				/// <param name="a_ColliderComponent">The ColliderComponent to display and edit.</param>
 				/// <param name="a_System">The ColliderSystem responsible for managing the ColliderComponent.</param>
-				ColliderComponentUIView(ImGuiWindow& a_Window, gameplay::EntityID& a_EntityID, gameplay::ColliderComponent& a_ColliderComponent, gameplay::CollisionSystem& a_System) : ComponentUIView(a_Window, a_EntityID, a_ColliderComponent, a_System)
+				ColliderComponentUIView(ImGuiWindow& a_Window, gameplay::EntityID& a_EntityID, gameplay::ColliderComponent& a_ColliderComponent, gameplay::CollisionSystem& a_System) : ComponentUIView(a_Window, a_EntityID, a_ColliderComponent, a_System),
+					m_OffsetView(a_Window),
+					m_SizeView(a_Window)
 				{}
+
+				void RenderComponentGizmos(const ImVec2& a_vScenePos, const ImVec2& a_vSize, const ImVec2& a_vPanOffset, float a_fZoom) override;
 			private:
 				/// <summary>
 				/// Render the inner part of the UI, including position, rotation, scale, and color.
@@ -42,6 +49,11 @@ namespace gallus
 				/// </summary>
 				/// <returns>The name of the UI component.</returns>
 				std::string GetName() const override;
+
+				/// UI elements for displaying and editing the position, rotation, and scale as glm::vec3.
+				Vector2View<DirectX::XMFLOAT2>
+					m_OffsetView,
+					m_SizeView;
 			};
 		}
 	}
