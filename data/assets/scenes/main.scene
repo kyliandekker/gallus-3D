@@ -7,22 +7,14 @@
                 "sprite": {
                     "texture": {
                         "name": "tex_goomba_sprites.png",
-                        "spriteIndex": 4,
-                        "name": "tex_goomba_sprites.png",
                         "spriteIndex": 4
                     },
                     "shader": {
                         "pixel": "vertexShader.hlsl",
-                        "vertex": "pixelShader.hlsl",
-                        "pixel": "vertexShader.hlsl",
                         "vertex": "pixelShader.hlsl"
                     },
-                    "mesh": "square",
-                    "texture": {},
-                    "shader": {},
                     "mesh": "square"
                 },
-                "sprite": {},
                 "transform": {
                     "position": {
                         "x": 1079.3211669921876,
@@ -43,22 +35,14 @@
                 "sprite": {
                     "texture": {
                         "name": "tex_goomba_sprites.png",
-                        "spriteIndex": 0,
-                        "name": "tex_goomba_sprites.png",
                         "spriteIndex": 0
                     },
                     "shader": {
                         "pixel": "vertexShader.hlsl",
-                        "vertex": "pixelShader.hlsl",
-                        "pixel": "vertexShader.hlsl",
                         "vertex": "pixelShader.hlsl"
                     },
-                    "mesh": "square",
-                    "texture": {},
-                    "shader": {},
                     "mesh": "square"
                 },
-                "sprite": {},
                 "transform": {
                     "position": {
                         "x": 443.87847900390627,
@@ -70,7 +54,9 @@
                         "y": 600.0
                     }
                 },
-                "player": {}
+                "player": {
+                    "movementSpeed": 10000.0
+                }
             }
         }
     ]

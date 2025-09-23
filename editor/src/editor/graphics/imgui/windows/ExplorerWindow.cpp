@@ -17,7 +17,7 @@
 #include "graphics/imgui/font_icon.h"
 
 // editor includes
-#include "editor/core/EditorTool.h"
+#include "editor/core/EditorEngine.h"
 #include "editor/FileResource.h"
 #include "editor/graphics/imgui/views/ExplorerFileUIView.h"
 #include "editor/graphics/imgui/views/inspector/ExplorerFileInspectorView.h"
@@ -35,9 +35,9 @@ namespace gallus
 
 			bool ExplorerWindow::Initialize()
 			{
-				core::EDITOR_TOOL->GetEditor().GetAssetDatabase().GetOnScanCompleted() += std::bind(&ExplorerWindow::OnScanCompleted, this);
+				core::EDITOR_ENGINE->GetEditor().GetAssetDatabase().GetOnScanCompleted() += std::bind(&ExplorerWindow::OnScanCompleted, this);
 
-				core::EDITOR_TOOL->GetEditor().GetSelectable().OnChanged() += std::bind(&ExplorerWindow::OnSelectableChanged, this, std::placeholders::_1, std::placeholders::_2);
+				core::EDITOR_ENGINE->GetEditor().GetSelectable().OnChanged() += std::bind(&ExplorerWindow::OnSelectableChanged, this, std::placeholders::_1, std::placeholders::_2);
 
 				m_pViewedFolder.OnChanged() += std::bind(&ExplorerWindow::OnViewedFolderChanged, this, std::placeholders::_1, std::placeholders::_2);
 
@@ -46,9 +46,9 @@ namespace gallus
 
 			bool ExplorerWindow::Destroy()
 			{
-				core::EDITOR_TOOL->GetEditor().GetAssetDatabase().GetOnScanCompleted() -= std::bind(&ExplorerWindow::OnScanCompleted, this);
+				core::EDITOR_ENGINE->GetEditor().GetAssetDatabase().GetOnScanCompleted() -= std::bind(&ExplorerWindow::OnScanCompleted, this);
 
-				core::EDITOR_TOOL->GetEditor().GetSelectable().OnChanged() -= std::bind(&ExplorerWindow::OnSelectableChanged, this, std::placeholders::_1, std::placeholders::_2);
+				core::EDITOR_ENGINE->GetEditor().GetSelectable().OnChanged() -= std::bind(&ExplorerWindow::OnSelectableChanged, this, std::placeholders::_1, std::placeholders::_2);
 
 				m_pViewedFolder.OnChanged() -= std::bind(&ExplorerWindow::OnViewedFolderChanged, this, std::placeholders::_1, std::placeholders::_2);
 
@@ -85,7 +85,7 @@ namespace gallus
 
 			void ExplorerWindow::Render()
 			{
-				if (!core::EDITOR_TOOL)
+				if (!core::EDITOR_ENGINE)
 				{
 					return;
 				}
@@ -97,8 +97,8 @@ namespace gallus
 					m_aFilteredExplorerItems.clear();
 					m_aExplorerItems.clear();
 
-					m_aExplorerItems.reserve(gallus::core::EDITOR_TOOL->GetEditor().GetAssetDatabase().GetRoot().GetChildren().size());
-					for (gallus::editor::FileResource& fileResource : gallus::core::EDITOR_TOOL->GetEditor().GetAssetDatabase().GetRoot().GetChildren())
+					m_aExplorerItems.reserve(gallus::core::EDITOR_ENGINE->GetEditor().GetAssetDatabase().GetRoot().GetChildren().size());
+					for (gallus::editor::FileResource& fileResource : gallus::core::EDITOR_ENGINE->GetEditor().GetAssetDatabase().GetRoot().GetChildren())
 					{
 						m_aExplorerItems.emplace_back(m_Window, fileResource);
 					}
@@ -268,7 +268,7 @@ namespace gallus
 										clicked,
 										right_clicked,
 										double_clicked,
-										core::EDITOR_TOOL->GetEditor().GetSelectable().get() == view,
+										core::EDITOR_ENGINE->GetEditor().GetSelectable().get() == view,
 										false
 									);
 								}
@@ -286,7 +286,7 @@ namespace gallus
 										clicked,
 										right_clicked,
 										double_clicked,
-										core::EDITOR_TOOL->GetEditor().GetSelectable().get() == view,
+										core::EDITOR_ENGINE->GetEditor().GetSelectable().get() == view,
 										false
 									);
 
@@ -305,7 +305,7 @@ namespace gallus
 
 								if (clicked)
 								{
-									core::EDITOR_TOOL->GetEditor().SetSelectable(view, new ExplorerFileInspectorView(m_Window, *view));
+									core::EDITOR_ENGINE->GetEditor().SetSelectable(view, new ExplorerFileInspectorView(m_Window, *view));
 								}
 							}
 						}
@@ -318,19 +318,19 @@ namespace gallus
 
 				if (doRescan)
 				{
-					const ExplorerFileUIView* derivedPtr = dynamic_cast<const ExplorerFileUIView*>(core::EDITOR_TOOL->GetEditor().GetSelectable().get());
+					const ExplorerFileUIView* derivedPtr = dynamic_cast<const ExplorerFileUIView*>(core::EDITOR_ENGINE->GetEditor().GetSelectable().get());
 					if (derivedPtr)
 					{
-						core::EDITOR_TOOL->GetEditor().SetSelectable(nullptr, nullptr);
+						core::EDITOR_ENGINE->GetEditor().SetSelectable(nullptr, nullptr);
 					}
 
-					core::EDITOR_TOOL->GetEditor().GetAssetDatabase().Rescan();
+					core::EDITOR_ENGINE->GetEditor().GetAssetDatabase().Rescan();
 				}
 			}
 
 			void ExplorerWindow::SetSelectable(ExplorerFileUIView* a_pView)
 			{
-				core::EDITOR_TOOL->GetEditor().SetSelectable(a_pView, a_pView ? new ExplorerFileInspectorView(m_Window, *a_pView) : nullptr);
+				core::EDITOR_ENGINE->GetEditor().SetSelectable(a_pView, a_pView ? new ExplorerFileInspectorView(m_Window, *a_pView) : nullptr);
 			}
 
 			void ExplorerWindow::OnScanCompleted()

@@ -5,7 +5,7 @@
 #include <rapidjson/prettywriter.h>
 
 // core includes
-#include "core/Tool.h"
+#include "core/Engine.h"
 #include "core/DataStream.h"
 
 // logger includes
@@ -29,7 +29,7 @@ namespace gallus
 		Scene::~Scene()
 		{
 			// Clear all entities.
-			core::TOOL->GetECS().Clear();
+			core::ENGINE->GetECS().Clear();
 		}
 
 		//---------------------------------------------------------------------
@@ -54,8 +54,8 @@ namespace gallus
 			}
 
 			// Clear all entities.
-			core::TOOL->GetECS().Clear();
-			while (!core::TOOL->GetECS().GetEntities().empty())
+			core::ENGINE->GetECS().Clear();
+			while (!core::ENGINE->GetECS().GetEntities().empty())
 			{
 			}
 
@@ -69,14 +69,14 @@ namespace gallus
 						continue;
 					}
 
-					std::string name = core::TOOL->GetECS().GetUniqueName("New GameObject");
+					std::string name = core::ENGINE->GetECS().GetUniqueName("New GameObject");
 					if (entityDoc.HasMember(JSON_SCENE_ENTITIES_VAR_NAME) && entityDoc[JSON_SCENE_ENTITIES_VAR_NAME].IsString())
 					{
 						name = entityDoc[JSON_SCENE_ENTITIES_VAR_NAME].GetString();
 					}
 
-					gameplay::EntityID id = core::TOOL->GetECS().CreateEntity(core::TOOL->GetECS().GetUniqueName(name));
-					gameplay::Entity* entity = core::TOOL->GetECS().GetEntity(id);
+					gameplay::EntityID id = core::ENGINE->GetECS().CreateEntity(core::ENGINE->GetECS().GetUniqueName(name));
+					gameplay::Entity* entity = core::ENGINE->GetECS().GetEntity(id);
 					if (!entity)
 					{
 						continue;
@@ -90,7 +90,7 @@ namespace gallus
 					entity->SetIsActive(isActive);
 
 					auto componentsDoc = entityDoc[JSON_SCENE_ENTITIES_VAR_COMPONENTS].GetObject();
-					for (gameplay::AbstractECSSystem* system : core::TOOL->GetECS().GetSystems())
+					for (gameplay::AbstractECSSystem* system : core::ENGINE->GetECS().GetSystems())
 					{
 						if (componentsDoc.HasMember(system->GetPropertyName().c_str()))
 						{
@@ -127,7 +127,7 @@ namespace gallus
 			rapidjson::Document::AllocatorType& allocator = a_Document.GetAllocator();
 
 			a_Document.AddMember(JSON_SCENE_ENTITIES_VAR, rapidjson::Value().SetArray(), allocator);
-			for (gameplay::Entity& entity : core::TOOL->GetECS().GetEntities())
+			for (gameplay::Entity& entity : core::ENGINE->GetECS().GetEntities())
 			{
 				rapidjson::Document entityDoc;
 				entityDoc.SetObject();
@@ -138,7 +138,7 @@ namespace gallus
 				rapidjson::Document componentsDoc;
 				componentsDoc.SetObject();
 
-				for (gameplay::AbstractECSSystem* system : core::TOOL->GetECS().GetSystemsContainingEntity(entity))
+				for (gameplay::AbstractECSSystem* system : core::ENGINE->GetECS().GetSystemsContainingEntity(entity))
 				{
 					rapidjson::Value key(system->GetPropertyName().c_str(), allocator);
 

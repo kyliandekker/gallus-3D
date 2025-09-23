@@ -4,7 +4,7 @@
 #include <stb_image.h>
 
 // core includes
-#include "core/Tool.h"
+#include "core/Engine.h"
 #include "core/Data.h"
 
 // logger includes
@@ -33,14 +33,14 @@ namespace gallus
 			//---------------------------------------------------------------------
 			void Texture::Destroy()
 			{
-				std::shared_ptr<CommandQueue> commandQueue = core::TOOL->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_DIRECT);
+				std::shared_ptr<CommandQueue> commandQueue = core::ENGINE->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_DIRECT);
 
-				uint64_t fenceVal = core::TOOL->GetDX12().GetCurrentFenceValue();
-				commandQueue->WaitForFenceValue(core::TOOL->GetDX12().GetCurrentFenceValue());
+				uint64_t fenceVal = core::ENGINE->GetDX12().GetCurrentFenceValue();
+				commandQueue->WaitForFenceValue(core::ENGINE->GetDX12().GetCurrentFenceValue());
 
 				if (m_pResource)
 				{
-					core::TOOL->GetDX12().GetSRV().Deallocate(m_iSRVIndex);
+					core::ENGINE->GetDX12().GetSRV().Deallocate(m_iSRVIndex);
 					m_pResource.Reset();
 					m_pResourceUploadHeap.Reset();
 					m_iSRVIndex = -1;
@@ -91,11 +91,11 @@ namespace gallus
 				// Only create SRV once
 				if (m_iSRVIndex == -1)
 				{
-					m_iSRVIndex = static_cast<int32_t>(core::TOOL->GetDX12().GetSRV().Allocate());
-					core::TOOL->GetDX12().GetDevice()->CreateShaderResourceView(
+					m_iSRVIndex = static_cast<int32_t>(core::ENGINE->GetDX12().GetSRV().Allocate());
+					core::ENGINE->GetDX12().GetDevice()->CreateShaderResourceView(
 						m_pResource.Get(),
 						&m_SrvDesc,
-						core::TOOL->GetDX12().GetSRV().GetCPUHandle(m_iSRVIndex)
+						core::ENGINE->GetDX12().GetSRV().GetCPUHandle(m_iSRVIndex)
 					);
 				}
 
@@ -110,9 +110,9 @@ namespace gallus
 			//---------------------------------------------------------------------
 			void Texture::Bind(std::shared_ptr<CommandList> a_pCommandList, int8_t a_iSpriteIndex)
 			{
-				a_pCommandList->GetCommandList()->SetDescriptorHeaps(1, core::TOOL->GetDX12().GetSRV().GetHeap().GetAddressOf());
+				a_pCommandList->GetCommandList()->SetDescriptorHeaps(1, core::ENGINE->GetDX12().GetSRV().GetHeap().GetAddressOf());
 
-				CD3DX12_GPU_DESCRIPTOR_HANDLE gpuHandle = core::TOOL->GetDX12().GetSRV().GetGPUHandle(m_iSRVIndex);
+				CD3DX12_GPU_DESCRIPTOR_HANDLE gpuHandle = core::ENGINE->GetDX12().GetSRV().GetGPUHandle(m_iSRVIndex);
 
 				a_pCommandList->GetCommandList()->SetGraphicsRootDescriptorTable(RootParameters::TEX_SRV, gpuHandle);
 
@@ -139,13 +139,13 @@ namespace gallus
 			//---------------------------------------------------------------------
 			CD3DX12_GPU_DESCRIPTOR_HANDLE Texture::GetGPUHandle()
 			{
-				return core::TOOL->GetDX12().GetSRV().GetGPUHandle(m_iSRVIndex);
+				return core::ENGINE->GetDX12().GetSRV().GetGPUHandle(m_iSRVIndex);
 			}
 
 			//---------------------------------------------------------------------
 			CD3DX12_CPU_DESCRIPTOR_HANDLE Texture::GetCPUHandle()
 			{
-				return core::TOOL->GetDX12().GetSRV().GetCPUHandle(m_iSRVIndex);
+				return core::ENGINE->GetDX12().GetSRV().GetCPUHandle(m_iSRVIndex);
 			}
 
 			//---------------------------------------------------------------------
@@ -186,7 +186,7 @@ namespace gallus
 
 				if (m_iSRVIndex != -1)
 				{
-					core::TOOL->GetDX12().GetSRV().Deallocate(m_iSRVIndex);
+					core::ENGINE->GetDX12().GetSRV().Deallocate(m_iSRVIndex);
 					m_iSRVIndex = -1;
 				}
 
@@ -278,7 +278,7 @@ namespace gallus
 			bool Texture::UploadTexture(const D3D12_HEAP_PROPERTIES& a_UploadHeapProperties, const D3D12_RESOURCE_DESC& a_BufferDescription)
 			{
 				UINT64 uploadBufferSize = GetRequiredIntermediateSize(m_pResource.Get(), 0, 1);
-				if (FAILED(core::TOOL->GetDX12().GetDevice()->CreateCommittedResource(
+				if (FAILED(core::ENGINE->GetDX12().GetDevice()->CreateCommittedResource(
 					&a_UploadHeapProperties,
 					D3D12_HEAP_FLAG_NONE,
 					&a_BufferDescription,

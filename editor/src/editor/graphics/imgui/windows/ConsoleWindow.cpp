@@ -13,7 +13,7 @@
 #include "graphics/imgui/ImGuiWindow.h"
 
 // editor includes
-#include "editor/core/EditorTool.h"
+#include "editor/core/EditorEngine.h"
 
 namespace gallus
 {
@@ -63,12 +63,12 @@ namespace gallus
 			//---------------------------------------------------------------------
 			void ConsoleWindow::Render()
 			{
-				if (!core::EDITOR_TOOL)
+				if (!core::EDITOR_ENGINE)
 				{
 					return;
 				}
 
-				gallus::editor::EditorSettings& editorSettings = core::EDITOR_TOOL->GetEditor().GetEditorSettings();
+				gallus::editor::EditorSettings& editorSettings = core::EDITOR_ENGINE->GetEditor().GetEditorSettings();
 
 				// Filter messages if need be.
 				if (m_bNeedsRefresh)

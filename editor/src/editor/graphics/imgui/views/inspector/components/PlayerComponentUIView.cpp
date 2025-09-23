@@ -32,7 +32,20 @@ namespace gallus
 
 			void PlayerComponentUIView::RenderInner()
 			{
-				ImGui::Text("Test");
+				ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(m_Window.GetFontSize() / 2, m_Window.GetFontSize() / 2));
+
+				ImGui::AlignTextToFramePadding();
+				ImGui::DisplayHeader(m_Window.GetBoldFont(), "Movement Speed: ");
+				ImGui::SameLine();
+
+				float val = m_Component.GetSpeed();
+				ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+				if (ImGui::DragFloat(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "PLAYER_SPEED_INSPECTOR").c_str(), &val, 1.0f, -999999999, 99999999999))
+				{
+					m_Component.SetSpeed(val);
+				}
+
+				ImGui::PopStyleVar();
 			}
 		}
 	}

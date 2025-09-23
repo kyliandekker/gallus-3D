@@ -34,55 +34,57 @@ namespace gallus
 			{
 				float fontSize = m_Window.GetFontSize();
 
-				ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(fontSize / 2, fontSize / 2));
+				ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, m_Window.GetFramePadding());
 				ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0);
 				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, m_Window.GetFramePadding());
-				ImGui::AlignTextToFramePadding();
-				ImGui::DisplayHeader(m_Window.GetBoldFont(), "Position: ");
-				ImGui::SameLine();
-				ImGui::PushItemWidth(75);
-
-				m_PositionView.SetValue(m_Component.Transform().GetPosition());
-				if (m_PositionView.Render("TRANSFORM_POSITION_INSPECTOR"))
-				{
-					m_Component.Transform().SetPosition(m_PositionView.GetValue());
-					gameplay::GAME->GetScene().SetIsDirty(true);
-				}
 
 				ImGui::AlignTextToFramePadding();
 				ImGui::DisplayHeader(m_Window.GetBoldFont(), "Rotation: ");
 				ImGui::SameLine();
 
-				float val = m_Component.Transform().GetRotation();
-				if (ImGui::DragFloat(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "TRANSFORM_ROT_INSPECTOR").c_str(), &val, 1.0f, -999999999, 99999999999))
+				float rotation = m_Component.Transform().GetRotation();
+				ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+				if (ImGui::DragFloat(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "TRANSFORM_ROT_INSPECTOR").c_str(), &rotation, 1.0f, -999999999, 99999999999))
 				{
-					m_Component.Transform().SetRotation(val);
+					m_Component.Transform().SetRotation(rotation);
 				}
 
-				ImGui::AlignTextToFramePadding();
+				ImGui::DisplayHeader(m_Window.GetBoldFont(), "Position: ");
+				ImGui::Indent();
+
+				m_PositionView.SetValue(m_Component.Transform().GetPosition());
+				if (m_PositionView.Render("TRANSFORM_POSITION_INSPECTOR"))
+				{
+					m_Component.Transform().SetPosition(m_PositionView.GetValue());
+					gameplay::GAME.GetScene().SetIsDirty(true);
+				}
+				ImGui::Unindent();
+
 				ImGui::DisplayHeader(m_Window.GetBoldFont(), "Scale: ");
-				ImGui::SameLine();
+				ImGui::Indent();
 
 				m_ScaleView.SetValue(m_Component.Transform().GetScale());
 				if (m_ScaleView.Render("TRANSFORM_SCALE_INSPECTOR"))
 				{
 					m_Component.Transform().SetScale(m_ScaleView.GetValue());
-					gameplay::GAME->GetScene().SetIsDirty(true);
+					gameplay::GAME.GetScene().SetIsDirty(true);
 				}
+				ImGui::Unindent();
 
-				ImGui::AlignTextToFramePadding();
 				ImGui::DisplayHeader(m_Window.GetBoldFont(), "Pivot: ");
-				ImGui::SameLine();
+				ImGui::Indent();
 
-				ImGui::PopStyleVar();
 				m_PivotView.SetValue(m_Component.Transform().GetPivot());
 				if (m_PivotView.Render("TRANSFORM_PIVOT_INSPECTOR", 0.01f, -0.5f, 0.5f))
 				{
 					m_Component.Transform().SetPivot(m_PivotView.GetValue());
-					gameplay::GAME->GetScene().SetIsDirty(true);
+					gameplay::GAME.GetScene().SetIsDirty(true);
 				}
+				ImGui::Unindent();
 
-				ImGui::PopItemWidth();
+				ImGui::SetCursorPosY(ImGui::GetCursorPosY() - m_Window.GetFramePadding().y);
+
+				ImGui::PopStyleVar();
 				ImGui::PopStyleVar();
 				ImGui::PopStyleVar();
 			}

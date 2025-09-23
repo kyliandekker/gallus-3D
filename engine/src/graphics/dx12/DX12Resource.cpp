@@ -1,7 +1,7 @@
 #include "DX12Resource.h"
 
 // core includes
-#include "core/Tool.h" 
+#include "core/Engine.h" 
 
 // logger includes
 #include "logger/Logger.h"
@@ -60,7 +60,7 @@ namespace gallus
 					m_pResource.Reset();
 				}
 
-				Microsoft::WRL::ComPtr<ID3D12Device2>& device = core::TOOL->GetDX12().GetDevice();
+				Microsoft::WRL::ComPtr<ID3D12Device2>& device = core::ENGINE->GetDX12().GetDevice();
 
 				m_sName = a_sName;
 				if (device->CreateCommittedResource(
@@ -141,7 +141,7 @@ namespace gallus
 			//---------------------------------------------------------------------
 			void DX12Resource::CheckFeatureSupport()
 			{
-				Microsoft::WRL::ComPtr<ID3D12Device2>& device = core::TOOL->GetDX12().GetDevice();
+				Microsoft::WRL::ComPtr<ID3D12Device2>& device = core::ENGINE->GetDX12().GetDevice();
 
 				const D3D12_RESOURCE_DESC desc = m_pResource->GetDesc();
 				m_FormatSupport.Format = desc.Format;

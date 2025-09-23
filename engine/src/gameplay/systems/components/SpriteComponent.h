@@ -32,7 +32,7 @@ namespace gallus
 		class SpriteComponent : public Component
 		{
 		public:
-			void Init() override;
+			void Init(const gameplay::EntityID& a_EntityID) override;
 
 			/// <summary>
 			/// Sets the mesh used by the mesh component.

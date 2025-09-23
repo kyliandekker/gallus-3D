@@ -1,4 +1,4 @@
-#include "Tool.h"
+#include "Engine.h"
 
 #include <glm/vec2.hpp>
 
@@ -12,11 +12,11 @@ namespace gallus
 	namespace core
 	{
 		//---------------------------------------------------------------------
-		// Tool
+		// Engine
 		//---------------------------------------------------------------------
-		bool Tool::Initialize(HINSTANCE a_hInstance, const std::string& a_sName)
+		bool Engine::Initialize(HINSTANCE a_hInstance, const std::string& a_sName)
 		{
-			TOOL = this;
+			ENGINE = this;
 #ifdef _TEST
 			std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 #endif // _TEST
@@ -24,7 +24,7 @@ namespace gallus
 			// Logger is a global var unlike all the other systems. Not the prettiest but not too bad either.
 			logger::LOGGER.Initialize(true);
 
-			LOG(LOGSEVERITY_INFO, LOG_CATEGORY_ENGINE, "Initializing tool.");
+			LOG(LOGSEVERITY_INFO, LOG_CATEGORY_ENGINE, "Initializing engine.");
 
 			m_ResourceAtlas.Initialize();
 
@@ -39,7 +39,7 @@ namespace gallus
 
 			System::Initialize();
 
-			LOG(LOGSEVERITY_INFO, LOG_CATEGORY_ENGINE, "Initialized tool.");
+			LOG(LOGSEVERITY_INFO, LOG_CATEGORY_ENGINE, "Initialized engine.");
 
 #ifdef _TEST
 			std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
@@ -58,7 +58,7 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		bool Tool::Destroy()
+		bool Engine::Destroy()
 		{
 			LOG(LOGSEVERITY_INFO, LOG_CATEGORY_ENGINE, "Destroying engine.");
 
@@ -77,27 +77,35 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		ResourceAtlas& Tool::GetResourceAtlas()
+		ResourceAtlas& Engine::GetResourceAtlas()
 		{
 			return m_ResourceAtlas;
 		}
 
 		//---------------------------------------------------------------------
-		graphics::win32::Window& Tool::GetWindow()
+		graphics::win32::Window& Engine::GetWindow()
 		{
 			return m_Window;
 		}
 
 		//---------------------------------------------------------------------
-		graphics::dx12::DX12System2D& Tool::GetDX12()
+		graphics::dx12::DX12System2D& Engine::GetDX12()
 		{
 			return m_DX12;
 		}
 
 		//---------------------------------------------------------------------
-		gameplay::EntityComponentSystem& Tool::GetECS()
+		gameplay::EntityComponentSystem& Engine::GetECS()
 		{
 			return m_ECS;
+		}
+
+		void Engine::SetDefaultArguments() const
+		{
+			gallus::core::ARGS.AddArgument<std::string>(ASSET_PATH_ARG, "./data/assets/");
+			gallus::core::ARGS.AddArgument<gallus::LogSeverity>(ASSERT_LEVEL_ARG, gallus::LogSeverity::LOGSEVERITY_ERROR);
+			gallus::core::ARGS.AddArgument<bool>(LOG_TO_FILE_ARG, false);
+			gallus::core::ARGS.AddArgument<gallus::logger::LogType>(LOG_TO_FILE_ARG, gallus::logger::LogType::LOGTYPE_WITH_PARENT_FOLDER);
 		}
 	}
 }

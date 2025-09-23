@@ -22,15 +22,15 @@ namespace gallus
 	namespace core
 	{
 		//---------------------------------------------------------------------
-		// Tool
+		// Engine
 		//---------------------------------------------------------------------
 		/// <summary>
 		/// Main tool that manages all systems in the program, like initialization, startup, update and shutdown.
 		/// </summary>
-		class Tool : public System
+		class Engine : public System
 		{
 		public:
-			Tool() = default;
+			Engine() = default;
 
 			/// <summary>
 			/// Initializes the engine and all necessary subsystems with the specified parameters.
@@ -71,7 +71,7 @@ namespace gallus
 			gameplay::EntityComponentSystem& GetECS();
 
 			/// <summary>
-			/// Retrieves the save directory of the program.
+			/// Retrieves the save directory of the application.
 			/// </summary>
 			/// <returns>Path to the save directory.</returns>
 			const std::filesystem::path& GetSaveDirectory()
@@ -80,7 +80,7 @@ namespace gallus
 			}
 
 			/// <summary>
-			/// Sets the save directory of the program.
+			/// Sets the save directory of the application.
 			/// </summary>
 			/// <param name="a_sSaveDirectory">Save directory.</param>
 			void SetSaveDirectory(const std::filesystem::path& a_sSaveDirectory)
@@ -88,6 +88,11 @@ namespace gallus
 				m_sSaveDirectory = a_sSaveDirectory;
 				file::CreateDirectory(a_sSaveDirectory);
 			}
+
+			/// <summary>
+			/// Sets the default arguments of the application.
+			/// </summary>
+			virtual void SetDefaultArguments() const;
 		private:
 			ResourceAtlas m_ResourceAtlas;
 			graphics::win32::Window m_Window;
@@ -96,6 +101,6 @@ namespace gallus
 
 			std::filesystem::path m_sSaveDirectory;
 		};
-		extern inline Tool* TOOL = nullptr;
+		extern inline Engine* ENGINE = nullptr;
 	}
 }

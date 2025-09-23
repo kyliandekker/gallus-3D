@@ -8,7 +8,7 @@
 #include <imgui/implot.h>
 
 // core includes
-#include "core/Tool.h"
+#include "core/Engine.h"
 
 // logger includes
 #include "logger/Logger.h"
@@ -46,7 +46,7 @@ namespace gallus
 				ImGui::CreateContext();
 				ImPlot::CreateContext();
 
-				m_IniPath = fs::path(core::TOOL->GetSaveDirectory().generic_string() + "/imgui.ini").generic_string();
+				m_IniPath = fs::path(core::ENGINE->GetSaveDirectory().generic_string() + "/imgui.ini").generic_string();
 				ImGuiIO& io = ImGui::GetIO();
 				io.IniFilename = m_IniPath.c_str();
 
@@ -92,7 +92,7 @@ namespace gallus
 			//---------------------------------------------------------------------
 			bool ImGuiWindow::CreateContextWin32()
 			{
-				if (!ImGui_ImplWin32_Init(core::TOOL->GetWindow().GetHWnd()))
+				if (!ImGui_ImplWin32_Init(core::ENGINE->GetWindow().GetHWnd()))
 				{
 					LOG(LOGSEVERITY_ERROR, LOG_CATEGORY_EDITOR, "Failed creating WIN32 context for ImGui.");
 					return false;
@@ -105,7 +105,7 @@ namespace gallus
 			//---------------------------------------------------------------------
 			bool ImGuiWindow::CreateContextDX12()
 			{
-				dx12::DX12System2D& dx12window = core::TOOL->GetDX12();
+				dx12::DX12System2D& dx12window = core::ENGINE->GetDX12();
 				m_iSrvIndex = dx12window.GetSRV().Allocate();
 
 				if (!ImGui_ImplDX12_Init(dx12window.GetDevice().Get(), dx12::g_iBufferCount,
@@ -132,7 +132,7 @@ namespace gallus
 				(void) io;
 
 				// On Windows 8.1+:
-				UINT dpi = GetDpiForWindow(core::TOOL->GetWindow().GetHWnd()); // returns DPI, e.g., 96, 120, 144
+				UINT dpi = GetDpiForWindow(core::ENGINE->GetWindow().GetHWnd()); // returns DPI, e.g., 96, 120, 144
 				float dp = dpi / 96.0f; // 96 is the default DPI (100%)
 
 				m_fFontSize *= dp;

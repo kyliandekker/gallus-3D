@@ -16,7 +16,7 @@
 #include "graphics/imgui/font_icon.h"
 
 // editor includes
-#include "editor/core/EditorTool.h"
+#include "editor/core/EditorEngine.h"
 #include "resources/AssetType.h"
 #include "editor/FileResource.h"
 #include "editor/graphics/imgui/modals/FilePickerModal.h"
@@ -53,7 +53,7 @@ namespace gallus
 				strncpy(m_TextureName, m_Component.GetTexture()->GetName().c_str(), sizeof(m_TextureName));
 				m_TextureName[sizeof(m_TextureName) - 1] = '\0';
 
-				FilePickerModal* modal = dynamic_cast<FilePickerModal*>(m_Window.GetModal(0));
+				FilePickerModal* modal = dynamic_cast<FilePickerModal*>(m_Window.GetModal((int) EDITOR_MODAL::EDITOR_MODAL_FILE_PICKER));
 
 				ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(m_Window.GetFontSize() / 2, m_Window.GetFontSize() / 2));
 				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
@@ -77,8 +77,8 @@ namespace gallus
 								if (success == 1)
 								{
 									m_Component.SetShader(
-										core::TOOL->GetResourceAtlas().LoadShaderBind(
-										core::TOOL->GetResourceAtlas().LoadPixelShader(resource.GetPath().filename().generic_string()).get(),
+										core::EDITOR_ENGINE->GetResourceAtlas().LoadShaderBind(
+										core::EDITOR_ENGINE->GetResourceAtlas().LoadPixelShader(resource.GetPath().filename().generic_string()).get(),
 										m_Component.GetShader()->GetVertexShader()
 									).get());
 								}
@@ -109,12 +109,12 @@ namespace gallus
 								if (success == 1)
 								{
 									m_Component.SetShader(
-										core::TOOL->GetResourceAtlas().LoadShaderBind(
+										core::EDITOR_ENGINE->GetResourceAtlas().LoadShaderBind(
 											m_Component.GetShader()->GetPixelShader(), 
-											core::TOOL->GetResourceAtlas().LoadVertexShader(resource.GetPath().filename().generic_string()).get()
+											core::EDITOR_ENGINE->GetResourceAtlas().LoadVertexShader(resource.GetPath().filename().generic_string()).get()
 									).get());
 									
-									gameplay::GAME->GetScene().SetIsDirty(true);
+									gameplay::GAME.GetScene().SetIsDirty(true);
 								}
 							},
 							std::vector<gallus::resources::AssetType>{ gallus::resources::AssetType::VertexShader }
@@ -142,13 +142,13 @@ namespace gallus
 							{
 								if (success == 1)
 								{
-									auto cCommandQueue = core::TOOL->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
+									auto cCommandQueue = core::EDITOR_ENGINE->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
 									auto cCommandList = cCommandQueue->GetCommandList();
-									m_Component.SetTexture(core::TOOL->GetResourceAtlas().LoadTexture(resource.GetPath().filename().generic_string(), cCommandList).get());
+									m_Component.SetTexture(core::EDITOR_ENGINE->GetResourceAtlas().LoadTexture(resource.GetPath().filename().generic_string(), cCommandList).get());
 									cCommandQueue->ExecuteCommandList(cCommandList);
 									cCommandQueue->Flush();
 
-									gameplay::GAME->GetScene().SetIsDirty(true);
+									gameplay::GAME.GetScene().SetIsDirty(true);
 								}
 							},
 							std::vector<gallus::resources::AssetType>{ gallus::resources::AssetType::Sprite }
@@ -161,6 +161,11 @@ namespace gallus
 				{
 					ImGui::SetCursorPosY(ImGui::GetCursorPosY() + m_Window.GetFramePadding().y);
 
+					ImGui::AlignTextToFramePadding();
+					ImGui::DisplayHeader(m_Window.GetBoldFont(), "Sprite Index: ");
+					ImGui::SameLine();
+
+					ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
 					int spriteIndex = m_Component.GetSpriteIndex();
 					if (ImGui::DragInt(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "MESH_COMPONENT_CURRENT_SPRITE_INDEX").c_str(), &spriteIndex, 1, 0, m_Component.GetTexture()->GetSpriteRectsSize() - 1))
 					{

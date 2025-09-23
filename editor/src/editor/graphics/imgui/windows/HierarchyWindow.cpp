@@ -14,7 +14,7 @@
 #include "graphics/imgui/ImGuiWindow.h"
 
 // editor includes
-#include "editor/core/EditorTool.h"
+#include "editor/core/EditorEngine.h"
 #include "editor/graphics/imgui/views/inspector/EntityInspectorView.h"
 
 // game includes
@@ -41,13 +41,13 @@ namespace gallus
 			//---------------------------------------------------------------------
 			bool HierarchyWindow::Initialize()
 			{
-				core::TOOL->GetECS().OnEntitiesUpdated() += std::bind(&HierarchyWindow::UpdateEntities, this);
+				core::EDITOR_ENGINE->GetECS().OnEntitiesUpdated() += std::bind(&HierarchyWindow::UpdateEntities, this);
 
-				core::TOOL->GetECS().OnEntityComponentsUpdated() += std::bind(&HierarchyWindow::UpdateEntityComponents, this);
+				core::EDITOR_ENGINE->GetECS().OnEntityComponentsUpdated() += std::bind(&HierarchyWindow::UpdateEntityComponents, this);
 
-				core::EDITOR_TOOL->GetEditor().GetSelectable().OnChanged() += std::bind(&HierarchyWindow::OnSelectableChanged, this, std::placeholders::_1, std::placeholders::_2);
+				core::EDITOR_ENGINE->GetEditor().GetSelectable().OnChanged() += std::bind(&HierarchyWindow::OnSelectableChanged, this, std::placeholders::_1, std::placeholders::_2);
 				
-				gameplay::GAME->GetScene().IsDirty().OnChanged() += std::bind(&HierarchyWindow::OnSceneDirty, this, std::placeholders::_1, std::placeholders::_2);
+				gameplay::GAME.GetScene().IsDirty().OnChanged() += std::bind(&HierarchyWindow::OnSceneDirty, this, std::placeholders::_1, std::placeholders::_2);
 
 				return BaseWindow::Initialize();
 			}
@@ -55,11 +55,11 @@ namespace gallus
 			//---------------------------------------------------------------------
 			bool HierarchyWindow::Destroy()
 			{
-				core::TOOL->GetECS().OnEntitiesUpdated() -= std::bind(&HierarchyWindow::UpdateEntities, this);
+				core::EDITOR_ENGINE->GetECS().OnEntitiesUpdated() -= std::bind(&HierarchyWindow::UpdateEntities, this);
 
-				core::TOOL->GetECS().OnEntityComponentsUpdated() -= std::bind(&HierarchyWindow::UpdateEntityComponents, this);
+				core::EDITOR_ENGINE->GetECS().OnEntityComponentsUpdated() -= std::bind(&HierarchyWindow::UpdateEntityComponents, this);
 
-				core::EDITOR_TOOL->GetEditor().GetSelectable().OnChanged() -= std::bind(&HierarchyWindow::OnSelectableChanged, this, std::placeholders::_1, std::placeholders::_2);
+				core::EDITOR_ENGINE->GetEditor().GetSelectable().OnChanged() -= std::bind(&HierarchyWindow::OnSelectableChanged, this, std::placeholders::_1, std::placeholders::_2);
 
 				return BaseWindow::Destroy();
 			}
@@ -67,12 +67,12 @@ namespace gallus
 			//---------------------------------------------------------------------
 			void HierarchyWindow::Render()
 			{
-				if (!core::EDITOR_TOOL)
+				if (!core::EDITOR_ENGINE)
 				{
 					return;
 				}
 
-				std::lock_guard<std::recursive_mutex> lock(core::TOOL->GetECS().m_EntityMutex);
+				std::lock_guard<std::recursive_mutex> lock(core::EDITOR_ENGINE->GetECS().m_EntityMutex);
 
 				// This needs to be done at the start of the frame to avoid errors.
 				// We refresh the assets that show up based on the search bar and the root directory.
@@ -81,14 +81,14 @@ namespace gallus
 					m_aEntities.clear();
 					m_aFilteredEntities.clear();
 
-					for (auto& entity : core::TOOL->GetECS().GetEntities())
+					for (auto& entity : core::EDITOR_ENGINE->GetECS().GetEntities())
 					{
 						m_aEntities.emplace_back(m_Window, entity.GetEntityID());
 					}
 
 					for (HierarchyEntityUIView& view : m_aEntities)
 					{
-						gameplay::Entity* entity = core::TOOL->GetECS().GetEntity(view.GetEntityID());
+						gameplay::Entity* entity = core::EDITOR_ENGINE->GetECS().GetEntity(view.GetEntityID());
 						if (!entity)
 						{
 							continue;
@@ -127,7 +127,7 @@ namespace gallus
 					m_bNeedsRefresh = false;
 				}
 
-				bool wasEmptyScene = gameplay::GAME->GetScene().GetScenePath().empty();
+				bool wasEmptyScene = gameplay::GAME.GetScene().GetScenePath().empty();
 				if (wasEmptyScene)
 				{
 					ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
@@ -150,7 +150,7 @@ namespace gallus
 				}
 				ImGui::SameLine();
 
-				bool wasDirty = gameplay::GAME->GetScene().IsDirty() && !gameplay::GAME->IsStarted() && !gameplay::GAME->GetScene().GetScenePath().empty();
+				bool wasDirty = gameplay::GAME.GetScene().IsDirty() && !gameplay::GAME.IsStarted() && !gameplay::GAME.GetScene().GetScenePath().empty();
 				if (!wasDirty)
 				{
 					ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
@@ -160,7 +160,7 @@ namespace gallus
 				if (ImGui::IconButton(
 					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_SAVE), BUTTON_ID, "SAVE_HIERARCHY").c_str(), m_Window.GetHeaderSize(), m_Window.GetIconFont(), ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent)))
 				{
-					gameplay::GAME->GetScene().SaveData();
+					gameplay::GAME.GetScene().SaveData();
 				}
 
 				ImVec2 endPos = ImGui::GetCursorPos();
@@ -173,7 +173,7 @@ namespace gallus
 
 				if (ImGui::IsKeyDown(ImGuiMod_Ctrl) && ImGui::IsKeyPressed(ImGuiKey_S) && wasDirty)
 				{
-					gameplay::GAME->GetScene().SaveData();
+					gameplay::GAME.GetScene().SaveData();
 				}
 
 				ImGui::PopStyleVar();
@@ -220,7 +220,7 @@ namespace gallus
 						view->RenderEntity(
 							clicked,
 							right_clicked,
-							core::EDITOR_TOOL->GetEditor().GetSelectable().get() == view
+							core::EDITOR_ENGINE->GetEditor().GetSelectable().get() == view
 						);
 
 						if (clicked)
@@ -234,14 +234,14 @@ namespace gallus
 
 				if (spawnEntity)
 				{
-					const HierarchyEntityUIView* derivedPtr = dynamic_cast<const HierarchyEntityUIView*>(core::EDITOR_TOOL->GetEditor().GetSelectable().get());
+					const HierarchyEntityUIView* derivedPtr = dynamic_cast<const HierarchyEntityUIView*>(core::EDITOR_ENGINE->GetEditor().GetSelectable().get());
 					if (derivedPtr)
 					{
-						core::EDITOR_TOOL->GetEditor().SetSelectable(nullptr, nullptr);
+						core::EDITOR_ENGINE->GetEditor().SetSelectable(nullptr, nullptr);
 					}
 
-					core::TOOL->GetECS().CreateEntity(core::TOOL->GetECS().GetUniqueName("New GameObject"));
-					gameplay::GAME->GetScene().SetIsDirty(true);
+					core::EDITOR_ENGINE->GetECS().CreateEntity(core::EDITOR_ENGINE->GetECS().GetUniqueName("New GameObject"));
+					gameplay::GAME.GetScene().SetIsDirty(true);
 				}
 
 				if (wasEmptyScene)
@@ -263,7 +263,7 @@ namespace gallus
 
 			void HierarchyWindow::SetSelectable(HierarchyEntityUIView* a_EntityView)
 			{
-				core::EDITOR_TOOL->GetEditor().SetSelectable(a_EntityView, a_EntityView ? new EntityInspectorView(m_Window, *a_EntityView) : nullptr);
+				core::EDITOR_ENGINE->GetEditor().SetSelectable(a_EntityView, a_EntityView ? new EntityInspectorView(m_Window, *a_EntityView) : nullptr);
 			}
 
 			void HierarchyWindow::OnSelectableChanged(const EditorSelectable* oldVal, const EditorSelectable* newVal)
@@ -286,10 +286,10 @@ namespace gallus
 
 			void HierarchyWindow::OnSceneDirty(const bool oldVal, const bool newVal)
 			{
-				std::string name = (newVal ? "*" : "") + gameplay::GAME->GetScene().GetScenePath().filename().generic_string();
+				std::string name = (newVal ? "*" : "") + gameplay::GAME.GetScene().GetScenePath().filename().generic_string();
 				std::string title = " - (" + name + ")";
 
-				core::EDITOR_TOOL->GetWindow().AddTitle(title);
+				core::EDITOR_ENGINE->GetWindow().AddTitle(title);
 			}
 		}
 	}

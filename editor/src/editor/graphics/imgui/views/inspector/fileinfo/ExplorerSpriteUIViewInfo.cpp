@@ -7,7 +7,7 @@
 #include <imgui/imgui_helpers.h>
 
 // core includes
-#include "core/Tool.h"
+#include "editor/core/EditorEngine.h"
 
 // graphics includes
 #include "graphics/imgui/ImGuiWindow.h"
@@ -45,9 +45,9 @@ namespace gallus
                     graphics::dx12::TextureTypeToString
                     );
 
-				auto cCommandQueue = core::TOOL->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
+				auto cCommandQueue = core::EDITOR_ENGINE->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
 				auto cCommandList = cCommandQueue->GetCommandList();
-				m_pPreviewTexture = core::TOOL->GetResourceAtlas().LoadTexture(m_ExplorerFileUIView.GetFileResource().GetPath().filename().generic_string(), cCommandList);
+				m_pPreviewTexture = core::EDITOR_ENGINE->GetResourceAtlas().LoadTexture(m_ExplorerFileUIView.GetFileResource().GetPath().filename().generic_string(), cCommandList);
 				m_pPreviewTexture->SetResourceCategory(gallus::core::EngineResourceCategory::Editor);
 				cCommandQueue->ExecuteCommandList(cCommandList);
 				cCommandQueue->Flush();
@@ -92,7 +92,7 @@ namespace gallus
                     case DXGI_FORMAT_R8G8_SINT:
                         return 2;
 
-                    // 3 channels (rare, often unused — many APIs avoid 3-component formats)
+                    // 3 channels (rare, often unused ï¿½ many APIs avoid 3-component formats)
                     case DXGI_FORMAT_R32G32B32_FLOAT:
                     case DXGI_FORMAT_R32G32B32_UINT:
                     case DXGI_FORMAT_R32G32B32_SINT:
@@ -155,7 +155,7 @@ namespace gallus
                 float width = ImGui::GetContentRegionAvail().x;
                 if (metaData->GetTextureType() == graphics::dx12::TextureType::SpriteSheet && ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_IMAGE + std::string(" Open Sprite Editor"), BUTTON_ID, "OPEN_SPRITE_EDITOR_INSPECTOR").c_str(), ImVec2(width, 0)))
                 {
-                    SpriteEditorModal* modal = dynamic_cast<SpriteEditorModal*>(m_Window.GetModal(1));
+                    SpriteEditorModal* modal = dynamic_cast<SpriteEditorModal*>(m_Window.GetModal((int) EDITOR_MODAL::EDITOR_MODAL_SPRITE_EDITOR));
                     if (modal)
                     {
                         modal->SetData(

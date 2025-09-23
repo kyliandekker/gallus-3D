@@ -7,7 +7,7 @@
 
 #include <string>
 
-#include "core/Tool.h"
+#include "editor/core/EditorEngine.h"
 
 namespace gallus
 {
@@ -118,7 +118,7 @@ namespace gallus
 				/// </summary>
 				void Render() override
 				{
-					std::lock_guard<std::recursive_mutex> lock(core::TOOL->GetECS().m_EntityMutex);
+					std::lock_guard<std::recursive_mutex> lock(core::EDITOR_ENGINE->GetECS().m_EntityMutex);
 
 					RenderBaseComponent(m_Component, m_System);
 				}
@@ -166,7 +166,7 @@ struct ComponentUIRegistrar
         typeid(ComponentType), \
         [](gallus::graphics::imgui::ImGuiWindow& window, gallus::gameplay::EntityID& entityId) \
             -> gallus::graphics::imgui::ComponentBaseUIView* { \
-            auto& sys = gallus::core::TOOL->GetECS().GetSystem<SystemType>(); \
+            auto& sys = gallus::core::EDITOR_ENGINE->GetECS().GetSystem<SystemType>(); \
             if (sys.HasComponent(entityId)) { \
                 auto& comp = sys.GetComponent(entityId); \
                 return new UIViewType(window, entityId, comp, sys); \

@@ -1,7 +1,7 @@
 ﻿#include "DX12ShaderBind.h"
 
 // core includes
-#include "core/Tool.h"
+#include "core/Engine.h"
 
 // logger includes
 #include "logger/Logger.h"
@@ -71,7 +71,7 @@ namespace gallus
 				rtvFormats.NumRenderTargets = 1;
 				rtvFormats.RTFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
 
-				pipelineStateStream.pRootSignature = core::TOOL->GetDX12().GetRootSignature().Get();
+				pipelineStateStream.pRootSignature = core::ENGINE->GetDX12().GetRootSignature().Get();
 				pipelineStateStream.InputLayout = { g_aInputLayout, _countof(g_aInputLayout) };
 				pipelineStateStream.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 				pipelineStateStream.PS = CD3DX12_SHADER_BYTECODE(m_pPixelShader->GetShaderBlob().Get());
@@ -84,7 +84,7 @@ namespace gallus
 				D3D12_PIPELINE_STATE_STREAM_DESC pipelineStateStreamDesc = {
 					sizeof(PipelineStateStream), &pipelineStateStream
 				};
-				if (FAILED(core::TOOL->GetDX12().GetDevice()->CreatePipelineState(&pipelineStateStreamDesc, IID_PPV_ARGS(&m_pPipelineState))))
+				if (FAILED(core::ENGINE->GetDX12().GetDevice()->CreatePipelineState(&pipelineStateStreamDesc, IID_PPV_ARGS(&m_pPipelineState))))
 				{
 					LOG(LOGSEVERITY_ERROR, LOG_CATEGORY_DX12, "Failed creating pipeline state.");
 					return false;
@@ -97,7 +97,7 @@ namespace gallus
 			void DX12ShaderBind::Bind(std::shared_ptr<CommandList> a_pCommandList)
 			{
 				a_pCommandList->GetCommandList()->SetPipelineState(m_pPipelineState.Get());
-				a_pCommandList->GetCommandList()->SetGraphicsRootSignature(core::TOOL->GetDX12().GetRootSignature().Get()); // Set the existing root signature
+				a_pCommandList->GetCommandList()->SetGraphicsRootSignature(core::ENGINE->GetDX12().GetRootSignature().Get()); // Set the existing root signature
 			}
 
 			//---------------------------------------------------------------------

@@ -3,6 +3,8 @@
 #include <rapidjson/document.h>
 #include <string>
 
+#include "gameplay/EntityID.h"
+
 namespace gallus
 {
 	namespace gameplay
@@ -18,8 +20,10 @@ namespace gallus
 			/// <summary>
 			/// Initializes the component.
 			/// </summary>
-			virtual void Init()
-			{}
+			virtual void Init(const gameplay::EntityID& a_EntityID)
+			{
+				m_EntityID = a_EntityID;
+			}
 
 			/// <summary>
 			/// Serialized the component to a json document.
@@ -51,7 +55,15 @@ namespace gallus
 			{
 				m_bIsDestroyed = true;
 			}
-		private:
+
+			/// <summary>
+			/// Updates the components.
+			/// </summary>
+			/// <param name="a_fDeltaTime">Delta time.</param>
+			virtual void Update(float a_fDeltaTime)
+			{ }
+		protected:
+			gameplay::EntityID m_EntityID;
 			bool m_bIsDestroyed = false;
 		};
 	}

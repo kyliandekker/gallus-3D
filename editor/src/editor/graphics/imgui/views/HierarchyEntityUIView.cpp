@@ -12,7 +12,7 @@
 #include "graphics/imgui/font_icon.h"
 
 // editor includes
-#include "editor/core/EditorTool.h"
+#include "editor/core/EditorEngine.h"
 
 // gameplay includes
 #include "gameplay/Game.h"
@@ -30,7 +30,7 @@ namespace gallus
 
 			void HierarchyEntityUIView::RenderEntity(bool& a_bClicked, bool& a_bDoubleClicked, bool a_bSelected)
 			{
-				gameplay::Entity* entity = core::EDITOR_TOOL->GetECS().GetEntity(m_EntityID);
+				gameplay::Entity* entity = core::EDITOR_ENGINE->GetECS().GetEntity(m_EntityID);
 				if (!entity)
 				{
 					return;
@@ -78,7 +78,7 @@ namespace gallus
 				if (ImGui::Checkbox(ImGui::IMGUI_FORMAT_ID("", CHECKBOX_ID, string_extensions::StringToUpper(entity->GetName()) + "_HIERARCHY").c_str(), &temp))
 				{
 					entity->SetIsActive(temp);
-					gameplay::GAME->GetScene().SetIsDirty(true);
+					gameplay::GAME.GetScene().SetIsDirty(true);
 				}
 				ImGui::PopStyleVar();
 

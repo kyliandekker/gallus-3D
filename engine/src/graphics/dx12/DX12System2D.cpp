@@ -1,7 +1,7 @@
 #include "DX12System2D.h"
 
 // core includes
-#include "core/Tool.h"
+#include "core/Engine.h"
 
 // logger includes
 #include "logger/Logger.h"
@@ -177,33 +177,33 @@ namespace gallus
 				m_ImGuiWindow.Initialize();
 #endif // IMGUI_DISABLE
 
-				std::shared_ptr<Texture> texture = core::TOOL->GetResourceAtlas().LoadTexture("tex_missing.png", cCommandList); // Default texture.
+				std::shared_ptr<Texture> texture = core::ENGINE->GetResourceAtlas().LoadTexture("tex_missing.png", cCommandList); // Default texture.
 				texture->SetResourceCategory(core::EngineResourceCategory::Missing);
 				texture->SetIsDestroyable(false);
 
-				std::shared_ptr<Texture> logo = core::TOOL->GetResourceAtlas().LoadTexture("icon.png", cCommandList); // Logo.
+				std::shared_ptr<Texture> logo = core::ENGINE->GetResourceAtlas().LoadTexture("icon.png", cCommandList); // Logo.
 				logo->SetResourceCategory(core::EngineResourceCategory::System);
 				logo->SetIsDestroyable(false);
 
-				std::shared_ptr<PixelShader> pixelShader = core::TOOL->GetResourceAtlas().LoadPixelShader("pixelShader.hlsl"); // Default shader.
-				std::shared_ptr<VertexShader> vertexShader = core::TOOL->GetResourceAtlas().LoadVertexShader("vertexShader.hlsl"); // Default shader.
+				std::shared_ptr<PixelShader> pixelShader = core::ENGINE->GetResourceAtlas().LoadPixelShader("pixelShader.hlsl"); // Default shader.
+				std::shared_ptr<VertexShader> vertexShader = core::ENGINE->GetResourceAtlas().LoadVertexShader("vertexShader.hlsl"); // Default shader.
 				pixelShader->SetResourceCategory(core::EngineResourceCategory::Missing);
 				pixelShader->SetIsDestroyable(false);
 				vertexShader->SetResourceCategory(core::EngineResourceCategory::Missing);
 				vertexShader->SetIsDestroyable(false);
 
-				std::shared_ptr<DX12ShaderBind> shaderBind = core::TOOL->GetResourceAtlas().LoadShaderBind(pixelShader.get(), vertexShader.get()); // Default shader.
+				std::shared_ptr<DX12ShaderBind> shaderBind = core::ENGINE->GetResourceAtlas().LoadShaderBind(pixelShader.get(), vertexShader.get()); // Default shader.
 
-				std::shared_ptr<PixelShader> renderTexPixelShader = core::TOOL->GetResourceAtlas().LoadPixelShader("renderTexPixelShader.hlsl"); // Default shader.
-				std::shared_ptr<VertexShader> renderTexVertexShader = core::TOOL->GetResourceAtlas().LoadVertexShader("renderTexVertexShader.hlsl"); // Default shader.
+				std::shared_ptr<PixelShader> renderTexPixelShader = core::ENGINE->GetResourceAtlas().LoadPixelShader("renderTexPixelShader.hlsl"); // Default shader.
+				std::shared_ptr<VertexShader> renderTexVertexShader = core::ENGINE->GetResourceAtlas().LoadVertexShader("renderTexVertexShader.hlsl"); // Default shader.
 				renderTexPixelShader->SetResourceCategory(core::EngineResourceCategory::Missing);
 				renderTexPixelShader->SetIsDestroyable(false);
 				renderTexVertexShader->SetResourceCategory(core::EngineResourceCategory::Missing);
 				renderTexVertexShader->SetIsDestroyable(false);
 
-				std::shared_ptr<DX12ShaderBind> renderTexShaderBind = core::TOOL->GetResourceAtlas().LoadShaderBind(renderTexPixelShader.get(), renderTexVertexShader.get()); // Render Tex shader.
+				std::shared_ptr<DX12ShaderBind> renderTexShaderBind = core::ENGINE->GetResourceAtlas().LoadShaderBind(renderTexPixelShader.get(), renderTexVertexShader.get()); // Render Tex shader.
 
-				std::shared_ptr<Mesh> mesh = core::TOOL->GetResourceAtlas().LoadMesh("square"); // Default mesh.
+				std::shared_ptr<Mesh> mesh = core::ENGINE->GetResourceAtlas().LoadMesh("square"); // Default mesh.
 				MeshPartData& squarePrimitive = s_PRIMITIVES[(int)PRIMITIVES::SQUARE];
 				mesh->SetMeshData(squarePrimitive, cCommandList);
 				mesh->SetResourceCategory(core::EngineResourceCategory::Missing);
@@ -228,7 +228,7 @@ namespace gallus
 #ifndef IMGUI_DISABLE
 				m_ImGuiWindow.OnRenderTargetCreated(dCommandList);
 #endif // IMGUI_DISABLE
-				core::TOOL->GetResourceAtlas().TransitionResources(dCommandList);
+				core::ENGINE->GetResourceAtlas().TransitionResources(dCommandList);
 
 				fenceValue = dCommandQueue->ExecuteCommandList(dCommandList);
 				dCommandQueue->WaitForFenceValue(fenceValue);
@@ -740,9 +740,9 @@ namespace gallus
 				{
 					// Bind pipeline + root signature
 					commandList->GetCommandList()->SetPipelineState(
-						core::TOOL->GetResourceAtlas().GetRenderTexShaderBind()->GetPipelineState());
+						core::ENGINE->GetResourceAtlas().GetRenderTexShaderBind()->GetPipelineState());
 					commandList->GetCommandList()->SetGraphicsRootSignature(
-						core::TOOL->GetDX12().GetRootSignature().Get());
+						core::ENGINE->GetDX12().GetRootSignature().Get());
 
 					m_pRenderTexture->Bind(commandList, 2);
 
@@ -800,7 +800,7 @@ namespace gallus
 			//---------------------------------------------------------------------
 			void DX12System2D::Render2D(std::shared_ptr<CommandQueue> a_pCommandQueue, std::shared_ptr<CommandList> a_pCommandList, D3D12_CPU_DESCRIPTOR_HANDLE a_RTVHandle)
 			{
-				core::TOOL->GetResourceAtlas().TransitionResources(a_pCommandList);
+				core::ENGINE->GetResourceAtlas().TransitionResources(a_pCommandList);
 				a_pCommandList->GetCommandList()->OMSetRenderTargets(1, &a_RTVHandle, FALSE, nullptr);
 				a_pCommandList->GetCommandList()->SetGraphicsRootSignature(m_pRootSignature.Get());
 
@@ -820,8 +820,8 @@ namespace gallus
 				ID3D12DescriptorHeap* descriptorHeaps[] = { m_SRV.GetHeap().Get() };
 				a_pCommandList->GetCommandList()->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
-				std::lock_guard<std::recursive_mutex> lock(core::TOOL->GetECS().m_EntityMutex);
-				for (auto& pair : core::TOOL->GetECS().GetSystem<gameplay::SpriteSystem>().GetComponents())
+				std::lock_guard<std::recursive_mutex> lock(core::ENGINE->GetECS().m_EntityMutex);
+				for (auto& pair : core::ENGINE->GetECS().GetSystem<gameplay::SpriteSystem>().GetComponents())
 				{
 					pair.second.Render(a_pCommandList, pair.first, m_Camera);
 				}
@@ -898,7 +898,7 @@ namespace gallus
 				texDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
 				texDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
 
-				m_pRenderTexture = core::TOOL->GetResourceAtlas().LoadTextureByDescription("RenderTexture", texDesc);
+				m_pRenderTexture = core::ENGINE->GetResourceAtlas().LoadTextureByDescription("RenderTexture", texDesc);
 			}
 		}
 	}

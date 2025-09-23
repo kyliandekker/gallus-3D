@@ -14,7 +14,7 @@
 #include "utils/string_extensions.h"
 #include "gameplay/ECSBaseSystem.h"
 #include "gameplay/systems/components/Component.h"
-#include "core/Tool.h"
+#include "core/Engine.h"
 
 namespace gallus
 {
@@ -48,9 +48,9 @@ namespace gallus
 				{
 					ImGui::SetCursorPosY(ImGui::GetCursorPosY() + m_Window.GetWindowPadding().y);
 
-					ImGui::Indent();
+					ImGui::Indent(m_Window.GetFramePadding().x);
 					RenderInner();
-					ImGui::Unindent();
+					ImGui::Unindent(m_Window.GetFramePadding().x);
 				}
 			}
 		}

@@ -1,21 +1,27 @@
 #pragma once
 
-#include "core/Tool.h"
+#include "core/Engine.h"
 #include "editor/Editor.h"
 
 namespace gallus
 {
+	enum class EDITOR_MODAL
+	{
+		EDITOR_MODAL_FILE_PICKER,
+		EDITOR_MODAL_SPRITE_EDITOR,
+	};
+
 	namespace core
 	{
 		//---------------------------------------------------------------------
-		// EditorTool
+		// EditorEngine
 		//---------------------------------------------------------------------
-		class EditorTool : public Tool
+		class EditorEngine : public Engine
 		{
 		public:
-			EditorTool();
+			EditorEngine();
 
-			~EditorTool() = default;
+			~EditorEngine() = default;
 
 			/// <summary>
 			/// Initializes the engine and all necessary subsystems with the specified parameters.
@@ -42,6 +48,6 @@ namespace gallus
 		private:
 			editor::Editor m_Editor;
 		};
-		extern inline EditorTool* EDITOR_TOOL = nullptr;
+		extern inline EditorEngine* EDITOR_ENGINE = nullptr;
 	}
 }

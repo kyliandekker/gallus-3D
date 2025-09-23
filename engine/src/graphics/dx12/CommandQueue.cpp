@@ -3,7 +3,7 @@
 #include <d3d12.h>
 
 // core includes
-#include "core/Tool.h" 
+#include "core/Engine.h" 
 
 // logger includes
 #include "logger/Logger.h"
@@ -31,7 +31,7 @@ namespace gallus
 				desc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
 				desc.NodeMask = 0;
 
-				Microsoft::WRL::ComPtr<ID3D12Device2>& device = core::TOOL->GetDX12().GetDevice();
+				Microsoft::WRL::ComPtr<ID3D12Device2>& device = core::ENGINE->GetDX12().GetDevice();
 				if (FAILED(device->CreateCommandQueue(&desc, IID_PPV_ARGS(&m_pCommandQueue))))
 				{
 					LOG(LOGSEVERITY_ERROR, LOG_CATEGORY_DX12, "Failed creating command queue.");
@@ -54,7 +54,7 @@ namespace gallus
 			//---------------------------------------------------------------------
 			std::shared_ptr<CommandList> CommandQueue::GetCommandList()
 			{
-				Microsoft::WRL::ComPtr<ID3D12Device2>& device = core::TOOL->GetDX12().GetDevice();
+				Microsoft::WRL::ComPtr<ID3D12Device2>& device = core::ENGINE->GetDX12().GetDevice();
 				Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator;
 				std::shared_ptr<CommandList> commandList = std::make_shared<CommandList>();
 
@@ -171,7 +171,7 @@ namespace gallus
 			//---------------------------------------------------------------------
 			Microsoft::WRL::ComPtr<ID3D12CommandAllocator> CommandQueue::CreateCommandAllocator()
 			{
-				Microsoft::WRL::ComPtr<ID3D12Device2>& device = core::TOOL->GetDX12().GetDevice();
+				Microsoft::WRL::ComPtr<ID3D12Device2>& device = core::ENGINE->GetDX12().GetDevice();
 				Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator = nullptr;
 				if (FAILED(device->CreateCommandAllocator(m_CommandListType, IID_PPV_ARGS(&commandAllocator))))
 				{

@@ -9,7 +9,7 @@
 #include <vector>
 
 // core includes
-#include "core/Tool.h"
+#include "core/Engine.h"
 
 // gameplay includes
 #include "gameplay/EntityID.h"
@@ -113,9 +113,9 @@ namespace gallus
 					ComponentType t;
 					m_mComponents.insert(std::make_pair(a_ID, t));
 				}
-				core::TOOL->GetECS().OnEntityComponentsUpdated().invoke();
+				core::ENGINE->GetECS().OnEntityComponentsUpdated().invoke();
 				Component& comp = m_mComponents.at(a_ID);
-				comp.Init();
+				comp.Init(a_ID);
 				return &comp;
 			}
 
@@ -202,7 +202,7 @@ namespace gallus
 
 				if (oldSize != m_mComponents.size())
 				{
-					core::TOOL->GetECS().OnEntityComponentsUpdated().invoke();
+					core::ENGINE->GetECS().OnEntityComponentsUpdated().invoke();
 				}
 			}
 
@@ -211,6 +211,10 @@ namespace gallus
 			/// </summary>
 			virtual void UpdateComponentsRealtime(float a_fDeltaTime) override
 			{
+				for (auto& component : m_mComponents)
+				{
+					component.second.Update(a_fDeltaTime);
+				}
 			}
 
 			/// <summary>

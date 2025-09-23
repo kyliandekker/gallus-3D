@@ -1,7 +1,7 @@
 ﻿#include "Game.h"
 
 // core includes
-#include "core/Tool.h"
+#include "core/Engine.h"
 
 // logger includes
 #include "logger/Logger.h"
@@ -27,11 +27,11 @@ namespace gallus
 		{
 			LOG(LOGSEVERITY_INFO, LOG_CATEGORY_GAME, "Initializing game.");
 
-			core::TOOL->GetECS().CreateSystem<SpriteSystem>().Initialize();
-			core::TOOL->GetECS().CreateSystem<TransformSystem>().Initialize();
-			core::TOOL->GetECS().CreateSystem<PlayerSystem>().Initialize();
+			core::ENGINE->GetECS().CreateSystem<SpriteSystem>().Initialize();
+			core::ENGINE->GetECS().CreateSystem<TransformSystem>().Initialize();
+			core::ENGINE->GetECS().CreateSystem<PlayerSystem>().Initialize();
 
-			core::TOOL->GetWindow().OnQuit() += std::bind(&Game::Shutdown, this);
+			core::ENGINE->GetWindow().OnQuit() += std::bind(&Game::Shutdown, this);
 
 			System::Initialize();
 
@@ -68,7 +68,7 @@ namespace gallus
 				{
 					bool updateRealtime = m_bStarted && !m_bPaused;
 
-					core::TOOL->GetECS().Update(FIXED_TIMESTEP, updateRealtime);
+					core::ENGINE->GetECS().Update(FIXED_TIMESTEP, updateRealtime);
 					lag -= FIXED_TIMESTEP;
 				}
 

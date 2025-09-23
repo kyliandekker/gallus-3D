@@ -9,7 +9,7 @@
 #include <algorithm>
 
 // core includes
-#include "editor/core/EditorTool.h"
+#include "editor/core/EditorEngine.h"
 
 // utils includes
 #include "utils/string_extensions.h"
@@ -38,9 +38,9 @@ namespace gallus
 
 			void SpriteEditorModal::LoadTexture(const std::string& a_sName)
 			{
-				auto cCommandQueue = core::TOOL->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
+				auto cCommandQueue = core::EDITOR_ENGINE->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
 				auto cCommandList = cCommandQueue->GetCommandList();
-				m_pPreviewTexture = core::TOOL->GetResourceAtlas().LoadTexture(a_sName, cCommandList);
+				m_pPreviewTexture = core::EDITOR_ENGINE->GetResourceAtlas().LoadTexture(a_sName, cCommandList);
 				m_pPreviewTexture->SetResourceCategory(gallus::core::EngineResourceCategory::Editor);
 				cCommandQueue->ExecuteCommandList(cCommandList);
 				cCommandQueue->Flush();

@@ -1,7 +1,7 @@
 #include "AssetDatabase.h"
 
 #include "logger/Logger.h"
-#include "core/Tool.h"
+#include "core/EditorEngine.h"
 
 namespace gallus
 {
@@ -12,7 +12,7 @@ namespace gallus
 		//---------------------------------------------------------------------
 		bool AssetDatabase::Initialize()
 		{
-			m_AssetsRoot.m_Path = core::TOOL->GetResourceAtlas().GetResourceFolder();
+			m_AssetsRoot.m_Path = core::EDITOR_ENGINE->GetResourceAtlas().GetResourceFolder();
 
 			LOG(LOGSEVERITY_INFO_SUCCESS, LOG_CATEGORY_EDITOR, "Initialized asset database.");
 			return System::Initialize();

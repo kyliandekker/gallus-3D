@@ -37,9 +37,9 @@ namespace gallus
 				{
 					core::Data data;
 					m_ExplorerFileUIView.GetFileResource().GetFileData(data);
-					gameplay::GAME->GetScene().SetData(data);
-					gameplay::GAME->GetScene().SetScenePath(m_ExplorerFileUIView.GetFileResource().GetPath());
-					gameplay::GAME->GetScene().LoadData();
+					gameplay::GAME.GetScene().SetData(data);
+					gameplay::GAME.GetScene().SetScenePath(m_ExplorerFileUIView.GetFileResource().GetPath());
+					gameplay::GAME.GetScene().LoadData();
 				}
 			}
 		}

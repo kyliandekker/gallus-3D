@@ -1,7 +1,7 @@
 ﻿#include "gameplay/systems/components/SpriteComponent.h"
 
 // core includes
-#include "core/Tool.h"
+#include "core/Engine.h"
 
 // graphics includes
 #include "graphics/dx12/Texture.h"
@@ -15,14 +15,14 @@
 // gameplay includes
 #include "gameplay/systems/TransformSystem.h"
 
-#define JSON_MESH_COMPONENT_TEX_VAR "texture"
-#define JSON_MESH_COMPONENT_TEX_NAME_VAR "name"
-#define JSON_MESH_COMPONENT_TEX_SPRITE_INDEX_VAR "spriteIndex"
-#define JSON_MESH_COMPONENT_MESH_VAR "mesh"
-#define JSON_MESH_COMPONENT_SHADER_VAR "shader"
-#define JSON_MESH_COMPONENT_SHADER_PIXEL_VAR "pixel"
-#define JSON_MESH_COMPONENT_SHADER_VERTEX_VAR "vertex"
-#define JSON_MESH_COMPONENT_MATERIAL_VAR "material"
+#define JSON_SPRITE_COMPONENT_TEX_VAR "texture"
+#define JSON_SPRITE_COMPONENT_TEX_NAME_VAR "name"
+#define JSON_SPRITE_COMPONENT_TEX_SPRITE_INDEX_VAR "spriteIndex"
+#define JSON_SPRITE_COMPONENT_MESH_VAR "mesh"
+#define JSON_SPRITE_COMPONENT_SHADER_VAR "shader"
+#define JSON_SPRITE_COMPONENT_SHADER_PIXEL_VAR "pixel"
+#define JSON_SPRITE_COMPONENT_SHADER_VERTEX_VAR "vertex"
+#define JSON_SPRITE_COMPONENT_MATERIAL_VAR "material"
 
 namespace gallus
 {
@@ -31,11 +31,12 @@ namespace gallus
 		//---------------------------------------------------------------------
 		// SpriteComponent
 		//---------------------------------------------------------------------
-		void SpriteComponent::Init()
+		void SpriteComponent::Init(const gameplay::EntityID& a_EntityID)
 		{
-			m_pShaderBind = core::TOOL->GetResourceAtlas().GetDefaultShaderBind().get();
-			m_pTexture = core::TOOL->GetResourceAtlas().GetDefaultTexture().get();
-			m_pMesh = core::TOOL->GetResourceAtlas().GetDefaultMesh().get();
+			Component::Init(a_EntityID);
+			m_pShaderBind = core::ENGINE->GetResourceAtlas().GetDefaultShaderBind().get();
+			m_pTexture = core::ENGINE->GetResourceAtlas().GetDefaultTexture().get();
+			m_pMesh = core::ENGINE->GetResourceAtlas().GetDefaultMesh().get();
 		}
 
 		//---------------------------------------------------------------------
@@ -132,7 +133,7 @@ namespace gallus
 			const DirectX::XMMATRIX& projectionMatrix = a_Camera.GetProjectionMatrix();
 
 			graphics::dx12::DX12Transform transform;
-			TransformSystem& transformSys = core::TOOL->GetECS().GetSystem<TransformSystem>();
+			TransformSystem& transformSys = core::ENGINE->GetECS().GetSystem<TransformSystem>();
 			if (transformSys.HasComponent(a_EntityID))
 			{
 				transform = transformSys.GetComponent(a_EntityID).Transform();
@@ -144,12 +145,12 @@ namespace gallus
 				return;
 			}
 
-			if (!core::TOOL->GetECS().GetEntity(a_EntityID))
+			if (!core::ENGINE->GetECS().GetEntity(a_EntityID))
 			{
 				return;
 			}
 
-			if (!core::TOOL->GetECS().GetEntity(a_EntityID)->IsActive())
+			if (!core::ENGINE->GetECS().GetEntity(a_EntityID)->IsActive())
 			{
 				return;
 			}
@@ -187,35 +188,35 @@ namespace gallus
 			std::string mesh = m_pMesh->GetName();
 			std::string pixelShader = m_pShaderBind->GetVertexShader()->GetName();
 			std::string vertexShader = m_pShaderBind->GetPixelShader()->GetName();
-			a_Document.AddMember(JSON_MESH_COMPONENT_TEX_VAR, rapidjson::Value().SetObject(), a_Allocator);
-			a_Document[JSON_MESH_COMPONENT_TEX_VAR];
-			a_Document[JSON_MESH_COMPONENT_TEX_VAR].AddMember(
-				JSON_MESH_COMPONENT_TEX_NAME_VAR,
+			a_Document.AddMember(JSON_SPRITE_COMPONENT_TEX_VAR, rapidjson::Value().SetObject(), a_Allocator);
+			a_Document[JSON_SPRITE_COMPONENT_TEX_VAR];
+			a_Document[JSON_SPRITE_COMPONENT_TEX_VAR].AddMember(
+				JSON_SPRITE_COMPONENT_TEX_NAME_VAR,
 				rapidjson::Value(tex.c_str(), a_Allocator),
 				a_Allocator
 			);
-			a_Document[JSON_MESH_COMPONENT_TEX_VAR].AddMember(
-				JSON_MESH_COMPONENT_TEX_SPRITE_INDEX_VAR,
+			a_Document[JSON_SPRITE_COMPONENT_TEX_VAR].AddMember(
+				JSON_SPRITE_COMPONENT_TEX_SPRITE_INDEX_VAR,
 				m_iSpriteIndex,
 				a_Allocator
 			);
 
-			a_Document.AddMember(JSON_MESH_COMPONENT_SHADER_VAR, rapidjson::Value().SetObject(), a_Allocator);
+			a_Document.AddMember(JSON_SPRITE_COMPONENT_SHADER_VAR, rapidjson::Value().SetObject(), a_Allocator);
 
-			a_Document[JSON_MESH_COMPONENT_SHADER_VAR].AddMember(
-				JSON_MESH_COMPONENT_SHADER_PIXEL_VAR,
+			a_Document[JSON_SPRITE_COMPONENT_SHADER_VAR].AddMember(
+				JSON_SPRITE_COMPONENT_SHADER_PIXEL_VAR,
 				rapidjson::Value(pixelShader.c_str(), a_Allocator),
 				a_Allocator
 			);
 
-			a_Document[JSON_MESH_COMPONENT_SHADER_VAR].AddMember(
-				JSON_MESH_COMPONENT_SHADER_VERTEX_VAR,
+			a_Document[JSON_SPRITE_COMPONENT_SHADER_VAR].AddMember(
+				JSON_SPRITE_COMPONENT_SHADER_VERTEX_VAR,
 				rapidjson::Value(vertexShader.c_str(), a_Allocator),
 				a_Allocator
 			);
 
 			a_Document.AddMember(
-				JSON_MESH_COMPONENT_MESH_VAR,
+				JSON_SPRITE_COMPONENT_MESH_VAR,
 				rapidjson::Value(mesh.c_str(), a_Allocator),
 				a_Allocator
 			);
@@ -233,44 +234,44 @@ namespace gallus
 			std::string mesh;
 			std::string pixelShader;
 			std::string vertexShader;
-			if (a_Document.HasMember(JSON_MESH_COMPONENT_TEX_VAR) && a_Document[JSON_MESH_COMPONENT_TEX_VAR].IsObject())
+			if (a_Document.HasMember(JSON_SPRITE_COMPONENT_TEX_VAR) && a_Document[JSON_SPRITE_COMPONENT_TEX_VAR].IsObject())
 			{
-				if (a_Document[JSON_MESH_COMPONENT_TEX_VAR].HasMember(JSON_MESH_COMPONENT_TEX_NAME_VAR) && a_Document[JSON_MESH_COMPONENT_TEX_VAR][JSON_MESH_COMPONENT_TEX_NAME_VAR].IsString())
+				if (a_Document[JSON_SPRITE_COMPONENT_TEX_VAR].HasMember(JSON_SPRITE_COMPONENT_TEX_NAME_VAR) && a_Document[JSON_SPRITE_COMPONENT_TEX_VAR][JSON_SPRITE_COMPONENT_TEX_NAME_VAR].IsString())
 				{
-					tex = a_Document[JSON_MESH_COMPONENT_TEX_VAR][JSON_MESH_COMPONENT_TEX_NAME_VAR].GetString();
+					tex = a_Document[JSON_SPRITE_COMPONENT_TEX_VAR][JSON_SPRITE_COMPONENT_TEX_NAME_VAR].GetString();
 				}
-				if (a_Document[JSON_MESH_COMPONENT_TEX_VAR].HasMember(JSON_MESH_COMPONENT_TEX_SPRITE_INDEX_VAR) && a_Document[JSON_MESH_COMPONENT_TEX_VAR][JSON_MESH_COMPONENT_TEX_SPRITE_INDEX_VAR].IsInt())
+				if (a_Document[JSON_SPRITE_COMPONENT_TEX_VAR].HasMember(JSON_SPRITE_COMPONENT_TEX_SPRITE_INDEX_VAR) && a_Document[JSON_SPRITE_COMPONENT_TEX_VAR][JSON_SPRITE_COMPONENT_TEX_SPRITE_INDEX_VAR].IsInt())
 				{
-					m_iSpriteIndex = a_Document[JSON_MESH_COMPONENT_TEX_VAR][JSON_MESH_COMPONENT_TEX_SPRITE_INDEX_VAR].GetInt();
+					m_iSpriteIndex = a_Document[JSON_SPRITE_COMPONENT_TEX_VAR][JSON_SPRITE_COMPONENT_TEX_SPRITE_INDEX_VAR].GetInt();
 				}
 			}
 
-			if (a_Document.HasMember(JSON_MESH_COMPONENT_SHADER_VAR) && a_Document[JSON_MESH_COMPONENT_SHADER_VAR].IsString())
+			if (a_Document.HasMember(JSON_SPRITE_COMPONENT_SHADER_VAR) && a_Document[JSON_SPRITE_COMPONENT_SHADER_VAR].IsString())
 			{
-				pixelShader = a_Document[JSON_MESH_COMPONENT_SHADER_VAR].GetString();
-				vertexShader = a_Document[JSON_MESH_COMPONENT_SHADER_VAR].GetString();
+				pixelShader = a_Document[JSON_SPRITE_COMPONENT_SHADER_VAR].GetString();
+				vertexShader = a_Document[JSON_SPRITE_COMPONENT_SHADER_VAR].GetString();
 			}
 
-			if (a_Document.HasMember(JSON_MESH_COMPONENT_MESH_VAR) && a_Document[JSON_MESH_COMPONENT_MESH_VAR].IsString())
+			if (a_Document.HasMember(JSON_SPRITE_COMPONENT_MESH_VAR) && a_Document[JSON_SPRITE_COMPONENT_MESH_VAR].IsString())
 			{
-				mesh = a_Document[JSON_MESH_COMPONENT_MESH_VAR].GetString();
+				mesh = a_Document[JSON_SPRITE_COMPONENT_MESH_VAR].GetString();
 			}
 
-			std::shared_ptr<graphics::dx12::CommandQueue> cCommandQueue = core::TOOL->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
+			std::shared_ptr<graphics::dx12::CommandQueue> cCommandQueue = core::ENGINE->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
 			std::shared_ptr<graphics::dx12::CommandList> cCommandList = cCommandQueue->GetCommandList();
 			if (!mesh.empty())
 			{
-				SetMesh(core::TOOL->GetResourceAtlas().LoadMesh(mesh).get());
+				SetMesh(core::ENGINE->GetResourceAtlas().LoadMesh(mesh).get());
 			}
 			if (!tex.empty())
 			{
-				SetTexture(core::TOOL->GetResourceAtlas().LoadTexture(tex, cCommandList).get());
+				SetTexture(core::ENGINE->GetResourceAtlas().LoadTexture(tex, cCommandList).get());
 			}
 			if (!vertexShader.empty() && !pixelShader.empty())
 			{
-				SetShader(core::TOOL->GetResourceAtlas().LoadShaderBind(
-					core::TOOL->GetResourceAtlas().LoadPixelShader(pixelShader).get(),
-					core::TOOL->GetResourceAtlas().LoadVertexShader(vertexShader).get()
+				SetShader(core::ENGINE->GetResourceAtlas().LoadShaderBind(
+					core::ENGINE->GetResourceAtlas().LoadPixelShader(pixelShader).get(),
+					core::ENGINE->GetResourceAtlas().LoadVertexShader(vertexShader).get()
 				).get());
 			}
 			cCommandQueue->ExecuteCommandList(cCommandList);

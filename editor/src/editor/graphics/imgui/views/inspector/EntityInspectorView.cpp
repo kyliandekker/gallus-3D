@@ -8,7 +8,7 @@
 #include <imgui/imgui_helpers.h>
 
 // core includes
-#include "core/Tool.h"
+#include "editor/core/EditorEngine.h"
 
 // graphics includes
 #include "graphics/imgui/font_icon.h"
@@ -44,7 +44,7 @@ namespace gallus
 				m_bShowRename = true;
 				m_bShowDelete = true;
 
-				m_pEntity = core::TOOL->GetECS().GetEntity(m_HierarchyEntityUIView.GetEntityID());
+				m_pEntity = core::EDITOR_ENGINE->GetECS().GetEntity(m_HierarchyEntityUIView.GetEntityID());
 				if (!m_pEntity)
 				{
 					return;
@@ -75,15 +75,15 @@ namespace gallus
 				if (m_pEntity)
 				{
 					m_pEntity->SetName(a_sName);
-					gameplay::GAME->GetScene().SetIsDirty(true);
+					gameplay::GAME.GetScene().SetIsDirty(true);
 				}
 			}
 
 			//---------------------------------------------------------------------
 			void EntityInspectorView::OnDelete()
 			{
-				core::TOOL->GetECS().DeleteEntity(m_HierarchyEntityUIView.GetEntityID());
-				gameplay::GAME->GetScene().SetIsDirty(true);
+				core::EDITOR_ENGINE->GetECS().DeleteEntity(m_HierarchyEntityUIView.GetEntityID());
+				gameplay::GAME.GetScene().SetIsDirty(true);
 			}
 
 			//---------------------------------------------------------------------
@@ -101,9 +101,9 @@ namespace gallus
 			//---------------------------------------------------------------------
 			void EntityInspectorView::Render()
 			{
-				std::lock_guard<std::recursive_mutex> lock(core::TOOL->GetECS().m_EntityMutex);
+				std::lock_guard<std::recursive_mutex> lock(core::EDITOR_ENGINE->GetECS().m_EntityMutex);
 
-				m_pEntity = core::TOOL->GetECS().GetEntity(m_HierarchyEntityUIView.GetEntityID());
+				m_pEntity = core::EDITOR_ENGINE->GetECS().GetEntity(m_HierarchyEntityUIView.GetEntityID());
 				if (!m_pEntity)
 				{
 					return;
@@ -137,12 +137,12 @@ namespace gallus
 
 				gameplay::EntityID& entityId = m_pEntity->GetEntityID();
 
-				gameplay::EntityComponentSystem& ecs = core::TOOL->GetECS();
+				gameplay::EntityComponentSystem& ecs = core::EDITOR_ENGINE->GetECS();
 				ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, m_Window.GetFramePadding());
 				ImGui::SetNextWindowSize(ImVec2(width, 0));
 				if (ImGui::BeginPopup(ImGui::IMGUI_FORMAT_ID("", POPUP_WINDOW_ID, "ADD_COMPONENT_MENU_INSPECTOR").c_str()))
 				{
-					for (gameplay::AbstractECSSystem* system : core::TOOL->GetECS().GetSystems())
+					for (gameplay::AbstractECSSystem* system : core::EDITOR_ENGINE->GetECS().GetSystems())
 					{
 						if (system->HasComponent(entityId))
 						{

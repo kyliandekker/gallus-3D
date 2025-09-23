@@ -12,7 +12,7 @@
 
 // editor includes
 #include "editor/graphics/imgui/views/inspector/InspectorView.h"
-#include "editor/core/EditorTool.h"
+#include "editor/core/EditorEngine.h"
 
 namespace gallus
 {
@@ -34,14 +34,14 @@ namespace gallus
 
 			void InspectorWindow::Render()
 			{
-				if (!core::EDITOR_TOOL)
+				if (!core::EDITOR_ENGINE)
 				{
 					return;
 				}
 
-				std::lock_guard<std::mutex> lock(core::EDITOR_TOOL->GetEditor().m_EditorMutex);
+				std::lock_guard<std::mutex> lock(core::EDITOR_ENGINE->GetEditor().m_EditorMutex);
 
-				InspectorView* inspectorView = core::EDITOR_TOOL->GetEditor().GetInspectorView();
+				InspectorView* inspectorView = core::EDITOR_ENGINE->GetEditor().GetInspectorView();
 				if (!inspectorView)
 				{
 					return;

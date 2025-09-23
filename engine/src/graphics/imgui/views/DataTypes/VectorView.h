@@ -67,11 +67,13 @@ namespace gallus
 					ImGui::AlignTextToFramePadding();
 					ImGui::Text("X");
 					ImGui::SameLine();
+					ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
 					bool changedValueX = ImGui::DragFloat(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, std::string("X_") + a_sLabel).c_str(), &m_Value.x, a_fSpeed, a_fMin, a_fMax);
+					
 					ImGui::AlignTextToFramePadding();
-					ImGui::SameLine();
 					ImGui::Text("Y");
 					ImGui::SameLine();
+					ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
 					bool changedValueY = ImGui::DragFloat(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, std::string("Y_") + a_sLabel).c_str(), &m_Value.y, a_fSpeed, a_fMin, a_fMax);
 
 					return changedValueX ? 1 : (changedValueY ? 2 : 0);
@@ -132,11 +134,13 @@ namespace gallus
 					ImGui::AlignTextToFramePadding();
 					ImGui::Text("X");
 					ImGui::SameLine();
+					ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
 					bool changedValueX = ImGui::DragInt(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, std::string("X_") + a_Label).c_str(), &m_Value.x, 1.0f);
-					ImGui::SameLine();
+			
 					ImGui::AlignTextToFramePadding();
 					ImGui::Text("Y");
 					ImGui::SameLine();
+					ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
 					bool changedValueY = ImGui::DragInt(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, std::string("Y_") + a_Label).c_str(), &m_Value.y, 1.0f);
 
 					return changedValueX ? 1 : (changedValueY ? 2 : 0);

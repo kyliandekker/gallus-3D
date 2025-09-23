@@ -1,21 +1,21 @@
-#include "EditorTool.h"
+#include "EditorEngine.h"
 
 namespace gallus
 {
 	namespace core
 	{
 		//---------------------------------------------------------------------
-		// EditorTool
+		// EditorEngine
 		//---------------------------------------------------------------------
-		EditorTool::EditorTool() : Tool::Tool()
+		EditorEngine::EditorEngine() : Engine::Engine()
 		{}
 
 		//---------------------------------------------------------------------
-		bool EditorTool::Initialize(HINSTANCE a_hInstance, const std::string& a_sName)
+		bool EditorEngine::Initialize(HINSTANCE a_hInstance, const std::string& a_sName)
 		{
-			Tool::Initialize(a_hInstance, a_sName);
+			Engine::Initialize(a_hInstance, a_sName);
 
-			EDITOR_TOOL = this;
+			EDITOR_ENGINE = this;
 
 			m_Editor.Initialize(true);
 
@@ -23,11 +23,11 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		bool EditorTool::Destroy()
+		bool EditorEngine::Destroy()
 		{
 			m_Editor.Destroy();
 
-			return Tool::Destroy();
+			return Engine::Destroy();
 		}
 	}
 }

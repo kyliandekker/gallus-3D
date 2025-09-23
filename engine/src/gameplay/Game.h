@@ -75,6 +75,6 @@ namespace gallus
 			bool m_bStarted = false;
 			bool m_bPaused = false;
 		};
-		inline extern Game* GAME = nullptr;
+		inline extern Game GAME = {};
 	}
 }

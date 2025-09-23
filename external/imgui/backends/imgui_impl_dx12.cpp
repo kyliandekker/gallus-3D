@@ -48,7 +48,7 @@
 #include "graphics/dx12/DX12PCH.h"
 #include "graphics/dx12/CommandList.h"
 #include "graphics/dx12/CommandQueue.h"
-#include "core/Tool.h"
+#include "core/Engine.h"
 
 #include "imgui/imgui.h"
 #ifndef IMGUI_DISABLE
@@ -873,7 +873,7 @@ static void ImGui_ImplDX12_CreateWindow(ImGuiViewport* viewport)
 	queue_desc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
 	queue_desc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
 
-	auto CQueue = gallus::core::TOOL->GetDX12().GetCommandQueue();
+	auto CQueue = gallus::core::ENGINE->GetDX12().GetCommandQueue();
 	vd->CommandQueue = CQueue->GetCommandQueue().Get();
 	HRESULT res = 0;
 

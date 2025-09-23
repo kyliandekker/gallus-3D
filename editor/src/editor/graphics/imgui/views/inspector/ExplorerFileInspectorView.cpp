@@ -10,7 +10,7 @@
 #include "resources/AssetType.h"
 
 // editor includes
-#include "editor/core/EditorTool.h"
+#include "editor/core/EditorEngine.h"
 #include "editor/FileResource.h"
 #include "editor/graphics/imgui/views/ExplorerFileUIView.h"
 #include "editor/graphics/imgui/views/inspector/fileinfo/ExplorerFileUIViewInfo.h"
@@ -99,7 +99,7 @@ namespace gallus
 			{
 				m_ExplorerFileUIView.GetFileResource().Delete();
 
-				core::EDITOR_TOOL->GetEditor().GetAssetDatabase().Rescan();
+				core::EDITOR_ENGINE->GetEditor().GetAssetDatabase().Rescan();
 			}
 
 			//---------------------------------------------------------------------

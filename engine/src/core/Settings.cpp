@@ -6,7 +6,7 @@
 #include <rapidjson/prettywriter.h>
 
 // core includes
-#include "core/Tool.h"
+#include "core/Engine.h"
 #include "core/DataStream.h"
 
 // logger includes
@@ -31,7 +31,7 @@ namespace gallus
 		bool Settings::Load()
 		{
 			DataStream data;
-			const fs::path path = TOOL->GetSaveDirectory().generic_string() + "/" + m_sFileName;
+			const fs::path path = ENGINE->GetSaveDirectory().generic_string() + "/" + m_sFileName;
 
 			if (!file::LoadFile(path, data))
 			{
@@ -76,7 +76,7 @@ namespace gallus
 			rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
 			document.Accept(writer);
 
-			const fs::path path = TOOL->GetSaveDirectory().generic_string() + "/" + m_sFileName;
+			const fs::path path = ENGINE->GetSaveDirectory().generic_string() + "/" + m_sFileName;
 			file::CreateDirectory(path.parent_path());
 			if (!file::SaveFile(path, core::Data(buffer.GetString(), buffer.GetSize())))
 			{

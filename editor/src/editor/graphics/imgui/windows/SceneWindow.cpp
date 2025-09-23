@@ -13,7 +13,7 @@
 #include "graphics/dx12/Texture.h"
 
 // editor includes
-#include "editor/core/EditorTool.h"
+#include "editor/core/EditorEngine.h"
 #include "editor/graphics/imgui/views/HierarchyEntityUIView.h"
 
 // gameplay includes
@@ -42,7 +42,7 @@ namespace gallus
             //---------------------------------------------------------------------
             void SceneWindow::Update()
             {
-                if (gameplay::GAME->IsStarted() && !gameplay::GAME->IsPaused())
+                if (gameplay::GAME.IsStarted() && !gameplay::GAME.IsPaused())
                 {
                     return;
                 }
@@ -52,7 +52,7 @@ namespace gallus
             //---------------------------------------------------------------------
             void SceneWindow::Render()
             {
-                if (!core::EDITOR_TOOL)
+                if (!core::EDITOR_ENGINE)
                 {
                     return;
                 }
@@ -63,28 +63,28 @@ namespace gallus
                 ImVec2 toolbarSize = ImVec2(ImGui::GetContentRegionAvail().x, m_Window.GetHeaderSize().y);
                 ImGui::BeginToolbar(toolbarSize);
 
-                bool isStarted = gameplay::GAME->IsStarted();
+                bool isStarted = gameplay::GAME.IsStarted();
                 if (ImGui::CheckboxButton(
                     ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_PLAY), BUTTON_ID, "PLAY_SCENE").c_str(), &isStarted, m_Window.GetHeaderSize()))
                 {
-                    core::EDITOR_TOOL->GetEditor().SetSelectable(nullptr, nullptr);
-                    gameplay::GAME->GetScene().LoadData();
-                    gameplay::GAME->SetIsStarted(isStarted);
+                    core::EDITOR_ENGINE->GetEditor().SetSelectable(nullptr, nullptr);
+                    gameplay::GAME.GetScene().LoadData();
+                    gameplay::GAME.SetIsStarted(isStarted);
                 }
                 ImGui::SameLine();
-                bool isPaused = gameplay::GAME->IsPaused();
+                bool isPaused = gameplay::GAME.IsPaused();
                 if (ImGui::CheckboxButton(
                     ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_PAUSE), BUTTON_ID, "PAUSE_SCENE").c_str(), &isPaused, m_Window.GetHeaderSize()))
                 {
-                    gameplay::GAME->SetIsPaused(isPaused);
+                    gameplay::GAME.SetIsPaused(isPaused);
                 }
                 ImGui::SameLine();
-                bool drawBounds = core::EDITOR_TOOL->GetEditor().GetEditorSettings().GetDrawBounds();
+                bool drawBounds = core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetDrawBounds();
                 if (ImGui::CheckboxButton(
                     ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_CUBE), BUTTON_ID, "DRAW_BOUNDS_SCENE").c_str(), &drawBounds, m_Window.GetHeaderSize()))
                 {
-                    core::EDITOR_TOOL->GetEditor().GetEditorSettings().SetDrawBounds(drawBounds);
-                    core::EDITOR_TOOL->GetEditor().GetEditorSettings().Save();
+                    core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetDrawBounds(drawBounds);
+                    core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
                 }
 
                 ImGui::EndToolbar(ImVec2(0, 0));
@@ -94,7 +94,7 @@ namespace gallus
 
                 DrawViewportPanel();
 
-                std::shared_ptr<gallus::graphics::dx12::Texture> renderTexture = core::EDITOR_TOOL->GetDX12().GetRenderTexture();
+                std::shared_ptr<gallus::graphics::dx12::Texture> renderTexture = core::EDITOR_ENGINE->GetDX12().GetRenderTexture();
                 if (!renderTexture || !renderTexture->IsValid())
                 {
                     return;
@@ -107,12 +107,12 @@ namespace gallus
                 );
 
                 // Static variables for m_fZoom and pan
-                m_fZoom = core::EDITOR_TOOL->GetEditor().GetEditorSettings().GetSceneZoom();
+                m_fZoom = core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetSceneZoom();
                 m_vPanOffset = ImVec2(
-                    core::EDITOR_TOOL->GetEditor().GetEditorSettings().GetScenePanOffset().x,
-                    core::EDITOR_TOOL->GetEditor().GetEditorSettings().GetScenePanOffset().y
+                    core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetScenePanOffset().x,
+                    core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetScenePanOffset().y
                 );
-                m_CurrentOperation = (ImGuizmo::OPERATION) core::EDITOR_TOOL->GetEditor().GetEditorSettings().GetLastSceneOperation();
+                m_CurrentOperation = (ImGuizmo::OPERATION) core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetLastSceneOperation();
 
                 // Begin scrollable child region
                 ImGui::BeginChild("SceneScroll", windowSize, 0,
@@ -130,10 +130,10 @@ namespace gallus
                     {
                         ImVec2 beforeZoom = (mouseLocal - m_vPanOffset) / m_fZoom;
                         m_fZoom = std::clamp(m_fZoom * (wheel > 0 ? 1.1f : 0.9f), 0.05f, 4.0f);
-                        core::EDITOR_TOOL->GetEditor().GetEditorSettings().SetSceneZoom(m_fZoom);
+                        core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetSceneZoom(m_fZoom);
                         m_vPanOffset = mouseLocal - beforeZoom * m_fZoom;
-                        core::EDITOR_TOOL->GetEditor().GetEditorSettings().SetScenePanOffset(glm::vec2(m_vPanOffset.x, m_vPanOffset.y));
-                        core::EDITOR_TOOL->GetEditor().GetEditorSettings().Save();
+                        core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetScenePanOffset(glm::vec2(m_vPanOffset.x, m_vPanOffset.y));
+                        core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
                     }
                 }
 
@@ -141,8 +141,8 @@ namespace gallus
                 if ((ImGui::IsWindowHovered() && ImGui::IsMouseDragging(ImGuiMouseButton_Middle)) || (ImGui::IsWindowHovered() && ImGui::IsMouseDragging(ImGuiMouseButton_Right)))
                 {
                     m_vPanOffset += ImGui::GetIO().MouseDelta;
-                    core::EDITOR_TOOL->GetEditor().GetEditorSettings().SetScenePanOffset(glm::vec2(m_vPanOffset.x, m_vPanOffset.y));
-                    core::EDITOR_TOOL->GetEditor().GetEditorSettings().Save();
+                    core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetScenePanOffset(glm::vec2(m_vPanOffset.x, m_vPanOffset.y));
+                    core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
                 }
 
                 // Draw the texture
@@ -178,9 +178,9 @@ namespace gallus
                 // Optional reset
                 if (ImGui::IsKeyPressed(ImGuiKey_R) && ImGui::IsKeyDown(ImGuiKey_LeftCtrl))
                 {
-                    core::EDITOR_TOOL->GetEditor().GetEditorSettings().SetSceneZoom(1.0f);
-                    core::EDITOR_TOOL->GetEditor().GetEditorSettings().SetScenePanOffset(glm::vec2(0));
-                    core::EDITOR_TOOL->GetEditor().GetEditorSettings().Save();
+                    core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetSceneZoom(1.0f);
+                    core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetScenePanOffset(glm::vec2(0));
+                    core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
                 }
             }
 
@@ -208,26 +208,26 @@ namespace gallus
 
                 DirectX::XMFLOAT2 spritePos;
                 DirectX::XMFLOAT2 spriteSize;
-                const HierarchyEntityUIView* entity = dynamic_cast<const HierarchyEntityUIView*>(core::EDITOR_TOOL->GetEditor().GetSelectable().get());
+                const HierarchyEntityUIView* entity = dynamic_cast<const HierarchyEntityUIView*>(core::EDITOR_ENGINE->GetEditor().GetSelectable().get());
                 if (!entity)
                 {
                     return;
                 }
 
-                std::lock_guard<std::recursive_mutex> lock(core::TOOL->GetECS().m_EntityMutex);
+                std::lock_guard<std::recursive_mutex> lock(core::EDITOR_ENGINE->GetECS().m_EntityMutex);
 
                 ImGui::SetItemAllowOverlap();
 
-                if (!core::TOOL->GetECS().GetSystem<gameplay::TransformSystem>().HasComponent(entity->GetEntityID()))
+                if (!core::EDITOR_ENGINE->GetECS().GetSystem<gameplay::TransformSystem>().HasComponent(entity->GetEntityID()))
                 {
                     return;
                 }
-                if (!core::TOOL->GetECS().GetSystem<gameplay::SpriteSystem>().HasComponent(entity->GetEntityID()))
+                if (!core::EDITOR_ENGINE->GetECS().GetSystem<gameplay::SpriteSystem>().HasComponent(entity->GetEntityID()))
                 {
                     return;
                 }
 
-                auto& transformComponent = core::TOOL->GetECS().GetSystem<gameplay::TransformSystem>().GetComponent(entity->GetEntityID());
+                auto& transformComponent = core::EDITOR_ENGINE->GetECS().GetSystem<gameplay::TransformSystem>().GetComponent(entity->GetEntityID());
                 spritePos = transformComponent.Transform().GetPosition();
                 spriteSize = transformComponent.Transform().GetScale();
 
@@ -320,16 +320,16 @@ namespace gallus
                 ImDrawList* drawList = ImGui::GetWindowDrawList();
                 ImVec2 mouseScreen = ImGui::GetMousePos();
 
-                std::lock_guard<std::recursive_mutex> lock(core::TOOL->GetECS().m_EntityMutex);
+                std::lock_guard<std::recursive_mutex> lock(core::EDITOR_ENGINE->GetECS().m_EntityMutex);
 
-                for (auto entity : core::TOOL->GetECS().GetEntities())
+                for (auto entity : core::EDITOR_ENGINE->GetECS().GetEntities())
                 {
-                    if (!core::TOOL->GetECS().GetSystem<gameplay::TransformSystem>().HasComponent(entity.GetEntityID()))
+                    if (!core::EDITOR_ENGINE->GetECS().GetSystem<gameplay::TransformSystem>().HasComponent(entity.GetEntityID()))
                         continue;
-                    if (!core::TOOL->GetECS().GetSystem<gameplay::SpriteSystem>().HasComponent(entity.GetEntityID()))
+                    if (!core::EDITOR_ENGINE->GetECS().GetSystem<gameplay::SpriteSystem>().HasComponent(entity.GetEntityID()))
                         continue;
 
-                    auto& transform = core::TOOL->GetECS().GetSystem<gameplay::TransformSystem>().GetComponent(entity.GetEntityID());
+                    auto& transform = core::EDITOR_ENGINE->GetECS().GetSystem<gameplay::TransformSystem>().GetComponent(entity.GetEntityID());
 
                     const DirectX::XMFLOAT2& pos = transform.Transform().GetPosition();
                     const DirectX::XMFLOAT2& scale = transform.Transform().GetScale();
@@ -428,8 +428,8 @@ namespace gallus
                             isTranslate ? ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent) : ImGui::GetStyleColorVec4(ImGuiCol_Text)))
                         {
                             m_CurrentOperation = ImGuizmo::TRANSLATE;
-                            core::EDITOR_TOOL->GetEditor().GetEditorSettings().SetLastSceneOperation((int) m_CurrentOperation);
-                            core::EDITOR_TOOL->GetEditor().GetEditorSettings().Save();
+                            core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetLastSceneOperation((int) m_CurrentOperation);
+                            core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
                         }
 
                         bool isRotate = m_CurrentOperation == ImGuizmo::ROTATE_Z;
@@ -441,8 +441,8 @@ namespace gallus
                             isRotate ? ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent) : ImGui::GetStyleColorVec4(ImGuiCol_Text)))
                         {
                             m_CurrentOperation = ImGuizmo::ROTATE_Z;
-                            core::EDITOR_TOOL->GetEditor().GetEditorSettings().SetLastSceneOperation((int) m_CurrentOperation);
-                            core::EDITOR_TOOL->GetEditor().GetEditorSettings().Save();
+                            core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetLastSceneOperation((int) m_CurrentOperation);
+                            core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
                         }
 
                         bool isScale = m_CurrentOperation == ImGuizmo::SCALE;
@@ -454,8 +454,8 @@ namespace gallus
                             isScale ? ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent) : ImGui::GetStyleColorVec4(ImGuiCol_Text)))
                         {
                             m_CurrentOperation = ImGuizmo::SCALE;
-                            core::EDITOR_TOOL->GetEditor().GetEditorSettings().SetLastSceneOperation((int) m_CurrentOperation);
-                            core::EDITOR_TOOL->GetEditor().GetEditorSettings().Save();
+                            core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetLastSceneOperation((int) m_CurrentOperation);
+                            core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
                         }
 
                         ImGui::PopStyleVar();
@@ -508,29 +508,29 @@ namespace gallus
             //---------------------------------------------------------------------
             void SceneWindow::DrawTransformGizmo()
             {
-                std::lock_guard<std::recursive_mutex> lock(core::TOOL->GetECS().m_EntityMutex);
+                std::lock_guard<std::recursive_mutex> lock(core::EDITOR_ENGINE->GetECS().m_EntityMutex);
 
-                const HierarchyEntityUIView* entity = dynamic_cast<const HierarchyEntityUIView*>(core::EDITOR_TOOL->GetEditor().GetSelectable().get());
+                const HierarchyEntityUIView* entity = dynamic_cast<const HierarchyEntityUIView*>(core::EDITOR_ENGINE->GetEditor().GetSelectable().get());
                 if (!entity)
                 {
                     return;
                 }
 
-                if (!core::TOOL->GetECS().GetSystem<gameplay::TransformSystem>().HasComponent(entity->GetEntityID()))
+                if (!core::EDITOR_ENGINE->GetECS().GetSystem<gameplay::TransformSystem>().HasComponent(entity->GetEntityID()))
                 {
                     return;
                 }
 
                 ImGui::SetItemAllowOverlap();
 
-                auto& transformComponent = core::TOOL->GetECS().GetSystem<gameplay::TransformSystem>().GetComponent(entity->GetEntityID());
+                auto& transformComponent = core::EDITOR_ENGINE->GetECS().GetSystem<gameplay::TransformSystem>().GetComponent(entity->GetEntityID());
                 DirectX::XMMATRIX pivotOffset = DirectX::XMMatrixTranslation(transformComponent.Transform().GetPivot().x, transformComponent.Transform().GetPivot().y, 0.0f);
                 DirectX::XMMATRIX objectMat = transformComponent.Transform().GetWorldMatrix();
                 objectMat = objectMat * pivotOffset;;
 
                 // Get transformation matrices
-                DirectX::XMMATRIX viewMat = core::TOOL->GetDX12().GetCamera().GetViewMatrix();
-                const DirectX::XMMATRIX& projMat = core::TOOL->GetDX12().GetCamera().GetProjectionMatrix();
+                DirectX::XMMATRIX viewMat = core::EDITOR_ENGINE->GetDX12().GetCamera().GetViewMatrix();
+                const DirectX::XMMATRIX& projMat = core::EDITOR_ENGINE->GetDX12().GetCamera().GetProjectionMatrix();
 
                 // Convert DirectX matrices to float[16] format for ImGuizmo
                 float objectFloat[16];
@@ -543,20 +543,20 @@ namespace gallus
                 if (ImGui::IsKeyPressed(ImGuiKey_T) || ImGui::IsKeyPressed(ImGuiKey_P))
                 {
                     m_CurrentOperation = ImGuizmo::TRANSLATE;
-                    core::EDITOR_TOOL->GetEditor().GetEditorSettings().SetLastSceneOperation((int) m_CurrentOperation);
-                    core::EDITOR_TOOL->GetEditor().GetEditorSettings().Save();
+                    core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetLastSceneOperation((int) m_CurrentOperation);
+                    core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
                 }
                 if (ImGui::IsKeyPressed(ImGuiKey_R))
                 {
                     m_CurrentOperation = ImGuizmo::ROTATE;
-                    core::EDITOR_TOOL->GetEditor().GetEditorSettings().SetLastSceneOperation((int) m_CurrentOperation);
-                    core::EDITOR_TOOL->GetEditor().GetEditorSettings().Save();
+                    core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetLastSceneOperation((int) m_CurrentOperation);
+                    core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
                 }
                 if (ImGui::IsKeyPressed(ImGuiKey_S))
                 {
                     m_CurrentOperation = ImGuizmo::SCALE;
-                    core::EDITOR_TOOL->GetEditor().GetEditorSettings().SetLastSceneOperation((int) m_CurrentOperation);
-                    core::EDITOR_TOOL->GetEditor().GetEditorSettings().Save();
+                    core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetLastSceneOperation((int) m_CurrentOperation);
+                    core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
                 }
 
                 bool useSnap = ImGui::IsKeyDown(ImGuiKey_LeftShift);
@@ -575,7 +575,7 @@ namespace gallus
 
                     transformComponent.Transform().SetWorldMatrix(result);
 
-					gameplay::GAME->GetScene().SetIsDirty(true);
+					gameplay::GAME.GetScene().SetIsDirty(true);
                 }
             }
 
@@ -591,7 +591,7 @@ namespace gallus
             void FullSceneWindow::Update()
             {
                 m_bFullScreen = true;
-                if (!gameplay::GAME->IsStarted() || gameplay::GAME->IsPaused())
+                if (!gameplay::GAME.IsStarted() || gameplay::GAME.IsPaused())
                 {
                     return;
                 }
@@ -602,16 +602,16 @@ namespace gallus
             //---------------------------------------------------------------------
             void FullSceneWindow::Render()
             {
-                if (!core::EDITOR_TOOL)
+                if (!core::EDITOR_ENGINE)
                 {
                     return;
                 }
 
                 if (ImGui::IsKeyDown(ImGuiKey_Escape))
                 {
-                    core::EDITOR_TOOL->GetEditor().SetSelectable(nullptr, nullptr);
-                    gameplay::GAME->GetScene().LoadData();
-                    gameplay::GAME->SetIsStarted(false);
+                    core::EDITOR_ENGINE->GetEditor().SetSelectable(nullptr, nullptr);
+                    gameplay::GAME.GetScene().LoadData();
+                    gameplay::GAME.SetIsStarted(false);
                 }
 
                 ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
@@ -621,20 +621,20 @@ namespace gallus
                 ImVec2 toolbarSize = ImVec2(ImGui::GetContentRegionAvail().x, m_Window.GetHeaderSize().y);
                 ImGui::BeginToolbar(toolbarSize);
 
-                bool isStarted = gameplay::GAME->IsStarted();
+                bool isStarted = gameplay::GAME.IsStarted();
                 if (ImGui::CheckboxButton(
                     ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_PLAY), BUTTON_ID, "PLAY_FULL_SCENE").c_str(), &isStarted, m_Window.GetHeaderSize()))
                 {
-                    core::EDITOR_TOOL->GetEditor().SetSelectable(nullptr, nullptr);
-                    gameplay::GAME->GetScene().LoadData();
-                    gameplay::GAME->SetIsStarted(isStarted);
+                    core::EDITOR_ENGINE->GetEditor().SetSelectable(nullptr, nullptr);
+                    gameplay::GAME.GetScene().LoadData();
+                    gameplay::GAME.SetIsStarted(isStarted);
                 }
                 ImGui::SameLine();
-                bool isPaused = gameplay::GAME->IsPaused();
+                bool isPaused = gameplay::GAME.IsPaused();
                 if (ImGui::CheckboxButton(
                     ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_PAUSE), BUTTON_ID, "PAUSE_FULL_SCENE").c_str(), &isPaused, m_Window.GetHeaderSize()))
                 {
-                    gameplay::GAME->SetIsPaused(isPaused);
+                    gameplay::GAME.SetIsPaused(isPaused);
                 }
 
                 ImGui::EndToolbar(ImVec2(0, 0));
@@ -643,7 +643,7 @@ namespace gallus
                 ImGui::PopStyleVar();
                 ImGui::PopStyleVar();
 
-                std::shared_ptr<gallus::graphics::dx12::Texture> renderTexture = core::EDITOR_TOOL->GetDX12().GetRenderTexture();
+                std::shared_ptr<gallus::graphics::dx12::Texture> renderTexture = core::EDITOR_ENGINE->GetDX12().GetRenderTexture();
                 if (!renderTexture || !renderTexture->IsValid())
                 {
                     return;
