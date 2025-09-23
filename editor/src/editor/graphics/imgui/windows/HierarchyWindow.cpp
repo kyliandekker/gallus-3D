@@ -160,7 +160,7 @@ namespace gallus
 				if (ImGui::IconButton(
 					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_SAVE), BUTTON_ID, "SAVE_HIERARCHY").c_str(), m_Window.GetHeaderSize(), m_Window.GetIconFont(), ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent)))
 				{
-					gameplay::GAME.GetScene().SaveData();
+					gameplay::GAME.GetScene().Save();
 				}
 
 				ImVec2 endPos = ImGui::GetCursorPos();
@@ -173,7 +173,7 @@ namespace gallus
 
 				if (ImGui::IsKeyDown(ImGuiMod_Ctrl) && ImGui::IsKeyPressed(ImGuiKey_S) && wasDirty)
 				{
-					gameplay::GAME.GetScene().SaveData();
+					gameplay::GAME.GetScene().Save();
 				}
 
 				ImGui::PopStyleVar();

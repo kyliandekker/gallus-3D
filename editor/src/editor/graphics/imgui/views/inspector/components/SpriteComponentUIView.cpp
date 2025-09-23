@@ -23,6 +23,7 @@
 
 // gameplay includes
 #include "gameplay/Game.h"
+#include "gameplay/systems/TransformSystem.h"
 
 namespace gallus
 {
@@ -180,6 +181,70 @@ namespace gallus
 			std::string SpriteComponentUIView::GetName() const
 			{
 				return m_System.GetSystemName();
+			}
+
+			void SpriteComponentUIView::RenderComponentGizmos(const ImVec2& a_vScenePos, const ImVec2& a_vSize, const ImVec2& a_vPanOffset, float a_fZoom)
+			{
+				if (!core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetDrawBounds())
+				{
+					return;
+				}
+
+				ImDrawList* drawList = ImGui::GetWindowDrawList();
+				ImVec2 mouseScreen = ImGui::GetMousePos();
+
+				std::lock_guard<std::recursive_mutex> lock(core::EDITOR_ENGINE->GetECS().m_EntityMutex);
+
+				if (!core::EDITOR_ENGINE->GetECS().GetSystem<gameplay::TransformSystem>().HasComponent(m_Component.GetEntityID()))
+				{
+					return;
+				}
+
+				auto& transform = core::EDITOR_ENGINE->GetECS().GetSystem<gameplay::TransformSystem>().GetComponent(m_Component.GetEntityID());
+
+				const DirectX::XMFLOAT2& pos = transform.Transform().GetPosition();
+				const DirectX::XMFLOAT2& scale = transform.Transform().GetScale();
+				const DirectX::XMFLOAT2& pivot = transform.Transform().GetPivot(); // -0.5 .. 0.5
+				float rotation = transform.Transform().GetRotation(); // in radians or degrees?
+
+				// Convert position to screen space with pan and zoom
+				ImVec2 spritePos = a_vScenePos + a_vPanOffset + ImVec2(pos.x * a_fZoom, pos.y * a_fZoom);
+				ImVec2 scaledSize = ImVec2(scale.x * a_fZoom, scale.y * a_fZoom);
+
+				// Define corners centered on sprite origin
+				ImVec2 corners[4] = {
+					ImVec2(-0.5f * scaledSize.x, -0.5f * scaledSize.y), // top-left
+					ImVec2(0.5f * scaledSize.x, -0.5f * scaledSize.y), // top-right
+					ImVec2(0.5f * scaledSize.x, 0.5f * scaledSize.y), // bottom-right
+					ImVec2(-0.5f * scaledSize.x, 0.5f * scaledSize.y)  // bottom-left
+				};
+
+				// Precompute sin/cos for rotation
+				float rotationRad = DirectX::XMConvertToRadians(rotation); // assuming rotation is degrees
+				float cosR = cosf(rotationRad);
+				float sinR = sinf(rotationRad);
+
+				// Rotate corners around pivot and translate to screen space
+				for (int i = 0; i < 4; ++i)
+				{
+					// offset relative to pivot
+					float x = corners[i].x - (pivot.x * scaledSize.x);
+					float y = corners[i].y - (pivot.y * scaledSize.y);
+
+					// rotate
+					float rx = x * cosR - y * sinR;
+					float ry = x * sinR + y * cosR;
+
+					// translate to spritePos (pivot position in screen space)
+					corners[i].x = rx + spritePos.x;
+					corners[i].y = ry + spritePos.y;
+				}
+
+				// Draw bounding box polyline
+				drawList->AddPolyline(corners, 4, IM_COL32(255, 255, 255, 155), true, 2.0f);
+
+				// Draw pivot point (pivot position)
+				drawList->AddCircleFilled(spritePos, 4.0f, IM_COL32(0, 255, 0, 255));
 			}
 
 			void SpriteComponentUIView::RenderPreview()

@@ -38,11 +38,11 @@ namespace gallus
 				ImGui::DisplayHeader(m_Window.GetBoldFont(), "Movement Speed: ");
 				ImGui::SameLine();
 
-				float val = m_Component.GetSpeed();
+				float speed = m_Component.GetSpeed();
 				ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
-				if (ImGui::DragFloat(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "PLAYER_SPEED_INSPECTOR").c_str(), &val, 1.0f, -999999999, 99999999999))
+				if (ImGui::DragFloat(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "PLAYER_SPEED_INSPECTOR").c_str(), &speed, 1.0f, -999999999, 99999999999))
 				{
-					m_Component.SetSpeed(val);
+					m_Component.SetSpeed(speed);
 				}
 
 				ImGui::PopStyleVar();

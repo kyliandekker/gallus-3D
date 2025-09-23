@@ -1,4 +1,4 @@
-#include "gameplay/systems/PlayerSystem.h"
+#include "gameplay/systems/CollisionSystem.h"
 
 // logger includes
 #include "logger/Logger.h"
@@ -11,26 +11,26 @@ namespace gallus
 	namespace gameplay
 	{
 		//---------------------------------------------------------------------
-		// PlayerSystem
+		// CollisionSystem
 		//---------------------------------------------------------------------
-		bool PlayerSystem::Initialize()
+		bool CollisionSystem::Initialize()
 		{
-			LOG(LOGSEVERITY_INFO_SUCCESS, LOG_CATEGORY_ECS, "Player system initialized.");
+			LOG(LOGSEVERITY_INFO_SUCCESS, LOG_CATEGORY_ECS, "Collision system initialized.");
 			return true;
 		}
 
 		//---------------------------------------------------------------------
-		std::string PlayerSystem::GetPropertyName() const
+		std::string CollisionSystem::GetPropertyName() const
 		{
-			return "player";
+			return "collision";
 		}
 
 		//---------------------------------------------------------------------
-		std::string PlayerSystem::GetSystemName() const
+		std::string CollisionSystem::GetSystemName() const
 		{
-			std::string name = "Player";
+			std::string name = "Collision";
 		#ifdef _EDITOR
-			name = std::string(font::ICON_SETTINGS) + " " + name;
+			name = std::string(font::ICON_BOUNDS) + " " + name;
 		#endif // _EDITOR
 			return name;
 		}

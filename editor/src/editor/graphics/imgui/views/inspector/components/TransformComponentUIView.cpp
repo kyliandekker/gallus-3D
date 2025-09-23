@@ -15,8 +15,6 @@
 #include "graphics/imgui/ImGuiWindow.h"
 
 // gameplay includes
-#include "gameplay/systems/components/TransformComponent.h"
-#include "gameplay/systems/TransformSystem.h"
 #include "gameplay/Game.h"
 
 namespace gallus
@@ -30,10 +28,14 @@ namespace gallus
 				return m_System.GetSystemName();
 			}
 
+			void TransformComponentUIView::RenderComponentGizmos(const ImVec2& a_vScenePos, const ImVec2& a_vSize, const ImVec2& a_vPanOffset, float a_fZoom)
+			{
+				DrawGizmos(a_vScenePos, a_vSize, a_vPanOffset, a_fZoom);
+				DrawTransformGizmo(m_Component.Transform(), a_vScenePos, a_vSize, a_vPanOffset, a_fZoom);
+			}
+
 			void TransformComponentUIView::RenderInner()
 			{
-				float fontSize = m_Window.GetFontSize();
-
 				ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, m_Window.GetFramePadding());
 				ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0);
 				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, m_Window.GetFramePadding());

@@ -55,8 +55,13 @@
                     }
                 },
                 "player": {
-                    "movementSpeed": 10000.0
-                }
+                    "movementSpeed": 900.0
+                },
+                "health": {
+                    "health": 100.0,
+                    "maxHealth": 324.0
+                },
+                "collision": {}
             }
         }
     ]

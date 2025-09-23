@@ -169,7 +169,9 @@ namespace gallus
             void ExplorerSpriteUIViewInfo::RenderPreview()
             {
                 if (!m_pPreviewTexture || !m_pPreviewTexture->CanBeDrawn())
+                {
                     return;
+                }
 
                 // Sprite dimensions
                 float spriteW = 0.0f;

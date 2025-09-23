@@ -4,17 +4,21 @@
 #include "ComponentUIView.h"
 
 #include <imgui/imgui_helpers.h>
+#include <imgui/imgui_internal.h>
+#include <imgui/ImGuizmo.h>
 #include <rapidjson/document.h>
 #include <rapidjson/utils.h>
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/prettywriter.h>
 
+#include "utils/string_extensions.h"
+
 #include "graphics/imgui/font_icon.h"
 #include "graphics/imgui/ImGuiWindow.h"
-#include "utils/string_extensions.h"
+
 #include "gameplay/ECSBaseSystem.h"
 #include "gameplay/systems/components/Component.h"
-#include "core/Engine.h"
+#include "gameplay/Game.h"
 
 namespace gallus
 {
@@ -51,6 +55,72 @@ namespace gallus
 					ImGui::Indent(m_Window.GetFramePadding().x);
 					RenderInner();
 					ImGui::Unindent(m_Window.GetFramePadding().x);
+				}
+			}
+
+			//---------------------------------------------------------------------
+			void ComponentBaseUIView::DrawGizmos(const ImVec2& a_vScenePos, const ImVec2& a_vSize, const ImVec2& a_vPanOffset, float a_fZoom)
+			{
+				ImGuizmo::BeginFrame();
+
+				ImGuizmo::SetOrthographic(false);
+				ImGuizmo::SetDrawlist(ImGui::GetCurrentWindow()->DrawList);
+
+				ImGuizmo::SetRect(a_vScenePos.x + a_vPanOffset.x, a_vScenePos.y + a_vPanOffset.y, a_vSize.x * a_fZoom, a_vSize.y * a_fZoom);
+			}
+
+			//---------------------------------------------------------------------
+			void ComponentBaseUIView::DrawTransformGizmo(graphics::dx12::DX12Transform& a_Transform, const ImVec2& a_vScenePos, const ImVec2& a_vSize, const ImVec2& a_vPanOffset, float a_fZoom)
+			{
+				DirectX::XMMATRIX pivotOffset = DirectX::XMMatrixTranslation(a_Transform.GetPivot().x, a_Transform.GetPivot().y, 0.0f);
+				DirectX::XMMATRIX objectMat = a_Transform.GetWorldMatrix();
+				objectMat = objectMat * pivotOffset;;
+
+				// Get transformation matrices
+				DirectX::XMMATRIX viewMat = core::EDITOR_ENGINE->GetDX12().GetCamera().GetViewMatrix();
+				const DirectX::XMMATRIX& projMat = core::EDITOR_ENGINE->GetDX12().GetCamera().GetProjectionMatrix();
+
+				// Convert DirectX matrices to float[16] format for ImGuizmo
+				float objectFloat[16];
+				DirectX::XMStoreFloat4x4(reinterpret_cast<DirectX::XMFLOAT4X4*>(objectFloat), objectMat);
+				float viewFloat[16];
+				DirectX::XMStoreFloat4x4(reinterpret_cast<DirectX::XMFLOAT4X4*>(viewFloat), viewMat);
+				float projFloat[16];
+				DirectX::XMStoreFloat4x4(reinterpret_cast<DirectX::XMFLOAT4X4*>(projFloat), projMat);
+
+				if (ImGui::IsKeyPressed(ImGuiKey_T) || ImGui::IsKeyPressed(ImGuiKey_P))
+				{
+					core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetLastSceneOperation((int) ImGuizmo::TRANSLATE);
+					core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
+				}
+				if (ImGui::IsKeyPressed(ImGuiKey_R))
+				{
+					core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetLastSceneOperation((int) ImGuizmo::ROTATE_Z);
+					core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
+				}
+				if (ImGui::IsKeyPressed(ImGuiKey_S))
+				{
+					core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetLastSceneOperation((int) ImGuizmo::SCALE);
+					core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
+				}
+
+				bool useSnap = ImGui::IsKeyDown(ImGuiKey_LeftShift);
+				float snap = useSnap ? 1.0f : 0.0f;
+
+				// Render the gizmo (check if manipulation occurred)
+				if (ImGuizmo::Manipulate(
+					viewFloat,
+					projFloat,
+					(ImGuizmo::OPERATION) core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetLastSceneOperation(),
+					ImGuizmo::LOCAL,
+					objectFloat, 0, &snap))
+				{
+					DirectX::XMMATRIX result = DirectX::XMLoadFloat4x4(reinterpret_cast<DirectX::XMFLOAT4X4*>(objectFloat));
+					result = result * DirectX::XMMatrixInverse(nullptr, pivotOffset);
+
+					a_Transform.SetWorldMatrix(result);
+
+					gameplay::GAME.GetScene().SetIsDirty(true);
 				}
 			}
 		}

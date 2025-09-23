@@ -34,6 +34,7 @@ namespace gallus
 			return System::Destroy();
 		}
 
+		bool previousUpdateRealtimeState = false;
 		//---------------------------------------------------------------------
 		void EntityComponentSystem::Update(float a_fDeltaTime, bool a_bUpdateRealtime)
 		{
@@ -75,9 +76,14 @@ namespace gallus
 			{
 				for (auto& sys : m_aSystems)
 				{
+					if (a_bUpdateRealtime && previousUpdateRealtimeState != a_bUpdateRealtime)
+					{
+						sys->InitComponentsRealtime();
+					}
 					sys->UpdateComponentsRealtime(a_fDeltaTime);
 				}
 			}
+			previousUpdateRealtimeState = a_bUpdateRealtime;
 		}
 
 		//---------------------------------------------------------------------

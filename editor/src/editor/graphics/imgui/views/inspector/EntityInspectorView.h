@@ -49,6 +49,11 @@ namespace gallus
 				void Render() override;
 
 				void RenderPreview() override;
+
+				std::vector<ComponentBaseUIView*>& GetComponents()
+				{
+					return m_aComponents;
+				}
 			protected:
 				HierarchyEntityUIView& m_HierarchyEntityUIView;
 				gameplay::Entity* m_pEntity = nullptr;

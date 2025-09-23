@@ -79,6 +79,15 @@ namespace gallus
 			}
 
 			/// <summary>
+			/// Retrieves the currently selected inspector view item.
+			/// </summary>
+			/// <returns>Pointer to the current selectable (can be null).</returns>
+			const graphics::imgui::InspectorView* GetInspectorView() const
+			{
+				return m_pInspectorView;
+			}
+
+			/// <summary>
 			/// Sets the selectable and inspector view.
 			/// </summary>
 			/// <param name="a_pSelectable">.The new selectable (can be null).</param>

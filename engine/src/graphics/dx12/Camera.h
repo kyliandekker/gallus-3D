@@ -51,13 +51,13 @@ namespace gallus
 				/// Gets a reference to the camera's transform, allowing modification of position and orientation.
 				/// </summary>
 				/// <returns>Reference to the transform component.</returns>
-				DX12Transform& GetTransform();
+				DX12Transform& Transform();
 
 				/// <summary>
 				/// Gets a constant reference to the camera's transform.
 				/// </summary>
 				/// <returns>Constant reference to the transform component.</returns>
-				const DX12Transform& GetTransform() const;
+				const DX12Transform& Transform() const;
 
 				/// <summary>
 				/// Computes and returns the view matrix from the camera's transform.

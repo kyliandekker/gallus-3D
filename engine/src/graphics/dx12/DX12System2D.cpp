@@ -223,7 +223,7 @@ namespace gallus
 				Resize({}, m_vSize);
 
 				m_Camera.Init(RENDER_TEX_SIZE.x, RENDER_TEX_SIZE.y);
-				m_Camera.GetTransform().SetPosition({ 0.0f, 0.0f });
+				m_Camera.Transform().SetPosition({ 0.0f, 0.0f });
 				
 #ifndef IMGUI_DISABLE
 				m_ImGuiWindow.OnRenderTargetCreated(dCommandList);

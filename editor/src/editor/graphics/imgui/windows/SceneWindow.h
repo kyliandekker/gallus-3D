@@ -45,15 +45,11 @@ namespace gallus
 				/// </summary>
 				void Render() override;
 			private:
-				void DrawGizmos(const ImVec2& a_vSceneStartPos, const ImVec2& a_vSize);
-				void DrawBoundsGizmo(const ImVec2& a_vScenePos);
-				void ShowSpriteBounds(const ImVec2& a_vScenePos, const ImVec2& a_vSize);
+				void DrawComponentGizmos(const ImVec2& a_vSceneStartPos, const ImVec2& a_vSize);
 				void DrawViewportPanel();
-				void DrawTransformGizmo();
 
 				float m_fZoom = 1.0f;
 				ImVec2 m_vPanOffset = ImVec2(0.0f, 0.0f);
-				ImGuizmo::OPERATION m_CurrentOperation = ImGuizmo::TRANSLATE;
 			};
 
 			class FullSceneWindow : public SceneWindow

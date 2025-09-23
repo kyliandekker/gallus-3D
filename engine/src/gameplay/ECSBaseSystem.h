@@ -62,6 +62,11 @@ namespace gallus
 			virtual void UpdateComponentsRealtime(float a_fDeltaTime) = 0;
 
 			/// <summary>
+			/// Inits the system's components.
+			/// </summary>
+			virtual void InitComponentsRealtime() = 0;
+
+			/// <summary>
 			/// Checks whether an entity is using the system.
 			/// </summary>
 			/// <param name="a_ID">The entity that will be checked.</param>
@@ -209,11 +214,22 @@ namespace gallus
 			/// <summary>
 			/// Updates the system's components.
 			/// </summary>
+			virtual void InitComponentsRealtime() override
+			{
+				for (auto& component : m_mComponents)
+				{
+					component.second.InitRealtime();
+				}
+			}
+
+			/// <summary>
+			/// Updates the system's components.
+			/// </summary>
 			virtual void UpdateComponentsRealtime(float a_fDeltaTime) override
 			{
 				for (auto& component : m_mComponents)
 				{
-					component.second.Update(a_fDeltaTime);
+					component.second.UpdateRealtime(a_fDeltaTime);
 				}
 			}
 

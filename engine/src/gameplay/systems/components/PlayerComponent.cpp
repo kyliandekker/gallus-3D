@@ -78,7 +78,7 @@ namespace gallus
 
 		Key w('W'), a('A'), s('S'), d('D');
 		//---------------------------------------------------------------------
-		void PlayerComponent::Update(float a_fDeltaTime)
+		void PlayerComponent::UpdateRealtime(float a_fDeltaTime)
 		{
 			TransformSystem& transformSys = core::ENGINE->GetECS().GetSystem<TransformSystem>();
 

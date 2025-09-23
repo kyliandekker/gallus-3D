@@ -7,11 +7,16 @@ namespace gallus
 	namespace gameplay
 	{
 		//---------------------------------------------------------------------
-		// PlayerComponent
+		// HealthComponent
 		//---------------------------------------------------------------------
-		class PlayerComponent : public Component
+		class HealthComponent : public Component
 		{
 		public:
+			/// <summary>
+			/// Initializes the component in runtime.
+			/// </summary>
+			void InitRealtime() override;
+
 			/// <summary>
 			/// Serialized the component to a json document.
 			/// </summary>
@@ -27,30 +32,43 @@ namespace gallus
 			void Deserialize(const rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator) override;
 
 			/// <summary>
-			/// Retrieves the movement speed.
+			/// Retrieves the health.
 			/// </summary>
-			/// <returns>Float representing the movement speed.</returns>
-			float GetSpeed() const
+			/// <returns>Float representing the health.</returns>
+			float GetHealth() const
 			{
-				return m_fSpeed;
+				return m_fHealth;
 			}
 
 			/// <summary>
-			/// Sets the movement speed.
+			/// Sets the health.
 			/// </summary>
-			/// <param name="a_fSpeed">The movement speed.</param>
-			void SetSpeed(float a_fSpeed)
+			/// <param name="a_fHealth">The health.</param>
+			void SetHealth(float a_fHealth)
 			{
-				m_fSpeed = a_fSpeed;
+				m_fHealth = a_fHealth;
 			}
 
 			/// <summary>
-			/// Updates the components.
+			/// Retrieves the max health.
 			/// </summary>
-			/// <param name="a_fDeltaTime">Delta time.</param>
-			void UpdateRealtime(float a_fDeltaTime) override;
+			/// <returns>Float representing the max health.</returns>
+			float GetMaxHealth() const
+			{
+				return m_fMaxHealth;
+			}
+
+			/// <summary>
+			/// Sets the max health.
+			/// </summary>
+			/// <param name="a_fMaxHealth">The max health.</param>
+			void SetMaxHealth(float a_fMaxHealth)
+			{
+				m_fMaxHealth = a_fMaxHealth;
+			}
 		protected:
-			float m_fSpeed = 200;
+			float m_fHealth = 100;
+			float m_fMaxHealth = 100;
 		};
 	}
 }

@@ -15,10 +15,10 @@
 // editor includes
 #include "editor/core/EditorEngine.h"
 #include "editor/graphics/imgui/views/HierarchyEntityUIView.h"
+#include "editor/graphics/imgui/views/inspector/EntityInspectorView.h"
+#include "editor/graphics/imgui/views/inspector/components/ComponentUIView.h"
 
 // gameplay includes
-#include "gameplay/systems/SpriteSystem.h"
-#include "gameplay/systems/TransformSystem.h"
 #include "gameplay/Game.h"
 
 namespace gallus
@@ -68,10 +68,12 @@ namespace gallus
                     ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_PLAY), BUTTON_ID, "PLAY_SCENE").c_str(), &isStarted, m_Window.GetHeaderSize()))
                 {
                     core::EDITOR_ENGINE->GetEditor().SetSelectable(nullptr, nullptr);
+                    gameplay::GAME.GetScene().Load();
                     gameplay::GAME.GetScene().LoadData();
                     gameplay::GAME.SetIsStarted(isStarted);
                 }
                 ImGui::SameLine();
+
                 bool isPaused = gameplay::GAME.IsPaused();
                 if (ImGui::CheckboxButton(
                     ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_PAUSE), BUTTON_ID, "PAUSE_SCENE").c_str(), &isPaused, m_Window.GetHeaderSize()))
@@ -79,9 +81,10 @@ namespace gallus
                     gameplay::GAME.SetIsPaused(isPaused);
                 }
                 ImGui::SameLine();
+
                 bool drawBounds = core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetDrawBounds();
                 if (ImGui::CheckboxButton(
-                    ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_CUBE), BUTTON_ID, "DRAW_BOUNDS_SCENE").c_str(), &drawBounds, m_Window.GetHeaderSize()))
+                    ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_BOUNDS), BUTTON_ID, "DRAW_BOUNDS_SCENE").c_str(), &drawBounds, m_Window.GetHeaderSize()))
                 {
                     core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetDrawBounds(drawBounds);
                     core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
@@ -112,7 +115,6 @@ namespace gallus
                     core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetScenePanOffset().x,
                     core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetScenePanOffset().y
                 );
-                m_CurrentOperation = (ImGuizmo::OPERATION) core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetLastSceneOperation();
 
                 // Begin scrollable child region
                 ImGui::BeginChild("SceneScroll", windowSize, 0,
@@ -155,12 +157,7 @@ namespace gallus
                     imageSize
                 );
 
-                if (drawBounds)
-                {
-                    ShowSpriteBounds(imageScreenPos, textureSize);
-                }
-
-                DrawGizmos(imageScreenPos, textureSize);
+                DrawComponentGizmos(imageScreenPos, textureSize);
 
                 ImU32 borderColor = IM_COL32(255, 255, 255, 255); // white border
                 float borderThickness = 2.0f;
@@ -185,197 +182,25 @@ namespace gallus
             }
 
             //---------------------------------------------------------------------
-            void SceneWindow::DrawGizmos(const ImVec2& a_vSceneStartPos, const ImVec2& a_vSize)
+            void SceneWindow::DrawComponentGizmos(const ImVec2& a_vSceneStartPos, const ImVec2& a_vSize)
             {
-                ImGuizmo::BeginFrame();
+                std::lock_guard<std::recursive_mutex> lock(core::EDITOR_ENGINE->GetECS().m_EntityMutex);
 
-                ImGuizmo::SetOrthographic(false);
-                ImGuizmo::SetDrawlist(ImGui::GetCurrentWindow()->DrawList);
-
-                ImGuizmo::SetRect(a_vSceneStartPos.x + m_vPanOffset.x, a_vSceneStartPos.y + m_vPanOffset.y, a_vSize.x * m_fZoom, a_vSize.y * m_fZoom);
-
-                DrawTransformGizmo();
-                // DrawBoundsGizmo(a_vSceneStartPos, m_fZoom, m_vPanOffset);
-            }
-
-            //---------------------------------------------------------------------
-            void SceneWindow::DrawBoundsGizmo(const ImVec2& a_vScenePos)
-            {
-                if (m_CurrentOperation != ImGuizmo::OPERATION::SPRITE_BOUNDS)
-                {
-                    return;
-                }
-
-                DirectX::XMFLOAT2 spritePos;
-                DirectX::XMFLOAT2 spriteSize;
                 const HierarchyEntityUIView* entity = dynamic_cast<const HierarchyEntityUIView*>(core::EDITOR_ENGINE->GetEditor().GetSelectable().get());
                 if (!entity)
                 {
                     return;
                 }
 
-                std::lock_guard<std::recursive_mutex> lock(core::EDITOR_ENGINE->GetECS().m_EntityMutex);
-
-                ImGui::SetItemAllowOverlap();
-
-                if (!core::EDITOR_ENGINE->GetECS().GetSystem<gameplay::TransformSystem>().HasComponent(entity->GetEntityID()))
-                {
-                    return;
-                }
-                if (!core::EDITOR_ENGINE->GetECS().GetSystem<gameplay::SpriteSystem>().HasComponent(entity->GetEntityID()))
+                EntityInspectorView* entityInspectorView = dynamic_cast<EntityInspectorView*>(core::EDITOR_ENGINE->GetEditor().GetInspectorView());
+                if (!entityInspectorView)
                 {
                     return;
                 }
 
-                auto& transformComponent = core::EDITOR_ENGINE->GetECS().GetSystem<gameplay::TransformSystem>().GetComponent(entity->GetEntityID());
-                spritePos = transformComponent.Transform().GetPosition();
-                spriteSize = transformComponent.Transform().GetScale();
-
-                ImDrawList* drawList = ImGui::GetWindowDrawList();
-
-                ImVec2 m_fZoomedSpritePos = ImVec2(spritePos.x * m_fZoom, spritePos.y * m_fZoom);
-                ImVec2 m_fZoomedSpriteSize = ImVec2(spriteSize.x * m_fZoom, spriteSize.y * m_fZoom);
-
-                ImVec2 topLeft = a_vScenePos + m_fZoomedSpritePos + m_vPanOffset;
-                ImVec2 bottomRight = topLeft + m_fZoomedSpriteSize;
-
-                ImU32 color = IM_COL32(255, 255, 255, 100);
-                float thickness = 2.0f;
-
-                // Draw rectangle
-                drawList->AddRect(topLeft, bottomRight, color, 0.0f, 0, thickness);
-
-                // Handle size
-                float handleSize = 8.0f;
-
-                // Four corner handles
-                ImVec2 handles[4] = {
-                    topLeft,
-                    ImVec2(bottomRight.x, topLeft.y),
-                    bottomRight,
-                    ImVec2(topLeft.x, bottomRight.y)
-                };
-
-                for (int i = 0; i < 4; ++i)
+                for (ComponentBaseUIView* component : entityInspectorView->GetComponents())
                 {
-                    ImVec2 handleCenter = handles[i];
-                    ImVec2 handleMin = handleCenter - ImVec2(handleSize * 0.5f, handleSize * 0.5f);
-                    ImVec2 handleMax = handleCenter + ImVec2(handleSize * 0.5f, handleSize * 0.5f);
-
-                    ImU32 col = IM_COL32(255, 255, 255, 255);
-                    if (ImGui::IsMouseHoveringRect(handleMin, handleMax))
-                    {
-                        col = IM_COL32(255, 255, 0, 255);
-                    }
-                    drawList->AddCircleFilled(ImVec2(handleMin + handleMax) / 2, 6.f, col);
-
-                    ImGui::SetCursorScreenPos(handleMin);
-                    ImGui::InvisibleButton(ImGui::IMGUI_FORMAT_ID("", BUTTON_ID, "HandleBounds_" + std::to_string(i)).c_str(), ImVec2(handleSize, handleSize));
-
-                    if (ImGui::IsItemActive() && ImGui::IsMouseDragging(ImGuiMouseButton_Left))
-                    {
-                        ImVec2 delta = ImGui::GetIO().MouseDelta;
-
-                        switch (i)
-                        {
-                            case 0: // top-left
-                            {
-                                spritePos.x += delta.x;
-                                spritePos.y += delta.y;
-                                spriteSize.x -= delta.x;
-                                spriteSize.y -= delta.y;
-                                break;
-                            }
-                            case 1: // top-right
-                            {
-                                spritePos.y += delta.y;
-                                spriteSize.x += delta.x;
-                                spriteSize.y -= delta.y;
-                                break;
-                            }
-                            case 2: // bottom-right
-                            {
-                                spriteSize.x += delta.x;
-                                spriteSize.y += delta.y;
-                                break;
-                            }
-                            case 3: // bottom-left
-                            {
-                                spritePos.x += delta.x;
-                                spriteSize.x -= delta.x;
-                                spriteSize.y += delta.y;
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                transformComponent.Transform().SetPosition(spritePos);
-                transformComponent.Transform().SetScale(spritePos);
-            }
-
-            //---------------------------------------------------------------------
-            void SceneWindow::ShowSpriteBounds(const ImVec2& a_vScenePos, const ImVec2& a_vSize)
-            {
-                ImDrawList* drawList = ImGui::GetWindowDrawList();
-                ImVec2 mouseScreen = ImGui::GetMousePos();
-
-                std::lock_guard<std::recursive_mutex> lock(core::EDITOR_ENGINE->GetECS().m_EntityMutex);
-
-                for (auto entity : core::EDITOR_ENGINE->GetECS().GetEntities())
-                {
-                    if (!core::EDITOR_ENGINE->GetECS().GetSystem<gameplay::TransformSystem>().HasComponent(entity.GetEntityID()))
-                        continue;
-                    if (!core::EDITOR_ENGINE->GetECS().GetSystem<gameplay::SpriteSystem>().HasComponent(entity.GetEntityID()))
-                        continue;
-
-                    auto& transform = core::EDITOR_ENGINE->GetECS().GetSystem<gameplay::TransformSystem>().GetComponent(entity.GetEntityID());
-
-                    const DirectX::XMFLOAT2& pos = transform.Transform().GetPosition();
-                    const DirectX::XMFLOAT2& scale = transform.Transform().GetScale();
-                    const DirectX::XMFLOAT2& pivot = transform.Transform().GetPivot(); // -0.5 .. 0.5
-                    float rotation = transform.Transform().GetRotation(); // in radians or degrees?
-
-                    // Convert position to screen space with pan and zoom
-                    ImVec2 spritePos = a_vScenePos + m_vPanOffset + ImVec2(pos.x * m_fZoom, pos.y * m_fZoom);
-                    ImVec2 scaledSize = ImVec2(scale.x * m_fZoom, scale.y * m_fZoom);
-
-                    // Define corners centered on sprite origin
-                    ImVec2 corners[4] = {
-                        ImVec2(-0.5f * scaledSize.x, -0.5f * scaledSize.y), // top-left
-                        ImVec2(0.5f * scaledSize.x, -0.5f * scaledSize.y), // top-right
-                        ImVec2(0.5f * scaledSize.x, 0.5f * scaledSize.y), // bottom-right
-                        ImVec2(-0.5f * scaledSize.x, 0.5f * scaledSize.y)  // bottom-left
-                    };
-
-                    // Precompute sin/cos for rotation
-                    float rotationRad = DirectX::XMConvertToRadians(rotation); // assuming rotation is degrees
-                    float cosR = cosf(rotationRad);
-                    float sinR = sinf(rotationRad);
-
-                    // Rotate corners around pivot and translate to screen space
-                    for (int i = 0; i < 4; ++i)
-                    {
-                        // offset relative to pivot
-                        float x = corners[i].x - (pivot.x * scaledSize.x);
-                        float y = corners[i].y - (pivot.y * scaledSize.y);
-
-                        // rotate
-                        float rx = x * cosR - y * sinR;
-                        float ry = x * sinR + y * cosR;
-
-                        // translate to spritePos (pivot position in screen space)
-                        corners[i].x = rx + spritePos.x;
-                        corners[i].y = ry + spritePos.y;
-                    }
-
-                    // Draw bounding box polyline
-                    drawList->AddPolyline(corners, 4, IM_COL32(255, 255, 0, 255), true, 2.0f);
-
-                    // Draw pivot point (pivot position)
-                    drawList->AddCircleFilled(spritePos, 4.0f, IM_COL32(0, 255, 0, 255));
-
-                    // Mouse cursor debugging, picking logic can be added here similarly if needed...
+                    component->RenderComponentGizmos(a_vSceneStartPos, a_vSize, m_vPanOffset, m_fZoom);
                 }
             }
 
@@ -419,7 +244,7 @@ namespace gallus
                         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
                         ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0);
 
-                        bool isTranslate = m_CurrentOperation == ImGuizmo::TRANSLATE;
+                        bool isTranslate = core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetLastSceneOperation() == ImGuizmo::TRANSLATE;
                         if (ImGui::IconCheckboxButton(
                             ImGui::IMGUI_FORMAT_ID(font::ICON_TRANSLATE, BUTTON_ID, "TRANSLATE").c_str(),
                             &isTranslate,
@@ -427,12 +252,11 @@ namespace gallus
                             m_Window.GetIconFont(),
                             isTranslate ? ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent) : ImGui::GetStyleColorVec4(ImGuiCol_Text)))
                         {
-                            m_CurrentOperation = ImGuizmo::TRANSLATE;
-                            core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetLastSceneOperation((int) m_CurrentOperation);
+                            core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetLastSceneOperation((int) ImGuizmo::TRANSLATE);
                             core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
                         }
 
-                        bool isRotate = m_CurrentOperation == ImGuizmo::ROTATE_Z;
+                        bool isRotate = core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetLastSceneOperation() == ImGuizmo::ROTATE_Z;
                         if (ImGui::IconCheckboxButton(
                             ImGui::IMGUI_FORMAT_ID(font::ICON_ROTATE, BUTTON_ID, "ROTATE").c_str(),
                             &isRotate,
@@ -440,12 +264,11 @@ namespace gallus
                             m_Window.GetIconFont(),
                             isRotate ? ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent) : ImGui::GetStyleColorVec4(ImGuiCol_Text)))
                         {
-                            m_CurrentOperation = ImGuizmo::ROTATE_Z;
-                            core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetLastSceneOperation((int) m_CurrentOperation);
+                            core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetLastSceneOperation((int) ImGuizmo::ROTATE_Z);
                             core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
                         }
 
-                        bool isScale = m_CurrentOperation == ImGuizmo::SCALE;
+                        bool isScale = core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetLastSceneOperation() == ImGuizmo::SCALE;
                         if (ImGui::IconCheckboxButton(
                             ImGui::IMGUI_FORMAT_ID(font::ICON_SCALE, BUTTON_ID, "SCALE").c_str(),
                             &isScale,
@@ -453,8 +276,7 @@ namespace gallus
                             m_Window.GetIconFont(),
                             isScale ? ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent) : ImGui::GetStyleColorVec4(ImGuiCol_Text)))
                         {
-                            m_CurrentOperation = ImGuizmo::SCALE;
-                            core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetLastSceneOperation((int) m_CurrentOperation);
+                            core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetLastSceneOperation((int) ImGuizmo::SCALE);
                             core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
                         }
 
@@ -506,80 +328,6 @@ namespace gallus
             }
 
             //---------------------------------------------------------------------
-            void SceneWindow::DrawTransformGizmo()
-            {
-                std::lock_guard<std::recursive_mutex> lock(core::EDITOR_ENGINE->GetECS().m_EntityMutex);
-
-                const HierarchyEntityUIView* entity = dynamic_cast<const HierarchyEntityUIView*>(core::EDITOR_ENGINE->GetEditor().GetSelectable().get());
-                if (!entity)
-                {
-                    return;
-                }
-
-                if (!core::EDITOR_ENGINE->GetECS().GetSystem<gameplay::TransformSystem>().HasComponent(entity->GetEntityID()))
-                {
-                    return;
-                }
-
-                ImGui::SetItemAllowOverlap();
-
-                auto& transformComponent = core::EDITOR_ENGINE->GetECS().GetSystem<gameplay::TransformSystem>().GetComponent(entity->GetEntityID());
-                DirectX::XMMATRIX pivotOffset = DirectX::XMMatrixTranslation(transformComponent.Transform().GetPivot().x, transformComponent.Transform().GetPivot().y, 0.0f);
-                DirectX::XMMATRIX objectMat = transformComponent.Transform().GetWorldMatrix();
-                objectMat = objectMat * pivotOffset;;
-
-                // Get transformation matrices
-                DirectX::XMMATRIX viewMat = core::EDITOR_ENGINE->GetDX12().GetCamera().GetViewMatrix();
-                const DirectX::XMMATRIX& projMat = core::EDITOR_ENGINE->GetDX12().GetCamera().GetProjectionMatrix();
-
-                // Convert DirectX matrices to float[16] format for ImGuizmo
-                float objectFloat[16];
-                DirectX::XMStoreFloat4x4(reinterpret_cast<DirectX::XMFLOAT4X4*>(objectFloat), objectMat);
-                float viewFloat[16];
-                DirectX::XMStoreFloat4x4(reinterpret_cast<DirectX::XMFLOAT4X4*>(viewFloat), viewMat);
-                float projFloat[16];
-                DirectX::XMStoreFloat4x4(reinterpret_cast<DirectX::XMFLOAT4X4*>(projFloat), projMat);
-
-                if (ImGui::IsKeyPressed(ImGuiKey_T) || ImGui::IsKeyPressed(ImGuiKey_P))
-                {
-                    m_CurrentOperation = ImGuizmo::TRANSLATE;
-                    core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetLastSceneOperation((int) m_CurrentOperation);
-                    core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
-                }
-                if (ImGui::IsKeyPressed(ImGuiKey_R))
-                {
-                    m_CurrentOperation = ImGuizmo::ROTATE;
-                    core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetLastSceneOperation((int) m_CurrentOperation);
-                    core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
-                }
-                if (ImGui::IsKeyPressed(ImGuiKey_S))
-                {
-                    m_CurrentOperation = ImGuizmo::SCALE;
-                    core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetLastSceneOperation((int) m_CurrentOperation);
-                    core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
-                }
-
-                bool useSnap = ImGui::IsKeyDown(ImGuiKey_LeftShift);
-                float snap = useSnap ? 1.0f : 0.0f;
-
-                // Render the gizmo (check if manipulation occurred)
-                if (ImGuizmo::Manipulate(
-                    viewFloat,
-                    projFloat,
-                    m_CurrentOperation,
-                    ImGuizmo::LOCAL,
-                    objectFloat, 0, &snap))
-                {
-                    DirectX::XMMATRIX result = DirectX::XMLoadFloat4x4(reinterpret_cast<DirectX::XMFLOAT4X4*>(objectFloat));
-                    result = result * DirectX::XMMatrixInverse(nullptr, pivotOffset);
-
-                    transformComponent.Transform().SetWorldMatrix(result);
-
-					gameplay::GAME.GetScene().SetIsDirty(true);
-                }
-            }
-
-            //---------------------------------------------------------------------
             FullSceneWindow::FullSceneWindow(ImGuiWindow& a_Window) : SceneWindow(a_Window)
             {
                 m_sWindowID = "FullScene";
@@ -626,6 +374,7 @@ namespace gallus
                     ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_PLAY), BUTTON_ID, "PLAY_FULL_SCENE").c_str(), &isStarted, m_Window.GetHeaderSize()))
                 {
                     core::EDITOR_ENGINE->GetEditor().SetSelectable(nullptr, nullptr);
+                    gameplay::GAME.GetScene().Load();
                     gameplay::GAME.GetScene().LoadData();
                     gameplay::GAME.SetIsStarted(isStarted);
                 }

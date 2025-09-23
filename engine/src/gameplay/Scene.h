@@ -24,7 +24,8 @@ namespace gallus
 			bool LoadData();
 
 #ifdef _EDITOR
-			bool SaveData();
+			bool Save();
+			bool Load();
 #endif
 
 			void SetData(const core::Data& a_Data);

@@ -39,6 +39,8 @@ namespace gallus
 					m_ScaleView(a_Window),
 					m_PivotView(a_Window)
 				{}
+
+				void RenderComponentGizmos(const ImVec2& a_vScenePos, const ImVec2& a_vSize, const ImVec2& a_vPanOffset, float a_fZoom) override;
 			private:
 				/// <summary>
 				/// Render the inner part of the UI, including position, rotation, scale, and color.

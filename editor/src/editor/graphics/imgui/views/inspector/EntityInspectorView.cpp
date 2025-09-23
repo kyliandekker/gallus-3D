@@ -54,17 +54,13 @@ namespace gallus
 
 				for (auto& [type, factory] : GetComponentUIFactoryRegistry())
 				{
-					if (auto* view = factory(m_Window, entityId))
+					if (ComponentBaseUIView* view = factory(m_Window, entityId))
 					{
+						if (view)
+						{
+							m_bShowPreview = true;
+						}
 						m_aComponents.push_back(view);
-					}
-				}
-
-				for (const ComponentBaseUIView* component : m_aComponents)
-				{
-					if (component->ShowPreview())
-					{
-						m_bShowPreview = true;
 					}
 				}
 			}

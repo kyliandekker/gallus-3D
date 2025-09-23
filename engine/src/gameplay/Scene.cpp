@@ -115,7 +115,7 @@ namespace gallus
 
 #ifdef _EDITOR
 		//---------------------------------------------------------------------
-		bool Scene::SaveData()
+		bool Scene::Save()
 		{
 			if (m_ScenePath.empty())
 			{
@@ -166,6 +166,17 @@ namespace gallus
 
 			m_fIsDirty = false;
 			return true;
+		}
+
+		//---------------------------------------------------------------------
+		bool Scene::Load()
+		{
+			if (m_ScenePath.empty())
+			{
+				return false;
+			}
+
+			return file::LoadFile(m_ScenePath, m_Data);
 		}
 #endif // _EDITOR
 

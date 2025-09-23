@@ -30,13 +30,13 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			DX12Transform& Camera::GetTransform()
+			DX12Transform& Camera::Transform()
 			{
 				return m_Transform;
 			}
 
 			//---------------------------------------------------------------------
-			const DX12Transform& Camera::GetTransform() const
+			const DX12Transform& Camera::Transform() const
 			{
 				return m_Transform;
 			}

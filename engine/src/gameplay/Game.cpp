@@ -15,6 +15,8 @@
 #include "gameplay/systems/SpriteSystem.h"
 #include "gameplay/systems/TransformSystem.h"
 #include "gameplay/systems/PlayerSystem.h"
+#include "gameplay/systems/HealthSystem.h"
+#include "gameplay/systems/CollisionSystem.h"
 
 namespace gallus
 {
@@ -30,6 +32,8 @@ namespace gallus
 			core::ENGINE->GetECS().CreateSystem<SpriteSystem>().Initialize();
 			core::ENGINE->GetECS().CreateSystem<TransformSystem>().Initialize();
 			core::ENGINE->GetECS().CreateSystem<PlayerSystem>().Initialize();
+			core::ENGINE->GetECS().CreateSystem<HealthSystem>().Initialize();
+			core::ENGINE->GetECS().CreateSystem<CollisionSystem>().Initialize();
 
 			core::ENGINE->GetWindow().OnQuit() += std::bind(&Game::Shutdown, this);
 
