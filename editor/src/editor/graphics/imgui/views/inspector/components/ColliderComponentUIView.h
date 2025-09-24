@@ -54,6 +54,8 @@ namespace gallus
 				Vector2View<DirectX::XMFLOAT2>
 					m_OffsetView,
 					m_SizeView;
+
+				int8_t m_iSelectedHandle = -1;
 			};
 		}
 	}

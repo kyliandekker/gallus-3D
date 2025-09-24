@@ -2,21 +2,22 @@
 
 #include "gameplay/systems/components/Component.h"
 
+#include <DirectXMath.h>
+#include <map>
+
+// gameplay includes
+#include "gameplay/systems/components/ColliderComponent.h"
+
 namespace gallus
 {
 	namespace gameplay
 	{
 		//---------------------------------------------------------------------
-		// HealthComponent
+		// MovementComponent
 		//---------------------------------------------------------------------
-		class HealthComponent : public Component
+		class MovementComponent : public Component
 		{
 		public:
-			/// <summary>
-			/// Initializes the component in runtime.
-			/// </summary>
-			void InitRealtime() override;
-
 			/// <summary>
 			/// Serialized the component to a json document.
 			/// </summary>
@@ -31,50 +32,33 @@ namespace gallus
 			/// <param name="a_Allocator">The allocator used by the json document.</param>
 			void Deserialize(const rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator) override;
 
-			/// <summary>
-			/// Retrieves the health.
-			/// </summary>
-			/// <returns>Float representing the health.</returns>
-			float GetHealth() const
-			{
-				return m_fHealth;
-			}
-
-			/// <summary>
-			/// Sets the health.
-			/// </summary>
-			/// <param name="a_fHealth">The health.</param>
-			void SetHealth(float a_fHealth)
-			{
-				m_fHealth = a_fHealth;
-			}
-
-			/// <summary>
-			/// Retrieves the max health.
-			/// </summary>
-			/// <returns>Float representing the max health.</returns>
-			float GetMaxHealth() const
-			{
-				return m_fMaxHealth;
-			}
-
-			/// <summary>
-			/// Sets the max health.
-			/// </summary>
-			/// <param name="a_fMaxHealth">The max health.</param>
-			void SetMaxHealth(float a_fMaxHealth)
-			{
-				m_fMaxHealth = a_fMaxHealth;
-			}
+			void Translate(const DirectX::XMFLOAT2& a_vTranslation);
 
 			/// <summary>
 			/// Updates the components.
 			/// </summary>
 			/// <param name="a_fDeltaTime">Delta time.</param>
-			void UpdateRealtime(float a_fDeltaTime) override;
+			void UpdateRealtime(float a_fDeltaTime)
+			{}
+
+			/// <summary>
+			/// Updates the components.
+			/// </summary>
+			/// <param name="a_fDeltaTime">Delta time.</param>
+			void UpdateRealtime(float a_fDeltaTime, std::map<EntityID, ColliderComponent>& a_aColliders);
+
+			bool HasGravity() const
+			{
+				return m_bHasGravity;
+			}
+
+			void SetHasGravity(bool a_bHasGravity)
+			{
+				m_bHasGravity = a_bHasGravity;
+			}
 		protected:
-			float m_fHealth = 100;
-			float m_fMaxHealth = 100;
+			bool m_bHasGravity = false;
+			DirectX::XMFLOAT2 m_vTranslation = {};
 		};
 	}
 }

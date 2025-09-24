@@ -2,10 +2,13 @@
 
 #include "gameplay/systems/components/Component.h"
 
+#include <map>
+
 namespace gallus
 {
 	namespace gameplay
 	{
+		class ColliderComponent;
 		//---------------------------------------------------------------------
 		// PlayerComponent
 		//---------------------------------------------------------------------
@@ -48,7 +51,7 @@ namespace gallus
 			/// Updates the components.
 			/// </summary>
 			/// <param name="a_fDeltaTime">Delta time.</param>
-			void UpdateRealtime(float a_fDeltaTime) override;
+			void UpdateRealtime(float a_fDeltaTime);
 		protected:
 			float m_fSpeed = 200;
 		};

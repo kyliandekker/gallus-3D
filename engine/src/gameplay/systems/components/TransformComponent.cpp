@@ -1,4 +1,4 @@
-#include "gameplay/systems/components/TransformComponent.h"
+﻿#include "gameplay/systems/components/TransformComponent.h"
 
 #include <rapidjson/utils.h>
 #include <DirectXMath.h>

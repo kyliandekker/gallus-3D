@@ -60,7 +60,12 @@ namespace gallus
 				ImGui::PopStyleVar();
 			}
 
-            void ColliderComponentUIView::RenderComponentGizmos(const ImVec2& a_vScenePos, const ImVec2& a_vSize, const ImVec2& a_vPanOffset, float a_fZoom)
+            constexpr float HANDLE_RADIUS = 6;
+            void ColliderComponentUIView::RenderComponentGizmos(
+                const ImVec2& a_vScenePos,
+                const ImVec2& a_vSize,
+                const ImVec2& a_vPanOffset,
+                float a_fZoom)
             {
                 ImDrawList* drawList = ImGui::GetWindowDrawList();
                 ImVec2 mouseScreen = ImGui::GetMousePos();
@@ -76,104 +81,77 @@ namespace gallus
                 const DirectX::XMFLOAT2& pos = transform.Transform().GetPosition();
                 const DirectX::XMFLOAT2& scale = transform.Transform().GetScale();
                 const DirectX::XMFLOAT2& pivot = transform.Transform().GetPivot();
-                float rotation = transform.Transform().GetRotation(); // degrees
+                float rotation = transform.Transform().GetRotation();
 
                 DirectX::XMFLOAT2 colliderOffset = m_Component.GetOffset();
                 DirectX::XMFLOAT2 colliderSize = m_Component.GetSize();
 
-                ImVec2 objectPos = a_vScenePos + a_vPanOffset + ImVec2(pos.x * a_fZoom, pos.y * a_fZoom);
+                std::array<DirectX::XMFLOAT2, 4> worldCorners =
+                    m_Component.GetColliderWorldCorners(pos, scale, pivot, rotation);
 
-                ImVec2 finalSize = ImVec2(colliderSize.x * scale.x * a_fZoom, colliderSize.y * scale.y * a_fZoom);
-
-                ImVec2 pivotShift = ImVec2(-pivot.x * scale.x * a_fZoom, -pivot.y * scale.y * a_fZoom);
-                ImVec2 localOffset = ImVec2(colliderOffset.x * scale.x * a_fZoom, colliderOffset.y * scale.y * a_fZoom);
-                ImVec2 localCenter = pivotShift + localOffset;
-
-                float rotationRad = DirectX::XMConvertToRadians(rotation);
-                float cosR = cosf(rotationRad);
-                float sinR = sinf(rotationRad);
-
-                ImVec2 rotatedCenter = ImVec2(localCenter.x * cosR - localCenter.y * sinR, localCenter.x * sinR + localCenter.y * cosR);
-                ImVec2 colliderCenter = objectPos + rotatedCenter;
-
-                ImVec2 corners[4] = {
-                    ImVec2(-0.5f * finalSize.x, -0.5f * finalSize.y),
-                    ImVec2(0.5f * finalSize.x, -0.5f * finalSize.y),
-                    ImVec2(0.5f * finalSize.x, 0.5f * finalSize.y),
-                    ImVec2(-0.5f * finalSize.x, 0.5f * finalSize.y)
-                };
-
+                ImVec2 screenCorners[4];
                 for (int i = 0; i < 4; ++i)
                 {
-                    float x = corners[i].x;
-                    float y = corners[i].y;
-                    float rx = x * cosR - y * sinR;
-                    float ry = x * sinR + y * cosR;
-                    corners[i].x = rx + colliderCenter.x;
-                    corners[i].y = ry + colliderCenter.y;
+                    screenCorners[i] = a_vScenePos + a_vPanOffset +
+                        ImVec2(worldCorners[i].x * a_fZoom,
+                            worldCorners[i].y * a_fZoom);
                 }
 
                 ImU32 handleCol = ImGui::ColorConvertFloat4ToU32(m_Window.GetAccentColor());
 
-                // Draw collider bounds
-                drawList->AddPolyline(corners, 4, handleCol, true, 2.0f);
+                drawList->AddPolyline(screenCorners, 4, handleCol, true, 2.0f);
 
-                // === Edge handles ===
                 ImVec2 handles[4] = {
-                    (corners[0] + corners[3]) * 0.5f, // Left
-                    (corners[1] + corners[2]) * 0.5f, // Right
-                    (corners[0] + corners[1]) * 0.5f, // Top
-                    (corners[2] + corners[3]) * 0.5f  // Bottom
+                    (screenCorners[0] + screenCorners[3]) * 0.5f, 
+                    (screenCorners[1] + screenCorners[2]) * 0.5f, 
+                    (screenCorners[0] + screenCorners[1]) * 0.5f, 
+                    (screenCorners[2] + screenCorners[3]) * 0.5f  
                 };
-
-                static int activeHandle = -1;
-                const float handleRadius = 6.0f;
 
                 for (int i = 0; i < 4; ++i)
                 {
                     ImVec4 defaultCol = m_Window.GetAccentColor();
                     defaultCol.w = 0.5f;
 
-                    bool hovered = ImLengthSqr(mouseScreen - handles[i]) <= handleRadius * handleRadius;
-                    drawList->AddCircleFilled(handles[i], handleRadius, hovered ? handleCol : ImGui::ColorConvertFloat4ToU32(defaultCol));
+                    bool hovered = ImLengthSqr(mouseScreen - handles[i]) <= HANDLE_RADIUS * HANDLE_RADIUS;
+                    drawList->AddCircleFilled(handles[i], HANDLE_RADIUS, hovered ? handleCol : ImGui::ColorConvertFloat4ToU32(defaultCol));
                     if (hovered && ImGui::IsMouseClicked(0))
                     {
-                        activeHandle = i;
+                        m_iSelectedHandle = i;
                     }
                 }
 
-                if (activeHandle != -1)
+                if (m_iSelectedHandle != -1)
                 {
                     if (ImGui::IsMouseDown(0))
                     {
                         ImVec2 delta = ImGui::GetIO().MouseDelta;
 
-                        // Convert mouse delta back into local space (ignoring rotation for simplicity)
                         float dx = delta.x / (scale.x * a_fZoom);
                         float dy = delta.y / (scale.y * a_fZoom);
 
                         const float minSize = 0.01f;
 
-                        if (activeHandle == 0)
-                        { // Left
+                        if (m_iSelectedHandle == 0)
+                        {
                             colliderSize.x -= dx;
-                            colliderOffset.x += dx * 0.5f;          // <-- SIGN FIX (was -=)
+                            colliderOffset.x += dx * 0.5f;
                             if (colliderSize.x < minSize) colliderSize.x = minSize;
                         }
-                        else if (activeHandle == 1)
-                        { // Right
+                        else if (m_iSelectedHandle == 1)
+                        {
                             colliderSize.x += dx;
                             colliderOffset.x += dx * 0.5f;
                             if (colliderSize.x < minSize) colliderSize.x = minSize;
                         }
-                        else if (activeHandle == 2)
-                        { // Top
+                        else if (m_iSelectedHandle == 2)
+                        {
                             colliderSize.y -= dy;
-                            colliderOffset.y += dy * 0.5f;          // <-- SIGN FIX (was -=)
+                            colliderOffset.y += dy * 0.5f;
                             if (colliderSize.y < minSize) colliderSize.y = minSize;
                         }
-                        else if (activeHandle == 3)
-                        { // Bottom
+                        else if (m_iSelectedHandle == 3)
+                        {
                             colliderSize.y += dy;
                             colliderOffset.y += dy * 0.5f;
                             if (colliderSize.y < minSize) colliderSize.y = minSize;
@@ -184,7 +162,7 @@ namespace gallus
                     }
                     else
                     {
-                        activeHandle = -1;
+                        m_iSelectedHandle = -1;
                     }
                 }
             }

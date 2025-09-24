@@ -92,13 +92,13 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			void DX12Transform::SetWorldMatrix(const DirectX::XMMATRIX& worldMatrix)
+			void DX12Transform::SetWorldMatrix(const DirectX::XMMATRIX& a_WorldMatrix)
 			{
-				m_vPosition.x = DirectX::XMVectorGetX(worldMatrix.r[3]);
-				m_vPosition.y = DirectX::XMVectorGetY(worldMatrix.r[3]);
+				m_vPosition.x = DirectX::XMVectorGetX(a_WorldMatrix.r[3]);
+				m_vPosition.y = DirectX::XMVectorGetY(a_WorldMatrix.r[3]);
 
-				DirectX::XMVECTOR column0 = worldMatrix.r[0];
-				DirectX::XMVECTOR column1 = worldMatrix.r[1];
+				DirectX::XMVECTOR column0 = a_WorldMatrix.r[0];
+				DirectX::XMVECTOR column1 = a_WorldMatrix.r[1];
 
 				m_vScale.x = DirectX::XMVectorGetX(DirectX::XMVector2Length(column0));
 				m_vScale.y = DirectX::XMVectorGetX(DirectX::XMVector2Length(column1));
@@ -113,6 +113,39 @@ namespace gallus
 				{
 					m_fRotationDegrees += 360.0f;
 				}
+			}
+
+			//---------------------------------------------------------------------
+			std::array<DirectX::XMFLOAT2, 4> DX12Transform::GetWorldCorners() const
+			{
+				std::array<DirectX::XMFLOAT2, 4> corners = {
+					DirectX::XMFLOAT2(-0.5f, -0.5f),
+					DirectX::XMFLOAT2(0.5f, -0.5f),
+					DirectX::XMFLOAT2(0.5f, 0.5f),
+					DirectX::XMFLOAT2(-0.5f, 0.5f)
+				};
+
+				DirectX::XMFLOAT2 pivotShift(-m_vPivot.x, -m_vPivot.y);
+
+				float rad = DirectX::XMConvertToRadians(m_fRotationDegrees);
+				float cosR = cosf(rad);
+				float sinR = sinf(rad);
+
+				for (auto& c : corners)
+				{
+					c.x += pivotShift.x;
+					c.y += pivotShift.y;
+
+					c.x *= m_vScale.x;
+					c.y *= m_vScale.y;
+
+					float rx = c.x * cosR - c.y * sinR;
+					float ry = c.x * sinR + c.y * cosR;
+					c.x = rx + m_vPosition.x;
+					c.y = ry + m_vPosition.y;
+				}
+
+				return corners;
 			}
 		}
 	}

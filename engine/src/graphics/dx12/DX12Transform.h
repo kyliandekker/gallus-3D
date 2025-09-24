@@ -1,6 +1,7 @@
 #pragma once
 
 #include <DirectXMath.h>
+#include <array>
 
 namespace gallus
 {
@@ -81,6 +82,12 @@ namespace gallus
 				/// </summary>
 				/// <param name="worldMatrix">A XMMATRIX containing the world matrix for the transform.</param>
 				void SetWorldMatrix(const DirectX::XMMATRIX& a_WorldMatrix);
+
+				/// <summary>
+				/// Retrieves the world corners for collision purposes.
+				/// </summary>
+				/// <returns>An array containing 4 corners in screen space.</returns>
+				std::array<DirectX::XMFLOAT2, 4> GetWorldCorners() const;
 			private:
 				DirectX::XMFLOAT2 m_vPosition = { 0, 0 };
 				float m_fRotationDegrees = 0.0f; // rotation around Z axis

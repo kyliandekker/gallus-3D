@@ -2,10 +2,12 @@
 
 #include <rapidjson/utils.h>
 
+// engine includes
 #include "core/Engine.h"
 
+// gameplay includes
 #include "gameplay/Entity.h"
-#include "gameplay/systems/TransformSystem.h"
+#include "gameplay/systems/MovementSystem.h"
 
 #define JSON_PLAYER_COMPONENT_MOVEMENT_SPEED_VAR "movementSpeed"
 
@@ -77,45 +79,51 @@ namespace gallus
 		};
 
 		Key w('W'), a('A'), s('S'), d('D');
-		//---------------------------------------------------------------------
-		void PlayerComponent::UpdateRealtime(float a_fDeltaTime)
-		{
-			TransformSystem& transformSys = core::ENGINE->GetECS().GetSystem<TransformSystem>();
+        void PlayerComponent::UpdateRealtime(float a_fDeltaTime)
+        {
+            MovementSystem& movementSys = core::ENGINE->GetECS().GetSystem<MovementSystem>();
 
-			bool wDown = w.isKey();
-			bool aDown = a.isKey();
-			bool sDown = s.isKey();
-			bool dDown = d.isKey();
+            const Entity* ent = core::ENGINE->GetECS().GetEntity(m_EntityID);
+            if (ent == nullptr)
+            {
+                return;
+            }
 
-			const Entity* ent = core::ENGINE->GetECS().GetEntity(m_EntityID);
+            float deltaSpeed = m_fSpeed * a_fDeltaTime;
 
-			if (ent)
-			{
-				TransformComponent& transformComp = transformSys.GetComponent(ent->GetEntityID());
+            DirectX::XMFLOAT2 movement = { 0.0f, 0.0f };
+            if (w.isKey())
+            {
+                movement.y -= 1.0f;
+            }
+            if (s.isKey())
+            {
+                movement.y += 1.0f;
+            }
+            if (a.isKey())
+            {
+                movement.x -= 1.0f;
+            }
+            if (d.isKey())
+            {
+                movement.x += 1.0f;
+            }
 
-				float deltaSpeed = m_fSpeed * a_fDeltaTime;
-				auto pos = transformComp.Transform().GetPosition();
-				if (wDown)
-				{
-					pos.y -= deltaSpeed;
-					transformComp.Transform().SetPosition(pos);
-				}
-				if (aDown)
-				{
-					pos.x -= deltaSpeed;
-					transformComp.Transform().SetPosition(pos);
-				}
-				if (sDown)
-				{
-					pos.y += deltaSpeed;
-					transformComp.Transform().SetPosition(pos);
-				}
-				if (dDown)
-				{
-					pos.x += deltaSpeed;
-					transformComp.Transform().SetPosition(pos);
-				}
-			}
-		}
+            if (movement.x == 0.0f && movement.y == 0.0f)
+            {
+                return; // no movement
+            }
+
+            // Normalize to avoid faster diagonal movement
+            float length = sqrtf(movement.x * movement.x + movement.y * movement.y);
+            if (length > 0.0f)
+            {
+                movement.x = (movement.x / length) * deltaSpeed;
+                movement.y = (movement.y / length) * deltaSpeed;
+            }
+
+			MovementComponent& movementComp = movementSys.GetComponent(ent->GetEntityID());
+			movementComp.Translate(movement);
+        }
 	}
 }

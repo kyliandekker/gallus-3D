@@ -119,7 +119,6 @@ namespace gallus
 			if (maxX < 0.0f || minX > a_Camera.GetSize().x ||
 				maxY < 0.0f || minY > a_Camera.GetSize().y)
 			{
-				printf("Out of screen");
 				return false;
 			}
 

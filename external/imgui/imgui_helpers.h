@@ -66,6 +66,11 @@ namespace ImGui
 	std::string IMGUI_FORMAT_ID(const std::string& a_Text, const char* a_ID, const std::string& a_IDName);
 
 	bool FoldOutButton(const std::string& a_ID, bool* a_pValue, const ImVec2& a_Size = ImVec2(0, 0));
+	bool OnOffButton(
+		char const* label,
+		bool* p_value,
+		ImVec2 const& size);
+
 }
 
 #endif

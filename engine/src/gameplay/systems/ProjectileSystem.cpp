@@ -1,4 +1,4 @@
-#include "gameplay/systems/HealthSystem.h"
+#include "gameplay/systems/ProjectileSystem.h"
 
 // logger includes
 #include "logger/Logger.h"
@@ -11,29 +11,27 @@ namespace gallus
 	namespace gameplay
 	{
 		//---------------------------------------------------------------------
-		// HealthSystem
+		// ProjectileSystem
 		//---------------------------------------------------------------------
-		bool HealthSystem::Initialize()
+		bool ProjectileSystem::Initialize()
 		{
-			m_UpdateTime = UpdateTime::UPDATE_TIME_POST_FRAME;
-
-			LOG(LOGSEVERITY_INFO_SUCCESS, LOG_CATEGORY_ECS, "Health system initialized.");
+			LOG(LOGSEVERITY_INFO_SUCCESS, LOG_CATEGORY_ECS, "Projectile system initialized.");
 			return true;
 		}
 
 		//---------------------------------------------------------------------
-		std::string HealthSystem::GetPropertyName() const
+		std::string ProjectileSystem::GetPropertyName() const
 		{
-			return "health";
+			return "projectile";
 		}
 
 		//---------------------------------------------------------------------
-		std::string HealthSystem::GetSystemName() const
+		std::string ProjectileSystem::GetSystemName() const
 		{
-			std::string name = "Health";
-		#ifdef _EDITOR
+			std::string name = "Projectile";
+#ifdef _EDITOR
 			name = std::string(font::ICON_HEART) + " " + name;
-		#endif // _EDITOR
+#endif // _EDITOR
 			return name;
 		}
 	}

@@ -7,16 +7,11 @@ namespace gallus
 	namespace gameplay
 	{
 		//---------------------------------------------------------------------
-		// HealthComponent
+		// ProjectileComponent
 		//---------------------------------------------------------------------
-		class HealthComponent : public Component
+		class ProjectileComponent : public Component
 		{
 		public:
-			/// <summary>
-			/// Initializes the component in runtime.
-			/// </summary>
-			void InitRealtime() override;
-
 			/// <summary>
 			/// Serialized the component to a json document.
 			/// </summary>
@@ -32,49 +27,10 @@ namespace gallus
 			void Deserialize(const rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator) override;
 
 			/// <summary>
-			/// Retrieves the health.
-			/// </summary>
-			/// <returns>Float representing the health.</returns>
-			float GetHealth() const
-			{
-				return m_fHealth;
-			}
-
-			/// <summary>
-			/// Sets the health.
-			/// </summary>
-			/// <param name="a_fHealth">The health.</param>
-			void SetHealth(float a_fHealth)
-			{
-				m_fHealth = a_fHealth;
-			}
-
-			/// <summary>
-			/// Retrieves the max health.
-			/// </summary>
-			/// <returns>Float representing the max health.</returns>
-			float GetMaxHealth() const
-			{
-				return m_fMaxHealth;
-			}
-
-			/// <summary>
-			/// Sets the max health.
-			/// </summary>
-			/// <param name="a_fMaxHealth">The max health.</param>
-			void SetMaxHealth(float a_fMaxHealth)
-			{
-				m_fMaxHealth = a_fMaxHealth;
-			}
-
-			/// <summary>
 			/// Updates the components.
 			/// </summary>
 			/// <param name="a_fDeltaTime">Delta time.</param>
 			void UpdateRealtime(float a_fDeltaTime) override;
-		protected:
-			float m_fHealth = 100;
-			float m_fMaxHealth = 100;
 		};
 	}
 }

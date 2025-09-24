@@ -19,6 +19,13 @@ namespace gallus
 {
 	namespace gameplay
 	{
+		enum class UpdateTime
+		{
+			UPDATE_TIME_FRAME,
+			UPDATE_TIME_END_FRAME,
+			UPDATE_TIME_POST_FRAME
+		};
+
 		//---------------------------------------------------------------------
 		// AbstractECSSystem
 		//---------------------------------------------------------------------
@@ -85,6 +92,17 @@ namespace gallus
 			/// </summary>
 			/// <param name="a_ID"></param>
 			virtual Component* CreateBaseComponent(const EntityID& a_ID) = 0;
+
+			/// <summary>
+			/// Retrieves the update time (when the system is updated).
+			/// </summary>
+			/// <returns>Enum representing the update time.</returns>
+			UpdateTime GetUpdateTime() const
+			{
+				return m_UpdateTime;
+			}
+		protected:
+			UpdateTime m_UpdateTime = UpdateTime::UPDATE_TIME_FRAME;
 		};
 
 		//---------------------------------------------------------------------

@@ -165,6 +165,51 @@ namespace ImGui
 
 		return *a_pValue;
 	}
+
+	bool OnOffButton(
+		char const* label,
+		bool* p_value,
+		ImVec2 const& size)
+	{
+		bool showLabel = label[0] != '#' && label[1] != '#' && label[0] != '\0';
+
+		ImGuiIO& io = GetIO();
+		ImGuiStyle& style = GetStyle();
+		ImVec2 s(size.x - 4, size.y - 4);
+
+		float radius_outer = std::fmin(s.x, s.y) / 2.0f;
+		ImVec2 pos = GetCursorScreenPos();
+		pos = ImVec2(pos.x + 2, pos.y + 2);
+		ImVec2 center = ImVec2(pos.x + radius_outer, pos.y + radius_outer);
+
+		float line_height = GetTextLineHeight();
+		ImDrawList* draw_list = GetWindowDrawList();
+
+		if (s.x != 0.0f && s.y != 0.0f)
+		{
+			center.x = pos.x + (s.x / 2.0f);
+			center.y = pos.y + (s.y / 2.0f);
+			InvisibleButton(label, ImVec2(s.x, s.y + (showLabel ? line_height + style.ItemInnerSpacing.y : 0)));
+		}
+		else
+		{
+			InvisibleButton(label, ImVec2(radius_outer * 2, radius_outer * 2 + (showLabel ? line_height + style.ItemInnerSpacing.y : 0)));
+		}
+
+		bool value_changed = false;
+		bool is_clicked = IsItemClicked();
+
+		draw_list->AddCircleFilled(center, radius_outer * 0.35f, GetColorU32(ImGuiCol_Text), 16);
+		draw_list->AddCircleFilled(center, radius_outer * 0.3f, *p_value ? GetColorU32(ImGuiCol_Text) : GetColorU32(ImGuiCol_Button), 16);
+
+		if (is_clicked)
+		{
+			*p_value = !(*p_value);
+			value_changed = true;
+		}
+
+		return value_changed;
+	}
 }
 
 #endif

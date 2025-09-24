@@ -4,9 +4,10 @@
 #include <ShellScalingApi.h>
 
 // core includes
-#include "core/Engine.h"
 #include "resource.h"
 #include "core/ArgProcessor.h"
+
+// logger includes
 #include "logger/Logger.h"
 
 // utils includes
@@ -14,6 +15,9 @@
 
 // gameplay includes
 #include "gameplay/Game.h"
+
+// editor includes
+#include "core/Engine.h"
 
 int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR lpCmdLine, _In_ int nShowCmd)
 {
@@ -32,14 +36,15 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR lp
 	std::string cmdLine(wstr.begin(), wstr.end());
 
 	// Initialize systems.
-	std::string name = "2D Game";
+	std::string name = "Game";
 	std::string saveDirPath = gallus::file::GetAppDataPath().generic_string() + "/game";
-	gallus::core::TOOL = new gallus::core::Tool();
-	gallus::core::ENGINESetSaveDirectory(saveDirPath);
-	gallus::core::ENGINESetDefaultArguments();
+	gallus::core::ENGINE = new gallus::core::Engine();
+	gallus::core::ENGINE->SetSaveDirectory(saveDirPath);
+	gallus::core::ENGINE->SetDefaultArguments();
 
 	gallus::core::ARGS.ProcessArguments(cmdLine);
-	gallus::core::ENGINEInitialize(hInstance, name);
+
+	gallus::core::ENGINE->Initialize(hInstance, name);
 
 	// Load icons.
 	HICON hIconLarge = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));
@@ -47,12 +52,13 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR lp
 	SendMessage(gallus::core::ENGINE->GetWindow().GetHWnd(), WM_SETICON, ICON_BIG, (LPARAM) hIconLarge);
 	SendMessage(gallus::core::ENGINE->GetWindow().GetHWnd(), WM_SETICON, ICON_SMALL, (LPARAM) hIconSmall);
 
-	// Loop.
+	// Game
 	gallus::gameplay::GAME.Initialize();
+
 	gallus::gameplay::GAME.Loop();
 
 	// Destroy the tool after loop ends.
-	gallus::core::ENGINEDestroy();
+	gallus::core::ENGINE->Destroy();
 
 	return 0;
 }

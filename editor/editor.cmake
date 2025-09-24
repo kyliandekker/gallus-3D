@@ -10,6 +10,10 @@ set(IMGUI
     ${CMAKE_SOURCE_DIR}/external/imgui/imgui_helpers.cpp
     ${CMAKE_SOURCE_DIR}/external/imgui/imgui_tables.cpp
     ${CMAKE_SOURCE_DIR}/external/imgui/implot.cpp
+    ${CMAKE_SOURCE_DIR}/external/imgui/imgui_toggle.cpp
+    ${CMAKE_SOURCE_DIR}/external/imgui/imgui_toggle_palette.cpp
+    ${CMAKE_SOURCE_DIR}/external/imgui/imgui_toggle_presets.cpp
+    ${CMAKE_SOURCE_DIR}/external/imgui/imgui_toggle_renderer.cpp
     ${CMAKE_SOURCE_DIR}/external/imgui/implot_items.cpp
     ${CMAKE_SOURCE_DIR}/external/imgui/ImGuizmo.cpp
 )

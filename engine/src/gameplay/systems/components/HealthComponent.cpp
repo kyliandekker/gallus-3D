@@ -5,6 +5,8 @@
 #define JSON_HEALTH_COMPONENT_HEALTH_VAR "health"
 #define JSON_HEALTH_COMPONENT_MAX_HEALTH_VAR "maxHealth"
 
+#include "core/Engine.h"
+
 namespace gallus
 {
 	namespace gameplay
@@ -39,6 +41,15 @@ namespace gallus
 
 			rapidjson::GetFloat(a_Document, JSON_HEALTH_COMPONENT_HEALTH_VAR, m_fHealth);
 			rapidjson::GetFloat(a_Document, JSON_HEALTH_COMPONENT_MAX_HEALTH_VAR, m_fMaxHealth);
+		}
+
+		//---------------------------------------------------------------------
+		void HealthComponent::UpdateRealtime(float a_fDeltaTime)
+		{
+			if (m_fHealth <= 0)
+			{
+				core::ENGINE->GetECS().GetEntity(m_EntityID)->Destroy();
+			}
 		}
 	}
 }

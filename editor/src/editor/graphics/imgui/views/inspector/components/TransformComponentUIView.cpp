@@ -49,6 +49,7 @@ namespace gallus
 				if (ImGui::DragFloat(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "TRANSFORM_ROT_INSPECTOR").c_str(), &rotation, 1.0f, -999999999, 99999999999))
 				{
 					m_Component.Transform().SetRotation(rotation);
+					gameplay::GAME.GetScene().SetIsDirty(true);
 				}
 
 				ImGui::DisplayHeader(m_Window.GetBoldFont(), "Position: ");

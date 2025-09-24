@@ -76,11 +76,36 @@ namespace gallus
 			{
 				for (auto& sys : m_aSystems)
 				{
-					if (a_bUpdateRealtime && previousUpdateRealtimeState != a_bUpdateRealtime)
+					if (sys->GetUpdateTime() == UpdateTime::UPDATE_TIME_FRAME)
 					{
-						sys->InitComponentsRealtime();
+						if (a_bUpdateRealtime && previousUpdateRealtimeState != a_bUpdateRealtime)
+						{
+							sys->InitComponentsRealtime();
+						}
+						sys->UpdateComponentsRealtime(a_fDeltaTime);
 					}
-					sys->UpdateComponentsRealtime(a_fDeltaTime);
+				}
+				for (auto& sys : m_aSystems)
+				{
+					if (sys->GetUpdateTime() == UpdateTime::UPDATE_TIME_END_FRAME)
+					{
+						if (a_bUpdateRealtime && previousUpdateRealtimeState != a_bUpdateRealtime)
+						{
+							sys->InitComponentsRealtime();
+						}
+						sys->UpdateComponentsRealtime(a_fDeltaTime);
+					}
+				}
+				for (auto& sys : m_aSystems)
+				{
+					if (sys->GetUpdateTime() == UpdateTime::UPDATE_TIME_POST_FRAME)
+					{
+						if (a_bUpdateRealtime && previousUpdateRealtimeState != a_bUpdateRealtime)
+						{
+							sys->InitComponentsRealtime();
+						}
+						sys->UpdateComponentsRealtime(a_fDeltaTime);
+					}
 				}
 			}
 			previousUpdateRealtimeState = a_bUpdateRealtime;
