@@ -18,6 +18,8 @@ namespace gallus
 		//---------------------------------------------------------------------
 		bool Editor::Initialize(bool a_bWait)
 		{
+			m_CurrentScene.SetResourceCategory(core::EngineResourceCategory::Editor);
+
 			LOG(LOGSEVERITY_INFO, LOG_CATEGORY_EDITOR, "Initializing editor.");
 
 			return ThreadedSystem::Initialize(a_bWait);

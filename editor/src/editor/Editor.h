@@ -4,10 +4,15 @@
 
 #include <string>
 
+#include "core/Observable.h"
+
+#include "graphics/imgui/views/inspector/InspectorView.h"
+
 #include "editor/EditorSettings.h"
 #include "editor/AssetDatabase.h"
-#include "core/Observable.h"
-#include "graphics/imgui/views/inspector/InspectorView.h"
+
+#include "gameplay/Scene.h"
+#include "gameplay/Prefab.h"
 
 namespace gallus
 {
@@ -20,6 +25,12 @@ namespace gallus
 	}
 	namespace editor
 	{
+		enum class EditorMethod
+		{
+			EDITOR_METHOD_SCENE,
+			EDITOR_METHOD_PREFAB
+		};
+
 		//---------------------------------------------------------------------
 		// Editor
 		//---------------------------------------------------------------------
@@ -113,6 +124,37 @@ namespace gallus
 			}
 
 			std::mutex m_EditorMutex;
+
+			/// <summary>
+			/// Retrieves the scene.
+			/// </summary>
+			/// <returns>Returns a reference to the scene.</returns>
+			gallus::gameplay::Scene& GetScene()
+			{
+				if (m_EditorMethod == EditorMethod::EDITOR_METHOD_SCENE)
+				{
+					return m_CurrentScene;
+				}
+				return m_Prefab;
+			}
+
+			/// <summary>
+			/// Retrieves the editor method.
+			/// </summary>
+			/// <returns>Returns the type of editor method, scene or prefab.</returns>
+			EditorMethod GetEditorMethod() const
+			{
+				return m_EditorMethod;
+			}
+
+			/// <summary>
+			/// Sets the editor method.
+			/// </summary>
+			/// <param name="a_EditorMethod">.The editor method.</param>
+			void SetEditorMethod(EditorMethod a_EditorMethod)
+			{
+				m_EditorMethod = a_EditorMethod;
+			}
 		protected:
 			// TODO: Use m_bLoadAssets or something in AssetDatabase to wake up thread and let it sleep otherwise.
 			bool Sleep() const override
@@ -137,6 +179,11 @@ namespace gallus
 
 			core::Observable<graphics::imgui::EditorSelectable*> m_pSelectable;
 			graphics::imgui::InspectorView* m_pInspectorView = nullptr;
+
+			gameplay::Scene m_CurrentScene;
+			gameplay::Prefab m_Prefab;
+
+			EditorMethod m_EditorMethod = EditorMethod::EDITOR_METHOD_SCENE;
 		};
 	}
 }

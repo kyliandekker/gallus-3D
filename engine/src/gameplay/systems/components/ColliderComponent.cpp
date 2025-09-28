@@ -156,6 +156,22 @@ namespace gallus
 			ColliderComponent& a, const DirectX::XMFLOAT2& posA, const DirectX::XMFLOAT2& scaleA, const DirectX::XMFLOAT2& pivotA, float rotA,
 			ColliderComponent& b, const DirectX::XMFLOAT2& posB, const DirectX::XMFLOAT2& scaleB, const DirectX::XMFLOAT2& pivotB, float rotB)
 		{
+			for (const auto& entityID : a.m_aEntitiesToIgnore)
+			{
+				if (entityID == a.GetEntityID() || entityID == b.GetEntityID())
+				{
+					return false;
+				}
+			}
+
+			for (const auto& entityID : b.m_aEntitiesToIgnore)
+			{
+				if (entityID == a.GetEntityID() || entityID == b.GetEntityID())
+				{
+					return false;
+				}
+			}
+
 			auto cornersA = a.GetColliderWorldCorners(posA, scaleA, pivotA, rotA);
 			auto cornersB = b.GetColliderWorldCorners(posB, scaleB, pivotB, rotB);
 
@@ -166,6 +182,12 @@ namespace gallus
 			for (auto& axis : axesB) if (!OverlapsOnAxis(cornersA, cornersB, axis)) return false;
 
 			return true; 
+		}
+
+		//---------------------------------------------------------------------
+		void ColliderComponent::IgnoreEntity(const gameplay::EntityID& a_EntityID)
+		{
+			m_aEntitiesToIgnore.insert(a_EntityID);
 		}
 	}
 }

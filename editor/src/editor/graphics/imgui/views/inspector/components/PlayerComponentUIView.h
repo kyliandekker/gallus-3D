@@ -42,6 +42,8 @@ namespace gallus
 				/// </summary>
 				/// <returns>The name of the UI component.</returns>
 				std::string GetName() const override;
+
+				char m_sPrefabName[128];
 			};
 		}
 	}

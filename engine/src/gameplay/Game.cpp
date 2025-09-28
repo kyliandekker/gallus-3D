@@ -31,6 +31,8 @@ namespace gallus
 		{
 			LOG(LOGSEVERITY_INFO, LOG_CATEGORY_GAME, "Initializing game.");
 
+			m_Scene.SetResourceCategory(core::EngineResourceCategory::Game);
+
 			core::ENGINE->GetECS().CreateSystem<SpriteSystem>().Initialize();
 			core::ENGINE->GetECS().CreateSystem<TransformSystem>().Initialize();
 			core::ENGINE->GetECS().CreateSystem<PlayerSystem>().Initialize();

@@ -63,13 +63,27 @@ namespace gallus
                 ImVec2 toolbarSize = ImVec2(ImGui::GetContentRegionAvail().x, m_Window.GetHeaderSize().y);
                 ImGui::BeginToolbar(toolbarSize);
 
+                bool prefabMode = core::EDITOR_ENGINE->GetEditor().GetEditorMethod() == editor::EditorMethod::EDITOR_METHOD_PREFAB;
+                if (prefabMode)
+                {
+                    ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+                    ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+                }
+
                 bool isStarted = gameplay::GAME.IsStarted();
                 if (ImGui::CheckboxButton(
                     ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_PLAY), BUTTON_ID, "PLAY_SCENE").c_str(), &isStarted, m_Window.GetHeaderSize()))
                 {
                     core::EDITOR_ENGINE->GetEditor().SetSelectable(nullptr, nullptr);
-                    gameplay::GAME.GetScene().Load();
-                    gameplay::GAME.GetScene().LoadData();
+                    if (isStarted)
+                    {
+                        gameplay::GAME.GetScene().Load();
+                        gameplay::GAME.GetScene().LoadData();
+                    }
+                    else
+                    {
+                        core::EDITOR_ENGINE->GetEditor().GetScene().LoadData();
+                    }
                     gameplay::GAME.SetIsStarted(isStarted);
                 }
                 ImGui::SameLine();
@@ -81,6 +95,12 @@ namespace gallus
                     gameplay::GAME.SetIsPaused(isPaused);
                 }
                 ImGui::SameLine();
+
+                if (prefabMode)
+                {
+                    ImGui::PopItemFlag();
+                    ImGui::PopStyleVar();
+                }
 
                 bool drawBounds = core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetDrawBounds();
                 if (ImGui::CheckboxButton(
@@ -355,10 +375,11 @@ namespace gallus
                     return;
                 }
 
+                bool isStarted = gameplay::GAME.IsStarted();
                 if (ImGui::IsKeyDown(ImGuiKey_Escape))
                 {
                     core::EDITOR_ENGINE->GetEditor().SetSelectable(nullptr, nullptr);
-                    gameplay::GAME.GetScene().LoadData();
+                    core::EDITOR_ENGINE->GetEditor().GetScene().LoadData();
                     gameplay::GAME.SetIsStarted(false);
                 }
 
@@ -369,13 +390,26 @@ namespace gallus
                 ImVec2 toolbarSize = ImVec2(ImGui::GetContentRegionAvail().x, m_Window.GetHeaderSize().y);
                 ImGui::BeginToolbar(toolbarSize);
 
-                bool isStarted = gameplay::GAME.IsStarted();
+                bool prefabMode = core::EDITOR_ENGINE->GetEditor().GetEditorMethod() == editor::EditorMethod::EDITOR_METHOD_PREFAB;
+                if (prefabMode)
+                {
+                    ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+                    ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+                }
+
                 if (ImGui::CheckboxButton(
                     ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_PLAY), BUTTON_ID, "PLAY_FULL_SCENE").c_str(), &isStarted, m_Window.GetHeaderSize()))
                 {
                     core::EDITOR_ENGINE->GetEditor().SetSelectable(nullptr, nullptr);
-                    gameplay::GAME.GetScene().Load();
-                    gameplay::GAME.GetScene().LoadData();
+                    if (isStarted)
+                    {
+                        gameplay::GAME.GetScene().Load();
+                        gameplay::GAME.GetScene().LoadData();
+                    }
+                    else
+                    {
+                        core::EDITOR_ENGINE->GetEditor().GetScene().LoadData();
+                    }
                     gameplay::GAME.SetIsStarted(isStarted);
                 }
                 ImGui::SameLine();
@@ -384,6 +418,12 @@ namespace gallus
                     ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_PAUSE), BUTTON_ID, "PAUSE_FULL_SCENE").c_str(), &isPaused, m_Window.GetHeaderSize()))
                 {
                     gameplay::GAME.SetIsPaused(isPaused);
+                }
+
+                if (prefabMode)
+                {
+                    ImGui::PopItemFlag();
+                    ImGui::PopStyleVar();
                 }
 
                 ImGui::EndToolbar(ImVec2(0, 0));

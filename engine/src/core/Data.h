@@ -85,7 +85,7 @@ namespace gallus
 			/// <returns>True if empty, otherwise false.</returns>
 			bool empty() const
 			{
-				return m_pData == nullptr && m_iSize == 0;
+				return m_pData == nullptr || m_iSize == 0;
 			}
 
 			/// <summary>

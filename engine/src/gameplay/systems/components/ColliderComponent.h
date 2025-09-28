@@ -4,6 +4,7 @@
 
 #include <DirectXMath.h>
 #include <array>
+#include <set>
 
 namespace gallus
 {
@@ -58,9 +59,13 @@ namespace gallus
 
 			static bool OverlapsOnAxis(const std::array<DirectX::XMFLOAT2, 4>& a, const std::array<DirectX::XMFLOAT2, 4>& b, const DirectX::XMFLOAT2& axis);
 			static bool CheckCollision(ColliderComponent& a, const DirectX::XMFLOAT2& posA, const DirectX::XMFLOAT2& scaleA, const DirectX::XMFLOAT2& pivotA, float rotA, ColliderComponent& b, const DirectX::XMFLOAT2& posB, const DirectX::XMFLOAT2& scaleB, const DirectX::XMFLOAT2& pivotB, float rotB);
+
+			void IgnoreEntity(const gameplay::EntityID& a_EntityID);
 		protected:
 			DirectX::XMFLOAT2 m_vOffset = { 0, 0 };
 			DirectX::XMFLOAT2 m_vSize = { 1, 1 };
+
+			std::set<gameplay::EntityID> m_aEntitiesToIgnore;
 		};
 	}
 }

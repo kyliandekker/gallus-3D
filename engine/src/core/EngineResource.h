@@ -131,6 +131,12 @@ namespace gallus
 			/// </summary>
 			/// <returns>Path of the resource.</returns>
 			const std::filesystem::path& GetPath() const;
+
+			/// <summary>
+			/// Sets the path of the resource.
+			/// </summary>
+			/// <param name="a_Path">The path.</param>
+			void SetPath(const std::filesystem::path& a_Path);
 		protected:
 			bool m_bIsDestroyable = true; // Whether it is destroyable once created.
 			bool m_bIsLocked = false; // Whether the resource can be overridden in the atlas.

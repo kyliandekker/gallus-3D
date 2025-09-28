@@ -51,6 +51,7 @@ namespace gallus
 		const std::unordered_map<std::string, std::vector<resources::AssetType>> FILE_ATLAS =
 		{
 			{ ".scene", { resources::AssetType::Scene } },
+			{ ".prefab", { resources::AssetType::Prefab } },
 			{ ".png", { resources::AssetType::Sprite } },
 			{ ".bmp", { resources::AssetType::Sprite } },
 			{ ".wav", { resources::AssetType::Sound, resources::AssetType::Song, resources::AssetType::VO } },

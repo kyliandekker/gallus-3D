@@ -31,7 +31,7 @@ namespace gallus
 	{
 		namespace imgui
 		{
-			char m_PixelShaderName[128];
+			char m_sPrefabName[128];
 			char m_VertexShaderName[128];
 			char m_TextureName[128];
 			SpriteComponentUIView::SpriteComponentUIView(ImGuiWindow& a_Window, gameplay::EntityID& a_EntityID, gameplay::SpriteComponent& a_SpriteComponent, gameplay::SpriteSystem& a_System) : ComponentUIView(a_Window, a_EntityID, a_SpriteComponent, a_System), m_SizeView(a_Window)
@@ -42,15 +42,15 @@ namespace gallus
 
 			void SpriteComponentUIView::RenderInner()
 			{
-				memset(m_PixelShaderName, 0, sizeof(m_PixelShaderName));
-				strncpy(m_PixelShaderName, m_Component.GetShader()->GetPixelShader()->GetName().c_str(), sizeof(m_PixelShaderName));
-				m_PixelShaderName[sizeof(m_PixelShaderName) - 1] = '\0';
+				memset(m_sPrefabName, 0, sizeof(m_sPrefabName));
+				strncpy(m_sPrefabName, m_Component.GetShader()->GetPixelShader()->GetName().c_str(), sizeof(m_sPrefabName));
+				m_sPrefabName[sizeof(m_sPrefabName) - 1] = '\0';
 
-				memset(m_VertexShaderName, 0, sizeof(m_PixelShaderName));
+				memset(m_VertexShaderName, 0, sizeof(m_sPrefabName));
 				strncpy(m_VertexShaderName, m_Component.GetShader()->GetVertexShader()->GetName().c_str(), sizeof(m_VertexShaderName));
 				m_VertexShaderName[sizeof(m_VertexShaderName) - 1] = '\0';
 
-				memset(m_TextureName, 0, sizeof(m_PixelShaderName));
+				memset(m_TextureName, 0, sizeof(m_sPrefabName));
 				strncpy(m_TextureName, m_Component.GetTexture()->GetName().c_str(), sizeof(m_TextureName));
 				m_TextureName[sizeof(m_TextureName) - 1] = '\0';
 
@@ -65,7 +65,7 @@ namespace gallus
 				ImGui::SameLine();
 				ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
 				ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x - buttonSize.x);
-				ImGui::InputText(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "SPRITE_COMPONENT_PIXEL_SHADER_NAME_INPUT").c_str(), m_PixelShaderName, sizeof(m_PixelShaderName), ImGuiInputTextFlags_ReadOnly);
+				ImGui::InputText(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "SPRITE_COMPONENT_PIXEL_SHADER_NAME_INPUT").c_str(), m_sPrefabName, sizeof(m_sPrefabName), ImGuiInputTextFlags_ReadOnly);
 				ImGui::PopItemFlag();
 				ImGui::SameLine();
 				if (ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_FILE, BUTTON_ID, "MESH_COMPONENT_PIXEL_SHADER").c_str(), buttonSize))
@@ -115,7 +115,7 @@ namespace gallus
 											core::EDITOR_ENGINE->GetResourceAtlas().LoadVertexShader(resource.GetPath().filename().generic_string()).get()
 									).get());
 									
-									gameplay::GAME.GetScene().SetIsDirty(true);
+									core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
 								}
 							},
 							std::vector<gallus::resources::AssetType>{ gallus::resources::AssetType::VertexShader }
@@ -149,7 +149,7 @@ namespace gallus
 									cCommandQueue->ExecuteCommandList(cCommandList);
 									cCommandQueue->Flush();
 
-									gameplay::GAME.GetScene().SetIsDirty(true);
+									core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
 								}
 							},
 							std::vector<gallus::resources::AssetType>{ gallus::resources::AssetType::Sprite }

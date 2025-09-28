@@ -133,5 +133,11 @@ namespace gallus
 		{
 			return m_Path;
 		}
+
+		//---------------------------------------------------------------------
+		void EngineResource::SetPath(const std::filesystem::path& a_Path)
+		{
+			m_Path = a_Path;
+		}
 	}
 }

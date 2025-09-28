@@ -1,0 +1,42 @@
+{
+    "name": "Bullet",
+    "isActive": true,
+    "components": {
+        "sprite": {
+            "texture": {
+                "name": "tex_bullet.png",
+                "spriteIndex": 0
+            },
+            "shader": {
+                "pixel": "vertexShader.hlsl",
+                "vertex": "pixelShader.hlsl"
+            },
+            "mesh": "square"
+        },
+        "transform": {
+            "position": {
+                "x": 0.0,
+                "y": 0.0
+            },
+            "rotation": 0.0,
+            "scale": {
+                "x": 134.08999633789063,
+                "y": 69.95999908447266
+            }
+        },
+        "collision": {
+            "offset": {
+                "x": 0.0,
+                "y": 0.0
+            },
+            "size": {
+                "x": 1.0,
+                "y": 1.0
+            }
+        },
+        "movement": {
+            "gravity": false
+        },
+        "projectile": {}
+    }
+}

@@ -8,6 +8,7 @@
 
 // utils includes
 #include "utils/string_extensions.h"
+#include "utils/file_abstractions.h"
 
 // graphics includes
 #include "graphics/imgui/font_icon.h"
@@ -26,9 +27,9 @@ namespace gallus
 	{
 		namespace imgui
 		{
-				//---------------------------------------------------------------------
-				// HierarchyWindow
-				//---------------------------------------------------------------------
+			//---------------------------------------------------------------------
+			// HierarchyWindow
+			//---------------------------------------------------------------------
 			HierarchyWindow::HierarchyWindow(ImGuiWindow& a_Window) : BaseWindow(a_Window, ImGuiWindowFlags_NoCollapse, std::string(font::ICON_LIST) + " Hierarchy", "Hierarchy"), m_SearchBar(a_Window)
 			{
 				m_SearchBar.Initialize("");
@@ -47,7 +48,7 @@ namespace gallus
 
 				core::EDITOR_ENGINE->GetEditor().GetSelectable().OnChanged() += std::bind(&HierarchyWindow::OnSelectableChanged, this, std::placeholders::_1, std::placeholders::_2);
 				
-				gameplay::GAME.GetScene().IsDirty().OnChanged() += std::bind(&HierarchyWindow::OnSceneDirty, this, std::placeholders::_1, std::placeholders::_2);
+				core::EDITOR_ENGINE->GetEditor().GetScene().IsDirty().OnChanged() += std::bind(&HierarchyWindow::OnSceneDirty, this, std::placeholders::_1, std::placeholders::_2);
 
 				return BaseWindow::Initialize();
 			}
@@ -127,13 +128,6 @@ namespace gallus
 					m_bNeedsRefresh = false;
 				}
 
-				bool wasEmptyScene = gameplay::GAME.GetScene().GetScenePath().empty();
-				if (wasEmptyScene)
-				{
-					ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-					ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
-				}
-
 				ImVec2 toolbarSize = ImVec2(ImGui::GetContentRegionAvail().x, m_Window.GetHeaderSize().y);
 				ImGui::BeginToolbar(toolbarSize);
 
@@ -141,6 +135,13 @@ namespace gallus
 				ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0);
 
 				float topPosY = ImGui::GetCursorPosY();
+
+				bool prefabMode = core::EDITOR_ENGINE->GetEditor().GetEditorMethod() == editor::EditorMethod::EDITOR_METHOD_PREFAB;
+				if (prefabMode)
+				{
+					ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+					ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+				}
 
 				bool spawnEntity = false;
 				if (ImGui::IconButton(
@@ -150,7 +151,13 @@ namespace gallus
 				}
 				ImGui::SameLine();
 
-				bool wasDirty = gameplay::GAME.GetScene().IsDirty() && !gameplay::GAME.IsStarted() && !gameplay::GAME.GetScene().GetScenePath().empty();
+				if (prefabMode)
+				{
+					ImGui::PopItemFlag();
+					ImGui::PopStyleVar();
+				}
+
+				bool wasDirty = core::EDITOR_ENGINE->GetEditor().GetScene().IsDirty() && !gameplay::GAME.IsStarted();
 				if (!wasDirty)
 				{
 					ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
@@ -160,7 +167,7 @@ namespace gallus
 				if (ImGui::IconButton(
 					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_SAVE), BUTTON_ID, "SAVE_HIERARCHY").c_str(), m_Window.GetHeaderSize(), m_Window.GetIconFont(), ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent)))
 				{
-					gameplay::GAME.GetScene().Save();
+					SaveScene();
 				}
 
 				ImVec2 endPos = ImGui::GetCursorPos();
@@ -173,7 +180,7 @@ namespace gallus
 
 				if (ImGui::IsKeyDown(ImGuiMod_Ctrl) && ImGui::IsKeyPressed(ImGuiKey_S) && wasDirty)
 				{
-					gameplay::GAME.GetScene().Save();
+					SaveScene();
 				}
 
 				ImGui::PopStyleVar();
@@ -241,31 +248,29 @@ namespace gallus
 					}
 
 					core::EDITOR_ENGINE->GetECS().CreateEntity(core::EDITOR_ENGINE->GetECS().GetUniqueName("New GameObject"));
-					gameplay::GAME.GetScene().SetIsDirty(true);
-				}
-
-				if (wasEmptyScene)
-				{
-					ImGui::PopItemFlag();
-					ImGui::PopStyleVar();
+					core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
 				}
 			}
 
+			//---------------------------------------------------------------------
 			void HierarchyWindow::UpdateEntities()
 			{
 				m_bNeedsRefresh = true;
 			}
 
+			//---------------------------------------------------------------------
 			void HierarchyWindow::UpdateEntityComponents()
 			{
 				m_bNeedsRefresh = true;
 			}
 
+			//---------------------------------------------------------------------
 			void HierarchyWindow::SetSelectable(HierarchyEntityUIView* a_EntityView)
 			{
 				core::EDITOR_ENGINE->GetEditor().SetSelectable(a_EntityView, a_EntityView ? new EntityInspectorView(m_Window, *a_EntityView) : nullptr);
 			}
 
+			//---------------------------------------------------------------------
 			void HierarchyWindow::OnSelectableChanged(const EditorSelectable* oldVal, const EditorSelectable* newVal)
 			{
 				if (!newVal)
@@ -284,9 +289,31 @@ namespace gallus
 				}
 			}
 
+			//---------------------------------------------------------------------
+			void HierarchyWindow::SaveScene()
+			{
+				if (core::EDITOR_ENGINE->GetEditor().GetScene().GetPath().empty())
+				{
+					fs::path scenePath;
+					if (file::SaveFile(scenePath, {
+						{ L"Scene Files (*.scene)", L"*.scene" },
+						{ L"Prefab Files (*.prefab)", L"*.prefab" },
+					}, core::EDITOR_ENGINE->GetResourceAtlas().GetResourceFolder().lexically_normal()))
+					{
+						core::EDITOR_ENGINE->GetEditor().GetScene().SetPath(scenePath);
+						core::EDITOR_ENGINE->GetEditor().GetScene().Save();
+					}
+				}
+				else
+				{
+					core::EDITOR_ENGINE->GetEditor().GetScene().Save();
+				}
+			}
+
+			//---------------------------------------------------------------------
 			void HierarchyWindow::OnSceneDirty(const bool oldVal, const bool newVal)
 			{
-				std::string name = (newVal ? "*" : "") + gameplay::GAME.GetScene().GetScenePath().filename().generic_string();
+				std::string name = (newVal ? "*" : "") + core::EDITOR_ENGINE->GetEditor().GetScene().GetPath().filename().generic_string();
 				std::string title = " - (" + name + ")";
 
 				core::EDITOR_ENGINE->GetWindow().AddTitle(title);

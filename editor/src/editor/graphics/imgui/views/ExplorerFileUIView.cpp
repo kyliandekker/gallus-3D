@@ -27,6 +27,7 @@ namespace gallus
 				font::ICON_FILE, // TODO: FIND ICON ANIMATION
 				font::ICON_FILE_SETTINGS, // TODO: FIND ICON SHADER
 				font::ICON_FILE_SETTINGS, // TODO: FIND ICON SHADER
+				font::ICON_FILE_MODEL,
 			};
 
 			ExplorerFileUIView::ExplorerFileUIView(ImGuiWindow& a_Window, gallus::editor::FileResource& a_FileResource, ExplorerFileUIView* a_pParent, bool a_bGetChildren) : ImGuiUIView(a_Window),

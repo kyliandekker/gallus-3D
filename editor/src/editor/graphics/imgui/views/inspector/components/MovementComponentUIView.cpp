@@ -30,13 +30,13 @@ namespace gallus
 				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, m_Window.GetFramePadding());
 
 				ImGui::AlignTextToFramePadding();
-				ImGui::DisplayHeader(m_Window.GetBoldFont(), "Movement: ");
+				ImGui::DisplayHeader(m_Window.GetBoldFont(), "Gravity: ");
 				ImGui::SameLine();
 				bool gravity = m_Component.HasGravity();
 				if (ImGui::Toggle(ImGui::IMGUI_FORMAT_ID("", CHECKBOX_ID, "MOVEMENT_GRAVITY_INSPECTOR").c_str(), &gravity))
 				{
 					m_Component.SetHasGravity(gravity);
-					gameplay::GAME.GetScene().SetIsDirty(true);
+					core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
 				}
 
 				ImGui::PopStyleVar();

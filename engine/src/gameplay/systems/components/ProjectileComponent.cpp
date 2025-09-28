@@ -5,6 +5,7 @@
 #include "core/Engine.h"
 #include "gameplay/systems/CollisionSystem.h"
 #include "gameplay/systems/HealthSystem.h"
+#include "gameplay/systems/MovementSystem.h"
 
 namespace gallus
 {
@@ -51,6 +52,11 @@ namespace gallus
 					core::ENGINE->GetECS().GetEntity(m_EntityID)->Destroy();
 				}
 			}
+
+			MovementSystem& movementSys = core::ENGINE->GetECS().GetSystem<MovementSystem>();
+
+			MovementComponent& movementComp = movementSys.GetComponent(m_EntityID);
+			movementComp.Translate(m_fVelocity);
 		}
 	}
 }

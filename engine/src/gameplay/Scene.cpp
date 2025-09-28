@@ -14,24 +14,12 @@
 // gameplay includes
 #include "gameplay/ECSBaseSystem.h"
 
-#define JSON_SCENE_ENTITIES_VAR "entities"
-#define JSON_SCENE_ENTITIES_VAR_NAME "name"
-#define JSON_SCENE_ENTITIES_VAR_ACTIVE "isActive"
-#define JSON_SCENE_ENTITIES_VAR_COMPONENTS "components"
-
 namespace gallus
 {
 	namespace gameplay
 	{
 		//---------------------------------------------------------------------
 		// Scene
-		//---------------------------------------------------------------------
-		Scene::~Scene()
-		{
-			// Clear all entities.
-			core::ENGINE->GetECS().Clear();
-		}
-
 		//---------------------------------------------------------------------
 		bool Scene::LoadData()
 		{
@@ -117,10 +105,50 @@ namespace gallus
 		//---------------------------------------------------------------------
 		bool Scene::Save()
 		{
-			if (m_ScenePath.empty())
+			if (m_Path.empty())
 			{
 				return false;
 			}
+
+			core::Data data = GetSceneData();
+
+			if (!file::SaveFile(m_Path, data))
+			{
+				LOGF(LOGSEVERITY_ERROR, LOG_CATEGORY_GAME, "Something went wrong when trying to save scene file \"%s\".", m_Path.generic_string().c_str());
+				return false;
+			}
+
+			m_fIsDirty = false;
+			return true;
+		}
+
+		//---------------------------------------------------------------------
+		bool Scene::Load()
+		{
+			if (m_Path.empty())
+			{
+				return false;
+			}
+
+			return file::LoadFile(m_Path, m_Data);
+		}
+#endif // _EDITOR
+
+		//---------------------------------------------------------------------
+		void Scene::SetData(const core::Data& a_Data)
+		{
+			m_Data = a_Data;
+		}
+
+		//---------------------------------------------------------------------
+		const core::Data& Scene::GetData() const
+		{
+			return m_Data;
+		}
+
+		//---------------------------------------------------------------------
+		const core::Data Scene::GetSceneData() const
+		{
 
 			rapidjson::Document a_Document;
 			a_Document.SetObject();
@@ -158,52 +186,10 @@ namespace gallus
 			rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
 			a_Document.Accept(writer);
 
-			if (!file::SaveFile(m_ScenePath, core::DataStream(buffer.GetString(), buffer.GetSize())))
-			{
-				LOGF(LOGSEVERITY_ERROR, LOG_CATEGORY_GAME, "Something went wrong when trying to save scene file \"%s\".", m_ScenePath.generic_string().c_str());
-				return false;
-			}
-
-			m_fIsDirty = false;
-			return true;
-		}
-
-		//---------------------------------------------------------------------
-		bool Scene::Load()
-		{
-			if (m_ScenePath.empty())
-			{
-				return false;
-			}
-
-			return file::LoadFile(m_ScenePath, m_Data);
-		}
-#endif // _EDITOR
-
-		//---------------------------------------------------------------------
-		void Scene::SetData(const core::Data& a_Data)
-		{
-			m_Data = a_Data;
-		}
-
-		//---------------------------------------------------------------------
-		const core::Data& Scene::GetData() const
-		{
-			return m_Data;
+			return core::DataStream(buffer.GetString(), buffer.GetSize());
 		}
 
 #ifdef _EDITOR
-		//---------------------------------------------------------------------
-		const fs::path& Scene::GetScenePath() const
-		{
-			return m_ScenePath;
-		}
-
-		//---------------------------------------------------------------------
-		void Scene::SetScenePath(const fs::path& a_ScenePath)
-		{
-			m_ScenePath = a_ScenePath;
-		}
 
 		//---------------------------------------------------------------------
 		const core::Observable<bool>& Scene::IsDirty() const
@@ -215,6 +201,8 @@ namespace gallus
 		void Scene::SetIsDirty(bool a_fIsDirty)
 		{
 			m_fIsDirty = a_fIsDirty;
+
+			SetData(GetSceneData());
 		}
 #endif // _EDITOR
 	}

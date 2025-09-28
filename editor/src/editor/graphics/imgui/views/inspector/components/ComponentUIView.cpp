@@ -120,7 +120,7 @@ namespace gallus
 
 					a_Transform.SetWorldMatrix(result);
 
-					gameplay::GAME.GetScene().SetIsDirty(true);
+					core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
 				}
 			}
 		}

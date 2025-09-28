@@ -4,11 +4,12 @@
 
 #include <map>
 
+#include "gameplay/Prefab.h"
+
 namespace gallus
 {
 	namespace gameplay
 	{
-		class ColliderComponent;
 		//---------------------------------------------------------------------
 		// PlayerComponent
 		//---------------------------------------------------------------------
@@ -52,8 +53,19 @@ namespace gallus
 			/// </summary>
 			/// <param name="a_fDeltaTime">Delta time.</param>
 			void UpdateRealtime(float a_fDeltaTime);
+
+			gameplay::Prefab& GetPrefab()
+			{
+				return m_pPrefab;
+			}
+
+			const gameplay::Prefab& GetPrefab() const
+			{
+				return m_pPrefab;
+			}
 		protected:
 			float m_fSpeed = 200;
+			gameplay::Prefab m_pPrefab;
 		};
 	}
 }

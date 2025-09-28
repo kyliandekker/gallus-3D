@@ -71,7 +71,7 @@ namespace gallus
 				if (m_pEntity)
 				{
 					m_pEntity->SetName(a_sName);
-					gameplay::GAME.GetScene().SetIsDirty(true);
+					core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
 				}
 			}
 
@@ -79,7 +79,7 @@ namespace gallus
 			void EntityInspectorView::OnDelete()
 			{
 				core::EDITOR_ENGINE->GetECS().DeleteEntity(m_HierarchyEntityUIView.GetEntityID());
-				gameplay::GAME.GetScene().SetIsDirty(true);
+				core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
 			}
 
 			//---------------------------------------------------------------------

@@ -38,7 +38,7 @@ namespace gallus
 				if (m_OffsetView.Render("COLLIDER_OFFSET_INSPECTOR", 0.01f))
 				{
 					m_Component.SetOffset(m_OffsetView.GetValue());
-					gameplay::GAME.GetScene().SetIsDirty(true);
+					core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
 				}
 				ImGui::Unindent();
 
@@ -49,7 +49,7 @@ namespace gallus
 				if (m_SizeView.Render("COLLIDER_SIZE_INSPECTOR", 0.01f))
 				{
 					m_Component.SetSize(m_SizeView.GetValue());
-					gameplay::GAME.GetScene().SetIsDirty(true);
+					core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
 				}
 				ImGui::Unindent();
 

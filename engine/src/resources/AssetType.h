@@ -20,6 +20,7 @@ namespace gallus
 			Animation,
 			PixelShader,
 			VertexShader,
+			Prefab,
 		};
 
 		/// <summary>

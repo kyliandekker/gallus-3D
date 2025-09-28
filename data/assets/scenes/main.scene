@@ -69,7 +69,8 @@
                     }
                 },
                 "player": {
-                    "movementSpeed": 900.0
+                    "movementSpeed": 900.0,
+                    "prefab": "bullet.prefab"
                 },
                 "health": {
                     "health": 100.0,
@@ -87,8 +88,7 @@
                 },
                 "movement": {
                     "gravity": false
-                },
-                "projectile": {}
+                }
             }
         }
     ]

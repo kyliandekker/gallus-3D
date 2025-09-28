@@ -2,6 +2,8 @@
 
 #include "gameplay/systems/components/Component.h"
 
+#include <DirectXMath.h>
+
 namespace gallus
 {
 	namespace gameplay
@@ -31,6 +33,13 @@ namespace gallus
 			/// </summary>
 			/// <param name="a_fDeltaTime">Delta time.</param>
 			void UpdateRealtime(float a_fDeltaTime) override;
+
+			void SetMovementSpeed(const DirectX::XMFLOAT2& a_fVelocity)
+			{
+				m_fVelocity = a_fVelocity;
+			}
+		protected:
+			DirectX::XMFLOAT2 m_fVelocity = {};
 		};
 	}
 }

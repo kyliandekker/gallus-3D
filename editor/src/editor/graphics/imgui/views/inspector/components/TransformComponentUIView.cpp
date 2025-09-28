@@ -49,7 +49,7 @@ namespace gallus
 				if (ImGui::DragFloat(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "TRANSFORM_ROT_INSPECTOR").c_str(), &rotation, 1.0f, -999999999, 99999999999))
 				{
 					m_Component.Transform().SetRotation(rotation);
-					gameplay::GAME.GetScene().SetIsDirty(true);
+					core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
 				}
 
 				ImGui::DisplayHeader(m_Window.GetBoldFont(), "Position: ");
@@ -59,7 +59,7 @@ namespace gallus
 				if (m_PositionView.Render("TRANSFORM_POSITION_INSPECTOR"))
 				{
 					m_Component.Transform().SetPosition(m_PositionView.GetValue());
-					gameplay::GAME.GetScene().SetIsDirty(true);
+					core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
 				}
 				ImGui::Unindent();
 
@@ -70,7 +70,7 @@ namespace gallus
 				if (m_ScaleView.Render("TRANSFORM_SCALE_INSPECTOR"))
 				{
 					m_Component.Transform().SetScale(m_ScaleView.GetValue());
-					gameplay::GAME.GetScene().SetIsDirty(true);
+					core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
 				}
 				ImGui::Unindent();
 
@@ -81,7 +81,7 @@ namespace gallus
 				if (m_PivotView.Render("TRANSFORM_PIVOT_INSPECTOR", 0.01f, -0.5f, 0.5f))
 				{
 					m_Component.Transform().SetPivot(m_PivotView.GetValue());
-					gameplay::GAME.GetScene().SetIsDirty(true);
+					core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
 				}
 				ImGui::Unindent();
 
