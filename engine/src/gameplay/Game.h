@@ -63,6 +63,11 @@ namespace gallus
 			{
 				m_bPaused = a_bPaused;
 			}
+
+			float GetFps() const
+			{
+				return m_Fps;
+			}
 		private:
 			/// <summary>
 			/// Callback for closing the window.
@@ -74,6 +79,8 @@ namespace gallus
 
 			bool m_bStarted = false;
 			bool m_bPaused = false;
+
+			float m_Fps;
 		};
 		inline extern Game GAME = {};
 	}

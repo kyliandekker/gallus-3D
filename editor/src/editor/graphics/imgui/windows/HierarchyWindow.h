@@ -58,6 +58,11 @@ namespace gallus
 				bool Destroy() override;
 
 				/// <summary>
+				/// Update loop for the window. This is where all ImGui interaction should be like buttons, etc.
+				/// </summary>
+				void Update() override;
+
+				/// <summary>
 				/// Renders the hierarchy window.
 				/// </summary>
 				void Render() override;

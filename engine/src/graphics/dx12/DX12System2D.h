@@ -6,6 +6,7 @@
 #include <glm/vec2.hpp>
 #include <memory>
 #include <mutex>
+#include <chrono>
 
 // core includes
 #include "core/Event.h"
@@ -57,6 +58,43 @@ namespace gallus
 				SPRITE_UV = 1,    // b1: Sprite rect UVs (float2 uv0, float2 uv1)
 				TEX_SRV = 2,            // Texture2D texture0 : register(t0);
 				NumRootParameters = 4
+			};
+
+			/// <summary>
+			/// Tracks and calculates frames per second (FPS).
+			/// </summary>
+			class FPSCounter
+			{
+			public:
+
+				/// <summary>
+				/// Retrieves the current frames per second (FPS).
+				/// </summary>
+				/// <returns>The FPS as a double.</returns>
+				double GetFPS() const;
+				double GetDeltaTime() const;
+
+				double GetTotalTime() const;
+			private:
+				friend class DX12System2D;
+
+				/// <summary>
+				/// Updates the FPS counter.
+				/// </summary>
+				void Update();
+
+				/// <summary>
+				/// Initializes the FPS counter.
+				/// </summary>
+				void Initialize();
+
+				double m_FPS = 0.0; /// The FPS as a double.
+				uint64_t m_FrameCounter = 0; /// The number of frames.
+				double m_DeltaTime = 0.0; /// The number of seconds since the last frame.
+				double m_ElapsedSeconds = 0.0; /// The number of seconds since the last frame.
+				double m_TotalTime = 0.0; /// The number of seconds since the last frame.
+				std::chrono::high_resolution_clock m_Clock; /// The clock.
+				std::chrono::steady_clock::time_point m_T0 = m_Clock.now(); /// The clock from first frame.
 			};
 
 			//---------------------------------------------------------------------
@@ -278,6 +316,11 @@ namespace gallus
 				/// </summary>
 				void UpdateRenderTargetViews();
 
+				const FPSCounter& GetFPS() const
+				{
+					return m_FpsCounter;
+				}
+
 				std::shared_ptr<Texture> GetRenderTexture();
 
 				SimpleEvent<DX12System2D&> m_eOnInitialize;
@@ -337,6 +380,8 @@ namespace gallus
 				imgui::ImGuiWindow m_ImGuiWindow;
 #endif // IMGUI_DISABLE
 				std::shared_ptr<Texture> m_pRenderTexture = nullptr;
+
+				FPSCounter m_FpsCounter;
 
 				Camera m_Camera;
 			};

@@ -458,6 +458,8 @@ namespace gallus
 
                 // Draw the texture
                 ImVec2 image_pos = ImGui::GetCursorScreenPos();
+
+                ImGui::SetCursorScreenPos(image_pos);
                 ImGui::Image(
                     (ImTextureID) renderTexture->GetGPUHandle().ptr,
                     ImVec2(drawW, drawH)
@@ -467,6 +469,24 @@ namespace gallus
                 ImDrawList* draw_list = ImGui::GetWindowDrawList();
                 draw_list->AddRect(image_pos, ImVec2(image_pos.x + drawW, image_pos.y + drawH),
                     ImGui::GetColorU32(ImGui::GetStyle().Colors[ImGuiCol_Border]));
+
+                {
+                    std::string fpsValue = std::to_string(static_cast<uint64_t>(std::round(core::ENGINE->GetDX12().GetFPS().GetFPS()))) + " graphics fps";
+
+                    ImGui::PushFont(m_Window.GetCapitalFont());
+                    ImGui::SetCursorScreenPos(ImVec2(image_pos.x + drawW - (ImGui::CalcTextSize(fpsValue.c_str()).x + m_Window.GetWindowPadding().x), image_pos.y + m_Window.GetWindowPadding().y));
+                    ImGui::TextColored(ImVec4(1, 1, 0, 1), fpsValue.c_str());
+                    ImGui::PopFont();
+                }
+
+                {
+                    std::string fpsValue = std::to_string(static_cast<uint64_t>(std::round(gameplay::GAME.GetFps()))) + " game fps";
+
+                    ImGui::PushFont(m_Window.GetCapitalFont());
+                    ImGui::SetCursorScreenPos(ImVec2(image_pos.x + drawW - (ImGui::CalcTextSize(fpsValue.c_str()).x + m_Window.GetWindowPadding().x), image_pos.y + (m_Window.GetFontSize() * 2) + m_Window.GetWindowPadding().y));
+                    ImGui::TextColored(ImVec4(1, 1, 0, 1), fpsValue.c_str());
+                    ImGui::PopFont();
+                }
             }
         }
     }

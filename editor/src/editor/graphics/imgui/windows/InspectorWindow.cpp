@@ -14,6 +14,9 @@
 #include "editor/graphics/imgui/views/inspector/InspectorView.h"
 #include "editor/core/EditorEngine.h"
 
+// gameplay includes
+#include "gameplay/Game.h"
+
 namespace gallus
 {
 	namespace graphics
@@ -30,6 +33,15 @@ namespace gallus
 			bool InspectorWindow::Destroy()
 			{
 				return true;
+			}
+
+			void InspectorWindow::Update()
+			{
+				if (gameplay::GAME.IsStarted() && !gameplay::GAME.IsPaused())
+				{
+					return;
+				}
+				BaseWindow::Update();
 			}
 
 			void InspectorWindow::Render()

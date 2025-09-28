@@ -15,6 +15,9 @@
 // editor includes
 #include "editor/core/EditorEngine.h"
 
+// game includes
+#include "gameplay/Game.h"
+
 namespace gallus
 {
 	namespace graphics
@@ -35,6 +38,16 @@ namespace gallus
 			//---------------------------------------------------------------------
 			ConsoleWindow::~ConsoleWindow()
 			{}
+
+			//---------------------------------------------------------------------
+			void ConsoleWindow::Update()
+			{
+				if (gameplay::GAME.IsStarted() && !gameplay::GAME.IsPaused())
+				{
+					return;
+				}
+				BaseWindow::Update();
+			}
 
 			std::string logo_arr[8] =
 			{

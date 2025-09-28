@@ -26,6 +26,51 @@ namespace gallus
 		{
 			constexpr glm::ivec2 RENDER_TEX_SIZE = glm::ivec2(1920, 1080);
 
+			double FPSCounter::GetFPS() const
+			{
+				return m_FPS;
+			}
+
+			double FPSCounter::GetDeltaTime() const
+			{
+				return m_DeltaTime;
+			}
+
+			double FPSCounter::GetTotalTime() const
+			{
+				return m_TotalTime;
+			}
+
+			void FPSCounter::Update()
+			{
+				m_FrameCounter++;
+
+				auto t1 = m_Clock.now();
+				std::chrono::duration<double> deltaTime = t1 - m_T0;
+				m_T0 = t1;
+
+				m_DeltaTime = deltaTime.count(); // Convert duration to seconds
+
+				m_ElapsedSeconds += m_DeltaTime;
+				m_TotalTime += m_DeltaTime;
+
+				if (m_ElapsedSeconds > 1.0)
+				{
+					m_FPS = m_FrameCounter / m_ElapsedSeconds;
+					m_FrameCounter = 0;
+					m_ElapsedSeconds = 0.0;
+				}
+			}
+
+			void FPSCounter::Initialize()
+			{
+				m_FPS = 0.0;
+				m_FrameCounter = 0;
+				m_ElapsedSeconds = 0.0;
+				m_TotalTime = 0.0;
+				m_T0 = m_Clock.now();
+			}
+
 			//---------------------------------------------------------------------
 			// DX12System2D
 			//---------------------------------------------------------------------
@@ -232,6 +277,8 @@ namespace gallus
 
 				fenceValue = dCommandQueue->ExecuteCommandList(dCommandList);
 				dCommandQueue->WaitForFenceValue(fenceValue);
+
+				m_FpsCounter.Initialize();
 
 				LOG(LOGSEVERITY_SUCCESS, LOG_CATEGORY_DX12, "Initialized dx12 system.");
 
@@ -699,6 +746,8 @@ namespace gallus
 				{
 					return;
 				}
+
+				m_FpsCounter.Update();
 
 				ProcessWindowEvents();
 

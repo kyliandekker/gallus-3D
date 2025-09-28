@@ -71,22 +71,36 @@ namespace gallus
 			auto previous = clock::now();
 			double lag = 0.0;
 
+			double fpsTimer = 0.0;
+			int fpsFrames = 0;
+
 			while (m_bRunning.load())
 			{
 				auto current = clock::now();
 				std::chrono::duration<double> elapsed = current - previous;
 				previous = current;
+
 				lag += elapsed.count();
+				fpsTimer += elapsed.count();
 
-				double deltaTime = elapsed.count(); // in seconds
+				int updatesThisFrame = 0;
 
-				// Run fixed updates (catch up if needed)
 				while (lag >= FIXED_TIMESTEP)
 				{
 					bool updateRealtime = m_bStarted && !m_bPaused;
-
 					core::ENGINE->GetECS().Update(FIXED_TIMESTEP, updateRealtime);
 					lag -= FIXED_TIMESTEP;
+					updatesThisFrame++;
+				}
+
+				fpsFrames += updatesThisFrame;
+
+				if (fpsTimer >= 1.0)
+				{
+					// m_Fps reflects how many fixed updates we actually managed per second
+					m_Fps = static_cast<double>(fpsFrames) / fpsTimer;
+					fpsFrames = 0;
+					fpsTimer = 0.0;
 				}
 
 				std::this_thread::sleep_for(std::chrono::milliseconds(1));

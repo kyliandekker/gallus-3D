@@ -22,6 +22,9 @@
 #include "editor/graphics/imgui/views/ExplorerFileUIView.h"
 #include "editor/graphics/imgui/views/inspector/ExplorerFileInspectorView.h"
 
+// game includes
+#include "gameplay/Game.h"
+
 namespace gallus
 {
 	namespace graphics
@@ -53,6 +56,15 @@ namespace gallus
 				m_pViewedFolder.OnChanged() -= std::bind(&ExplorerWindow::OnViewedFolderChanged, this, std::placeholders::_1, std::placeholders::_2);
 
 				return BaseWindow::Destroy();
+			}
+
+			void ExplorerWindow::Update()
+			{
+				if (gameplay::GAME.IsStarted() && !gameplay::GAME.IsPaused())
+				{
+					return;
+				}
+				BaseWindow::Update();
 			}
 
 			void ExplorerWindow::RenderFolder(ExplorerFileUIView& a_Resource, int a_Indent, const ImVec2& a_InitialPos)

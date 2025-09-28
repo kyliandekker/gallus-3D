@@ -42,6 +42,11 @@ namespace gallus
 				~ConsoleWindow();
 
 				/// <summary>
+				/// Update loop for the window. This is where all ImGui interaction should be like buttons, etc.
+				/// </summary>
+				void Update() override;
+
+				/// <summary>
 				/// Renders the console window.
 				/// </summary>
 				void Render() override;

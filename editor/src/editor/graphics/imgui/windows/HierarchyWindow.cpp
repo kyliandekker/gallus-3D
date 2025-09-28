@@ -66,6 +66,16 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
+			void HierarchyWindow::Update()
+			{
+				if (gameplay::GAME.IsStarted() && !gameplay::GAME.IsPaused())
+				{
+					return;
+				}
+				BaseWindow::Update();
+			}
+
+			//---------------------------------------------------------------------
 			void HierarchyWindow::Render()
 			{
 				if (!core::EDITOR_ENGINE)
