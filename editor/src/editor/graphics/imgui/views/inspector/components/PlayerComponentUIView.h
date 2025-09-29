@@ -26,10 +26,9 @@ namespace gallus
 				/// Constructs the PlayerComponentUIView with specific views for the position, rotation and scale.
 				/// </summary>
 				/// <param name="a_Window">The ImGui window for rendering the view.</param>
-				/// <param name="a_EntityID">The entity ID associated with the transform component.</param>
 				/// <param name="a_PlayerComponent">The PlayerComponent to display and edit.</param>
 				/// <param name="a_System">The PlayerSystem responsible for managing the PlayerComponent.</param>
-				PlayerComponentUIView(ImGuiWindow& a_Window, gameplay::EntityID& a_EntityID, gameplay::PlayerComponent& a_PlayerComponent, gameplay::PlayerSystem& a_System) : ComponentUIView(a_Window, a_EntityID, a_PlayerComponent, a_System)
+				PlayerComponentUIView(ImGuiWindow& a_Window, gameplay::PlayerComponent& a_PlayerComponent, gameplay::PlayerSystem& a_System) : ComponentUIView(a_Window, a_PlayerComponent, a_System)
 				{}
 			private:
 				/// <summary>

@@ -31,10 +31,9 @@ namespace gallus
 				/// Constructs the TransformComponentUIView with specific views for the position, rotation and scale.
 				/// </summary>
 				/// <param name="a_Window">The ImGui window for rendering the view.</param>
-				/// <param name="a_EntityID">The entity ID associated with the transform component.</param>
 				/// <param name="a_TransformComponent">The TransformComponent to display and edit.</param>
 				/// <param name="a_System">The TransformSystem responsible for managing the TransformComponent.</param>
-				TransformComponentUIView(ImGuiWindow& a_Window, gameplay::EntityID& a_EntityID, gameplay::TransformComponent& a_TransformComponent, gameplay::TransformSystem& a_System) : ComponentUIView(a_Window, a_EntityID, a_TransformComponent, a_System),
+				TransformComponentUIView(ImGuiWindow& a_Window, gameplay::TransformComponent& a_TransformComponent, gameplay::TransformSystem& a_System) : ComponentUIView(a_Window, a_TransformComponent, a_System),
 					m_PositionView(a_Window),
 					m_ScaleView(a_Window),
 					m_PivotView(a_Window)

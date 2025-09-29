@@ -26,10 +26,9 @@ namespace gallus
 				/// Constructs the MovementComponentUIView with specific views for the position, rotation and scale.
 				/// </summary>
 				/// <param name="a_Window">The ImGui window for rendering the view.</param>
-				/// <param name="a_EntityID">The entity ID associated with the transform component.</param>
 				/// <param name="a_MovementComponent">The MovementComponent to display and edit.</param>
 				/// <param name="a_System">The MovementSystem responsible for managing the MovementComponent.</param>
-				MovementComponentUIView(ImGuiWindow& a_Window, gameplay::EntityID& a_EntityID, gameplay::MovementComponent& a_MovementComponent, gameplay::MovementSystem& a_System) : ComponentUIView(a_Window, a_EntityID, a_MovementComponent, a_System)
+				MovementComponentUIView(ImGuiWindow& a_Window, gameplay::MovementComponent& a_MovementComponent, gameplay::MovementSystem& a_System) : ComponentUIView(a_Window, a_MovementComponent, a_System)
 				{}
 			private:
 				/// <summary>

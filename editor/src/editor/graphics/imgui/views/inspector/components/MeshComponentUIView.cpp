@@ -31,7 +31,7 @@ namespace gallus
 	{
 		namespace imgui
 		{
-			MeshComponentUIView::MeshComponentUIView(ImGuiWindow& a_Window, gameplay::EntityID& a_EntityID, gameplay::MeshComponent& a_MeshComponent, gameplay::MeshSystem& a_System) : ComponentUIView(a_Window, a_EntityID, a_MeshComponent, a_System), m_SizeView(a_Window)
+			MeshComponentUIView::MeshComponentUIView(ImGuiWindow& a_Window, gameplay::MeshComponent& a_MeshComponent, gameplay::MeshSystem& a_System) : ComponentUIView(a_Window, a_MeshComponent, a_System), m_SizeView(a_Window)
 			{
 			}
 
@@ -41,17 +41,17 @@ namespace gallus
 				strncpy(m_sPrefabName, m_Component.GetShader()->GetPixelShader()->GetName().c_str(), sizeof(m_sPrefabName));
 				m_sPrefabName[sizeof(m_sPrefabName) - 1] = '\0';
 
-				memset(m_VertexShaderName, 0, sizeof(m_VertexShaderName));
-				strncpy(m_VertexShaderName, m_Component.GetShader()->GetVertexShader()->GetName().c_str(), sizeof(m_VertexShaderName));
-				m_VertexShaderName[sizeof(m_VertexShaderName) - 1] = '\0';
+				memset(m_sVertexShaderName, 0, sizeof(m_sVertexShaderName));
+				strncpy(m_sVertexShaderName, m_Component.GetShader()->GetVertexShader()->GetName().c_str(), sizeof(m_sVertexShaderName));
+				m_sVertexShaderName[sizeof(m_sVertexShaderName) - 1] = '\0';
 
-				memset(m_TextureName, 0, sizeof(m_TextureName));
-				strncpy(m_TextureName, m_Component.GetTexture()->GetName().c_str(), sizeof(m_TextureName));
-				m_TextureName[sizeof(m_TextureName) - 1] = '\0';
+				memset(m_sTextureName, 0, sizeof(m_sTextureName));
+				strncpy(m_sTextureName, m_Component.GetTexture()->GetName().c_str(), sizeof(m_sTextureName));
+				m_sTextureName[sizeof(m_sTextureName) - 1] = '\0';
 
-				memset(m_MeshName, 0, sizeof(m_MeshName));
-				strncpy(m_MeshName, m_Component.GetMesh()->GetName().c_str(), sizeof(m_MeshName));
-				m_MeshName[sizeof(m_MeshName) - 1] = '\0';
+				memset(m_sMeshName, 0, sizeof(m_sMeshName));
+				strncpy(m_sMeshName, m_Component.GetMesh()->GetName().c_str(), sizeof(m_sMeshName));
+				m_sMeshName[sizeof(m_sMeshName) - 1] = '\0';
 
 				FilePickerModal* modal = dynamic_cast<FilePickerModal*>(m_Window.GetModal((int) EDITOR_MODAL::EDITOR_MODAL_FILE_PICKER));
 
@@ -96,7 +96,7 @@ namespace gallus
 				ImGui::SameLine();
 				ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
 				ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x - buttonSize.x);
-				ImGui::InputText(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "MESH_COMPONENT_VERTEX_SHADER_NAME_INPUT").c_str(), m_VertexShaderName, sizeof(m_VertexShaderName), ImGuiInputTextFlags_ReadOnly);
+				ImGui::InputText(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "MESH_COMPONENT_VERTEX_SHADER_NAME_INPUT").c_str(), m_sVertexShaderName, sizeof(m_sVertexShaderName), ImGuiInputTextFlags_ReadOnly);
 				ImGui::PopItemFlag();
 				ImGui::SameLine();
 				if (ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_FILE, BUTTON_ID, "MESH_COMPONENT_VERTEX_SHADER").c_str(), buttonSize))
@@ -130,7 +130,7 @@ namespace gallus
 				ImGui::SameLine();
 				ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
 				ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x - buttonSize.x);
-				ImGui::InputText(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "MESH_COMPONENT_TEXTURE_NAME_INPUT").c_str(), m_TextureName, sizeof(m_TextureName), ImGuiInputTextFlags_ReadOnly);
+				ImGui::InputText(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "MESH_COMPONENT_TEXTURE_NAME_INPUT").c_str(), m_sTextureName, sizeof(m_sTextureName), ImGuiInputTextFlags_ReadOnly);
 				ImGui::PopItemFlag();
 				ImGui::SameLine();
 				if (ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_FILE_IMAGE, BUTTON_ID, "MESH_COMPONENT_TEXTURE").c_str(), buttonSize))
@@ -164,7 +164,7 @@ namespace gallus
 				ImGui::SameLine();
 				ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
 				ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x - buttonSize.x);
-				ImGui::InputText(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "MESH_COMPONENT_MESH_NAME_INPUT").c_str(), m_MeshName, sizeof(m_MeshName), ImGuiInputTextFlags_ReadOnly);
+				ImGui::InputText(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "MESH_COMPONENT_MESH_NAME_INPUT").c_str(), m_sMeshName, sizeof(m_sMeshName), ImGuiInputTextFlags_ReadOnly);
 				ImGui::PopItemFlag();
 				ImGui::SameLine();
 				if (ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_FILE_MODEL, BUTTON_ID, "MESH_COMPONENT_MESH").c_str(), buttonSize))

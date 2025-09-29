@@ -35,10 +35,9 @@ namespace gallus
 				/// Constructs the SpriteComponentUIView with specific views for the position, rotation and scale.
 				/// </summary>
 				/// <param name="a_Window">The ImGui window for rendering the view.</param>
-				/// <param name="a_EntityID">The entity ID associated with the transform component.</param>
 				/// <param name="a_SpriteComponent">The SpriteComponent to display and edit.</param>
 				/// <param name="a_System">The SpriteSystem responsible for managing the SpriteComponent.</param>
-				SpriteComponentUIView(ImGuiWindow& a_Window, gameplay::EntityID& a_EntityID, gameplay::SpriteComponent& a_SpriteComponent, gameplay::SpriteSystem& a_System);
+				SpriteComponentUIView(ImGuiWindow& a_Window, gameplay::SpriteComponent& a_SpriteComponent, gameplay::SpriteSystem& a_System);
 
 				void RenderPreview() override;
 

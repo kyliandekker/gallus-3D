@@ -29,7 +29,7 @@ namespace gallus
 			//---------------------------------------------------------------------
 			// ComponentBaseUIView
 			//---------------------------------------------------------------------
-			void ComponentBaseUIView::RenderBaseComponent(gameplay::Component& a_Component, gameplay::AbstractECSSystem& a_System)
+			void ComponentBaseUIView::RenderBaseComponent(gameplay::Component& a_Component, gameplay::AbstractECSSystem& a_System, const gameplay::EntityID& a_EntityID)
 			{
 				ImVec2 size = m_Window.GetHeaderSize();
 
@@ -44,7 +44,7 @@ namespace gallus
 				ImGui::SameLine();
 				if (ImGui::IconButton(ImGui::IMGUI_FORMAT_ID(font::ICON_DELETE, BUTTON_ID, string_extensions::StringToUpper(GetName()) + "_DELETE_HIERARCHY").c_str(), size, m_Window.GetIconFont()))
 				{
-					a_System.DeleteComponent(m_EntityID);
+					a_System.DeleteComponent(a_EntityID);
 				}
 				ImGui::PopStyleVar();
 				ImGui::PopStyleVar();

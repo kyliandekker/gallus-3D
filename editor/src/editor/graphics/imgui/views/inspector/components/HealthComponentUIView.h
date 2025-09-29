@@ -26,10 +26,9 @@ namespace gallus
 				/// Constructs the HealthComponentUIView with specific views for the position, rotation and scale.
 				/// </summary>
 				/// <param name="a_Window">The ImGui window for rendering the view.</param>
-				/// <param name="a_EntityID">The entity ID associated with the transform component.</param>
 				/// <param name="a_HealthComponent">The HealthComponent to display and edit.</param>
 				/// <param name="a_System">The HealthSystem responsible for managing the HealthComponent.</param>
-				HealthComponentUIView(ImGuiWindow& a_Window, gameplay::EntityID& a_EntityID, gameplay::HealthComponent& a_HealthComponent, gameplay::HealthSystem& a_System) : ComponentUIView(a_Window, a_EntityID, a_HealthComponent, a_System)
+				HealthComponentUIView(ImGuiWindow& a_Window, gameplay::HealthComponent& a_HealthComponent, gameplay::HealthSystem& a_System) : ComponentUIView(a_Window, a_HealthComponent, a_System)
 				{}
 			private:
 				/// <summary>

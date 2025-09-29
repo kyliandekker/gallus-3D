@@ -29,10 +29,9 @@ namespace gallus
 				/// Constructs the ColliderComponentUIView with specific views for the position, rotation and scale.
 				/// </summary>
 				/// <param name="a_Window">The ImGui window for rendering the view.</param>
-				/// <param name="a_EntityID">The entity ID associated with the transform component.</param>
 				/// <param name="a_ColliderComponent">The ColliderComponent to display and edit.</param>
 				/// <param name="a_System">The ColliderSystem responsible for managing the ColliderComponent.</param>
-				ColliderComponentUIView(ImGuiWindow& a_Window, gameplay::EntityID& a_EntityID, gameplay::ColliderComponent& a_ColliderComponent, gameplay::CollisionSystem& a_System) : ComponentUIView(a_Window, a_EntityID, a_ColliderComponent, a_System),
+				ColliderComponentUIView(ImGuiWindow& a_Window, gameplay::ColliderComponent& a_ColliderComponent, gameplay::CollisionSystem& a_System) : ComponentUIView(a_Window, a_ColliderComponent, a_System),
 					m_OffsetView(a_Window),
 					m_SizeView(a_Window)
 				{}

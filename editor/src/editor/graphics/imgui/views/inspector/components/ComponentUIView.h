@@ -46,8 +46,7 @@ namespace gallus
 				/// and entity ID.
 				/// </summary>
 				/// <param name="a_Window">The ImGui window for rendering the view.</param>
-				/// <param name="a_EntityID">The EntityID associated with the component being rendered.</param>
-				ComponentBaseUIView(ImGuiWindow& a_Window, gameplay::EntityID& a_EntityID) : ImGuiUIView(a_Window), m_EntityID(a_EntityID)
+				ComponentBaseUIView(ImGuiWindow& a_Window) : ImGuiUIView(a_Window)
 				{}
 
 				/// <summary>
@@ -63,7 +62,7 @@ namespace gallus
 				/// </summary>
 				/// <param name="a_Component">The component to be rendered.</param>
 				/// <param name="a_System">The system managing the component.</param>
-				void RenderBaseComponent(gameplay::Component& a_Component, gameplay::AbstractECSSystem& a_System);
+				void RenderBaseComponent(gameplay::Component& a_Component, gameplay::AbstractECSSystem& a_System, const gameplay::EntityID& a_EntityID);
 
 				bool ShowPreview() const
 				{
@@ -81,8 +80,6 @@ namespace gallus
 				virtual void RenderComponentGizmos(const ImVec2 & a_vScenePos, const ImVec2 & a_vSize, const ImVec2& a_vPanOffset, float a_fZoom)
 				{}
 			protected:
-				gameplay::EntityID& m_EntityID; // Reference to the entity's ID. Used for associating the component with an entity.
-
 				/// <summary>
 				/// Render the inner part of the UI, specific to each derived class.
 				/// </summary>
@@ -124,7 +121,7 @@ namespace gallus
 				/// <param name="a_EntityID">The EntityID associated with the component being rendered.</param>
 				/// <param name="a_Component">The component to render.</param>
 				/// <param name="a_System">The system managing the component.</param>
-				ComponentUIView(ImGuiWindow& a_Window, gameplay::EntityID& a_EntityID, C& a_Component, S& a_System) : ComponentBaseUIView(a_Window, a_EntityID), m_Component(a_Component), m_System(a_System)
+				ComponentUIView(ImGuiWindow& a_Window, C& a_Component, S& a_System) : ComponentBaseUIView(a_Window), m_Component(a_Component), m_System(a_System)
 				{}
 
 				/// <summary>
@@ -134,7 +131,7 @@ namespace gallus
 				{
 					std::lock_guard<std::recursive_mutex> lock(core::EDITOR_ENGINE->GetECS().m_EntityMutex);
 
-					RenderBaseComponent(m_Component, m_System);
+					RenderBaseComponent(m_Component, m_System, m_Component.GetEntityID());
 				}
 
 				/// <summary>
@@ -183,7 +180,7 @@ struct ComponentUIRegistrar
             auto& sys = gallus::core::EDITOR_ENGINE->GetECS().GetSystem<SystemType>(); \
             if (sys.HasComponent(entityId)) { \
                 auto& comp = sys.GetComponent(entityId); \
-                return new UIViewType(window, entityId, comp, sys); \
+                return new UIViewType(window, comp, sys); \
             } \
             return nullptr; \
         });

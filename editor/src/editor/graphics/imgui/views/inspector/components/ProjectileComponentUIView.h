@@ -26,10 +26,9 @@ namespace gallus
 				/// Constructs the ProjectileComponentUIView with specific views for the position, rotation and scale.
 				/// </summary>
 				/// <param name="a_Window">The ImGui window for rendering the view.</param>
-				/// <param name="a_EntityID">The entity ID associated with the transform component.</param>
 				/// <param name="a_ProjectileComponent">The ProjectileComponent to display and edit.</param>
 				/// <param name="a_System">The ProjectileSystem responsible for managing the ProjectileComponent.</param>
-				ProjectileComponentUIView(ImGuiWindow& a_Window, gameplay::EntityID& a_EntityID, gameplay::ProjectileComponent& a_ProjectileComponent, gameplay::ProjectileSystem& a_System) : ComponentUIView(a_Window, a_EntityID, a_ProjectileComponent, a_System)
+				ProjectileComponentUIView(ImGuiWindow& a_Window, gameplay::ProjectileComponent& a_ProjectileComponent, gameplay::ProjectileSystem& a_System) : ComponentUIView(a_Window, a_ProjectileComponent, a_System)
 				{}
 			private:
 				/// <summary>

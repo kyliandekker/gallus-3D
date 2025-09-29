@@ -35,10 +35,9 @@ namespace gallus
 				/// Constructs the MeshComponentUIView with specific views for the position, rotation and scale.
 				/// </summary>
 				/// <param name="a_Window">The ImGui window for rendering the view.</param>
-				/// <param name="a_EntityID">The entity ID associated with the transform component.</param>
 				/// <param name="a_MeshComponent">The MeshComponent to display and edit.</param>
 				/// <param name="a_System">The MeshSystem responsible for managing the MeshComponent.</param>
-				MeshComponentUIView(ImGuiWindow& a_Window, gameplay::EntityID& a_EntityID, gameplay::MeshComponent& a_MeshComponent, gameplay::MeshSystem& a_System);
+				MeshComponentUIView(ImGuiWindow& a_Window, gameplay::MeshComponent& a_MeshComponent, gameplay::MeshSystem& a_System);
 			private:
 				/// <summary>
 				/// Render the inner part of the UI, including position, rotation, scale, and color.
@@ -56,9 +55,9 @@ namespace gallus
 					m_SizeView;
 
 				char m_sPrefabName[128];
-				char m_VertexShaderName[128];
-				char m_TextureName[128];
-				char m_MeshName[128];
+				char m_sVertexShaderName[128];
+				char m_sTextureName[128];
+				char m_sMeshName[128];
 			};
 		}
 	}
