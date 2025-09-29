@@ -26,12 +26,14 @@ namespace gallus
 			// VertexPosUV
 			//---------------------------------------------------------------------
 			/// <summary>
-			/// A simple vertex format containing a 2D position and texture coordinates (UV).
+			/// A simple vertex format.
 			/// </summary>
 			struct VertexPosUV
 			{
-				DirectX::XMFLOAT2 Position;
+				DirectX::XMFLOAT3 Position;
 				DirectX::XMFLOAT2 UV;
+				DirectX::XMFLOAT3 Normal;
+				DirectX::XMFLOAT3 Color = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
 			};
 
 			//---------------------------------------------------------------------
@@ -44,6 +46,7 @@ namespace gallus
 			class MeshPartData
 			{
 			public:
+				MeshPartData() = default;
 				MeshPartData(
 					std::vector<VertexPosUV> a_aVertices,
 					std::vector<uint16_t> a_aIndices) :
@@ -67,10 +70,10 @@ namespace gallus
 			inline std::vector<MeshPartData> s_PRIMITIVES = {
 				MeshPartData(
 					{
-						{ DirectX::XMFLOAT2(-0.5f, -0.5f), DirectX::XMFLOAT2(0.0f, 0.0f) },
-						{ DirectX::XMFLOAT2(0.5f, -0.5f), DirectX::XMFLOAT2(1.0f, 0.0f) },
-						{ DirectX::XMFLOAT2(-0.5f, 0.5f), DirectX::XMFLOAT2(0.0f, 1.0f) },
-						{ DirectX::XMFLOAT2(0.5f, 0.5f), DirectX::XMFLOAT2(1.0f, 1.0f) }
+						{ DirectX::XMFLOAT3(-0.5f, -0.5f, 0), DirectX::XMFLOAT2(0.0f, 0.0f), DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f), DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f) },
+						{ DirectX::XMFLOAT3(0.5f, -0.5f, 0), DirectX::XMFLOAT2(1.0f, 0.0f), DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f), DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f) },
+						{ DirectX::XMFLOAT3(-0.5f, 0.5f, 0), DirectX::XMFLOAT2(0.0f, 1.0f), DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f), DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f) },
+						{ DirectX::XMFLOAT3(0.5f, 0.5f, 0), DirectX::XMFLOAT2(1.0f, 1.0f), DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f), DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f) }
 					},
 					{
 						0, 1, 2,
@@ -117,9 +120,15 @@ namespace gallus
 				/// <returns>True if loading was successful, false otherwise.</returns>
 				bool LoadByName(const std::string& a_sName);
 
-				void SetMeshData(const MeshPartData& a_aData, const std::shared_ptr<CommandList> a_pCommandList);
+				bool GetMeshDataFromModel(const std::string& a_sName, std::vector<MeshPartData>& a_aMeshData);
+				bool GetMeshDataFromModel(const fs::path& a_Path, std::vector<MeshPartData>& a_aMeshData);
+
+				void SetMeshData(const MeshPartData& a_aData);
+				void SetMeshData(const std::vector<MeshPartData>& a_aData);
+				void UploadMesh(const std::shared_ptr<CommandList> a_pCommandList);
 			private:
 				std::vector<MeshPartData> m_aMeshData;
+				bool m_bUploadedMeshData = false;
 			};
 		}
 	}

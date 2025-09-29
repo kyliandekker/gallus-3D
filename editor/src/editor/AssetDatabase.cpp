@@ -12,8 +12,6 @@ namespace gallus
 		//---------------------------------------------------------------------
 		bool AssetDatabase::Initialize()
 		{
-			m_AssetsRoot.m_Path = core::EDITOR_ENGINE->GetResourceAtlas().GetResourceFolder();
-
 			LOG(LOGSEVERITY_INFO_SUCCESS, LOG_CATEGORY_EDITOR, "Initialized asset database.");
 			return System::Initialize();
 		}
@@ -45,16 +43,9 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		FileResource& AssetDatabase::GetRoot()
-		{
-			std::lock_guard<std::recursive_mutex> lock(m_AssetMutex);
-			return m_AssetsRoot;
-		}
-
-		//---------------------------------------------------------------------
 		bool AssetDatabase::Scan()
 		{
-			if (m_AssetsRoot.Scan())
+			if (core::ENGINE->GetResourceAtlas().GetResourceFolder().Scan())
 			{
 				LOG(LOGSEVERITY_INFO, LOG_CATEGORY_EDITOR, "Scanned asset database.");
 				m_eOnScanCompleted();

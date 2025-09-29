@@ -90,6 +90,33 @@
                     "gravity": false
                 }
             }
+        },
+        {
+            "name": "New GameObject (2)",
+            "isActive": true,
+            "components": {
+                "mesh": {
+                    "texture": {
+                        "name": "tex_goomba_sprites.png"
+                    },
+                    "shader": {
+                        "pixel": "vertexShader.hlsl",
+                        "vertex": "pixelShader.hlsl"
+                    },
+                    "mesh": "mod_chicken.glb"
+                },
+                "transform": {
+                    "position": {
+                        "x": 829.9983520507813,
+                        "y": 334.12115478515627
+                    },
+                    "rotation": 256.59539794921877,
+                    "scale": {
+                        "x": 865.0989990234375,
+                        "y": 865.0989990234375
+                    }
+                }
+            }
         }
     ]
 }

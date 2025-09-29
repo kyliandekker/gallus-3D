@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <rapidjson/document.h>
+#include <unordered_map>
 
 // utils includes
 #include "utils/file_abstractions.h"
@@ -19,8 +20,20 @@ namespace gallus
 	{
 		class Data;
 	}
-	namespace editor
+	namespace resources
 	{
+		inline const std::unordered_map<std::string, std::vector<AssetType>> FILE_ATLAS =
+		{
+			{ ".scene", { AssetType::Scene } },
+			{ ".prefab", { AssetType::Prefab } },
+			{ ".png", { AssetType::Sprite } },
+			{ ".bmp", { AssetType::Sprite } },
+			{ ".wav", { AssetType::Sound, AssetType::Song, AssetType::VO } },
+			{ ".anim", { AssetType::Animation } },
+			{ ".hlsl", { AssetType::PixelShader, AssetType::VertexShader } },
+			{ ".glb", { AssetType::Mesh } },
+		};
+
 		//---------------------------------------------------------------------
 		// FileResource
 		//---------------------------------------------------------------------
@@ -37,6 +50,11 @@ namespace gallus
 			/// </summary>
 			/// <returns>The path of the resource.</returns>
 			const fs::path& GetPath() const;
+
+			void SetPath(const fs::path& a_Path)
+			{
+				m_Path = a_Path;
+			}
 
 			/// <summary>
 			/// Retrieves the parent.
@@ -79,12 +97,12 @@ namespace gallus
 				return m_aChildren;
 			}
 
-			resources::MetaData* GetMetaData()
+			MetaData* GetMetaData()
 			{
 				return m_MetaData;
 			}
 
-			const resources::MetaData* GetMetaData() const
+			const MetaData* GetMetaData() const
 			{
 				return m_MetaData;
 			}
@@ -100,9 +118,12 @@ namespace gallus
 			{
 				return static_cast<T*>(m_MetaData);
 			}
+
+			bool Find(const std::string& a_sName, FileResource*& a_pFileResource);
+			bool Find(const fs::path& a_Path, FileResource*& a_pFileResource);
 		protected:
 			std::vector<FileResource> m_aChildren; /// Child resources (only used for folders).
-			resources::MetaData* m_MetaData = nullptr;
+			MetaData* m_MetaData = nullptr;
 
 			fs::path m_Path; /// The path of the resource.
 			FileResource* m_Parent = nullptr; // The parent of the resource.

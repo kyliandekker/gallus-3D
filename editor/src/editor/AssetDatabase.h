@@ -4,7 +4,7 @@
 
 #include <string>
 
-#include "editor/FileResource.h"
+#include "resources/FileResource.h"
 #include "core/System.h"
 #include "core/Event.h"
 
@@ -42,12 +42,6 @@ namespace gallus
 			/// </summary>
 			void CheckAssetDatabase();
 
-			/// <summary>
-			/// Retrieves the root folder of the project.
-			/// </summary>
-			/// <returns>A reference to the root folder.</returns>
-			FileResource& GetRoot();
-
 			const SimpleEvent<>& GetOnScanCompleted() const
 			{
 				return m_eOnScanCompleted;
@@ -59,7 +53,6 @@ namespace gallus
 			SimpleEvent<> m_eOnScanCompleted; /// Simple event that gets called when the asset database has completed a scan.
 
 			bool m_bRescan; /// Whether the asset database needs to be scanned again.
-			FileResource m_AssetsRoot; /// The root of the asset database.
 		};
 	}
 }

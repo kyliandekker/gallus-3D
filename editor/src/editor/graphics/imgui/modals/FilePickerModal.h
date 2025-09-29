@@ -15,7 +15,7 @@
 
 namespace gallus
 {
-	namespace editor
+	namespace resources
 	{
 		class FileResource;
 	}
@@ -56,17 +56,17 @@ namespace gallus
 				/// </summary>
 				/// <param name="a_Callback">Callback for modal selection.</param>
 				/// <param name="a_FileTypes">The file types that should be shown in the modal.</param>
-				void SetData(const std::function<void(int, gallus::editor::FileResource&)>& a_Callback, const std::vector<gallus::resources::AssetType>& a_aFileTypes);
+				void SetData(const std::function<void(int, resources::FileResource&)>& a_Callback, const std::vector<resources::AssetType>& a_aFileTypes);
 			private:
 				std::shared_ptr<graphics::dx12::Texture> m_pPreviewTexture = nullptr;
 
-				std::function<void(int, gallus::editor::FileResource&)> m_Callback = nullptr; /// The callback that gets called when choosing an option.
+				std::function<void(int, resources::FileResource&)> m_Callback = nullptr; /// The callback that gets called when choosing an option.
 
 				ExplorerFileUIView* m_pSelectedFileResource = nullptr; /// The current selected resource in the modal.
 				std::shared_ptr<graphics::dx12::DX12Resource> m_pSelectedResource = nullptr; /// The current selected resource in the modal.
 				bool m_bNeedsRefresh = true; /// Used for refreshing the resources that are shown.
 
-				std::vector<gallus::resources::AssetType> m_aFileTypes; /// The file types that will be used in the filter.
+				std::vector<resources::AssetType> m_aFileTypes; /// The file types that will be used in the filter.
 				std::vector<ExplorerFileUIView> m_aResources; /// List of explorer items shown in the explorer window.
 				std::vector<ExplorerFileUIView*> m_aFilteredFileResources; /// List of explorer items shown in the explorer window.
 

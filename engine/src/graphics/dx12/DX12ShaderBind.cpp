@@ -19,7 +19,7 @@ namespace gallus
 			//---------------------------------------------------------------------
 			DX12ShaderBind::DX12ShaderBind()
 			{
-				m_ResourceType = core::ResourceType::ResourceType_ShaderBind;
+				m_AssetType = resources::AssetType::ShaderBind;
 			}
 
 			//---------------------------------------------------------------------
@@ -27,7 +27,7 @@ namespace gallus
 				m_pPixelShader(a_PixelShader),
 				m_pVertexShader(a_VertexShader)
 			{
-				m_ResourceType = core::ResourceType::ResourceType_ShaderBind;
+				m_AssetType = resources::AssetType::ShaderBind;
 			}
 
 			//---------------------------------------------------------------------

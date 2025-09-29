@@ -81,7 +81,7 @@ namespace gallus
 					return;
 				}
 
-				gallus::editor::EditorSettings& editorSettings = core::EDITOR_ENGINE->GetEditor().GetEditorSettings();
+				editor::EditorSettings& editorSettings = core::EDITOR_ENGINE->GetEditor().GetEditorSettings();
 
 				// Filter messages if need be.
 				if (m_bNeedsRefresh)

@@ -16,13 +16,12 @@
 
 // editor includes
 #include "resources/AssetType.h"
-#include "editor/AssetDatabase.h"
 #include "resources/metadata/MetaData.h"
 #include "resources/metadata/TextureMetaData.h"
 
 namespace gallus
 {
-	namespace editor
+	namespace resources
 	{
 		//---------------------------------------------------------------------
 		// FileResource
@@ -48,17 +47,6 @@ namespace gallus
 			return m_Parent;
 		}
 
-		const std::unordered_map<std::string, std::vector<resources::AssetType>> FILE_ATLAS =
-		{
-			{ ".scene", { resources::AssetType::Scene } },
-			{ ".prefab", { resources::AssetType::Prefab } },
-			{ ".png", { resources::AssetType::Sprite } },
-			{ ".bmp", { resources::AssetType::Sprite } },
-			{ ".wav", { resources::AssetType::Sound, resources::AssetType::Song, resources::AssetType::VO } },
-			{ ".anim", { resources::AssetType::Animation } },
-			{ ".hlsl", { resources::AssetType::PixelShader, resources::AssetType::VertexShader } },
-		};
-
 		//---------------------------------------------------------------------
 		bool FileResource::Scan()
 		{
@@ -72,8 +60,8 @@ namespace gallus
 
 			if (fs::is_directory(m_Path))
 			{
-				m_MetaData = new resources::MetaData();
-				m_MetaData->SetAssetType(resources::AssetType::Folder);
+				m_MetaData = new MetaData();
+				m_MetaData->SetAssetType(AssetType::Folder);
 
 				// Go through each file/folder and check their status.
 				fs::directory_iterator ds = fs::directory_iterator(m_Path, std::filesystem::directory_options::skip_permission_denied);
@@ -105,7 +93,7 @@ namespace gallus
 			}
 			else
 			{
-				m_MetaData = new resources::MetaData();
+				m_MetaData = new MetaData();
 				if (!m_MetaData->Exists(m_Path))
 				{
 					std::string extension = m_Path.extension().generic_string();
@@ -125,14 +113,14 @@ namespace gallus
 
 					rapidjson::Document doc = m_MetaData->Load(m_Path);
 					m_MetaData->LoadMetaData(doc);
-					resources::AssetType assetType = m_MetaData->GetAssetType();
+					AssetType assetType = m_MetaData->GetAssetType();
 
 					switch (assetType)
 					{
-						case resources::AssetType::Sprite:
+						case AssetType::Sprite:
 						{
 							delete m_MetaData;
-							m_MetaData = new resources::TextureMetaData();
+							m_MetaData = new TextureMetaData();
 							break;
 						}
 						default:
@@ -172,6 +160,42 @@ namespace gallus
 		bool FileResource::GetFileData(core::Data& a_Data) const
 		{
 			return file::LoadFile(m_Path, a_Data);
+		}
+
+		//---------------------------------------------------------------------
+		bool FileResource::Find(const std::string& a_sName, FileResource*& a_pFileResource)
+		{
+			if (m_Path.filename() == a_sName || m_Path.stem() == a_sName)
+			{
+				a_pFileResource = this;
+				return true;
+			}
+			for (FileResource& resource : m_aChildren)
+			{
+				if (resource.Find(a_sName, a_pFileResource))
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+
+		//---------------------------------------------------------------------
+		bool FileResource::Find(const fs::path& a_Path, FileResource*& a_pFileResource)
+		{
+			if (m_Path == a_Path)
+			{
+				a_pFileResource = this;
+				return true;
+			}
+			for (FileResource& resource : m_aChildren)
+			{
+				if (resource.Find(a_Path, a_pFileResource))
+				{
+					return true;
+				}
+			}
+			return false;
 		}
 
 		//---------------------------------------------------------------------

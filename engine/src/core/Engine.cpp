@@ -102,10 +102,10 @@ namespace gallus
 
 		void Engine::SetDefaultArguments() const
 		{
-			gallus::core::ARGS.AddArgument<std::string>(ASSET_PATH_ARG, "./data/assets/");
-			gallus::core::ARGS.AddArgument<gallus::LogSeverity>(ASSERT_LEVEL_ARG, gallus::LogSeverity::LOGSEVERITY_ERROR);
-			gallus::core::ARGS.AddArgument<bool>(LOG_TO_FILE_ARG, false);
-			gallus::core::ARGS.AddArgument<gallus::logger::LogType>(LOG_TO_FILE_ARG, gallus::logger::LogType::LOGTYPE_WITH_PARENT_FOLDER);
+			core::ARGS.AddArgument<std::string>(ASSET_PATH_ARG, "./data/assets/");
+			core::ARGS.AddArgument<LogSeverity>(ASSERT_LEVEL_ARG, LogSeverity::LOGSEVERITY_ERROR);
+			core::ARGS.AddArgument<bool>(LOG_TO_FILE_ARG, false);
+			core::ARGS.AddArgument<logger::LogType>(LOG_TO_FILE_ARG, logger::LogType::LOGTYPE_WITH_PARENT_FOLDER);
 		}
 	}
 }

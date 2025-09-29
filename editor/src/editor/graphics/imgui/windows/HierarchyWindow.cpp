@@ -308,7 +308,7 @@ namespace gallus
 					if (file::SaveFile(scenePath, {
 						{ L"Scene Files (*.scene)", L"*.scene" },
 						{ L"Prefab Files (*.prefab)", L"*.prefab" },
-					}, core::EDITOR_ENGINE->GetResourceAtlas().GetResourceFolder().lexically_normal()))
+					}, core::EDITOR_ENGINE->GetResourceAtlas().GetResourceFolder().GetPath().lexically_normal()))
 					{
 						core::EDITOR_ENGINE->GetEditor().GetScene().SetPath(scenePath);
 						core::EDITOR_ENGINE->GetEditor().GetScene().Save();

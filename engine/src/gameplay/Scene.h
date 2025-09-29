@@ -1,6 +1,7 @@
 #pragma once
 
 #include <rapidjson/document.h>
+#include <string>
 
 // core includes
 #include "core/Data.h"
@@ -25,6 +26,15 @@ namespace gallus
 		class Scene : public core::EngineResource
 		{
 		public:
+			Scene() = default;
+
+			/// <summary>
+			/// Constructs a scene with a given name.
+			/// </summary>
+			/// <param name="a_sName">Name of the resource.</param>
+			Scene(const std::string& a_sName) : core::EngineResource(a_sName)
+			{}
+
 			virtual bool LoadData();
 #ifdef _EDITOR
 			bool Save();

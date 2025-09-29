@@ -8,6 +8,8 @@
 
 #include "utils/file_abstractions.h"
 
+#include "resources/FileResource.h"
+
 namespace gallus
 {
 	namespace graphics
@@ -22,6 +24,11 @@ namespace gallus
 
 			class CommandList;
 		}
+	}
+	namespace gameplay
+	{
+		class Scene;
+		class Prefab;
 	}
 	namespace core
 	{
@@ -51,30 +58,6 @@ namespace gallus
 			/// </summary>
 			/// <returns>True if the destruction was successful, otherwise false.</returns>
 			bool Destroy() override;
-
-			/// <summary>
-			/// Retrieves a resource from the given vector, or loads it if not found.
-			/// </summary>
-			/// <typeparam name="T">The resource type (e.g., Texture, Shader, Mesh).</typeparam>
-			/// <param name="a_vVector">Vector containing cached resources.</param>
-			/// <param name="a_sName">The resource name identifier.</param>
-			/// <param name="a_Path">The filesystem path to the resource.</param>
-			/// <returns>Shared pointer to the resource.</returns>
-			template<class T>
-			std::shared_ptr<T> GetResource(std::vector<std::shared_ptr<T>>& a_vVector, const std::string& a_sName, const fs::path& a_Path);
-
-			/// <summary>
-			/// Checks whether a resource already exists in the given vector.
-			/// </summary>
-			/// <typeparam name="T">The resource type.</typeparam>
-			/// <param name="a_vVector">Vector containing cached resources.</param>
-			/// <param name="a_sName">The resource name identifier.</param>
-			/// <param name="a_Path">The filesystem path to the resource.</param>
-			/// <returns>
-			/// The index of the resource if found, otherwise -1.
-			/// </returns>
-			template<class T>
-			int32_t HasResource(std::vector<std::shared_ptr<T>>& a_vVector, const std::string& a_sName, const fs::path& a_Path);
 
 			/// <summary>
 			/// Loads a texture by name from the resource folder.
@@ -124,7 +107,12 @@ namespace gallus
 			/// <summary>
 			/// Loads a scene.
 			/// </summary>
-			core::Data LoadScene(const std::string& a_sName);
+			bool LoadScene(const std::string& a_sName, gameplay::Scene& a_Scene);
+
+			/// <summary>
+			/// Loads a prefab.
+			/// </summary>
+			bool LoadPrefab(const std::string& a_sName, gameplay::Prefab& a_Prefab);
 
 			/// <summary>
 			/// Loads a mesh by name from the resource folder.
@@ -202,29 +190,73 @@ namespace gallus
 			/// </summary>
 			const std::vector<std::shared_ptr<graphics::dx12::Mesh>>& GetMeshes() const;
 
+#ifdef _EDITOR
 			/// <summary>
-			/// Sets the folder used to resolve resource paths.
+			/// Gets a resource (if it exists) by name and returns the full path and all properties, including metadata.
 			/// </summary>
-			void SetResourceFolder(const fs::path& a_sResourceFolder)
+			bool GetResource(const std::string& a_sName, resources::FileResource*& a_pResource)
 			{
-				m_ResourceFolder = a_sResourceFolder;
+				return m_ResourceFolder.Find(a_sName, a_pResource);
 			}
 
 			/// <summary>
-			/// Gets the current resource folder path.
+			/// Gets a resource (if it exists) by path and returns the full path and all properties, including metadata.
 			/// </summary>
-			const fs::path& GetResourceFolder() const
+			bool GetResource(const fs::path& a_Path, resources::FileResource*& a_pResource)
+			{
+				return m_ResourceFolder.Find(a_Path, a_pResource);
+			}
+
+			/// <summary>
+			/// Retrieves the current resource folder.
+			/// </summary>
+			resources::FileResource& GetResourceFolder()
 			{
 				return m_ResourceFolder;
 			}
+
+			/// <summary>
+			/// Retrieves the current resource folder.
+			/// </summary>
+			const resources::FileResource& GetResourceFolder() const
+			{
+				return m_ResourceFolder;
+			}
+#endif _EDITOR // _EDITOR
 		private:
+			/// <summary>
+			/// Retrieves a resource from the given vector, or loads it if not found.
+			/// </summary>
+			/// <typeparam name="T">The resource type (e.g., Texture, Shader, Mesh).</typeparam>
+			/// <param name="a_vVector">Vector containing cached resources.</param>
+			/// <param name="a_sName">The resource name identifier.</param>
+			/// <param name="a_Path">The filesystem path to the resource.</param>
+			/// <returns>Shared pointer to the resource.</returns>
+			template<class T>
+			std::shared_ptr<T> GetResource(std::vector<std::shared_ptr<T>>& a_vVector, const std::string& a_sName, const fs::path& a_Path);
+
+			/// <summary>
+			/// Checks whether a resource already exists in the given vector.
+			/// </summary>
+			/// <typeparam name="T">The resource type.</typeparam>
+			/// <param name="a_vVector">Vector containing cached resources.</param>
+			/// <param name="a_sName">The resource name identifier.</param>
+			/// <param name="a_Path">The filesystem path to the resource.</param>
+			/// <returns>
+			/// The index of the resource if found, otherwise -1.
+			/// </returns>
+			template<class T>
+			int32_t HasResource(std::vector<std::shared_ptr<T>>& a_vVector, const std::string& a_sName, const fs::path& a_Path);
+
 			std::vector<std::shared_ptr<graphics::dx12::Texture>> m_aTextures;
 			std::vector<std::shared_ptr<graphics::dx12::PixelShader>> m_aPixelShaders;
 			std::vector<std::shared_ptr<graphics::dx12::VertexShader>> m_aVertexShaders;
 			std::vector<std::shared_ptr<graphics::dx12::DX12ShaderBind>> m_aShaderBinds;
 			std::vector<std::shared_ptr<graphics::dx12::Mesh>> m_aMeshes;
 
-			fs::path m_ResourceFolder;
+#ifdef _EDITOR
+			resources::FileResource m_ResourceFolder;
+#endif _EDITOR // _EDITOR
 		};
 	}
 }

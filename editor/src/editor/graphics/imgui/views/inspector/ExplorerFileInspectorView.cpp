@@ -11,7 +11,7 @@
 
 // editor includes
 #include "editor/core/EditorEngine.h"
-#include "editor/FileResource.h"
+#include "resources/FileResource.h"
 #include "editor/graphics/imgui/views/ExplorerFileUIView.h"
 #include "editor/graphics/imgui/views/inspector/fileinfo/ExplorerFileUIViewInfo.h"
 

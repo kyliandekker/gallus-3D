@@ -54,9 +54,7 @@ namespace gallus
 			if (a_Document.HasMember(JSON_PLAYER_COMPONENT_PREFAB_NAME) && a_Document[JSON_PLAYER_COMPONENT_PREFAB_NAME].IsString())
 			{
 				std::string prefabName = a_Document[JSON_PLAYER_COMPONENT_PREFAB_NAME].GetString();
-				prefabName = core::ENGINE->GetResourceAtlas().GetResourceFolder().generic_string() + "/prefabs/" + prefabName;
-				m_pPrefab.SetPath(prefabName);
-				m_pPrefab.Load();
+				core::ENGINE->GetResourceAtlas().LoadPrefab(prefabName, m_pPrefab);
 			}
 
 			if (a_Document.HasMember(JSON_PLAYER_COMPONENT_PREFAB_NAME) && a_Document[JSON_PLAYER_COMPONENT_PREFAB_NAME].IsFloat())

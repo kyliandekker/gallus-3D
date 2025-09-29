@@ -3,6 +3,8 @@
 #include <string>
 #include <filesystem>
 
+#include "resources/AssetType.h"
+
 namespace gallus
 {
 	namespace core
@@ -15,19 +17,6 @@ namespace gallus
 			System, // This is more specific stuff like depth buffers, etc.
 			Game // This is for any resource created by the game code.
 		};
-
-		enum class ResourceType
-		{
-			ResourceType_Unknown, // THIS SHOULD NEVER HAPPEN IF ONE IS ALLOCATED.
-			ResourceType_Texture,
-			ResourceType_PixelShader,
-			ResourceType_VertexShader,
-			ResourceType_ShaderBind,
-			ResourceType_Mesh,
-			ResourceType_Material,
-		};
-
-		std::string ResourceTypeToString(ResourceType a_ResourceType);
 
 		//---------------------------------------------------------------------
 		// EngineResource
@@ -112,13 +101,13 @@ namespace gallus
 			/// Returns the resource type of the engine resource.
 			/// </summary>
 			/// <returns>Type of resource.</returns>
-			ResourceType GetResourceType() const;
+			resources::AssetType GetResourceType() const;
 
 			/// <summary>
-			/// Sets the resource type of the engine resource.
+			/// Sets the asset type of the engine resource.
 			/// </summary>
-			/// <param name="a_ResourceType">The type of resource.</param>
-			void SetResourceType(ResourceType a_ResourceType);
+			/// <param name="a_ResourceType">The type of asset.</param>
+			void SetResourceType(resources::AssetType a_AssetType);
 
 			/// <summary>
 			/// Returns the name of the resource.
@@ -143,7 +132,7 @@ namespace gallus
 			bool m_bIsUnique = false; // Whether the resource can be shared in the atlas.
 
 			EngineResourceCategory m_ResourceCategory = EngineResourceCategory::Unknown;
-			ResourceType m_ResourceType = ResourceType::ResourceType_Unknown;
+			resources::AssetType m_AssetType;
 
 			std::string m_sName;
 			std::filesystem::path m_Path;

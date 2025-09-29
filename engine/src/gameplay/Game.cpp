@@ -19,6 +19,7 @@
 #include "gameplay/systems/CollisionSystem.h"
 #include "gameplay/systems/MovementSystem.h"
 #include "gameplay/systems/ProjectileSystem.h"
+#include "gameplay/systems/MeshSystem.h"
 
 namespace gallus
 {
@@ -40,15 +41,14 @@ namespace gallus
 			core::ENGINE->GetECS().CreateSystem<CollisionSystem>().Initialize();
 			core::ENGINE->GetECS().CreateSystem<MovementSystem>().Initialize();
 			core::ENGINE->GetECS().CreateSystem<ProjectileSystem>().Initialize();
+			core::ENGINE->GetECS().CreateSystem<MeshSystem>().Initialize();
 
 			core::ENGINE->GetWindow().OnQuit() += std::bind(&Game::Shutdown, this);
 
 			System::Initialize();
 
 #ifndef _EDITOR
-			m_Scene.SetData(core::ENGINE->GetResourceAtlas().LoadScene("main.scene"));
-			m_Scene.LoadData();
-
+			core::ENGINE.GetResourceAtlas().LoadScene("main.scene", m_Scene);
 			m_bStarted = true;
 #endif
 

@@ -67,7 +67,7 @@ namespace gallus
 			{
 				if (Shader::LoadByName(a_sPixelShader))
 				{
-					m_ResourceType = core::ResourceType::ResourceType_PixelShader;
+					m_AssetType = resources::AssetType::PixelShader;
 
 					m_pShaderBlob = CompileShader(a_sPixelShader, "main", "ps_5_1");
 
@@ -81,7 +81,7 @@ namespace gallus
 			{
 				if (Shader::LoadByPath(a_PixelShaderPath))
 				{
-					m_ResourceType = core::ResourceType::ResourceType_PixelShader;
+					m_AssetType = resources::AssetType::PixelShader;
 
 					m_pShaderBlob = CompileShader(a_PixelShaderPath, "main", "ps_5_1");
 					return IsValid();
@@ -94,7 +94,7 @@ namespace gallus
 			{
 				if (Shader::LoadByName(a_sVertexShader))
 				{
-					m_ResourceType = core::ResourceType::ResourceType_VertexShader;
+					m_AssetType = resources::AssetType::VertexShader;
 
 					m_pShaderBlob = CompileShader(a_sVertexShader, "main", "vs_5_1");
 
@@ -108,7 +108,7 @@ namespace gallus
 			{
 				if (Shader::LoadByPath(a_VertexShaderPath))
 				{
-					m_ResourceType = core::ResourceType::ResourceType_VertexShader;
+					m_AssetType = resources::AssetType::VertexShader;
 
 					m_pShaderBlob = CompileShader(a_VertexShaderPath, "main", "vs_5_1");
 

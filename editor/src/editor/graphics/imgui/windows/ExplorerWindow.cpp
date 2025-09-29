@@ -18,7 +18,7 @@
 
 // editor includes
 #include "editor/core/EditorEngine.h"
-#include "editor/FileResource.h"
+#include "resources/FileResource.h"
 #include "editor/graphics/imgui/views/ExplorerFileUIView.h"
 #include "editor/graphics/imgui/views/inspector/ExplorerFileInspectorView.h"
 
@@ -87,7 +87,7 @@ namespace gallus
 				{
 					for (ExplorerFileUIView& child : a_Resource.GetChildren())
 					{
-						if (child.GetFileResource().GetMetaData()->GetAssetType() == gallus::resources::AssetType::Folder)
+						if (child.GetFileResource().GetMetaData()->GetAssetType() == resources::AssetType::Folder)
 						{
 							RenderFolder(child, a_Indent + 1, ImGui::GetCursorPos());
 						}
@@ -109,8 +109,8 @@ namespace gallus
 					m_aFilteredExplorerItems.clear();
 					m_aExplorerItems.clear();
 
-					m_aExplorerItems.reserve(gallus::core::EDITOR_ENGINE->GetEditor().GetAssetDatabase().GetRoot().GetChildren().size());
-					for (gallus::editor::FileResource& fileResource : gallus::core::EDITOR_ENGINE->GetEditor().GetAssetDatabase().GetRoot().GetChildren())
+					m_aExplorerItems.reserve(core::EDITOR_ENGINE->GetResourceAtlas().GetResourceFolder().GetChildren().size());
+					for (resources::FileResource& fileResource : core::EDITOR_ENGINE->GetResourceAtlas().GetResourceFolder().GetChildren())
 					{
 						m_aExplorerItems.emplace_back(m_Window, fileResource);
 					}
@@ -309,7 +309,7 @@ namespace gallus
 									}
 								}
 
-								if (double_clicked && view->GetFileResource().GetMetaData()->GetAssetType() == gallus::resources::AssetType::Folder)
+								if (double_clicked && view->GetFileResource().GetMetaData()->GetAssetType() == resources::AssetType::Folder)
 								{
 									m_pViewedFolder = view;
 									m_bNeedsRefresh = true;

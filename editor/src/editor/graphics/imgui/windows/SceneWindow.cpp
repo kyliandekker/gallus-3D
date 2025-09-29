@@ -117,7 +117,7 @@ namespace gallus
 
                 DrawViewportPanel();
 
-                std::shared_ptr<gallus::graphics::dx12::Texture> renderTexture = core::EDITOR_ENGINE->GetDX12().GetRenderTexture();
+                std::shared_ptr<graphics::dx12::Texture> renderTexture = core::EDITOR_ENGINE->GetDX12().GetRenderTexture();
                 if (!renderTexture || !renderTexture->IsValid())
                 {
                     return;
@@ -432,7 +432,7 @@ namespace gallus
                 ImGui::PopStyleVar();
                 ImGui::PopStyleVar();
 
-                std::shared_ptr<gallus::graphics::dx12::Texture> renderTexture = core::EDITOR_ENGINE->GetDX12().GetRenderTexture();
+                std::shared_ptr<graphics::dx12::Texture> renderTexture = core::EDITOR_ENGINE->GetDX12().GetRenderTexture();
                 if (!renderTexture || !renderTexture->IsValid())
                 {
                     return;

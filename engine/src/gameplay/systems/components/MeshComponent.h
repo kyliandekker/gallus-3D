@@ -27,9 +27,9 @@ namespace gallus
 		struct EntityID;
 
 		//---------------------------------------------------------------------
-		// SpriteComponent
+		// MeshComponent
 		//---------------------------------------------------------------------
-		class SpriteComponent : public Component
+		class MeshComponent : public Component
 		{
 		public:
 			void Init(const gameplay::EntityID& a_EntityID) override;
@@ -79,16 +79,6 @@ namespace gallus
 				return m_pTexture;
 			}
 
-			int8_t GetSpriteIndex()
-			{
-				return m_iSpriteIndex;
-			}
-
-			void SetSpriteIndex(int8_t a_iSpriteIndex)
-			{
-				m_iSpriteIndex = a_iSpriteIndex;
-			}
-
 			/// <summary>
 			/// Renders the mesh.
 			/// </summary>
@@ -111,12 +101,9 @@ namespace gallus
 			/// <param name="a_Allocator">The allocator used by the json document.</param>
 			void Deserialize(const rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator) override;
 		private:
-			bool CheckVisibility(const graphics::dx12::DX12Transform& a_Transform, const graphics::dx12::Camera& a_Camera);
-
 			graphics::dx12::Mesh* m_pMesh = nullptr;
 			graphics::dx12::DX12ShaderBind* m_pShaderBind = nullptr;
 			graphics::dx12::Texture* m_pTexture = nullptr;
-			int8_t m_iSpriteIndex = 0;
 		};
 	}
 }

@@ -20,7 +20,7 @@
 #include "graphics/dx12/Texture.h"
 
 // graphics includes
-#include "editor/FileResource.h"
+#include "resources/FileResource.h"
 #include "editor/graphics/imgui/views/ExplorerFileUIView.h"
 
 namespace gallus
@@ -39,7 +39,7 @@ namespace gallus
 				auto cCommandQueue = core::EDITOR_ENGINE->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
 				auto cCommandList = cCommandQueue->GetCommandList();
 				m_pPreviewTexture = core::EDITOR_ENGINE->GetResourceAtlas().LoadTexture(a_sName, cCommandList);
-				m_pPreviewTexture->SetResourceCategory(gallus::core::EngineResourceCategory::Editor);
+				m_pPreviewTexture->SetResourceCategory(core::EngineResourceCategory::Editor);
 				cCommandQueue->ExecuteCommandList(cCommandList);
 				cCommandQueue->Flush();
 			}
@@ -99,7 +99,7 @@ namespace gallus
 						{
 							m_pSelectedFileResource = view;
 
-							if (view->GetFileResource().GetMetaData()->GetAssetType() == gallus::resources::AssetType::Sprite)
+							if (view->GetFileResource().GetMetaData()->GetAssetType() == resources::AssetType::Sprite)
 							{
 								LoadTexture(view->GetFileResource().GetPath().filename().generic_string());
 							}
@@ -165,11 +165,11 @@ namespace gallus
 				ImGui::PopStyleVar();
 			}
 
-			void RecursiveFind(gallus::editor::FileResource& a_File, std::vector<gallus::resources::AssetType>& a_aFileTypes, std::vector<ExplorerFileUIView>& a_aResources, ImGuiWindow& a_Window)
+			void RecursiveFind(resources::FileResource& a_File, std::vector<resources::AssetType>& a_aFileTypes, std::vector<ExplorerFileUIView>& a_aResources, ImGuiWindow& a_Window)
 			{
-				for (gallus::editor::FileResource& fileResource : a_File.GetChildren())
+				for (resources::FileResource& fileResource : a_File.GetChildren())
 				{
-					for (gallus::resources::AssetType assetType : a_aFileTypes)
+					for (resources::AssetType assetType : a_aFileTypes)
 					{
 						if (fileResource.GetMetaData()->GetAssetType() == assetType)
 						{
@@ -183,13 +183,13 @@ namespace gallus
 			void FilePickerModal::Show()
 			{
 				m_aResources.clear();
-				m_aResources.reserve(gallus::core::EDITOR_ENGINE->GetEditor().GetAssetDatabase().GetRoot().GetChildren().size());
-				RecursiveFind(gallus::core::EDITOR_ENGINE->GetEditor().GetAssetDatabase().GetRoot(), m_aFileTypes, m_aResources, m_Window);
+				m_aResources.reserve(core::EDITOR_ENGINE->GetResourceAtlas().GetResourceFolder().GetChildren().size());
+				RecursiveFind(core::EDITOR_ENGINE->GetResourceAtlas().GetResourceFolder(), m_aFileTypes, m_aResources, m_Window);
 
 				BaseModal::Show();
 			}
 
-			void FilePickerModal::SetData(const std::function<void(int, gallus::editor::FileResource&)>& a_Callback, const std::vector<gallus::resources::AssetType>& a_aFileTypes)
+			void FilePickerModal::SetData(const std::function<void(int, resources::FileResource&)>& a_Callback, const std::vector<resources::AssetType>& a_aFileTypes)
 			{
 				m_pSelectedFileResource = nullptr;
 				m_Callback = nullptr;

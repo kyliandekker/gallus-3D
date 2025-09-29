@@ -164,7 +164,7 @@ namespace gallus
 					SetSRVDesc(srvDesc);
 				}
 
-				m_ResourceType = core::ResourceType::ResourceType_Texture;
+				m_AssetType = resources::AssetType::Sprite;
 				return success;
 			}
 
@@ -172,7 +172,7 @@ namespace gallus
 			//---------------------------------------------------------------------
 			bool Texture::LoadByName(const std::string& a_sName, std::shared_ptr<CommandList> a_pCommandList, const D3D12_HEAP_PROPERTIES& a_Heap, const D3D12_RESOURCE_STATES a_ResourceState)
 			{
-				m_ResourceType = core::ResourceType::ResourceType_Texture;
+				m_AssetType = resources::AssetType::Sprite;
 				return false;
 			}
 
@@ -266,7 +266,7 @@ namespace gallus
 				srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
 				SetSRVDesc(srvDesc);
 
-				m_ResourceType = core::ResourceType::ResourceType_Texture;
+				m_AssetType = resources::AssetType::Sprite;
 
 				LoadMetaData();
 

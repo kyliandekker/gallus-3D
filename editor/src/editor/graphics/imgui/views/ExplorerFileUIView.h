@@ -17,7 +17,7 @@
 
 namespace gallus
 {
-	namespace editor
+	namespace resources
 	{
 		class FileResource;
 	}
@@ -30,7 +30,7 @@ namespace gallus
 			class ExplorerFileUIView : public ImGuiUIView, public EditorSelectable
 			{
 			public:
-				ExplorerFileUIView(ImGuiWindow& a_Window, gallus::editor::FileResource& a_FileResource, ExplorerFileUIView* a_pParent = nullptr, bool a_bGetChildren = true);
+				ExplorerFileUIView(ImGuiWindow& a_Window, resources::FileResource& a_FileResource, ExplorerFileUIView* a_pParent = nullptr, bool a_bGetChildren = true);
 
 				/// <summary>
 				/// Retrieves the icon string for the resource.
@@ -104,12 +104,12 @@ namespace gallus
 					return m_aChildren;
 				}
 
-				gallus::editor::FileResource& GetFileResource()
+				resources::FileResource& GetFileResource()
 				{
 					return m_FileResource;
 				}
 
-				const gallus::editor::FileResource& GetFileResource() const
+				const resources::FileResource& GetFileResource() const
 				{
 					return m_FileResource;
 				}
@@ -126,7 +126,7 @@ namespace gallus
 
 				bool SearchForPath(const fs::path& a_Path, ExplorerFileUIView*& a_pExplorerFile);
 			private:
-				gallus::editor::FileResource& m_FileResource;
+				resources::FileResource& m_FileResource;
 				std::string m_sDisplayName; /// The name that will be displayed in imgui.
 				std::string m_sIcon; /// The icon of the resource.
 				bool m_bIsFoldedOut = false; /// Whether the node is folded out.

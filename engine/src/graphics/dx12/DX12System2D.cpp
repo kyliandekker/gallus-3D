@@ -17,6 +17,7 @@
 
 // gameplay includes
 #include "gameplay/systems/SpriteSystem.h"
+#include "gameplay/systems/MeshSystem.h"
 
 namespace gallus
 {
@@ -250,9 +251,10 @@ namespace gallus
 
 				std::shared_ptr<Mesh> mesh = core::ENGINE->GetResourceAtlas().LoadMesh("square"); // Default mesh.
 				MeshPartData& squarePrimitive = s_PRIMITIVES[(int)PRIMITIVES::SQUARE];
-				mesh->SetMeshData(squarePrimitive, cCommandList);
+				mesh->SetMeshData(squarePrimitive);
 				mesh->SetResourceCategory(core::EngineResourceCategory::Missing);
 				mesh->SetIsDestroyable(false);
+				mesh->UploadMesh(cCommandList);
 
 				uint64_t fenceValue = cCommandQueue->ExecuteCommandList(cCommandList);
 				cCommandQueue->WaitForFenceValue(fenceValue);
@@ -749,6 +751,20 @@ namespace gallus
 
 				m_FpsCounter.Update();
 
+				std::shared_ptr<CommandQueue> cCommandQueue = GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
+				std::shared_ptr<CommandList> cCommandList = cCommandQueue->GetCommandList();
+
+				for (auto& pair : core::ENGINE->GetECS().GetSystem<gameplay::MeshSystem>().GetComponents())
+				{
+					if (pair.second.GetMesh())
+					{
+						pair.second.GetMesh()->UploadMesh(cCommandList);
+					}
+				}
+
+				uint64_t fenceValue = cCommandQueue->ExecuteCommandList(cCommandList);
+				cCommandQueue->WaitForFenceValue(fenceValue);
+
 				ProcessWindowEvents();
 
 				auto commandQueue = GetCommandQueue(D3D12_COMMAND_LIST_TYPE_DIRECT);
@@ -871,6 +887,10 @@ namespace gallus
 
 				std::lock_guard<std::recursive_mutex> lock(core::ENGINE->GetECS().m_EntityMutex);
 				for (auto& pair : core::ENGINE->GetECS().GetSystem<gameplay::SpriteSystem>().GetComponents())
+				{
+					pair.second.Render(a_pCommandList, pair.first, m_Camera);
+				}
+				for (auto& pair : core::ENGINE->GetECS().GetSystem<gameplay::MeshSystem>().GetComponents())
 				{
 					pair.second.Render(a_pCommandList, pair.first, m_Camera);
 				}

@@ -14,7 +14,7 @@
 #include "graphics/imgui/font_icon.h"
 
 // editor includes
-#include "editor/FileResource.h"
+#include "resources/FileResource.h"
 #include "editor/graphics/imgui/views/ExplorerFileUIView.h"
 #include "editor/core/EditorEngine.h"
 

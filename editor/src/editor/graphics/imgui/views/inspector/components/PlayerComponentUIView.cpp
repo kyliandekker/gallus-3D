@@ -18,7 +18,7 @@
 // editor includes
 #include "editor/core/EditorEngine.h"
 #include "resources/AssetType.h"
-#include "editor/FileResource.h"
+#include "resources/FileResource.h"
 #include "editor/graphics/imgui/modals/FilePickerModal.h"
 
 // gameplay includes
@@ -78,7 +78,7 @@ namespace gallus
 					if (modal)
 					{
 						modal->SetData(
-							[this](int success, gallus::editor::FileResource& resource)
+							[this](int success, resources::FileResource& resource)
 							{
 								if (success == 1)
 								{
@@ -86,7 +86,7 @@ namespace gallus
 									m_Component.GetPrefab().Load();
 								}
 							},
-							std::vector<gallus::resources::AssetType>{ gallus::resources::AssetType::Prefab }
+							std::vector<resources::AssetType>{ resources::AssetType::Prefab }
 						);
 						modal->Show();
 					}

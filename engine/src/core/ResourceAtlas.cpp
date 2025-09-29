@@ -14,6 +14,9 @@
 #include "graphics/dx12/Mesh.h"
 #include "graphics/dx12/CommandList.h"
 
+#include "gameplay/Scene.h"
+#include "gameplay/Prefab.h"
+
 namespace gallus
 {
 	namespace core
@@ -89,7 +92,9 @@ namespace gallus
 		bool ResourceAtlas::Initialize()
 		{
 			std::string resourceFolder = core::ARGS.GetArgument<std::string>(ASSET_PATH_ARG);
-			m_ResourceFolder = resourceFolder;
+
+			m_ResourceFolder.SetPath(resourceFolder);
+			m_ResourceFolder.Scan();
 
 			LOG(LOGSEVERITY_SUCCESS, LOG_CATEGORY_ECS, "Resource atlas initialized.");
 			return System::Initialize();
@@ -109,10 +114,17 @@ namespace gallus
 			if (!texture->IsValid())
 			{
 //#ifdef _EDITOR
-				fs::path texturePath = fs::path(m_ResourceFolder.generic_string() + "/textures/" + a_sName).lexically_normal();
+				resources::FileResource* fileResource = nullptr;
+				if (!GetResource(a_sName, fileResource))
+				{
+					LOG(LogSeverity::LOGSEVERITY_ERROR, "Could not find resource: \"%s\".", a_sName.c_str());
+					return nullptr;
+				}
+
+				fs::path texturePath = fileResource->GetPath().lexically_normal();
 				texture->LoadByPath(texturePath, a_pCommandList);
 //#else
-//				texture->LoadByName(a_sName, a_pCommandList);
+// 
 //#endif // _EDITOR
 			}
 			return texture;
@@ -149,11 +161,17 @@ namespace gallus
 			if (!shader->IsValid())
 			{
 //#ifdef _EDITOR
-				fs::path pixelShaderPath = fs::path(m_ResourceFolder.generic_string() + "/shaders/" + a_sName).lexically_normal();
+				resources::FileResource* fileResource = nullptr;
+				if (!GetResource(a_sName, fileResource))
+				{
+					LOG(LogSeverity::LOGSEVERITY_ERROR, "Could not find resource: \"%s\".", a_sName.c_str());
+					return nullptr;
+				}
 
+				fs::path pixelShaderPath = fileResource->GetPath().lexically_normal();
 				shader->LoadByPath(pixelShaderPath);
 //#else
-//				shader->LoadByName(a_sName);
+// 
 //#endif // _EDITOR
 			}
 			return shader;
@@ -166,11 +184,17 @@ namespace gallus
 			if (!shader->IsValid())
 			{
 //#ifdef _EDITOR
-				fs::path vertexShaderPath = fs::path(m_ResourceFolder.generic_string() + "/shaders/" + a_sName).lexically_normal();
+				resources::FileResource* fileResource = nullptr;
+				if (!GetResource(a_sName, fileResource))
+				{
+					LOG(LogSeverity::LOGSEVERITY_ERROR, "Could not find resource: \"%s\".", a_sName.c_str());
+					return nullptr;
+				}
 
+				fs::path vertexShaderPath = fileResource->GetPath().lexically_normal();
 				shader->LoadByPath(vertexShaderPath);
 //#else
-//				shader->LoadByName(a_sName);
+// 
 //#endif // _EDITOR
 			}
 			return shader;
@@ -207,15 +231,43 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		core::Data ResourceAtlas::LoadScene(const std::string& a_sName)
+		bool ResourceAtlas::LoadScene(const std::string& a_sName, gameplay::Scene& a_Scene)
 		{
-			core::Data data;
 //#ifdef _EDITOR
-			file::LoadFile(m_ResourceFolder.generic_string() + "/scenes/" + a_sName, data);
+			resources::FileResource* fileResource = nullptr;
+			if (!GetResource(a_sName, fileResource))
+			{
+				LOG(LogSeverity::LOGSEVERITY_ERROR, "Could not find resource: \"%s\".", a_sName.c_str());
+				return false;
+			}
+
+			a_Scene = gameplay::Scene(a_sName);
+			a_Scene.SetPath(fileResource->GetPath());
+			a_Scene.Load();
+
+			return true;
 //#else
-//				shader->LoadByName(a_sName);
-//#endif // _EDITOR
-			return data;
+			return false;
+		}
+
+		//---------------------------------------------------------------------
+		bool ResourceAtlas::LoadPrefab(const std::string& a_sName, gameplay::Prefab& a_Prefab)
+		{
+//#ifdef _EDITOR
+			resources::FileResource* fileResource = nullptr;
+			if (!GetResource(a_sName, fileResource))
+			{
+				LOG(LogSeverity::LOGSEVERITY_ERROR, "Could not find resource: \"%s\".", a_sName.c_str());
+				return false;
+			}
+
+			a_Prefab = gameplay::Prefab(a_sName);
+			a_Prefab.SetPath(fileResource->GetPath());
+			a_Prefab.Load();
+
+			return true;
+//#else
+			return false;
 		}
 
 		//---------------------------------------------------------------------
@@ -225,6 +277,18 @@ namespace gallus
 			if (!mesh->IsValid())
 			{
 				mesh->LoadByName(a_sName);
+
+				resources::FileResource* fileResource = nullptr;
+				if (!GetResource(a_sName, fileResource))
+				{
+					return mesh;
+				}
+
+				fs::path meshPath = fileResource->GetPath().lexically_normal();
+
+				std::vector<graphics::dx12::MeshPartData> meshData;
+				mesh->GetMeshDataFromModel(meshPath, meshData);
+				mesh->SetMeshData(meshData);
 			}
 			return mesh;
 		}

@@ -18,9 +18,6 @@ namespace gallus
 	namespace resources
 	{
 		class TextureMetaData;
-	}
-	namespace editor
-	{
 		class FileResource;
 	}
 	namespace graphics
@@ -57,7 +54,7 @@ namespace gallus
 				/// Sets the data of the sprite editor modal.
 				/// </summary>
 				/// <param name="a_FileResource">The sprite file.</param>
-				void SetData(editor::FileResource& a_FileResource);
+				void SetData(resources::FileResource& a_FileResource);
 			private:
 				void RenderToolbar();
 				void HandleGlobalControls(const ImVec2& a_vWindowSize);
@@ -78,7 +75,7 @@ namespace gallus
 				std::shared_ptr<graphics::dx12::Texture> m_pPreviewTexture = nullptr;
 
 				resources::TextureMetaData* m_pTextureMetaData = nullptr;
-				editor::FileResource* m_FileResource = nullptr;
+				resources::FileResource* m_FileResource = nullptr;
 			};
 		}
 	}

@@ -5,43 +5,6 @@ namespace gallus
 	namespace core
 	{
 		//---------------------------------------------------------------------
-		std::string ResourceTypeToString(ResourceType a_ResourceType)
-		{
-			switch (a_ResourceType)
-			{
-				case ResourceType::ResourceType_Unknown:
-				{
-					return "Unknown";
-				}
-				case ResourceType::ResourceType_Texture:
-				{
-					return "Texture";
-				}
-				case ResourceType::ResourceType_PixelShader:
-				{
-					return "Pixel Shader";
-				}
-				case ResourceType::ResourceType_VertexShader:
-				{
-					return "Vertex Shader";
-				}
-				case ResourceType::ResourceType_ShaderBind:
-				{
-					return "Shader Bind";
-				}
-				case ResourceType::ResourceType_Mesh:
-				{
-					return "Mesh";
-				}
-				case ResourceType::ResourceType_Material:
-				{
-					return "Material";
-				}
-			}
-			return "?";
-		}
-
-		//---------------------------------------------------------------------
 		// EngineResource
 		//---------------------------------------------------------------------
 		EngineResource::EngineResource(const std::string& a_sName) : m_sName(a_sName)
@@ -56,7 +19,6 @@ namespace gallus
 			}
 
 			m_ResourceCategory = EngineResourceCategory::Unknown;
-			m_ResourceType = ResourceType::ResourceType_Unknown;
 			m_bIsDestroyable = true;
 			m_sName = "";
 			m_Path = "";
@@ -111,15 +73,15 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		ResourceType EngineResource::GetResourceType() const
+		resources::AssetType EngineResource::GetResourceType() const
 		{
-			return m_ResourceType;
+			return m_AssetType;
 		}
 
 		//---------------------------------------------------------------------
-		void EngineResource::SetResourceType(ResourceType a_ResourceType)
+		void EngineResource::SetResourceType(resources::AssetType a_ResourceType)
 		{
-			m_ResourceType = a_ResourceType;
+			m_AssetType = a_ResourceType;
 		}
 
 		//---------------------------------------------------------------------

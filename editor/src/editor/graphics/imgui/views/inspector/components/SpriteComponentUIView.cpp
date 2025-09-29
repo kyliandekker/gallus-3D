@@ -18,7 +18,7 @@
 // editor includes
 #include "editor/core/EditorEngine.h"
 #include "resources/AssetType.h"
-#include "editor/FileResource.h"
+#include "resources/FileResource.h"
 #include "editor/graphics/imgui/modals/FilePickerModal.h"
 
 // gameplay includes
@@ -31,9 +31,6 @@ namespace gallus
 	{
 		namespace imgui
 		{
-			char m_sPrefabName[128];
-			char m_VertexShaderName[128];
-			char m_TextureName[128];
 			SpriteComponentUIView::SpriteComponentUIView(ImGuiWindow& a_Window, gameplay::EntityID& a_EntityID, gameplay::SpriteComponent& a_SpriteComponent, gameplay::SpriteSystem& a_System) : ComponentUIView(a_Window, a_EntityID, a_SpriteComponent, a_System), m_SizeView(a_Window)
 			{
 				m_bShowPreview = true;
@@ -68,12 +65,12 @@ namespace gallus
 				ImGui::InputText(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "SPRITE_COMPONENT_PIXEL_SHADER_NAME_INPUT").c_str(), m_sPrefabName, sizeof(m_sPrefabName), ImGuiInputTextFlags_ReadOnly);
 				ImGui::PopItemFlag();
 				ImGui::SameLine();
-				if (ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_FILE, BUTTON_ID, "MESH_COMPONENT_PIXEL_SHADER").c_str(), buttonSize))
+				if (ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_FILE, BUTTON_ID, "SPRITE_COMPONENT_PIXEL_SHADER").c_str(), buttonSize))
 				{
 					if (modal)
 					{
 						modal->SetData(
-							[this](int success, gallus::editor::FileResource& resource)
+							[this](int success, resources::FileResource& resource)
 							{
 								if (success == 1)
 								{
@@ -84,7 +81,7 @@ namespace gallus
 									).get());
 								}
 							},
-							std::vector<gallus::resources::AssetType>{ gallus::resources::AssetType::PixelShader }
+							std::vector<resources::AssetType>{ resources::AssetType::PixelShader }
 						);
 						modal->Show();
 					}
@@ -100,12 +97,12 @@ namespace gallus
 				ImGui::InputText(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "SPRITE_COMPONENT_VERTEX_SHADER_NAME_INPUT").c_str(), m_VertexShaderName, sizeof(m_VertexShaderName), ImGuiInputTextFlags_ReadOnly);
 				ImGui::PopItemFlag();
 				ImGui::SameLine();
-				if (ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_FILE, BUTTON_ID, "MESH_COMPONENT_VERTEX_SHADER").c_str(), buttonSize))
+				if (ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_FILE, BUTTON_ID, "SPRITE_COMPONENT_VERTEX_SHADER").c_str(), buttonSize))
 				{
 					if (modal)
 					{
 						modal->SetData(
-							[this](int success, gallus::editor::FileResource& resource)
+							[this](int success, resources::FileResource& resource)
 							{
 								if (success == 1)
 								{
@@ -118,7 +115,7 @@ namespace gallus
 									core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
 								}
 							},
-							std::vector<gallus::resources::AssetType>{ gallus::resources::AssetType::VertexShader }
+							std::vector<resources::AssetType>{ resources::AssetType::VertexShader }
 						);
 						modal->Show();
 					}
@@ -134,12 +131,12 @@ namespace gallus
 				ImGui::InputText(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "SPRITE_COMPONENT_TEXTURE_NAME_INPUT").c_str(), m_TextureName, sizeof(m_TextureName), ImGuiInputTextFlags_ReadOnly);
 				ImGui::PopItemFlag();
 				ImGui::SameLine();
-				if (ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_FILE_IMAGE, BUTTON_ID, "MESH_COMPONENT_TEXTURE").c_str(), buttonSize))
+				if (ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_FILE_IMAGE, BUTTON_ID, "SPRITE_COMPONENT_TEXTURE").c_str(), buttonSize))
 				{
 					if (modal)
 					{
 						modal->SetData(
-							[this](int success, gallus::editor::FileResource& resource)
+							[this](int success, resources::FileResource& resource)
 							{
 								if (success == 1)
 								{
@@ -152,7 +149,7 @@ namespace gallus
 									core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
 								}
 							},
-							std::vector<gallus::resources::AssetType>{ gallus::resources::AssetType::Sprite }
+							std::vector<resources::AssetType>{ resources::AssetType::Sprite }
 						);
 						modal->Show();
 					}
@@ -168,7 +165,7 @@ namespace gallus
 
 					ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
 					int spriteIndex = m_Component.GetSpriteIndex();
-					if (ImGui::DragInt(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "MESH_COMPONENT_CURRENT_SPRITE_INDEX").c_str(), &spriteIndex, 1, 0, m_Component.GetTexture()->GetSpriteRectsSize() - 1))
+					if (ImGui::DragInt(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "SPRITE_COMPONENT_CURRENT_SPRITE_INDEX").c_str(), &spriteIndex, 1, 0, m_Component.GetTexture()->GetSpriteRectsSize() - 1))
 					{
 						m_Component.SetSpriteIndex(spriteIndex);
 					}

@@ -1,4 +1,4 @@
-﻿#include "gameplay/systems/components/SpriteComponent.h"
+#include "gameplay/systems/components/MeshComponent.h"
 
 // core includes
 #include "core/Engine.h"
@@ -29,9 +29,9 @@ namespace gallus
 	namespace gameplay
 	{
 		//---------------------------------------------------------------------
-		// SpriteComponent
+		// MeshComponent
 		//---------------------------------------------------------------------
-		void SpriteComponent::Init(const gameplay::EntityID& a_EntityID)
+		void MeshComponent::Init(const gameplay::EntityID& a_EntityID)
 		{
 			Component::Init(a_EntityID);
 			m_pShaderBind = core::ENGINE->GetResourceAtlas().GetDefaultShaderBind().get();
@@ -40,25 +40,25 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		void SpriteComponent::SetMesh(graphics::dx12::Mesh* a_pMesh)
+		void MeshComponent::SetMesh(graphics::dx12::Mesh* a_pMesh)
 		{
 			m_pMesh = a_pMesh;
 		}
 
 		//---------------------------------------------------------------------
-		void SpriteComponent::SetShader(graphics::dx12::DX12ShaderBind* a_pShaderBind)
+		void MeshComponent::SetShader(graphics::dx12::DX12ShaderBind* a_pShaderBind)
 		{
 			m_pShaderBind = a_pShaderBind;
 		}
 
 		//---------------------------------------------------------------------
-		void SpriteComponent::SetTexture(graphics::dx12::Texture* a_pTexture)
+		void MeshComponent::SetTexture(graphics::dx12::Texture* a_pTexture)
 		{
 			m_pTexture = a_pTexture;
 		}
 
 		//---------------------------------------------------------------------
-		bool SpriteComponent::CheckVisibility(const graphics::dx12::DX12Transform& a_Transform, const graphics::dx12::Camera& a_Camera)
+		bool CheckVisibility(const graphics::dx12::DX12Transform& a_Transform, const graphics::dx12::Camera& a_Camera)
 		{
 			const DirectX::XMFLOAT2& pos = a_Transform.GetPosition();
 			const DirectX::XMFLOAT2& scale = a_Transform.GetScale();
@@ -126,7 +126,7 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		void SpriteComponent::Render(std::shared_ptr<graphics::dx12::CommandList> a_pCommandList, const EntityID& a_EntityID, const graphics::dx12::Camera& a_Camera)
+		void MeshComponent::Render(std::shared_ptr<graphics::dx12::CommandList> a_pCommandList, const EntityID& a_EntityID, const graphics::dx12::Camera& a_Camera)
 		{
 			const DirectX::XMMATRIX viewMatrix = a_Camera.GetViewMatrix();
 			const DirectX::XMMATRIX& projectionMatrix = a_Camera.GetProjectionMatrix();
@@ -156,7 +156,7 @@ namespace gallus
 
 			if (m_pTexture && m_pTexture->CanBeDrawn())
 			{
-				m_pTexture->Bind(a_pCommandList, m_iSpriteIndex);
+				m_pTexture->Bind(a_pCommandList, 0);
 			}
 
 			if (m_pShaderBind && m_pShaderBind->IsValid())
@@ -176,7 +176,7 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		void SpriteComponent::Serialize(rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator) const
+		void MeshComponent::Serialize(rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator) const
 		{
 			if (!a_Document.IsObject())
 			{
@@ -194,12 +194,7 @@ namespace gallus
 				rapidjson::Value(tex.c_str(), a_Allocator),
 				a_Allocator
 			);
-			a_Document[JSON_SPRITE_COMPONENT_TEX_VAR].AddMember(
-				JSON_SPRITE_COMPONENT_TEX_SPRITE_INDEX_VAR,
-				m_iSpriteIndex,
-				a_Allocator
-			);
-
+			
 			a_Document.AddMember(JSON_SPRITE_COMPONENT_SHADER_VAR, rapidjson::Value().SetObject(), a_Allocator);
 
 			a_Document[JSON_SPRITE_COMPONENT_SHADER_VAR].AddMember(
@@ -222,7 +217,7 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		void SpriteComponent::Deserialize(const rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator)
+		void MeshComponent::Deserialize(const rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator)
 		{
 			if (!a_Document.IsObject())
 			{
@@ -238,10 +233,6 @@ namespace gallus
 				if (a_Document[JSON_SPRITE_COMPONENT_TEX_VAR].HasMember(JSON_SPRITE_COMPONENT_TEX_NAME_VAR) && a_Document[JSON_SPRITE_COMPONENT_TEX_VAR][JSON_SPRITE_COMPONENT_TEX_NAME_VAR].IsString())
 				{
 					tex = a_Document[JSON_SPRITE_COMPONENT_TEX_VAR][JSON_SPRITE_COMPONENT_TEX_NAME_VAR].GetString();
-				}
-				if (a_Document[JSON_SPRITE_COMPONENT_TEX_VAR].HasMember(JSON_SPRITE_COMPONENT_TEX_SPRITE_INDEX_VAR) && a_Document[JSON_SPRITE_COMPONENT_TEX_VAR][JSON_SPRITE_COMPONENT_TEX_SPRITE_INDEX_VAR].IsInt())
-				{
-					m_iSpriteIndex = a_Document[JSON_SPRITE_COMPONENT_TEX_VAR][JSON_SPRITE_COMPONENT_TEX_SPRITE_INDEX_VAR].GetInt();
 				}
 			}
 
@@ -261,6 +252,7 @@ namespace gallus
 			if (!mesh.empty())
 			{
 				SetMesh(core::ENGINE->GetResourceAtlas().LoadMesh(mesh).get());
+				GetMesh()->UploadMesh(cCommandList);
 			}
 			if (!tex.empty())
 			{

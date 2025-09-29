@@ -14,6 +14,7 @@ namespace gallus
 			Folder,
 			Scene,
 			Sprite,
+			Mesh,
 			Sound,
 			Song,
 			VO,
@@ -21,6 +22,7 @@ namespace gallus
 			PixelShader,
 			VertexShader,
 			Prefab,
+			ShaderBind
 		};
 
 		/// <summary>
@@ -39,6 +41,10 @@ namespace gallus
 				case AssetType::Sprite:
 				{
 					return "Sprite File";
+				}
+				case AssetType::Mesh:
+				{
+					return "Mesh File";
 				}
 				case AssetType::Sound:
 				{
@@ -63,6 +69,10 @@ namespace gallus
 				case AssetType::VertexShader:
 				{
 					return "Vertex Shader File";
+				}
+				case AssetType::ShaderBind:
+				{
+					return "ShaderBind";
 				}
 				default:
 				{

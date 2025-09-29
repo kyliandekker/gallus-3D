@@ -14,7 +14,7 @@
 #include "graphics/imgui/font_icon.h"
 
 // editor includes
-#include "editor/FileResource.h"
+#include "resources/FileResource.h"
 #include "editor/graphics/imgui/views/ExplorerFileUIView.h"
 #include "editor/core/EditorEngine.h"
 
@@ -28,8 +28,7 @@ namespace gallus
 		namespace imgui
 		{
 			ExplorerPrefabUIViewInfo::ExplorerPrefabUIViewInfo(ImGuiWindow& a_Window, ExplorerFileUIView& a_ExplorerFileUIView) : ExplorerFileUIViewInfo(a_Window, a_ExplorerFileUIView)
-			{
-			}
+			{ }
 
 			void ExplorerPrefabUIViewInfo::RenderSpecific()
 			{

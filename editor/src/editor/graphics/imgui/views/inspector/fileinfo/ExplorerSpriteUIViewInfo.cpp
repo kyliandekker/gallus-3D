@@ -19,7 +19,7 @@
 #include "graphics/imgui/font_icon.h"
 
 // editor includes
-#include "editor/FileResource.h"
+#include "resources/FileResource.h"
 #include "editor/graphics/imgui/views/ExplorerFileUIView.h"
 #include "resources/metadata/TextureMetaData.h"
 #include "editor/graphics/imgui/modals/SpriteEditorModal.h"
@@ -48,7 +48,7 @@ namespace gallus
 				auto cCommandQueue = core::EDITOR_ENGINE->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
 				auto cCommandList = cCommandQueue->GetCommandList();
 				m_pPreviewTexture = core::EDITOR_ENGINE->GetResourceAtlas().LoadTexture(m_ExplorerFileUIView.GetFileResource().GetPath().filename().generic_string(), cCommandList);
-				m_pPreviewTexture->SetResourceCategory(gallus::core::EngineResourceCategory::Editor);
+				m_pPreviewTexture->SetResourceCategory(core::EngineResourceCategory::Editor);
 				cCommandQueue->ExecuteCommandList(cCommandList);
 				cCommandQueue->Flush();
 			}
