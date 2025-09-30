@@ -31,7 +31,7 @@ namespace gallus
 			//---------------------------------------------------------------------
 			// ResourcesWindow
 			//---------------------------------------------------------------------
-			ResourcesWindow::ResourcesWindow(ImGuiWindow& a_Window) : BaseWindow(a_Window, ImGuiWindowFlags_NoCollapse, std::string(font::ICON_SETTINGS) + " Resources", "Resources")
+			ResourcesWindow::ResourcesWindow(ImGuiWindow& a_Window) : BaseWindow(a_Window, ImGuiWindowFlags_NoCollapse, std::string(font::ICON_SETTINGS) + " Resources", "RESOURCES")
 			{
 			}
 

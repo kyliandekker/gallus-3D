@@ -30,7 +30,7 @@ namespace gallus
             //---------------------------------------------------------------------
             // HierarchyWindow
             //---------------------------------------------------------------------
-            SceneWindow::SceneWindow(ImGuiWindow& a_Window) : BaseWindow(a_Window, ImGuiWindowFlags_NoCollapse, std::string(font::ICON_SCENE) + " Scene", "Scene")
+            SceneWindow::SceneWindow(ImGuiWindow& a_Window) : BaseWindow(a_Window, ImGuiWindowFlags_NoCollapse, std::string(font::ICON_SCENE) + " Scene", "SCENE")
             {
                 ImGuizmo::Enable(true);
             }
@@ -42,6 +42,15 @@ namespace gallus
             //---------------------------------------------------------------------
             void SceneWindow::Update()
             {
+                bool isStarted = gameplay::GAME.IsStarted();
+
+                graphics::dx12::Camera* cam = &core::ENGINE->GetDX12().GetCamera();
+                if (!isStarted && core::EDITOR_ENGINE->GetEditor().GetCameraMode() == editor::CameraMode::CAMERA_MODE_SCENE)
+                {
+                    cam = &core::EDITOR_ENGINE->GetEditor().GetEditorCamera();
+                }
+                core::EDITOR_ENGINE->GetDX12().SetActiveCamera(*cam);
+
                 if (gameplay::GAME.IsStarted() && !gameplay::GAME.IsPaused())
                 {
                     return;
@@ -57,6 +66,8 @@ namespace gallus
                     return;
                 }
 
+                bool isStarted = gameplay::GAME.IsStarted();
+
                 ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
                 ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0);
 
@@ -70,7 +81,6 @@ namespace gallus
                     ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
                 }
 
-                bool isStarted = gameplay::GAME.IsStarted();
                 if (ImGui::CheckboxButton(
                     ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_PLAY), BUTTON_ID, "PLAY_SCENE").c_str(), &isStarted, m_Window.GetHeaderSize()))
                 {
@@ -109,6 +119,14 @@ namespace gallus
                     core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetDrawBounds(drawBounds);
                     core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
                 }
+                ImGui::SameLine();
+
+                bool inGameMode = core::EDITOR_ENGINE->GetEditor().GetCameraMode() == editor::CameraMode::CAMERA_MODE_GAME;
+                if (ImGui::CheckboxButton(
+                    ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_GAMEMODE), BUTTON_ID, "CAMERA_MODE_GAME").c_str(), &inGameMode, m_Window.GetHeaderSize()))
+                {
+                    core::EDITOR_ENGINE->GetEditor().SetCameraMode(inGameMode ? editor::CameraMode::CAMERA_MODE_GAME : editor::CameraMode::CAMERA_MODE_SCENE);
+                }
 
                 ImGui::EndToolbar(ImVec2(0, 0));
 
@@ -116,6 +134,8 @@ namespace gallus
                 ImGui::PopStyleVar();
 
                 DrawViewportPanel();
+
+                std::lock_guard<std::recursive_mutex> lock(core::ENGINE->GetECS().m_EntityMutex);
 
                 std::shared_ptr<graphics::dx12::Texture> renderTexture = core::EDITOR_ENGINE->GetDX12().GetRenderTexture();
                 if (!renderTexture || !renderTexture->IsValid())
@@ -160,7 +180,7 @@ namespace gallus
                 }
 
                 // Pan with middle mouse button
-                if ((ImGui::IsWindowHovered() && ImGui::IsMouseDragging(ImGuiMouseButton_Middle)) || (ImGui::IsWindowHovered() && ImGui::IsMouseDragging(ImGuiMouseButton_Right)))
+                if ((ImGui::IsWindowHovered() && ImGui::IsMouseDragging(ImGuiMouseButton_Middle)))
                 {
                     m_vPanOffset += ImGui::GetIO().MouseDelta;
                     core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetScenePanOffset(glm::vec2(m_vPanOffset.x, m_vPanOffset.y));
@@ -177,7 +197,10 @@ namespace gallus
                     imageSize
                 );
 
-                DrawComponentGizmos(imageScreenPos, textureSize);
+                if (core::EDITOR_ENGINE->GetEditor().GetCameraMode() == editor::CameraMode::CAMERA_MODE_SCENE)
+                {
+                    HandleCameraInput(gameplay::GAME.GetDeltaTime(), imageScreenPos, textureSize);
+                }
 
                 ImU32 borderColor = IM_COL32(255, 255, 255, 255); // white border
                 float borderThickness = 2.0f;
@@ -189,6 +212,11 @@ namespace gallus
                     0,    // flags
                     borderThickness
                 );
+
+                if (core::EDITOR_ENGINE->GetEditor().GetCameraMode() == editor::CameraMode::CAMERA_MODE_SCENE)
+                {
+                    DrawComponentGizmos(imageScreenPos, textureSize);
+                }
 
                 ImGui::EndChild();
 
@@ -202,10 +230,145 @@ namespace gallus
             }
 
             //---------------------------------------------------------------------
+            void SceneWindow::HandleCameraInput(double a_fDeltaTime, const ImVec2& a_vSceneStartPos, const ImVec2& a_vSize)
+            {
+                ImGuiIO& io = ImGui::GetIO();
+                graphics::dx12::Camera& camera = core::EDITOR_ENGINE->GetEditor().GetEditorCamera();
+
+                DirectX::XMFLOAT3 position = camera.Transform().GetPosition();
+
+                ImVec2 imageMin = { a_vSceneStartPos.x + m_vPanOffset.x, a_vSceneStartPos.y + m_vPanOffset.y };
+                ImVec2 imageMax = imageMin + ImVec2(a_vSize.x * m_fZoom, a_vSize.y * m_fZoom);
+
+                ImVec2 mouse = io.MousePos;
+
+                // Persistent state for mouse look
+                static bool moving = false;
+                static POINT lastCursorPos;
+                static float yaw = 0.0f;
+                static float pitch = 0.0f;
+
+                if (ImGui::IsWindowHovered() &&
+                    mouse.x >= imageMin.x && mouse.y >= imageMin.y &&
+                    mouse.x <= imageMax.x && mouse.y <= imageMax.y)
+                {
+                    HWND hwnd = core::EDITOR_ENGINE->GetWindow().GetHWnd();
+
+                    // Right-click drag -> rotate
+                    if (ImGui::IsMouseDown(ImGuiMouseButton_Right))
+                    {
+                        if (!moving)
+                        {
+                            moving = true;
+                            ImGui::SetMouseCursor(ImGuiMouseCursor_None);
+
+                            // Cache current cursor
+                            GetCursorPos(&lastCursorPos);
+
+                            // Initialize yaw/pitch from camera once
+                            DirectX::XMFLOAT3 camRot = camera.Transform().GetRotation();
+                            pitch = camRot.x;
+                            yaw = camRot.y;
+                        }
+
+                        POINT currentPos;
+                        GetCursorPos(&currentPos);
+
+                        float deltaX = static_cast<float>(currentPos.x - lastCursorPos.x);
+                        float deltaY = static_cast<float>(currentPos.y - lastCursorPos.y);
+
+                        // Reset cursor so deltas stay per-frame
+                        SetCursorPos(lastCursorPos.x, lastCursorPos.y);
+
+                        // Apply rotation
+                        yaw += deltaX * 0.1f;
+                        pitch += deltaY * 0.1f;
+                        pitch = std::clamp(pitch, -89.0f, 89.0f);
+
+                        // Apply directly instead of AddRotation (avoids drift)
+                        camera.Transform().SetRotation({ pitch, yaw, 0.0f });
+                    }
+                    else
+                    {
+                        if (moving)
+                        {
+                            moving = false;
+                            ImGui::SetMouseCursor(ImGuiMouseCursor_Arrow);
+                        }
+                    }
+
+                    // WASD movement when moving
+                    if (moving)
+                    {
+                        using namespace DirectX;
+
+                        XMVECTOR forward = XMVector3Transform(
+                            FORWARD,
+                            XMMatrixRotationRollPitchYaw(
+                            XMConvertToRadians(pitch),
+                            XMConvertToRadians(yaw),
+                            0.0f
+                        )
+                        );
+
+                        XMVECTOR up = UP;
+                        XMVECTOR right = XMVector3Cross(forward, up);
+
+                        float baseMoveSpeed = 0.5f;
+                        if (ImGui::IsKeyDown(ImGuiKey_LeftShift))
+                        {
+                            baseMoveSpeed = 2.0f;
+                        }
+
+                        float moveSpeed = baseMoveSpeed * static_cast<float>(a_fDeltaTime);
+
+                        if (ImGui::IsKeyDown(ImGuiKey_W))
+                        {
+                            XMStoreFloat3(&position, XMLoadFloat3(&position) + forward * moveSpeed);
+                        }
+
+                        if (ImGui::IsKeyDown(ImGuiKey_S))
+                        {
+                            XMStoreFloat3(&position, XMLoadFloat3(&position) - forward * moveSpeed);
+                        }
+
+                        if (ImGui::IsKeyDown(ImGuiKey_A))
+                        {
+                            XMStoreFloat3(&position, XMLoadFloat3(&position) + right * moveSpeed);
+                        }
+
+                        if (ImGui::IsKeyDown(ImGuiKey_D))
+                        {
+                            XMStoreFloat3(&position, XMLoadFloat3(&position) - right * moveSpeed);
+                        }
+
+                        if (ImGui::IsKeyDown(ImGuiKey_Q))
+                        {
+                            XMStoreFloat3(&position, XMLoadFloat3(&position) - up * moveSpeed);
+                        }
+
+                        if (ImGui::IsKeyDown(ImGuiKey_E))
+                        {
+                            XMStoreFloat3(&position, XMLoadFloat3(&position) + up * moveSpeed);
+                        }
+                    }
+                }
+                else
+                {
+                    if (moving)
+                    {
+                        moving = false;
+                        ImGui::SetMouseCursor(ImGuiMouseCursor_Arrow);
+                    }
+                }
+
+                // Always apply position after rotation
+                camera.Transform().SetPosition(position);
+            }
+
+            //---------------------------------------------------------------------
             void SceneWindow::DrawComponentGizmos(const ImVec2& a_vSceneStartPos, const ImVec2& a_vSize)
             {
-                std::lock_guard<std::recursive_mutex> lock(core::EDITOR_ENGINE->GetECS().m_EntityMutex);
-
                 const HierarchyEntityUIView* entity = dynamic_cast<const HierarchyEntityUIView*>(core::EDITOR_ENGINE->GetEditor().GetSelectable().get());
                 if (!entity)
                 {
@@ -276,7 +439,7 @@ namespace gallus
                             core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
                         }
 
-                        bool isRotate = core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetLastSceneOperation() == ImGuizmo::ROTATE_Z;
+                        bool isRotate = core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetLastSceneOperation() == ImGuizmo::ROTATE;
                         if (ImGui::IconCheckboxButton(
                             ImGui::IMGUI_FORMAT_ID(font::ICON_ROTATE, BUTTON_ID, "ROTATE").c_str(),
                             &isRotate,
@@ -284,7 +447,7 @@ namespace gallus
                             m_Window.GetIconFont(),
                             isRotate ? ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent) : ImGui::GetStyleColorVec4(ImGuiCol_Text)))
                         {
-                            core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetLastSceneOperation((int) ImGuizmo::ROTATE_Z);
+                            core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetLastSceneOperation((int) ImGuizmo::ROTATE);
                             core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
                         }
 

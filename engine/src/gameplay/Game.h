@@ -68,6 +68,11 @@ namespace gallus
 			{
 				return m_Fps;
 			}
+
+			float GetDeltaTime() const
+			{
+				return m_fDeltaTime;
+			}
 		private:
 			/// <summary>
 			/// Callback for closing the window.
@@ -81,6 +86,7 @@ namespace gallus
 			bool m_bPaused = false;
 
 			float m_Fps;
+			float m_fDeltaTime;
 		};
 		inline extern Game GAME = {};
 	}

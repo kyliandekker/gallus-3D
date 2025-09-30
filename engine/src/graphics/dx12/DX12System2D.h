@@ -141,6 +141,15 @@ namespace gallus
 				{
 					return m_Camera;
 				}
+
+				/// <summary>
+				/// Retrieves the camera.
+				/// </summary>
+				/// <returns>Reference to the camera.</returns>
+				Camera& GetActiveCamera()
+				{
+					return *m_pActiveCamera;
+				}
 			protected:
 				bool Sleep() const override
 				{
@@ -323,6 +332,11 @@ namespace gallus
 					return m_FpsCounter;
 				}
 
+				void SetActiveCamera(Camera& a_Camera)
+				{
+					m_pActiveCamera = &a_Camera;
+				}
+
 				std::shared_ptr<Texture> GetRenderTexture();
 
 				SimpleEvent<DX12System2D&> m_eOnInitialize;
@@ -386,6 +400,7 @@ namespace gallus
 				FPSCounter m_FpsCounter;
 
 				Camera m_Camera;
+				Camera* m_pActiveCamera = &m_Camera;
 			};
 		}
 	}

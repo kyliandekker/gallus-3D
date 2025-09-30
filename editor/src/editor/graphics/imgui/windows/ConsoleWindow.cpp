@@ -27,7 +27,7 @@ namespace gallus
 			//---------------------------------------------------------------------
 			// ConsoleWindow
 			//---------------------------------------------------------------------
-			ConsoleWindow::ConsoleWindow(ImGuiWindow& a_Window) : BaseWindow(a_Window, ImGuiWindowFlags_NoCollapse, std::string(font::ICON_CONSOLE) + " Console", "Console"), m_SearchBar(a_Window)
+			ConsoleWindow::ConsoleWindow(ImGuiWindow& a_Window) : BaseWindow(a_Window, ImGuiWindowFlags_NoCollapse, std::string(font::ICON_CONSOLE) + " Console", "CONSOLE"), m_SearchBar(a_Window)
 			{
 				m_SearchBar.Initialize("");
 

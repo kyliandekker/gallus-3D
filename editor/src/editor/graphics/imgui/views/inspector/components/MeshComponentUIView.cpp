@@ -31,7 +31,7 @@ namespace gallus
 	{
 		namespace imgui
 		{
-			MeshComponentUIView::MeshComponentUIView(ImGuiWindow& a_Window, gameplay::MeshComponent& a_MeshComponent, gameplay::MeshSystem& a_System) : ComponentUIView(a_Window, a_MeshComponent, a_System), m_SizeView(a_Window)
+			MeshComponentUIView::MeshComponentUIView(ImGuiWindow& a_Window, gameplay::MeshComponent& a_MeshComponent, gameplay::MeshSystem& a_System) : ComponentUIView(a_Window, a_MeshComponent, a_System)
 			{
 			}
 

@@ -31,7 +31,7 @@ namespace gallus
 	{
 		namespace imgui
 		{
-			SpriteComponentUIView::SpriteComponentUIView(ImGuiWindow& a_Window, gameplay::SpriteComponent& a_SpriteComponent, gameplay::SpriteSystem& a_System) : ComponentUIView(a_Window, a_SpriteComponent, a_System), m_SizeView(a_Window)
+			SpriteComponentUIView::SpriteComponentUIView(ImGuiWindow& a_Window, gameplay::SpriteComponent& a_SpriteComponent, gameplay::SpriteSystem& a_System) : ComponentUIView(a_Window, a_SpriteComponent, a_System)
 			{
 				m_bShowPreview = true;
 				m_iPreviewPriority = 4;

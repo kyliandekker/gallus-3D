@@ -50,10 +50,6 @@ namespace gallus
 				/// <returns>The name of the UI component.</returns>
 				std::string GetName() const override;
 
-				/// UI elements for displaying and editing the position, rotation, and scale as glm::vec3.
-				IVector2View<DirectX::XMINT2>
-					m_SizeView;
-
 				char m_sPrefabName[128];
 				char m_sVertexShaderName[128];
 				char m_sTextureName[128];

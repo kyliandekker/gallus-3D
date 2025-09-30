@@ -111,8 +111,6 @@ namespace gallus
 			/// <param name="a_Allocator">The allocator used by the json document.</param>
 			void Deserialize(const rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator) override;
 		private:
-			bool CheckVisibility(const graphics::dx12::DX12Transform& a_Transform, const graphics::dx12::Camera& a_Camera);
-
 			graphics::dx12::Mesh* m_pMesh = nullptr;
 			graphics::dx12::DX12ShaderBind* m_pShaderBind = nullptr;
 			graphics::dx12::Texture* m_pTexture = nullptr;

@@ -24,12 +24,16 @@ namespace gallus
 		//---------------------------------------------------------------------
 		bool EntityComponentSystem::Destroy()
 		{
+			std::lock_guard<std::recursive_mutex> lock(m_EntityMutex);
+
 			for (AbstractECSSystem* system : m_aSystems)
 			{
 				system->Destroy();
 				delete system;
 			}
+
 			m_aSystems.clear();
+
 			LOG(LOGSEVERITY_SUCCESS, LOG_CATEGORY_ECS, "ECS destroyed.");
 			return System::Destroy();
 		}

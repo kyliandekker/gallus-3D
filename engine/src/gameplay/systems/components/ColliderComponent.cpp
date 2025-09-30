@@ -54,25 +54,25 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		void ColliderComponent::SetOffset(const DirectX::XMFLOAT2& a_vOffset)
+		void ColliderComponent::SetOffset(const DirectX::XMFLOAT3& a_vOffset)
 		{
 			m_vOffset = a_vOffset;
 		}
 
 		//---------------------------------------------------------------------
-		void ColliderComponent::SetSize(const DirectX::XMFLOAT2& a_vSize)
+		void ColliderComponent::SetSize(const DirectX::XMFLOAT3& a_vSize)
 		{
 			m_vSize = a_vSize;
 		}
 
 		//---------------------------------------------------------------------
-		const DirectX::XMFLOAT2& ColliderComponent::GetOffset() const
+		const DirectX::XMFLOAT3& ColliderComponent::GetOffset() const
 		{
 			return m_vOffset;
 		}
 
 		//---------------------------------------------------------------------
-		const DirectX::XMFLOAT2& ColliderComponent::GetSize() const
+		const DirectX::XMFLOAT3& ColliderComponent::GetSize() const
 		{
 			return m_vSize;
 		}

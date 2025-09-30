@@ -63,7 +63,13 @@ namespace gallus
 			{
 				ImGuizmo::BeginFrame();
 
-				ImGuizmo::SetOrthographic(false);
+				graphics::dx12::Camera* cam = &core::ENGINE->GetDX12().GetCamera();
+				if (!gameplay::GAME.IsStarted() && core::EDITOR_ENGINE->GetEditor().GetCameraMode() == editor::CameraMode::CAMERA_MODE_SCENE)
+				{
+					cam = &core::EDITOR_ENGINE->GetEditor().GetEditorCamera();
+				}
+
+				ImGuizmo::SetOrthographic(cam->GetCameraProjectionMode() == graphics::dx12::CameraProjectionMode::Orthographic);
 				ImGuizmo::SetDrawlist(ImGui::GetCurrentWindow()->DrawList);
 
 				ImGuizmo::SetRect(a_vScenePos.x + a_vPanOffset.x, a_vScenePos.y + a_vPanOffset.y, a_vSize.x * a_fZoom, a_vSize.y * a_fZoom);
@@ -72,13 +78,19 @@ namespace gallus
 			//---------------------------------------------------------------------
 			void ComponentBaseUIView::DrawTransformGizmo(graphics::dx12::DX12Transform& a_Transform, const ImVec2& a_vScenePos, const ImVec2& a_vSize, const ImVec2& a_vPanOffset, float a_fZoom)
 			{
-				DirectX::XMMATRIX pivotOffset = DirectX::XMMatrixTranslation(a_Transform.GetPivot().x, a_Transform.GetPivot().y, 0.0f);
+				DirectX::XMMATRIX pivotOffset = DirectX::XMMatrixTranslation(a_Transform.GetPivot().x, a_Transform.GetPivot().y, a_Transform.GetPivot().z);
 				DirectX::XMMATRIX objectMat = a_Transform.GetWorldMatrix();
-				objectMat = objectMat * pivotOffset;;
+				objectMat = objectMat * pivotOffset;
+
+				graphics::dx12::Camera* cam = &core::ENGINE->GetDX12().GetCamera();
+				if (!gameplay::GAME.IsStarted() && core::EDITOR_ENGINE->GetEditor().GetCameraMode() == editor::CameraMode::CAMERA_MODE_SCENE)
+				{
+					cam = &core::EDITOR_ENGINE->GetEditor().GetEditorCamera();
+				}
 
 				// Get transformation matrices
-				DirectX::XMMATRIX viewMat = core::EDITOR_ENGINE->GetDX12().GetCamera().GetViewMatrix();
-				const DirectX::XMMATRIX& projMat = core::EDITOR_ENGINE->GetDX12().GetCamera().GetProjectionMatrix();
+				DirectX::XMMATRIX viewMat = cam->GetViewMatrix();
+				const DirectX::XMMATRIX& projMat = cam->GetProjectionMatrix();
 
 				// Convert DirectX matrices to float[16] format for ImGuizmo
 				float objectFloat[16];
@@ -95,7 +107,7 @@ namespace gallus
 				}
 				if (ImGui::IsKeyPressed(ImGuiKey_R))
 				{
-					core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetLastSceneOperation((int) ImGuizmo::ROTATE_Z);
+					core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetLastSceneOperation((int) ImGuizmo::ROTATE);
 					core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
 				}
 				if (ImGui::IsKeyPressed(ImGuiKey_S))
@@ -112,7 +124,7 @@ namespace gallus
 					viewFloat,
 					projFloat,
 					(ImGuizmo::OPERATION) core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetLastSceneOperation(),
-					ImGuizmo::LOCAL,
+					ImGuizmo::WORLD,
 					objectFloat, 0, &snap))
 				{
 					DirectX::XMMATRIX result = DirectX::XMLoadFloat4x4(reinterpret_cast<DirectX::XMFLOAT4X4*>(objectFloat));

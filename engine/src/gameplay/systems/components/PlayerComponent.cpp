@@ -110,7 +110,7 @@ namespace gallus
 				gameplay::EntityID id = m_pPrefab.Instantiate();
 
 				ProjectileSystem& projectileSystem = core::ENGINE->GetECS().GetSystem<ProjectileSystem>();
-				projectileSystem.GetComponent(id).SetMovementSpeed({ bulletSpeed, 0 });
+				projectileSystem.GetComponent(id).SetMovementSpeed({ bulletSpeed, 0, 0 });
 
 				CollisionSystem& collisionSys = core::ENGINE->GetECS().GetSystem<CollisionSystem>();
 				collisionSys.GetComponent(m_EntityID).IgnoreEntity(id);
@@ -119,18 +119,13 @@ namespace gallus
 				auto pos = transformSys.GetComponent(m_EntityID).Transform().GetPosition();
 				TransformComponent& transformComp = transformSys.GetComponent(id);
 				transformComp.Transform().SetPosition(pos);
-
-				if (leftDown)
-				{
-					transformComp.Transform().SetRotation(180);
-				}
 			}
 
             MovementSystem& movementSys = core::ENGINE->GetECS().GetSystem<MovementSystem>();
 
             float deltaSpeed = m_fSpeed * a_fDeltaTime;
 
-            DirectX::XMFLOAT2 movement = { 0.0f, 0.0f };
+            DirectX::XMFLOAT3 movement = { 0.0f, 0.0f, 0.0f };
             if (w.isKey())
             {
                 movement.y -= 1.0f;

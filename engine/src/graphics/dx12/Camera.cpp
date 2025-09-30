@@ -16,17 +16,26 @@ namespace gallus
 			void Camera::Init(float a_fWidth, float a_fHeight)
 			{
 				m_vSize = { static_cast<int>(a_fWidth), static_cast<int>(a_fHeight) };
-				SetProjection(a_fWidth, a_fHeight, -1.0f, 1.0f);
+				SetProjectionMode(CameraProjectionMode::Perspective);
 			}
 
 			//---------------------------------------------------------------------
 			void Camera::SetProjection(float a_fWidth, float a_fHeight, float a_fNearPlane, float a_fFarPlane)
 			{
-				m_ProjectionMatrix = DirectX::XMMatrixOrthographicOffCenterLH(
-					0.0f, a_fWidth,
-					a_fHeight, 0.0f,
-					a_fNearPlane, a_fFarPlane
-				);
+				if (m_CameraProjectionMode == CameraProjectionMode::Orthographic)
+				{
+					m_ProjectionMatrix = DirectX::XMMatrixOrthographicOffCenterLH(
+						0.0f, a_fWidth,
+						a_fHeight, 0.0f,
+						0, a_fFarPlane
+					);
+				}
+				else
+				{
+					m_ProjectionMatrix = DirectX::XMMatrixPerspectiveFovLH(
+						DirectX::XMConvertToRadians(m_fFoV), a_fWidth / a_fHeight, a_fNearPlane, a_fFarPlane
+					);
+				}
 			}
 
 			//---------------------------------------------------------------------
@@ -44,15 +53,12 @@ namespace gallus
 			//---------------------------------------------------------------------
 			DirectX::XMMATRIX Camera::GetViewMatrix() const
 			{
-				const DirectX::XMFLOAT2& pos = m_Transform.GetPosition();
-				const float rotZ = DirectX::XMConvertToRadians(m_Transform.GetRotation());
-				const DirectX::XMFLOAT2& scale = m_Transform.GetScale();
+				const DirectX::XMFLOAT3& pos = m_Transform.GetPosition();
 
-				const DirectX::XMMATRIX translation = DirectX::XMMatrixTranslation(pos.x, pos.y, 0.0f);
-				const DirectX::XMMATRIX rotation = DirectX::XMMatrixRotationZ(rotZ);
-				const DirectX::XMMATRIX scaling = DirectX::XMMatrixScaling(scale.x, scale.y, 1.0f);
+				const DirectX::XMMATRIX translation = DirectX::XMMatrixTranslation(pos.x, pos.y, pos.z);
+				DirectX::XMMATRIX rotation = DirectX::XMMatrixRotationQuaternion(m_Transform.GetRotationQuaternion());
 
-				const DirectX::XMMATRIX world = scaling * rotation * translation;
+				const DirectX::XMMATRIX world = rotation * translation;
 
 				return DirectX::XMMatrixInverse(nullptr, world);
 			}
@@ -61,6 +67,24 @@ namespace gallus
 			const DirectX::XMMATRIX& Camera::GetProjectionMatrix() const
 			{
 				return m_ProjectionMatrix;
+			}
+
+			//---------------------------------------------------------------------
+			void Camera::SetProjectionMode(CameraProjectionMode a_CameraProjectionMode)
+			{
+				if (m_CameraProjectionMode == a_CameraProjectionMode)
+				{
+					return;
+				}
+
+				m_CameraProjectionMode = a_CameraProjectionMode;
+				SetProjection(m_vSize.x, m_vSize.y, 0.1f, 1000.0f);
+			}
+
+			//---------------------------------------------------------------------
+			CameraProjectionMode Camera::GetCameraProjectionMode() const
+			{
+				return m_CameraProjectionMode;
 			}
 		}
 	}

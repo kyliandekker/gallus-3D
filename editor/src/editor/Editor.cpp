@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include "core/Engine.h"
+
 #include "logger/Logger.h"
 
 namespace gallus
@@ -21,6 +23,8 @@ namespace gallus
 			m_CurrentScene.SetResourceCategory(core::EngineResourceCategory::Editor);
 
 			LOG(LOGSEVERITY_INFO, LOG_CATEGORY_EDITOR, "Initializing editor.");
+
+			m_EditorCamera.Init(core::ENGINE->GetDX12().GetCamera().GetSize().x, core::ENGINE->GetDX12().GetCamera().GetSize().y);
 
 			return ThreadedSystem::Initialize(a_bWait);
 		}

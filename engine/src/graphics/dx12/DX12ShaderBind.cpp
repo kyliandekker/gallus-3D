@@ -34,7 +34,7 @@ namespace gallus
 			bool DX12ShaderBind::CreatePipelineState()
 			{
 				CD3DX12_RASTERIZER_DESC rasterDesc(D3D12_DEFAULT);
-				rasterDesc.CullMode = D3D12_CULL_MODE_NONE;
+				rasterDesc.CullMode = D3D12_CULL_MODE_FRONT;
 
 				// Build the raw blend desc
 				D3D12_BLEND_DESC blendDesc = {};
@@ -44,7 +44,7 @@ namespace gallus
 				D3D12_RENDER_TARGET_BLEND_DESC rtBlendDesc = {};
 				rtBlendDesc.BlendEnable = TRUE;
 				rtBlendDesc.LogicOpEnable = FALSE;
-				rtBlendDesc.SrcBlend = D3D12_BLEND_ONE;                  // premultiplied alpha
+				rtBlendDesc.SrcBlend = D3D12_BLEND_ONE;
 				rtBlendDesc.DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
 				rtBlendDesc.BlendOp = D3D12_BLEND_OP_ADD;
 				rtBlendDesc.SrcBlendAlpha = D3D12_BLEND_ONE;

@@ -25,7 +25,7 @@ namespace gallus
 		{
 			constexpr float PREVIEW_SECTION_SIZE = 300;
 
-			InspectorWindow::InspectorWindow(ImGuiWindow& a_Window) : BaseWindow(a_Window, ImGuiWindowFlags_NoCollapse, std::string(font::ICON_CIRCLE_INFO) + " Inspector", "Inspector"), m_NameInput(a_Window)
+			InspectorWindow::InspectorWindow(ImGuiWindow& a_Window) : BaseWindow(a_Window, ImGuiWindowFlags_NoCollapse, std::string(font::ICON_CIRCLE_INFO) + " Inspector", "INSPECTOR"), m_NameInput(a_Window)
 			{
 				m_NameInput.Initialize("");
 			}

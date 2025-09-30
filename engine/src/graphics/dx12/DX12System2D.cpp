@@ -270,7 +270,7 @@ namespace gallus
 				Resize({}, m_vSize);
 
 				m_Camera.Init(RENDER_TEX_SIZE.x, RENDER_TEX_SIZE.y);
-				m_Camera.Transform().SetPosition({ 0.0f, 0.0f });
+				m_Camera.Transform().SetPosition({ 0.0f, 0.0f, 0.0f });
 				
 #ifndef IMGUI_DISABLE
 				m_ImGuiWindow.OnRenderTargetCreated(dCommandList);
@@ -754,11 +754,15 @@ namespace gallus
 				std::shared_ptr<CommandQueue> cCommandQueue = GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
 				std::shared_ptr<CommandList> cCommandList = cCommandQueue->GetCommandList();
 
-				for (auto& pair : core::ENGINE->GetECS().GetSystem<gameplay::MeshSystem>().GetComponents())
 				{
-					if (pair.second.GetMesh())
+					std::lock_guard<std::recursive_mutex> lock(core::ENGINE->GetECS().m_EntityMutex);
+
+					for (auto& pair : core::ENGINE->GetECS().GetSystem<gameplay::MeshSystem>().GetComponents())
 					{
-						pair.second.GetMesh()->UploadMesh(cCommandList);
+						if (pair.second.GetMesh())
+						{
+							pair.second.GetMesh()->UploadMesh(cCommandList);
+						}
 					}
 				}
 
@@ -865,6 +869,11 @@ namespace gallus
 			//---------------------------------------------------------------------
 			void DX12System2D::Render2D(std::shared_ptr<CommandQueue> a_pCommandQueue, std::shared_ptr<CommandList> a_pCommandList, D3D12_CPU_DESCRIPTOR_HANDLE a_RTVHandle)
 			{
+				if (!m_pActiveCamera)
+				{
+					return;
+				}
+
 				core::ENGINE->GetResourceAtlas().TransitionResources(a_pCommandList);
 				a_pCommandList->GetCommandList()->OMSetRenderTargets(1, &a_RTVHandle, FALSE, nullptr);
 				a_pCommandList->GetCommandList()->SetGraphicsRootSignature(m_pRootSignature.Get());
@@ -888,11 +897,11 @@ namespace gallus
 				std::lock_guard<std::recursive_mutex> lock(core::ENGINE->GetECS().m_EntityMutex);
 				for (auto& pair : core::ENGINE->GetECS().GetSystem<gameplay::SpriteSystem>().GetComponents())
 				{
-					pair.second.Render(a_pCommandList, pair.first, m_Camera);
+					pair.second.Render(a_pCommandList, pair.first, *m_pActiveCamera);
 				}
 				for (auto& pair : core::ENGINE->GetECS().GetSystem<gameplay::MeshSystem>().GetComponents())
 				{
-					pair.second.Render(a_pCommandList, pair.first, m_Camera);
+					pair.second.Render(a_pCommandList, pair.first, *m_pActiveCamera);
 				}
 
 				m_eOnRender(a_pCommandList);

@@ -31,7 +31,7 @@ namespace gallus
 	{
 		namespace imgui
 		{
-			ExplorerWindow::ExplorerWindow(ImGuiWindow& a_Window) : BaseWindow(a_Window, ImGuiWindowFlags_NoCollapse, std::string(font::ICON_FOLDER) + " Explorer", "Explorer"), m_SearchBar(a_Window)
+			ExplorerWindow::ExplorerWindow(ImGuiWindow& a_Window) : BaseWindow(a_Window, ImGuiWindowFlags_NoCollapse, std::string(font::ICON_FOLDER) + " Explorer", "EXPLORER"), m_SearchBar(a_Window)
 			{
 				m_SearchBar.Initialize("");
 			}

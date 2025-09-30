@@ -36,11 +36,12 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		void MovementComponent::Translate(const DirectX::XMFLOAT2& a_vTranslation)
+		void MovementComponent::Translate(const DirectX::XMFLOAT3& a_vTranslation)
 		{
             m_vTranslation = {
                 m_vTranslation.x + a_vTranslation.x,
-                m_vTranslation.y + a_vTranslation.y
+                m_vTranslation.y + a_vTranslation.y,
+                m_vTranslation.z + a_vTranslation.z
             };
 		}
 
@@ -61,8 +62,8 @@ namespace gallus
             }
 
             TransformComponent& transformComp = transformSys.GetComponent(ent->GetEntityID());
-            DirectX::XMFLOAT2 currentPos = transformComp.Transform().GetPosition();
-            DirectX::XMFLOAT2 newPos = currentPos;
+            DirectX::XMFLOAT3 currentPos = transformComp.Transform().GetPosition();
+            DirectX::XMFLOAT3 newPos = currentPos;
 
             if (!a_aColliders.contains(m_EntityID))
             {
@@ -91,30 +92,30 @@ namespace gallus
                 TransformComponent& otherTransform = transformSys.GetComponent(colliderPair.first);
 
                 // Test X movement
-                if (allowX)
-                {
-                    DirectX::XMFLOAT2 testPosX = { newPos.x + m_vTranslation.x, newPos.y };
-                    if (ColliderComponent::CheckCollision(
-                        playerCollider, testPosX, transformComp.Transform().GetScale(), transformComp.Transform().GetPivot(), transformComp.Transform().GetRotation(),
-                        otherCollider, otherTransform.Transform().GetPosition(), otherTransform.Transform().GetScale(), otherTransform.Transform().GetPivot(), otherTransform.Transform().GetRotation()))
-                    {
-                        core::ENGINE->GetECS().GetSystem<CollisionSystem>().Collide(playerCollider, otherCollider);
-                        allowX = false;
-                    }
-                }
+                //if (allowX)
+                //{
+                //    DirectX::XMFLOAT2 testPosX = { newPos.x + m_vTranslation.x, newPos.y };
+                //    if (ColliderComponent::CheckCollision(
+                //        playerCollider, testPosX, transformComp.Transform().GetScale(), transformComp.Transform().GetPivot(), transformComp.Transform().GetRotation(),
+                //        otherCollider, otherTransform.Transform().GetPosition(), otherTransform.Transform().GetScale(), otherTransform.Transform().GetPivot(), otherTransform.Transform().GetRotation()))
+                //    {
+                //        core::ENGINE->GetECS().GetSystem<CollisionSystem>().Collide(playerCollider, otherCollider);
+                //        allowX = false;
+                //    }
+                //}
 
-                // Test Y movement
-                if (allowY)
-                {
-                    DirectX::XMFLOAT2 testPosY = { newPos.x, newPos.y + m_vTranslation.y };
-                    if (ColliderComponent::CheckCollision(
-                        playerCollider, testPosY, transformComp.Transform().GetScale(), transformComp.Transform().GetPivot(), transformComp.Transform().GetRotation(),
-                        otherCollider, otherTransform.Transform().GetPosition(), otherTransform.Transform().GetScale(), otherTransform.Transform().GetPivot(), otherTransform.Transform().GetRotation()))
-                    {
-                        core::ENGINE->GetECS().GetSystem<CollisionSystem>().Collide(playerCollider, otherCollider);
-                        allowY = false;
-                    }
-                }
+                //// Test Y movement
+                //if (allowY)
+                //{
+                //    DirectX::XMFLOAT2 testPosY = { newPos.x, newPos.y + m_vTranslation.y };
+                //    if (ColliderComponent::CheckCollision(
+                //        playerCollider, testPosY, transformComp.Transform().GetScale(), transformComp.Transform().GetPivot(), transformComp.Transform().GetRotation(),
+                //        otherCollider, otherTransform.Transform().GetPosition(), otherTransform.Transform().GetScale(), otherTransform.Transform().GetPivot(), otherTransform.Transform().GetRotation()))
+                //    {
+                //        core::ENGINE->GetECS().GetSystem<CollisionSystem>().Collide(playerCollider, otherCollider);
+                //        allowY = false;
+                //    }
+                //}
 
                 if (!allowX && !allowY)
                 {

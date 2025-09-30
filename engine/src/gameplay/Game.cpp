@@ -85,6 +85,7 @@ namespace gallus
 
 				int updatesThisFrame = 0;
 
+				m_fDeltaTime = FIXED_TIMESTEP;
 				while (lag >= FIXED_TIMESTEP)
 				{
 					bool updateRealtime = m_bStarted && !m_bPaused;

@@ -50,7 +50,7 @@ namespace gallus
 				std::string GetName() const override;
 
 				/// UI elements for displaying and editing the position, rotation, and scale as glm::vec3.
-				Vector2View<DirectX::XMFLOAT2>
+				Vector3View<DirectX::XMFLOAT3>
 					m_OffsetView,
 					m_SizeView;
 
