@@ -14,6 +14,7 @@
 // graphics includes
 #include "graphics/dx12/HeapAllocation.h"
 #include "graphics/dx12/Camera.h"
+#include "graphics/dx12/DX12Resource.h"
 #ifndef IMGUI_DISABLE
 #include "graphics/imgui/ImGuiWindow.h"
 #endif // IMGUI_DISABLE
@@ -199,6 +200,11 @@ namespace gallus
 				void CreateSRV();
 
 				/// <summary>
+				/// Creates the DSV.
+				/// </summary>
+				void CreateDSV();
+
+				/// <summary>
 				/// Destroys the system, releasing resources and performing necessary cleanup.
 				/// </summary>
 				/// <returns>True if the destruction was successful, otherwise false.</returns>
@@ -219,6 +225,12 @@ namespace gallus
 				/// <param name="a_vPos">The position of the window.</param>
 				/// <param name="a_vSize">The size of the window.</param>
 				void Resize(const glm::ivec2& a_vPos, const glm::ivec2& a_vSize);
+
+				/// <summary>
+				/// Resizes the depth buffer.
+				/// </summary>
+				/// <param name="a_Size">The new size of the depth buffer.</param>
+				void ResizeDepthBuffer(const glm::ivec2& a_vSize);
 
 				/// <summary>
 				/// Retrieves the current back buffer.
@@ -284,6 +296,15 @@ namespace gallus
 				HeapAllocation& GetSRV()
 				{
 					return m_SRV;
+				};
+
+				/// <summary>
+				/// Retrieves the DSV heap.
+				/// </summary>
+				/// <returns>Reference to the DSV heap allocation.</returns>
+				HeapAllocation& GetDSV()
+				{
+					return m_DSV;
 				};
 
 				/// <summary>
@@ -371,6 +392,8 @@ namespace gallus
 				std::shared_ptr<CommandQueue> m_pDirectCommandQueue = nullptr;
 				std::shared_ptr<CommandQueue> m_pCopyCommandQueue = nullptr;
 
+				DX12Resource m_DepthBuffer;
+
 				HWND m_hWnd = nullptr;
 				win32::Window* m_pWindow = nullptr;
 
@@ -378,7 +401,8 @@ namespace gallus
 
 				HeapAllocation
 					m_SRV,
-					m_RTV;
+					m_RTV,
+					m_DSV;
 
 				Microsoft::WRL::ComPtr<ID3D12RootSignature> m_pRootSignature = nullptr;
 

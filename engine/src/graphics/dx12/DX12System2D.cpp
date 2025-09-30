@@ -27,21 +27,25 @@ namespace gallus
 		{
 			constexpr glm::ivec2 RENDER_TEX_SIZE = glm::ivec2(1920, 1080);
 
+			//---------------------------------------------------------------------
 			double FPSCounter::GetFPS() const
 			{
 				return m_FPS;
 			}
 
+			//---------------------------------------------------------------------
 			double FPSCounter::GetDeltaTime() const
 			{
 				return m_DeltaTime;
 			}
 
+			//---------------------------------------------------------------------
 			double FPSCounter::GetTotalTime() const
 			{
 				return m_TotalTime;
 			}
 
+			//---------------------------------------------------------------------
 			void FPSCounter::Update()
 			{
 				m_FrameCounter++;
@@ -63,6 +67,7 @@ namespace gallus
 				}
 			}
 
+			//---------------------------------------------------------------------
 			void FPSCounter::Initialize()
 			{
 				m_FPS = 0.0;
@@ -226,10 +231,6 @@ namespace gallus
 				std::shared_ptr<Texture> texture = core::ENGINE->GetResourceAtlas().LoadTexture("tex_missing.png", cCommandList); // Default texture.
 				texture->SetResourceCategory(core::EngineResourceCategory::Missing);
 				texture->SetIsDestroyable(false);
-
-				std::shared_ptr<Texture> logo = core::ENGINE->GetResourceAtlas().LoadTexture("icon.png", cCommandList); // Logo.
-				logo->SetResourceCategory(core::EngineResourceCategory::System);
-				logo->SetIsDestroyable(false);
 
 				std::shared_ptr<PixelShader> pixelShader = core::ENGINE->GetResourceAtlas().LoadPixelShader("pixelShader.hlsl"); // Default shader.
 				std::shared_ptr<VertexShader> vertexShader = core::ENGINE->GetResourceAtlas().LoadVertexShader("vertexShader.hlsl"); // Default shader.
@@ -514,6 +515,17 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
+			void DX12System2D::CreateDSV()
+			{
+				// Create the descriptor heap for the depth-stencil view.
+				D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc = {};
+				dsvHeapDesc.NumDescriptors = 1;
+				dsvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
+				dsvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+				m_DSV = HeapAllocation(dsvHeapDesc);
+			}
+
+			//---------------------------------------------------------------------
 			void DX12System2D::Finalize()
 			{
 				std::lock_guard<std::mutex> lock(m_RenderMutex);
@@ -576,6 +588,7 @@ namespace gallus
 			{
 				CreateRTV();
 				CreateSRV();
+				CreateDSV();
 
 				return true;
 			}
@@ -713,7 +726,46 @@ namespace gallus
 				m_Viewport = CD3DX12_VIEWPORT(0.0f, 0.0f, m_vSize.x, m_vSize.y);
 				m_ScissorRect = CD3DX12_RECT(0, 0, m_vSize.x, m_vSize.y);
 
+				ResizeDepthBuffer(RENDER_TEX_SIZE);
+
 				m_vSize = glm::vec2(a_vSize.x, a_vSize.y);
+			}
+
+			//---------------------------------------------------------------------
+			void DX12System2D::ResizeDepthBuffer(const glm::ivec2& a_vSize)
+			{
+				// Flush any GPU commands that might be referencing the depth buffer.
+				Flush();
+
+				{
+					m_DSV.Deallocate(0);
+
+					// Resize screen dependent resources.
+					// Create a depth buffer.
+					D3D12_CLEAR_VALUE optimizedClearValue = {};
+					optimizedClearValue.Format = DXGI_FORMAT_D32_FLOAT;
+					optimizedClearValue.DepthStencil = { 1.0f, 0 };
+
+					CD3DX12_HEAP_PROPERTIES heapType = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
+					CD3DX12_RESOURCE_DESC tex = CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_D32_FLOAT, a_vSize.x, a_vSize.y,
+						1, 0, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL);
+
+					if (!m_DepthBuffer.CreateResource(tex, "Depth Buffer", CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_RESOURCE_STATE_DEPTH_WRITE, &optimizedClearValue))
+					{
+						LOG(LOGSEVERITY_ERROR, LOG_CATEGORY_DX12, "Failed creating committed resource.");
+						return;
+					}
+
+					// Update the depth-stencil view.
+					D3D12_DEPTH_STENCIL_VIEW_DESC dsv = {};
+					dsv.Format = DXGI_FORMAT_D32_FLOAT;
+					dsv.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+					dsv.Texture2D.MipSlice = 0;
+					dsv.Flags = D3D12_DSV_FLAG_NONE;
+
+					m_pDevice->CreateDepthStencilView(m_DepthBuffer.GetResource().Get(), &dsv,
+						m_DSV.GetCPUHandle(m_DSV.Allocate()));
+				}
 			}
 
 			//---------------------------------------------------------------------
@@ -774,14 +826,15 @@ namespace gallus
 				auto commandQueue = GetCommandQueue(D3D12_COMMAND_LIST_TYPE_DIRECT);
 				auto commandList = commandQueue->GetCommandList();
 
-				auto backBuffer = GetCurrentBackBuffer();
+				auto& backBuffer = GetCurrentBackBuffer();
 				UINT backIndex = GetCurrentBackBufferIndex();
 				const FLOAT clearColor[] = { 0, 0, 0, 1 };
 
 				// Keep RTV handles outside of scopes
 				D3D12_CPU_DESCRIPTOR_HANDLE backRtv;  // For back buffer
 
-				// 1. Render 2D scene into RenderTexture
+				auto dsv = m_DSV.GetCPUDescriptorHandleForHeapStart();
+
 				if (m_pRenderTexture->CanBeDrawn())
 				{
 					// Transition RenderTexture -> RTV
@@ -789,8 +842,9 @@ namespace gallus
 
 					// Render onto the render tex rtv (true arg does this).
 					D3D12_CPU_DESCRIPTOR_HANDLE rtRtv = GetCurrentRenderTargetView(true);
+					commandList->GetCommandList()->ClearDepthStencilView(dsv, D3D12_CLEAR_FLAG_DEPTH, 1.0, 0, 0, nullptr);
 					commandList->GetCommandList()->ClearRenderTargetView(rtRtv, clearColor, 0, nullptr);
-					commandList->GetCommandList()->OMSetRenderTargets(1, &rtRtv, FALSE, nullptr);
+					commandList->GetCommandList()->OMSetRenderTargets(1, &rtRtv, FALSE, &dsv);
 
 					Render2D(commandQueue, commandList, rtRtv);
 
@@ -801,10 +855,10 @@ namespace gallus
 
 				// back buffer rtv.
 				backRtv = GetCurrentRenderTargetView(false);
+				commandList->GetCommandList()->ClearDepthStencilView(dsv, D3D12_CLEAR_FLAG_DEPTH, 1.0, 0, 0, nullptr);
 				commandList->GetCommandList()->ClearRenderTargetView(backRtv, clearColor, 0, nullptr);
-				commandList->GetCommandList()->OMSetRenderTargets(1, &backRtv, FALSE, nullptr);
+				commandList->GetCommandList()->OMSetRenderTargets(1, &backRtv, FALSE, &dsv);
 #ifndef _EDITOR
-				// 1. Render RenderTexture onto quad.
 				if (m_pRenderTexture->CanBeDrawn())
 				{
 					// Bind pipeline + root signature
@@ -875,7 +929,7 @@ namespace gallus
 				}
 
 				core::ENGINE->GetResourceAtlas().TransitionResources(a_pCommandList);
-				a_pCommandList->GetCommandList()->OMSetRenderTargets(1, &a_RTVHandle, FALSE, nullptr);
+
 				a_pCommandList->GetCommandList()->SetGraphicsRootSignature(m_pRootSignature.Get());
 
 				D3D12_VIEWPORT rtViewport{};
