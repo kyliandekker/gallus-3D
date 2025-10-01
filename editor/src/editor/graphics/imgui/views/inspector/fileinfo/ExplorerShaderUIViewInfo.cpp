@@ -9,6 +9,9 @@
 // graphics includes
 #include "graphics/imgui/ImGuiWindow.h"
 
+// resources includes
+#include "resources/metadata/MetaData.h"
+
 // editor includes
 #include "resources/FileResource.h"
 #include "editor/graphics/imgui/views/ExplorerFileUIView.h"

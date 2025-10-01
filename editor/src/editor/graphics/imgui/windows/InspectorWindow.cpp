@@ -11,7 +11,7 @@
 #include "graphics/imgui/font_icon.h"
 
 // editor includes
-#include "editor/graphics/imgui/views/inspector/InspectorView.h"
+#include "editor/graphics/imgui/views/inspector/InspectorUIView.h"
 #include "editor/core/EditorEngine.h"
 
 // gameplay includes
@@ -53,7 +53,7 @@ namespace gallus
 
 				std::lock_guard<std::mutex> lock(core::EDITOR_ENGINE->GetEditor().m_EditorMutex);
 
-				InspectorView* inspectorView = core::EDITOR_ENGINE->GetEditor().GetInspectorView();
+				InspectorUIView* inspectorView = core::EDITOR_ENGINE->GetEditor().GetInspectorView();
 				if (!inspectorView)
 				{
 					return;

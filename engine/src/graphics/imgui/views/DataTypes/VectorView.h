@@ -62,7 +62,7 @@ namespace gallus
 				/// Renders the 2D vector as draggable float inputs in ImGui (X and Y components).
 				/// </summary>
 				/// <param name="a_sLabel">The label displayed next to the input fields.</param>
-				virtual uint8_t Render(const char* a_sLabel, float a_fSpeed = 1.0f, float a_fMin = std::numeric_limits<float>::min(), float a_fMax = std::numeric_limits<float>::max())
+				virtual uint8_t Render(const char* a_sLabel, float a_fSpeed = 0.05f, float a_fMin = std::numeric_limits<float>::min(), float a_fMax = std::numeric_limits<float>::max())
 				{
 					ImGui::AlignTextToFramePadding();
 					ImGui::Text("X");
@@ -105,7 +105,7 @@ namespace gallus
 				/// Renders the 3D vector as draggable float inputs in ImGui (X, Y and Z components).
 				/// </summary>
 				/// <param name="a_Label">The label displayed next to the input fields.</param>
-				uint8_t Render(const char* a_sLabel, float a_fSpeed = 1.0f, float a_fMin = -90000, float a_fMax = std::numeric_limits<float>::max()) override
+				uint8_t Render(const char* a_sLabel, float a_fSpeed = 0.05f, float a_fMin = -90000, float a_fMax = std::numeric_limits<float>::max()) override
 				{
 					uint8_t changedValueXY = Vector2View<T>::Render(a_sLabel, a_fSpeed, a_fMin, a_fMax);
 

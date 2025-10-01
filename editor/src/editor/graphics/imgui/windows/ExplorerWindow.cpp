@@ -16,11 +16,14 @@
 #include "graphics/imgui/ImGuiWindow.h"
 #include "graphics/imgui/font_icon.h"
 
+// resources includes
+#include "resources/metadata/MetaData.h"
+
 // editor includes
 #include "editor/core/EditorEngine.h"
 #include "resources/FileResource.h"
 #include "editor/graphics/imgui/views/ExplorerFileUIView.h"
-#include "editor/graphics/imgui/views/inspector/ExplorerFileInspectorView.h"
+#include "editor/graphics/imgui/views/inspector/ExplorerFileInspectorUIView.h"
 
 // game includes
 #include "gameplay/Game.h"
@@ -317,7 +320,7 @@ namespace gallus
 
 								if (clicked)
 								{
-									core::EDITOR_ENGINE->GetEditor().SetSelectable(view, new ExplorerFileInspectorView(m_Window, *view));
+									core::EDITOR_ENGINE->GetEditor().SetSelectable(view, new ExplorerFileInspectorUIView(m_Window, *view));
 								}
 							}
 						}
@@ -342,7 +345,7 @@ namespace gallus
 
 			void ExplorerWindow::SetSelectable(ExplorerFileUIView* a_pView)
 			{
-				core::EDITOR_ENGINE->GetEditor().SetSelectable(a_pView, a_pView ? new ExplorerFileInspectorView(m_Window, *a_pView) : nullptr);
+				core::EDITOR_ENGINE->GetEditor().SetSelectable(a_pView, a_pView ? new ExplorerFileInspectorUIView(m_Window, *a_pView) : nullptr);
 			}
 
 			void ExplorerWindow::OnScanCompleted()

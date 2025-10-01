@@ -16,7 +16,8 @@
 
 // editor includes
 #include "editor/core/EditorEngine.h"
-#include "editor/graphics/imgui/views/inspector/EntityInspectorView.h"
+#include "editor/graphics/imgui/views/inspector/EntityInspectorUIView.h"
+#include "editor/graphics/imgui/views/inspector/CameraInspectorUIView.h"
 
 // game includes
 #include "gameplay/Game.h"
@@ -30,9 +31,12 @@ namespace gallus
 			//---------------------------------------------------------------------
 			// HierarchyWindow
 			//---------------------------------------------------------------------
-			HierarchyWindow::HierarchyWindow(ImGuiWindow& a_Window) : BaseWindow(a_Window, ImGuiWindowFlags_NoCollapse, std::string(font::ICON_LIST) + " Hierarchy", "Hierarchy"), m_SearchBar(a_Window)
+			HierarchyWindow::HierarchyWindow(ImGuiWindow& a_Window) : BaseWindow(a_Window, ImGuiWindowFlags_NoCollapse, std::string(font::ICON_LIST) + " Hierarchy", "Hierarchy"), m_SearchBar(a_Window), m_CameraHierarchyUIView(a_Window)
 			{
 				m_SearchBar.Initialize("");
+
+				m_CameraHierarchyUIView.SetName("Camera");
+				m_CameraHierarchyUIView.SetIcon(font::ICON_CAMERA);
 			}
 
 			//---------------------------------------------------------------------
@@ -223,6 +227,20 @@ namespace gallus
 					))
 				{
 					ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+
+					{
+						bool
+							clicked = false,
+							right_clicked = false;
+
+						m_CameraHierarchyUIView.RenderInHierarchy(clicked, right_clicked, core::EDITOR_ENGINE->GetEditor().GetSelectable().get() == &m_CameraHierarchyUIView);
+
+						if (clicked)
+						{
+							core::EDITOR_ENGINE->GetEditor().SetSelectable(&m_CameraHierarchyUIView, new CameraInspectorUIView(m_Window, m_CameraHierarchyUIView));
+						}
+					}
+
 					for (HierarchyEntityUIView* view : m_aFilteredEntities)
 					{
 						if (!view)
@@ -234,7 +252,7 @@ namespace gallus
 							clicked = false,
 							right_clicked = false;
 
-						view->RenderEntity(
+						view->RenderInHierarchy(
 							clicked,
 							right_clicked,
 							core::EDITOR_ENGINE->GetEditor().GetSelectable().get() == view
@@ -277,7 +295,7 @@ namespace gallus
 			//---------------------------------------------------------------------
 			void HierarchyWindow::SetSelectable(HierarchyEntityUIView* a_EntityView)
 			{
-				core::EDITOR_ENGINE->GetEditor().SetSelectable(a_EntityView, a_EntityView ? new EntityInspectorView(m_Window, *a_EntityView) : nullptr);
+				core::EDITOR_ENGINE->GetEditor().SetSelectable(a_EntityView, a_EntityView ? new EntityInspectorUIView(m_Window, *a_EntityView) : nullptr);
 			}
 
 			//---------------------------------------------------------------------

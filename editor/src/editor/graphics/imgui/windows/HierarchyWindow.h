@@ -92,6 +92,8 @@ namespace gallus
 				std::vector<HierarchyEntityUIView*> m_aFilteredEntities; /// List of entities shown in the hierarchy window.
 				std::vector<std::string> m_aEntityIcons; /// List of entities shown in the hierarchy window.
 
+				HierarchyUIView m_CameraHierarchyUIView;
+
 				SearchBarInput m_SearchBar; /// Search bar to filter specific messages in the hierarchy window.
 			};
 		}

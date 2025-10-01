@@ -23,6 +23,9 @@
 #include "audio/ChunkFilter.h"
 #include "audio/AudioUtils.h"
 
+// resources includes
+#include "resources/metadata/MetaData.h"
+
 // editor includes
 #include "resources/FileResource.h"
 #include "editor/graphics/imgui/views/ExplorerFileUIView.h"

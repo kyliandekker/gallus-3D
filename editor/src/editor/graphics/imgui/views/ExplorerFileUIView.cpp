@@ -5,9 +5,14 @@
 
 #include <imgui/imgui_helpers.h>
 
-#include "resources/FileResource.h"
+// graphics includes
 #include "graphics/imgui/ImGuiWindow.h"
 #include "graphics/imgui/font_icon.h"
+
+// resources includes
+#include "resources/metadata/MetaData.h"
+#include "resources/FileResource.h"
+
 #include "resources/AssetType.h"
 
 namespace gallus

@@ -3,12 +3,9 @@
 
 #pragma once
 
-#include "graphics/imgui/views/ImGuiUIView.h"
+#include "editor/graphics/imgui/views/HierarchyUIView.h"
 
 #include <string>
-
-// editor includes
-#include "editor/graphics/imgui/EditorSelectable.h"
 
 namespace gallus
 {
@@ -22,7 +19,7 @@ namespace gallus
 		{
 			class ImGuiWindow;
 
-			class HierarchyEntityUIView : public ImGuiUIView, public EditorSelectable
+			class HierarchyEntityUIView : public HierarchyUIView
 			{
 			public:
 				HierarchyEntityUIView(ImGuiWindow& a_Window, gameplay::EntityID& a_EntityID);
@@ -33,10 +30,7 @@ namespace gallus
 				/// <param name="a_bClicked">Reference to a boolean indicating if the entity was clicked.</param>
 				/// <param name="a_bDoubleClicked">Reference to a boolean indicating if the entity was double clicked.</param>
 				/// <param name="a_bSelected">Boolean indicating if the entity is currently selected.</param>
-				void RenderEntity(bool& a_bClicked, bool& a_bDoubleClicked, bool a_bSelected);
-
-				void Render() override
-				{}
+				void RenderInHierarchy(bool& a_bClicked, bool& a_bDoubleClicked, bool a_bSelected) override;
 
 				gameplay::EntityID& GetEntityID()
 				{
@@ -47,14 +41,8 @@ namespace gallus
 				{
 					return m_EntityID;
 				}
-
-				const std::string& GetIcon()
-				{
-					return m_sIcon;
-				}
 			private:
 				gameplay::EntityID& m_EntityID;
-				std::string m_sIcon;
 			};
 		}
 	}

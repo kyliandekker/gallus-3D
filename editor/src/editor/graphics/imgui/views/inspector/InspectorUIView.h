@@ -18,17 +18,17 @@ namespace gallus
 			/// <summary>
 			/// Abstract class for items that will be viewable in the inspector.
 			/// </summary>
-			class InspectorView : public ImGuiUIView
+			class InspectorUIView : public ImGuiUIView
 			{
 			public:
 				/// <summary>
 				/// Constructs an inspector view.
 				/// </summary>
 				/// <param name="a_Window">The ImGui window for rendering the view.</param>
-				InspectorView(ImGuiWindow& a_Window) : ImGuiUIView(a_Window)
+				InspectorUIView(ImGuiWindow& a_Window) : ImGuiUIView(a_Window)
 				{}
 
-				virtual ~InspectorView() = default;
+				virtual ~InspectorUIView() = default;
 
 				virtual void OnRename(const std::string& a_sName)
 				{}

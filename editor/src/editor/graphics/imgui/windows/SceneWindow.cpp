@@ -15,7 +15,7 @@
 // editor includes
 #include "editor/core/EditorEngine.h"
 #include "editor/graphics/imgui/views/HierarchyEntityUIView.h"
-#include "editor/graphics/imgui/views/inspector/EntityInspectorView.h"
+#include "editor/graphics/imgui/views/inspector/EntityInspectorUIView.h"
 #include "editor/graphics/imgui/views/inspector/components/ComponentUIView.h"
 
 // gameplay includes
@@ -375,7 +375,7 @@ namespace gallus
                     return;
                 }
 
-                EntityInspectorView* entityInspectorView = dynamic_cast<EntityInspectorView*>(core::EDITOR_ENGINE->GetEditor().GetInspectorView());
+                EntityInspectorUIView* entityInspectorView = dynamic_cast<EntityInspectorUIView*>(core::EDITOR_ENGINE->GetEditor().GetInspectorView());
                 if (!entityInspectorView)
                 {
                     return;

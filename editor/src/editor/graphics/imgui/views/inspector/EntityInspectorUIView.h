@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "editor/graphics/imgui/views/inspector/InspectorView.h"
+#include "editor/graphics/imgui/views/inspector/InspectorUIView.h"
 
 #include <string>
 #include <vector>
@@ -26,17 +26,17 @@ namespace gallus
 			/// <summary>
 			/// Class that displays entities in the inspector.
 			/// </summary>
-			class EntityInspectorView : public InspectorView
+			class EntityInspectorUIView : public InspectorUIView
 			{
 			public:
-				~EntityInspectorView();
+				~EntityInspectorUIView();
 
 				/// <summary>
 				/// Constructs an inspector view.
 				/// </summary>
 				/// <param name="a_Window">The ImGui window for rendering the view.</param>
 				/// <param name="a_HierarchyEntityUIView">The entity that will be shown in the view.</param>
-				EntityInspectorView(ImGuiWindow& a_Window, HierarchyEntityUIView& a_HierarchyEntityUIView);
+				EntityInspectorUIView(ImGuiWindow& a_Window, HierarchyEntityUIView& a_HierarchyEntityUIView);
 
 				void OnRename(const std::string& a_sName) override;
 

@@ -19,8 +19,11 @@
 #include "graphics/dx12/CommandList.h"
 #include "graphics/dx12/Texture.h"
 
-// graphics includes
+// resources includes
+#include "resources/metadata/MetaData.h"
 #include "resources/FileResource.h"
+
+// graphics includes
 #include "editor/graphics/imgui/views/ExplorerFileUIView.h"
 
 namespace gallus
