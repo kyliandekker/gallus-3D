@@ -1,16 +1,17 @@
 #ifndef IMGUI_DISABLE
 #ifdef _EDITOR
 
+// header
 #include "ExplorerFileInspectorUIView.h"
 
-// utils includes
-#include "utils/file_abstractions.h"
-
-// resource includes
+// resource
 #include "resources/metadata/MetaData.h"
 #include "resources/AssetType.h"
 
-// editor includes
+// utils
+#include "utils/file_abstractions.h"
+
+// editor
 #include "editor/core/EditorEngine.h"
 #include "resources/FileResource.h"
 #include "editor/graphics/imgui/views/ExplorerFileUIView.h"

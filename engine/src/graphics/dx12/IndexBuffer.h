@@ -1,5 +1,6 @@
 #pragma once
 
+// base class
 #include "graphics/dx12/Buffer.h"
 
 namespace gallus

@@ -3,14 +3,19 @@
 
 #pragma once
 
+// base class
 #include "graphics/imgui/modals/BaseModal.h"
 
+// external
 #include <string>
 #include <vector>
 #include <functional>
 #include <memory>
 
+// graphics
 #include "graphics/imgui/views/DataTypes/StringTextInput.h"
+
+// resources
 #include "resources/AssetType.h"
 
 namespace gallus

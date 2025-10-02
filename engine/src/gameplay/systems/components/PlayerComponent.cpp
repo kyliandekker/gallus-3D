@@ -1,11 +1,13 @@
-#include "gameplay/systems/components/PlayerComponent.h"
+// header
+#include "PlayerComponent.h"
 
+// external
 #include <rapidjson/utils.h>
 
-// engine includes
+// engine
 #include "core/Engine.h"
 
-// gameplay includes
+// gameplay
 #include "gameplay/Entity.h"
 #include "gameplay/systems/MovementSystem.h"
 #include "gameplay/systems/TransformSystem.h"

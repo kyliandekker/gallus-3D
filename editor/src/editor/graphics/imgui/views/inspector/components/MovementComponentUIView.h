@@ -3,9 +3,10 @@
 
 #pragma once
 
+// base class
 #include "ComponentUIView.h"
 
-// gameplay includes
+// gameplay
 #include "gameplay/systems/MovementSystem.h"
 #include "gameplay/systems/components/MovementComponent.h"
 

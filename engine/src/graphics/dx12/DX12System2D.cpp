@@ -1,12 +1,10 @@
+// header
 #include "DX12System2D.h"
 
-// core includes
+// core
 #include "core/Engine.h"
 
-// logger includes
-#include "logger/Logger.h"
-
-// graphics includes
+// graphics
 #include "graphics/win32/Window.h"
 #include "graphics/dx12/CommandQueue.h"
 #include "graphics/dx12/CommandList.h"
@@ -15,7 +13,10 @@
 #include "graphics/dx12/Texture.h"
 #include "graphics/dx12/Mesh.h"
 
-// gameplay includes
+// logger
+#include "logger/Logger.h"
+
+// gameplay
 #include "gameplay/systems/SpriteSystem.h"
 #include "gameplay/systems/MeshSystem.h"
 

@@ -1,8 +1,10 @@
 #pragma once
 
+// external
 #include <string>
 #include <filesystem>
 
+// resources
 #include "resources/AssetType.h"
 
 namespace gallus

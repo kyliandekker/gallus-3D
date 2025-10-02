@@ -1,8 +1,10 @@
 #ifndef IMGUI_DISABLE
 #ifdef _EDITOR
 
+// header
 #include "PlayerComponentUIView.h"
 
+// external
 #include <imgui/imgui_helpers.h>
 #include <imgui/ImGuizmo.h>
 #include <imgui/imgui_internal.h>
@@ -11,17 +13,17 @@
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/prettywriter.h>
 
-// graphics includes
+// graphics
 #include "graphics/imgui/font_icon.h"
 #include "graphics/imgui/ImGuiWindow.h"
 
-// editor includes
+// editor
 #include "editor/core/EditorEngine.h"
 #include "resources/AssetType.h"
 #include "resources/FileResource.h"
 #include "editor/graphics/imgui/modals/FilePickerModal.h"
 
-// gameplay includes
+// gameplay
 #include "gameplay/systems/components/PlayerComponent.h"
 #include "gameplay/systems/PlayerSystem.h"
 #include "gameplay/Game.h"

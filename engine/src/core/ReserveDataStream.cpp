@@ -1,9 +1,11 @@
-#include "core/ReserveDataStream.h"
+// header
+#include "ReserveDataStream.h"
 
+// external
 #include <vcruntime_string.h>
 #include <corecrt_malloc.h>
 
-// core includes
+// core
 #include "core/Memory.h"
 
 namespace gallus

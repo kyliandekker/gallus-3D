@@ -1,15 +1,17 @@
 #ifndef IMGUI_DISABLE
 #ifdef _EDITOR
 
+// header
 #include "HealthComponentUIView.h"
 
+// external
 #include <imgui/imgui_helpers.h>
 
-// graphics includes
+// graphics
 #include "graphics/imgui/font_icon.h"
 #include "graphics/imgui/ImGuiWindow.h"
 
-// gameplay includes
+// gameplay
 #include "gameplay/Game.h"
 
 namespace gallus

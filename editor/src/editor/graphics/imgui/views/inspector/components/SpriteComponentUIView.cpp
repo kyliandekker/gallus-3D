@@ -1,12 +1,14 @@
 #ifndef IMGUI_DISABLE
 #ifdef _EDITOR
 
+// header
 #include "SpriteComponentUIView.h"
 
+// external
 #include <imgui/imgui_helpers.h>
 #include <imgui/imgui_internal.h>
 
-// graphics includes
+// graphics
 #include "graphics/dx12/Mesh.h"
 #include "graphics/dx12/Texture.h"
 #include "graphics/dx12/Shader.h"
@@ -15,13 +17,13 @@
 #include "graphics/dx12/CommandQueue.h"
 #include "graphics/imgui/font_icon.h"
 
-// editor includes
+// editor
 #include "editor/core/EditorEngine.h"
 #include "resources/AssetType.h"
 #include "resources/FileResource.h"
 #include "editor/graphics/imgui/modals/FilePickerModal.h"
 
-// gameplay includes
+// gameplay
 #include "gameplay/Game.h"
 #include "gameplay/systems/TransformSystem.h"
 
@@ -178,40 +180,6 @@ namespace gallus
 			std::string SpriteComponentUIView::GetName() const
 			{
 				return m_System.GetSystemName();
-			}
-
-			void SpriteComponentUIView::RenderComponentGizmos(const ImVec2& a_vScenePos, const ImVec2& a_vSize, const ImVec2& a_vPanOffset, float a_fZoom)
-			{
-				if (!core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetDrawBounds())
-				{
-					return;
-				}
-
-				ImDrawList* drawList = ImGui::GetWindowDrawList();
-				ImVec2 mouseScreen = ImGui::GetMousePos();
-
-				std::lock_guard<std::recursive_mutex> lock(core::EDITOR_ENGINE->GetECS().m_EntityMutex);
-
-				if (!core::EDITOR_ENGINE->GetECS().GetSystem<gameplay::TransformSystem>().HasComponent(m_Component.GetEntityID()))
-				{
-					return;
-				}
-
-				auto& transform = core::EDITOR_ENGINE->GetECS().GetSystem<gameplay::TransformSystem>().GetComponent(m_Component.GetEntityID());
-
-				std::array<DirectX::XMFLOAT2, 4> worldCorners =
-					transform.Transform().GetWorldCorners();
-
-				ImVec2 corners[4];
-				for (int i = 0; i < 4; ++i)
-				{
-					corners[i] = a_vScenePos + a_vPanOffset +
-						ImVec2(worldCorners[i].x * a_fZoom,
-							worldCorners[i].y * a_fZoom);
-				}
-
-				// Draw bounding box polyline
-				drawList->AddPolyline(corners, 4, IM_COL32(255, 255, 255, 155), true, 2.0f);
 			}
 
 			void SpriteComponentUIView::RenderPreview()

@@ -1,17 +1,18 @@
 #pragma once
 
+// base class
 #include "core/System.h"
 
-// std::is_base_of
-#include <type_traits> 
+// external
+#include <type_traits> // std::is_base_of
 #include <map>
 #include <string>
 #include <vector>
 
-// core includes
+// core
 #include "core/Engine.h"
 
-// gameplay includes
+// gameplay
 #include "gameplay/EntityID.h"
 #include "gameplay/systems/components/Component.h"
 

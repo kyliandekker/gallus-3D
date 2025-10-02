@@ -1,17 +1,18 @@
 #pragma once
 
+// external
 #include <string>
 #include <vector>
 #include <shtypes.h>
-#include <filesystem>
+
+// utils
+#include "utils/FILEPCH.h"
 
 #if defined(CreateDirectory)
 #undef CreateDirectory
 #undef CreateDirectoryA
 #undef CreateDirectoryW
 #endif
-
-namespace fs = std::filesystem;
 
 namespace gallus
 {

@@ -1,18 +1,20 @@
+#pragma once
+
 #ifndef IMGUI_DISABLE
 #ifdef _EDITOR
 
-#pragma once
-
+// base class
 #include "graphics/imgui/views/ImGuiUIView.h"
 
+// external
 #include <imgui/imgui.h>
 #include <string>
 #include <vector>
 
-// utils includes
-#include "utils/file_abstractions.h"
+// utils
+#include "utils/FILEPCH.h"
 
-// editor includes
+// editor
 #include "editor/graphics/imgui/EditorSelectable.h"
 
 namespace gallus

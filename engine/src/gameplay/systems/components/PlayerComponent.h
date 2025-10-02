@@ -1,9 +1,12 @@
 #pragma once
 
+// base class
 #include "gameplay/systems/components/Component.h"
 
+// external
 #include <map>
 
+// gameplay
 #include "gameplay/Prefab.h"
 
 namespace gallus

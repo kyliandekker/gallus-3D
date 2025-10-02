@@ -1,8 +1,9 @@
 #pragma once
 
+// base class
 #include "core/System.h"
 
-// gameplay includes
+// gameplay
 #include "gameplay/Scene.h"
 
 namespace gallus

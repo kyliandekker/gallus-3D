@@ -3,16 +3,18 @@
 
 #pragma once
 
+// base class
 #include "graphics/imgui/windows/BaseWindow.h"
 
+// external
 #include <vector>
 #include <string>
 #include <memory>
 
-// graphics includes
+// graphics
 #include "graphics/imgui/views/DataTypes/StringTextInput.h"
 
-// editor includes
+// editor
 #include "editor/graphics/imgui/views/ExplorerFileUIView.h"
 
 namespace gallus

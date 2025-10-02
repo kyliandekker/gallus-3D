@@ -1,15 +1,15 @@
 #pragma once
 
+// base class
+#include "core/EngineResource.h"
+
+// external
 #include <rapidjson/document.h>
 #include <string>
 
-// core includes
+// core
 #include "core/Data.h"
 #include "core/Observable.h"
-#include "core/EngineResource.h"
-
-// utils includes
-#include "utils/file_abstractions.h"
 
 #define JSON_SCENE_ENTITIES_VAR "entities"
 #define JSON_SCENE_ENTITIES_VAR_NAME "name"

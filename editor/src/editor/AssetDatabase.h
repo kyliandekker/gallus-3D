@@ -2,10 +2,13 @@
 
 #ifdef _EDITOR
 
+// base class
+#include "core/System.h"
+
+// external
 #include <string>
 
-#include "resources/FileResource.h"
-#include "core/System.h"
+// core
 #include "core/Event.h"
 
 namespace gallus

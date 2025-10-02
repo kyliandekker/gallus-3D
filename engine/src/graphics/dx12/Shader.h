@@ -1,13 +1,17 @@
 #pragma once
 
-#include "graphics/dx12/DX12PCH.h"
+// base class
 #include "core/EngineResource.h"
 
+// external
 #include <string>
 #include <wrl.h>
 
-// utils includes
-#include "utils/file_abstractions.h"
+// graphics
+#include "graphics/dx12/DX12PCH.h"
+
+// utils
+#include "utils/FILEPCH.h"
 
 namespace gallus
 {
@@ -42,7 +46,7 @@ namespace gallus
 				static Microsoft::WRL::ComPtr<ID3DBlob> CompileShader(const fs::path& a_sFilePath, const std::string& a_sEntryPoint, const std::string& a_sTarget);
 
 				/// <summary>
-				/// Loads and compiles shaders using logical resource names, resolving them through the engine’s resource system.
+				/// Loads and compiles shaders using logical resource names, resolving them through the engineï¿½s resource system.
 				/// </summary>
 				/// <param name="a_sShader">The resource name of the shader.</param>
 				/// <returns>True if loading and compilation were successful, false otherwise.</returns>
@@ -83,7 +87,7 @@ namespace gallus
 				PixelShader() = default;
 
 				/// <summary>
-				/// Loads and compiles shaders using logical resource names, resolving them through the engine’s resource system.
+				/// Loads and compiles shaders using logical resource names, resolving them through the engineï¿½s resource system.
 				/// </summary>
 				/// <param name="a_sShader">The resource name of the pixel shader.</param>
 				/// <returns>True if loading and compilation were successful, false otherwise.</returns>
@@ -108,7 +112,7 @@ namespace gallus
 				VertexShader() = default;
 
 				/// <summary>
-				/// Loads and compiles shaders using logical resource names, resolving them through the engine’s resource system.
+				/// Loads and compiles shaders using logical resource names, resolving them through the engineï¿½s resource system.
 				/// </summary>
 				/// <param name="a_sShader">The resource name of the vertex shader.</param>
 				/// <returns>True if loading and compilation were successful, false otherwise.</returns>

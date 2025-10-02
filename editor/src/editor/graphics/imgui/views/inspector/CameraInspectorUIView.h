@@ -3,19 +3,26 @@
 
 #pragma once
 
+// base class
 #include "editor/graphics/imgui/views/inspector/InspectorUIView.h"
 
+// external
 #include <string>
 #include <vector>
+#include <DirectXMath.h>
 
-// graphics includes
+// graphics
 #include "graphics/imgui/views/DataTypes/VectorView.h"
-#include "graphics/dx12/DX12PCH.h"
+#include "graphics/imgui/views/DataTypes/StringDropdown.h"
 
 namespace gallus
 {
 	namespace graphics
 	{
+		namespace dx12
+		{
+			enum class CameraProjectionMode;
+		}
 		namespace imgui
 		{
 			class ImGuiWindow;
@@ -49,6 +56,8 @@ namespace gallus
 				Vector3View<DirectX::XMFLOAT3>
 					m_PositionView,
 					m_RotationView;
+
+				StringDropdown<graphics::dx12::CameraProjectionMode> m_CameraProjectionModeDropdown;
 			};
 		}
 	}

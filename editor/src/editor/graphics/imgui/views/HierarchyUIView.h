@@ -3,11 +3,13 @@
 
 #pragma once
 
+// base class
 #include "graphics/imgui/views/ImGuiUIView.h"
 
+// external
 #include <string>
 
-// editor includes
+// editor
 #include "editor/graphics/imgui/EditorSelectable.h"
 
 namespace gallus

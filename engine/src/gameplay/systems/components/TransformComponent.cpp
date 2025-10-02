@@ -1,5 +1,7 @@
-﻿#include "gameplay/systems/components/TransformComponent.h"
+﻿// header
+#include "TransformComponent.h"
 
+// external
 #include <rapidjson/utils.h>
 #include <DirectXMath.h>
 

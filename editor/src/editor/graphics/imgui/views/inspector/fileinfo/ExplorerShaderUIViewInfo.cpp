@@ -1,19 +1,21 @@
 ﻿#ifndef IMGUI_DISABLE
 #ifdef _EDITOR
 
+// header
 #include "ExplorerShaderUIViewInfo.h"
 
+// external
 #include <imgui/imgui.h>
 #include <imgui/imgui_helpers.h>
 
-// graphics includes
+// graphics
 #include "graphics/imgui/ImGuiWindow.h"
 
-// resources includes
+// resources
 #include "resources/metadata/MetaData.h"
-
-// editor includes
 #include "resources/FileResource.h"
+
+// editor
 #include "editor/graphics/imgui/views/ExplorerFileUIView.h"
 
 namespace gallus

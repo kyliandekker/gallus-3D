@@ -1,10 +1,12 @@
-#include "utils/file_abstractions.h"
+// header
+#include "file_abstractions.h"
 
+// external
 #include <vector>
 #include <windows.h>
 #include <ShlObj_core.h>
 
-// core includes
+// core
 #include "core/DataStream.h"
 
 namespace gallus

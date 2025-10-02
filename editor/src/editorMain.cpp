@@ -3,21 +3,18 @@
 #include <filesystem>
 #include <ShellScalingApi.h>
 
-// core includes
+// core
 #include "resource.h"
 #include "core/ArgProcessor.h"
 
-// logger includes
-#include "logger/Logger.h"
-
-// utils includes
-#include "utils/file_abstractions.h"
-
-// graphics includes
+// graphics
 #include "graphics/imgui/windows/MainWindowDock.h"
 
-// gameplay includes
-#include "gameplay/Game.h"
+// logger
+#include "logger/Logger.h"
+
+// utils
+#include "utils/file_abstractions.h"
 
 // editor includes
 #include "editor/core/EditorEngine.h"
@@ -27,9 +24,11 @@
 #include "editor/graphics/imgui/windows/ExplorerWindow.h"
 #include "editor/graphics/imgui/windows/InspectorWindow.h"
 #include "editor/graphics/imgui/windows/ResourcesWindow.h"
-
 #include "editor/graphics/imgui/modals/FilePickerModal.h"
 #include "editor/graphics/imgui/modals/SpriteEditorModal.h"
+
+// gameplay
+#include "gameplay/Game.h"
 
 int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR lpCmdLine, _In_ int nShowCmd)
 {

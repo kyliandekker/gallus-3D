@@ -3,9 +3,8 @@
 
 #pragma once
 
+// base class
 #include "graphics/imgui/windows/BaseWindow.h"
-
-#include <imgui\ImGuizmo.h>
 
 namespace gallus
 {

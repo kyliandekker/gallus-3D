@@ -1,14 +1,19 @@
 #pragma once
 
-#include "graphics/dx12/DX12PCH.h"
+// base class
 #include "core/System.h"
 
+// external
 #include <vector>
 #include <memory>
 
-#include "utils/file_abstractions.h"
-
+// resources
 #include "resources/FileResource.h"
+
+// utils
+#include "utils/FILEPCH.h"
+
+struct D3D12_RESOURCE_DESC;
 
 namespace gallus
 {

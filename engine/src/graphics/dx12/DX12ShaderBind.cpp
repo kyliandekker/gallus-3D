@@ -1,14 +1,15 @@
-﻿#include "DX12ShaderBind.h"
+﻿// header
+#include "DX12ShaderBind.h"
 
-// core includes
+// core
 #include "core/Engine.h"
 
-// logger includes
-#include "logger/Logger.h"
-
-// graphics includes
+// graphics
 #include "graphics/dx12/CommandList.h"
 #include "graphics/dx12/Shader.h"
+
+// logger
+#include "logger/Logger.h"
 
 namespace gallus
 {

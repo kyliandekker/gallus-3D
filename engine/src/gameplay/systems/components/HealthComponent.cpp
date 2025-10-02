@@ -1,10 +1,13 @@
-#include "gameplay/systems/components/HealthComponent.h"
+// header
+#include "HealthComponent.h"
 
+// external
 #include <rapidjson/utils.h>
 
 #define JSON_HEALTH_COMPONENT_HEALTH_VAR "health"
 #define JSON_HEALTH_COMPONENT_MAX_HEALTH_VAR "maxHealth"
 
+// core
 #include "core/Engine.h"
 
 namespace gallus

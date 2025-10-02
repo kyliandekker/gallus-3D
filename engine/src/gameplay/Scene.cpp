@@ -1,17 +1,22 @@
+// header
 #include "Scene.h"
 
+// external
 #include <rapidjson/utils.h>
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/prettywriter.h>
 
-// core includes
+// core
 #include "core/Engine.h"
 #include "core/DataStream.h"
 
-// logger includes
+// logger
 #include "logger/Logger.h"
 
-// gameplay includes
+// utils
+#include "utils/file_abstractions.h"
+
+// gameplay
 #include "gameplay/ECSBaseSystem.h"
 
 namespace gallus

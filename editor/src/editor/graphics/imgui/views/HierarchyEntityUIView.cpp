@@ -1,20 +1,22 @@
 #ifndef IMGUI_DISABLE
 #ifdef _EDITOR
 
+// header
 #include "HierarchyEntityUIView.h"
 
+// external
 #include <imgui/imgui_helpers.h>
 
-// utils includes
-#include "utils/string_extensions.h"
-
-// graphics includes
+// graphics
 #include "graphics/imgui/font_icon.h"
 
-// editor includes
+// utils
+#include "utils/string_extensions.h"
+
+// editor
 #include "editor/core/EditorEngine.h"
 
-// gameplay includes
+// gameplay
 #include "gameplay/systems/MeshSystem.h"
 #include "gameplay/systems/SpriteSystem.h"
 #include "gameplay/systems/TransformSystem.h"

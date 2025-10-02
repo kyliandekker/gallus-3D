@@ -1,7 +1,11 @@
+// header
 #include "AssetDatabase.h"
 
-#include "logger/Logger.h"
+// core
 #include "core/EditorEngine.h"
+
+// logger
+#include "logger/Logger.h"
 
 namespace gallus
 {

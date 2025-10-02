@@ -1,29 +1,31 @@
 #ifndef IMGUI_DISABLE
 #ifdef _EDITOR
 
+// header
 #include "FilePickerModal.h"
 
+// external
 #include <imgui/imgui.h>
 #include <imgui/imgui_helpers.h>
 
-// core includes
+// core
 #include "editor/core/EditorEngine.h"
 
-// utils includes
-#include "utils/string_extensions.h"
-
-// graphics includes
+// graphics
 #include "graphics/imgui/font_icon.h"
 #include "graphics/imgui/ImGuiWindow.h"
 #include "graphics/dx12/CommandQueue.h"
 #include "graphics/dx12/CommandList.h"
 #include "graphics/dx12/Texture.h"
 
-// resources includes
+// resources
 #include "resources/metadata/MetaData.h"
 #include "resources/FileResource.h"
 
-// graphics includes
+// utils
+#include "utils/string_extensions.h"
+
+// editor
 #include "editor/graphics/imgui/views/ExplorerFileUIView.h"
 
 namespace gallus

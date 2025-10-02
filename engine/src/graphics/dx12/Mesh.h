@@ -1,20 +1,22 @@
 #pragma once
 
-#include "graphics/dx12/DX12PCH.h"
+// base class
 #include "graphics/dx12/DX12Resource.h"
 
+// external
 #include <string>
 #include <vector>
 #include <cstdint>
 #include <memory>
 
-// utils includes
-#include "utils/file_abstractions.h"
-
-// graphics includes
+// graphics
+#include "graphics/dx12/DX12PCH.h"
 #include "graphics/dx12/DX12Transform.h"
 #include "graphics/dx12/IndexBuffer.h"
 #include "graphics/dx12/VertexBuffer.h"
+
+// utils
+#include "utils/FILEPCH.h"
 
 namespace gallus
 {

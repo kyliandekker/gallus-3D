@@ -1,14 +1,15 @@
+#pragma once
+
 #ifndef IMGUI_DISABLE
 #ifdef _EDITOR
 
-#pragma once
-
+// base class
 #include "ComponentUIView.h"
 
-// graphics includes
+// graphics
 #include "graphics/imgui/views/DataTypes/VectorView.h"
 
-// gameplay includes
+// gameplay
 #include "gameplay/systems/CollisionSystem.h"
 #include "gameplay/systems/components/ColliderComponent.h"
 

@@ -3,18 +3,20 @@
 
 #pragma once
 
+// base class
 #include "graphics/imgui/windows/BaseWindow.h"
 
+// external
 #include <vector>
 
-// graphics includes
+// graphics
 #include "graphics/imgui/views/DataTypes/StringTextInput.h"
 
-// gameplay includes
-#include "gameplay/EntityID.h"
-
-// editor includes
+// editor
 #include "editor/graphics/imgui/views/HierarchyEntityUIView.h"
+
+// gameplay
+#include "gameplay/EntityID.h"
 
 namespace gallus
 {

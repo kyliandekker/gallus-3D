@@ -1,24 +1,26 @@
 #ifndef IMGUI_DISABLE
 #ifdef _EDITOR
 
+// header
 #include "SceneWindow.h"
 
+// external
 #include <imgui/imgui_helpers.h>
 #include <imgui/imgui_internal.h>
 #include <imgui/ImGuizmo.h>
 
-// graphics includes
+// graphics
 #include "graphics/imgui/font_icon.h"
 #include "graphics/imgui/ImGuiWindow.h"
 #include "graphics/dx12/Texture.h"
 
-// editor includes
+// editor
 #include "editor/core/EditorEngine.h"
 #include "editor/graphics/imgui/views/HierarchyEntityUIView.h"
 #include "editor/graphics/imgui/views/inspector/EntityInspectorUIView.h"
 #include "editor/graphics/imgui/views/inspector/components/ComponentUIView.h"
 
-// gameplay includes
+// gameplay
 #include "gameplay/Game.h"
 
 namespace gallus

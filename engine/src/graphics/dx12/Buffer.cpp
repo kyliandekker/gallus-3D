@@ -1,4 +1,5 @@
-#include "graphics/dx12/Buffer.h"
+// header
+#include "Buffer.h"
 
 namespace gallus
 {

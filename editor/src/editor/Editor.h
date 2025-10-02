@@ -1,16 +1,22 @@
 #pragma once
 
+// base class
 #include "core/System.h"
 
+// external
 #include <string>
 
+// core
 #include "core/Observable.h"
 
+// graphics
 #include "graphics/dx12/Camera.h"
 
+// editor
 #include "editor/EditorSettings.h"
 #include "editor/AssetDatabase.h"
 
+// gameplay
 #include "gameplay/Scene.h"
 #include "gameplay/Prefab.h"
 

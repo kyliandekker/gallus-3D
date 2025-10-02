@@ -1,16 +1,18 @@
 #ifndef IMGUI_DISABLE
 #ifdef _EDITOR
 
+// header
 #include "ColliderComponentUIView.h"
 
+// external
 #include <imgui/imgui_helpers.h>
 #include <imgui/imgui_internal.h>
 
-// graphics includes
+// graphics
 #include "graphics/imgui/font_icon.h"
 #include "graphics/imgui/ImGuiWindow.h"
 
-// gameplay includes
+// gameplay
 #include "gameplay/Game.h"
 #include "gameplay/systems/TransformSystem.h"
 

@@ -1,26 +1,25 @@
 #pragma once
 
-#include "DX12PCH.h"
+// base class
 #include "core/System.h"
 
+// external
 #include <glm/vec2.hpp>
 #include <memory>
 #include <mutex>
 #include <chrono>
 
-// core includes
+// core
 #include "core/Event.h"
 
-// graphics includes
+// graphics
+#include "DX12PCH.h"
 #include "graphics/dx12/HeapAllocation.h"
 #include "graphics/dx12/Camera.h"
 #include "graphics/dx12/DX12Resource.h"
 #ifndef IMGUI_DISABLE
 #include "graphics/imgui/ImGuiWindow.h"
 #endif // IMGUI_DISABLE
-
-// gameplay includes
-#include "gameplay/systems/components/SpriteComponent.h"
 
 #undef min
 #undef max

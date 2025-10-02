@@ -1,12 +1,13 @@
-#include "gameplay/systems/MovementSystem.h"
+// header
+#include "MovementSystem.h"
 
-// logger includes
-#include "logger/Logger.h"
-
-// graphics includes
+// graphics
 #include "graphics/imgui/font_icon.h"
 
-// gameplay includes
+// logger
+#include "logger/Logger.h"
+
+// gameplay
 #include "gameplay/systems/CollisionSystem.h"
 
 namespace gallus

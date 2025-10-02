@@ -1,16 +1,18 @@
 #ifndef IMGUI_DISABLE
 #ifdef _EDITOR
 
+// header
 #include "HierarchyUIView.h"
 
+// external
 #include <imgui/imgui_helpers.h>
 
-// utils includes
-#include "utils/string_extensions.h"
-
-// graphics includes
+// graphics
 #include "graphics/imgui/font_icon.h"
 #include "graphics/imgui/ImGuiWindow.h"
+
+// utils
+#include "utils/string_extensions.h"
 
 namespace gallus
 {

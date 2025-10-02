@@ -1,9 +1,10 @@
+// header
 #include "gameplay/systems/components/MeshComponent.h"
 
-// core includes
+// core
 #include "core/Engine.h"
 
-// graphics includes
+// graphics
 #include "graphics/dx12/Texture.h"
 #include "graphics/dx12/Mesh.h"
 #include "graphics/dx12/DX12ShaderBind.h"
@@ -12,7 +13,7 @@
 #include "graphics/dx12/CommandList.h"
 #include "graphics/dx12/CommandQueue.h"
 
-// gameplay includes
+// gameplay
 #include "gameplay/systems/TransformSystem.h"
 
 #define JSON_SPRITE_COMPONENT_TEX_VAR "texture"

@@ -1,11 +1,12 @@
-﻿#include "ResourceAtlas.h"
+﻿// header
+#include "ResourceAtlas.h"
 
+// external
 #include <algorithm>
 
+// core
 #include "core/Data.h"
 #include "core/ArgProcessor.h"
-
-#include "logger/Logger.h"
 
 // graphics includes
 #include "graphics/dx12/Texture.h"
@@ -14,6 +15,10 @@
 #include "graphics/dx12/Mesh.h"
 #include "graphics/dx12/CommandList.h"
 
+// logger
+#include "logger/Logger.h"
+
+// gameplay
 #include "gameplay/Scene.h"
 #include "gameplay/Prefab.h"
 

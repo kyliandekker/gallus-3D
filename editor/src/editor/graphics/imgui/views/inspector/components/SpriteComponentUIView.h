@@ -3,14 +3,16 @@
 
 #pragma once
 
+// base class
 #include "ComponentUIView.h"
 
+// external
 #include <DirectXMath.h>
 
-// graphics includes
+// graphics
 #include "graphics/imgui/views/DataTypes/VectorView.h"
 
-// gameplay includes
+// gameplay
 #include "gameplay/systems/SpriteSystem.h"
 #include "gameplay/systems/components/SpriteComponent.h"
 
@@ -40,8 +42,6 @@ namespace gallus
 				SpriteComponentUIView(ImGuiWindow& a_Window, gameplay::SpriteComponent& a_SpriteComponent, gameplay::SpriteSystem& a_System);
 
 				void RenderPreview() override;
-
-				void RenderComponentGizmos(const ImVec2& a_vScenePos, const ImVec2& a_vSize, const ImVec2& a_vPanOffset, float a_fZoom) override;
 			private:
 				/// <summary>
 				/// Render the inner part of the UI, including position, rotation, scale, and color.

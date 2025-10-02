@@ -1,7 +1,9 @@
 #ifndef IMGUI_DISABLE
 
+// header
 #include "MainWindowPanel.h"
 
+// external
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
 #include <imgui/imgui_helpers.h>

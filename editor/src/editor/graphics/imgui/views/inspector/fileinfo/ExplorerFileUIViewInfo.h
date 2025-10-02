@@ -1,8 +1,9 @@
+#pragma once
+
 #ifndef IMGUI_DISABLE
 #ifdef _EDITOR
 
-#pragma once
-
+// base class
 #include "graphics/imgui/views/ImGuiUIView.h"
 
 namespace gallus

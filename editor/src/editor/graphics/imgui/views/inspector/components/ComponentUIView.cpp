@@ -1,8 +1,10 @@
 #ifndef IMGUI_DISABLE
 #ifdef _EDITOR
 
+// header
 #include "ComponentUIView.h"
 
+// external
 #include <imgui/imgui_helpers.h>
 #include <imgui/imgui_internal.h>
 #include <imgui/ImGuizmo.h>
@@ -11,11 +13,14 @@
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/prettywriter.h>
 
-#include "utils/string_extensions.h"
-
+// graphics
 #include "graphics/imgui/font_icon.h"
 #include "graphics/imgui/ImGuiWindow.h"
 
+// utils
+#include "utils/string_extensions.h"
+
+// gameplay
 #include "gameplay/ECSBaseSystem.h"
 #include "gameplay/systems/components/Component.h"
 #include "gameplay/Game.h"

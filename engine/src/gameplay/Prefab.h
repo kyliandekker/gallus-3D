@@ -1,7 +1,9 @@
 #pragma once
 
+// base class
 #include "gameplay/Scene.h"
 
+// gameplay
 #include "gameplay/EntityID.h"
 
 namespace gallus

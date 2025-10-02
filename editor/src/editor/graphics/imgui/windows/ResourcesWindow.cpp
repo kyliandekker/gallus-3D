@@ -1,14 +1,13 @@
 #ifndef IMGUI_DISABLE
 #ifdef _EDITOR
 
+// header
 #include "ResourcesWindow.h"
 
+// external
 #include <imgui/imgui_helpers.h>
 
-// utils includes
-#include "utils/string_extensions.h"
-
-// graphics includes
+// graphics
 #include "graphics/imgui/font_icon.h"
 #include "graphics/imgui/ImGuiWindow.h"
 #include "graphics/dx12/Texture.h"
@@ -16,7 +15,10 @@
 #include "graphics/dx12/Shader.h"
 #include "graphics/dx12/DX12ShaderBind.h"
 
-// editor includes
+// utils
+#include "utils/string_extensions.h"
+
+// editor
 #include "editor/core/EditorEngine.h"
 
 // game includes

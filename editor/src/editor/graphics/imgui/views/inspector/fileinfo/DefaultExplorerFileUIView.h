@@ -3,8 +3,10 @@
 
 #pragma once
 
+// base class
 #include "ExplorerFileUIViewInfo.h"
 
+// external
 #include <memory>
 
 namespace gallus

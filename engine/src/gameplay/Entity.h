@@ -1,8 +1,9 @@
 #pragma once
 
+// external
 #include <string>
 
-// gameplay includes
+// gameplay
 #include "gameplay/EntityID.h"
 
 namespace gallus

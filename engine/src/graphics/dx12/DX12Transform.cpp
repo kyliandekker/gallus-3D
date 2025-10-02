@@ -1,5 +1,7 @@
-﻿#include "DX12Transform.h"
+﻿// header
+#include "DX12Transform.h"
 
+// external
 #include <iostream>
 
 namespace gallus

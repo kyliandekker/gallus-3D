@@ -1,7 +1,10 @@
-#include "gameplay/systems/components/MovementComponent.h"
+// header
+#include "MovementComponent.h"
 
+// external
 #include <rapidjson/utils.h>
 
+// gameplay
 #include "gameplay/systems/TransformSystem.h"
 #include "gameplay/systems/CollisionSystem.h"
 

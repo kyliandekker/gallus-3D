@@ -1,12 +1,13 @@
+// header
 #include "gameplay/EntityComponentSystem.h"
 
-// logger includes
-#include "logger/Logger.h"
-
-// gameplay includes
+// gameplay
 #include "gameplay/ECSBaseSystem.h"
 #include "gameplay/systems/TransformSystem.h"
 #include "gameplay/systems/SpriteSystem.h"
+
+// logger
+#include "logger/Logger.h"
 
 namespace gallus
 {

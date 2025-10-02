@@ -1,9 +1,11 @@
 #pragma once
 
-#include "DX12PCH.h"
-
+// external
 #include <vector>
 #include <mutex>
+
+// graphics
+#include "graphics/dx12/DX12PCH.h"
 
 namespace gallus
 {

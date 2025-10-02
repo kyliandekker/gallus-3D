@@ -3,14 +3,16 @@
 
 #pragma once
 
+// base class
 #include "ComponentUIView.h"
 
+// external
 #include <DirectXMath.h>
 
-// graphics includes
+// graphics
 #include "graphics/imgui/views/DataTypes/VectorView.h"
 
-// gameplay includes
+// gameplay
 #include "gameplay/systems/TransformSystem.h"
 #include "gameplay/systems/components/TransformComponent.h"
 

@@ -1,8 +1,10 @@
 #ifndef IMGUI_DISABLE
 #ifdef _EDITOR
 
+// header
 #include "TransformComponentUIView.h"
 
+// external
 #include <imgui/imgui_helpers.h>
 #include <imgui/ImGuizmo.h>
 #include <rapidjson/document.h>
@@ -10,11 +12,11 @@
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/prettywriter.h>
 
-// graphics includes
+// graphics
 #include "graphics/imgui/font_icon.h"
 #include "graphics/imgui/ImGuiWindow.h"
 
-// gameplay includes
+// gameplay
 #include "gameplay/Game.h"
 
 namespace gallus

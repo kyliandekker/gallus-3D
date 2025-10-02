@@ -1,8 +1,9 @@
 #pragma once
 
+// base class
 #include "gameplay/systems/components/Component.h"
 
-// graphics includes
+// graphics
 #include "graphics/dx12/DX12Transform.h"
 
 namespace gallus

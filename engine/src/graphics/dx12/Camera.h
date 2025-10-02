@@ -1,8 +1,8 @@
 #pragma once
 
-#include "DX12PCH.h"
+#include <string>
 
-// graphics includes
+// graphics
 #include "graphics/dx12/DX12Transform.h"
 
 namespace gallus
@@ -17,6 +17,22 @@ namespace gallus
 				Perspective,
 				Orthographic,
 			};
+
+			inline std::string CameraProjectionModeToString(CameraProjectionMode a_CameraProjectionMode)
+			{
+				switch (a_CameraProjectionMode)
+				{
+					case CameraProjectionMode::Perspective:
+					{
+						return "Perspective";
+					}
+					case CameraProjectionMode::Orthographic:
+					{
+						return "Orthographic";
+					}
+				}
+				return "";
+			}
 
 			//---------------------------------------------------------------------
 			// Camera

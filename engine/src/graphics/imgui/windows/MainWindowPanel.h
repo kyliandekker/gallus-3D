@@ -2,6 +2,7 @@
 
 #pragma once
 
+// base class
 #include "BaseWindow.h"
 
 namespace gallus

@@ -1,12 +1,14 @@
 #ifdef _EDITOR
 
-#include "graphics/imgui/modals/BaseModal.h"
+// header
+#include "BaseModal.h"
 
+// external
 #include <imgui/imgui.h>
 #include <imgui/imgui_helpers.h>
 #include <imgui/imgui_internal.h>
 
-// graphics includes
+// graphics
 #include "graphics/imgui/ImGuiWindow.h"
 
 namespace gallus

@@ -1,5 +1,7 @@
-﻿#include "gameplay/systems/components/ColliderComponent.h"
+﻿// header
+#include "ColliderComponent.h"
 
+// external
 #include <rapidjson/utils.h>
 
 #define JSON_COLLIDER_COMPONENT_OFFSET_VAR "offset"

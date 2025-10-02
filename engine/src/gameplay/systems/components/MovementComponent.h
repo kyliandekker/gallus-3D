@@ -1,7 +1,9 @@
 #pragma once
 
+// base class
 #include "gameplay/systems/components/Component.h"
 
+// external
 #include <DirectXMath.h>
 #include <map>
 

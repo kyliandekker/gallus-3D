@@ -1,32 +1,34 @@
 #ifndef IMGUI_DISABLE
 #ifdef _EDITOR
 
+// header
 #include "ExplorerAudioUIViewInfo.h"
 
+// external
 #include <imgui/imgui.h>
 #include <imgui/imgui_helpers.h>
 #include <imgui/implot.h>
 
-// core includes
+// core
 #include "core/Data.h"
 
-// logger includes
-#include "logger/Logger.h"
-
-// graphics includes
+// graphics
 #include "graphics/imgui/ImGuiWindow.h"
 
-// audio includes
+// audio
 #include "audio/WaveReader.h"
 #include "audio/ChunkCollection.h"
 #include "audio/WaveChunks.h"
 #include "audio/ChunkFilter.h"
 #include "audio/AudioUtils.h"
 
-// resources includes
+// resources
 #include "resources/metadata/MetaData.h"
 
-// editor includes
+// logger
+#include "logger/Logger.h"
+
+// editor
 #include "resources/FileResource.h"
 #include "editor/graphics/imgui/views/ExplorerFileUIView.h"
 

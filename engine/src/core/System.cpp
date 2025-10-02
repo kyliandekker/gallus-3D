@@ -1,6 +1,7 @@
-#include "core/System.h"
+// header
+#include "System.h"
 
-// logger includes
+// logger
 #include "logger/Logger.h"
 
 namespace gallus

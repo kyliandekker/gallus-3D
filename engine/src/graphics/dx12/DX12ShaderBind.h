@@ -1,10 +1,13 @@
 #pragma once
 
-#include "graphics/dx12/DX12PCH.h"
+// base class
 #include "core/EngineResource.h"
 
+// external
 #include <wrl.h>
 #include <memory>
+
+struct ID3D12PipelineState;
 
 namespace gallus
 {

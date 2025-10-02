@@ -1,13 +1,11 @@
 #ifndef IMGUI_DISABLE
 #ifdef _EDITOR
 
+// header
 #include "ExplorerWindow.h"
 
+// external
 #include <imgui/imgui_helpers.h>
-
-// utils includes
-#include "utils/string_extensions.h"
-#include "utils/file_abstractions.h"
 
 // graphics includes
 #include "graphics/dx12/CommandQueue.h"
@@ -18,6 +16,9 @@
 
 // resources includes
 #include "resources/metadata/MetaData.h"
+
+// utils
+#include "utils/string_extensions.h"
 
 // editor includes
 #include "editor/core/EditorEngine.h"

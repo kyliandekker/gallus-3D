@@ -1,5 +1,7 @@
-#include "utils/string_extensions.h"
+// header
+#include "string_extensions.h"
 
+// external
 #include <algorithm>
 
 namespace gallus

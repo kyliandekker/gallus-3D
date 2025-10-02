@@ -2,17 +2,18 @@
 
 #ifdef _EDITOR
 
+// external
 #include <vector>
 #include <string>
 #include <rapidjson/document.h>
 #include <unordered_map>
 
-// utils includes
-#include "utils/file_abstractions.h"
-
-// editor includes
+// resources
 #include "resources/AssetType.h"
 #include "resources/metadata/MetaData.h"
+
+// utils includes
+#include "utils/FILEPCH.h"
 
 namespace gallus
 {

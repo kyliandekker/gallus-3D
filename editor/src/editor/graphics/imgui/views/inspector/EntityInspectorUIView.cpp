@@ -1,23 +1,25 @@
 #ifndef IMGUI_DISABLE
 #ifdef _EDITOR
 
+// header
 #include "EntityInspectorUIView.h"
 
+// external
 #include <typeindex>
 #include <unordered_map>
 #include <imgui/imgui_helpers.h>
 
-// core includes
+// core
 #include "editor/core/EditorEngine.h"
 
-// graphics includes
+// graphics
 #include "graphics/imgui/font_icon.h"
 
-// editor includes
+// editor
 #include "editor/graphics/imgui/views/HierarchyEntityUIView.h"
 #include "editor/graphics/imgui/views/inspector/components/ComponentUIView.h"
 
-// game includes
+// game
 #include "gameplay/Game.h"
 #include "gameplay/ECSBaseSystem.h"
 

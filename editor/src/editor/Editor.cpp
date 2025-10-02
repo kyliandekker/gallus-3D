@@ -1,9 +1,13 @@
+// header
 #include "Editor.h"
 
+// external
 #include <iostream>
 
+// core
 #include "core/Engine.h"
 
+// logger
 #include "logger/Logger.h"
 
 namespace gallus

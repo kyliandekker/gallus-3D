@@ -1,30 +1,34 @@
 #ifndef IMGUI_DISABLE
 #ifdef _EDITOR
 
+// header
 #include "SpriteEditorModal.h"
 
+// external
 #include <imgui/imgui.h>
 #include <imgui/imgui_helpers.h>
 #include <imgui/imgui_internal.h>
 #include <algorithm>
 
-// core includes
+// core
 #include "editor/core/EditorEngine.h"
 
-// utils includes
-#include "utils/string_extensions.h"
-
-// graphics includes
+// graphics
 #include "graphics/imgui/font_icon.h"
 #include "graphics/imgui/ImGuiWindow.h"
 #include "graphics/dx12/CommandQueue.h"
 #include "graphics/dx12/CommandList.h"
 #include "graphics/dx12/Texture.h"
 
-// graphics includes
+// resources
 #include "resources/FileResource.h"
-#include "editor/graphics/imgui/views/ExplorerFileUIView.h"
 #include "resources/metadata/TextureMetaData.h"
+
+// utils
+#include "utils/string_extensions.h"
+
+// graphics
+#include "editor/graphics/imgui/views/ExplorerFileUIView.h"
 
 namespace gallus
 {

@@ -1,6 +1,6 @@
 #pragma once
 
-// core includes
+// base class
 #include "DataStream.h"
 
 namespace gallus

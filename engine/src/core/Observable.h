@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-// core includes
-#include "core/Event.h" // your gallus::Event definition
+// core
+#include "core/Event.h"
 
 namespace gallus
 {

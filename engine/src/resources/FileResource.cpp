@@ -1,20 +1,22 @@
 #ifdef _EDITOR
 
+// header
 #include "FileResource.h"
 
+// external
 #include <rapidjson/document.h>
 #include <unordered_map>
 
-// core includes
+// core
 #include "core/DataStream.h"
 
-// logger includes
+// logger
 #include "logger/Logger.h"
 
-// utils includes
+// utils
 #include "utils/file_abstractions.h"
 
-// editor includes
+// resources
 #include "resources/AssetType.h"
 #include "resources/metadata/MetaData.h"
 #include "resources/metadata/TextureMetaData.h"
