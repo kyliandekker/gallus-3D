@@ -3,19 +3,16 @@
 
 #pragma once
 
-// base class
 #include "ExplorerFileUIViewInfo.h"
 
-// external
 #include <memory>
 
-// core
+// core includes
 #include "core/Data.h"
 
-// graphics
+// graphics includes
 #include "graphics/imgui/views/DataTypes/StringDropdown.h"
 
-// audio
 #include "audio/ChunkCollection.h"
 
 namespace gallus

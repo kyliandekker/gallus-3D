@@ -1,11 +1,6 @@
-// header
 #include "Utils.h"
-
-// external
 #include <string.h>
-
-// audio
-#include "audio/Defines.h"
+#include "Defines.h"
 
 namespace gallus
 {

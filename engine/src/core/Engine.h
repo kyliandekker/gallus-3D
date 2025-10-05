@@ -1,22 +1,20 @@
 #pragma once
 
-// base class
 #include "System.h"
 
-// external
 #include <wtypes.h>
 
-// core
+// core includes
 #include "core/ResourceAtlas.h"
 
-// graphics
+// utils includes
+#include "utils/file_abstractions.h"
+
+// graphics includes
 #include "graphics/dx12/DX12System2D.h"
 #include "graphics/win32/Window.h"
 
-// utils
-#include "utils/FILEPCH.h"
-
-// gameplay
+// gameplay includes
 #include "gameplay/EntityComponentSystem.h"
 
 namespace gallus
@@ -85,7 +83,11 @@ namespace gallus
 			/// Sets the save directory of the application.
 			/// </summary>
 			/// <param name="a_sSaveDirectory">Save directory.</param>
-			void SetSaveDirectory(const std::filesystem::path& a_sSaveDirectory);
+			void SetSaveDirectory(const std::filesystem::path& a_sSaveDirectory)
+			{
+				m_sSaveDirectory = a_sSaveDirectory;
+				file::CreateDirectory(a_sSaveDirectory);
+			}
 
 			/// <summary>
 			/// Sets the default arguments of the application.

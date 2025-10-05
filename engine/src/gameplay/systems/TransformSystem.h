@@ -1,9 +1,8 @@
 #pragma once
 
-// base class
 #include "gameplay/ECSBaseSystem.h"
 
-// gameplay
+// gameplay includes
 #include "gameplay/systems/components/TransformComponent.h"
 
 namespace gallus

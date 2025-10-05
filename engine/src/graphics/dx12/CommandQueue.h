@@ -1,12 +1,10 @@
 #pragma once
 
-// external
+#include "DX12PCH.h"
+
 #include <cstdint>  // For uint64_t
 #include <queue>    // For std::queue
-#include <memory> // shared_ptr
-
-// graphics
-#include "DX12PCH.h"
+#include <memory>
 
 namespace gallus
 {

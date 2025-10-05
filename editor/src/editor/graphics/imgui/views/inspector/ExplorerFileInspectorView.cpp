@@ -1,21 +1,21 @@
 #ifndef IMGUI_DISABLE
 #ifdef _EDITOR
 
-// header
-#include "ExplorerFileInspectorUIView.h"
+#include "ExplorerFileInspectorView.h"
 
-// resource
-#include "resources/metadata/MetaData.h"
-#include "resources/AssetType.h"
-
-// utils
+// utils includes
 #include "utils/file_abstractions.h"
 
-// editor
+// resource includes
+#include "resources/AssetType.h"
+
+// editor includes
 #include "editor/core/EditorEngine.h"
-#include "resources/FileResource.h"
 #include "editor/graphics/imgui/views/ExplorerFileUIView.h"
 #include "editor/graphics/imgui/views/inspector/fileinfo/ExplorerFileUIViewInfo.h"
+
+// resources
+#include "resources/FileResource.h"
 
 namespace gallus
 {
@@ -26,9 +26,9 @@ namespace gallus
 			class ImGuiWindow;
 
 			//---------------------------------------------------------------------
-			// ExplorerFileInspectorUIView
+			// ExplorerFileInspectorView
 			//---------------------------------------------------------------------
-			ExplorerFileInspectorUIView::ExplorerFileInspectorUIView(ImGuiWindow& a_Window, ExplorerFileUIView& a_ExplorerFileUIView) : InspectorUIView(a_Window), m_ExplorerFileUIView(a_ExplorerFileUIView)
+			ExplorerFileInspectorView::ExplorerFileInspectorView(ImGuiWindow& a_Window, ExplorerFileUIView& a_ExplorerFileUIView) : InspectorView(a_Window), m_ExplorerFileUIView(a_ExplorerFileUIView)
 			{
 				m_bShowRename = true;
 				m_bShowDelete = true;
@@ -50,7 +50,7 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			ExplorerFileInspectorUIView::~ExplorerFileInspectorUIView()
+			ExplorerFileInspectorView::~ExplorerFileInspectorView()
 			{
 				if (m_pExplorerFileUIViewInfo)
 				{
@@ -59,13 +59,13 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			void ExplorerFileInspectorUIView::OnRename(const std::string& a_sName)
+			void ExplorerFileInspectorView::OnRename(const std::string& a_sName)
 			{
 				m_ExplorerFileUIView.GetFileResource().Rename(a_sName);
 			}
 
 			//---------------------------------------------------------------------
-			void ExplorerFileInspectorUIView::OnDelete()
+			void ExplorerFileInspectorView::OnDelete()
 			{
 				m_ExplorerFileUIView.GetFileResource().Delete();
 
@@ -73,25 +73,25 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			void ExplorerFileInspectorUIView::OnShowInExplorer()
+			void ExplorerFileInspectorView::OnShowInExplorer()
 			{
 				file::OpenInExplorer(m_ExplorerFileUIView.GetFileResource().GetPath().parent_path().lexically_normal());
 			}
 
 			//---------------------------------------------------------------------
-			std::string ExplorerFileInspectorUIView::GetName() const
+			std::string ExplorerFileInspectorView::GetName() const
 			{
 				return m_ExplorerFileUIView.GetFileResource().GetPath().filename().generic_string();
 			}
 
 			//---------------------------------------------------------------------
-			std::string ExplorerFileInspectorUIView::GetIcon() const
+			std::string ExplorerFileInspectorView::GetIcon() const
 			{
 				return m_ExplorerFileUIView.GetIcon();
 			}
 
 			//---------------------------------------------------------------------
-			void ExplorerFileInspectorUIView::Render()
+			void ExplorerFileInspectorView::Render()
 			{
 				if (m_pExplorerFileUIViewInfo)
 				{
@@ -100,7 +100,7 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			void ExplorerFileInspectorUIView::RenderPreview()
+			void ExplorerFileInspectorView::RenderPreview()
 			{
 				if (m_pExplorerFileUIViewInfo)
 				{

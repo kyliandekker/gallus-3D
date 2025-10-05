@@ -3,16 +3,14 @@
 
 #pragma once
 
-// base class
 #include "ComponentUIView.h"
 
-// external
 #include <DirectXMath.h>
 
-// graphics
+// graphics includes
 #include "graphics/imgui/views/DataTypes/VectorView.h"
 
-// gameplay
+// gameplay includes
 #include "gameplay/systems/TransformSystem.h"
 #include "gameplay/systems/components/TransformComponent.h"
 
@@ -33,11 +31,11 @@ namespace gallus
 				/// Constructs the TransformComponentUIView with specific views for the position, rotation and scale.
 				/// </summary>
 				/// <param name="a_Window">The ImGui window for rendering the view.</param>
+				/// <param name="a_EntityID">The entity ID associated with the transform component.</param>
 				/// <param name="a_TransformComponent">The TransformComponent to display and edit.</param>
 				/// <param name="a_System">The TransformSystem responsible for managing the TransformComponent.</param>
 				TransformComponentUIView(ImGuiWindow& a_Window, gameplay::TransformComponent& a_TransformComponent, gameplay::TransformSystem& a_System) : ComponentUIView(a_Window, a_TransformComponent, a_System),
 					m_PositionView(a_Window),
-					m_RotationView(a_Window),
 					m_ScaleView(a_Window),
 					m_PivotView(a_Window)
 				{}
@@ -56,9 +54,8 @@ namespace gallus
 				std::string GetName() const override;
 
 				/// UI elements for displaying and editing the position, rotation, and scale as glm::vec3.
-				Vector3View<DirectX::XMFLOAT3>
+				Vector2View<DirectX::XMFLOAT2>
 					m_PositionView,
-					m_RotationView,
 					m_ScaleView,
 					m_PivotView;
 			};

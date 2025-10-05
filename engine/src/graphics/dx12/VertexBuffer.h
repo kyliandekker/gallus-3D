@@ -1,9 +1,7 @@
 #pragma once
 
-// base class
 #include "graphics/dx12/Buffer.h"
 
-// external
 #include <string>
 
 namespace gallus

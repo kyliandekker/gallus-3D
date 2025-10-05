@@ -1,6 +1,5 @@
 #pragma once
 
-// graphics
 #include "DX12PCH.h"
 
 namespace gallus

@@ -1,8 +1,8 @@
 #pragma once
 
-#include <string>
+#include "DX12PCH.h"
 
-// graphics
+// graphics includes
 #include "graphics/dx12/DX12Transform.h"
 
 namespace gallus
@@ -11,28 +11,13 @@ namespace gallus
 	{
 		namespace dx12
 		{
-			enum class CameraProjectionMode
+#ifdef _EDITOR
+			enum CameraMode
 			{
-				None,
-				Perspective,
-				Orthographic,
+				CameraMode_Editor,
+				CameraMode_Game
 			};
-
-			inline std::string CameraProjectionModeToString(CameraProjectionMode a_CameraProjectionMode)
-			{
-				switch (a_CameraProjectionMode)
-				{
-					case CameraProjectionMode::Perspective:
-					{
-						return "Perspective";
-					}
-					case CameraProjectionMode::Orthographic:
-					{
-						return "Orthographic";
-					}
-				}
-				return "";
-			}
+#endif // _EDITOR
 
 			//---------------------------------------------------------------------
 			// Camera
@@ -86,25 +71,14 @@ namespace gallus
 				/// <returns>The projection matrix used for rendering.</returns>
 				const DirectX::XMMATRIX& GetProjectionMatrix() const;
 
-				/// <summary>
-				/// Returns the size of the camera.
-				/// </summary>
-				/// <returns>The size of the camera (render size).</returns>
 				const DirectX::XMINT2& GetSize() const
 				{
 					return m_vSize;
 				}
-
-				void SetProjectionMode(CameraProjectionMode a_CameraProjectionMode);
-
-				CameraProjectionMode GetCameraProjectionMode() const;
 			private:
-				DirectX::XMINT2 m_vSize = { 0, 0 };
+				DirectX::XMINT2 m_vSize;
 				DX12Transform m_Transform;
 				DirectX::XMMATRIX m_ProjectionMatrix;
-				float m_fFoV = 90;
-
-				CameraProjectionMode m_CameraProjectionMode = CameraProjectionMode::None;
 			};
 		}
 	}

@@ -1,6 +1,5 @@
 #pragma once
 
-// external
 #include <vector>
 #include <functional>
 

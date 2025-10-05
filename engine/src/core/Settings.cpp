@@ -1,19 +1,18 @@
-// header
-#include "Settings.h"
+#include "core/Settings.h"
 
-// external
+// # Rapidjson
 #include <rapidjson/document.h>
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/prettywriter.h>
 
-// core
+// core includes
 #include "core/Engine.h"
 #include "core/DataStream.h"
 
-// logger
+// logger includes
 #include "logger/Logger.h"
 
-// utils
+// utils includes
 #include "utils/file_abstractions.h"
 
 namespace gallus

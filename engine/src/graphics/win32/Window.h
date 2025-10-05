@@ -1,18 +1,16 @@
 #pragma once
 
-// base class
 #include "core/System.h"
 
-// external
 #include <glm/vec2.hpp>
 #include <wtypes.h>
 #include <string>
 #include <queue>
 
-// core
+// core includes
 #include "core/Event.h"
 
-// gameplay
+// gameplay includes
 #include "graphics/win32/WindowSettings.h"
 
 #if defined(CreateWindow)

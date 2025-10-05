@@ -1,13 +1,7 @@
-// header
 #include "Editor.h"
 
-// external
 #include <iostream>
 
-// core
-#include "core/Engine.h"
-
-// logger
 #include "logger/Logger.h"
 
 namespace gallus
@@ -27,8 +21,6 @@ namespace gallus
 			m_CurrentScene.SetResourceCategory(core::EngineResourceCategory::Editor);
 
 			LOG(LOGSEVERITY_INFO, LOG_CATEGORY_EDITOR, "Initializing editor.");
-
-			m_EditorCamera.Init(core::ENGINE->GetDX12().GetCamera().GetSize().x, core::ENGINE->GetDX12().GetCamera().GetSize().y);
 
 			return ThreadedSystem::Initialize(a_bWait);
 		}
@@ -51,7 +43,6 @@ namespace gallus
 		bool Editor::InitThreadWorker()
 		{
 			m_AssetDatabase.Initialize();
-			m_AssetDatabase.Scan();
 
 			m_EditorSettings.Load();
 

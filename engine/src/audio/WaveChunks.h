@@ -1,11 +1,9 @@
 ﻿#pragma once
 
-// external
 #include <cstdint>
 
-// audio
-#include "audio/Defines.h"
-#include "audio/ChunkHeader.h"
+#include "./Defines.h"
+#include "./ChunkHeader.h"
 
 /*
  * WHAT IS THIS FILE?

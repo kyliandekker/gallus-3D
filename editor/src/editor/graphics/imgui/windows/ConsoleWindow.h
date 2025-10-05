@@ -3,18 +3,13 @@
 
 #pragma once
 
-// base class
 #include "graphics/imgui/windows/BaseWindow.h"
 
-// external
 #include <vector>
 #include <mutex>
 
-// graphics
-#include "graphics/imgui/views/DataTypes/StringTextInput.h"
-
-// logger
 #include "logger/Logger.h"
+#include "graphics/imgui/views/DataTypes/StringTextInput.h"
 
 namespace gallus
 {

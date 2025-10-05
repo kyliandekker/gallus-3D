@@ -1,9 +1,7 @@
 #pragma once
 
-// base class
 #include "gameplay/systems/components/Component.h"
 
-// external
 #include <DirectXMath.h>
 #include <map>
 
@@ -34,7 +32,7 @@ namespace gallus
 			/// <param name="a_Allocator">The allocator used by the json document.</param>
 			void Deserialize(const rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator) override;
 
-			void Translate(const DirectX::XMFLOAT3& a_vTranslation);
+			void Translate(const DirectX::XMFLOAT2& a_vTranslation);
 
 			/// <summary>
 			/// Updates the components.
@@ -60,7 +58,7 @@ namespace gallus
 			}
 		protected:
 			bool m_bHasGravity = false;
-			DirectX::XMFLOAT3 m_vTranslation = {};
+			DirectX::XMFLOAT2 m_vTranslation = {};
 		};
 	}
 }

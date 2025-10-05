@@ -1,16 +1,15 @@
-﻿// header
-#include "Game.h"
+﻿#include "Game.h"
 
 // core includes
 #include "core/Engine.h"
+
+// logger includes
+#include "logger/Logger.h"
 
 // graphics includes
 #include "graphics/dx12/CommandQueue.h"
 #include "graphics/dx12/CommandList.h"
 #include "graphics/dx12/Texture.h"
-
-// logger includes
-#include "logger/Logger.h"
 
 // gameplay includes
 #include "gameplay/systems/SpriteSystem.h"
@@ -20,7 +19,6 @@
 #include "gameplay/systems/CollisionSystem.h"
 #include "gameplay/systems/MovementSystem.h"
 #include "gameplay/systems/ProjectileSystem.h"
-#include "gameplay/systems/MeshSystem.h"
 
 namespace gallus
 {
@@ -42,14 +40,15 @@ namespace gallus
 			core::ENGINE->GetECS().CreateSystem<CollisionSystem>().Initialize();
 			core::ENGINE->GetECS().CreateSystem<MovementSystem>().Initialize();
 			core::ENGINE->GetECS().CreateSystem<ProjectileSystem>().Initialize();
-			core::ENGINE->GetECS().CreateSystem<MeshSystem>().Initialize();
 
 			core::ENGINE->GetWindow().OnQuit() += std::bind(&Game::Shutdown, this);
 
 			System::Initialize();
 
 #ifndef _EDITOR
-			core::ENGINE.GetResourceAtlas().LoadScene("main.scene", m_Scene);
+			m_Scene.SetData(core::ENGINE->GetResourceAtlas().LoadScene("main.scene"));
+			m_Scene.LoadData();
+
 			m_bStarted = true;
 #endif
 
@@ -86,7 +85,6 @@ namespace gallus
 
 				int updatesThisFrame = 0;
 
-				m_fDeltaTime = FIXED_TIMESTEP;
 				while (lag >= FIXED_TIMESTEP)
 				{
 					bool updateRealtime = m_bStarted && !m_bPaused;

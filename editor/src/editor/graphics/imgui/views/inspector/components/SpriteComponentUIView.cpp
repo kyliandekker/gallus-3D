@@ -1,14 +1,12 @@
 #ifndef IMGUI_DISABLE
 #ifdef _EDITOR
 
-// header
 #include "SpriteComponentUIView.h"
 
-// external
 #include <imgui/imgui_helpers.h>
 #include <imgui/imgui_internal.h>
 
-// graphics
+// graphics includes
 #include "graphics/dx12/Mesh.h"
 #include "graphics/dx12/Texture.h"
 #include "graphics/dx12/Shader.h"
@@ -17,15 +15,17 @@
 #include "graphics/dx12/CommandQueue.h"
 #include "graphics/imgui/font_icon.h"
 
-// editor
+// editor includes
 #include "editor/core/EditorEngine.h"
 #include "resources/AssetType.h"
-#include "resources/FileResource.h"
 #include "editor/graphics/imgui/modals/FilePickerModal.h"
 
-// gameplay
+// gameplay includes
 #include "gameplay/Game.h"
 #include "gameplay/systems/TransformSystem.h"
+
+// resources
+#include "resources/FileResource.h"
 
 namespace gallus
 {
@@ -33,7 +33,10 @@ namespace gallus
 	{
 		namespace imgui
 		{
-			SpriteComponentUIView::SpriteComponentUIView(ImGuiWindow& a_Window, gameplay::SpriteComponent& a_SpriteComponent, gameplay::SpriteSystem& a_System) : ComponentUIView(a_Window, a_SpriteComponent, a_System)
+			char m_sPrefabName[128];
+			char m_VertexShaderName[128];
+			char m_TextureName[128];
+			SpriteComponentUIView::SpriteComponentUIView(ImGuiWindow& a_Window, gameplay::SpriteComponent& a_SpriteComponent, gameplay::SpriteSystem& a_System) : ComponentUIView(a_Window, a_SpriteComponent, a_System), m_SizeView(a_Window)
 			{
 				m_bShowPreview = true;
 				m_iPreviewPriority = 4;
@@ -67,12 +70,12 @@ namespace gallus
 				ImGui::InputText(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "SPRITE_COMPONENT_PIXEL_SHADER_NAME_INPUT").c_str(), m_sPrefabName, sizeof(m_sPrefabName), ImGuiInputTextFlags_ReadOnly);
 				ImGui::PopItemFlag();
 				ImGui::SameLine();
-				if (ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_FILE, BUTTON_ID, "SPRITE_COMPONENT_PIXEL_SHADER").c_str(), buttonSize))
+				if (ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_FILE, BUTTON_ID, "MESH_COMPONENT_PIXEL_SHADER").c_str(), buttonSize))
 				{
 					if (modal)
 					{
 						modal->SetData(
-							[this](int success, resources::FileResource& resource)
+							[this](int success, gallus::resources::FileResource& resource)
 							{
 								if (success == 1)
 								{
@@ -83,7 +86,7 @@ namespace gallus
 									).get());
 								}
 							},
-							std::vector<resources::AssetType>{ resources::AssetType::PixelShader }
+							std::vector<gallus::resources::AssetType>{ gallus::resources::AssetType::PixelShader }
 						);
 						modal->Show();
 					}
@@ -99,12 +102,12 @@ namespace gallus
 				ImGui::InputText(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "SPRITE_COMPONENT_VERTEX_SHADER_NAME_INPUT").c_str(), m_VertexShaderName, sizeof(m_VertexShaderName), ImGuiInputTextFlags_ReadOnly);
 				ImGui::PopItemFlag();
 				ImGui::SameLine();
-				if (ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_FILE, BUTTON_ID, "SPRITE_COMPONENT_VERTEX_SHADER").c_str(), buttonSize))
+				if (ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_FILE, BUTTON_ID, "MESH_COMPONENT_VERTEX_SHADER").c_str(), buttonSize))
 				{
 					if (modal)
 					{
 						modal->SetData(
-							[this](int success, resources::FileResource& resource)
+							[this](int success, gallus::resources::FileResource& resource)
 							{
 								if (success == 1)
 								{
@@ -117,7 +120,7 @@ namespace gallus
 									core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
 								}
 							},
-							std::vector<resources::AssetType>{ resources::AssetType::VertexShader }
+							std::vector<gallus::resources::AssetType>{ gallus::resources::AssetType::VertexShader }
 						);
 						modal->Show();
 					}
@@ -133,12 +136,12 @@ namespace gallus
 				ImGui::InputText(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "SPRITE_COMPONENT_TEXTURE_NAME_INPUT").c_str(), m_TextureName, sizeof(m_TextureName), ImGuiInputTextFlags_ReadOnly);
 				ImGui::PopItemFlag();
 				ImGui::SameLine();
-				if (ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_FILE_IMAGE, BUTTON_ID, "SPRITE_COMPONENT_TEXTURE").c_str(), buttonSize))
+				if (ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_FILE_IMAGE, BUTTON_ID, "MESH_COMPONENT_TEXTURE").c_str(), buttonSize))
 				{
 					if (modal)
 					{
 						modal->SetData(
-							[this](int success, resources::FileResource& resource)
+							[this](int success, gallus::resources::FileResource& resource)
 							{
 								if (success == 1)
 								{
@@ -151,7 +154,7 @@ namespace gallus
 									core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
 								}
 							},
-							std::vector<resources::AssetType>{ resources::AssetType::Sprite }
+							std::vector<gallus::resources::AssetType>{ gallus::resources::AssetType::Sprite }
 						);
 						modal->Show();
 					}
@@ -167,7 +170,7 @@ namespace gallus
 
 					ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
 					int spriteIndex = m_Component.GetSpriteIndex();
-					if (ImGui::DragInt(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "SPRITE_COMPONENT_CURRENT_SPRITE_INDEX").c_str(), &spriteIndex, 1, 0, m_Component.GetTexture()->GetSpriteRectsSize() - 1))
+					if (ImGui::DragInt(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "MESH_COMPONENT_CURRENT_SPRITE_INDEX").c_str(), &spriteIndex, 1, 0, m_Component.GetTexture()->GetSpriteRectsSize() - 1))
 					{
 						m_Component.SetSpriteIndex(spriteIndex);
 					}
@@ -180,6 +183,40 @@ namespace gallus
 			std::string SpriteComponentUIView::GetName() const
 			{
 				return m_System.GetSystemName();
+			}
+
+			void SpriteComponentUIView::RenderComponentGizmos(const ImVec2& a_vScenePos, const ImVec2& a_vSize, const ImVec2& a_vPanOffset, float a_fZoom)
+			{
+				if (!core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetDrawBounds())
+				{
+					return;
+				}
+
+				ImDrawList* drawList = ImGui::GetWindowDrawList();
+				ImVec2 mouseScreen = ImGui::GetMousePos();
+
+				std::lock_guard<std::recursive_mutex> lock(core::EDITOR_ENGINE->GetECS().m_EntityMutex);
+
+				if (!core::EDITOR_ENGINE->GetECS().GetSystem<gameplay::TransformSystem>().HasComponent(m_Component.GetEntityID()))
+				{
+					return;
+				}
+
+				auto& transform = core::EDITOR_ENGINE->GetECS().GetSystem<gameplay::TransformSystem>().GetComponent(m_Component.GetEntityID());
+
+				std::array<DirectX::XMFLOAT2, 4> worldCorners =
+					transform.Transform().GetWorldCorners();
+
+				ImVec2 corners[4];
+				for (int i = 0; i < 4; ++i)
+				{
+					corners[i] = a_vScenePos + a_vPanOffset +
+						ImVec2(worldCorners[i].x * a_fZoom,
+							worldCorners[i].y * a_fZoom);
+				}
+
+				// Draw bounding box polyline
+				drawList->AddPolyline(corners, 4, IM_COL32(255, 255, 255, 155), true, 2.0f);
 			}
 
 			void SpriteComponentUIView::RenderPreview()

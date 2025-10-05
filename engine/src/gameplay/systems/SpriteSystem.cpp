@@ -1,11 +1,10 @@
-// header
-#include "SpriteSystem.h"
+#include "gameplay/systems/SpriteSystem.h"
 
-// graphics
-#include "graphics/imgui/font_icon.h"
-
-// logger
+// logger includes
 #include "logger/Logger.h"
+
+// graphics includes
+#include "graphics/imgui/font_icon.h"
 
 namespace gallus
 {

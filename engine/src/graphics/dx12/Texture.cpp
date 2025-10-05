@@ -1,23 +1,20 @@
-﻿// header
-#include "Texture.h"
+﻿#include "graphics/dx12/Texture.h"
 
-// external
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
-// core
+// core includes
 #include "core/Engine.h"
 #include "core/Data.h"
 
-// graphics
+// logger includes
+#include "logger/Logger.h"
+
+// graphics includes
 #include "graphics/dx12/CommandList.h"
 #include "graphics/dx12/CommandQueue.h"
 
-// resources
 #include "resources/metadata/TextureMetaData.h"
-
-// logger
-#include "logger/Logger.h"
 
 namespace gallus
 {

@@ -1,11 +1,13 @@
 #ifndef IMGUI_DISABLE
 #ifdef _EDITOR
 
-// header
 #include "ExplorerWindow.h"
 
-// external
 #include <imgui/imgui_helpers.h>
+
+// utils includes
+#include "utils/string_extensions.h"
+#include "utils/file_abstractions.h"
 
 // graphics includes
 #include "graphics/dx12/CommandQueue.h"
@@ -14,17 +16,13 @@
 #include "graphics/imgui/ImGuiWindow.h"
 #include "graphics/imgui/font_icon.h"
 
-// resources includes
-#include "resources/metadata/MetaData.h"
-
-// utils
-#include "utils/string_extensions.h"
-
 // editor includes
 #include "editor/core/EditorEngine.h"
-#include "resources/FileResource.h"
 #include "editor/graphics/imgui/views/ExplorerFileUIView.h"
-#include "editor/graphics/imgui/views/inspector/ExplorerFileInspectorUIView.h"
+#include "editor/graphics/imgui/views/inspector/ExplorerFileInspectorView.h"
+
+// resources
+#include "resources/FileResource.h"
 
 // game includes
 #include "gameplay/Game.h"
@@ -35,7 +33,7 @@ namespace gallus
 	{
 		namespace imgui
 		{
-			ExplorerWindow::ExplorerWindow(ImGuiWindow& a_Window) : BaseWindow(a_Window, ImGuiWindowFlags_NoCollapse, std::string(font::ICON_FOLDER) + " Explorer", "EXPLORER"), m_SearchBar(a_Window)
+			ExplorerWindow::ExplorerWindow(ImGuiWindow& a_Window) : BaseWindow(a_Window, ImGuiWindowFlags_NoCollapse, std::string(font::ICON_FOLDER) + " Explorer", "Explorer"), m_SearchBar(a_Window)
 			{
 				m_SearchBar.Initialize("");
 			}
@@ -91,7 +89,7 @@ namespace gallus
 				{
 					for (ExplorerFileUIView& child : a_Resource.GetChildren())
 					{
-						if (child.GetFileResource().GetMetaData()->GetAssetType() == resources::AssetType::Folder)
+						if (child.GetFileResource().GetMetaData()->GetAssetType() == gallus::resources::AssetType::Folder)
 						{
 							RenderFolder(child, a_Indent + 1, ImGui::GetCursorPos());
 						}
@@ -113,8 +111,8 @@ namespace gallus
 					m_aFilteredExplorerItems.clear();
 					m_aExplorerItems.clear();
 
-					m_aExplorerItems.reserve(core::EDITOR_ENGINE->GetResourceAtlas().GetResourceFolder().GetChildren().size());
-					for (resources::FileResource& fileResource : core::EDITOR_ENGINE->GetResourceAtlas().GetResourceFolder().GetChildren())
+					m_aExplorerItems.reserve(gallus::core::EDITOR_ENGINE->GetResourceAtlas().GetResourceFolder().GetChildren().size());
+					for (gallus::resources::FileResource& fileResource : gallus::core::EDITOR_ENGINE->GetResourceAtlas().GetResourceFolder().GetChildren())
 					{
 						m_aExplorerItems.emplace_back(m_Window, fileResource);
 					}
@@ -313,7 +311,7 @@ namespace gallus
 									}
 								}
 
-								if (double_clicked && view->GetFileResource().GetMetaData()->GetAssetType() == resources::AssetType::Folder)
+								if (double_clicked && view->GetFileResource().GetMetaData()->GetAssetType() == gallus::resources::AssetType::Folder)
 								{
 									m_pViewedFolder = view;
 									m_bNeedsRefresh = true;
@@ -321,7 +319,7 @@ namespace gallus
 
 								if (clicked)
 								{
-									core::EDITOR_ENGINE->GetEditor().SetSelectable(view, new ExplorerFileInspectorUIView(m_Window, *view));
+									core::EDITOR_ENGINE->GetEditor().SetSelectable(view, new ExplorerFileInspectorView(m_Window, *view));
 								}
 							}
 						}
@@ -346,7 +344,7 @@ namespace gallus
 
 			void ExplorerWindow::SetSelectable(ExplorerFileUIView* a_pView)
 			{
-				core::EDITOR_ENGINE->GetEditor().SetSelectable(a_pView, a_pView ? new ExplorerFileInspectorUIView(m_Window, *a_pView) : nullptr);
+				core::EDITOR_ENGINE->GetEditor().SetSelectable(a_pView, a_pView ? new ExplorerFileInspectorView(m_Window, *a_pView) : nullptr);
 			}
 
 			void ExplorerWindow::OnScanCompleted()

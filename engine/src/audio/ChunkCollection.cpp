@@ -1,18 +1,16 @@
-// header
-#include "ChunkCollection.h"
-
-// external
 #include <cstdio>
 #include <cstring>
 
-// core
+#include "ChunkCollection.h"
+
+// core includes
 #include "core/Memory.h"
 
-// audio
-#include "audio/Utils.h"
-
-// logger
+// logger includes
 #include "logger/Logger.h"
+
+// audio includes
+#include "audio/Utils.h"
 
 namespace gallus
 {

@@ -1,22 +1,20 @@
 #ifndef IMGUI_DISABLE
 #ifdef _EDITOR
 
-// header
 #include "InspectorWindow.h"
 
-// external
 #include <imgui/imgui_helpers.h>
 #include <imgui/imgui_internal.h>
 
-// graphics
+// graphics includes
 #include "graphics/imgui/ImGuiWindow.h"
 #include "graphics/imgui/font_icon.h"
 
-// editor
-#include "editor/graphics/imgui/views/inspector/InspectorUIView.h"
+// editor includes
+#include "editor/graphics/imgui/views/inspector/InspectorView.h"
 #include "editor/core/EditorEngine.h"
 
-// gameplay
+// gameplay includes
 #include "gameplay/Game.h"
 
 namespace gallus
@@ -27,7 +25,7 @@ namespace gallus
 		{
 			constexpr float PREVIEW_SECTION_SIZE = 300;
 
-			InspectorWindow::InspectorWindow(ImGuiWindow& a_Window) : BaseWindow(a_Window, ImGuiWindowFlags_NoCollapse, std::string(font::ICON_CIRCLE_INFO) + " Inspector", "INSPECTOR"), m_NameInput(a_Window)
+			InspectorWindow::InspectorWindow(ImGuiWindow& a_Window) : BaseWindow(a_Window, ImGuiWindowFlags_NoCollapse, std::string(font::ICON_CIRCLE_INFO) + " Inspector", "Inspector"), m_NameInput(a_Window)
 			{
 				m_NameInput.Initialize("");
 			}
@@ -55,7 +53,7 @@ namespace gallus
 
 				std::lock_guard<std::mutex> lock(core::EDITOR_ENGINE->GetEditor().m_EditorMutex);
 
-				InspectorUIView* inspectorView = core::EDITOR_ENGINE->GetEditor().GetInspectorView();
+				InspectorView* inspectorView = core::EDITOR_ENGINE->GetEditor().GetInspectorView();
 				if (!inspectorView)
 				{
 					return;

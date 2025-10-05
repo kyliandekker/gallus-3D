@@ -3,24 +3,22 @@
 
 #pragma once
 
-// base class
 #include "graphics/imgui/windows/BaseWindow.h"
 
-// external
 #include <vector>
 #include <string>
 #include <memory>
 
-// core
+// core includes
 #include "core/Observable.h"
 
-// graphics
+// utils includes
+#include "utils/file_abstractions.h"
+
+// graphics includes
 #include "graphics/imgui/views/DataTypes/StringTextInput.h"
 
-// utils
-#include "utils/FILEPCH.h"
-
-// editor
+// graphics includes
 #include "editor/graphics/imgui/views/ExplorerFileUIView.h"
 
 namespace gallus

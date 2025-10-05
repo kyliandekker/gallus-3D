@@ -1,29 +1,27 @@
 #ifndef IMGUI_DISABLE
 #ifdef _EDITOR
 
-// header
 #include "ExplorerPrefabUIViewInfo.h"
 
-// external
 #include <imgui/imgui.h>
 #include <imgui/imgui_helpers.h>
 
-// core
+// core includes
 #include "core/Data.h"
 
-// graphics
+// graphics includes
 #include "graphics/imgui/ImGuiWindow.h"
 #include "graphics/imgui/font_icon.h"
 
-// resources
-#include "resources/FileResource.h"
-
-// editor
+// editor includes
 #include "editor/graphics/imgui/views/ExplorerFileUIView.h"
 #include "editor/core/EditorEngine.h"
 
-// game
+// game includes
 #include "gameplay/Game.h"
+
+// resources
+#include "resources/FileResource.h"
 
 namespace gallus
 {
@@ -32,7 +30,8 @@ namespace gallus
 		namespace imgui
 		{
 			ExplorerPrefabUIViewInfo::ExplorerPrefabUIViewInfo(ImGuiWindow& a_Window, ExplorerFileUIView& a_ExplorerFileUIView) : ExplorerFileUIViewInfo(a_Window, a_ExplorerFileUIView)
-			{ }
+			{
+			}
 
 			void ExplorerPrefabUIViewInfo::RenderSpecific()
 			{

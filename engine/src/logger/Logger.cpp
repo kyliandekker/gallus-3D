@@ -1,7 +1,5 @@
-// header
 #include "logger/Logger.h"
 
-// external
 #include <cstdarg>
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,7 +8,6 @@
 #include <windows.h>
 #include <iostream>
 
-// core
 #include "core/ArgProcessor.h"
 
 #define CATEGORY_LOGGER "LOGGER"

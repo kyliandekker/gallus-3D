@@ -1,9 +1,6 @@
 #pragma once
 
-// base class
 #include "core/Engine.h"
-
-// editor
 #include "editor/Editor.h"
 
 namespace gallus

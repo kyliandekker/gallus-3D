@@ -1,13 +1,8 @@
-// header
-#include "ProjectileComponent.h"
+#include "gameplay/systems/components/ProjectileComponent.h"
 
-// external
 #include <rapidjson/utils.h>
 
-// core
 #include "core/Engine.h"
-
-// gameplay
 #include "gameplay/systems/CollisionSystem.h"
 #include "gameplay/systems/HealthSystem.h"
 #include "gameplay/systems/MovementSystem.h"

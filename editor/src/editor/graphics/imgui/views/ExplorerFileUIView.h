@@ -1,20 +1,18 @@
-#pragma once
-
 #ifndef IMGUI_DISABLE
 #ifdef _EDITOR
 
-// base class
+#pragma once
+
 #include "graphics/imgui/views/ImGuiUIView.h"
 
-// external
 #include <imgui/imgui.h>
 #include <string>
 #include <vector>
 
-// utils
-#include "utils/FILEPCH.h"
+// utils includes
+#include "utils/file_abstractions.h"
 
-// editor
+// editor includes
 #include "editor/graphics/imgui/EditorSelectable.h"
 
 namespace gallus
@@ -32,7 +30,7 @@ namespace gallus
 			class ExplorerFileUIView : public ImGuiUIView, public EditorSelectable
 			{
 			public:
-				ExplorerFileUIView(ImGuiWindow& a_Window, resources::FileResource& a_FileResource, ExplorerFileUIView* a_pParent = nullptr, bool a_bGetChildren = true);
+				ExplorerFileUIView(ImGuiWindow& a_Window, gallus::resources::FileResource& a_FileResource, ExplorerFileUIView* a_pParent = nullptr, bool a_bGetChildren = true);
 
 				/// <summary>
 				/// Retrieves the icon string for the resource.
@@ -106,12 +104,12 @@ namespace gallus
 					return m_aChildren;
 				}
 
-				resources::FileResource& GetFileResource()
+				gallus::resources::FileResource& GetFileResource()
 				{
 					return m_FileResource;
 				}
 
-				const resources::FileResource& GetFileResource() const
+				const gallus::resources::FileResource& GetFileResource() const
 				{
 					return m_FileResource;
 				}
@@ -128,7 +126,7 @@ namespace gallus
 
 				bool SearchForPath(const fs::path& a_Path, ExplorerFileUIView*& a_pExplorerFile);
 			private:
-				resources::FileResource& m_FileResource;
+				gallus::resources::FileResource& m_FileResource;
 				std::string m_sDisplayName; /// The name that will be displayed in imgui.
 				std::string m_sIcon; /// The icon of the resource.
 				bool m_bIsFoldedOut = false; /// Whether the node is folded out.

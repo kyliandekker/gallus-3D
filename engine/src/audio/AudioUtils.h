@@ -1,6 +1,3 @@
-#pragma once
-
-// external
 #include <cstdint>
 #include <string>
 

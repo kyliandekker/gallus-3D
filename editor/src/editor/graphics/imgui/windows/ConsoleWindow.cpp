@@ -1,24 +1,22 @@
 #ifndef IMGUI_DISABLE
 #ifdef _EDITOR
 
-// header
 #include "ConsoleWindow.h"
 
-// external
 #include <imgui/imgui_helpers.h>
 
-// utils
+// utils includes
 #include "utils/string_extensions.h"
 
-// graphics
+// graphics includes
 #include "graphics/imgui/font_icon.h"
 #include "graphics/imgui/ImGuiWindow.h"
 
-// game
-#include "gameplay/Game.h"
-
-// editor
+// editor includes
 #include "editor/core/EditorEngine.h"
+
+// game includes
+#include "gameplay/Game.h"
 
 namespace gallus
 {
@@ -29,7 +27,7 @@ namespace gallus
 			//---------------------------------------------------------------------
 			// ConsoleWindow
 			//---------------------------------------------------------------------
-			ConsoleWindow::ConsoleWindow(ImGuiWindow& a_Window) : BaseWindow(a_Window, ImGuiWindowFlags_NoCollapse, std::string(font::ICON_CONSOLE) + " Console", "CONSOLE"), m_SearchBar(a_Window)
+			ConsoleWindow::ConsoleWindow(ImGuiWindow& a_Window) : BaseWindow(a_Window, ImGuiWindowFlags_NoCollapse, std::string(font::ICON_CONSOLE) + " Console", "Console"), m_SearchBar(a_Window)
 			{
 				m_SearchBar.Initialize("");
 
@@ -83,7 +81,7 @@ namespace gallus
 					return;
 				}
 
-				editor::EditorSettings& editorSettings = core::EDITOR_ENGINE->GetEditor().GetEditorSettings();
+				gallus::editor::EditorSettings& editorSettings = core::EDITOR_ENGINE->GetEditor().GetEditorSettings();
 
 				// Filter messages if need be.
 				if (m_bNeedsRefresh)

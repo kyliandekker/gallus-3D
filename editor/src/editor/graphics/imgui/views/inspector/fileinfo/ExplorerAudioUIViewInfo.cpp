@@ -1,36 +1,33 @@
 #ifndef IMGUI_DISABLE
 #ifdef _EDITOR
 
-// header
 #include "ExplorerAudioUIViewInfo.h"
 
-// external
 #include <imgui/imgui.h>
 #include <imgui/imgui_helpers.h>
 #include <imgui/implot.h>
 
-// core
+// core includes
 #include "core/Data.h"
 
-// graphics
+// logger includes
+#include "logger/Logger.h"
+
+// graphics includes
 #include "graphics/imgui/ImGuiWindow.h"
 
-// audio
+// audio includes
 #include "audio/WaveReader.h"
 #include "audio/ChunkCollection.h"
 #include "audio/WaveChunks.h"
 #include "audio/ChunkFilter.h"
 #include "audio/AudioUtils.h"
 
-// resources
-#include "resources/metadata/MetaData.h"
-
-// logger
-#include "logger/Logger.h"
-
-// editor
-#include "resources/FileResource.h"
+// editor includes
 #include "editor/graphics/imgui/views/ExplorerFileUIView.h"
+
+// resources
+#include "resources/FileResource.h"
 
 namespace gallus
 {

@@ -1,17 +1,14 @@
 #pragma once
 
-// base class
 #include "gameplay/ECSBaseSystem.h"
 
-// external
 #include <vector>
 #include <map>
 #include <set>
 
-// core
 #include "core/Event.h"
 
-// gameplay
+// gameplay includes
 #include "gameplay/systems/components/ColliderComponent.h"
 
 namespace gallus

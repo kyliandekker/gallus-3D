@@ -1,15 +1,12 @@
 #pragma once
 
-// base class
 #include "core/ReserveDataStream.h"
 
-// core
 #include "core/Memory.h"
 
-// audio
-#include "audio/Utils.h"
-#include "audio/ChunkHeader.h"
-#include "audio/WAVE_READER_RESULT.h"
+#include "./Utils.h"
+#include "./ChunkHeader.h"
+#include "./WAVE_READER_RESULT.h"
 
 namespace gallus
 {

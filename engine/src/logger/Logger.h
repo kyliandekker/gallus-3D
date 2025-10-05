@@ -1,9 +1,7 @@
 #pragma once
 
-// base class
 #include "core/System.h"
 
-// external
 #include <assert.h>
 #include <queue>
 #include <thread>
@@ -11,11 +9,11 @@
 #include <mutex>
 #include <chrono>
 
-// core
+// core includes
 #include "core/Event.h"
 
-// utils
-#include "utils/FILEPCH.h"
+// utils includes
+#include "utils/file_abstractions.h"
 
 namespace gallus
 {

@@ -1,10 +1,8 @@
 #ifndef IMGUI_DISABLE
 #ifdef _EDITOR
 
-// header
 #include "TransformComponentUIView.h"
 
-// external
 #include <imgui/imgui_helpers.h>
 #include <imgui/ImGuizmo.h>
 #include <rapidjson/document.h>
@@ -12,11 +10,11 @@
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/prettywriter.h>
 
-// graphics
+// graphics includes
 #include "graphics/imgui/font_icon.h"
 #include "graphics/imgui/ImGuiWindow.h"
 
-// gameplay
+// gameplay includes
 #include "gameplay/Game.h"
 
 namespace gallus
@@ -42,6 +40,18 @@ namespace gallus
 				ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0);
 				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, m_Window.GetFramePadding());
 
+				ImGui::AlignTextToFramePadding();
+				ImGui::DisplayHeader(m_Window.GetBoldFont(), "Rotation: ");
+				ImGui::SameLine();
+
+				float rotation = m_Component.Transform().GetRotation();
+				ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+				if (ImGui::DragFloat(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "TRANSFORM_ROT_INSPECTOR").c_str(), &rotation, 1.0f, -999999999, 99999999999))
+				{
+					m_Component.Transform().SetRotation(rotation);
+					core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
+				}
+
 				ImGui::DisplayHeader(m_Window.GetBoldFont(), "Position: ");
 				ImGui::Indent();
 
@@ -49,24 +59,6 @@ namespace gallus
 				if (m_PositionView.Render("TRANSFORM_POSITION_INSPECTOR"))
 				{
 					m_Component.Transform().SetPosition(m_PositionView.GetValue());
-					core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
-				}
-				ImGui::Unindent();
-
-				ImGui::DisplayHeader(m_Window.GetBoldFont(), "Rotation: ");
-				ImGui::Indent();
-
-				DirectX::XMFLOAT3 preVal = m_Component.Transform().GetRotation();
-				m_RotationView.SetValue(preVal);
-				int axis = m_RotationView.Render("TRANSFORM_ROTATION_INSPECTOR");
-				if (axis)
-				{
-					DirectX::XMFLOAT3 result = {
-						m_RotationView.GetValue().x - preVal.x,
-						m_RotationView.GetValue().y - preVal.y,
-						m_RotationView.GetValue().z - preVal.z
-					};
-					m_Component.Transform().AddRotation(result);
 					core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
 				}
 				ImGui::Unindent();

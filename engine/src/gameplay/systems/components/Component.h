@@ -1,10 +1,8 @@
 #pragma once
 
-// external
 #include <rapidjson/document.h>
 #include <string>
 
-// gameplay
 #include "gameplay/EntityID.h"
 
 namespace gallus

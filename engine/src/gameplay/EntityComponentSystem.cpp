@@ -1,13 +1,12 @@
-// header
 #include "gameplay/EntityComponentSystem.h"
 
-// gameplay
+// logger includes
+#include "logger/Logger.h"
+
+// gameplay includes
 #include "gameplay/ECSBaseSystem.h"
 #include "gameplay/systems/TransformSystem.h"
 #include "gameplay/systems/SpriteSystem.h"
-
-// logger
-#include "logger/Logger.h"
 
 namespace gallus
 {
@@ -25,16 +24,12 @@ namespace gallus
 		//---------------------------------------------------------------------
 		bool EntityComponentSystem::Destroy()
 		{
-			std::lock_guard<std::recursive_mutex> lock(m_EntityMutex);
-
 			for (AbstractECSSystem* system : m_aSystems)
 			{
 				system->Destroy();
 				delete system;
 			}
-
 			m_aSystems.clear();
-
 			LOG(LOGSEVERITY_SUCCESS, LOG_CATEGORY_ECS, "ECS destroyed.");
 			return System::Destroy();
 		}

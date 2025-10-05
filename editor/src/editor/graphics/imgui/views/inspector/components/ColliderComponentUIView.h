@@ -1,15 +1,14 @@
-#pragma once
-
 #ifndef IMGUI_DISABLE
 #ifdef _EDITOR
 
-// base class
+#pragma once
+
 #include "ComponentUIView.h"
 
-// graphics
+// graphics includes
 #include "graphics/imgui/views/DataTypes/VectorView.h"
 
-// gameplay
+// gameplay includes
 #include "gameplay/systems/CollisionSystem.h"
 #include "gameplay/systems/components/ColliderComponent.h"
 
@@ -51,7 +50,7 @@ namespace gallus
 				std::string GetName() const override;
 
 				/// UI elements for displaying and editing the position, rotation, and scale as glm::vec3.
-				Vector3View<DirectX::XMFLOAT3>
+				Vector2View<DirectX::XMFLOAT2>
 					m_OffsetView,
 					m_SizeView;
 

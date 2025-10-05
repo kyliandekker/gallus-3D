@@ -1,11 +1,8 @@
-// header
 #include "ChunkHeader.h"
 
-// external
 #include <cstring>
 
-// audio
-#include "audio/Utils.h"
+#include "Utils.h"
 
 namespace gallus
 {

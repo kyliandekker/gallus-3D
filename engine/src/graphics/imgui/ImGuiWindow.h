@@ -2,10 +2,8 @@
 
 #pragma once
 
-// base class
 #include "core/System.h"
 
-// external
 #include <imgui/imgui.h>
 #include <wtypes.h>
 #include <memory>

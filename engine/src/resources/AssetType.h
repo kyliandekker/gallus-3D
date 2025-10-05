@@ -1,6 +1,5 @@
 #pragma once
 
-// external
 #include <string>
 
 namespace gallus
@@ -15,7 +14,6 @@ namespace gallus
 			Folder,
 			Scene,
 			Sprite,
-			Mesh,
 			Sound,
 			Song,
 			VO,
@@ -23,7 +21,8 @@ namespace gallus
 			PixelShader,
 			VertexShader,
 			Prefab,
-			ShaderBind
+			ShaderBind,
+			Mesh,
 		};
 
 		/// <summary>
@@ -42,10 +41,6 @@ namespace gallus
 				case AssetType::Sprite:
 				{
 					return "Sprite File";
-				}
-				case AssetType::Mesh:
-				{
-					return "Mesh File";
 				}
 				case AssetType::Sound:
 				{
@@ -73,7 +68,11 @@ namespace gallus
 				}
 				case AssetType::ShaderBind:
 				{
-					return "ShaderBind";
+					return "Shader Bind";
+				}
+				case AssetType::Mesh:
+				{
+					return "Mesh";
 				}
 				default:
 				{

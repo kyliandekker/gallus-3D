@@ -1,7 +1,5 @@
-// header
 #include "Data.h"
 
-// external
 #include <corecrt_malloc.h>
 #include <stdio.h>
 #include <cassert>

@@ -1,9 +1,7 @@
 #pragma once
 
-// base class
 #include "Data.h"
 
-// external
 #include <cstdint>
 
 #ifndef SEEK_SET

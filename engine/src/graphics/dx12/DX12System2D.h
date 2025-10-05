@@ -1,25 +1,25 @@
 #pragma once
 
-// base class
+#include "DX12PCH.h"
 #include "core/System.h"
 
-// external
 #include <glm/vec2.hpp>
 #include <memory>
 #include <mutex>
 #include <chrono>
 
-// core
+// core includes
 #include "core/Event.h"
 
-// graphics
-#include "DX12PCH.h"
+// graphics includes
 #include "graphics/dx12/HeapAllocation.h"
 #include "graphics/dx12/Camera.h"
-#include "graphics/dx12/DX12Resource.h"
 #ifndef IMGUI_DISABLE
 #include "graphics/imgui/ImGuiWindow.h"
 #endif // IMGUI_DISABLE
+
+// gameplay includes
+#include "gameplay/systems/components/SpriteComponent.h"
 
 #undef min
 #undef max
@@ -47,10 +47,8 @@ namespace gallus
 
 			// Create the vertex input layout
 			const D3D12_INPUT_ELEMENT_DESC g_aInputLayout[] = {
-				{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+				{ "POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
 				{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-				{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-				{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
 			};
 
 			// Root parameters for the game.
@@ -141,15 +139,6 @@ namespace gallus
 				{
 					return m_Camera;
 				}
-
-				/// <summary>
-				/// Retrieves the camera.
-				/// </summary>
-				/// <returns>Reference to the camera.</returns>
-				Camera& GetActiveCamera()
-				{
-					return *m_pActiveCamera;
-				}
 			protected:
 				bool Sleep() const override
 				{
@@ -199,11 +188,6 @@ namespace gallus
 				void CreateSRV();
 
 				/// <summary>
-				/// Creates the DSV.
-				/// </summary>
-				void CreateDSV();
-
-				/// <summary>
 				/// Destroys the system, releasing resources and performing necessary cleanup.
 				/// </summary>
 				/// <returns>True if the destruction was successful, otherwise false.</returns>
@@ -224,12 +208,6 @@ namespace gallus
 				/// <param name="a_vPos">The position of the window.</param>
 				/// <param name="a_vSize">The size of the window.</param>
 				void Resize(const glm::ivec2& a_vPos, const glm::ivec2& a_vSize);
-
-				/// <summary>
-				/// Resizes the depth buffer.
-				/// </summary>
-				/// <param name="a_Size">The new size of the depth buffer.</param>
-				void ResizeDepthBuffer(const glm::ivec2& a_vSize);
 
 				/// <summary>
 				/// Retrieves the current back buffer.
@@ -298,15 +276,6 @@ namespace gallus
 				};
 
 				/// <summary>
-				/// Retrieves the DSV heap.
-				/// </summary>
-				/// <returns>Reference to the DSV heap allocation.</returns>
-				HeapAllocation& GetDSV()
-				{
-					return m_DSV;
-				};
-
-				/// <summary>
 				/// Retrieves the DirectX 12 device.
 				/// </summary>
 				/// <returns>ComPtr to the ID3D12Device2.</returns>
@@ -352,11 +321,6 @@ namespace gallus
 					return m_FpsCounter;
 				}
 
-				void SetActiveCamera(Camera& a_Camera)
-				{
-					m_pActiveCamera = &a_Camera;
-				}
-
 				std::shared_ptr<Texture> GetRenderTexture();
 
 				SimpleEvent<DX12System2D&> m_eOnInitialize;
@@ -391,8 +355,6 @@ namespace gallus
 				std::shared_ptr<CommandQueue> m_pDirectCommandQueue = nullptr;
 				std::shared_ptr<CommandQueue> m_pCopyCommandQueue = nullptr;
 
-				DX12Resource m_DepthBuffer;
-
 				HWND m_hWnd = nullptr;
 				win32::Window* m_pWindow = nullptr;
 
@@ -400,8 +362,7 @@ namespace gallus
 
 				HeapAllocation
 					m_SRV,
-					m_RTV,
-					m_DSV;
+					m_RTV;
 
 				Microsoft::WRL::ComPtr<ID3D12RootSignature> m_pRootSignature = nullptr;
 
@@ -423,7 +384,6 @@ namespace gallus
 				FPSCounter m_FpsCounter;
 
 				Camera m_Camera;
-				Camera* m_pActiveCamera = &m_Camera;
 			};
 		}
 	}

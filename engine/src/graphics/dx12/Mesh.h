@@ -1,22 +1,20 @@
 #pragma once
 
-// base class
+#include "graphics/dx12/DX12PCH.h"
 #include "graphics/dx12/DX12Resource.h"
 
-// external
 #include <string>
 #include <vector>
 #include <cstdint>
 #include <memory>
 
-// graphics
-#include "graphics/dx12/DX12PCH.h"
+// utils includes
+#include "utils/file_abstractions.h"
+
+// graphics includes
 #include "graphics/dx12/DX12Transform.h"
 #include "graphics/dx12/IndexBuffer.h"
 #include "graphics/dx12/VertexBuffer.h"
-
-// utils
-#include "utils/FILEPCH.h"
 
 namespace gallus
 {
@@ -28,14 +26,12 @@ namespace gallus
 			// VertexPosUV
 			//---------------------------------------------------------------------
 			/// <summary>
-			/// A simple vertex format.
+			/// A simple vertex format containing a 2D position and texture coordinates (UV).
 			/// </summary>
 			struct VertexPosUV
 			{
-				DirectX::XMFLOAT3 Position;
+				DirectX::XMFLOAT2 Position;
 				DirectX::XMFLOAT2 UV;
-				DirectX::XMFLOAT3 Normal;
-				DirectX::XMFLOAT3 Color = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
 			};
 
 			//---------------------------------------------------------------------
@@ -48,7 +44,6 @@ namespace gallus
 			class MeshPartData
 			{
 			public:
-				MeshPartData() = default;
 				MeshPartData(
 					std::vector<VertexPosUV> a_aVertices,
 					std::vector<uint16_t> a_aIndices) :
@@ -72,10 +67,10 @@ namespace gallus
 			inline std::vector<MeshPartData> s_PRIMITIVES = {
 				MeshPartData(
 					{
-						{ DirectX::XMFLOAT3(-0.5f, -0.5f, 0), DirectX::XMFLOAT2(0.0f, 0.0f), DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f), DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f) },
-						{ DirectX::XMFLOAT3(0.5f, -0.5f, 0), DirectX::XMFLOAT2(1.0f, 0.0f), DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f), DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f) },
-						{ DirectX::XMFLOAT3(-0.5f, 0.5f, 0), DirectX::XMFLOAT2(0.0f, 1.0f), DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f), DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f) },
-						{ DirectX::XMFLOAT3(0.5f, 0.5f, 0), DirectX::XMFLOAT2(1.0f, 1.0f), DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f), DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f) }
+						{ DirectX::XMFLOAT2(-0.5f, -0.5f), DirectX::XMFLOAT2(0.0f, 0.0f) },
+						{ DirectX::XMFLOAT2(0.5f, -0.5f), DirectX::XMFLOAT2(1.0f, 0.0f) },
+						{ DirectX::XMFLOAT2(-0.5f, 0.5f), DirectX::XMFLOAT2(0.0f, 1.0f) },
+						{ DirectX::XMFLOAT2(0.5f, 0.5f), DirectX::XMFLOAT2(1.0f, 1.0f) }
 					},
 					{
 						0, 1, 2,
@@ -122,15 +117,9 @@ namespace gallus
 				/// <returns>True if loading was successful, false otherwise.</returns>
 				bool LoadByName(const std::string& a_sName);
 
-				bool GetMeshDataFromModel(const std::string& a_sName, std::vector<MeshPartData>& a_aMeshData);
-				bool GetMeshDataFromModel(const fs::path& a_Path, std::vector<MeshPartData>& a_aMeshData);
-
-				void SetMeshData(const MeshPartData& a_aData);
-				void SetMeshData(const std::vector<MeshPartData>& a_aData);
-				void UploadMesh(const std::shared_ptr<CommandList> a_pCommandList);
+				void SetMeshData(const MeshPartData& a_aData, const std::shared_ptr<CommandList> a_pCommandList);
 			private:
 				std::vector<MeshPartData> m_aMeshData;
-				bool m_bUploadedMeshData = false;
 			};
 		}
 	}

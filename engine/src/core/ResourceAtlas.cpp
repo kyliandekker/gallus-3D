@@ -282,18 +282,6 @@ namespace gallus
 			if (!mesh->IsValid())
 			{
 				mesh->LoadByName(a_sName);
-
-				resources::FileResource* fileResource = nullptr;
-				if (!GetResource(a_sName, fileResource))
-				{
-					return mesh;
-				}
-
-				fs::path meshPath = fileResource->GetPath().lexically_normal();
-
-				std::vector<graphics::dx12::MeshPartData> meshData;
-				mesh->GetMeshDataFromModel(meshPath, meshData);
-				mesh->SetMeshData(meshData);
 			}
 			return mesh;
 		}

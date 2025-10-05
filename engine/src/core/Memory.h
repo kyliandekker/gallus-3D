@@ -1,6 +1,5 @@
 #pragma once
 
-// external
 #include <cstdint>
 
 namespace gallus

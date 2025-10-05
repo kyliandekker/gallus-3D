@@ -1,10 +1,7 @@
-// header
 #include "WaveChunks.h"
 
-// external
 #include <cstring>
 
-// core
 #include "core/Memory.h"
 
 namespace gallus

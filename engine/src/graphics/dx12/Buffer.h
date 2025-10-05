@@ -1,13 +1,9 @@
 #pragma once
 
-// base class
+#include "graphics/dx12/DX12PCH.h"
 #include "graphics/dx12/DX12Resource.h"
 
-// external
 #include <string>
-
-// graphics
-#include "graphics/dx12/DX12PCH.h"
 
 namespace gallus
 {

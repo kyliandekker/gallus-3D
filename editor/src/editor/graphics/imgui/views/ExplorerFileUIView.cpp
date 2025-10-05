@@ -1,19 +1,13 @@
 #ifndef IMGUI_DISABLE
 #ifdef _EDITOR
 
-// header
 #include "ExplorerFileUIView.h"
 
-// external
 #include <imgui/imgui_helpers.h>
 
-// graphics
+#include "resources/FileResource.h"
 #include "graphics/imgui/ImGuiWindow.h"
 #include "graphics/imgui/font_icon.h"
-
-// resources
-#include "resources/metadata/MetaData.h"
-#include "resources/FileResource.h"
 #include "resources/AssetType.h"
 
 namespace gallus
@@ -27,7 +21,6 @@ namespace gallus
 				font::ICON_FOLDER,
 				font::ICON_FILE_SCENE,
 				font::ICON_FILE_IMAGE,
-				font::ICON_FILE_MODEL,
 				font::ICON_FILE_AUDIO,
 				font::ICON_FILE_MUSIC,
 				font::ICON_FILE_VO,
@@ -35,10 +28,9 @@ namespace gallus
 				font::ICON_FILE_SETTINGS, // TODO: FIND ICON SHADER
 				font::ICON_FILE_SETTINGS, // TODO: FIND ICON SHADER
 				font::ICON_FILE_MODEL,
-				font::ICON_FILE_SETTINGS, 
 			};
 
-			ExplorerFileUIView::ExplorerFileUIView(ImGuiWindow& a_Window, resources::FileResource& a_FileResource, ExplorerFileUIView* a_pParent, bool a_bGetChildren) : ImGuiUIView(a_Window),
+			ExplorerFileUIView::ExplorerFileUIView(ImGuiWindow& a_Window, gallus::resources::FileResource& a_FileResource, ExplorerFileUIView* a_pParent, bool a_bGetChildren) : ImGuiUIView(a_Window),
 				m_FileResource(a_FileResource),
 				m_pParent(a_pParent)
 			{
@@ -47,7 +39,7 @@ namespace gallus
 
 				if (a_bGetChildren)
 				{
-					for (resources::FileResource& child : a_FileResource.GetChildren())
+					for (gallus::resources::FileResource& child : a_FileResource.GetChildren())
 					{
 						m_aChildren.emplace_back(a_Window, child, this);
 					}
@@ -196,7 +188,7 @@ namespace gallus
 
 				ImGui::Text(m_sDisplayName.c_str());
 
-				std::string assetType = resources::AssetTypeToString(m_FileResource.GetMetaData()->GetAssetType());
+				std::string assetType = gallus::resources::AssetTypeToString(m_FileResource.GetMetaData()->GetAssetType());
 
 				textSize = ImGui::CalcTextSize(assetType.c_str());
 
@@ -285,9 +277,9 @@ namespace gallus
 
 			bool ExplorerFileUIView::HasFolders() const
 			{
-				for (const resources::FileResource& resource : m_FileResource.GetChildren())
+				for (const gallus::resources::FileResource& resource : m_FileResource.GetChildren())
 				{
-					if (resource.GetMetaData() && resource.GetMetaData()->GetAssetType() == resources::AssetType::Folder)
+					if (resource.GetMetaData() && resource.GetMetaData()->GetAssetType() == gallus::resources::AssetType::Folder)
 					{
 						return true;
 					}

@@ -1,17 +1,15 @@
 #pragma once
 
-// base class
 #include "core/System.h"
 
-// external
 #include <vector>
 #include <string>
 #include <mutex>
 
-// core
+// core includes
 #include "core/Event.h"
 
-// gameplay
+// gameplay includes
 #include "gameplay/Entity.h"
 
 namespace gallus

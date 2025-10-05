@@ -1,11 +1,10 @@
-// header
-#include "TransformSystem.h"
+#include "gameplay/systems/TransformSystem.h"
 
-// graphics
-#include "graphics/imgui/font_icon.h"
-
-// logger
+// logger includes
 #include "logger/Logger.h"
+
+// graphics includes
+#include "graphics/imgui/font_icon.h"
 
 namespace gallus
 {

@@ -3,19 +3,14 @@
 
 #pragma once
 
-// base class
 #include "graphics/imgui/modals/BaseModal.h"
 
-// external
 #include <string>
 #include <vector>
 #include <functional>
 #include <memory>
 
-// graphics
 #include "graphics/imgui/views/DataTypes/StringTextInput.h"
-
-// resources
 #include "resources/AssetType.h"
 
 namespace gallus
@@ -23,6 +18,9 @@ namespace gallus
 	namespace resources
 	{
 		class TextureMetaData;
+	}
+	namespace resources
+	{
 		class FileResource;
 	}
 	namespace graphics
@@ -80,7 +78,7 @@ namespace gallus
 				std::shared_ptr<graphics::dx12::Texture> m_pPreviewTexture = nullptr;
 
 				resources::TextureMetaData* m_pTextureMetaData = nullptr;
-				resources::FileResource* m_FileResource = nullptr;
+				resources::FileResource* m_pFileResource = nullptr;
 			};
 		}
 	}

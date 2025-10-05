@@ -3,13 +3,10 @@
 
 #pragma once
 
-// base class
 #include "graphics/imgui/views/ImGuiUIView.h"
 
-// external
 #include <string>
 
-// editor
 #include "editor/core/EditorEngine.h"
 
 namespace gallus
@@ -65,7 +62,7 @@ namespace gallus
 				/// </summary>
 				/// <param name="a_Component">The component to be rendered.</param>
 				/// <param name="a_System">The system managing the component.</param>
-				void RenderBaseComponent(gameplay::Component& a_Component, gameplay::AbstractECSSystem& a_System, const gameplay::EntityID& a_EntityID);
+				void RenderBaseComponent(gameplay::Component& a_Component, gameplay::AbstractECSSystem& a_System);
 
 				bool ShowPreview() const
 				{
@@ -121,7 +118,6 @@ namespace gallus
 				/// Constructs the ComponentUIView with a specific component and system.
 				/// </summary>
 				/// <param name="a_Window">The ImGui window for rendering the view.</param>
-				/// <param name="a_EntityID">The EntityID associated with the component being rendered.</param>
 				/// <param name="a_Component">The component to render.</param>
 				/// <param name="a_System">The system managing the component.</param>
 				ComponentUIView(ImGuiWindow& a_Window, C& a_Component, S& a_System) : ComponentBaseUIView(a_Window), m_Component(a_Component), m_System(a_System)
@@ -134,7 +130,7 @@ namespace gallus
 				{
 					std::lock_guard<std::recursive_mutex> lock(core::EDITOR_ENGINE->GetECS().m_EntityMutex);
 
-					RenderBaseComponent(m_Component, m_System, m_Component.GetEntityID());
+					RenderBaseComponent(m_Component, m_System);
 				}
 
 				/// <summary>

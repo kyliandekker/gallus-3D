@@ -3,10 +3,8 @@
 
 #pragma once
 
-// base class
 #include "graphics/imgui/views/ImGuiUIView.h"
 
-// external
 #include <string>
 
 namespace gallus
@@ -20,17 +18,17 @@ namespace gallus
 			/// <summary>
 			/// Abstract class for items that will be viewable in the inspector.
 			/// </summary>
-			class InspectorUIView : public ImGuiUIView
+			class InspectorView : public ImGuiUIView
 			{
 			public:
 				/// <summary>
 				/// Constructs an inspector view.
 				/// </summary>
 				/// <param name="a_Window">The ImGui window for rendering the view.</param>
-				InspectorUIView(ImGuiWindow& a_Window) : ImGuiUIView(a_Window)
+				InspectorView(ImGuiWindow& a_Window) : ImGuiUIView(a_Window)
 				{}
 
-				virtual ~InspectorUIView() = default;
+				virtual ~InspectorView() = default;
 
 				virtual void OnRename(const std::string& a_sName)
 				{}

@@ -1,10 +1,8 @@
 #ifndef IMGUI_DISABLE
 #ifdef _EDITOR
 
-// header
 #include "ComponentUIView.h"
 
-// external
 #include <imgui/imgui_helpers.h>
 #include <imgui/imgui_internal.h>
 #include <imgui/ImGuizmo.h>
@@ -13,14 +11,11 @@
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/prettywriter.h>
 
-// graphics
+#include "utils/string_extensions.h"
+
 #include "graphics/imgui/font_icon.h"
 #include "graphics/imgui/ImGuiWindow.h"
 
-// utils
-#include "utils/string_extensions.h"
-
-// gameplay
 #include "gameplay/ECSBaseSystem.h"
 #include "gameplay/systems/components/Component.h"
 #include "gameplay/Game.h"
@@ -34,7 +29,7 @@ namespace gallus
 			//---------------------------------------------------------------------
 			// ComponentBaseUIView
 			//---------------------------------------------------------------------
-			void ComponentBaseUIView::RenderBaseComponent(gameplay::Component& a_Component, gameplay::AbstractECSSystem& a_System, const gameplay::EntityID& a_EntityID)
+			void ComponentBaseUIView::RenderBaseComponent(gameplay::Component& a_Component, gameplay::AbstractECSSystem& a_System)
 			{
 				ImVec2 size = m_Window.GetHeaderSize();
 
@@ -49,7 +44,7 @@ namespace gallus
 				ImGui::SameLine();
 				if (ImGui::IconButton(ImGui::IMGUI_FORMAT_ID(font::ICON_DELETE, BUTTON_ID, string_extensions::StringToUpper(GetName()) + "_DELETE_HIERARCHY").c_str(), size, m_Window.GetIconFont()))
 				{
-					a_System.DeleteComponent(a_EntityID);
+					a_System.DeleteComponent(a_Component.GetEntityID());
 				}
 				ImGui::PopStyleVar();
 				ImGui::PopStyleVar();
@@ -68,13 +63,7 @@ namespace gallus
 			{
 				ImGuizmo::BeginFrame();
 
-				graphics::dx12::Camera* cam = &core::ENGINE->GetDX12().GetCamera();
-				if (!gameplay::GAME.IsStarted() && core::EDITOR_ENGINE->GetEditor().GetCameraMode() == editor::CameraMode::CAMERA_MODE_SCENE)
-				{
-					cam = &core::EDITOR_ENGINE->GetEditor().GetEditorCamera();
-				}
-
-				ImGuizmo::SetOrthographic(cam->GetCameraProjectionMode() == graphics::dx12::CameraProjectionMode::Orthographic);
+				ImGuizmo::SetOrthographic(false);
 				ImGuizmo::SetDrawlist(ImGui::GetCurrentWindow()->DrawList);
 
 				ImGuizmo::SetRect(a_vScenePos.x + a_vPanOffset.x, a_vScenePos.y + a_vPanOffset.y, a_vSize.x * a_fZoom, a_vSize.y * a_fZoom);
@@ -83,19 +72,13 @@ namespace gallus
 			//---------------------------------------------------------------------
 			void ComponentBaseUIView::DrawTransformGizmo(graphics::dx12::DX12Transform& a_Transform, const ImVec2& a_vScenePos, const ImVec2& a_vSize, const ImVec2& a_vPanOffset, float a_fZoom)
 			{
-				DirectX::XMMATRIX pivotOffset = DirectX::XMMatrixTranslation(a_Transform.GetPivot().x, a_Transform.GetPivot().y, a_Transform.GetPivot().z);
+				DirectX::XMMATRIX pivotOffset = DirectX::XMMatrixTranslation(a_Transform.GetPivot().x, a_Transform.GetPivot().y, 0.0f);
 				DirectX::XMMATRIX objectMat = a_Transform.GetWorldMatrix();
-				objectMat = objectMat * pivotOffset;
-
-				graphics::dx12::Camera* cam = &core::ENGINE->GetDX12().GetCamera();
-				if (!gameplay::GAME.IsStarted() && core::EDITOR_ENGINE->GetEditor().GetCameraMode() == editor::CameraMode::CAMERA_MODE_SCENE)
-				{
-					cam = &core::EDITOR_ENGINE->GetEditor().GetEditorCamera();
-				}
+				objectMat = objectMat * pivotOffset;;
 
 				// Get transformation matrices
-				DirectX::XMMATRIX viewMat = cam->GetViewMatrix();
-				const DirectX::XMMATRIX& projMat = cam->GetProjectionMatrix();
+				DirectX::XMMATRIX viewMat = core::EDITOR_ENGINE->GetDX12().GetCamera().GetViewMatrix();
+				const DirectX::XMMATRIX& projMat = core::EDITOR_ENGINE->GetDX12().GetCamera().GetProjectionMatrix();
 
 				// Convert DirectX matrices to float[16] format for ImGuizmo
 				float objectFloat[16];
@@ -112,7 +95,7 @@ namespace gallus
 				}
 				if (ImGui::IsKeyPressed(ImGuiKey_R))
 				{
-					core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetLastSceneOperation((int) ImGuizmo::ROTATE);
+					core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetLastSceneOperation((int) ImGuizmo::ROTATE_Z);
 					core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
 				}
 				if (ImGui::IsKeyPressed(ImGuiKey_S))
@@ -129,7 +112,7 @@ namespace gallus
 					viewFloat,
 					projFloat,
 					(ImGuizmo::OPERATION) core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetLastSceneOperation(),
-					ImGuizmo::WORLD,
+					ImGuizmo::LOCAL,
 					objectFloat, 0, &snap))
 				{
 					DirectX::XMMATRIX result = DirectX::XMLoadFloat4x4(reinterpret_cast<DirectX::XMFLOAT4X4*>(objectFloat));

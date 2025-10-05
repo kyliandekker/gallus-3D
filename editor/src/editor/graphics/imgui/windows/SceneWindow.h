@@ -3,8 +3,9 @@
 
 #pragma once
 
-// base class
 #include "graphics/imgui/windows/BaseWindow.h"
+
+#include <imgui\ImGuizmo.h>
 
 namespace gallus
 {
@@ -43,7 +44,6 @@ namespace gallus
 				/// Renders the scene window.
 				/// </summary>
 				void Render() override;
-				void HandleCameraInput(double a_fDeltaTime, const ImVec2& a_vSceneStartPos, const ImVec2& a_vSize);
 			private:
 				void DrawComponentGizmos(const ImVec2& a_vSceneStartPos, const ImVec2& a_vSize);
 				void DrawViewportPanel();

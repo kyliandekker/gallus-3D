@@ -1,29 +1,29 @@
 #ifndef IMGUI_DISABLE
 #ifdef _EDITOR
 
-// header
 #include "ExplorerSpriteUIViewInfo.h"
 
-// external
 #include <imgui/imgui.h>
 #include <imgui/imgui_helpers.h>
 
-// core
+// core includes
 #include "editor/core/EditorEngine.h"
 
-// graphics
+// graphics includes
 #include "graphics/imgui/ImGuiWindow.h"
-#include "graphics/imgui/font_icon.h"
+
+// graphics includes
 #include "graphics/dx12/Texture.h"
 #include "graphics/dx12/CommandQueue.h"
 #include "graphics/dx12/CommandList.h"
+#include "graphics/imgui/font_icon.h"
 
 // resources
 #include "resources/FileResource.h"
-#include "resources/metadata/TextureMetaData.h"
 
-// editor
+// editor includes
 #include "editor/graphics/imgui/views/ExplorerFileUIView.h"
+#include "resources/metadata/TextureMetaData.h"
 #include "editor/graphics/imgui/modals/SpriteEditorModal.h"
 
 namespace gallus
@@ -50,7 +50,7 @@ namespace gallus
 				auto cCommandQueue = core::EDITOR_ENGINE->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
 				auto cCommandList = cCommandQueue->GetCommandList();
 				m_pPreviewTexture = core::EDITOR_ENGINE->GetResourceAtlas().LoadTexture(m_ExplorerFileUIView.GetFileResource().GetPath().filename().generic_string(), cCommandList);
-				m_pPreviewTexture->SetResourceCategory(core::EngineResourceCategory::Editor);
+				m_pPreviewTexture->SetResourceCategory(gallus::core::EngineResourceCategory::Editor);
 				cCommandQueue->ExecuteCommandList(cCommandList);
 				cCommandQueue->Flush();
 			}

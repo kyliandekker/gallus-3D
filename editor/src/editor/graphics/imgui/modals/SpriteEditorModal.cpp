@@ -1,34 +1,30 @@
 #ifndef IMGUI_DISABLE
 #ifdef _EDITOR
 
-// header
 #include "SpriteEditorModal.h"
 
-// external
 #include <imgui/imgui.h>
 #include <imgui/imgui_helpers.h>
 #include <imgui/imgui_internal.h>
 #include <algorithm>
 
-// core
+// core includes
 #include "editor/core/EditorEngine.h"
 
-// graphics
+// utils includes
+#include "utils/string_extensions.h"
+
+// graphics includes
 #include "graphics/imgui/font_icon.h"
 #include "graphics/imgui/ImGuiWindow.h"
 #include "graphics/dx12/CommandQueue.h"
 #include "graphics/dx12/CommandList.h"
 #include "graphics/dx12/Texture.h"
 
-// resources
+// graphics includes
 #include "resources/FileResource.h"
-#include "resources/metadata/TextureMetaData.h"
-
-// utils
-#include "utils/string_extensions.h"
-
-// graphics
 #include "editor/graphics/imgui/views/ExplorerFileUIView.h"
+#include "resources/metadata/TextureMetaData.h"
 
 namespace gallus
 {
@@ -45,7 +41,7 @@ namespace gallus
 				auto cCommandQueue = core::EDITOR_ENGINE->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
 				auto cCommandList = cCommandQueue->GetCommandList();
 				m_pPreviewTexture = core::EDITOR_ENGINE->GetResourceAtlas().LoadTexture(a_sName, cCommandList);
-				m_pPreviewTexture->SetResourceCategory(core::EngineResourceCategory::Editor);
+				m_pPreviewTexture->SetResourceCategory(gallus::core::EngineResourceCategory::Editor);
 				cCommandQueue->ExecuteCommandList(cCommandList);
 				cCommandQueue->Flush();
 			}
@@ -120,7 +116,7 @@ namespace gallus
                     if (ImGui::IconButton(
                         ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_SAVE), BUTTON_ID, "SAVE_SPRITE_EDITOR_MODAL").c_str(), m_Window.GetHeaderSize(), m_Window.GetIconFont(), ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent)))
                     {
-                        m_pTextureMetaData->Save(m_FileResource->GetPath());
+                        m_pTextureMetaData->Save(m_pFileResource->GetPath());
                     }
                     ImGui::SameLine();
                     if (ImGui::Button(ImGui::IMGUI_FORMAT_ID("Add Sprite", BUTTON_ID, "ADD_SPRITE_EDITOR_MODAL").c_str(), ImVec2(0, m_Window.GetHeaderSize().y)))
@@ -517,9 +513,9 @@ namespace gallus
 
 			void SpriteEditorModal::SetData(resources::FileResource& a_FileResource)
 			{
-                m_FileResource = &a_FileResource;
+                m_pFileResource = &a_FileResource;
 				m_pTextureMetaData = a_FileResource.GetMetaData<resources::TextureMetaData>();
-				LoadTexture(m_FileResource->GetPath().filename().generic_string());
+				LoadTexture(m_pFileResource->GetPath().filename().generic_string());
 			}
 		}
 	}

@@ -1,9 +1,7 @@
 #pragma once
 
-// base class
 #include "gameplay/systems/components/Component.h"
 
-// external
 #include <DirectXMath.h>
 
 namespace gallus
@@ -36,12 +34,12 @@ namespace gallus
 			/// <param name="a_fDeltaTime">Delta time.</param>
 			void UpdateRealtime(float a_fDeltaTime) override;
 
-			void SetMovementSpeed(const DirectX::XMFLOAT3& a_fVelocity)
+			void SetMovementSpeed(const DirectX::XMFLOAT2& a_fVelocity)
 			{
 				m_fVelocity = a_fVelocity;
 			}
 		protected:
-			DirectX::XMFLOAT3 m_fVelocity = {};
+			DirectX::XMFLOAT2 m_fVelocity = {};
 		};
 	}
 }

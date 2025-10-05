@@ -3,20 +3,18 @@
 
 #pragma once
 
-// base class
 #include "graphics/imgui/windows/BaseWindow.h"
 
-// external
 #include <vector>
 
-// graphics
+// graphics includes
 #include "graphics/imgui/views/DataTypes/StringTextInput.h"
 
-// editor
-#include "editor/graphics/imgui/views/HierarchyEntityUIView.h"
-
-// gameplay
+// gameplay includes
 #include "gameplay/EntityID.h"
+
+// editor includes
+#include "editor/graphics/imgui/views/HierarchyEntityUIView.h"
 
 namespace gallus
 {
@@ -93,8 +91,6 @@ namespace gallus
 				std::vector<HierarchyEntityUIView> m_aEntities; /// List of entities shown in the hierarchy window.
 				std::vector<HierarchyEntityUIView*> m_aFilteredEntities; /// List of entities shown in the hierarchy window.
 				std::vector<std::string> m_aEntityIcons; /// List of entities shown in the hierarchy window.
-
-				HierarchyUIView m_CameraHierarchyUIView;
 
 				SearchBarInput m_SearchBar; /// Search bar to filter specific messages in the hierarchy window.
 			};

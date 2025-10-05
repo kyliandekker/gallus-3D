@@ -3,18 +3,21 @@
 #include <filesystem>
 #include <ShellScalingApi.h>
 
-// core
+// core includes
 #include "resource.h"
 #include "core/ArgProcessor.h"
 
-// graphics
-#include "graphics/imgui/windows/MainWindowDock.h"
-
-// logger
+// logger includes
 #include "logger/Logger.h"
 
-// utils
+// utils includes
 #include "utils/file_abstractions.h"
+
+// graphics includes
+#include "graphics/imgui/windows/MainWindowDock.h"
+
+// gameplay includes
+#include "gameplay/Game.h"
 
 // editor includes
 #include "editor/core/EditorEngine.h"
@@ -23,12 +26,8 @@
 #include "editor/graphics/imgui/windows/SceneWindow.h"
 #include "editor/graphics/imgui/windows/ExplorerWindow.h"
 #include "editor/graphics/imgui/windows/InspectorWindow.h"
-#include "editor/graphics/imgui/windows/ResourcesWindow.h"
 #include "editor/graphics/imgui/modals/FilePickerModal.h"
 #include "editor/graphics/imgui/modals/SpriteEditorModal.h"
-
-// gameplay
-#include "gameplay/Game.h"
 
 int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR lpCmdLine, _In_ int nShowCmd)
 {
@@ -62,7 +61,6 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR lp
 	imguiWindow.AddWindow(new gallus::graphics::imgui::SceneWindow(imguiWindow));
 	imguiWindow.AddWindow(new gallus::graphics::imgui::FullSceneWindow(imguiWindow));
 	imguiWindow.AddWindow(new gallus::graphics::imgui::ExplorerWindow(imguiWindow));
-	imguiWindow.AddWindow(new gallus::graphics::imgui::ResourcesWindow(imguiWindow));
 	imguiWindow.AddWindow(new gallus::graphics::imgui::InspectorWindow(imguiWindow));
 
 	imguiWindow.AddModal(new gallus::graphics::imgui::FilePickerModal(imguiWindow));

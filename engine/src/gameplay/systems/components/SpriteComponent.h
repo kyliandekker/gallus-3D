@@ -1,10 +1,11 @@
 #pragma once
 
-// base class
-#include "gameplay/systems/components/Component.h"
+#include "graphics/dx12/DX12PCH.h"
 
-// external
 #include <memory>
+
+// gameplay includes
+#include "gameplay/systems/components/Component.h"
 
 namespace gallus
 {

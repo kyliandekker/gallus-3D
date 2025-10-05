@@ -1,10 +1,8 @@
-// header
 #include "graphics/win32/Window.h"
 
-// external
 #include <iostream>
 
-// logger
+// logger includes
 #include "logger/Logger.h"
 
 namespace gallus

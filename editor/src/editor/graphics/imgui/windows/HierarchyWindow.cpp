@@ -1,27 +1,24 @@
 #ifndef IMGUI_DISABLE
 #ifdef _EDITOR
 
-// header
 #include "HierarchyWindow.h"
 
-// external
 #include <imgui/imgui_helpers.h>
 #include <imgui/imgui_internal.h>
 
-// graphics
-#include "graphics/imgui/font_icon.h"
-#include "graphics/imgui/ImGuiWindow.h"
-
-// utils
+// utils includes
 #include "utils/string_extensions.h"
 #include "utils/file_abstractions.h"
 
-// editor
-#include "editor/core/EditorEngine.h"
-#include "editor/graphics/imgui/views/inspector/EntityInspectorUIView.h"
-#include "editor/graphics/imgui/views/inspector/CameraInspectorUIView.h"
+// graphics includes
+#include "graphics/imgui/font_icon.h"
+#include "graphics/imgui/ImGuiWindow.h"
 
-// game
+// editor includes
+#include "editor/core/EditorEngine.h"
+#include "editor/graphics/imgui/views/inspector/EntityInspectorView.h"
+
+// game includes
 #include "gameplay/Game.h"
 
 namespace gallus
@@ -33,12 +30,9 @@ namespace gallus
 			//---------------------------------------------------------------------
 			// HierarchyWindow
 			//---------------------------------------------------------------------
-			HierarchyWindow::HierarchyWindow(ImGuiWindow& a_Window) : BaseWindow(a_Window, ImGuiWindowFlags_NoCollapse, std::string(font::ICON_LIST) + " Hierarchy", "Hierarchy"), m_SearchBar(a_Window), m_CameraHierarchyUIView(a_Window)
+			HierarchyWindow::HierarchyWindow(ImGuiWindow& a_Window) : BaseWindow(a_Window, ImGuiWindowFlags_NoCollapse, std::string(font::ICON_LIST) + " Hierarchy", "Hierarchy"), m_SearchBar(a_Window)
 			{
 				m_SearchBar.Initialize("");
-
-				m_CameraHierarchyUIView.SetName("Camera");
-				m_CameraHierarchyUIView.SetIcon(font::ICON_CAMERA);
 			}
 
 			//---------------------------------------------------------------------
@@ -229,20 +223,6 @@ namespace gallus
 					))
 				{
 					ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
-
-					{
-						bool
-							clicked = false,
-							right_clicked = false;
-
-						m_CameraHierarchyUIView.RenderInHierarchy(clicked, right_clicked, core::EDITOR_ENGINE->GetEditor().GetSelectable().get() == &m_CameraHierarchyUIView);
-
-						if (clicked)
-						{
-							core::EDITOR_ENGINE->GetEditor().SetSelectable(&m_CameraHierarchyUIView, new CameraInspectorUIView(m_Window, m_CameraHierarchyUIView));
-						}
-					}
-
 					for (HierarchyEntityUIView* view : m_aFilteredEntities)
 					{
 						if (!view)
@@ -254,7 +234,7 @@ namespace gallus
 							clicked = false,
 							right_clicked = false;
 
-						view->RenderInHierarchy(
+						view->RenderEntity(
 							clicked,
 							right_clicked,
 							core::EDITOR_ENGINE->GetEditor().GetSelectable().get() == view
@@ -297,7 +277,7 @@ namespace gallus
 			//---------------------------------------------------------------------
 			void HierarchyWindow::SetSelectable(HierarchyEntityUIView* a_EntityView)
 			{
-				core::EDITOR_ENGINE->GetEditor().SetSelectable(a_EntityView, a_EntityView ? new EntityInspectorUIView(m_Window, *a_EntityView) : nullptr);
+				core::EDITOR_ENGINE->GetEditor().SetSelectable(a_EntityView, a_EntityView ? new EntityInspectorView(m_Window, *a_EntityView) : nullptr);
 			}
 
 			//---------------------------------------------------------------------
@@ -328,7 +308,7 @@ namespace gallus
 					if (file::SaveFile(scenePath, {
 						{ L"Scene Files (*.scene)", L"*.scene" },
 						{ L"Prefab Files (*.prefab)", L"*.prefab" },
-					}, core::EDITOR_ENGINE->GetResourceAtlas().GetResourceFolder().GetPath().lexically_normal()))
+					}, core::EDITOR_ENGINE->GetResourceAtlas().GetResourceFolder().GetPath()))
 					{
 						core::EDITOR_ENGINE->GetEditor().GetScene().SetPath(scenePath);
 						core::EDITOR_ENGINE->GetEditor().GetScene().Save();

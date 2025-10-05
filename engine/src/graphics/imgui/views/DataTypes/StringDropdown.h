@@ -2,10 +2,8 @@
 
 #pragma once
 
-// base class
 #include "graphics/imgui/views/ImGuiUIView.h"
 
-// external
 #include <vector>
 #include <string>
 #include <algorithm>

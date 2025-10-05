@@ -1,13 +1,11 @@
-// header
-#include "PlayerComponent.h"
+#include "gameplay/systems/components/PlayerComponent.h"
 
-// external
 #include <rapidjson/utils.h>
 
-// engine
+// engine includes
 #include "core/Engine.h"
 
-// gameplay
+// gameplay includes
 #include "gameplay/Entity.h"
 #include "gameplay/systems/MovementSystem.h"
 #include "gameplay/systems/TransformSystem.h"
@@ -56,7 +54,8 @@ namespace gallus
 			if (a_Document.HasMember(JSON_PLAYER_COMPONENT_PREFAB_NAME) && a_Document[JSON_PLAYER_COMPONENT_PREFAB_NAME].IsString())
 			{
 				std::string prefabName = a_Document[JSON_PLAYER_COMPONENT_PREFAB_NAME].GetString();
-				core::ENGINE->GetResourceAtlas().LoadPrefab(prefabName, m_pPrefab);
+				prefabName = core::ENGINE->GetResourceAtlas().LoadPrefab(prefabName, m_pPrefab);
+				m_pPrefab.Load();
 			}
 
 			if (a_Document.HasMember(JSON_PLAYER_COMPONENT_PREFAB_NAME) && a_Document[JSON_PLAYER_COMPONENT_PREFAB_NAME].IsFloat())
@@ -112,7 +111,7 @@ namespace gallus
 				gameplay::EntityID id = m_pPrefab.Instantiate();
 
 				ProjectileSystem& projectileSystem = core::ENGINE->GetECS().GetSystem<ProjectileSystem>();
-				projectileSystem.GetComponent(id).SetMovementSpeed({ bulletSpeed, 0, 0 });
+				projectileSystem.GetComponent(id).SetMovementSpeed({ bulletSpeed, 0 });
 
 				CollisionSystem& collisionSys = core::ENGINE->GetECS().GetSystem<CollisionSystem>();
 				collisionSys.GetComponent(m_EntityID).IgnoreEntity(id);
@@ -121,13 +120,18 @@ namespace gallus
 				auto pos = transformSys.GetComponent(m_EntityID).Transform().GetPosition();
 				TransformComponent& transformComp = transformSys.GetComponent(id);
 				transformComp.Transform().SetPosition(pos);
+
+				if (leftDown)
+				{
+					transformComp.Transform().SetRotation(180);
+				}
 			}
 
             MovementSystem& movementSys = core::ENGINE->GetECS().GetSystem<MovementSystem>();
 
             float deltaSpeed = m_fSpeed * a_fDeltaTime;
 
-            DirectX::XMFLOAT3 movement = { 0.0f, 0.0f, 0.0f };
+            DirectX::XMFLOAT2 movement = { 0.0f, 0.0f };
             if (w.isKey())
             {
                 movement.y -= 1.0f;

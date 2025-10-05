@@ -1,21 +1,13 @@
 #pragma once
 
-// base class
 #include "MetaData.h"
 
-// external
 #include <vector>
+
+#include "graphics/dx12/Texture.h"
 
 namespace gallus
 {
-	namespace graphics
-	{
-		namespace dx12
-		{
-			enum class TextureType;
-			class SpriteRect;
-		}
-	}
 	namespace resources
 	{
 		class TextureMetaData : public MetaData
@@ -52,7 +44,8 @@ namespace gallus
 		private:
 			graphics::dx12::TextureType m_TextureType;
 
-			std::vector<graphics::dx12::SpriteRect> m_aSprites;
+			std::vector<graphics::dx12::SpriteRect> m_aSprites = {
+			};
 		};
 	}
 }

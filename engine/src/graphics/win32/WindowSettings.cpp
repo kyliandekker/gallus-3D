@@ -1,18 +1,20 @@
-// header
 #include "WindowSettings.h"
 
-// external
+// # Rapidjson
 #include <rapidjson/document.h>
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/prettywriter.h>
 #include <rapidjson/utils.h>
 
-// core
+// core includes
 #include "core/Engine.h"
 #include "core/DataStream.h"
 
-// logger
+// logger includes
 #include "logger/Logger.h"
+
+// utils includes
+#include "utils/file_abstractions.h"
 
 #define DEFAULT_SIZE_X 400
 #define DEFAULT_SIZE_Y 800

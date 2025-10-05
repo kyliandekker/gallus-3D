@@ -1,18 +1,16 @@
-// header
 #include "TextureMetaData.h"
 
-// external
 #include <rapidjson/utils.h>
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/prettywriter.h>
 
-// core
+// core includes
 #include "core/DataStream.h"
 
-// graphics
-#include "graphics/dx12/Texture.h"
+// utils includes
+#include "utils/file_abstractions.h"
 
-// logger
+// logger includes
 #include "logger/Logger.h"
 
 #define JSON_META_DATA_FILE_RESOURCE_TEXTURE_TYPE_VAR "textureType"

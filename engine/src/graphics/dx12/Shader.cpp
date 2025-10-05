@@ -1,7 +1,6 @@
-// header
-#include "Shader.h"
+#include "graphics/dx12/Shader.h"
 
-// logger
+// logger includes
 #include "logger/Logger.h"
 
 namespace gallus

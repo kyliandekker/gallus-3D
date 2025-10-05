@@ -3,13 +3,10 @@
 
 #pragma once
 
-// base class
 #include "ExplorerFileUIViewInfo.h"
 
-// external
 #include <memory>
 
-// graphics
 #include "graphics/imgui/views/DataTypes/StringDropdown.h"
 
 namespace gallus

@@ -1,22 +1,16 @@
 #pragma once
 
-// base class
 #include "core/System.h"
 
-// external
 #include <string>
 
-// core
 #include "core/Observable.h"
 
-// graphics
-#include "graphics/dx12/Camera.h"
+#include "graphics/imgui/views/inspector/InspectorView.h"
 
-// editor
 #include "editor/EditorSettings.h"
 #include "editor/AssetDatabase.h"
 
-// gameplay
 #include "gameplay/Scene.h"
 #include "gameplay/Prefab.h"
 
@@ -27,7 +21,6 @@ namespace gallus
 		namespace imgui
 		{
 			class EditorSelectable;
-			class InspectorUIView;
 		}
 	}
 	namespace editor
@@ -36,12 +29,6 @@ namespace gallus
 		{
 			EDITOR_METHOD_SCENE,
 			EDITOR_METHOD_PREFAB
-		};
-
-		enum CameraMode
-		{
-			CAMERA_MODE_SCENE,
-			CAMERA_MODE_GAME
 		};
 
 		//---------------------------------------------------------------------
@@ -106,16 +93,7 @@ namespace gallus
 			/// Retrieves the currently selected inspector view item.
 			/// </summary>
 			/// <returns>Pointer to the current selectable (can be null).</returns>
-			const graphics::imgui::InspectorUIView* GetInspectorView() const
-			{
-				return m_pInspectorView;
-			}
-
-			/// <summary>
-			/// Retrieves the currently inspector view.
-			/// </summary>
-			/// <returns>Pointer to the current inspector view (can be null).</returns>
-			graphics::imgui::InspectorUIView* GetInspectorView()
+			const graphics::imgui::InspectorView* GetInspectorView() const
 			{
 				return m_pInspectorView;
 			}
@@ -125,7 +103,7 @@ namespace gallus
 			/// </summary>
 			/// <param name="a_pSelectable">.The new selectable (can be null).</param>
 			/// <param name="a_pInspectorView">The new inspector view (can be null).</param>
-			void SetSelectable(graphics::imgui::EditorSelectable* a_pSelectable, graphics::imgui::InspectorUIView* a_pInspectorView)
+			void SetSelectable(graphics::imgui::EditorSelectable* a_pSelectable, graphics::imgui::InspectorView* a_pInspectorView)
 			{
 				if (m_pInspectorView)
 				{
@@ -134,6 +112,15 @@ namespace gallus
 				}
 				m_pSelectable = a_pSelectable;
 				m_pInspectorView = a_pInspectorView;
+			}
+
+			/// <summary>
+			/// Retrieves the currently inspector view.
+			/// </summary>
+			/// <returns>Pointer to the current inspector view (can be null).</returns>
+			graphics::imgui::InspectorView* GetInspectorView()
+			{
+				return m_pInspectorView;
 			}
 
 			std::mutex m_EditorMutex;
@@ -168,37 +155,6 @@ namespace gallus
 			{
 				m_EditorMethod = a_EditorMethod;
 			}
-
-			/// <summary>
-			/// Retrieves the camera mode.
-			/// </summary>
-			/// <returns>Returns the camera mode, editor camera or game camera.</returns>
-			CameraMode GetCameraMode() const
-			{
-				return m_CameraMode;
-			}
-
-			/// <summary>
-			/// Sets the camera mode.
-			/// </summary>
-			void SetCameraMode(CameraMode a_CameraMode)
-			{
-				m_CameraMode = a_CameraMode;
-			}
-
-			/// <summary>
-			/// Sets the camera mode.
-			/// </summary>
-			/// <param name="a_CameraMode">.The camera mode.</param>
-			void SetEditorMethod(CameraMode a_CameraMode)
-			{
-				m_CameraMode = a_CameraMode;
-			}
-
-			graphics::dx12::Camera& GetEditorCamera()
-			{
-				return m_EditorCamera;
-			}
 		protected:
 			// TODO: Use m_bLoadAssets or something in AssetDatabase to wake up thread and let it sleep otherwise.
 			bool Sleep() const override
@@ -222,15 +178,12 @@ namespace gallus
 			editor::AssetDatabase m_AssetDatabase;
 
 			core::Observable<graphics::imgui::EditorSelectable*> m_pSelectable;
-			graphics::imgui::InspectorUIView* m_pInspectorView = nullptr;
+			graphics::imgui::InspectorView* m_pInspectorView = nullptr;
 
 			gameplay::Scene m_CurrentScene;
 			gameplay::Prefab m_Prefab;
 
 			EditorMethod m_EditorMethod = EditorMethod::EDITOR_METHOD_SCENE;
-			CameraMode m_CameraMode = CameraMode::CAMERA_MODE_SCENE;
-
-			graphics::dx12::Camera m_EditorCamera;
 		};
 	}
 }

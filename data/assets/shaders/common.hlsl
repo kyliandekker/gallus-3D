@@ -14,18 +14,14 @@ cbuffer SpriteUV : register(b1)
 
 struct VSInput
 {
-    float3 pos : POSITION;
+    float2 pos : POSITION;
     float2 uv  : TEXCOORD0;
-	float3 normal   : NORMAL;
-    float4 color    : COLOR;
 };
 
 struct PSInput
 {
     float4 pos : SV_POSITION;
     float2 uv  : TEXCOORD0;
-	float3 normal   : NORMAL;
-    float4 color    : COLOR;
 };
 
 Texture2D spriteTexture : register(t0);

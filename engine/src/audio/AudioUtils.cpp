@@ -1,10 +1,8 @@
-// header
 #include "AudioUtils.h"
 
-// core
+// core includes
 #include "core/DataStream.h"
 
-// audio
 #include "audio/Defines.h"
 #include "audio/int24_t.h"
 

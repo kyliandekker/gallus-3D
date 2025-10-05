@@ -1,19 +1,17 @@
-// header
 #include "MetaData.h"
 
-// external
 #include <rapidjson/utils.h>
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/prettywriter.h>
 
-// core
+// core includes
 #include "core/DataStream.h"
 
-// logger
-#include "logger/Logger.h"
-
-// utils
+// utils includes
 #include "utils/file_abstractions.h"
+
+// logger includes
+#include "logger/Logger.h"
 
 #define JSON_META_DATA_FILE_RESOURCE_ASSET_TYPE_VAR "assetType"
 

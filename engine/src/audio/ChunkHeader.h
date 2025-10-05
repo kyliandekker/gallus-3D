@@ -1,10 +1,8 @@
 #pragma once
 
-// external
 #include <cstdint>
 
-// audio
-#include "audio/Defines.h"
+#include "./Defines.h"
 
 namespace gallus
 {

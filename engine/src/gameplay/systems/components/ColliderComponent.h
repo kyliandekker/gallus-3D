@@ -1,9 +1,7 @@
 #pragma once
 
-// base class
 #include "gameplay/systems/components/Component.h"
 
-// external
 #include <DirectXMath.h>
 #include <array>
 #include <set>
@@ -35,26 +33,26 @@ namespace gallus
 			/// <summary>
 			/// Sets the offset of the collider.
 			/// </summary>
-			/// <param name="a_vOffset">A XMFLOAT3 containing the offset.</param>
-			void SetOffset(const DirectX::XMFLOAT3& a_vOffset);
+			/// <param name="a_vOffset">A XMFLOAT2 containing the offset.</param>
+			void SetOffset(const DirectX::XMFLOAT2& a_vOffset);
 
 			/// <summary>
 			/// Sets the size of the collider.
 			/// </summary>
-			/// <param name="a_vSize">A XMFLOAT3 containing the size.</param>
-			void SetSize(const DirectX::XMFLOAT3& a_vSize);
+			/// <param name="a_vSize">A XMFLOAT2 containing the size.</param>
+			void SetSize(const DirectX::XMFLOAT2& a_vSize);
 
 			/// <summary>
 			/// Retrieves the offset of the collider.
 			/// </summary>
-			/// <returns>A XMFLOAT3 containing the offset.</returns>
-			const DirectX::XMFLOAT3& GetOffset() const;
+			/// <returns>A XMFLOAT2 containing the offset.</returns>
+			const DirectX::XMFLOAT2& GetOffset() const;
 
 			/// <summary>
 			/// Retrieves the size of the collider.
 			/// </summary>
-			/// <returns>A XMFLOAT3 containing the size.</returns>
-			const DirectX::XMFLOAT3& GetSize() const;
+			/// <returns>A XMFLOAT2 containing the size.</returns>
+			const DirectX::XMFLOAT2& GetSize() const;
 
 			std::array<DirectX::XMFLOAT2, 4> GetColliderWorldCorners(const DirectX::XMFLOAT2& a_vPos, const DirectX::XMFLOAT2& a_vScale, const DirectX::XMFLOAT2& a_vPivot, float a_fRotation);
 			std::array<DirectX::XMFLOAT2, 4> GetAxes(const std::array<DirectX::XMFLOAT2, 4>& corners);
@@ -64,8 +62,8 @@ namespace gallus
 
 			void IgnoreEntity(const gameplay::EntityID& a_EntityID);
 		protected:
-			DirectX::XMFLOAT3 m_vOffset = { 0, 0, 0 };
-			DirectX::XMFLOAT3 m_vSize = { 1, 1, 1 };
+			DirectX::XMFLOAT2 m_vOffset = { 0, 0 };
+			DirectX::XMFLOAT2 m_vSize = { 1, 1 };
 
 			std::set<gameplay::EntityID> m_aEntitiesToIgnore;
 		};

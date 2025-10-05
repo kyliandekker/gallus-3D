@@ -3,10 +3,9 @@
 
 #pragma once
 
-// base class
 #include "ComponentUIView.h"
 
-// gameplay
+// gameplay includes
 #include "gameplay/systems/HealthSystem.h"
 #include "gameplay/systems/components/HealthComponent.h"
 
