@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef _EDITOR
+//#ifdef _EDITOR
 
 // external
 #include <vector>
@@ -132,4 +132,4 @@ namespace gallus
 	}
 }
 
-#endif // _EDITOR
+//#endif // _EDITOR

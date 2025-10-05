@@ -329,16 +329,6 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		std::shared_ptr<graphics::dx12::Texture> ResourceAtlas::GetLogo()
-		{
-#ifdef _EDITOR
-			return m_aTextures[LOGO + 1];
-#else
-			return m_aTextures[LOGO];
-#endif // _EDITOR
-		}
-
-		//---------------------------------------------------------------------
 		void ResourceAtlas::TransitionResources(std::shared_ptr<graphics::dx12::CommandList> a_CommandList)
 		{
 			for (size_t i = 0; i < m_aTextures.size(); i++)

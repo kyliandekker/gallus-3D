@@ -36,10 +36,10 @@ namespace gallus
 			{}
 
 			virtual bool LoadData();
-#ifdef _EDITOR
+//#ifdef _EDITOR
 			bool Save();
 			bool Load();
-#endif
+//#endif
 			void SetData(const core::Data& a_Data);
 
 			const core::Data& GetData() const;

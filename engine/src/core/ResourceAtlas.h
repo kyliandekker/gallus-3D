@@ -40,7 +40,6 @@ namespace gallus
 		constexpr uint32_t MAX_RESOURCES = 64;
 		constexpr uint32_t MISSING = 0;
 		constexpr uint32_t RENDER_TEX = 1;
-		constexpr uint32_t LOGO = 1;
 
 		//---------------------------------------------------------------------
 		// ResourceAtlas
@@ -160,11 +159,6 @@ namespace gallus
 			std::shared_ptr<graphics::dx12::Mesh> GetDefaultMesh();
 
 			/// <summary>
-			/// Retrieves the logo texture.
-			/// </summary>
-			std::shared_ptr<graphics::dx12::Texture> GetLogo();
-
-			/// <summary>
 			/// Transitions all loaded resources to the appropriate state
 			/// for use on the GPU.
 			/// </summary>
@@ -195,7 +189,7 @@ namespace gallus
 			/// </summary>
 			const std::vector<std::shared_ptr<graphics::dx12::Mesh>>& GetMeshes() const;
 
-#ifdef _EDITOR
+//#ifdef _EDITOR
 			/// <summary>
 			/// Gets a resource (if it exists) by name and returns the full path and all properties, including metadata.
 			/// </summary>
@@ -227,7 +221,7 @@ namespace gallus
 			{
 				return m_ResourceFolder;
 			}
-#endif _EDITOR // _EDITOR
+//#endif _EDITOR // _EDITOR
 		private:
 			/// <summary>
 			/// Retrieves a resource from the given vector, or loads it if not found.
@@ -259,9 +253,9 @@ namespace gallus
 			std::vector<std::shared_ptr<graphics::dx12::DX12ShaderBind>> m_aShaderBinds;
 			std::vector<std::shared_ptr<graphics::dx12::Mesh>> m_aMeshes;
 
-#ifdef _EDITOR
+//#ifdef _EDITOR
 			resources::FileResource m_ResourceFolder;
-#endif _EDITOR // _EDITOR
+//#endif _EDITOR // _EDITOR
 		};
 	}
 }

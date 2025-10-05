@@ -46,7 +46,7 @@ namespace gallus
 			System::Initialize();
 
 #ifndef _EDITOR
-			m_Scene.SetData(core::ENGINE->GetResourceAtlas().LoadScene("main.scene"));
+			core::ENGINE->GetResourceAtlas().LoadScene("main.scene", m_Scene);
 			m_Scene.LoadData();
 
 			m_bStarted = true;
