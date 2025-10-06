@@ -40,56 +40,79 @@ namespace gallus
 				ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0);
 				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, m_Window.GetFramePadding());
 
-				ImGui::AlignTextToFramePadding();
-				ImGui::DisplayHeader(m_Window.GetBoldFont(), "Rotation: ");
-				ImGui::SameLine();
+				ImGui::StartInspectorKeyVal(ImGui::IMGUI_FORMAT_ID("", TABLE_ID, "TRANSFORM_COMPONENT_TABLE_INSPECTOR"), m_Window.GetFramePadding());
+				ImGuiWindow& window = m_Window;
+				gameplay::TransformComponent& transformComp = m_Component;
+				ImGui::KeyValue([&window]
+					{
+						ImGui::AlignTextToFramePadding();
+						ImGui::DisplayHeader(window.GetBoldFont(), "Rotation: ");
+					},
+					[&transformComp]
+					{
+						ImGui::AlignTextToFramePadding();
+						ImGui::Text("Y");
+						ImGui::SameLine();
+						float rotation = transformComp.Transform().GetRotation();
+						ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+						if (ImGui::DragFloat(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "TRANSFORM_COMPONENT_ROTATION_INSPECTOR").c_str(), &rotation, 1.0f, -999999999, 99999999999))
+						{
+							transformComp.Transform().SetRotation(rotation);
+							core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
+						}
+					});
+				Vector2View<DirectX::XMFLOAT2>& positionView = m_PositionView;
+				ImGui::KeyValue([&window]
+					{
+						ImGui::AlignTextToFramePadding();
+						ImGui::DisplayHeader(window.GetBoldFont(), "Position: ");
+					},
+					[&positionView , &transformComp]
+					{
+						positionView.SetValue(transformComp.Transform().GetPosition());
+						if (positionView.Render("TRANSFORM_COMPONENT_POSITION_INSPECTOR"))
+						{
+							transformComp.Transform().SetPosition(positionView.GetValue());
+							core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
+						}
+					});
+				Vector2View<DirectX::XMFLOAT2>& scaleView = m_ScaleView;
+				ImGui::KeyValue([&window]
+					{
+						ImGui::AlignTextToFramePadding();
+						ImGui::DisplayHeader(window.GetBoldFont(), "Scale: ");
+					},
+					[&scaleView, &transformComp]
+					{
+						scaleView.SetValue(transformComp.Transform().GetScale());
+						if (scaleView.Render("TRANSFORM_COMPONENT_SCALE_INSPECTOR"))
+						{
+							transformComp.Transform().SetScale(scaleView.GetValue());
+							core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
+						}
+					});
+				Vector2View<DirectX::XMFLOAT2>& pivotView = m_PivotView;
+				ImGui::KeyValue([&window]
+					{
+						ImGui::AlignTextToFramePadding();
+						ImGui::DisplayHeader(window.GetBoldFont(), "Pivot: ");
+					},
+					[&pivotView, &transformComp]
+					{
+						pivotView.SetValue(transformComp.Transform().GetPivot());
+						if (pivotView.Render("TRANSFORM_COMPONENT_PIVOT_INSPECTOR"))
+						{
+							transformComp.Transform().SetPivot(pivotView.GetValue());
+							core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
+						}
+					});
+				ImGui::EndInspectorKeyVal();
 
-				float rotation = m_Component.Transform().GetRotation();
-				ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
-				if (ImGui::DragFloat(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "TRANSFORM_ROT_INSPECTOR").c_str(), &rotation, 1.0f, -999999999, 99999999999))
-				{
-					m_Component.Transform().SetRotation(rotation);
-					core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
-				}
-
-				ImGui::DisplayHeader(m_Window.GetBoldFont(), "Position: ");
-				ImGui::Indent();
-
-				m_PositionView.SetValue(m_Component.Transform().GetPosition());
-				if (m_PositionView.Render("TRANSFORM_POSITION_INSPECTOR"))
-				{
-					m_Component.Transform().SetPosition(m_PositionView.GetValue());
-					core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
-				}
-				ImGui::Unindent();
-
-				ImGui::DisplayHeader(m_Window.GetBoldFont(), "Scale: ");
-				ImGui::Indent();
-
-				m_ScaleView.SetValue(m_Component.Transform().GetScale());
-				if (m_ScaleView.Render("TRANSFORM_SCALE_INSPECTOR"))
-				{
-					m_Component.Transform().SetScale(m_ScaleView.GetValue());
-					core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
-				}
-				ImGui::Unindent();
-
-				ImGui::DisplayHeader(m_Window.GetBoldFont(), "Pivot: ");
-				ImGui::Indent();
-
-				m_PivotView.SetValue(m_Component.Transform().GetPivot());
-				if (m_PivotView.Render("TRANSFORM_PIVOT_INSPECTOR", 0.01f, -0.5f, 0.5f))
-				{
-					m_Component.Transform().SetPivot(m_PivotView.GetValue());
-					core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
-				}
-				ImGui::Unindent();
+				ImGui::PopStyleVar();
+				ImGui::PopStyleVar();
+				ImGui::PopStyleVar();
 
 				ImGui::SetCursorPosY(ImGui::GetCursorPosY() - m_Window.GetFramePadding().y);
-
-				ImGui::PopStyleVar();
-				ImGui::PopStyleVar();
-				ImGui::PopStyleVar();
 			}
 		}
 	}

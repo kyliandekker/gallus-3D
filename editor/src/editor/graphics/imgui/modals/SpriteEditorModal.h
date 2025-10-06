@@ -58,6 +58,8 @@ namespace gallus
 				/// </summary>
 				/// <param name="a_FileResource">The sprite file.</param>
 				void SetData(resources::FileResource& a_FileResource);
+				void RenderSpriteInfoPopup();
+				void RenderFloatingToolbar();
 			private:
 				void RenderToolbar();
 				void HandleGlobalControls(const ImVec2& a_vWindowSize);

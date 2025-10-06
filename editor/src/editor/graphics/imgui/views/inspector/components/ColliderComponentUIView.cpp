@@ -31,33 +31,46 @@ namespace gallus
 				ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0);
 				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, m_Window.GetFramePadding());
 
-				ImGui::DisplayHeader(m_Window.GetBoldFont(), "Offset: ");
-				ImGui::Indent();
-
-				m_OffsetView.SetValue(m_Component.GetOffset());
-				if (m_OffsetView.Render("COLLIDER_OFFSET_INSPECTOR", 0.01f))
-				{
-					m_Component.SetOffset(m_OffsetView.GetValue());
-					core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
-				}
-				ImGui::Unindent();
-
-				ImGui::DisplayHeader(m_Window.GetBoldFont(), "Size: ");
-				ImGui::Indent();
-
-				m_SizeView.SetValue(m_Component.GetSize());
-				if (m_SizeView.Render("COLLIDER_SIZE_INSPECTOR", 0.01f))
-				{
-					m_Component.SetSize(m_SizeView.GetValue());
-					core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
-				}
-				ImGui::Unindent();
-
-				ImGui::SetCursorPosY(ImGui::GetCursorPosY() - m_Window.GetFramePadding().y);
+                ImGui::StartInspectorKeyVal(ImGui::IMGUI_FORMAT_ID("", TABLE_ID, "COLLIDER_COMPONENT_TABLE_INSPECTOR"), m_Window.GetFramePadding());
+                ImGuiWindow& window = m_Window;
+                gameplay::ColliderComponent& colliderComp = m_Component;
+                Vector2View<DirectX::XMFLOAT2>& offsetView = m_OffsetView;
+                ImGui::KeyValue([&window]
+                    {
+                        ImGui::AlignTextToFramePadding();
+                        ImGui::DisplayHeader(window.GetBoldFont(), "Offset: ");
+                    },
+                    [&offsetView, &colliderComp]
+                    {
+                        offsetView.SetValue(colliderComp.GetOffset());
+                        if (offsetView.Render("COLLIDER_COMPONENT_OFFSET_INSPECTOR", 0.01f))
+                        {
+                            colliderComp.SetOffset(offsetView.GetValue());
+                            core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
+                        }
+                    });
+                Vector2View<DirectX::XMFLOAT2>& sizeView = m_SizeView;
+                ImGui::KeyValue([&window]
+                    {
+                        ImGui::AlignTextToFramePadding();
+                        ImGui::DisplayHeader(window.GetBoldFont(), "Size: ");
+                    },
+                    [&sizeView, &colliderComp]
+                    {
+                        sizeView.SetValue(colliderComp.GetSize());
+                        if (sizeView.Render("COLLIDER_COMPONENT_SIZE_INSPECTOR", 0.01f))
+                        {
+                            colliderComp.SetSize(sizeView.GetValue());
+                            core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
+                        }
+                    });
+                ImGui::EndInspectorKeyVal();
 
 				ImGui::PopStyleVar();
 				ImGui::PopStyleVar();
 				ImGui::PopStyleVar();
+
+                ImGui::SetCursorPosY(ImGui::GetCursorPosY() - m_Window.GetFramePadding().y);
 			}
 
             constexpr float HANDLE_RADIUS = 6;

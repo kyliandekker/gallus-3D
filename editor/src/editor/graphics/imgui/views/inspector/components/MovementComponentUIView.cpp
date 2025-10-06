@@ -29,19 +29,29 @@ namespace gallus
 				ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, m_Window.GetFramePadding());
 				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, m_Window.GetFramePadding());
 
-				ImGui::AlignTextToFramePadding();
-				ImGui::DisplayHeader(m_Window.GetBoldFont(), "Gravity: ");
-				ImGui::SameLine();
-				bool gravity = m_Component.HasGravity();
-				if (ImGui::Toggle(ImGui::IMGUI_FORMAT_ID("", CHECKBOX_ID, "MOVEMENT_GRAVITY_INSPECTOR").c_str(), &gravity))
-				{
-					m_Component.SetHasGravity(gravity);
-					core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
-				}
+				ImGui::StartInspectorKeyVal(ImGui::IMGUI_FORMAT_ID("", TABLE_ID, "MOVEMENT_COMPONENT_TABLE_INSPECTOR"), m_Window.GetFramePadding());
+				ImGuiWindow& window = m_Window;
+				gameplay::MovementComponent& movementComp = m_Component;
+				ImGui::KeyValue([&window]
+					{
+						ImGui::AlignTextToFramePadding();
+						ImGui::DisplayHeader(window.GetBoldFont(), "Gravity: ");
+					},
+					[&movementComp]
+					{
+						bool gravity = movementComp.HasGravity();
+						if (ImGui::Toggle(ImGui::IMGUI_FORMAT_ID("", CHECKBOX_ID, "MOVEMENT_COMPONENT_GRAVITY_INSPECTOR").c_str(), &gravity))
+						{
+							movementComp.SetHasGravity(gravity);
+							core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
+						}
+					});
+				ImGui::EndInspectorKeyVal();
 
 				ImGui::PopStyleVar();
-
 				ImGui::PopStyleVar();
+
+				ImGui::SetCursorPosY(ImGui::GetCursorPosY() - m_Window.GetFramePadding().y);
 			}
 		}
 	}

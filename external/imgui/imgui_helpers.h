@@ -4,6 +4,7 @@
 
 #include <imgui/imgui.h>
 
+#include <functional>
 #include <stdint.h>
 #include <string>
 #include <map>
@@ -27,6 +28,7 @@ namespace ImGui
 #define SELECTABLE_ID "###SELECTABLE_"
 #define FOLDOUT_ID "###FOLDOUT_"
 #define COLOR_WHEEL_ID "###COLOR_WHEEL_"
+#define TABLE_ID "###TABLE_"
 
 	bool CheckboxButton(const char* a_Label, bool* a_pValue, const ImVec2& a_Size = ImVec2(0, 0), const ImVec4& a_Color = ImVec4(1, 1, 1, 1));
 	bool TextButton(const char* a_Label, const ImVec2& a_Size = ImVec2(0, 0), const ImVec4& a_Color = ImVec4(1, 1, 1, 1));
@@ -71,6 +73,9 @@ namespace ImGui
 		bool* p_value,
 		ImVec2 const& size);
 
+	bool StartInspectorKeyVal(const std::string& a_sId, const ImVec2& a_vFramePadding);
+	void KeyValue(std::function<void()> a_Key, std::function<void()> a_Val);
+	void EndInspectorKeyVal();
 }
 
 #endif

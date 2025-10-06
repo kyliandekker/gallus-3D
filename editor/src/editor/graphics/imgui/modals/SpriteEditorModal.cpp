@@ -108,10 +108,11 @@ namespace gallus
 
             void SpriteEditorModal::RenderToolbar()
             {
-                glm::ivec2 textureSize = m_pPreviewTexture->GetSize();
-                bool deleteRect = false;
+                RenderFloatingToolbar();
 
-                if (ImGui::BeginChild("SpriteToolbar", ImVec2(0, m_Window.GetHeaderSize().y * 1.75f)))
+                glm::ivec2 textureSize = m_pPreviewTexture->GetSize();
+
+                if (ImGui::BeginChild("SpriteToolbar", ImVec2(0, m_Window.GetHeaderSize().y * 2.75f)))
                 {
                     if (ImGui::IconButton(
                         ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_SAVE), BUTTON_ID, "SAVE_SPRITE_EDITOR_MODAL").c_str(), m_Window.GetHeaderSize(), m_Window.GetIconFont(), ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent)))
@@ -124,22 +125,24 @@ namespace gallus
                         m_pTextureMetaData->GetSprites().push_back({ 10, 10, 50, 50 });
                         m_iCurrentSprite = (int8_t) m_pTextureMetaData->GetSprites().size() - 1;
                     }
-                    ImGui::SameLine();
+
                     static glm::ivec2 generateRects;
                     ImGui::PushItemWidth(75);
                     ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(7, 7));
-                    if (ImGui::DragInt(ImGui::IMGUI_FORMAT_ID("x", BUTTON_ID, "GENERATE_X_SPRITE_EDITOR_MODAL").c_str(), &generateRects.x, 1.0f, textureSize.x))
+                    ImGui::AlignTextToFramePadding();
+                    ImGui::DisplayHeader(m_Window.GetBoldFont(), "Size");
+                    ImGui::SameLine();
+                    if (ImGui::DragInt(ImGui::IMGUI_FORMAT_ID("", BUTTON_ID, "GENERATE_X_SPRITE_EDITOR_MODAL").c_str(), &generateRects.x, 1.0f, textureSize.x))
                     {
                         generateRects.x = std::clamp(generateRects.x, 0, textureSize.x);
                     }
                     ImGui::SameLine();
-                    if (ImGui::DragInt(ImGui::IMGUI_FORMAT_ID("y", BUTTON_ID, "GENERATE_Y_SPRITE_EDITOR_MODAL").c_str(), &generateRects.y, 1.0f, textureSize.y))
+                    if (ImGui::DragInt(ImGui::IMGUI_FORMAT_ID("", BUTTON_ID, "GENERATE_Y_SPRITE_EDITOR_MODAL").c_str(), &generateRects.y, 1.0f, textureSize.y))
                     {
                         generateRects.y = std::clamp(generateRects.y, 0, textureSize.y);
                     }
                     ImGui::PopStyleVar();
                     ImGui::PopItemWidth();
-                    ImGui::SameLine();
                     if (ImGui::Button(ImGui::IMGUI_FORMAT_ID("Generate", BUTTON_ID, "GENERATE_SPRITE_EDITOR_MODAL").c_str(), ImVec2(0, m_Window.GetHeaderSize().y)))
                     {
                         m_pTextureMetaData->GetSprites().clear();
@@ -159,46 +162,7 @@ namespace gallus
                         }
                     }
 
-                    if (m_iCurrentSprite != -1 && m_iCurrentSprite < m_pTextureMetaData->GetSprites().size())
-                    {
-                        graphics::dx12::SpriteRect& spriteUV = m_pTextureMetaData->GetSprites()[m_iCurrentSprite];
-
-                        if (ImGui::Button(ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_DELETE) + " Delete", BUTTON_ID, "DELETE_SPRITE_EDITOR_MODAL").c_str(), ImVec2(0, m_Window.GetHeaderSize().y)))
-                        {
-                            deleteRect = true;
-                        }
-                        
-                        ImGui::PushItemWidth(75);
-                        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(7, 7));
-                        if (ImGui::DragInt(ImGui::IMGUI_FORMAT_ID("x", BUTTON_ID, "X_SPRITE_EDITOR_MODAL").c_str(), &spriteUV.x, 1.0f, textureSize.x))
-                        {
-                            spriteUV.x = std::clamp(spriteUV.x, 0, textureSize.x - spriteUV.height);
-                        }
-                        ImGui::SameLine();
-                        if (ImGui::DragInt(ImGui::IMGUI_FORMAT_ID("y", BUTTON_ID, "Y_SPRITE_EDITOR_MODAL").c_str(), &spriteUV.y, 1.0f, textureSize.y))
-                        {
-                            spriteUV.y = std::clamp(spriteUV.y, 0, textureSize.y - spriteUV.width);
-                        }
-                        ImGui::SameLine();
-                        if (ImGui::DragInt(ImGui::IMGUI_FORMAT_ID("Width", BUTTON_ID, "WIDTH_SPRITE_EDITOR_MODAL").c_str(), &spriteUV.width, 1.0f, textureSize.x))
-                        {
-                            spriteUV.width = std::clamp(spriteUV.width, 1, textureSize.x - spriteUV.x);
-                        }
-                        ImGui::SameLine();
-                        if (ImGui::DragInt(ImGui::IMGUI_FORMAT_ID("Height", BUTTON_ID, "HEIGHT_SPRITE_EDITOR_MODAL").c_str(), &spriteUV.height, 1.0f, textureSize.y))
-                        {
-                            spriteUV.height = std::clamp(spriteUV.height, 1, textureSize.y - spriteUV.y);
-                        }
-                        ImGui::PopStyleVar();
-                        ImGui::PopItemWidth();
-                    }
                     ImGui::EndChild();
-                }
-
-                if ((deleteRect || ImGui::IsKeyDown(ImGuiKey_Delete)) && m_iCurrentSprite != -1)
-                {
-                    m_pTextureMetaData->GetSprites().erase(m_pTextureMetaData->GetSprites().begin() + m_iCurrentSprite);
-                    m_iCurrentSprite = -1;
                 }
             }
 
@@ -517,6 +481,106 @@ namespace gallus
 				m_pTextureMetaData = a_FileResource.GetMetaData<resources::TextureMetaData>();
 				LoadTexture(m_pFileResource->GetPath().filename().generic_string());
 			}
+
+            ImVec2 m_vFloatingPanelPos = ImVec2(50, 50);
+            void SpriteEditorModal::RenderFloatingToolbar()
+            {
+                if (m_iCurrentSprite == -1 || m_iCurrentSprite >= m_pTextureMetaData->GetSprites().size())
+                {
+                    return;
+                }
+
+                graphics::dx12::SpriteRect& spriteUV = m_pTextureMetaData->GetSprites()[m_iCurrentSprite];
+                glm::ivec2 textureSize = m_pPreviewTexture->GetSize();
+
+                ImGui::SetNextWindowPos(m_vFloatingPanelPos, ImGuiCond_FirstUseEver);
+                ImGui::SetNextWindowBgAlpha(0.9f);
+
+                ImGuiWindowFlags windowFlags =
+                    ImGuiWindowFlags_NoCollapse |
+                    ImGuiWindowFlags_AlwaysAutoResize |
+                    ImGuiWindowFlags_NoSavedSettings |
+                    ImGuiWindowFlags_NoScrollbar |
+                    ImGuiWindowFlags_NoScrollWithMouse;
+
+                bool deleteRect = false;
+                if (ImGui::Begin("Sprite Info", nullptr, windowFlags))
+                {
+                    // Allow dragging
+                    if (ImGui::IsWindowHovered() && ImGui::IsMouseDragging(ImGuiMouseButton_Left))
+                    {
+                        m_vFloatingPanelPos += ImGui::GetIO().MouseDelta;
+                    }
+
+                    ImGui::Text("Sprite #%d", m_iCurrentSprite);
+
+                    ImGui::Separator();
+
+                    ImGui::StartInspectorKeyVal(ImGui::IMGUI_FORMAT_ID("", TABLE_ID, "SPRITE_EDITOR_MODAL_SPRITE_INFO"), m_Window.GetFramePadding());
+                    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(7, 7));
+                    ImGuiWindow& window = m_Window;
+                    ImGui::KeyValue([&window]
+                        {
+                            ImGui::AlignTextToFramePadding();
+                            ImGui::DisplayHeader(window.GetBoldFont(), "Offset");
+                        },
+                        [&spriteUV, &textureSize]
+                        {
+                            ImGui::PushItemWidth(75);
+                            if (ImGui::DragInt(ImGui::IMGUI_FORMAT_ID("", BUTTON_ID, "X_SPRITE_EDITOR_MODAL").c_str(), &spriteUV.x, 1.0f, textureSize.x))
+                            {
+                                spriteUV.x = std::clamp(spriteUV.x, 0, textureSize.x - spriteUV.height);
+                            }
+                            ImGui::SameLine();
+                            if (ImGui::DragInt(ImGui::IMGUI_FORMAT_ID("", BUTTON_ID, "Y_SPRITE_EDITOR_MODAL").c_str(), &spriteUV.y, 1.0f, textureSize.y))
+                            {
+                                spriteUV.y = std::clamp(spriteUV.y, 0, textureSize.y - spriteUV.width);
+                            }
+                            ImGui::PopItemWidth();
+                        });
+                    ImGui::KeyValue([&window]
+                        {
+                            ImGui::AlignTextToFramePadding();
+                            ImGui::DisplayHeader(window.GetBoldFont(), "Size");
+                        },
+                        [&spriteUV, &textureSize]
+                        {
+                            ImGui::PushItemWidth(75);
+                            if (ImGui::DragInt(ImGui::IMGUI_FORMAT_ID("", BUTTON_ID, "WIDTH_SPRITE_EDITOR_MODAL").c_str(), &spriteUV.width, 1.0f, textureSize.x))
+                            {
+                                spriteUV.width = std::clamp(spriteUV.width, 1, textureSize.x - spriteUV.x);
+                            }
+                            ImGui::SameLine();
+                            if (ImGui::DragInt(ImGui::IMGUI_FORMAT_ID("", BUTTON_ID, "HEIGHT_SPRITE_EDITOR_MODAL").c_str(), &spriteUV.height, 1.0f, textureSize.y))
+                            {
+                                spriteUV.height = std::clamp(spriteUV.height, 1, textureSize.y - spriteUV.y);
+                            }
+                            ImGui::PopItemWidth();
+                        });
+                    ImGui::PopStyleVar();
+                    ImGui::EndInspectorKeyVal();
+
+                    if (m_iCurrentSprite != -1 && m_iCurrentSprite < m_pTextureMetaData->GetSprites().size())
+                    {
+                        graphics::dx12::SpriteRect& spriteUV = m_pTextureMetaData->GetSprites()[m_iCurrentSprite];
+
+                        if (ImGui::Button(ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_DELETE) + " Delete", BUTTON_ID, "DELETE_SPRITE_EDITOR_MODAL").c_str(), ImVec2(0, 0)))
+                        {
+                            deleteRect = true;
+                        }
+
+                        ImGui::SameLine();
+                    }
+
+                    ImGui::End();
+
+                    if ((deleteRect || ImGui::IsKeyDown(ImGuiKey_Delete)) && m_iCurrentSprite != -1)
+                    {
+                        m_pTextureMetaData->GetSprites().erase(m_pTextureMetaData->GetSprites().begin() + m_iCurrentSprite);
+                        m_iCurrentSprite = -1;
+                    }
+                }
+            }
 		}
 	}
 }

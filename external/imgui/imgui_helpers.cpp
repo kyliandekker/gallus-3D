@@ -210,6 +210,30 @@ namespace ImGui
 
 		return value_changed;
 	}
+
+	bool StartInspectorKeyVal(const std::string& a_sId, const ImVec2& a_vFramePadding)
+	{
+		ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, a_vFramePadding / 2);
+		bool b = ImGui::BeginTable(a_sId.c_str(), 2, ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_BordersInnerH);
+		ImGui::TableSetupColumn("Key", ImGuiTableColumnFlags_WidthFixed, 200.0f);
+		ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch, 1.0f);
+		return b;
+	}
+
+	void KeyValue(std::function<void()> a_Key, std::function<void()> a_Val)
+	{
+		ImGui::TableNextRow();
+		ImGui::TableNextColumn();
+		a_Key();
+		ImGui::TableNextColumn();
+		a_Val();
+	}
+
+	void EndInspectorKeyVal()
+	{
+		ImGui::EndTable();
+		ImGui::PopStyleVar();
+	}
 }
 
 #endif

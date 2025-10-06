@@ -48,56 +48,62 @@ namespace gallus
 
 				ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(m_Window.GetFontSize() / 2, m_Window.GetFontSize() / 2));
 
-				ImGui::AlignTextToFramePadding();
-				ImGui::DisplayHeader(m_Window.GetBoldFont(), "Movement Speed: ");
-				ImGui::SameLine();
-
-				float speed = m_Component.GetSpeed();
-				ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
-				if (ImGui::DragFloat(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "PLAYER_SPEED_INSPECTOR").c_str(), &speed, 1.0f, -999999999, 99999999999))
-				{
-					m_Component.SetSpeed(speed);
-				}
-
-				ImGui::PopStyleVar();
-
 				FilePickerModal* modal = dynamic_cast<FilePickerModal*>(m_Window.GetModal((int) EDITOR_MODAL::EDITOR_MODAL_FILE_PICKER));
 
-				ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(m_Window.GetFontSize() / 2, m_Window.GetFontSize() / 2));
-				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
-				ImVec2 buttonSize = ImVec2(m_Window.GetFontSize() * 2, m_Window.GetFontSize() * 2);
-
-				ImGui::AlignTextToFramePadding();
-				ImGui::DisplayHeader(m_Window.GetBoldFont(), "Prefab Name: ");
-				ImGui::SameLine();
-				ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-				ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x - buttonSize.x);
-				ImGui::InputText(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "PLAYER_PREFAB_NAME_INPUT").c_str(), m_sPrefabName, sizeof(m_sPrefabName), ImGuiInputTextFlags_ReadOnly);
-				ImGui::PopItemFlag();
-				ImGui::SameLine();
-				if (ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_FILE, BUTTON_ID, "PLAYER_PREFAB").c_str(), buttonSize))
-				{
-					if (modal)
+				ImGui::StartInspectorKeyVal(ImGui::IMGUI_FORMAT_ID("", TABLE_ID, "PLAYER_COMPONENT_TABLE_INSPECTOR"), m_Window.GetFramePadding() / 2);
+				ImGuiWindow& window = m_Window;
+				gameplay::PlayerComponent& playerComp = m_Component;
+				ImGui::KeyValue([&window]
 					{
-						modal->SetData(
-							[this](int success, gallus::resources::FileResource& resource)
+						ImGui::AlignTextToFramePadding();
+						ImGui::DisplayHeader(window.GetBoldFont(), "Movement Speed: ");
+					},
+					[&playerComp]
+					{
+						float speed = playerComp.GetSpeed();
+						ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+						if (ImGui::DragFloat(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "PLAYER_COMPONENT_SPEED_INSPECTOR").c_str(), &speed, 1.0f, -999999999, 99999999999))
+						{
+							playerComp.SetSpeed(speed);
+						}
+					});
+				char* prefabNameStr = m_sPrefabName;
+				ImGui::KeyValue([&window]
+					{
+						ImGui::AlignTextToFramePadding();
+						ImGui::DisplayHeader(window.GetBoldFont(), "Bullet Prefab: ");
+					},
+					[&playerComp, modal, &window, prefabNameStr]
+					{
+						ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+						ImVec2 buttonSize = ImVec2(window.GetFontSize() * 2, window.GetFontSize() * 2);
+						ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+						ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x - buttonSize.x);
+						ImGui::InputText(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "PLAYER_COMPONENT_BULLET_PREFAB_NAME_INPUT_INSPECTOR").c_str(), prefabNameStr, sizeof(prefabNameStr), ImGuiInputTextFlags_ReadOnly);
+						ImGui::PopItemFlag();
+						ImGui::SameLine();
+						if (ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_FILE, BUTTON_ID, "PLAYER_COMPONENT_BULLET_PREFAB_INSPECTOR").c_str(), buttonSize))
+						{
+							if (modal)
 							{
-								if (success == 1)
-								{
-									m_Component.GetPrefab().SetPath(resource.GetPath().filename().generic_string());
-									m_Component.GetPrefab().Load();
-								}
-							},
-							std::vector<gallus::resources::AssetType>{ gallus::resources::AssetType::Prefab }
-						);
-						modal->Show();
-					}
-				}
-
+								modal->SetData(
+									[&playerComp](int success, gallus::resources::FileResource& resource)
+									{
+										if (success == 1)
+										{
+											playerComp.GetPrefab().SetPath(resource.GetPath().filename().generic_string());
+											playerComp.GetPrefab().Load();
+										}
+									},
+									std::vector<gallus::resources::AssetType>{ gallus::resources::AssetType::Prefab }
+								);
+								modal->Show();
+							}
+						}
+						ImGui::PopStyleVar();
+					});
+				ImGui::EndInspectorKeyVal();
 				ImGui::PopStyleVar();
-				ImGui::PopStyleVar();
-
-				ImGui::SetCursorPosY(ImGui::GetCursorPosY() + m_Window.GetFramePadding().y);
 			}
 		}
 	}
