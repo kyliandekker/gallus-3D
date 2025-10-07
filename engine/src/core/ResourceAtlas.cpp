@@ -14,6 +14,7 @@
 #include "graphics/dx12/DX12ShaderBind.h"
 #include "graphics/dx12/Mesh.h"
 #include "graphics/dx12/CommandList.h"
+#include "graphics/dx12/CommandQueue.h"
 
 // logger
 #include "logger/Logger.h"
@@ -113,7 +114,7 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		std::shared_ptr<graphics::dx12::Texture> ResourceAtlas::LoadTexture(const std::string& a_sName, std::shared_ptr<graphics::dx12::CommandList> a_pCommandList)
+		std::shared_ptr<graphics::dx12::Texture> ResourceAtlas::LoadTexture(const std::string& a_sName, std::shared_ptr<graphics::dx12::CommandQueue> a_pCommandQueue)
 		{
 			std::shared_ptr<graphics::dx12::Texture> texture = GetResource(m_aTextures, a_sName, fs::path());
 			if (!texture->IsValid())
@@ -127,7 +128,7 @@ namespace gallus
 				}
 
 				fs::path texturePath = fileResource->GetPath().lexically_normal();
-				texture->LoadByPath(texturePath, a_pCommandList);
+				texture->LoadByPath(texturePath, a_pCommandQueue);
 //#else
 // 
 //#endif // _EDITOR
@@ -326,19 +327,6 @@ namespace gallus
 		std::shared_ptr<graphics::dx12::Mesh> ResourceAtlas::GetDefaultMesh()
 		{
 			return m_aMeshes[MISSING];
-		}
-
-		//---------------------------------------------------------------------
-		void ResourceAtlas::TransitionResources(std::shared_ptr<graphics::dx12::CommandList> a_CommandList)
-		{
-			for (size_t i = 0; i < m_aTextures.size(); i++)
-			{
-				std::shared_ptr<graphics::dx12::Texture> texture = m_aTextures[i];
-				if (texture && !texture->IsSrvIndexValid())
-				{
-					texture->CreateSRV(a_CommandList);
-				}
-			}
 		}
 
 		//---------------------------------------------------------------------

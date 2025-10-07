@@ -48,11 +48,8 @@ namespace gallus
                     );
 
 				auto cCommandQueue = core::EDITOR_ENGINE->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
-				auto cCommandList = cCommandQueue->GetCommandList();
-				m_pPreviewTexture = core::EDITOR_ENGINE->GetResourceAtlas().LoadTexture(m_ExplorerFileUIView.GetFileResource().GetPath().filename().generic_string(), cCommandList);
+				m_pPreviewTexture = core::EDITOR_ENGINE->GetResourceAtlas().LoadTexture(m_ExplorerFileUIView.GetFileResource().GetPath().filename().generic_string(), cCommandQueue);
 				m_pPreviewTexture->SetResourceCategory(gallus::core::EngineResourceCategory::Editor);
-				cCommandQueue->ExecuteCommandList(cCommandList);
-				cCommandQueue->Flush();
 			}
 
 			ExplorerSpriteUIViewInfo::~ExplorerSpriteUIViewInfo()

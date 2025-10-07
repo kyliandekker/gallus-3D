@@ -27,6 +27,7 @@ namespace gallus
 			class DX12ShaderBind;
 			class Mesh;
 
+			class CommandQueue;
 			class CommandList;
 		}
 	}
@@ -66,7 +67,7 @@ namespace gallus
 			/// <summary>
 			/// Loads a texture by name from the resource folder.
 			/// </summary>
-			std::shared_ptr<graphics::dx12::Texture> LoadTexture(const std::string& a_sName, std::shared_ptr<graphics::dx12::CommandList> a_pCommandList);
+			std::shared_ptr<graphics::dx12::Texture> LoadTexture(const std::string& a_sName, std::shared_ptr<graphics::dx12::CommandQueue> a_pCommandQueue);
 
 			/// <summary>
 			/// Loads a texture using a provided Direct3D resource description.
@@ -157,12 +158,6 @@ namespace gallus
 			/// Retrieves the default mesh (used as fallback).
 			/// </summary>
 			std::shared_ptr<graphics::dx12::Mesh> GetDefaultMesh();
-
-			/// <summary>
-			/// Transitions all loaded resources to the appropriate state
-			/// for use on the GPU.
-			/// </summary>
-			void TransitionResources(std::shared_ptr<graphics::dx12::CommandList> a_pCommandList);
 
 			/// <summary>
 			/// Gets the list of loaded textures.

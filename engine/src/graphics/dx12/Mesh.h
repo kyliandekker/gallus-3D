@@ -80,6 +80,7 @@ namespace gallus
 			};
 
 			class CommandList;
+			class CommandQueue;
 
 			//---------------------------------------------------------------------
 			// Mesh
@@ -117,7 +118,7 @@ namespace gallus
 				/// <returns>True if loading was successful, false otherwise.</returns>
 				bool LoadByName(const std::string& a_sName);
 
-				void SetMeshData(const MeshPartData& a_aData, const std::shared_ptr<CommandList> a_pCommandList);
+				void SetMeshData(const MeshPartData& a_aData, const std::shared_ptr<CommandQueue> a_pCommandQueue);
 			private:
 				std::vector<MeshPartData> m_aMeshData;
 			};

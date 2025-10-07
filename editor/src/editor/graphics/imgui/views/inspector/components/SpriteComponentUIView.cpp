@@ -164,10 +164,7 @@ namespace gallus
 										if (success == 1)
 										{
 											auto cCommandQueue = core::EDITOR_ENGINE->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
-											auto cCommandList = cCommandQueue->GetCommandList();
-											spriteComp.SetTexture(core::EDITOR_ENGINE->GetResourceAtlas().LoadTexture(resource.GetPath().filename().generic_string(), cCommandList).get());
-											cCommandQueue->ExecuteCommandList(cCommandList);
-											cCommandQueue->Flush();
+											spriteComp.SetTexture(core::EDITOR_ENGINE->GetResourceAtlas().LoadTexture(resource.GetPath().filename().generic_string(), cCommandQueue).get());
 
 											core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
 										}

@@ -39,11 +39,8 @@ namespace gallus
 			void SpriteEditorModal::LoadTexture(const std::string& a_sName)
 			{
 				auto cCommandQueue = core::EDITOR_ENGINE->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
-				auto cCommandList = cCommandQueue->GetCommandList();
-				m_pPreviewTexture = core::EDITOR_ENGINE->GetResourceAtlas().LoadTexture(a_sName, cCommandList);
+				m_pPreviewTexture = core::EDITOR_ENGINE->GetResourceAtlas().LoadTexture(a_sName, cCommandQueue);
 				m_pPreviewTexture->SetResourceCategory(gallus::core::EngineResourceCategory::Editor);
-				cCommandQueue->ExecuteCommandList(cCommandList);
-				cCommandQueue->Flush();
 			}
 
 			void SpriteEditorModal::Render()

@@ -295,14 +295,13 @@ namespace gallus
 			}
 
 			std::shared_ptr<graphics::dx12::CommandQueue> cCommandQueue = core::ENGINE->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
-			std::shared_ptr<graphics::dx12::CommandList> cCommandList = cCommandQueue->GetCommandList();
 			if (!mesh.empty())
 			{
 				SetMesh(core::ENGINE->GetResourceAtlas().LoadMesh(mesh).get());
 			}
 			if (!tex.empty())
 			{
-				SetTexture(core::ENGINE->GetResourceAtlas().LoadTexture(tex, cCommandList).get());
+				SetTexture(core::ENGINE->GetResourceAtlas().LoadTexture(tex, cCommandQueue).get());
 			}
 			if (!vertexShader.empty() && !pixelShader.empty())
 			{
@@ -311,7 +310,6 @@ namespace gallus
 					core::ENGINE->GetResourceAtlas().LoadVertexShader(vertexShader).get()
 				).get());
 			}
-			cCommandQueue->ExecuteCommandList(cCommandList);
 			cCommandQueue->Flush();
 		}
 	}

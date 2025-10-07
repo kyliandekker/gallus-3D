@@ -18,6 +18,7 @@
 #include "graphics/dx12/Texture.h"
 #include "graphics/dx12/Shader.h"
 #include "graphics/dx12/CommandList.h"
+#include "graphics/dx12/CommandQueue.h"
 
 namespace gallus
 {
@@ -58,7 +59,7 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			void Mesh::SetMeshData(const MeshPartData& a_aData, const std::shared_ptr<CommandList> a_pCommandList)
+			void Mesh::SetMeshData(const MeshPartData& a_aData, const std::shared_ptr<CommandQueue> a_pCommandQueue)
 			{
 				if (!m_bIsDestroyable)
 				{
@@ -69,8 +70,10 @@ namespace gallus
 				m_aMeshData.push_back(a_aData);
 				MeshPartData& data = m_aMeshData[index];
 
+				auto commandList = a_pCommandQueue->GetCommandList();
+
 				// Upload vertex buffer data.
-				a_pCommandList->UpdateBufferResource(
+				commandList->UpdateBufferResource(
 					&data.m_VertexBuffer.GetResource(), &data.m_pIntermediateVertexBuffer,
 					data.m_aVertices.size(), sizeof(VertexPosUV), data.m_aVertices.data());
 
@@ -78,12 +81,15 @@ namespace gallus
 				data.m_VertexBuffer.CreateViews(data.m_aVertices.size(), sizeof(VertexPosUV));
 
 				// Upload index buffer data.
-				a_pCommandList->UpdateBufferResource(
+				commandList->UpdateBufferResource(
 					&data.m_IndexBuffer.GetResource(), &data.m_pIntermediateIndexBuffer,
 					data.m_aIndices.size(), sizeof(uint16_t), data.m_aIndices.data());
 
 				// Create index buffer view.
 				data.m_IndexBuffer.CreateViews(data.m_aIndices.size(), sizeof(uint16_t));
+
+				uint64_t fenceValue = a_pCommandQueue->ExecuteCommandList(commandList);
+				a_pCommandQueue->WaitForFenceValue(fenceValue);
 			}
 
 			//---------------------------------------------------------------------

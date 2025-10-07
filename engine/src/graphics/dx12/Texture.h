@@ -19,7 +19,7 @@ namespace gallus
 		namespace dx12
 		{
 			class DX12System2D;
-			class CommandList;
+			class CommandQueue;
 
 			enum class TextureType
 			{
@@ -169,7 +169,7 @@ namespace gallus
 				/// <param name="a_Path">The path to the texture.</param>
 				/// <param name="a_pCommandList">The command list used for updating resources.</param>
 				/// <returns></returns>
-				bool LoadByPath(const fs::path& a_Path, std::shared_ptr<CommandList> a_pCommandList);
+				bool LoadByPath(const fs::path& a_Path, std::shared_ptr<CommandQueue> a_pCommandQueue);
 
 				/// <summary>
 				/// Uploads a texture to the heap.

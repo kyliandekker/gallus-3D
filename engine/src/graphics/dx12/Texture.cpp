@@ -164,6 +164,10 @@ namespace gallus
 					SetSRVDesc(srvDesc);
 				}
 
+				auto dCommandQueue = core::ENGINE->GetDX12().GetCommandQueue();
+				auto dCommandList = dCommandQueue->GetCommandList();
+				CreateSRV(dCommandList);
+
 				m_AssetType = resources::AssetType::Sprite;
 				return success;
 			}
@@ -177,7 +181,7 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			bool Texture::LoadByPath(const fs::path& a_Path, std::shared_ptr<CommandList> a_CommandList)
+			bool Texture::LoadByPath(const fs::path& a_Path, std::shared_ptr<CommandQueue> a_CommandQueue)
 			{
 				if (m_pResource && !m_bIsDestroyable)
 				{
@@ -254,8 +258,13 @@ namespace gallus
 				textureData.RowPitch = width * channels;
 				textureData.SlicePitch = textureData.RowPitch * height;
 
+				auto cCommandList = a_CommandQueue->GetCommandList();
+
 				UploadTexture(uploadHeapProperties, bufferResource);
-				UpdateSubresources(a_CommandList->GetCommandList().Get(), m_pResource.Get(), m_pResourceUploadHeap.Get(), 0, 0, 1, &textureData);
+				UpdateSubresources(cCommandList->GetCommandList().Get(), m_pResource.Get(), m_pResourceUploadHeap.Get(), 0, 0, 1, &textureData);
+
+				uint64_t fenceValue = a_CommandQueue->ExecuteCommandList(cCommandList);
+				a_CommandQueue->WaitForFenceValue(fenceValue);
 
 				D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 				srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -269,6 +278,10 @@ namespace gallus
 				m_AssetType = resources::AssetType::Sprite;
 
 				LoadMetaData();
+
+				auto dCommandQueue = core::ENGINE->GetDX12().GetCommandQueue();
+				auto dCommandList = dCommandQueue->GetCommandList();
+				CreateSRV(dCommandList);
 
 				LOGF(LOGSEVERITY_INFO_SUCCESS, LOG_CATEGORY_DX12, "Successfully loaded texture: \"%s\".", a_Path.generic_string().c_str());
 				return true;

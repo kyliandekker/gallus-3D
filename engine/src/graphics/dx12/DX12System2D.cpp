@@ -213,7 +213,6 @@ namespace gallus
 
 				// Get the copy command queue.
 				std::shared_ptr<CommandQueue> cCommandQueue = GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
-				std::shared_ptr<CommandList> cCommandList = cCommandQueue->GetCommandList();
 
 				CreateRenderTexture({ RENDER_TEX_SIZE.x, RENDER_TEX_SIZE.y });
 
@@ -222,11 +221,11 @@ namespace gallus
 				m_ImGuiWindow.Initialize();
 #endif // IMGUI_DISABLE
 
-				std::shared_ptr<Texture> texture = core::ENGINE->GetResourceAtlas().LoadTexture("tex_missing.png", cCommandList); // Default texture.
+				std::shared_ptr<Texture> texture = core::ENGINE->GetResourceAtlas().LoadTexture("tex_missing.png", cCommandQueue); // Default texture.
 				texture->SetResourceCategory(core::EngineResourceCategory::Missing);
 				texture->SetIsDestroyable(false);
 
-				std::shared_ptr<Texture> logo = core::ENGINE->GetResourceAtlas().LoadTexture("icon.png", cCommandList); // Logo.
+				std::shared_ptr<Texture> logo = core::ENGINE->GetResourceAtlas().LoadTexture("icon.png", cCommandQueue); // Logo.
 				logo->SetResourceCategory(core::EngineResourceCategory::System);
 				logo->SetIsDestroyable(false);
 
@@ -250,12 +249,11 @@ namespace gallus
 
 				std::shared_ptr<Mesh> mesh = core::ENGINE->GetResourceAtlas().LoadMesh("square"); // Default mesh.
 				MeshPartData& squarePrimitive = s_PRIMITIVES[(int)PRIMITIVES::SQUARE];
-				mesh->SetMeshData(squarePrimitive, cCommandList);
+				mesh->SetMeshData(squarePrimitive, cCommandQueue);
 				mesh->SetResourceCategory(core::EngineResourceCategory::Missing);
 				mesh->SetIsDestroyable(false);
 
-				uint64_t fenceValue = cCommandQueue->ExecuteCommandList(cCommandList);
-				cCommandQueue->WaitForFenceValue(fenceValue);
+				cCommandQueue->Flush();
 
 				UpdateRenderTargetViews();
 
@@ -273,9 +271,7 @@ namespace gallus
 #ifndef IMGUI_DISABLE
 				m_ImGuiWindow.OnRenderTargetCreated(dCommandList);
 #endif // IMGUI_DISABLE
-				core::ENGINE->GetResourceAtlas().TransitionResources(dCommandList);
-
-				fenceValue = dCommandQueue->ExecuteCommandList(dCommandList);
+				int fenceValue = dCommandQueue->ExecuteCommandList(dCommandList);
 				dCommandQueue->WaitForFenceValue(fenceValue);
 
 				m_FpsCounter.Initialize();
@@ -852,7 +848,6 @@ namespace gallus
 			//---------------------------------------------------------------------
 			void DX12System2D::Render2D(std::shared_ptr<CommandQueue> a_pCommandQueue, std::shared_ptr<CommandList> a_pCommandList, D3D12_CPU_DESCRIPTOR_HANDLE a_RTVHandle)
 			{
-				core::ENGINE->GetResourceAtlas().TransitionResources(a_pCommandList);
 				a_pCommandList->GetCommandList()->OMSetRenderTargets(1, &a_RTVHandle, FALSE, nullptr);
 				a_pCommandList->GetCommandList()->SetGraphicsRootSignature(m_pRootSignature.Get());
 
