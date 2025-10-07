@@ -64,19 +64,17 @@ namespace gallus
 				/// <param name="a_sLabel">The label displayed next to the input fields.</param>
 				virtual uint8_t Render(const char* a_sLabel, float a_fSpeed = 1.0f, float a_fMin = -999999999999999, float a_fMax = 9999999999999999)
 				{
-					ImGui::AlignTextToFramePadding();
-					ImGui::Text("X");
-					ImGui::SameLine();
-					ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
-					bool changedValueX = ImGui::DragFloat(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, std::string("X_") + a_sLabel).c_str(), &m_Value.x, a_fSpeed, a_fMin, a_fMax);
-					
-					ImGui::AlignTextToFramePadding();
-					ImGui::Text("Y");
-					ImGui::SameLine();
-					ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
-					bool changedValueY = ImGui::DragFloat(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, std::string("Y_") + a_sLabel).c_str(), &m_Value.y, a_fSpeed, a_fMin, a_fMax);
+					float val[2] = {
+						m_Value.x,
+						m_Value.y,
+					};
+					if (ImGui::VectorEdit2(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, a_sLabel).c_str(), val))
+					{
+						m_Value = { val[0], val[1] };
+						return true;
+					}
 
-					return changedValueX ? 1 : (changedValueY ? 2 : 0);
+					return false;
 				}
 			protected:
 				T m_Value; /// The current value of the vector.
@@ -136,7 +134,7 @@ namespace gallus
 					ImGui::SameLine();
 					ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
 					bool changedValueX = ImGui::DragInt(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, std::string("X_") + a_Label).c_str(), &m_Value.x, 1.0f);
-			
+
 					ImGui::AlignTextToFramePadding();
 					ImGui::Text("Y");
 					ImGui::SameLine();

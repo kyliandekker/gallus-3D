@@ -42,6 +42,7 @@ namespace gallus
                     },
                     [&offsetView, &colliderComp]
                     {
+                        ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
                         offsetView.SetValue(colliderComp.GetOffset());
                         if (offsetView.Render("COLLIDER_COMPONENT_OFFSET_INSPECTOR", 0.01f))
                         {
@@ -57,6 +58,7 @@ namespace gallus
                     },
                     [&sizeView, &colliderComp]
                     {
+                        ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
                         sizeView.SetValue(colliderComp.GetSize());
                         if (sizeView.Render("COLLIDER_COMPONENT_SIZE_INSPECTOR", 0.01f))
                         {
@@ -64,7 +66,7 @@ namespace gallus
                             core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
                         }
                     });
-                ImGui::EndInspectorKeyVal();
+                ImGui::EndInspectorKeyVal(m_Window.GetFramePadding());
 
 				ImGui::PopStyleVar();
 				ImGui::PopStyleVar();

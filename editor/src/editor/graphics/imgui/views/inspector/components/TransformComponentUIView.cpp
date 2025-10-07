@@ -50,9 +50,6 @@ namespace gallus
 					},
 					[&transformComp]
 					{
-						ImGui::AlignTextToFramePadding();
-						ImGui::Text("Y");
-						ImGui::SameLine();
 						float rotation = transformComp.Transform().GetRotation();
 						ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
 						if (ImGui::DragFloat(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "TRANSFORM_COMPONENT_ROTATION_INSPECTOR").c_str(), &rotation, 1.0f, -999999999, 99999999999))
@@ -69,6 +66,7 @@ namespace gallus
 					},
 					[&positionView , &transformComp]
 					{
+						ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
 						positionView.SetValue(transformComp.Transform().GetPosition());
 						if (positionView.Render("TRANSFORM_COMPONENT_POSITION_INSPECTOR"))
 						{
@@ -84,6 +82,7 @@ namespace gallus
 					},
 					[&scaleView, &transformComp]
 					{
+						ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
 						scaleView.SetValue(transformComp.Transform().GetScale());
 						if (scaleView.Render("TRANSFORM_COMPONENT_SCALE_INSPECTOR"))
 						{
@@ -99,6 +98,7 @@ namespace gallus
 					},
 					[&pivotView, &transformComp]
 					{
+						ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
 						pivotView.SetValue(transformComp.Transform().GetPivot());
 						if (pivotView.Render("TRANSFORM_COMPONENT_PIVOT_INSPECTOR"))
 						{
@@ -106,7 +106,7 @@ namespace gallus
 							core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
 						}
 					});
-				ImGui::EndInspectorKeyVal();
+				ImGui::EndInspectorKeyVal(m_Window.GetFramePadding());
 
 				ImGui::PopStyleVar();
 				ImGui::PopStyleVar();

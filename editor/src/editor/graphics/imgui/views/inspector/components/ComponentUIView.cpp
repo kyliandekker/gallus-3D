@@ -52,9 +52,9 @@ namespace gallus
 				{
 					ImGui::SetCursorPosY(ImGui::GetCursorPosY() + m_Window.GetWindowPadding().y);
 
-					ImGui::Indent(m_Window.GetFramePadding().x);
+					ImGui::Indent(m_Window.GetFramePadding().x * 4);
 					RenderInner();
-					ImGui::Unindent(m_Window.GetFramePadding().x);
+					ImGui::Unindent(m_Window.GetFramePadding().x * 4);
 				}
 			}
 

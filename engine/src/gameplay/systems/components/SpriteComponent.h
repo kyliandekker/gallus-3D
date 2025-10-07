@@ -3,6 +3,7 @@
 #include "graphics/dx12/DX12PCH.h"
 
 #include <memory>
+#include <glm/vec4.hpp>
 
 // gameplay includes
 #include "gameplay/systems/components/Component.h"
@@ -89,6 +90,16 @@ namespace gallus
 				m_iSpriteIndex = a_iSpriteIndex;
 			}
 
+			const DirectX::XMFLOAT4& GetColor()
+			{
+				return m_vColor;
+			}
+
+			void SetColor(const DirectX::XMFLOAT4& a_vColor)
+			{
+				m_vColor = a_vColor;
+			}
+
 			/// <summary>
 			/// Renders the mesh.
 			/// </summary>
@@ -115,6 +126,7 @@ namespace gallus
 			graphics::dx12::DX12ShaderBind* m_pShaderBind = nullptr;
 			graphics::dx12::Texture* m_pTexture = nullptr;
 			int8_t m_iSpriteIndex = 0;
+			DirectX::XMFLOAT4 m_vColor = { 1, 1, 1, 1 };
 		};
 	}
 }

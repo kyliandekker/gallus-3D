@@ -213,7 +213,9 @@ namespace ImGui
 
 	bool StartInspectorKeyVal(const std::string& a_sId, const ImVec2& a_vFramePadding)
 	{
-		ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, a_vFramePadding / 2);
+		ImGui::SetCursorPosY(ImGui::GetCursorPosY() - (a_vFramePadding.y / 2));
+
+		ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, a_vFramePadding);
 		bool b = ImGui::BeginTable(a_sId.c_str(), 2, ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_BordersInnerH);
 		ImGui::TableSetupColumn("Key", ImGuiTableColumnFlags_WidthFixed, 200.0f);
 		ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch, 1.0f);
@@ -229,11 +231,179 @@ namespace ImGui
 		a_Val();
 	}
 
-	void EndInspectorKeyVal()
+	void EndInspectorKeyVal(const ImVec2& a_vFramePadding)
 	{
 		ImGui::EndTable();
 		ImGui::PopStyleVar();
+
+		ImGui::SetCursorPosY(ImGui::GetCursorPosY() - (a_vFramePadding.y / 2));
 	}
+
+    bool VectorEdit2(const char* label, float col[2])
+    {
+        ImGuiWindow* window = GetCurrentWindow();
+        if (window->SkipItems)
+            return false;
+
+        ImGuiContext& g = *GImGui;
+        const ImGuiStyle& style = g.Style;
+        const float square_sz = GetFrameHeight();
+        const char* label_display_end = FindRenderedTextEnd(label);
+        float w_full = CalcItemWidth();
+        g.NextItemData.ClearFlags();
+
+        BeginGroup();
+        PushID(label);
+        const bool set_current_color_edit_id = (g.ColorEditCurrentID == 0);
+        if (set_current_color_edit_id)
+            g.ColorEditCurrentID = window->IDStack.back();
+
+		const int components = 2;
+        const float w_button = 0.0f;
+        const float w_inputs = ImMax(w_full - w_button, 1.0f);
+        w_full = w_inputs + w_button;
+
+        // Convert to the formats we need
+        float f[2] = { col[0], col[1] };
+
+        bool value_changed = false;
+        bool value_changed_as_float = false;
+
+        const ImVec2 pos = window->DC.CursorPos;
+        const float inputs_offset_x = (style.ColorButtonPosition == ImGuiDir_Left) ? w_button : 0.0f;
+        window->DC.CursorPos.x = pos.x + inputs_offset_x;
+
+
+			// RGB/HSV 0..255 Sliders
+		const float w_items = w_inputs - style.ItemInnerSpacing.x * (components - 1);
+
+		const bool hide_prefix = (IM_TRUNC(w_items / components) <= CalcTextSize("M:0.000").x);
+		static const char* ids[4] = { "##X", "##Y", "##Z", "##W" };
+		static const char* fmt_table_int[3][4] =
+		{
+			{ "%3d", "%3d", "%3d", "%3d" }, // Short display
+			{ "X:%3d", "T:%3d" }, // Long display for RGBA
+		};
+		static const char* fmt_table_float[3][4] =
+		{
+			{ "%0.3f", "%0.3f", "%0.3f", "%0.3f" }, // Short display
+			{ "X:%0.3f", "Y:%0.3f" }, // Long display for RGBA
+		};
+		const int fmt_idx = hide_prefix ? 0 : 1;
+
+		float prev_split = 0.0f;
+		for (int n = 0; n < components; n++)
+		{
+			if (n > 0)
+				SameLine(0, style.ItemInnerSpacing.x);
+			float next_split = IM_TRUNC(w_items * (n + 1) / components);
+			SetNextItemWidth(ImMax(next_split - prev_split, 1.0f));
+			prev_split = next_split;
+
+			value_changed |= DragFloat(ids[n], &f[n], 1.0f / 255.0f, -999999999, 999999999, fmt_table_float[fmt_idx][n]);
+			value_changed_as_float |= value_changed;
+		}
+
+        if (label != label_display_end )
+        {
+            // Position not necessarily next to last submitted button (e.g. if style.ColorButtonPosition == ImGuiDir_Left),
+            // but we need to use SameLine() to setup baseline correctly. Might want to refactor SameLine() to simplify this.
+            SameLine(0.0f, style.ItemInnerSpacing.x);
+            window->DC.CursorPos.x = pos.x + (w_full + style.ItemInnerSpacing.x);
+            TextEx(label, label_display_end);
+        }
+
+        if (value_changed && g.LastItemData.ID != 0) // In case of ID collision, the second EndGroup() won't catch g.ActiveId
+            MarkItemEdited(g.LastItemData.ID);
+
+		PopID();
+		EndGroup();
+
+        return value_changed;
+    }
+
+    bool IVectorEdit2(const char* label, int col[2])
+    {
+        ImGuiWindow* window = GetCurrentWindow();
+        if (window->SkipItems)
+            return false;
+
+        ImGuiContext& g = *GImGui;
+        const ImGuiStyle& style = g.Style;
+        const float square_sz = GetFrameHeight();
+        const char* label_display_end = FindRenderedTextEnd(label);
+        float w_full = CalcItemWidth();
+        g.NextItemData.ClearFlags();
+
+        BeginGroup();
+        PushID(label);
+        const bool set_current_color_edit_id = (g.ColorEditCurrentID == 0);
+        if (set_current_color_edit_id)
+            g.ColorEditCurrentID = window->IDStack.back();
+
+		const int components = 2;
+        const float w_button = 0.0f;
+        const float w_inputs = ImMax(w_full - w_button, 1.0f);
+        w_full = w_inputs + w_button;
+
+        // Convert to the formats we need
+        int f[2] = { col[0], col[1] };
+
+        bool value_changed = false;
+        bool value_changed_as_float = false;
+
+        const ImVec2 pos = window->DC.CursorPos;
+        const float inputs_offset_x = (style.ColorButtonPosition == ImGuiDir_Left) ? w_button : 0.0f;
+        window->DC.CursorPos.x = pos.x + inputs_offset_x;
+
+
+			// RGB/HSV 0..255 Sliders
+		const float w_items = w_inputs - style.ItemInnerSpacing.x * (components - 1);
+
+		const bool hide_prefix = (IM_TRUNC(w_items / components) <= CalcTextSize("M:0.000").x);
+		static const char* ids[4] = { "##X", "##Y", "##Z", "##W" };
+		static const char* fmt_table_int[3][4] =
+		{
+			{ "%3d", "%3d", "%3d", "%3d" }, // Short display
+			{ "X:%3d", "T:%3d" }, // Long display for RGBA
+		};
+		static const char* fmt_table_float[3][4] =
+		{
+			{ "%0.3f", "%0.3f", "%0.3f", "%0.3f" }, // Short display
+			{ "X:%0.3f", "Y:%0.3f" }, // Long display for RGBA
+		};
+		const int fmt_idx = hide_prefix ? 0 : 1;
+
+		float prev_split = 0.0f;
+		for (int n = 0; n < components; n++)
+		{
+			if (n > 0)
+				SameLine(0, style.ItemInnerSpacing.x);
+			float next_split = IM_TRUNC(w_items * (n + 1) / components);
+			SetNextItemWidth(ImMax(next_split - prev_split, 1.0f));
+			prev_split = next_split;
+
+			value_changed |= DragInt(ids[n], &f[n], 1.0f / 255.0f, -999999999, 999999999, fmt_table_float[fmt_idx][n]);
+			value_changed_as_float |= value_changed;
+		}
+
+        if (label != label_display_end )
+        {
+            // Position not necessarily next to last submitted button (e.g. if style.ColorButtonPosition == ImGuiDir_Left),
+            // but we need to use SameLine() to setup baseline correctly. Might want to refactor SameLine() to simplify this.
+            SameLine(0.0f, style.ItemInnerSpacing.x);
+            window->DC.CursorPos.x = pos.x + (w_full + style.ItemInnerSpacing.x);
+            TextEx(label, label_display_end);
+        }
+
+        if (value_changed && g.LastItemData.ID != 0) // In case of ID collision, the second EndGroup() won't catch g.ActiveId
+            MarkItemEdited(g.LastItemData.ID);
+
+		PopID();
+		EndGroup();
+
+        return value_changed;
+    }
 }
 
 #endif

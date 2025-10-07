@@ -102,7 +102,7 @@ namespace gallus
 						}
 						ImGui::PopStyleVar();
 					});
-				ImGui::EndInspectorKeyVal();
+				ImGui::EndInspectorKeyVal(m_Window.GetFramePadding());
 				ImGui::PopStyleVar();
 			}
 		}

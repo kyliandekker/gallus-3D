@@ -59,7 +59,7 @@ namespace gallus
 							healthComp.SetMaxHealth(maxHealth);
 						}
 					});
-				ImGui::EndInspectorKeyVal();
+				ImGui::EndInspectorKeyVal(m_Window.GetFramePadding());
 
 				ImGui::PopStyleVar();
 				ImGui::PopStyleVar();

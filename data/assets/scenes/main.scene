@@ -10,10 +10,16 @@
                         "spriteIndex": 4
                     },
                     "shader": {
-                        "pixel": "vertexShader.hlsl",
-                        "vertex": "pixelShader.hlsl"
+                        "pixel": "pixelShader.hlsl",
+                        "vertex": "vertexShader.hlsl"
                     },
-                    "mesh": "square"
+                    "mesh": "square",
+                    "color": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
                 },
                 "transform": {
                     "position": {
@@ -52,20 +58,26 @@
                         "spriteIndex": 0
                     },
                     "shader": {
-                        "pixel": "vertexShader.hlsl",
-                        "vertex": "pixelShader.hlsl"
+                        "pixel": "pixelShader.hlsl",
+                        "vertex": "vertexShader.hlsl"
                     },
-                    "mesh": "square"
+                    "mesh": "square",
+                    "color": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
                 },
                 "transform": {
                     "position": {
-                        "x": 443.87847900390627,
-                        "y": 549.4612426757813
+                        "x": 467.2524108886719,
+                        "y": 582.2111206054688
                     },
-                    "rotation": 0.0,
+                    "rotation": 17.328027725219728,
                     "scale": {
-                        "x": 160.0,
-                        "y": 160.0
+                        "x": 148.79989624023438,
+                        "y": 148.79989624023438
                     }
                 },
                 "player": {

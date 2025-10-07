@@ -46,7 +46,7 @@ namespace gallus
 							core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
 						}
 					});
-				ImGui::EndInspectorKeyVal();
+				ImGui::EndInspectorKeyVal(m_Window.GetFramePadding());
 
 				ImGui::PopStyleVar();
 				ImGui::PopStyleVar();

@@ -1,5 +1,7 @@
 ﻿#include "gameplay/systems/components/SpriteComponent.h"
 
+#include <rapidjson/utils.h>
+
 // core includes
 #include "core/Engine.h"
 
@@ -23,6 +25,11 @@
 #define JSON_SPRITE_COMPONENT_SHADER_PIXEL_VAR "pixel"
 #define JSON_SPRITE_COMPONENT_SHADER_VERTEX_VAR "vertex"
 #define JSON_SPRITE_COMPONENT_MATERIAL_VAR "material"
+#define JSON_SPRITE_COMPONENT_COLOR_VAR "color"
+#define JSON_SPRITE_COMPONENT_COLOR_R_VAR "r"
+#define JSON_SPRITE_COMPONENT_COLOR_G_VAR "g"
+#define JSON_SPRITE_COMPONENT_COLOR_B_VAR "b"
+#define JSON_SPRITE_COMPONENT_COLOR_A_VAR "a"
 
 namespace gallus
 {
@@ -37,6 +44,7 @@ namespace gallus
 			m_pShaderBind = core::ENGINE->GetResourceAtlas().GetDefaultShaderBind().get();
 			m_pTexture = core::ENGINE->GetResourceAtlas().GetDefaultTexture().get();
 			m_pMesh = core::ENGINE->GetResourceAtlas().GetDefaultMesh().get();
+			m_vColor = { 1, 1, 1, 1 };
 		}
 
 		//---------------------------------------------------------------------
@@ -154,6 +162,9 @@ namespace gallus
 				return;
 			}
 
+			float colorData[4] = { m_vColor.x, m_vColor.y, m_vColor.z, m_vColor.w };
+			a_pCommandList->GetCommandList()->SetGraphicsRoot32BitConstants(graphics::dx12::RootParameters::SPRITE_COLOR, 4, colorData, 0);
+
 			if (m_pTexture && m_pTexture->CanBeDrawn())
 			{
 				m_pTexture->Bind(a_pCommandList, m_iSpriteIndex);
@@ -183,42 +194,59 @@ namespace gallus
 				return;
 			}
 
-			std::string tex = m_pTexture->GetName();
-			std::string mesh = m_pMesh->GetName();
-			std::string pixelShader = m_pShaderBind->GetVertexShader()->GetName();
-			std::string vertexShader = m_pShaderBind->GetPixelShader()->GetName();
-			a_Document.AddMember(JSON_SPRITE_COMPONENT_TEX_VAR, rapidjson::Value().SetObject(), a_Allocator);
-			a_Document[JSON_SPRITE_COMPONENT_TEX_VAR];
-			a_Document[JSON_SPRITE_COMPONENT_TEX_VAR].AddMember(
-				JSON_SPRITE_COMPONENT_TEX_NAME_VAR,
-				rapidjson::Value(tex.c_str(), a_Allocator),
-				a_Allocator
-			);
-			a_Document[JSON_SPRITE_COMPONENT_TEX_VAR].AddMember(
-				JSON_SPRITE_COMPONENT_TEX_SPRITE_INDEX_VAR,
-				m_iSpriteIndex,
-				a_Allocator
-			);
+			{
+				a_Document.AddMember(JSON_SPRITE_COMPONENT_TEX_VAR, rapidjson::Value().SetObject(), a_Allocator);
+				std::string tex = m_pTexture->GetName();
+				a_Document[JSON_SPRITE_COMPONENT_TEX_VAR].AddMember(
+					JSON_SPRITE_COMPONENT_TEX_NAME_VAR,
+					rapidjson::Value(tex.c_str(), a_Allocator),
+					a_Allocator
+				);
+				a_Document[JSON_SPRITE_COMPONENT_TEX_VAR].AddMember(
+					JSON_SPRITE_COMPONENT_TEX_SPRITE_INDEX_VAR,
+					m_iSpriteIndex,
+					a_Allocator
+				);
+			}
 
 			a_Document.AddMember(JSON_SPRITE_COMPONENT_SHADER_VAR, rapidjson::Value().SetObject(), a_Allocator);
 
+			std::string pixelShader = m_pShaderBind->GetPixelShader()->GetName();
 			a_Document[JSON_SPRITE_COMPONENT_SHADER_VAR].AddMember(
 				JSON_SPRITE_COMPONENT_SHADER_PIXEL_VAR,
 				rapidjson::Value(pixelShader.c_str(), a_Allocator),
 				a_Allocator
 			);
 
+			std::string vertexShader = m_pShaderBind->GetVertexShader()->GetName();
 			a_Document[JSON_SPRITE_COMPONENT_SHADER_VAR].AddMember(
 				JSON_SPRITE_COMPONENT_SHADER_VERTEX_VAR,
 				rapidjson::Value(vertexShader.c_str(), a_Allocator),
 				a_Allocator
 			);
 
+			std::string mesh = m_pMesh->GetName();
 			a_Document.AddMember(
 				JSON_SPRITE_COMPONENT_MESH_VAR,
 				rapidjson::Value(mesh.c_str(), a_Allocator),
 				a_Allocator
 			);
+
+			{
+				rapidjson::Document colorDoc;
+				colorDoc.SetObject();
+
+				colorDoc.AddMember(JSON_SPRITE_COMPONENT_COLOR_R_VAR, m_vColor.x, a_Allocator);
+				colorDoc.AddMember(JSON_SPRITE_COMPONENT_COLOR_G_VAR, m_vColor.y, a_Allocator);
+				colorDoc.AddMember(JSON_SPRITE_COMPONENT_COLOR_B_VAR, m_vColor.z, a_Allocator);
+				colorDoc.AddMember(JSON_SPRITE_COMPONENT_COLOR_A_VAR, m_vColor.w, a_Allocator);
+
+				a_Document.AddMember(
+					JSON_SPRITE_COMPONENT_COLOR_VAR,
+					colorDoc,
+					a_Allocator
+				);
+			}
 		}
 
 		//---------------------------------------------------------------------
@@ -237,23 +265,33 @@ namespace gallus
 			{
 				if (a_Document[JSON_SPRITE_COMPONENT_TEX_VAR].HasMember(JSON_SPRITE_COMPONENT_TEX_NAME_VAR) && a_Document[JSON_SPRITE_COMPONENT_TEX_VAR][JSON_SPRITE_COMPONENT_TEX_NAME_VAR].IsString())
 				{
-					tex = a_Document[JSON_SPRITE_COMPONENT_TEX_VAR][JSON_SPRITE_COMPONENT_TEX_NAME_VAR].GetString();
+					rapidjson::GetString(a_Document[JSON_SPRITE_COMPONENT_TEX_VAR], JSON_SPRITE_COMPONENT_TEX_NAME_VAR, tex);
 				}
 				if (a_Document[JSON_SPRITE_COMPONENT_TEX_VAR].HasMember(JSON_SPRITE_COMPONENT_TEX_SPRITE_INDEX_VAR) && a_Document[JSON_SPRITE_COMPONENT_TEX_VAR][JSON_SPRITE_COMPONENT_TEX_SPRITE_INDEX_VAR].IsInt())
 				{
-					m_iSpriteIndex = a_Document[JSON_SPRITE_COMPONENT_TEX_VAR][JSON_SPRITE_COMPONENT_TEX_SPRITE_INDEX_VAR].GetInt();
+					int spriteIndex = 0;
+					rapidjson::GetInt(a_Document[JSON_SPRITE_COMPONENT_TEX_VAR], JSON_SPRITE_COMPONENT_TEX_SPRITE_INDEX_VAR, spriteIndex);
+					m_iSpriteIndex = spriteIndex;
 				}
 			}
 
-			if (a_Document.HasMember(JSON_SPRITE_COMPONENT_SHADER_VAR) && a_Document[JSON_SPRITE_COMPONENT_SHADER_VAR].IsString())
+			if (a_Document.HasMember(JSON_SPRITE_COMPONENT_SHADER_VAR) && a_Document[JSON_SPRITE_COMPONENT_SHADER_VAR].IsObject())
 			{
-				pixelShader = a_Document[JSON_SPRITE_COMPONENT_SHADER_VAR].GetString();
-				vertexShader = a_Document[JSON_SPRITE_COMPONENT_SHADER_VAR].GetString();
+				rapidjson::GetString(a_Document[JSON_SPRITE_COMPONENT_SHADER_VAR], JSON_SPRITE_COMPONENT_SHADER_PIXEL_VAR, pixelShader);
+				rapidjson::GetString(a_Document[JSON_SPRITE_COMPONENT_SHADER_VAR], JSON_SPRITE_COMPONENT_SHADER_VERTEX_VAR, vertexShader);
 			}
 
 			if (a_Document.HasMember(JSON_SPRITE_COMPONENT_MESH_VAR) && a_Document[JSON_SPRITE_COMPONENT_MESH_VAR].IsString())
 			{
-				mesh = a_Document[JSON_SPRITE_COMPONENT_MESH_VAR].GetString();
+				rapidjson::GetString(a_Document, JSON_SPRITE_COMPONENT_MESH_VAR, mesh);
+			}
+
+			if (a_Document.HasMember(JSON_SPRITE_COMPONENT_COLOR_VAR) && a_Document[JSON_SPRITE_COMPONENT_COLOR_VAR].IsObject())
+			{
+				rapidjson::GetFloat(a_Document[JSON_SPRITE_COMPONENT_COLOR_VAR], JSON_SPRITE_COMPONENT_COLOR_R_VAR, m_vColor.x);
+				rapidjson::GetFloat(a_Document[JSON_SPRITE_COMPONENT_COLOR_VAR], JSON_SPRITE_COMPONENT_COLOR_G_VAR, m_vColor.y);
+				rapidjson::GetFloat(a_Document[JSON_SPRITE_COMPONENT_COLOR_VAR], JSON_SPRITE_COMPONENT_COLOR_B_VAR, m_vColor.z);
+				rapidjson::GetFloat(a_Document[JSON_SPRITE_COMPONENT_COLOR_VAR], JSON_SPRITE_COMPONENT_COLOR_A_VAR, m_vColor.w);
 			}
 
 			std::shared_ptr<graphics::dx12::CommandQueue> cCommandQueue = core::ENGINE->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);

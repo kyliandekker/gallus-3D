@@ -558,7 +558,7 @@ namespace gallus
                             ImGui::PopItemWidth();
                         });
                     ImGui::PopStyleVar();
-                    ImGui::EndInspectorKeyVal();
+                    ImGui::EndInspectorKeyVal(m_Window.GetFramePadding());
 
                     if (m_iCurrentSprite != -1 && m_iCurrentSprite < m_pTextureMetaData->GetSprites().size())
                     {

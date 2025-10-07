@@ -36,7 +36,9 @@ namespace gallus
 			char m_sPixelShaderName[128];
 			char m_VertexShaderName[128];
 			char m_TextureName[128];
-			SpriteComponentUIView::SpriteComponentUIView(ImGuiWindow& a_Window, gameplay::SpriteComponent& a_SpriteComponent, gameplay::SpriteSystem& a_System) : ComponentUIView(a_Window, a_SpriteComponent, a_System), m_SizeView(a_Window)
+			SpriteComponentUIView::SpriteComponentUIView(ImGuiWindow& a_Window, gameplay::SpriteComponent& a_SpriteComponent, gameplay::SpriteSystem& a_System) : ComponentUIView(a_Window, a_SpriteComponent, a_System), 
+				m_SizeView(a_Window),
+				m_ColorView(a_Window)
 			{
 				m_bShowPreview = true;
 				m_iPreviewPriority = 4;
@@ -190,7 +192,23 @@ namespace gallus
 							spriteComp.SetSpriteIndex(spriteIndex);
 						}
 					});
-				ImGui::EndInspectorKeyVal();
+				ColorRGBAView<DirectX::XMFLOAT4>& colorView = m_ColorView;
+				ImGui::KeyValue([&window]
+					{
+						ImGui::AlignTextToFramePadding();
+						ImGui::DisplayHeader(window.GetBoldFont(), "Color: ");
+					},
+					[&colorView, &spriteComp]
+					{
+						ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+						colorView.SetValue(spriteComp.GetColor());
+						if (colorView.Render("SPRITE_COMPONENT_COLOR_INSPECTOR"))
+						{
+							spriteComp.SetColor(colorView.GetValue());
+							core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
+						}
+					});
+				ImGui::EndInspectorKeyVal(m_Window.GetFramePadding());
 
 				ImGui::PopStyleVar();
 				ImGui::PopStyleVar();

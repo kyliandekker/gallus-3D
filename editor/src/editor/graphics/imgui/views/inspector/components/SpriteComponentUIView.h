@@ -9,6 +9,7 @@
 
 // graphics includes
 #include "graphics/imgui/views/DataTypes/VectorView.h"
+#include "graphics/imgui/views/DataTypes/ColorView.h"
 
 // gameplay includes
 #include "gameplay/systems/SpriteSystem.h"
@@ -57,6 +58,9 @@ namespace gallus
 				/// UI elements for displaying and editing the position, rotation, and scale as glm::vec3.
 				IVector2View<DirectX::XMINT2>
 					m_SizeView;
+
+				ColorRGBAView<DirectX::XMFLOAT4>
+					m_ColorView;
 			};
 		}
 	}
