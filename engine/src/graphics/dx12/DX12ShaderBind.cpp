@@ -23,7 +23,7 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			DX12ShaderBind::DX12ShaderBind(const PixelShader* a_PixelShader, const VertexShader* a_VertexShader) :
+			DX12ShaderBind::DX12ShaderBind(const std::string& a_sName, const PixelShader* a_PixelShader, const VertexShader* a_VertexShader) : core::EngineResource(a_sName),
 				m_pPixelShader(a_PixelShader),
 				m_pVertexShader(a_VertexShader)
 			{

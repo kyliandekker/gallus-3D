@@ -27,7 +27,7 @@ namespace gallus
 				/// <summary>
 				/// Constructs a shader resource.
 				/// </summary>
-				DX12ShaderBind(const PixelShader* a_PixelShader, const VertexShader* a_VertexShader);
+				DX12ShaderBind(const std::string& a_sName, const PixelShader* a_PixelShader, const VertexShader* a_VertexShader);
 
 				/// <summary>
 				/// Creates the pipe line state.

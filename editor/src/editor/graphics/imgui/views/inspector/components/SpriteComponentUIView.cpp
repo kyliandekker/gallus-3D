@@ -91,6 +91,7 @@ namespace gallus
 										{
 											spriteComp.SetShader(
 												core::EDITOR_ENGINE->GetResourceAtlas().LoadShaderBind(
+												spriteComp.GetTexture()->GetName(),
 												core::EDITOR_ENGINE->GetResourceAtlas().LoadPixelShader(resource.GetPath().filename().generic_string()).get(),
 												spriteComp.GetShader()->GetVertexShader()
 											).get());
@@ -128,6 +129,7 @@ namespace gallus
 										{
 											spriteComp.SetShader(
 												core::EDITOR_ENGINE->GetResourceAtlas().LoadShaderBind(
+												spriteComp.GetTexture()->GetName(),
 												spriteComp.GetShader()->GetPixelShader(),
 												core::EDITOR_ENGINE->GetResourceAtlas().LoadVertexShader(resource.GetPath().filename().generic_string()).get()
 											).get());

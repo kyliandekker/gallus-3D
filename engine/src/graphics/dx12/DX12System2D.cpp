@@ -225,10 +225,6 @@ namespace gallus
 				texture->SetResourceCategory(core::EngineResourceCategory::Missing);
 				texture->SetIsDestroyable(false);
 
-				std::shared_ptr<Texture> logo = core::ENGINE->GetResourceAtlas().LoadTexture("icon.png", cCommandQueue); // Logo.
-				logo->SetResourceCategory(core::EngineResourceCategory::System);
-				logo->SetIsDestroyable(false);
-
 				std::shared_ptr<PixelShader> pixelShader = core::ENGINE->GetResourceAtlas().LoadPixelShader("pixelShader.hlsl"); // Default shader.
 				std::shared_ptr<VertexShader> vertexShader = core::ENGINE->GetResourceAtlas().LoadVertexShader("vertexShader.hlsl"); // Default shader.
 				pixelShader->SetResourceCategory(core::EngineResourceCategory::Missing);
@@ -236,16 +232,16 @@ namespace gallus
 				vertexShader->SetResourceCategory(core::EngineResourceCategory::Missing);
 				vertexShader->SetIsDestroyable(false);
 
-				std::shared_ptr<DX12ShaderBind> shaderBind = core::ENGINE->GetResourceAtlas().LoadShaderBind(pixelShader.get(), vertexShader.get()); // Default shader.
+				std::shared_ptr<DX12ShaderBind> shaderBind = core::ENGINE->GetResourceAtlas().LoadShaderBind("defaultShaderBind", pixelShader.get(), vertexShader.get()); // Default shader.
 
-				std::shared_ptr<PixelShader> renderTexPixelShader = core::ENGINE->GetResourceAtlas().LoadPixelShader("renderTexPixelShader.hlsl"); // Default shader.
-				std::shared_ptr<VertexShader> renderTexVertexShader = core::ENGINE->GetResourceAtlas().LoadVertexShader("renderTexVertexShader.hlsl"); // Default shader.
+				std::shared_ptr<PixelShader> renderTexPixelShader = core::ENGINE->GetResourceAtlas().LoadPixelShader("renderTexPixelShader.hlsl"); // Default render tex shader.
+				std::shared_ptr<VertexShader> renderTexVertexShader = core::ENGINE->GetResourceAtlas().LoadVertexShader("renderTexVertexShader.hlsl"); // Default render tex shader.
 				renderTexPixelShader->SetResourceCategory(core::EngineResourceCategory::Missing);
 				renderTexPixelShader->SetIsDestroyable(false);
 				renderTexVertexShader->SetResourceCategory(core::EngineResourceCategory::Missing);
 				renderTexVertexShader->SetIsDestroyable(false);
 
-				std::shared_ptr<DX12ShaderBind> renderTexShaderBind = core::ENGINE->GetResourceAtlas().LoadShaderBind(renderTexPixelShader.get(), renderTexVertexShader.get()); // Render Tex shader.
+				std::shared_ptr<DX12ShaderBind> renderTexShaderBind = core::ENGINE->GetResourceAtlas().LoadShaderBind("renderTexShaderBind", renderTexPixelShader.get(), renderTexVertexShader.get()); // Render Tex shader.
 
 				std::shared_ptr<Mesh> mesh = core::ENGINE->GetResourceAtlas().LoadMesh("square"); // Default mesh.
 				MeshPartData& squarePrimitive = s_PRIMITIVES[(int)PRIMITIVES::SQUARE];

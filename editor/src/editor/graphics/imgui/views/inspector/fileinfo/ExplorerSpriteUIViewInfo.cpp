@@ -52,11 +52,6 @@ namespace gallus
 				m_pPreviewTexture->SetResourceCategory(gallus::core::EngineResourceCategory::Editor);
 			}
 
-			ExplorerSpriteUIViewInfo::~ExplorerSpriteUIViewInfo()
-			{
-				
-			}
-            
             int GetFormatChannelCount(DXGI_FORMAT format)
             {
                 switch (format)

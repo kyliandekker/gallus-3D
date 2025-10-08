@@ -38,8 +38,6 @@ namespace gallus
 				/// <param name="a_Window">The ImGui window for rendering the view.</param>
 				/// <param name="a_ExplorerFileUIView">The explorer file ui view.</param>
 				ExplorerSpriteUIViewInfo(ImGuiWindow& a_Window, ExplorerFileUIView& a_ExplorerFileUIView);
-
-				virtual ~ExplorerSpriteUIViewInfo();
 			protected:
 				/// <summary>
 				/// Renders the file UI in the editor.

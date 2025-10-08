@@ -219,7 +219,7 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		std::shared_ptr<graphics::dx12::DX12ShaderBind> ResourceAtlas::LoadShaderBind(const graphics::dx12::PixelShader* a_PixelShader, const graphics::dx12::VertexShader* a_VertexShader)
+		std::shared_ptr<graphics::dx12::DX12ShaderBind> ResourceAtlas::LoadShaderBind(const std::string& a_sName, const graphics::dx12::PixelShader* a_PixelShader, const graphics::dx12::VertexShader* a_VertexShader)
 		{
 			for (std::shared_ptr<graphics::dx12::DX12ShaderBind>& shaderBind : m_aShaderBinds)
 			{
@@ -229,7 +229,7 @@ namespace gallus
 				}
 			}
 
-			std::shared_ptr<graphics::dx12::DX12ShaderBind> shaderBind = std::make_shared<graphics::dx12::DX12ShaderBind>(a_PixelShader, a_VertexShader);
+			std::shared_ptr<graphics::dx12::DX12ShaderBind> shaderBind = std::make_shared<graphics::dx12::DX12ShaderBind>(a_sName, a_PixelShader, a_VertexShader);
 			shaderBind->CreatePipelineState();
 			m_aShaderBinds.push_back(shaderBind);
 

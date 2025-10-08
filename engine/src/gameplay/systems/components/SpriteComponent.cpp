@@ -306,6 +306,7 @@ namespace gallus
 			if (!vertexShader.empty() && !pixelShader.empty())
 			{
 				SetShader(core::ENGINE->GetResourceAtlas().LoadShaderBind(
+					tex,
 					core::ENGINE->GetResourceAtlas().LoadPixelShader(pixelShader).get(),
 					core::ENGINE->GetResourceAtlas().LoadVertexShader(vertexShader).get()
 				).get());

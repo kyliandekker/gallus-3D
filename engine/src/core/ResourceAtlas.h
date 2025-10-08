@@ -107,7 +107,7 @@ namespace gallus
 			/// <summary>
 			/// Loads a shader bind.
 			/// </summary>
-			std::shared_ptr<graphics::dx12::DX12ShaderBind> LoadShaderBind(const graphics::dx12::PixelShader* a_PixelShader, const graphics::dx12::VertexShader* a_VertexShader);
+			std::shared_ptr<graphics::dx12::DX12ShaderBind> LoadShaderBind(const std::string& a_sName, const graphics::dx12::PixelShader* a_PixelShader, const graphics::dx12::VertexShader* a_VertexShader);
 
 			/// <summary>
 			/// Loads a scene.
