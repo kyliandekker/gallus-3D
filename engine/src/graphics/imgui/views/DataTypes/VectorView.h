@@ -68,7 +68,7 @@ namespace gallus
 						m_Value.x,
 						m_Value.y,
 					};
-					if (ImGui::VectorEdit2(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, a_sLabel).c_str(), val))
+					if (ImGui::VectorEdit2(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, a_sLabel).c_str(), val, a_fSpeed, a_fMin, a_fMax))
 					{
 						m_Value = { val[0], val[1] };
 						return true;
@@ -145,48 +145,6 @@ namespace gallus
 				}
 			protected:
 				T m_Value; /// The current value of the vector.
-			};
-
-			//---------------------------------------------------------------------
-			// Vector3View
-			//---------------------------------------------------------------------
-			/// <summary>
-			/// A UI view for rendering and interacting with vectors.
-			/// Can be used for both glm-based types and ImVec types.
-			/// </summary>
-			/// <typeparam name="T">The type of the color, such as glm::vec3 or ImVec.</typeparam>
-			template <class T>
-			class Vector3View : public Vector2View<T>
-			{
-			public:
-				/// <summary>
-				/// Constructor for Vector3View.
-				/// </summary>
-				/// <param name="a_Window">The ImGui window for rendering the view.</param>
-				Vector3View(ImGuiWindow& a_Window) : Vector2View<T>(a_Window)
-				{}
-
-				/// <summary>
-				/// Empty render method (implemented because base class is pure).
-				/// </summary>
-				void Render() override
-				{}
-
-				/// <summary>
-				/// Renders the 3D vector as draggable float inputs in ImGui (X, Y and Z components).
-				/// </summary>
-				/// <param name="a_Label">The label displayed next to the input fields.</param>
-				uint8_t Render(const char* a_Label) override
-				{
-					uint8_t changedValueXY = Vector2View<T>::Render(a_Label);
-					ImGui::SameLine();
-					ImGui::AlignTextToFramePadding();
-					ImGui::Text("Z");
-					ImGui::SameLine();
-					bool changedValueZ = ImGui::DragFloat(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, std::string("Z_") + a_Label).c_str(), &this->m_Value.z, 0.1f);
-
-					return changedValueZ ? 3 : changedValueXY;
-				}
 			};
 		}
 	}

@@ -116,35 +116,58 @@ namespace gallus
 
 			void ExplorerSpriteUIViewInfo::RenderSpecific()
 			{
-				if (m_pPreviewTexture)
-				{
-					ImGui::DisplayHeader(m_Window.GetBoldFont(), "Width: ");
-					ImGui::SameLine();
-					ImGui::Text(std::to_string(m_pPreviewTexture->GetResourceDesc().Width).c_str());
+                ImGui::StartInspectorKeyVal(ImGui::IMGUI_FORMAT_ID("", TABLE_ID, "SPRITE_EXPLORER_ITEM_TABLE_INSPECTOR"), m_Window.GetFramePadding());
 
-					ImGui::DisplayHeader(m_Window.GetBoldFont(), "Height: ");
-					ImGui::SameLine();
-					ImGui::Text(std::to_string(m_pPreviewTexture->GetResourceDesc().Height).c_str());
-
-					ImGui::DisplayHeader(m_Window.GetBoldFont(), "Channels: ");
-					ImGui::SameLine();
-					ImGui::Text(std::to_string(GetFormatChannelCount(m_pPreviewTexture->GetResourceDesc().Format)).c_str());
-				}
-
+                ImGuiWindow& window = m_Window;
+                ExplorerFileUIView& explorerFileUIView = m_ExplorerFileUIView;
+                StringDropdown<gallus::graphics::dx12::TextureType>& textureTypeDropdown = m_TextureTypeDropdown;
                 resources::TextureMetaData* metaData = m_ExplorerFileUIView.GetFileResource().GetMetaData<resources::TextureMetaData>();
-
-                ImGui::DisplayHeader(m_Window.GetBoldFont(), "Type: ");
-                ImGui::SameLine();
-                ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(m_Window.GetFramePadding().x, 0));
-                ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
-                if (m_TextureTypeDropdown.Render(ImGui::IMGUI_FORMAT_ID("", COMBO_ID, "ASSETTYPE_SHADER_FILE_INSPECTOR").c_str()))
+                std::shared_ptr<graphics::dx12::Texture> previewTex = m_pPreviewTexture;
+                if (m_pPreviewTexture)
                 {
-                    metaData->SetTextureType(m_TextureTypeDropdown.GetValue());
-                    metaData->Save(m_ExplorerFileUIView.GetFileResource().GetPath());
+                    ImGui::KeyValue([&window]
+                    {
+                        ImGui::AlignTextToFramePadding();
+                        ImGui::DisplayHeader(window.GetBoldFont(), "Width: ");
+                    },
+                        [previewTex]
+                    {
+                        ImGui::Text(std::to_string(previewTex->GetResourceDesc().Width).c_str());
+                    });
+                    ImGui::KeyValue([&window]
+                    {
+                        ImGui::AlignTextToFramePadding();
+                        ImGui::DisplayHeader(window.GetBoldFont(), "Height: ");
+                    },
+                        [previewTex]
+                    {
+                        ImGui::Text(std::to_string(previewTex->GetResourceDesc().Height).c_str());
+                    });
+                    ImGui::KeyValue([&window]
+                    {
+                        ImGui::AlignTextToFramePadding();
+                        ImGui::DisplayHeader(window.GetBoldFont(), "Channels: ");
+                    },
+                        [previewTex]
+                    {
+                        ImGui::Text(std::to_string(GetFormatChannelCount(previewTex->GetResourceDesc().Format)).c_str());
+                    });
                 }
-                ImGui::PopStyleVar();
-
-                ImGui::NewLine();
+                ImGui::KeyValue([&window]
+                {
+                    ImGui::AlignTextToFramePadding();
+                    ImGui::DisplayHeader(window.GetBoldFont(), "Type: ");
+                },
+                    [&textureTypeDropdown, &explorerFileUIView, metaData]
+                {
+                    ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+                    if (textureTypeDropdown.Render(ImGui::IMGUI_FORMAT_ID("", COMBO_ID, "TEXTURE_TYPE_SPRITE_EXPLORER_ITEM_INSPECTOR").c_str()))
+                    {
+                        metaData->SetTextureType(textureTypeDropdown.GetValue());
+                        metaData->Save(explorerFileUIView.GetFileResource().GetPath());
+                    }
+                });
+                ImGui::EndInspectorKeyVal(m_Window.GetFramePadding());
 
                 float width = ImGui::GetContentRegionAvail().x;
                 if (metaData->GetTextureType() == graphics::dx12::TextureType::SpriteSheet && ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_IMAGE + std::string(" Open Sprite Editor"), BUTTON_ID, "OPEN_SPRITE_EDITOR_INSPECTOR").c_str(), ImVec2(width, 0)))

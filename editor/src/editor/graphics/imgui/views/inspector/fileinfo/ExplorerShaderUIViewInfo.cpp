@@ -36,15 +36,25 @@ namespace gallus
 
             void ExplorerShaderUIViewInfo::RenderSpecific()
             {
-                ImGui::DisplayHeader(m_Window.GetBoldFont(), "Type: ");
-                ImGui::SameLine();
-                ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(m_Window.GetFramePadding().x, 0));
-                ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
-                if (m_AssetTypeDropdown.Render(ImGui::IMGUI_FORMAT_ID("", COMBO_ID, "ASSETTYPE_SHADER_FILE_INSPECTOR").c_str()))
+                ImGui::StartInspectorKeyVal(ImGui::IMGUI_FORMAT_ID("", TABLE_ID, "SHADER_EXPLORER_ITEM_TABLE_INSPECTOR"), m_Window.GetFramePadding());
+
+                ImGuiWindow& window = m_Window;
+                ExplorerFileUIView& explorerFileUIView = m_ExplorerFileUIView;
+                StringDropdown<gallus::resources::AssetType>& assetTypeDropdown = m_AssetTypeDropdown;
+                ImGui::KeyValue([&window]
                 {
-                    m_ExplorerFileUIView.GetFileResource().GetMetaData()->SetAssetType(m_AssetTypeDropdown.GetValue());
-                }
-                ImGui::PopStyleVar();
+                    ImGui::AlignTextToFramePadding();
+                    ImGui::DisplayHeader(window.GetBoldFont(), "Type: ");
+                },
+                    [&assetTypeDropdown, &explorerFileUIView]
+                {
+                    ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+                    if (assetTypeDropdown.Render(ImGui::IMGUI_FORMAT_ID("", COMBO_ID, "ASSETTYPE_SHADER_EXPLORER_ITEM_INSPECTOR").c_str()))
+                    {
+                        explorerFileUIView.GetFileResource().GetMetaData()->SetAssetType(assetTypeDropdown.GetValue());
+                    }
+                });
+                ImGui::EndInspectorKeyVal(m_Window.GetFramePadding());
             }
         }
     }

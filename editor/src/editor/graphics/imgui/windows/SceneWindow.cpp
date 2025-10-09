@@ -42,6 +42,15 @@ namespace gallus
             //---------------------------------------------------------------------
             void SceneWindow::Update()
             {
+                bool isStarted = gameplay::GAME.IsStarted();
+
+                graphics::dx12::Camera* cam = &core::ENGINE->GetDX12().GetCamera();
+                if (!isStarted && core::EDITOR_ENGINE->GetEditor().GetCameraMode() == editor::CameraMode::CAMERA_MODE_SCENE)
+                {
+                    cam = &core::EDITOR_ENGINE->GetEditor().GetEditorCamera();
+                }
+                core::EDITOR_ENGINE->GetDX12().SetActiveCamera(*cam);
+
                 if (gameplay::GAME.IsStarted() && !gameplay::GAME.IsPaused())
                 {
                     return;
@@ -110,6 +119,14 @@ namespace gallus
                     core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
                 }
 
+                ImGui::SameLine();
+                bool inGameMode = core::EDITOR_ENGINE->GetEditor().GetCameraMode() == editor::CameraMode::CAMERA_MODE_GAME;
+                if (ImGui::CheckboxButton(
+                    ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_GAMEMODE), BUTTON_ID, "CAMERA_MODE_GAME").c_str(), &inGameMode, m_Window.GetHeaderSize()))
+                {
+                    core::EDITOR_ENGINE->GetEditor().SetCameraMode(inGameMode ? editor::CameraMode::CAMERA_MODE_GAME : editor::CameraMode::CAMERA_MODE_SCENE);
+                }
+
                 ImGui::EndToolbar(ImVec2(0, 0));
 
                 ImGui::PopStyleVar();
@@ -160,7 +177,7 @@ namespace gallus
                 }
 
                 // Pan with middle mouse button
-                if ((ImGui::IsWindowHovered() && ImGui::IsMouseDragging(ImGuiMouseButton_Middle)) || (ImGui::IsWindowHovered() && ImGui::IsMouseDragging(ImGuiMouseButton_Right)))
+                if (ImGui::IsWindowHovered() && ImGui::IsMouseDragging(ImGuiMouseButton_Middle))
                 {
                     m_vPanOffset += ImGui::GetIO().MouseDelta;
                     core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetScenePanOffset(glm::vec2(m_vPanOffset.x, m_vPanOffset.y));
@@ -177,7 +194,12 @@ namespace gallus
                     imageSize
                 );
 
-                DrawComponentGizmos(imageScreenPos, textureSize);
+                if (core::EDITOR_ENGINE->GetEditor().GetCameraMode() == editor::CameraMode::CAMERA_MODE_SCENE)
+                {
+                    HandleCameraInput(gameplay::GAME.GetDeltaTime(), imageScreenPos, textureSize);
+
+                    DrawComponentGizmos(imageScreenPos, textureSize);
+                }
 
                 ImU32 borderColor = IM_COL32(255, 255, 255, 255); // white border
                 float borderThickness = 2.0f;
@@ -201,9 +223,78 @@ namespace gallus
                 }
             }
 
+            void SceneWindow::Draw2DGrid(
+                const ImVec2& a_vScenePos,
+                const ImVec2& a_vSize,
+                const ImVec2& a_vPanOffset,
+                float a_fZoom)
+            {
+                ImDrawList* drawList = ImGui::GetWindowDrawList();
+
+                const float baseSpacing = 100.0f;
+                const int majorEvery = 10;
+                const ImU32 minorColor = IM_COL32(255, 255, 255, 25);
+                const ImU32 majorColor = IM_COL32(255, 255, 255, 55);
+                const ImU32 axisXColor = IM_COL32(255, 80, 80, 200);
+                const ImU32 axisYColor = IM_COL32(80, 160, 255, 200);
+
+                ImVec2 rectMin = ImVec2(a_vScenePos.x + a_vPanOffset.x, a_vScenePos.y + a_vPanOffset.y);
+                ImVec2 rectMax = ImVec2(rectMin.x + a_vSize.x * a_fZoom, rectMin.y + a_vSize.y * a_fZoom);
+
+                graphics::dx12::Camera& cam = core::ENGINE->GetDX12().GetActiveCamera();
+                const DirectX::XMFLOAT2& cameraPos = cam.Transform().GetPosition();
+
+                // Draw vertical grid lines
+                float leftWorld = cameraPos.x;
+                float rightWorld = cameraPos.x + a_vSize.x / a_fZoom;
+                float firstX = floorf(leftWorld / baseSpacing) * baseSpacing;
+
+                for (float x = firstX;; x += baseSpacing)
+                {
+                    float screenX = rectMin.x + (x - cameraPos.x) * a_fZoom;
+                    if (screenX > rectMax.x + 0.5f) break; // stop when past rect
+                    if (screenX >= rectMin.x - 0.5f)      // only draw inside rect
+                    {
+                        bool major = (static_cast<int>(x / baseSpacing) % majorEvery == 0);
+                        ImU32 color = major ? majorColor : minorColor;
+                        drawList->AddLine(ImVec2(screenX, rectMin.y), ImVec2(screenX, rectMax.y), color);
+                    }
+                }
+
+                // Draw horizontal grid lines
+                float topWorld = cameraPos.y;
+                float bottomWorld = cameraPos.y + a_vSize.y / a_fZoom;
+                float firstY = floorf(topWorld / baseSpacing) * baseSpacing;
+
+                for (float y = firstY;; y += baseSpacing)
+                {
+                    float screenY = rectMin.y + (y - cameraPos.y) * a_fZoom;
+                    if (screenY > rectMax.y + 0.5f) break;
+                    if (screenY >= rectMin.y - 0.5f)
+                    {
+                        bool major = (static_cast<int>(y / baseSpacing) % majorEvery == 0);
+                        ImU32 color = major ? majorColor : minorColor;
+                        drawList->AddLine(ImVec2(rectMin.x, screenY), ImVec2(rectMax.x, screenY), color);
+                    }
+                }
+
+                // Draw axes
+                float originX = rectMin.x + (0.0f - cameraPos.x) * a_fZoom;
+                float originY = rectMin.y + (0.0f - cameraPos.y) * a_fZoom;
+
+                if (originX >= rectMin.x && originX <= rectMax.x)
+                    drawList->AddLine(ImVec2(originX, rectMin.y), ImVec2(originX, rectMax.y), axisYColor, 1.5f);
+
+                if (originY >= rectMin.y && originY <= rectMax.y)
+                    drawList->AddLine(ImVec2(rectMin.x, originY), ImVec2(rectMax.x, originY), axisXColor, 1.5f);
+            }
+
             //---------------------------------------------------------------------
             void SceneWindow::DrawComponentGizmos(const ImVec2& a_vSceneStartPos, const ImVec2& a_vSize)
             {
+                DrawGizmos(a_vSceneStartPos, a_vSize, m_vPanOffset, m_fZoom);
+                Draw2DGrid(a_vSceneStartPos, a_vSize, m_vPanOffset, m_fZoom);
+
                 std::lock_guard<std::recursive_mutex> lock(core::EDITOR_ENGINE->GetECS().m_EntityMutex);
 
                 const HierarchyEntityUIView* entity = dynamic_cast<const HierarchyEntityUIView*>(core::EDITOR_ENGINE->GetEditor().GetSelectable().get());
@@ -222,6 +313,17 @@ namespace gallus
                 {
                     component->RenderComponentGizmos(a_vSceneStartPos, a_vSize, m_vPanOffset, m_fZoom);
                 }
+            }
+
+            //---------------------------------------------------------------------
+            void SceneWindow::DrawGizmos(const ImVec2& a_vScenePos, const ImVec2& a_vSize, const ImVec2& a_vPanOffset, float a_fZoom)
+            {
+                ImGuizmo::BeginFrame();
+
+                ImGuizmo::SetOrthographic(false);
+                ImGuizmo::SetDrawlist(ImGui::GetCurrentWindow()->DrawList);
+
+                ImGuizmo::SetRect(a_vScenePos.x + a_vPanOffset.x, a_vScenePos.y + a_vPanOffset.y, a_vSize.x * a_fZoom, a_vSize.y * a_fZoom);
             }
 
             //---------------------------------------------------------------------
@@ -365,6 +467,76 @@ namespace gallus
                 }
 
                 BaseWindow::Update();
+            }
+
+            void SceneWindow::HandleCameraInput(double a_fDeltaTime, const ImVec2& a_vSceneStartPos, const ImVec2& a_vSize)
+            {
+                ImGuiIO& io = ImGui::GetIO();
+                graphics::dx12::Camera& camera = core::EDITOR_ENGINE->GetEditor().GetEditorCamera();
+
+                DirectX::XMFLOAT2 position = camera.Transform().GetPosition();
+
+                ImVec2 imageMin = { a_vSceneStartPos.x + m_vPanOffset.x, a_vSceneStartPos.y + m_vPanOffset.y };
+                ImVec2 imageMax = imageMin + ImVec2(a_vSize.x * m_fZoom, a_vSize.y * m_fZoom);
+
+                ImVec2 mouse = io.MousePos;
+
+                // Persistent state for mouse look
+                static bool moving = false;
+                static POINT lastCursorPos;
+
+                if (ImGui::IsWindowHovered() &&
+                    mouse.x >= imageMin.x && mouse.y >= imageMin.y &&
+                    mouse.x <= imageMax.x && mouse.y <= imageMax.y)
+                {
+                    HWND hwnd = core::EDITOR_ENGINE->GetWindow().GetHWnd();
+
+                    // Right-click drag -> rotate
+                    if (ImGui::IsMouseDown(ImGuiMouseButton_Right))
+                    {
+                        if (!moving)
+                        {
+                            moving = true;
+                            ImGui::SetMouseCursor(ImGuiMouseCursor_None);
+
+                            // Cache current cursor
+                            GetCursorPos(&lastCursorPos);
+                        }
+
+                        POINT currentPos;
+                        GetCursorPos(&currentPos);
+
+                        float deltaX = static_cast<float>(currentPos.x - lastCursorPos.x);
+                        float deltaY = static_cast<float>(currentPos.y - lastCursorPos.y);
+
+                        float moveSpeed = 20 * a_fDeltaTime;
+
+                        position.x -= deltaX * moveSpeed;
+                        position.y -= deltaY * moveSpeed;
+
+                        // Reset cursor so deltas stay per-frame
+                        SetCursorPos(lastCursorPos.x, lastCursorPos.y);
+                    }
+                    else
+                    {
+                        if (moving)
+                        {
+                            moving = false;
+                            ImGui::SetMouseCursor(ImGuiMouseCursor_Arrow);
+                        }
+                    }
+                }
+                else
+                {
+                    if (moving)
+                    {
+                        moving = false;
+                        ImGui::SetMouseCursor(ImGuiMouseCursor_Arrow);
+                    }
+                }
+
+                // Always apply position after rotation
+                camera.Transform().SetPosition(position);
             }
 
             //---------------------------------------------------------------------

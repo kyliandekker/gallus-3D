@@ -1,15 +1,16 @@
-﻿#include "Game.h"
+﻿// header
+#include "Game.h"
 
 // core includes
 #include "core/Engine.h"
-
-// logger includes
-#include "logger/Logger.h"
 
 // graphics includes
 #include "graphics/dx12/CommandQueue.h"
 #include "graphics/dx12/CommandList.h"
 #include "graphics/dx12/Texture.h"
+
+// logger includes
+#include "logger/Logger.h"
 
 // gameplay includes
 #include "gameplay/systems/SpriteSystem.h"
@@ -47,8 +48,6 @@ namespace gallus
 
 #ifndef _EDITOR
 			core::ENGINE->GetResourceAtlas().LoadScene("main.scene", m_Scene);
-			m_Scene.LoadData();
-
 			m_bStarted = true;
 #endif
 
@@ -85,6 +84,7 @@ namespace gallus
 
 				int updatesThisFrame = 0;
 
+				m_fDeltaTime = FIXED_TIMESTEP;
 				while (lag >= FIXED_TIMESTEP)
 				{
 					bool updateRealtime = m_bStarted && !m_bPaused;

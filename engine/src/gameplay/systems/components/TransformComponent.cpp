@@ -6,6 +6,7 @@
 #define JSON_TRANSFORM_COMPONENT_POSITION_VAR "position"
 #define JSON_TRANSFORM_COMPONENT_ROTATION_VAR "rotation"
 #define JSON_TRANSFORM_COMPONENT_SCALE_VAR "scale"
+#define JSON_TRANSFORM_COMPONENT_PIVOT_VAR "pivot"
 #define JSON_TRANSFORM_COMPONENT_X_VAR "x"
 #define JSON_TRANSFORM_COMPONENT_Y_VAR "y"
 
@@ -40,6 +41,11 @@ namespace gallus
 
 			a_Document[JSON_TRANSFORM_COMPONENT_SCALE_VAR].AddMember(JSON_TRANSFORM_COMPONENT_X_VAR, m_Transform.GetScale().x, a_Allocator);
 			a_Document[JSON_TRANSFORM_COMPONENT_SCALE_VAR].AddMember(JSON_TRANSFORM_COMPONENT_Y_VAR, m_Transform.GetScale().y, a_Allocator);
+
+			a_Document.AddMember(JSON_TRANSFORM_COMPONENT_PIVOT_VAR, rapidjson::Value().SetObject(), a_Allocator);
+
+			a_Document[JSON_TRANSFORM_COMPONENT_PIVOT_VAR].AddMember(JSON_TRANSFORM_COMPONENT_X_VAR, m_Transform.GetPivot().x, a_Allocator);
+			a_Document[JSON_TRANSFORM_COMPONENT_PIVOT_VAR].AddMember(JSON_TRANSFORM_COMPONENT_Y_VAR, m_Transform.GetPivot().y, a_Allocator);
 		}
 
 		//---------------------------------------------------------------------
@@ -71,6 +77,14 @@ namespace gallus
 				rapidjson::GetFloat(a_Document[JSON_TRANSFORM_COMPONENT_SCALE_VAR], JSON_TRANSFORM_COMPONENT_X_VAR, scale.x);
 				rapidjson::GetFloat(a_Document[JSON_TRANSFORM_COMPONENT_SCALE_VAR], JSON_TRANSFORM_COMPONENT_Y_VAR, scale.y);
 				m_Transform.SetScale(scale);
+			}
+
+			if (a_Document.HasMember(JSON_TRANSFORM_COMPONENT_PIVOT_VAR) && a_Document[JSON_TRANSFORM_COMPONENT_PIVOT_VAR].IsObject())
+			{
+				DirectX::XMFLOAT2 pivot;
+				rapidjson::GetFloat(a_Document[JSON_TRANSFORM_COMPONENT_PIVOT_VAR], JSON_TRANSFORM_COMPONENT_X_VAR, pivot.x);
+				rapidjson::GetFloat(a_Document[JSON_TRANSFORM_COMPONENT_PIVOT_VAR], JSON_TRANSFORM_COMPONENT_Y_VAR, pivot.y);
+				m_Transform.SetPivot(pivot);
 			}
 		}
 	}

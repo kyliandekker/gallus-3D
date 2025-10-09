@@ -66,6 +66,7 @@ namespace gallus
 
 				ImGui::StartInspectorKeyVal(ImGui::IMGUI_FORMAT_ID("", TABLE_ID, "SPRITE_COMPONENT_TABLE_INSEPCTOR"), m_Window.GetFramePadding());
 				ImGuiWindow& window = m_Window;
+				ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(window.GetFontSize() / 2, window.GetFontSize() / 2));
 				gameplay::SpriteComponent& spriteComp = m_Component;
 				char* pixelShaderName = m_sPixelShaderName;
 				ImGui::KeyValue([&window]
@@ -177,6 +178,7 @@ namespace gallus
 							}
 						}
 					});
+				ImGui::PopStyleVar();
 				ImGui::KeyValue([&window]
 					{
 						ImGui::AlignTextToFramePadding();

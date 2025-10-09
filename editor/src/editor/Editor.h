@@ -7,6 +7,7 @@
 #include "core/Observable.h"
 
 #include "graphics/imgui/views/inspector/InspectorView.h"
+#include "graphics/dx12/Camera.h"
 
 #include "editor/EditorSettings.h"
 #include "editor/AssetDatabase.h"
@@ -29,6 +30,12 @@ namespace gallus
 		{
 			EDITOR_METHOD_SCENE,
 			EDITOR_METHOD_PREFAB
+		};
+
+		enum CameraMode
+		{
+			CAMERA_MODE_SCENE,
+			CAMERA_MODE_GAME
 		};
 
 		//---------------------------------------------------------------------
@@ -155,6 +162,28 @@ namespace gallus
 			{
 				m_EditorMethod = a_EditorMethod;
 			}
+
+			graphics::dx12::Camera& GetEditorCamera()
+			{
+				return m_EditorCamera;
+			}
+
+			/// <summary>
+			/// Retrieves the camera mode.
+			/// </summary>
+			/// <returns>Returns the camera mode, editor camera or game camera.</returns>
+			CameraMode GetCameraMode() const
+			{
+				return m_CameraMode;
+			}
+
+			/// <summary>
+			/// Sets the camera mode.
+			/// </summary>
+			void SetCameraMode(CameraMode a_CameraMode)
+			{
+				m_CameraMode = a_CameraMode;
+			}
 		protected:
 			// TODO: Use m_bLoadAssets or something in AssetDatabase to wake up thread and let it sleep otherwise.
 			bool Sleep() const override
@@ -182,6 +211,9 @@ namespace gallus
 
 			gameplay::Scene m_CurrentScene;
 			gameplay::Prefab m_Prefab;
+
+			CameraMode m_CameraMode = CameraMode::CAMERA_MODE_SCENE;
+			graphics::dx12::Camera m_EditorCamera;
 
 			EditorMethod m_EditorMethod = EditorMethod::EDITOR_METHOD_SCENE;
 		};

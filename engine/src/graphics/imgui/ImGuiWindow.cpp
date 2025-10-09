@@ -193,6 +193,16 @@ namespace gallus
 #elif REDMOND
 				m_vAccentColor = ImVec4(0.63f, 0.36f, 0.32f, 1.00f);
 #endif
+				float m_fDarkenFactor = 0.5f; // 80% brightness
+
+				ImVec4 m_vDarkerColor = ImVec4(
+					m_vAccentColor.x * m_fDarkenFactor,
+					m_vAccentColor.y * m_fDarkenFactor,
+					m_vAccentColor.z * m_fDarkenFactor,
+					m_vAccentColor.w
+				);
+
+				colors[ImGuiCol_TextColorAccentDarker] = m_vDarkerColor;
 				colors[ImGuiCol_Text] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
 				colors[ImGuiCol_TextDisabled] = ImVec4(0.24f, 0.24f, 0.24f, 1.00f);
 				colors[ImGuiCol_WindowBg] = ImVec4(0.14f, 0.14f, 0.14f, 1.00f);

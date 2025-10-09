@@ -34,6 +34,8 @@ namespace gallus
 		}
 		namespace dx12
 		{
+			constexpr glm::ivec2 RENDER_TEX_SIZE = glm::ivec2(1920, 1080);
+
 /// Whether DX12 makes a full log of creating devices, resources, etc (spam).
 #define LOG_DX12 1
 
@@ -322,6 +324,20 @@ namespace gallus
 					return m_FpsCounter;
 				}
 
+				/// <summary>
+				/// Retrieves the camera.
+				/// </summary>
+				/// <returns>Reference to the camera.</returns>
+				Camera& GetActiveCamera()
+				{
+					return *m_pActiveCamera;
+				}
+
+				void SetActiveCamera(Camera& a_Camera)
+				{
+					m_pActiveCamera = &a_Camera;
+				}
+
 				std::shared_ptr<Texture> GetRenderTexture();
 
 				SimpleEvent<DX12System2D&> m_eOnInitialize;
@@ -385,6 +401,7 @@ namespace gallus
 				FPSCounter m_FpsCounter;
 
 				Camera m_Camera;
+				Camera* m_pActiveCamera = &m_Camera;
 			};
 		}
 	}

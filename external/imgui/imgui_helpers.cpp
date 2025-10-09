@@ -215,8 +215,9 @@ namespace ImGui
 	{
 		ImGui::SetCursorPosY(ImGui::GetCursorPosY() - (a_vFramePadding.y / 2));
 
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(a_vFramePadding.x, a_vFramePadding.x / 2));
 		ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, a_vFramePadding);
-		bool b = ImGui::BeginTable(a_sId.c_str(), 2, ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_BordersInnerH);
+		bool b = ImGui::BeginTable(a_sId.c_str(), 2, ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_BordersInnerH | ImGuiTableFlags_BordersInnerV);
 		ImGui::TableSetupColumn("Key", ImGuiTableColumnFlags_WidthFixed, 200.0f);
 		ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch, 1.0f);
 		return b;
@@ -235,11 +236,12 @@ namespace ImGui
 	{
 		ImGui::EndTable();
 		ImGui::PopStyleVar();
+		ImGui::PopStyleVar();
 
 		ImGui::SetCursorPosY(ImGui::GetCursorPosY() - (a_vFramePadding.y / 2));
 	}
 
-    bool VectorEdit2(const char* label, float col[2])
+    bool VectorEdit2(const char* label, float col[2], float a_fSpeed, float a_fMin, float a_fMax)
     {
         ImGuiWindow* window = GetCurrentWindow();
         if (window->SkipItems)
@@ -263,9 +265,6 @@ namespace ImGui
         const float w_inputs = ImMax(w_full - w_button, 1.0f);
         w_full = w_inputs + w_button;
 
-        // Convert to the formats we need
-        float f[2] = { col[0], col[1] };
-
         bool value_changed = false;
         bool value_changed_as_float = false;
 
@@ -273,8 +272,7 @@ namespace ImGui
         const float inputs_offset_x = (style.ColorButtonPosition == ImGuiDir_Left) ? w_button : 0.0f;
         window->DC.CursorPos.x = pos.x + inputs_offset_x;
 
-
-			// RGB/HSV 0..255 Sliders
+		// RGB/HSV 0..255 Sliders
 		const float w_items = w_inputs - style.ItemInnerSpacing.x * (components - 1);
 
 		const bool hide_prefix = (IM_TRUNC(w_items / components) <= CalcTextSize("M:0.000").x);
@@ -300,7 +298,7 @@ namespace ImGui
 			SetNextItemWidth(ImMax(next_split - prev_split, 1.0f));
 			prev_split = next_split;
 
-			value_changed |= DragFloat(ids[n], &f[n], 1.0f / 255.0f, -999999999, 999999999, fmt_table_float[fmt_idx][n]);
+			value_changed |= DragFloat(ids[n], &col[n], a_fSpeed, a_fMin, a_fMax, fmt_table_float[fmt_idx][n]);
 			value_changed_as_float |= value_changed;
 		}
 
@@ -313,13 +311,10 @@ namespace ImGui
             TextEx(label, label_display_end);
         }
 
-        if (value_changed && g.LastItemData.ID != 0) // In case of ID collision, the second EndGroup() won't catch g.ActiveId
-            MarkItemEdited(g.LastItemData.ID);
-
 		PopID();
 		EndGroup();
 
-        return value_changed;
+        return value_changed_as_float;
     }
 
     bool IVectorEdit2(const char* label, int col[2])

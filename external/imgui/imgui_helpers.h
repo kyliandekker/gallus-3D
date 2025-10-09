@@ -77,7 +77,7 @@ namespace ImGui
 	void KeyValue(std::function<void()> a_Key, std::function<void()> a_Val);
 	void EndInspectorKeyVal(const ImVec2& a_vFramePadding);
 
-	bool VectorEdit2(const char* label, float col[2]);
+	bool VectorEdit2(const char* label, float col[2], float a_fSpeed = 1.0f, float a_fMin = -999999999999999, float a_fMax = 9999999999999999);
 	bool IVectorEdit2(const char* label, int col[2]);
 }
 

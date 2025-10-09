@@ -30,7 +30,6 @@ namespace gallus
 
 			void TransformComponentUIView::RenderComponentGizmos(const ImVec2& a_vScenePos, const ImVec2& a_vSize, const ImVec2& a_vPanOffset, float a_fZoom)
 			{
-				DrawGizmos(a_vScenePos, a_vSize, a_vPanOffset, a_fZoom);
 				DrawTransformGizmo(m_Component.Transform(), a_vScenePos, a_vSize, a_vPanOffset, a_fZoom);
 			}
 
@@ -100,7 +99,7 @@ namespace gallus
 					{
 						ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
 						pivotView.SetValue(transformComp.Transform().GetPivot());
-						if (pivotView.Render("TRANSFORM_COMPONENT_PIVOT_INSPECTOR"))
+						if (pivotView.Render("TRANSFORM_COMPONENT_PIVOT_INSPECTOR", 0.01f, -0.5f, 0.5f))
 						{
 							transformComp.Transform().SetPivot(pivotView.GetValue());
 							core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);

@@ -44,9 +44,13 @@ namespace gallus
 				/// Renders the scene window.
 				/// </summary>
 				void Render() override;
+				void Draw2DGrid(const ImVec2& a_vScenePos, const ImVec2& a_vSize, const ImVec2& a_vPanOffset, float a_fZoom);
 			private:
 				void DrawComponentGizmos(const ImVec2& a_vSceneStartPos, const ImVec2& a_vSize);
+				void DrawGizmos(const ImVec2& a_vScenePos, const ImVec2& a_vSize, const ImVec2& a_vPanOffset, float a_fZoom);
 				void DrawViewportPanel();
+
+				void HandleCameraInput(double a_fDeltaTime, const ImVec2& a_vSceneStartPos, const ImVec2& a_vSize);
 
 				float m_fZoom = 1.0f;
 				ImVec2 m_vPanOffset = ImVec2(0.0f, 0.0f);

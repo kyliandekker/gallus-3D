@@ -94,8 +94,6 @@ namespace gallus
 					return "";
 				}
 
-				void DrawGizmos(const ImVec2& a_vScenePos, const ImVec2& a_vSize, const ImVec2& a_vPanOffset, float a_fZoom);
-
 				void DrawTransformGizmo(graphics::dx12::DX12Transform& a_Transform, const ImVec2& a_vScenePos, const ImVec2& a_vSize, const ImVec2& a_vPanOffset, float a_fZoom);
 
 				bool m_bFoldedOut = true; /// Indicates whether the component UI is folded out or not.

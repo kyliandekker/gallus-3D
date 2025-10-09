@@ -46,8 +46,6 @@ namespace gallus
 				strncpy(m_sPrefabName, prefabName.c_str(), sizeof(m_sPrefabName));
 				m_sPrefabName[sizeof(m_sPrefabName) - 1] = '\0';
 
-				ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(m_Window.GetFontSize() / 2, m_Window.GetFontSize() / 2));
-
 				FilePickerModal* modal = dynamic_cast<FilePickerModal*>(m_Window.GetModal((int) EDITOR_MODAL::EDITOR_MODAL_FILE_PICKER));
 
 				ImGui::StartInspectorKeyVal(ImGui::IMGUI_FORMAT_ID("", TABLE_ID, "PLAYER_COMPONENT_TABLE_INSPECTOR"), m_Window.GetFramePadding() / 2);
@@ -67,6 +65,8 @@ namespace gallus
 							playerComp.SetSpeed(speed);
 						}
 					});
+				ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(window.GetFontSize() / 2, window.GetFontSize() / 2));
+
 				char* prefabNameStr = m_sPrefabName;
 				ImGui::KeyValue([&window]
 					{
@@ -102,8 +102,8 @@ namespace gallus
 						}
 						ImGui::PopStyleVar();
 					});
-				ImGui::EndInspectorKeyVal(m_Window.GetFramePadding());
 				ImGui::PopStyleVar();
+				ImGui::EndInspectorKeyVal(m_Window.GetFramePadding());
 			}
 		}
 	}

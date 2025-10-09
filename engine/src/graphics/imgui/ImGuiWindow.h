@@ -167,6 +167,15 @@ namespace gallus
 				}
 
 				/// <summary>
+				/// Retrieves the accent (main) color of the application.
+				/// </summary>
+				/// <returns>A vector containing the color.</returns>
+				const ImVec4& GetAccentColorDarker() const
+				{
+					return m_vAccentColorDarker;
+				}
+
+				/// <summary>
 				/// Adds a window to the render queue.
 				/// </summary>
 				/// <param name="a_pWindow">The window to add.</param>
@@ -209,6 +218,7 @@ namespace gallus
 				ImVec2 m_vHeaderSize;
 
 				ImVec4 m_vAccentColor;
+				ImVec4 m_vAccentColorDarker;
 
 				std::vector<BaseWindow*> m_aWindows;
 				std::vector<BaseModal*> m_aModals;

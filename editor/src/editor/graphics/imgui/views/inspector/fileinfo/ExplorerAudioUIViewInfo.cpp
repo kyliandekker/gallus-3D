@@ -67,40 +67,68 @@ namespace gallus
             //---------------------------------------------------------------------
             void ExplorerAudioUIViewInfo::RenderSpecific()
             {
-                ImGui::DisplayHeader(m_Window.GetBoldFont(), "Type: ");
-                ImGui::SameLine();
-                ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(m_Window.GetFramePadding().x, 0));
-                ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
-                if (m_AssetTypeDropdown.Render(ImGui::IMGUI_FORMAT_ID("", COMBO_ID, "ASSETTYPE_AUDIO_FILE_INSPECTOR").c_str()))
+                ImGui::StartInspectorKeyVal(ImGui::IMGUI_FORMAT_ID("", TABLE_ID, "AUDIO_EXPLORER_ITEM_TABLE_INSPECTOR"), m_Window.GetFramePadding());
+
+                ImGuiWindow& window = m_Window;
+                ExplorerFileUIView& explorerFileUIView = m_ExplorerFileUIView;
+                StringDropdown<gallus::resources::AssetType>& assetTypeDropdown = m_AssetTypeDropdown;
+                ImGui::KeyValue([&window]
                 {
-                    m_ExplorerFileUIView.GetFileResource().GetMetaData()->SetAssetType(m_AssetTypeDropdown.GetValue());
-                    m_ExplorerFileUIView.SetIcon();
-                    m_ExplorerFileUIView.GetFileResource().GetMetaData()->Save(m_ExplorerFileUIView.GetFileResource().GetPath());
-                }
-                ImGui::PopStyleVar();
+                    ImGui::AlignTextToFramePadding();
+                    ImGui::DisplayHeader(window.GetBoldFont(), "Type: ");
+                },
+                    [&explorerFileUIView, &assetTypeDropdown , &window]
+                {
+                    ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+                    if (assetTypeDropdown.Render(ImGui::IMGUI_FORMAT_ID("", COMBO_ID, "ASSETTYPE_AUDIO_EXPLORER_ITEM_INSPECTOR").c_str()))
+                    {
+                        explorerFileUIView.GetFileResource().GetMetaData()->SetAssetType(assetTypeDropdown.GetValue());
+                        explorerFileUIView.SetIcon();
+                        explorerFileUIView.GetFileResource().GetMetaData()->Save(explorerFileUIView.GetFileResource().GetPath());
+                    }
+                });
 
                 audio::FMT_Chunk fmt_chunk;
                 audio::WAVE_READER_RESULT result = m_SongData.GetChunkFromData(fmt_chunk, audio::FMT_CHUNK_ID);
                 bool hasFmt = !(WAVEREADERFAILED(result));
                 if (hasFmt)
                 {
-                    ImGui::NewLine();
-
-                    ImGui::DisplayHeader(m_Window.GetBoldFont(), "Bits per Sample: ");
-                    ImGui::SameLine();
-                    ImGui::Text(std::to_string(fmt_chunk.m_iBitsPerSample).c_str());
-
-                    ImGui::DisplayHeader(m_Window.GetBoldFont(), "Channels: ");
-                    ImGui::SameLine();
-                    ImGui::Text(std::to_string(fmt_chunk.m_iNumChannels).c_str());
-
-                    ImGui::DisplayHeader(m_Window.GetBoldFont(), "Sample Rate: ");
-                    ImGui::SameLine();
-                    ImGui::Text(std::to_string(fmt_chunk.m_iSampleRate).c_str());
-
-                    ImGui::DisplayHeader(m_Window.GetBoldFont(), "Byte Rate: ");
-                    ImGui::SameLine();
-                    ImGui::Text(std::to_string(fmt_chunk.m_iByteRate).c_str());
+                    ImGui::KeyValue([&window]
+                    {
+                        ImGui::AlignTextToFramePadding();
+                        ImGui::DisplayHeader(window.GetBoldFont(), "Bits per Sample: ");
+                    },
+                        [&fmt_chunk]
+                    {
+                        ImGui::Text(std::to_string(fmt_chunk.m_iBitsPerSample).c_str());
+                    });
+                    ImGui::KeyValue([&window]
+                    {
+                        ImGui::AlignTextToFramePadding();
+                        ImGui::DisplayHeader(window.GetBoldFont(), "Channels: ");
+                    },
+                        [&fmt_chunk]
+                    {
+                        ImGui::Text(std::to_string(fmt_chunk.m_iNumChannels).c_str());
+                    });
+                    ImGui::KeyValue([&window]
+                    {
+                        ImGui::AlignTextToFramePadding();
+                        ImGui::DisplayHeader(window.GetBoldFont(), "Sample Rate: ");
+                    },
+                        [&fmt_chunk]
+                    {
+                        ImGui::Text(std::to_string(fmt_chunk.m_iSampleRate).c_str());
+                    });
+                    ImGui::KeyValue([&window]
+                    {
+                        ImGui::AlignTextToFramePadding();
+                        ImGui::DisplayHeader(window.GetBoldFont(), "Byte Rate: ");
+                    },
+                        [&fmt_chunk]
+                    {
+                        ImGui::Text(std::to_string(fmt_chunk.m_iByteRate).c_str());
+                    });
                 }
 
                 audio::DATA_Chunk data_chunk;
@@ -108,21 +136,32 @@ namespace gallus
                 bool hasData = !(WAVEREADERFAILED(result));
                 if (hasData)
                 {
-                    ImGui::NewLine();
-
-                    ImGui::DisplayHeader(m_Window.GetBoldFont(), "Data Size: ");
-                    ImGui::SameLine();
-                    ImGui::Text(std::to_string(data_chunk.ChunkSize()).c_str());
+                    ImGui::KeyValue([&window]
+                    {
+                        ImGui::AlignTextToFramePadding();
+                        ImGui::DisplayHeader(window.GetBoldFont(), "Data Size: ");
+                    },
+                        [&data_chunk]
+                    {
+                        ImGui::Text(std::to_string(data_chunk.ChunkSize()).c_str());
+                    });
                 }
 
                 if (hasFmt && hasData)
                 {
-                    ImGui::DisplayHeader(m_Window.GetBoldFont(), "Song Length: ");
-                    ImGui::SameLine();
-                    ImGui::Text(
-                        audio::FormatDuration(audio::PosToSeconds(data_chunk.ChunkSize(), fmt_chunk.m_iByteRate), true).c_str()
-                    );
+                    ImGui::KeyValue([&window]
+                    {
+                        ImGui::AlignTextToFramePadding();
+                        ImGui::DisplayHeader(window.GetBoldFont(), "Song Length: ");
+                    },
+                        [&data_chunk, &fmt_chunk]
+                    {
+                        ImGui::Text(
+                            audio::FormatDuration(audio::PosToSeconds(data_chunk.ChunkSize(), fmt_chunk.m_iByteRate), true).c_str()
+                        );
+                    });
                 }
+                ImGui::EndInspectorKeyVal(m_Window.GetFramePadding());
             }
 
             //---------------------------------------------------------------------

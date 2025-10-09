@@ -24,8 +24,6 @@ namespace gallus
 	{
 		namespace dx12
 		{
-			constexpr glm::ivec2 RENDER_TEX_SIZE = glm::ivec2(1920, 1080);
-
 			double FPSCounter::GetFPS() const
 			{
 				return m_FPS;
@@ -844,6 +842,11 @@ namespace gallus
 			//---------------------------------------------------------------------
 			void DX12System2D::Render2D(std::shared_ptr<CommandQueue> a_pCommandQueue, std::shared_ptr<CommandList> a_pCommandList, D3D12_CPU_DESCRIPTOR_HANDLE a_RTVHandle)
 			{
+				if (!m_pActiveCamera)
+				{
+					return;
+				}
+
 				a_pCommandList->GetCommandList()->OMSetRenderTargets(1, &a_RTVHandle, FALSE, nullptr);
 				a_pCommandList->GetCommandList()->SetGraphicsRootSignature(m_pRootSignature.Get());
 
@@ -866,7 +869,7 @@ namespace gallus
 				std::lock_guard<std::recursive_mutex> lock(core::ENGINE->GetECS().m_EntityMutex);
 				for (auto& pair : core::ENGINE->GetECS().GetSystem<gameplay::SpriteSystem>().GetComponents())
 				{
-					pair.second.Render(a_pCommandList, pair.first, m_Camera);
+					pair.second.Render(a_pCommandList, pair.first, *m_pActiveCamera);
 				}
 
 				m_eOnRender(a_pCommandList);
