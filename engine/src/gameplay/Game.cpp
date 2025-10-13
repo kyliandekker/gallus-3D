@@ -103,7 +103,8 @@ namespace gallus
 						{
 							gameplay::TransformSystem& transformSys = core::ENGINE->GetECS().GetSystem<gameplay::TransformSystem>();
 							gameplay::TransformComponent& transformComponent = transformSys.GetComponent(player->GetEntityID());
-							core::ENGINE->GetDX12().GetActiveCamera().Transform().SetPosition(transformComponent.Transform().GetPosition());
+							DirectX::XMFLOAT2 pos = { transformComponent.Transform().GetPosition().x - (graphics::dx12::RENDER_TEX_SIZE.x / 2), transformComponent.Transform().GetPosition().y - (graphics::dx12::RENDER_TEX_SIZE.y / 2) };
+							core::ENGINE->GetDX12().GetActiveCamera().Transform().SetPosition(pos);
 						}
 					}
 				}
