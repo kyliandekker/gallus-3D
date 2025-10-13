@@ -49,7 +49,7 @@ namespace gallus
 
 				auto cCommandQueue = core::EDITOR_ENGINE->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
 				m_pPreviewTexture = core::EDITOR_ENGINE->GetResourceAtlas().LoadTexture(m_ExplorerFileUIView.GetFileResource().GetPath().filename().generic_string(), cCommandQueue);
-				m_pPreviewTexture->SetResourceCategory(gallus::core::EngineResourceCategory::Editor);
+				m_pPreviewTexture->SetResourceCategory(gallus::resources::EngineResourceCategory::Editor);
 			}
 
             int GetFormatChannelCount(DXGI_FORMAT format)

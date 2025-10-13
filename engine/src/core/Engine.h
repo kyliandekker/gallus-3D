@@ -5,7 +5,7 @@
 #include <wtypes.h>
 
 // core includes
-#include "core/ResourceAtlas.h"
+#include "resources/ResourceAtlas.h"
 
 // utils includes
 #include "utils/file_abstractions.h"
@@ -50,7 +50,7 @@ namespace gallus
 			/// Retrieves the resource atlas.
 			/// </summary>
 			/// <returns>Reference to the resource atlas.</returns>
-			ResourceAtlas& GetResourceAtlas();
+			resources::ResourceAtlas& GetResourceAtlas();
 
 			/// <summary>
 			/// Retrieves the window.
@@ -94,7 +94,7 @@ namespace gallus
 			/// </summary>
 			virtual void SetDefaultArguments() const;
 		private:
-			ResourceAtlas m_ResourceAtlas;
+			resources::ResourceAtlas m_ResourceAtlas;
 			graphics::win32::Window m_Window;
 			graphics::dx12::DX12System2D m_DX12;
 			gameplay::EntityComponentSystem m_ECS;

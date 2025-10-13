@@ -17,7 +17,7 @@ namespace gallus
 		{
 			m_UpdateTime = UpdateTime::UPDATE_TIME_POST_FRAME;
 
-			LOG(LOGSEVERITY_INFO_SUCCESS, LOG_CATEGORY_ECS, "Health system initialized.");
+			LOG_ICON(font::ICON_HEART, LOGSEVERITY_INFO_SUCCESS, LOG_CATEGORY_ECS, "Health system initialized.");
 			return true;
 		}
 

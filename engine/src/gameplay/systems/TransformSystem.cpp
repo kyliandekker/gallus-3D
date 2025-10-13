@@ -15,7 +15,7 @@ namespace gallus
 		//---------------------------------------------------------------------
 		bool TransformSystem::Initialize()
 		{
-			LOG(LOGSEVERITY_INFO_SUCCESS, LOG_CATEGORY_ECS, "Transform system initialized.");
+			LOG_ICON(font::ICON_AXIS, LOGSEVERITY_INFO_SUCCESS, LOG_CATEGORY_ECS, "Transform system initialized.");
 			return true;
 		}
 

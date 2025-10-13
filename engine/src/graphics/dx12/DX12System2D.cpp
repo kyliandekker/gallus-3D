@@ -220,23 +220,23 @@ namespace gallus
 #endif // IMGUI_DISABLE
 
 				std::shared_ptr<Texture> texture = core::ENGINE->GetResourceAtlas().LoadTexture("tex_missing.png", cCommandQueue); // Default texture.
-				texture->SetResourceCategory(core::EngineResourceCategory::Missing);
+				texture->SetResourceCategory(resources::EngineResourceCategory::Missing);
 				texture->SetIsDestroyable(false);
 
 				std::shared_ptr<PixelShader> pixelShader = core::ENGINE->GetResourceAtlas().LoadPixelShader("pixelShader.hlsl"); // Default shader.
 				std::shared_ptr<VertexShader> vertexShader = core::ENGINE->GetResourceAtlas().LoadVertexShader("vertexShader.hlsl"); // Default shader.
-				pixelShader->SetResourceCategory(core::EngineResourceCategory::Missing);
+				pixelShader->SetResourceCategory(resources::EngineResourceCategory::Missing);
 				pixelShader->SetIsDestroyable(false);
-				vertexShader->SetResourceCategory(core::EngineResourceCategory::Missing);
+				vertexShader->SetResourceCategory(resources::EngineResourceCategory::Missing);
 				vertexShader->SetIsDestroyable(false);
 
 				std::shared_ptr<DX12ShaderBind> shaderBind = core::ENGINE->GetResourceAtlas().LoadShaderBind("defaultShaderBind", pixelShader.get(), vertexShader.get()); // Default shader.
 
 				std::shared_ptr<PixelShader> renderTexPixelShader = core::ENGINE->GetResourceAtlas().LoadPixelShader("renderTexPixelShader.hlsl"); // Default render tex shader.
 				std::shared_ptr<VertexShader> renderTexVertexShader = core::ENGINE->GetResourceAtlas().LoadVertexShader("renderTexVertexShader.hlsl"); // Default render tex shader.
-				renderTexPixelShader->SetResourceCategory(core::EngineResourceCategory::Missing);
+				renderTexPixelShader->SetResourceCategory(resources::EngineResourceCategory::Missing);
 				renderTexPixelShader->SetIsDestroyable(false);
-				renderTexVertexShader->SetResourceCategory(core::EngineResourceCategory::Missing);
+				renderTexVertexShader->SetResourceCategory(resources::EngineResourceCategory::Missing);
 				renderTexVertexShader->SetIsDestroyable(false);
 
 				std::shared_ptr<DX12ShaderBind> renderTexShaderBind = core::ENGINE->GetResourceAtlas().LoadShaderBind("renderTexShaderBind", renderTexPixelShader.get(), renderTexVertexShader.get()); // Render Tex shader.
@@ -244,7 +244,7 @@ namespace gallus
 				std::shared_ptr<Mesh> mesh = core::ENGINE->GetResourceAtlas().LoadMesh("square"); // Default mesh.
 				MeshPartData& squarePrimitive = s_PRIMITIVES[(int)PRIMITIVES::SQUARE];
 				mesh->SetMeshData(squarePrimitive, cCommandQueue);
-				mesh->SetResourceCategory(core::EngineResourceCategory::Missing);
+				mesh->SetResourceCategory(resources::EngineResourceCategory::Missing);
 				mesh->SetIsDestroyable(false);
 
 				cCommandQueue->Flush();

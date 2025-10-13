@@ -1,7 +1,7 @@
 #pragma once
 
 // base class
-#include "core/EngineResource.h"
+#include "resources/EngineResource.h"
 
 // external
 #include <rapidjson/document.h>
@@ -23,7 +23,7 @@ namespace gallus
 		//---------------------------------------------------------------------
 		// Scene
 		//---------------------------------------------------------------------
-		class Scene : public core::EngineResource
+		class Scene : public resources::EngineResource
 		{
 		public:
 			Scene() = default;
@@ -32,7 +32,7 @@ namespace gallus
 			/// Constructs a scene with a given name.
 			/// </summary>
 			/// <param name="a_sName">Name of the resource.</param>
-			Scene(const std::string& a_sName) : core::EngineResource(a_sName)
+			Scene(const std::string& a_sName) : resources::EngineResource(a_sName)
 			{}
 
 			virtual bool LoadData();

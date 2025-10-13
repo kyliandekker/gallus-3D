@@ -2,6 +2,8 @@
 
 #include <rapidjson/utils.h>
 
+#include "resources/SrcData.h"
+
 #define JSON_COLLIDER_COMPONENT_OFFSET_VAR "offset"
 #define JSON_COLLIDER_COMPONENT_SIZE_VAR "size"
 #define JSON_COLLIDER_COMPONENT_X_VAR "x"
@@ -33,24 +35,10 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		void ColliderComponent::Deserialize(const rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator)
+		void ColliderComponent::Deserialize(const resources::SrcData& a_SrcData)
 		{
-			if (!a_Document.IsObject())
-			{
-				return;
-			}
-
-			if (a_Document.HasMember(JSON_COLLIDER_COMPONENT_OFFSET_VAR) && a_Document[JSON_COLLIDER_COMPONENT_OFFSET_VAR].IsObject())
-			{
-				rapidjson::GetFloat(a_Document[JSON_COLLIDER_COMPONENT_OFFSET_VAR], JSON_COLLIDER_COMPONENT_X_VAR, m_vOffset.x);
-				rapidjson::GetFloat(a_Document[JSON_COLLIDER_COMPONENT_OFFSET_VAR], JSON_COLLIDER_COMPONENT_Y_VAR, m_vOffset.y);
-			}
-
-			if (a_Document.HasMember(JSON_COLLIDER_COMPONENT_SIZE_VAR) && a_Document[JSON_COLLIDER_COMPONENT_SIZE_VAR].IsObject())
-			{
-				rapidjson::GetFloat(a_Document[JSON_COLLIDER_COMPONENT_SIZE_VAR], JSON_COLLIDER_COMPONENT_X_VAR, m_vSize.x);
-				rapidjson::GetFloat(a_Document[JSON_COLLIDER_COMPONENT_SIZE_VAR], JSON_COLLIDER_COMPONENT_Y_VAR, m_vSize.y);
-			}
+			m_vOffset = a_SrcData.GetVector(JSON_COLLIDER_COMPONENT_OFFSET_VAR);
+			m_vSize = a_SrcData.GetVector(JSON_COLLIDER_COMPONENT_SIZE_VAR);
 		}
 
 		//---------------------------------------------------------------------
@@ -188,6 +176,104 @@ namespace gallus
 		void ColliderComponent::IgnoreEntity(const gameplay::EntityID& a_EntityID)
 		{
 			m_aEntitiesToIgnore.insert(a_EntityID);
+		}
+
+		//---------------------------------------------------------------------
+		bool ColliderComponent::IsPointInside(
+			const DirectX::XMFLOAT2& a_vPoint,
+			const DirectX::XMFLOAT2& a_vPos,
+			const DirectX::XMFLOAT2& a_vScale,
+			const DirectX::XMFLOAT2& a_vPivot,
+			float a_fRotation)
+		{
+			std::array<DirectX::XMFLOAT2, 4> corners = GetColliderWorldCorners(a_vPos, a_vScale, a_vPivot, a_fRotation);
+
+			float minX = corners[0].x;
+			float maxX = corners[0].x;
+			float minY = corners[0].y;
+			float maxY = corners[0].y;
+
+			for (int i = 1; i < 4; ++i)
+			{
+				if (corners[i].x < minX)
+				{
+					minX = corners[i].x;
+				}
+				if (corners[i].x > maxX)
+				{
+					maxX = corners[i].x;
+				}
+				if (corners[i].y < minY)
+				{
+					minY = corners[i].y;
+				}
+				if (corners[i].y > maxY)
+				{
+					maxY = corners[i].y;
+				}
+			}
+
+			return (a_vPoint.x >= minX && a_vPoint.x <= maxX &&
+				a_vPoint.y >= minY && a_vPoint.y <= maxY);
+		}
+
+		//---------------------------------------------------------------------
+		float ColliderComponent::GetDistanceTo(
+			const DirectX::XMFLOAT2& a_vPoint,
+			const DirectX::XMFLOAT2& a_vPos,
+			const DirectX::XMFLOAT2& a_vScale,
+			const DirectX::XMFLOAT2& a_vPivot,
+			float a_fRotation)
+		{
+			std::array<DirectX::XMFLOAT2, 4> corners = GetColliderWorldCorners(a_vPos, a_vScale, a_vPivot, a_fRotation);
+
+			float minX = corners[0].x;
+			float maxX = corners[0].x;
+			float minY = corners[0].y;
+			float maxY = corners[0].y;
+
+			for (int i = 1; i < 4; ++i)
+			{
+				if (corners[i].x < minX)
+				{
+					minX = corners[i].x;
+				}
+				if (corners[i].x > maxX)
+				{
+					maxX = corners[i].x;
+				}
+				if (corners[i].y < minY)
+				{
+					minY = corners[i].y;
+				}
+				if (corners[i].y > maxY)
+				{
+					maxY = corners[i].y;
+				}
+			}
+
+			float dx = 0.0f;
+			float dy = 0.0f;
+
+			if (a_vPoint.x < minX)
+			{
+				dx = minX - a_vPoint.x;
+			}
+			else if (a_vPoint.x > maxX)
+			{
+				dx = a_vPoint.x - maxX;
+			}
+
+			if (a_vPoint.y < minY)
+			{
+				dy = minY - a_vPoint.y;
+			}
+			else if (a_vPoint.y > maxY)
+			{
+				dy = a_vPoint.y - maxY;
+			}
+
+			return sqrtf(dx * dx + dy * dy);
 		}
 	}
 }

@@ -22,6 +22,14 @@ namespace gallus
 			//---------------------------------------------------------------------
 			void Camera::SetProjection(float a_fWidth, float a_fHeight, float a_fNearPlane, float a_fFarPlane)
 			{
+				//m_ProjectionMatrix = DirectX::XMMatrixOrthographicOffCenterLH(
+				//	-a_fWidth * 0.5f, 
+				//	a_fWidth * 0.5f,
+				//	a_fHeight * 0.5f,
+				//	-a_fHeight * 0.5f,
+				//	a_fNearPlane, 
+				//	a_fFarPlane
+				//);
 				m_ProjectionMatrix = DirectX::XMMatrixOrthographicOffCenterLH(
 					0.0f, a_fWidth,
 					a_fHeight, 0.0f,

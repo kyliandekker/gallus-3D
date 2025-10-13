@@ -9,6 +9,8 @@
 // core
 #include "core/DataStream.h"
 
+#include "resources/SrcData.h"
+
 // logger
 #include "logger/Logger.h"
 
@@ -144,7 +146,7 @@ namespace gallus
 					}
 
 					const rapidjson::Value& testMember = componentsDoc[system->GetPropertyName().c_str()];
-					component->Deserialize(testMember, document.GetAllocator());
+					component->Deserialize(resources::SrcData(testMember));
 				}
 			}
 

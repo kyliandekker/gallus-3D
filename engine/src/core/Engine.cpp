@@ -77,7 +77,7 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		ResourceAtlas& Engine::GetResourceAtlas()
+		resources::ResourceAtlas& Engine::GetResourceAtlas()
 		{
 			return m_ResourceAtlas;
 		}

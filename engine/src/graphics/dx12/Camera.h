@@ -2,6 +2,8 @@
 
 #include "DX12PCH.h"
 
+#include <DirectXMath.h>
+
 // graphics includes
 #include "graphics/dx12/DX12Transform.h"
 
@@ -11,6 +13,7 @@ namespace gallus
 	{
 		namespace dx12
 		{
+			constexpr DirectX::XMFLOAT2 RENDER_TEX_SIZE = { 1920, 1080 };
 #ifdef _EDITOR
 			enum CameraMode
 			{

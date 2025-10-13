@@ -25,7 +25,7 @@
 
 namespace gallus
 {
-	namespace core
+	namespace resources
 	{
 		//---------------------------------------------------------------------
 		// ResourceAtlas
@@ -97,6 +97,12 @@ namespace gallus
 		//---------------------------------------------------------------------
 		bool ResourceAtlas::Initialize()
 		{
+			m_aTextures.reserve(MAX_RESOURCES);
+			m_aPixelShaders.reserve(MAX_RESOURCES);
+			m_aVertexShaders.reserve(MAX_RESOURCES);
+			m_aShaderBinds.reserve(MAX_RESOURCES);
+			m_aMeshes.reserve(MAX_RESOURCES);
+
 			std::string resourceFolder = core::ARGS.GetArgument<std::string>(ASSET_PATH_ARG);
 
 			m_ResourceFolder.SetPath(resourceFolder);

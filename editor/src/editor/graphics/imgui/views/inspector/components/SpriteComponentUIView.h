@@ -8,7 +8,6 @@
 #include <DirectXMath.h>
 
 // graphics includes
-#include "graphics/imgui/views/DataTypes/VectorView.h"
 #include "graphics/imgui/views/DataTypes/ColorView.h"
 
 // gameplay includes
@@ -54,10 +53,6 @@ namespace gallus
 				/// </summary>
 				/// <returns>The name of the UI component.</returns>
 				std::string GetName() const override;
-
-				/// UI elements for displaying and editing the position, rotation, and scale as glm::vec3.
-				IVector2View<DirectX::XMINT2>
-					m_SizeView;
 
 				ColorRGBAView<DirectX::XMFLOAT4>
 					m_ColorView;

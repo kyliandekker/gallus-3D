@@ -2,6 +2,8 @@
 
 #include <rapidjson/utils.h>
 
+#include "resources/SrcData.h"
+
 #include "gameplay/systems/TransformSystem.h"
 #include "gameplay/systems/CollisionSystem.h"
 
@@ -24,16 +26,11 @@ namespace gallus
 			a_Document.AddMember(JSON_MOVEMENT_COMPONENT_GRAVITY_VAR, m_bHasGravity, a_Allocator);
 		}
 
-		//---------------------------------------------------------------------
-		void MovementComponent::Deserialize(const rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator)
-		{
-			if (!a_Document.IsObject())
-			{
-				return;
-			}
-
-			rapidjson::GetBool(a_Document, JSON_MOVEMENT_COMPONENT_GRAVITY_VAR, m_bHasGravity);
-		}
+        //---------------------------------------------------------------------
+        void MovementComponent::Deserialize(const resources::SrcData& a_SrcData)
+        {
+            m_bHasGravity = a_SrcData.GetBool(JSON_MOVEMENT_COMPONENT_GRAVITY_VAR);
+        }
 
 		//---------------------------------------------------------------------
 		void MovementComponent::Translate(const DirectX::XMFLOAT2& a_vTranslation)
@@ -45,95 +42,170 @@ namespace gallus
 		}
 
         //---------------------------------------------------------------------
+        //---------------------------------------------------------------------
         void MovementComponent::UpdateRealtime(float a_fDeltaTime, std::map<EntityID, ColliderComponent>& a_aColliders)
         {
             if (m_bHasGravity)
             {
-                m_vTranslation.y += 20;
+                m_vTranslation.y += 20.0f;
             }
 
-            TransformSystem& transformSys = core::ENGINE->GetECS().GetSystem<TransformSystem>();
+            TransformSystem& m_TransformSys = core::ENGINE->GetECS().GetSystem<TransformSystem>();
 
-            const Entity* ent = core::ENGINE->GetECS().GetEntity(m_EntityID);
-            if (ent == nullptr)
+            const Entity* m_pEntity = core::ENGINE->GetECS().GetEntity(m_EntityID);
+            if (m_pEntity == nullptr)
             {
                 return;
             }
 
-            TransformComponent& transformComp = transformSys.GetComponent(ent->GetEntityID());
-            DirectX::XMFLOAT2 currentPos = transformComp.Transform().GetPosition();
-            DirectX::XMFLOAT2 newPos = currentPos;
+            TransformComponent& m_TransformComp = m_TransformSys.GetComponent(m_pEntity->GetEntityID());
+            DirectX::XMFLOAT2 m_vCurrentPos = m_TransformComp.Transform().GetPosition();
+            DirectX::XMFLOAT2 m_vScale = m_TransformComp.Transform().GetScale();
+            DirectX::XMFLOAT2 m_vPivot = m_TransformComp.Transform().GetPivot();
+            float m_fRotation = m_TransformComp.Transform().GetRotation();
+
+            DirectX::XMFLOAT2 m_vNewPos = m_vCurrentPos;
 
             if (!a_aColliders.contains(m_EntityID))
             {
-                transformComp.Transform().SetPosition(newPos);
+                m_TransformComp.Transform().SetPosition(m_vNewPos);
                 return;
             }
 
-            auto& playerCollider = a_aColliders[m_EntityID];
+            ColliderComponent& m_PlayerCollider = a_aColliders[m_EntityID];
 
-            bool allowX = true;
-            bool allowY = true;
+            // Start with full desired movement
+            float m_fAllowedMoveX = m_vTranslation.x;
+            float m_fAllowedMoveY = m_vTranslation.y;
 
-            for (auto& colliderPair : a_aColliders)
+            // Build player's AABB from its world corners (current position)
+            auto m_PlayerCorners = m_PlayerCollider.GetColliderWorldCorners(m_vCurrentPos, m_vScale, m_vPivot, m_fRotation);
+            float m_pMinX = m_PlayerCorners[0].x;
+            float m_pMaxX = m_PlayerCorners[0].x;
+            float m_pMinY = m_PlayerCorners[0].y;
+            float m_pMaxY = m_PlayerCorners[0].y;
+
+            for (int i = 1; i < 4; ++i)
             {
-                if (colliderPair.first == m_EntityID)
+                if (m_PlayerCorners[i].x < m_pMinX) { m_pMinX = m_PlayerCorners[i].x; }
+                if (m_PlayerCorners[i].x > m_pMaxX) { m_pMaxX = m_PlayerCorners[i].x; }
+                if (m_PlayerCorners[i].y < m_pMinY) { m_pMinY = m_PlayerCorners[i].y; }
+                if (m_PlayerCorners[i].y > m_pMaxY) { m_pMaxY = m_PlayerCorners[i].y; }
+            }
+
+            for (auto& m_ColliderPair : a_aColliders)
+            {
+                if (m_ColliderPair.first == m_EntityID)
                 {
                     continue;
                 }
 
-                if (!transformSys.HasComponent(colliderPair.first))
+                if (!m_TransformSys.HasComponent(m_ColliderPair.first))
                 {
                     continue;
                 }
 
-                auto& otherCollider = colliderPair.second;
-                TransformComponent& otherTransform = transformSys.GetComponent(colliderPair.first);
+                ColliderComponent& m_OtherCollider = m_ColliderPair.second;
+                TransformComponent& m_OtherTransform = m_TransformSys.GetComponent(m_ColliderPair.first);
 
-                // Test X movement
-                if (allowX)
+                DirectX::XMFLOAT2 m_vOtherPos = m_OtherTransform.Transform().GetPosition();
+                DirectX::XMFLOAT2 m_vOtherScale = m_OtherTransform.Transform().GetScale();
+                DirectX::XMFLOAT2 m_vOtherPivot = m_OtherTransform.Transform().GetPivot();
+                float m_fOtherRotation = m_OtherTransform.Transform().GetRotation();
+
+                // Build other AABB from its world corners
+                auto m_OtherCorners = m_OtherCollider.GetColliderWorldCorners(m_vOtherPos, m_vOtherScale, m_vOtherPivot, m_fOtherRotation);
+                float m_oMinX = m_OtherCorners[0].x;
+                float m_oMaxX = m_OtherCorners[0].x;
+                float m_oMinY = m_OtherCorners[0].y;
+                float m_oMaxY = m_OtherCorners[0].y;
+
+                for (int i = 1; i < 4; ++i)
                 {
-                    DirectX::XMFLOAT2 testPosX = { newPos.x + m_vTranslation.x, newPos.y };
-                    if (ColliderComponent::CheckCollision(
-                        playerCollider, testPosX, transformComp.Transform().GetScale(), transformComp.Transform().GetPivot(), transformComp.Transform().GetRotation(),
-                        otherCollider, otherTransform.Transform().GetPosition(), otherTransform.Transform().GetScale(), otherTransform.Transform().GetPivot(), otherTransform.Transform().GetRotation()))
+                    if (m_OtherCorners[i].x < m_oMinX) { m_oMinX = m_OtherCorners[i].x; }
+                    if (m_OtherCorners[i].x > m_oMaxX) { m_oMaxX = m_OtherCorners[i].x; }
+                    if (m_OtherCorners[i].y < m_oMinY) { m_oMinY = m_OtherCorners[i].y; }
+                    if (m_OtherCorners[i].y > m_oMaxY) { m_oMaxY = m_OtherCorners[i].y; }
+                }
+
+                //---------------------------------------------------------------------
+                // X-axis distance check (moving right)
+                if (m_vTranslation.x > 0.0f)
+                {
+                    float m_fDist = m_oMinX - m_pMaxX; // positive = gap on right
+                    if (m_fDist >= 0.0f && m_fDist < m_fAllowedMoveX)
                     {
-                        core::ENGINE->GetECS().GetSystem<CollisionSystem>().Collide(playerCollider, otherCollider);
-                        allowX = false;
+                        // Only treat it as blocking if Y ranges overlap
+                        if (m_pMaxY > m_oMinY && m_pMinY < m_oMaxY)
+                        {
+                            m_fAllowedMoveX = m_fDist;
+                            core::ENGINE->GetECS().GetSystem<CollisionSystem>().Collide(m_PlayerCollider, m_OtherCollider);
+                        }
+                    }
+                }
+                else if (m_vTranslation.x < 0.0f)
+                {
+                    // moving left
+                    float m_fDist = m_oMaxX - m_pMinX; // negative or zero
+                    if (m_fDist <= 0.0f && m_fDist > m_fAllowedMoveX)
+                    {
+                        if (m_pMaxY > m_oMinY && m_pMinY < m_oMaxY)
+                        {
+                            m_fAllowedMoveX = m_fDist;
+                            core::ENGINE->GetECS().GetSystem<CollisionSystem>().Collide(m_PlayerCollider, m_OtherCollider);
+                        }
                     }
                 }
 
-                // Test Y movement
-                if (allowY)
+                //---------------------------------------------------------------------
+                // Y-axis distance check (moving down = positive Y in your code)
+                if (m_vTranslation.y > 0.0f)
                 {
-                    DirectX::XMFLOAT2 testPosY = { newPos.x, newPos.y + m_vTranslation.y };
-                    if (ColliderComponent::CheckCollision(
-                        playerCollider, testPosY, transformComp.Transform().GetScale(), transformComp.Transform().GetPivot(), transformComp.Transform().GetRotation(),
-                        otherCollider, otherTransform.Transform().GetPosition(), otherTransform.Transform().GetScale(), otherTransform.Transform().GetPivot(), otherTransform.Transform().GetRotation()))
+                    float m_fDist = m_oMinY - m_pMaxY; // positive = gap below
+                    if (m_fDist >= 0.0f && m_fDist < m_fAllowedMoveY)
                     {
-                        core::ENGINE->GetECS().GetSystem<CollisionSystem>().Collide(playerCollider, otherCollider);
-                        allowY = false;
+                        // Only treat it as blocking if X ranges overlap
+                        if (m_pMaxX > m_oMinX && m_pMinX < m_oMaxX)
+                        {
+                            m_fAllowedMoveY = m_fDist;
+                            core::ENGINE->GetECS().GetSystem<CollisionSystem>().Collide(m_PlayerCollider, m_OtherCollider);
+                        }
                     }
                 }
-
-                if (!allowX && !allowY)
+                else if (m_vTranslation.y < 0.0f)
                 {
-                    break; // no movement possible, exit early
+                    // moving up (negative Y)
+                    float m_fDist = m_oMaxY - m_pMinY; // negative or zero
+                    if (m_fDist <= 0.0f && m_fDist > m_fAllowedMoveY)
+                    {
+                        if (m_pMaxX > m_oMinX && m_pMinX < m_oMaxX)
+                        {
+                            m_fAllowedMoveY = m_fDist;
+                            core::ENGINE->GetECS().GetSystem<CollisionSystem>().Collide(m_PlayerCollider, m_OtherCollider);
+                        }
+                    }
                 }
             }
 
-            if (allowX)
+            //---------------------------------------------------------------------
+            // Move as far as possible without collision (small epsilon to avoid sticking)
+            const float m_fEpsilon = 0.001f;
+
+            if (fabs(m_fAllowedMoveX) > 0.0f)
             {
-                newPos.x += m_vTranslation.x;
-            }
-            if (allowY)
-            {
-                newPos.y += m_vTranslation.y;
+                m_vNewPos.x += m_fAllowedMoveX - std::copysign(m_fEpsilon, m_fAllowedMoveX);
             }
 
-            transformComp.Transform().SetPosition(newPos);
+            if (fabs(m_fAllowedMoveY) > 0.0f)
+            {
+                m_vNewPos.y += m_fAllowedMoveY - std::copysign(m_fEpsilon, m_fAllowedMoveY);
+            }
 
+            m_TransformComp.Transform().SetPosition(m_vNewPos);
+
+            // Reset translation applied this frame
             m_vTranslation = {};
         }
+
 	}
 }

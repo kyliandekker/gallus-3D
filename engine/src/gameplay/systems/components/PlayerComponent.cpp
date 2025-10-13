@@ -5,6 +5,8 @@
 // engine includes
 #include "core/Engine.h"
 
+#include "resources/SrcData.h"
+
 // gameplay includes
 #include "gameplay/Entity.h"
 #include "gameplay/systems/MovementSystem.h"
@@ -39,29 +41,11 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		void PlayerComponent::Deserialize(const rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator)
+		void PlayerComponent::Deserialize(const resources::SrcData& a_SrcData)
 		{
-			if (!a_Document.IsObject())
-			{
-				return;
-			}
-
-			if (a_Document.HasMember(JSON_PLAYER_COMPONENT_MOVEMENT_SPEED_VAR) && a_Document[JSON_PLAYER_COMPONENT_MOVEMENT_SPEED_VAR].IsFloat())
-			{
-				rapidjson::GetFloat(a_Document, JSON_PLAYER_COMPONENT_MOVEMENT_SPEED_VAR, m_fSpeed);
-			}
-
-			if (a_Document.HasMember(JSON_PLAYER_COMPONENT_PREFAB_NAME) && a_Document[JSON_PLAYER_COMPONENT_PREFAB_NAME].IsString())
-			{
-				std::string prefabName = a_Document[JSON_PLAYER_COMPONENT_PREFAB_NAME].GetString();
-				prefabName = core::ENGINE->GetResourceAtlas().LoadPrefab(prefabName, m_pPrefab);
-				m_pPrefab.Load();
-			}
-
-			if (a_Document.HasMember(JSON_PLAYER_COMPONENT_PREFAB_NAME) && a_Document[JSON_PLAYER_COMPONENT_PREFAB_NAME].IsFloat())
-			{
-				rapidjson::GetFloat(a_Document, JSON_PLAYER_COMPONENT_MOVEMENT_SPEED_VAR, m_fSpeed);
-			}
+			m_fSpeed = a_SrcData.GetFloat(JSON_PLAYER_COMPONENT_MOVEMENT_SPEED_VAR);
+			core::ENGINE->GetResourceAtlas().LoadPrefab(a_SrcData.GetString(JSON_PLAYER_COMPONENT_PREFAB_NAME), m_pPrefab);
+			m_pPrefab.Load();
 		}
 
 #include <Windows.h>

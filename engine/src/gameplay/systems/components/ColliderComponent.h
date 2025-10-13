@@ -23,12 +23,7 @@ namespace gallus
 			/// <param name="a_Allocator">The allocator used by the json document.</param>
 			void Serialize(rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator) const override;
 
-			/// <summary>
-			/// Deserializes data from a json document and loads it into the component.
-			/// </summary>
-			/// <param name="a_Document">The json document that contains the data.</param>
-			/// <param name="a_Allocator">The allocator used by the json document.</param>
-			void Deserialize(const rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator) override;
+			void Deserialize(const resources::SrcData& a_SrcData) override;
 
 			/// <summary>
 			/// Sets the offset of the collider.
@@ -59,8 +54,10 @@ namespace gallus
 
 			static bool OverlapsOnAxis(const std::array<DirectX::XMFLOAT2, 4>& a, const std::array<DirectX::XMFLOAT2, 4>& b, const DirectX::XMFLOAT2& axis);
 			static bool CheckCollision(ColliderComponent& a, const DirectX::XMFLOAT2& posA, const DirectX::XMFLOAT2& scaleA, const DirectX::XMFLOAT2& pivotA, float rotA, ColliderComponent& b, const DirectX::XMFLOAT2& posB, const DirectX::XMFLOAT2& scaleB, const DirectX::XMFLOAT2& pivotB, float rotB);
+			float GetDistanceTo(const DirectX::XMFLOAT2& a_vPoint, const DirectX::XMFLOAT2& a_vPos, const DirectX::XMFLOAT2& a_vScale, const DirectX::XMFLOAT2& a_vPivot, float a_fRotation);
 
 			void IgnoreEntity(const gameplay::EntityID& a_EntityID);
+			bool IsPointInside(const DirectX::XMFLOAT2& a_vPoint, const DirectX::XMFLOAT2& a_vPos, const DirectX::XMFLOAT2& a_vScale, const DirectX::XMFLOAT2& a_vPivot, float a_fRotation);
 		protected:
 			DirectX::XMFLOAT2 m_vOffset = { 0, 0 };
 			DirectX::XMFLOAT2 m_vSize = { 1, 1 };

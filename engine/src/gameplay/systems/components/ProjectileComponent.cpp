@@ -21,12 +21,8 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		void ProjectileComponent::Deserialize(const rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator)
+		void ProjectileComponent::Deserialize(const resources::SrcData& a_SrcData)
 		{
-			if (!a_Document.IsObject())
-			{
-				return;
-			}
 		}
 
 		//---------------------------------------------------------------------

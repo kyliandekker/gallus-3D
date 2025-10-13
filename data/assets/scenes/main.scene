@@ -1,7 +1,7 @@
 {
     "entities": [
         {
-            "name": "New GameObject",
+            "name": "Other Character",
             "isActive": true,
             "components": {
                 "sprite": {
@@ -23,17 +23,17 @@
                 },
                 "transform": {
                     "position": {
-                        "x": 1356.6251220703126,
-                        "y": 523.6795654296875
+                        "x": 190.72998046875,
+                        "y": -409.3350524902344
                     },
                     "rotation": 0.0,
                     "scale": {
-                        "x": 160.00010681152345,
-                        "y": 160.00010681152345
+                        "x": 100.0,
+                        "y": 100.0
                     },
                     "pivot": {
-                        "x": 0.0,
-                        "y": 0.0
+                        "x": -0.5,
+                        "y": -0.5
                     }
                 },
                 "health": {
@@ -42,18 +42,21 @@
                 },
                 "collision": {
                     "offset": {
-                        "x": 0.008558748289942742,
-                        "y": 0.02567622996866703
+                        "x": 0.0,
+                        "y": 0.0
                     },
                     "size": {
-                        "x": 0.7774724960327148,
-                        "y": 0.9486474990844727
+                        "x": 1.0,
+                        "y": 1.0
                     }
+                },
+                "movement": {
+                    "gravity": true
                 }
             }
         },
         {
-            "name": "New GameObject (1)",
+            "name": "Player",
             "isActive": true,
             "components": {
                 "sprite": {
@@ -98,16 +101,64 @@
                 },
                 "collision": {
                     "offset": {
-                        "x": -0.03708789125084877,
-                        "y": 0.048499539494514468
+                        "x": 0.0,
+                        "y": 0.0
                     },
                     "size": {
-                        "x": 0.8231191635131836,
-                        "y": 0.9030008316040039
+                        "x": 1.0,
+                        "y": 1.0
                     }
                 },
                 "movement": {
                     "gravity": true
+                }
+            }
+        },
+        {
+            "name": "Ground",
+            "isActive": true,
+            "components": {
+                "sprite": {
+                    "texture": {
+                        "name": "tex_missing.png",
+                        "spriteIndex": 0
+                    },
+                    "shader": {
+                        "pixel": "pixelShader.hlsl",
+                        "vertex": "vertexShader.hlsl"
+                    },
+                    "mesh": "square",
+                    "color": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "transform": {
+                    "position": {
+                        "x": -325.0,
+                        "y": 200.0
+                    },
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 700.0,
+                        "y": 100.0
+                    },
+                    "pivot": {
+                        "x": -0.5,
+                        "y": -0.5
+                    }
+                },
+                "collision": {
+                    "offset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "size": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
                 }
             }
         }

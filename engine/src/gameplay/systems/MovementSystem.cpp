@@ -20,7 +20,7 @@ namespace gallus
 		{
 			m_UpdateTime = UpdateTime::UPDATE_TIME_END_FRAME;
 
-			LOG(LOGSEVERITY_INFO_SUCCESS, LOG_CATEGORY_ECS, "Movement system initialized.");
+			LOG_ICON(font::ICON_TRANSLATE, LOGSEVERITY_INFO_SUCCESS, LOG_CATEGORY_ECS, "Movement system initialized.");
 			return true;
 		}
 

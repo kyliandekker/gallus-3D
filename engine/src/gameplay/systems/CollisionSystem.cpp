@@ -15,7 +15,7 @@ namespace gallus
 		//---------------------------------------------------------------------
 		bool CollisionSystem::Initialize()
 		{
-			LOG(LOGSEVERITY_INFO_SUCCESS, LOG_CATEGORY_ECS, "Collision system initialized.");
+			LOG_ICON(font::ICON_BOUNDS, LOGSEVERITY_INFO_SUCCESS, LOG_CATEGORY_ECS, "Collision system initialized.");
 			return true;
 		}
 

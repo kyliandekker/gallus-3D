@@ -43,9 +43,10 @@ namespace gallus
             void SceneWindow::Update()
             {
                 bool isStarted = gameplay::GAME.IsStarted();
+                bool isPaused = gameplay::GAME.IsPaused();
 
                 graphics::dx12::Camera* cam = &core::ENGINE->GetDX12().GetCamera();
-                if (!isStarted && core::EDITOR_ENGINE->GetEditor().GetCameraMode() == editor::CameraMode::CAMERA_MODE_SCENE)
+                if ((!isStarted || (isStarted && isPaused)) && core::EDITOR_ENGINE->GetEditor().GetCameraMode() == editor::CameraMode::CAMERA_MODE_SCENE)
                 {
                     cam = &core::EDITOR_ENGINE->GetEditor().GetEditorCamera();
                 }
@@ -245,7 +246,7 @@ namespace gallus
                 const DirectX::XMFLOAT2& cameraPos = cam.Transform().GetPosition();
 
                 // Draw vertical grid lines
-                float leftWorld = cameraPos.x;
+                float leftWorld = cameraPos.x + 0.5f;
                 float rightWorld = cameraPos.x + a_vSize.x / a_fZoom;
                 float firstX = floorf(leftWorld / baseSpacing) * baseSpacing;
 

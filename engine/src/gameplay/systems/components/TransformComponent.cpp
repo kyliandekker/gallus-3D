@@ -3,6 +3,8 @@
 #include <rapidjson/utils.h>
 #include <DirectXMath.h>
 
+#include "resources/SrcData.h"
+
 #define JSON_TRANSFORM_COMPONENT_POSITION_VAR "position"
 #define JSON_TRANSFORM_COMPONENT_ROTATION_VAR "rotation"
 #define JSON_TRANSFORM_COMPONENT_SCALE_VAR "scale"
@@ -49,43 +51,12 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		void TransformComponent::Deserialize(const rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator)
+		void TransformComponent::Deserialize(const resources::SrcData& a_SrcData)
 		{
-			if (!a_Document.IsObject())
-			{
-				return;
-			}
-
-			if (a_Document.HasMember(JSON_TRANSFORM_COMPONENT_POSITION_VAR) && a_Document[JSON_TRANSFORM_COMPONENT_POSITION_VAR].IsObject())
-			{
-				DirectX::XMFLOAT2 position;
-				rapidjson::GetFloat(a_Document[JSON_TRANSFORM_COMPONENT_POSITION_VAR], JSON_TRANSFORM_COMPONENT_X_VAR, position.x);
-				rapidjson::GetFloat(a_Document[JSON_TRANSFORM_COMPONENT_POSITION_VAR], JSON_TRANSFORM_COMPONENT_Y_VAR, position.y);
-				m_Transform.SetPosition(position);
-			}
-
-			if (a_Document.HasMember(JSON_TRANSFORM_COMPONENT_ROTATION_VAR) && a_Document[JSON_TRANSFORM_COMPONENT_ROTATION_VAR].IsFloat())
-			{
-				float rotation;
-				rapidjson::GetFloat(a_Document, JSON_TRANSFORM_COMPONENT_ROTATION_VAR, rotation);
-				m_Transform.SetRotation(rotation);
-			}
-
-			if (a_Document.HasMember(JSON_TRANSFORM_COMPONENT_SCALE_VAR) && a_Document[JSON_TRANSFORM_COMPONENT_SCALE_VAR].IsObject())
-			{
-				DirectX::XMFLOAT2 scale;
-				rapidjson::GetFloat(a_Document[JSON_TRANSFORM_COMPONENT_SCALE_VAR], JSON_TRANSFORM_COMPONENT_X_VAR, scale.x);
-				rapidjson::GetFloat(a_Document[JSON_TRANSFORM_COMPONENT_SCALE_VAR], JSON_TRANSFORM_COMPONENT_Y_VAR, scale.y);
-				m_Transform.SetScale(scale);
-			}
-
-			if (a_Document.HasMember(JSON_TRANSFORM_COMPONENT_PIVOT_VAR) && a_Document[JSON_TRANSFORM_COMPONENT_PIVOT_VAR].IsObject())
-			{
-				DirectX::XMFLOAT2 pivot;
-				rapidjson::GetFloat(a_Document[JSON_TRANSFORM_COMPONENT_PIVOT_VAR], JSON_TRANSFORM_COMPONENT_X_VAR, pivot.x);
-				rapidjson::GetFloat(a_Document[JSON_TRANSFORM_COMPONENT_PIVOT_VAR], JSON_TRANSFORM_COMPONENT_Y_VAR, pivot.y);
-				m_Transform.SetPivot(pivot);
-			}
+			m_Transform.SetPosition(a_SrcData.GetVector(JSON_TRANSFORM_COMPONENT_POSITION_VAR));
+			m_Transform.SetScale(a_SrcData.GetVector(JSON_TRANSFORM_COMPONENT_SCALE_VAR));
+			m_Transform.SetPivot(a_SrcData.GetVector(JSON_TRANSFORM_COMPONENT_PIVOT_VAR));
+			m_Transform.SetRotation(a_SrcData.GetFloat(JSON_TRANSFORM_COMPONENT_ROTATION_VAR));
 		}
 	}
 }

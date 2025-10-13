@@ -7,6 +7,10 @@
 
 namespace gallus
 {
+	namespace resources
+	{
+		class SrcData;
+	}
 	namespace gameplay
 	{
 		//---------------------------------------------------------------------
@@ -38,13 +42,12 @@ namespace gallus
 			/// <param name="a_Document">The json document that the data will be put into.</param>
 			/// <param name="a_Allocator">The allocator used by the json document.</param>
 			virtual void Serialize(rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator) const = 0;
-
+			
 			/// <summary>
-			/// Deserializes data from a json document and loads it into the component.
+			/// Creates an instance based on source data.
 			/// </summary>
-			/// <param name="a_Document">The json document that contains the data.</param>
-			/// <param name="a_Allocator">The allocator used by the json document.</param>
-			virtual void Deserialize(const rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator) = 0;
+			/// <param name="a_SrcData">The source data.</param>
+			virtual void Deserialize(const resources::SrcData& a_SrcData) = 0;
 
 			/// <summary>
 			/// Checks whether the component is destroyed.

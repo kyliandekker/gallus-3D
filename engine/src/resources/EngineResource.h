@@ -9,7 +9,7 @@
 
 namespace gallus
 {
-	namespace core
+	namespace resources
 	{
 		enum class EngineResourceCategory
 		{

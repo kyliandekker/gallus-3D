@@ -15,7 +15,7 @@ namespace gallus
 		//---------------------------------------------------------------------
 		bool ProjectileSystem::Initialize()
 		{
-			LOG(LOGSEVERITY_INFO_SUCCESS, LOG_CATEGORY_ECS, "Projectile system initialized.");
+			LOG_ICON(font::ICON_PROJECTILE, LOGSEVERITY_INFO_SUCCESS, LOG_CATEGORY_ECS, "Projectile system initialized.");
 			return true;
 		}
 
@@ -30,7 +30,7 @@ namespace gallus
 		{
 			std::string name = "Projectile";
 #ifdef _EDITOR
-			name = std::string(font::ICON_HEART) + " " + name;
+			name = std::string(font::ICON_PROJECTILE) + " " + name;
 #endif // _EDITOR
 			return name;
 		}

@@ -89,7 +89,7 @@ namespace gallus
 			/// Represents a renderable mesh resource in the engine.
 			/// Contains vertex and index buffers, transformation data, and supports rendering with a command list.
 			/// </summary>
-			class Mesh : public core::EngineResource
+			class Mesh : public resources::EngineResource
 			{
 			public:
 				/// <summary>

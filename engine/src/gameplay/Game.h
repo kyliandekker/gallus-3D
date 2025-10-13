@@ -67,7 +67,7 @@ namespace gallus
 
 			float GetFps() const
 			{
-				return m_Fps;
+				return m_fFps;
 			}
 
 			float GetDeltaTime() const
@@ -86,7 +86,7 @@ namespace gallus
 			bool m_bStarted = false;
 			bool m_bPaused = false;
 
-			float m_Fps;
+			float m_fFps;
 			float m_fDeltaTime;
 		};
 		inline extern Game GAME = {};

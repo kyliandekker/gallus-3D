@@ -11,10 +11,11 @@ namespace gallus
 			//---------------------------------------------------------------------
 			// DX12Transform
 			//---------------------------------------------------------------------
-			DX12Transform::DX12Transform()
-				: m_vPosition{ 0.0f, 0.0f },
-				m_fRotationDegrees(0),
-				m_vScale{ 1.0f, 1.0f }
+			DX12Transform::DX12Transform() : 
+				m_vPosition{ 0.0f, 0.0f },
+				m_vScale{ 1.0f, 1.0f },
+				m_vPivot{ -0.5f, -0.5f },
+				m_fRotationDegrees(0)
 			{}
 
 			//---------------------------------------------------------------------

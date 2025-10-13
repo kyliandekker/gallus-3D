@@ -34,8 +34,6 @@ namespace gallus
 		}
 		namespace dx12
 		{
-			constexpr glm::ivec2 RENDER_TEX_SIZE = glm::ivec2(1920, 1080);
-
 /// Whether DX12 makes a full log of creating devices, resources, etc (spam).
 #define LOG_DX12 1
 

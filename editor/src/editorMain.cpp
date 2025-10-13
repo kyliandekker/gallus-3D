@@ -57,13 +57,13 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR lp
 
 	gallus::graphics::imgui::ImGuiWindow& imguiWindow = gallus::core::EDITOR_ENGINE->GetDX12().GetImGuiWindow();
 	imguiWindow.AddWindow(new gallus::graphics::imgui::MainWindowDock(imguiWindow));
+	imguiWindow.AddWindow(new gallus::graphics::imgui::ResourcesWindow(imguiWindow));
 	imguiWindow.AddWindow(new gallus::graphics::imgui::ConsoleWindow(imguiWindow));
 	imguiWindow.AddWindow(new gallus::graphics::imgui::HierarchyWindow(imguiWindow));
 	imguiWindow.AddWindow(new gallus::graphics::imgui::SceneWindow(imguiWindow));
 	imguiWindow.AddWindow(new gallus::graphics::imgui::FullSceneWindow(imguiWindow));
 	imguiWindow.AddWindow(new gallus::graphics::imgui::ExplorerWindow(imguiWindow));
 	imguiWindow.AddWindow(new gallus::graphics::imgui::InspectorWindow(imguiWindow));
-	imguiWindow.AddWindow(new gallus::graphics::imgui::ResourcesWindow(imguiWindow));
 
 	imguiWindow.AddModal(new gallus::graphics::imgui::FilePickerModal(imguiWindow));
 	imguiWindow.AddModal(new gallus::graphics::imgui::SpriteEditorModal(imguiWindow));

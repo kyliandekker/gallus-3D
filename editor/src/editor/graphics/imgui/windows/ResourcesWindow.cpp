@@ -51,7 +51,7 @@ namespace gallus
 				BaseWindow::Update();
 			}
 
-			void ResourcesWindow::RenderResource(core::EngineResource* a_pResource)
+			void ResourcesWindow::RenderResource(resources::EngineResource* a_pResource)
 			{
 				if (!a_pResource)
 				{

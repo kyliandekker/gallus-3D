@@ -166,6 +166,22 @@ namespace gallus
 			return nullptr;
 		}
 
+		const Entity* EntityComponentSystem::GetEntityByName(const std::string& a_sName) const
+		{
+			auto it = std::find_if(m_aEntities.begin(), m_aEntities.end(),
+				[&](const Entity& e)
+			{
+				return e.GetName() == a_sName;
+			});
+
+			if (it != m_aEntities.end())
+			{
+				return &(*it);
+			}
+
+			return nullptr;
+		}
+
 		//---------------------------------------------------------------------
 		Entity* EntityComponentSystem::GetEntity(const EntityID& a_ID)
 		{

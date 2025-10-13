@@ -3,7 +3,7 @@
 
 namespace gallus
 {
-	namespace core
+	namespace resources
 	{
 		//---------------------------------------------------------------------
 		// EngineResource

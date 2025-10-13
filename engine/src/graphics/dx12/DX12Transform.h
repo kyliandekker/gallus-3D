@@ -90,9 +90,9 @@ namespace gallus
 				std::array<DirectX::XMFLOAT2, 4> GetWorldCorners() const;
 			private:
 				DirectX::XMFLOAT2 m_vPosition = { 0, 0 };
-				float m_fRotationDegrees = 0.0f; // rotation around Z axis
 				DirectX::XMFLOAT2 m_vScale = { 1, 1 };
-				DirectX::XMFLOAT2 m_vPivot = { 0.0f, 0.0f };
+				DirectX::XMFLOAT2 m_vPivot = { -0.5f, -0.5f };
+				float m_fRotationDegrees = 0.0f; // rotation around Z axis
 			};
 		}
 	}

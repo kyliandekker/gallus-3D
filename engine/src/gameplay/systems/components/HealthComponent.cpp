@@ -2,6 +2,8 @@
 
 #include <rapidjson/utils.h>
 
+#include "resources/SrcData.h"
+
 #define JSON_HEALTH_COMPONENT_HEALTH_VAR "health"
 #define JSON_HEALTH_COMPONENT_MAX_HEALTH_VAR "maxHealth"
 
@@ -32,15 +34,10 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		void HealthComponent::Deserialize(const rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator)
+		void HealthComponent::Deserialize(const resources::SrcData& a_SrcData)
 		{
-			if (!a_Document.IsObject())
-			{
-				return;
-			}
-
-			rapidjson::GetFloat(a_Document, JSON_HEALTH_COMPONENT_HEALTH_VAR, m_fHealth);
-			rapidjson::GetFloat(a_Document, JSON_HEALTH_COMPONENT_MAX_HEALTH_VAR, m_fMaxHealth);
+			m_fHealth = a_SrcData.GetFloat(JSON_HEALTH_COMPONENT_HEALTH_VAR);
+			m_fMaxHealth = a_SrcData.GetFloat(JSON_HEALTH_COMPONENT_MAX_HEALTH_VAR);
 		}
 
 		//---------------------------------------------------------------------

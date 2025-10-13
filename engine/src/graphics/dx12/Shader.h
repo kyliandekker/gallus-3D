@@ -1,7 +1,7 @@
 #pragma once
 
 #include "graphics/dx12/DX12PCH.h"
-#include "core/EngineResource.h"
+#include "resources/EngineResource.h"
 
 #include <string>
 #include <wrl.h>
@@ -24,7 +24,7 @@ namespace gallus
 			/// Represents a GPU shader program resource in the engine.
 			/// Wraps vertex and pixel shaders, compiling them and creating a pipeline state object (PSO).
 			/// </summary>
-			class Shader : public core::EngineResource
+			class Shader : public resources::EngineResource
 			{
 			public:
 				/// <summary>

@@ -36,7 +36,7 @@ namespace gallus
 		class Scene;
 		class Prefab;
 	}
-	namespace core
+	namespace resources
 	{
 		constexpr uint32_t MAX_RESOURCES = 64;
 		constexpr uint32_t MISSING = 0;

@@ -20,7 +20,7 @@ namespace gallus
 		//---------------------------------------------------------------------
 		bool Editor::Initialize(bool a_bWait)
 		{
-			m_CurrentScene.SetResourceCategory(core::EngineResourceCategory::Editor);
+			m_CurrentScene.SetResourceCategory(resources::EngineResourceCategory::Editor);
 			m_EditorCamera.Init(graphics::dx12::RENDER_TEX_SIZE.x, graphics::dx12::RENDER_TEX_SIZE.y);
 
 			LOG(LOGSEVERITY_INFO, LOG_CATEGORY_EDITOR, "Initializing editor.");

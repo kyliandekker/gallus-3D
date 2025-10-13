@@ -73,6 +73,11 @@ namespace gallus
 			/// <summary>
 			/// Gets entity info from a specific entity.
 			/// </summary>
+			const Entity* GetEntityByName(const std::string& a_sName) const;
+
+			/// <summary>
+			/// Gets entity info from a specific entity.
+			/// </summary>
 			/// <param name="a_ID">The entity.</param>
 			Entity* GetEntity(const EntityID& a_ID);
 

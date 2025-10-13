@@ -1,7 +1,7 @@
 #pragma once
 
 #include "graphics/dx12/DX12PCH.h"
-#include "core/EngineResource.h"
+#include "resources/EngineResource.h"
 
 #include <wrl.h>
 #include <memory>
@@ -16,7 +16,7 @@ namespace gallus
 			class PixelShader;
 			class VertexShader;
 
-			class DX12ShaderBind : public core::EngineResource
+			class DX12ShaderBind : public resources::EngineResource
 			{
 			public:
 				/// <summary>

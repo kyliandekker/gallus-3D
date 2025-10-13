@@ -12,6 +12,8 @@
 // core includes
 #include "core/Event.h"
 
+#include "graphics/imgui/font_icon.h"
+
 // utils includes
 #include "utils/file_abstractions.h"
 
@@ -88,6 +90,51 @@ namespace gallus
 		return "";
 	}
 
+	/// <summary>
+	/// Converts a log severity enumeration value to its corresponding icon.
+	/// </summary>
+	/// <param name="a_LogSeverity">The log severity to convert.</param>
+	/// <returns>A string representing the icon.</returns>
+	inline const std::string LogSeverityToIcon(LogSeverity a_LogSeverity)
+	{
+		switch (a_LogSeverity)
+		{
+			case LOGSEVERITY_ASSERT:
+			{
+				return font::ICON_CIRCLE_ASSERT;
+			}
+			case LOGSEVERITY_ERROR:
+			{
+				return font::ICON_CIRCLE_ERROR;
+			}
+			case LOGSEVERITY_WARNING:
+			{
+				return font::ICON_CIRCLE_WARNING;
+			}
+			case LOGSEVERITY_INFO:
+			{
+				return font::ICON_CIRCLE_INFO;
+			}
+			case LOGSEVERITY_TEST:
+			{
+				return font::ICON_CIRCLE_INFO;
+			}
+			case LOGSEVERITY_SUCCESS:
+			{
+				return font::ICON_CIRCLE_SUCCESS;
+			}
+			case LOGSEVERITY_INFO_SUCCESS:
+			{
+				return font::ICON_CIRCLE_INFO_SUCCESS;
+			}
+			case LOGSEVERITY_AWESOME:
+			{
+				return font::ICON_CIRCLE_AWESOME;
+			}
+		}
+		return "";
+	}
+
 	namespace logger
 	{
 		enum LogType
@@ -107,13 +154,15 @@ namespace gallus
 		class LoggerMessage
 		{
 		public:
-			LoggerMessage(const std::string& a_sRawMessage, const std::string& a_sCategory, const fs::path& a_Location, uint32_t a_iLine, LogSeverity a_Severity, const std::chrono::system_clock::time_point& a_Time);
+			LoggerMessage(const std::string& a_sRawMessage, const std::string& a_sIcon, const std::string& a_sCategory, const fs::path& a_Location, uint32_t a_iLine, LogSeverity a_Severity, const std::chrono::system_clock::time_point& a_Time);
 
 			/// <summary>
 			/// Retrieves the raw message.
 			/// </summary>
 			/// <returns>A string containing the message without any category, location and severity information.</returns>
 			const std::string& GetRawMessage() const;
+
+			const std::string& GetIcon() const;
 
 			/// <summary>
 			/// Retrieves the logging category.
@@ -145,6 +194,7 @@ namespace gallus
 			/// <returns>The time point containing information about when the message was logged.</returns>
 			const std::chrono::system_clock::time_point& GetTime() const;
 		private:
+			std::string m_sIcon; /// The message without any category, location and severity information.
 			std::string m_sRawMessage; /// The message without any category, location and severity information.
 			std::string m_sCategory; /// The logging category.
 			fs::path m_Location; /// The file the logging took place in.
@@ -182,7 +232,7 @@ namespace gallus
 			/// <param name="a_sMessage">The message that will be logged.</param>
 			/// <param name="a_sFile">The file it was logged from.</param>
 			/// <param name="a_iLine">The line of the file it was logged from.</param>
-			void Log(LogSeverity a_Severity, const char* a_sCategory, const char* a_sMessage, const char* a_sFile, int a_iLine);
+			void Log(const std::string& a_sIcon, LogSeverity a_Severity, const std::string& a_sCategory, const std::string& a_sMessage, const std::string& a_sFile, int a_iLine);
 
 			/// <summary>
 			/// Logs a formatted message with category, file and line info to the console and a file.
@@ -192,7 +242,7 @@ namespace gallus
 			/// <param name="a_sMessage">The message that will be logged.</param>
 			/// <param name="a_sFile">The file it was logged from.</param>
 			/// <param name="a_iLine">The line of the file it was logged from.</param>
-			void LogF(LogSeverity a_Severity, const char* a_sCategory, const char* a_sMessage, const char* a_sFile, int a_iLine, ...);
+			void LogF(const std::string& a_sIcon, LogSeverity a_Severity, const std::string& a_sCategory, const std::string& a_sMessage, const std::string& a_sFile, int a_iLine, ...);
 
 			/// <summary>
 			/// Prints a message to the console.
@@ -202,7 +252,7 @@ namespace gallus
 			/// <param name="a_sMessage">The message that will be logged.</param>
 			/// <param name="a_sFile">The file it was logged from.</param>
 			/// <param name="a_iLine">The line of the file it was logged from.</param>
-			void PrintMessage(LogSeverity a_Severity, const char* a_sCategory, const char* a_sMessage, const char* a_sFile, int a_iLine);
+			void PrintMessage(const std::string& a_sIcon, LogSeverity a_Severity, const std::string& a_sCategory, const std::string& a_sMessage, const std::string& a_sFile, int a_iLine);
 
 			/// <summary>
 			/// Retrieves the on message logged event.
@@ -250,7 +300,7 @@ namespace gallus
 // Messages should be like this: "STATUS ACTION", so "Created x" or "Failed creating x"
 #define LOGF(a_Severity, a_sCategory, a_sMessage, ...)\
 do{\
-	gallus::logger::LOGGER.LogF(a_Severity, a_sCategory, a_sMessage, __FILE__, __LINE__, __VA_ARGS__);\
+	gallus::logger::LOGGER.LogF(gallus::LogSeverityToIcon(a_Severity), a_Severity, a_sCategory, a_sMessage, __FILE__, __LINE__, __VA_ARGS__);\
 	if (a_Severity <= gallus::logger::LOGGER.GetAssertLevel())\
 		assert(false);\
 } while (0)
@@ -258,17 +308,25 @@ do{\
 // Messages should be like this: "STATUS ACTION", so "Created x" or "Failed creating x"
 #define LOG(a_Severity, a_sCategory, a_sMessage)\
 do{\
-	gallus::logger::LOGGER.Log(a_Severity, a_sCategory, a_sMessage, __FILE__, __LINE__);\
+	gallus::logger::LOGGER.Log(gallus::LogSeverityToIcon(a_Severity), a_Severity, a_sCategory, a_sMessage, __FILE__, __LINE__);\
+	if (a_Severity <= gallus::logger::LOGGER.GetAssertLevel())\
+		assert(false);\
+} while (0)
+
+// Messages should be like this: "STATUS ACTION", so "Created x" or "Failed creating x"
+#define LOG_ICON(a_sIcon, a_Severity, a_sCategory, a_sMessage)\
+do{\
+	gallus::logger::LOGGER.Log(a_sIcon, a_Severity, a_sCategory, a_sMessage, __FILE__, __LINE__);\
 	if (a_Severity <= gallus::logger::LOGGER.GetAssertLevel())\
 		assert(false);\
 } while (0)
 
 #define TEST(a_sMessage)\
 do{\
-	gallus::logger::LOGGER.Log(LOGSEVERITY_TEST, LOG_CATEGORY_TEST, a_sMessage, __FILE__, __LINE__);\
+	gallus::logger::LOGGER.Log(gallus::LogSeverityToIcon(a_Severity), LOGSEVERITY_TEST, LOG_CATEGORY_TEST, a_sMessage, __FILE__, __LINE__);\
 } while (0)
 
 #define TESTF(a_sMessage, ...)\
 do{\
-	gallus::logger::LOGGER.LogF(LOGSEVERITY_TEST, LOG_CATEGORY_TEST, a_sMessage, __FILE__, __LINE__, __VA_ARGS__);\
+	gallus::logger::LOGGER.LogF(gallus::LogSeverityToIcon(a_Severity), LOGSEVERITY_TEST, LOG_CATEGORY_TEST, a_sMessage, __FILE__, __LINE__, __VA_ARGS__);\
 } while (0)

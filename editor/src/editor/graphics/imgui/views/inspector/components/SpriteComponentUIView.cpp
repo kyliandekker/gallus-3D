@@ -37,7 +37,6 @@ namespace gallus
 			char m_VertexShaderName[128];
 			char m_TextureName[128];
 			SpriteComponentUIView::SpriteComponentUIView(ImGuiWindow& a_Window, gameplay::SpriteComponent& a_SpriteComponent, gameplay::SpriteSystem& a_System) : ComponentUIView(a_Window, a_SpriteComponent, a_System), 
-				m_SizeView(a_Window),
 				m_ColorView(a_Window)
 			{
 				m_bShowPreview = true;
