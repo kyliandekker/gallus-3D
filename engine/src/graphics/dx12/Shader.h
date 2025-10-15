@@ -55,6 +55,10 @@ namespace gallus
 				/// <returns>True if loading and compilation were successful, false otherwise.</returns>
 				virtual bool LoadByPath(const fs::path& a_ShaderPath);
 
+				/// <summary>
+				/// Retrieves the shader blob data.
+				/// </summary>
+				/// <returns>Pointer to the shader blob data.</returns>
 				const Microsoft::WRL::ComPtr<ID3DBlob> GetShaderBlob() const
 				{
 					return m_pShaderBlob;

@@ -26,7 +26,7 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		void ProjectileComponent::UpdateRealtime(float a_fDeltaTime)
+		void ProjectileComponent::UpdateRealtime(float a_fDeltaTime, UpdateTime a_UpdateTime)
 		{
 			CollisionSystem& collisionSystem = core::ENGINE->GetECS().GetSystem<CollisionSystem>();
 			auto collisions = collisionSystem.GetCollisions(m_EntityID);

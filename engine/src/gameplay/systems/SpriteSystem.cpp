@@ -15,6 +15,8 @@ namespace gallus
 		//---------------------------------------------------------------------
 		bool SpriteSystem::Initialize()
 		{
+			m_aUpdateTimes.AddFlag(UpdateTime::UPDATE_TIME_FRAME);
+
 			LOG_ICON(font::ICON_IMAGE, LOGSEVERITY_INFO_SUCCESS, LOG_CATEGORY_ECS, "Sprite system initialized.");
 			return true;
 		}

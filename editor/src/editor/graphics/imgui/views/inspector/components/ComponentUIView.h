@@ -64,19 +64,37 @@ namespace gallus
 				/// <param name="a_System">The system managing the component.</param>
 				void RenderBaseComponent(gameplay::Component& a_Component, gameplay::AbstractECSSystem& a_System);
 
+				/// <summary>
+				/// Returns the priority of the preview order.
+				/// </summary>
+				/// <returns>True if the preview should be shown, false otherwise.</returns>
 				bool ShowPreview() const
 				{
 					return m_bShowPreview;
 				}
 
+				/// <summary>
+				/// Returns the priority of the preview order.
+				/// </summary>
+				/// <returns>An integer representing which component is more important to show a preview of.</returns>
 				int GetPreviewPriority() const
 				{
 					return m_iPreviewPriority;
 				}
 
+				/// <summary>
+				/// Renders the preview.
+				/// </summary>
 				virtual void RenderPreview()
 				{}
 
+				/// <summary>
+				/// Renders component-specific gizmos.
+				/// </summary>
+				/// <param name="a_vScenePos">The view port starting position.</param>
+				/// <param name="a_vSize">The size of the view port rect.</param>
+				/// <param name="a_vPanOffset">The panning of the scene view port.</param>
+				/// <param name="a_fZoom">The zoom of the scene view port.</param>
 				virtual void RenderComponentGizmos(const ImVec2 & a_vScenePos, const ImVec2 & a_vSize, const ImVec2& a_vPanOffset, float a_fZoom)
 				{}
 			protected:
@@ -94,6 +112,14 @@ namespace gallus
 					return "";
 				}
 
+				/// <summary>
+				/// Renders the transform gizmo.
+				/// </summary>
+				/// <param name="a_Transform">The transform of the object.</param>
+				/// <param name="a_vScenePos">The view port starting position.</param>
+				/// <param name="a_vSize">The size of the view port rect.</param>
+				/// <param name="a_vPanOffset">The panning of the scene view port.</param>
+				/// <param name="a_fZoom">The zoom of the scene view port.</param>
 				void DrawTransformGizmo(graphics::dx12::DX12Transform& a_Transform, const ImVec2& a_vScenePos, const ImVec2& a_vSize, const ImVec2& a_vPanOffset, float a_fZoom);
 
 				bool m_bFoldedOut = true; /// Indicates whether the component UI is folded out or not.

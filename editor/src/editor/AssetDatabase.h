@@ -45,12 +45,20 @@ namespace gallus
 			/// </summary>
 			void CheckAssetDatabase();
 
+			/// <summary>
+			/// Returns the on scan completed event.
+			/// </summary>
+			/// <returns>Reference to the on scan completed event.</returns>
 			const SimpleEvent<>& GetOnScanCompleted() const
 			{
 				return m_eOnScanCompleted;
 			}
 
-			bool Scan(); /// Function that scans the database.
+			/// <summary>
+			/// Scans the database.
+			/// </summary>
+			/// <returns>True if scan succeeds, otherwise false.</returns>
+			bool Scan();
 		private:
 			std::recursive_mutex m_AssetMutex;
 			SimpleEvent<> m_eOnScanCompleted; /// Simple event that gets called when the asset database has completed a scan.

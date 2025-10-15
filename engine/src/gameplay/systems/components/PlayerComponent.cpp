@@ -15,7 +15,7 @@
 #include "gameplay/systems/ProjectileSystem.h"
 
 #define JSON_PLAYER_COMPONENT_MOVEMENT_SPEED_VAR "movementSpeed"
-#define JSON_PLAYER_COMPONENT_PREFAB_NAME "prefab"
+#define JSON_PLAYER_COMPONENT_PREFAB_NAME "bulletPrefab"
 
 namespace gallus
 {
@@ -35,7 +35,7 @@ namespace gallus
 
 			a_Document.AddMember(
 				JSON_PLAYER_COMPONENT_PREFAB_NAME,
-				rapidjson::Value(m_pPrefab.GetPath().filename().generic_string().c_str(), a_Allocator),
+				rapidjson::Value(m_pBulletPrefab.GetPath().filename().generic_string().c_str(), a_Allocator),
 				a_Allocator
 			);
 		}
@@ -44,8 +44,8 @@ namespace gallus
 		void PlayerComponent::Deserialize(const resources::SrcData& a_SrcData)
 		{
 			m_fSpeed = a_SrcData.GetFloat(JSON_PLAYER_COMPONENT_MOVEMENT_SPEED_VAR);
-			core::ENGINE->GetResourceAtlas().LoadPrefab(a_SrcData.GetString(JSON_PLAYER_COMPONENT_PREFAB_NAME), m_pPrefab);
-			m_pPrefab.Load();
+			core::ENGINE->GetResourceAtlas().LoadPrefab(a_SrcData.GetString(JSON_PLAYER_COMPONENT_PREFAB_NAME), m_pBulletPrefab);
+			m_pBulletPrefab.Load();
 		}
 
 #include <Windows.h>
@@ -86,22 +86,35 @@ namespace gallus
 
 		float bulletSpeed = 50;
 		Key w('W'), a('A'), s('S'), d('D'), left(VK_LEFT), right(VK_RIGHT), up(VK_UP), down(VK_DOWN);
-        void PlayerComponent::UpdateRealtime(float a_fDeltaTime)
+        void PlayerComponent::UpdateRealtime(float a_fDeltaTime, UpdateTime a_UpdateTime)
         {
+			const Entity* entity = core::ENGINE->GetECS().GetEntity(m_EntityID);
+			if (entity == nullptr)
+			{
+				return;
+			}
+
+			if (!entity->IsActive())
+			{
+				return;
+			}
+
 			bool leftDown = left.isKeyDown();
 			bool rightDown = right.isKeyDown();
 			if (leftDown || rightDown)
 			{
-				gameplay::EntityID id = m_pPrefab.Instantiate();
+				gameplay::EntityID id = m_pBulletPrefab.Instantiate();
 
 				ProjectileSystem& projectileSystem = core::ENGINE->GetECS().GetSystem<ProjectileSystem>();
 				projectileSystem.GetComponent(id).SetMovementSpeed({ bulletSpeed, 0 });
 
 				CollisionSystem& collisionSys = core::ENGINE->GetECS().GetSystem<CollisionSystem>();
-				collisionSys.GetComponent(m_EntityID).IgnoreEntity(id);
+				collisionSys.GetComponent(id).IgnoreEntity(id);
+				collisionSys.GetComponent(id).IgnoreEntity(m_EntityID);
 
 				TransformSystem& transformSys = core::ENGINE->GetECS().GetSystem<TransformSystem>();
 				auto pos = transformSys.GetComponent(m_EntityID).Transform().GetPosition();
+				pos = { pos.x - 100, pos.y };
 				TransformComponent& transformComp = transformSys.GetComponent(id);
 				transformComp.Transform().SetPosition(pos);
 

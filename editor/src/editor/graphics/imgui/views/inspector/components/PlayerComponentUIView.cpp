@@ -42,7 +42,7 @@ namespace gallus
 			void PlayerComponentUIView::RenderInner()
 			{
 				memset(m_sPrefabName, 0, sizeof(m_sPrefabName));
-				std::string prefabName = m_Component.GetPrefab().GetPath().stem().generic_string();
+				std::string prefabName = m_Component.GetBulletPrefab().GetPath().stem().generic_string();
 				strncpy(m_sPrefabName, prefabName.c_str(), sizeof(m_sPrefabName));
 				m_sPrefabName[sizeof(m_sPrefabName) - 1] = '\0';
 
@@ -91,8 +91,8 @@ namespace gallus
 									{
 										if (success == 1)
 										{
-											playerComp.GetPrefab().SetPath(resource.GetPath().filename().generic_string());
-											playerComp.GetPrefab().Load();
+											playerComp.GetBulletPrefab().SetPath(resource.GetPath().filename().generic_string());
+											playerComp.GetBulletPrefab().Load();
 										}
 									},
 									std::vector<gallus::resources::AssetType>{ gallus::resources::AssetType::Prefab }

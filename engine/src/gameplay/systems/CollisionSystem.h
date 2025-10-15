@@ -72,7 +72,11 @@ namespace gallus
 
 			void Collide(ColliderComponent& a_ColliderA, ColliderComponent& a_ColliderB);
 
-			void UpdateComponentsRealtime(float a_fDeltatime) override;
+			/// <summary>
+			/// Updates the system's components.
+			/// </summary>
+			// <param name="a_fDeltaTime">The time it took since last frame.</param>
+			void UpdateComponentsRealtime(float a_fDeltatime, UpdateTime a_UpdateTime) override;
 		private:
 			std::map<CollisionInfo, CollisionType> m_mCollision;
 			std::set<CollisionInfo> m_mNewCollision;

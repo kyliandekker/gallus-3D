@@ -13,10 +13,21 @@ namespace gallus
 		//---------------------------------------------------------------------
 		struct EntityID
 		{
-			EntityID(unsigned int a_ID) : m_iID(a_ID)
+			/// <summary>
+			/// Constructs an empty entity ID.
+			/// </summary>
+			EntityID() = default;
+
+			/// <summary>
+			/// Constructs an entity with a given ID.
+			/// </summary>
+			/// <param name="a_iID">The id.</param>
+			EntityID(unsigned int a_iID) : m_iID(a_iID)
 			{};
-			EntityID()
-			{};
+
+			/// <summary>
+			/// Deconstructs an entity ID.
+			/// </summary>
 			~EntityID() = default;
 
 			/// <summary>

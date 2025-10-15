@@ -15,6 +15,9 @@ namespace gallus
 		//---------------------------------------------------------------------
 		bool CollisionSystem::Initialize()
 		{
+            m_aUpdateTimes.AddFlag(UpdateTime::UPDATE_TIME_END_FRAME);
+            m_aUpdateTimes.AddFlag(UpdateTime::UPDATE_TIME_END);
+
 			LOG_ICON(font::ICON_BOUNDS, LOGSEVERITY_INFO_SUCCESS, LOG_CATEGORY_ECS, "Collision system initialized.");
 			return true;
 		}
@@ -62,53 +65,56 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		void CollisionSystem::UpdateComponentsRealtime(float a_fDeltatime)
+		void CollisionSystem::UpdateComponentsRealtime(float a_fDeltatime, UpdateTime a_UpdateTime)
 		{
-			ECSBaseSystem::UpdateComponentsRealtime(a_fDeltatime);
-
-			std::map<CollisionInfo, CollisionType> tempMap;
-
-			// Remove all events that exited.
-			for (auto it = m_mCollision.begin(); it != m_mCollision.end(); )
+			ECSBaseSystem::UpdateComponentsRealtime(a_fDeltatime, a_UpdateTime);
+			
+			if (a_UpdateTime == UpdateTime::UPDATE_TIME_END)
 			{
-				if (it->second == CollisionType::COLLISION_TYPE_EXIT)
+				std::map<CollisionInfo, CollisionType> tempMap;
+
+				// Remove all events that exited.
+				for (auto it = m_mCollision.begin(); it != m_mCollision.end(); )
 				{
-					it = m_mCollision.erase(it); // erase returns next iterator
+					if (it->second == CollisionType::COLLISION_TYPE_EXIT)
+					{
+						it = m_mCollision.erase(it); // erase returns next iterator
+					}
+					else
+					{
+						++it;
+					}
 				}
-				else
+
+				for (auto& newCollision : m_mNewCollision)
 				{
-					++it;
+					CollisionType collisionType;
+
+					// If it is already in the map, it means it already started.
+					if (m_mCollision.contains(newCollision))
+					{
+						collisionType = CollisionType::COLLISION_TYPE_STAY;
+					}
+					// If it was not present, set it to start.
+					else
+					{
+						collisionType = CollisionType::COLLISION_TYPE_START;
+					}
+					tempMap.insert(std::make_pair(newCollision, collisionType));
 				}
+
+				// Set all the ones that previously had collision to exit.
+				for (auto& prePair : m_mCollision)
+				{
+					if (!m_mNewCollision.contains(prePair.first))
+					{
+						tempMap.insert(std::make_pair(prePair.first, CollisionType::COLLISION_TYPE_EXIT));
+					}
+				}
+
+				m_mCollision = std::move(tempMap);
+				m_mNewCollision.clear();
 			}
-
-			for (auto& newCollision : m_mNewCollision)
-			{
-				CollisionType collisionType;
-
-				// If it is already in the map, it means it already started.
-				if (m_mCollision.contains(newCollision))
-				{
-					collisionType = CollisionType::COLLISION_TYPE_STAY;
-				}
-				// If it was not present, set it to start.
-				else
-				{
-					collisionType = CollisionType::COLLISION_TYPE_START;
-				}
-				tempMap.insert(std::make_pair(newCollision, collisionType));
-			}
-
-			// Set all the ones that previously had collision to exit.
-			for (auto& prePair : m_mCollision)
-			{
-				if (!m_mNewCollision.contains(prePair.first))
-				{
-					tempMap.insert(std::make_pair(prePair.first, CollisionType::COLLISION_TYPE_EXIT));
-				}
-			}
-
-			m_mCollision = std::move(tempMap);
-			m_mNewCollision.clear();
 		}
 	}
 }

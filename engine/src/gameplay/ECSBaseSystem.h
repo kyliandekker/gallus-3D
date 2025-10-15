@@ -10,22 +10,17 @@
 
 // core includes
 #include "core/Engine.h"
+#include "core/FlagEnum.h"
 
 // gameplay includes
 #include "gameplay/EntityID.h"
 #include "gameplay/systems/components/Component.h"
+#include "gameplay/systems/UpdateTime.h"
 
 namespace gallus
 {
 	namespace gameplay
 	{
-		enum class UpdateTime
-		{
-			UPDATE_TIME_FRAME,
-			UPDATE_TIME_END_FRAME,
-			UPDATE_TIME_POST_FRAME
-		};
-
 		//---------------------------------------------------------------------
 		// AbstractECSSystem
 		//---------------------------------------------------------------------
@@ -66,7 +61,8 @@ namespace gallus
 			/// <summary>
 			/// Updates the system's components.
 			/// </summary>
-			virtual void UpdateComponentsRealtime(float a_fDeltaTime) = 0;
+			// <param name="a_fDeltaTime">The time it took since last frame.</param>
+			virtual void UpdateComponentsRealtime(float a_fDeltaTime, UpdateTime a_UpdateTime) = 0;
 
 			/// <summary>
 			/// Inits the system's components.
@@ -93,16 +89,12 @@ namespace gallus
 			/// <param name="a_ID"></param>
 			virtual Component* CreateBaseComponent(const EntityID& a_ID) = 0;
 
-			/// <summary>
-			/// Retrieves the update time (when the system is updated).
-			/// </summary>
-			/// <returns>Enum representing the update time.</returns>
-			UpdateTime GetUpdateTime() const
+			const core::FlagEnum<UpdateTime>& GetUpdateTimes() const
 			{
-				return m_UpdateTime;
+				return m_aUpdateTimes;
 			}
 		protected:
-			UpdateTime m_UpdateTime = UpdateTime::UPDATE_TIME_FRAME;
+			core::FlagEnum<UpdateTime> m_aUpdateTimes;
 		};
 
 		//---------------------------------------------------------------------
@@ -243,11 +235,12 @@ namespace gallus
 			/// <summary>
 			/// Updates the system's components.
 			/// </summary>
-			virtual void UpdateComponentsRealtime(float a_fDeltaTime) override
+			// <param name="a_fDeltaTime">The time it took since last frame.</param>
+			virtual void UpdateComponentsRealtime(float a_fDeltaTime, UpdateTime a_UpdateTime) override
 			{
 				for (auto& component : m_mComponents)
 				{
-					component.second.UpdateRealtime(a_fDeltaTime);
+					component.second.UpdateRealtimeInner(a_fDeltaTime, a_UpdateTime);
 				}
 			}
 

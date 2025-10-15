@@ -118,6 +118,11 @@ namespace gallus
 				/// <returns>True if loading was successful, false otherwise.</returns>
 				bool LoadByName(const std::string& a_sName);
 
+				/// <summary>
+				/// Sets the mesh data.
+				/// </summary>
+				/// <param name="a_aData">The mesh part data.</param>
+				/// <param name="a_pCommandQueue">The command queue used for uploading.</param>
 				void SetMeshData(const MeshPartData& a_aData, const std::shared_ptr<CommandQueue> a_pCommandQueue);
 			private:
 				std::vector<MeshPartData> m_aMeshData;

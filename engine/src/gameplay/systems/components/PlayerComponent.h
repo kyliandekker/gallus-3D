@@ -23,6 +23,10 @@ namespace gallus
 			/// <param name="a_Allocator">The allocator used by the json document.</param>
 			void Serialize(rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator) const override;
 
+			/// <summary>
+			/// Creates an instance based on source data.
+			/// </summary>
+			/// <param name="a_SrcData">The source data.</param>
 			void Deserialize(const resources::SrcData& a_SrcData) override;
 
 			/// <summary>
@@ -44,23 +48,31 @@ namespace gallus
 			}
 
 			/// <summary>
+			/// Retrieves the bullet prefab.
+			/// </summary>
+			/// <returns>Prefab containing the bullet.</returns>
+			gameplay::Prefab& GetBulletPrefab()
+			{
+				return m_pBulletPrefab;
+			}
+
+			/// <summary>
+			/// Retrieves the bullet prefab.
+			/// </summary>
+			/// <returns>Prefab containing the bullet.</returns>
+			const gameplay::Prefab& GetBulletPrefab() const
+			{
+				return m_pBulletPrefab;
+			}
+		protected:
+			/// <summary>
 			/// Updates the components.
 			/// </summary>
 			/// <param name="a_fDeltaTime">Delta time.</param>
-			void UpdateRealtime(float a_fDeltaTime);
+			void UpdateRealtime(float a_fDeltaTime, UpdateTime a_UpdateTime);
 
-			gameplay::Prefab& GetPrefab()
-			{
-				return m_pPrefab;
-			}
-
-			const gameplay::Prefab& GetPrefab() const
-			{
-				return m_pPrefab;
-			}
-		protected:
 			float m_fSpeed = 200;
-			gameplay::Prefab m_pPrefab;
+			gameplay::Prefab m_pBulletPrefab;
 		};
 	}
 }

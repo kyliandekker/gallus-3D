@@ -32,8 +32,6 @@ namespace gallus
 			/// </summary>
 			/// <returns>A string containing the name of the system.</returns>
 			std::string GetSystemName() const override;
-			
-			void UpdateComponentsRealtime(float a_fDeltatime) override;
 		};
 	}
 }

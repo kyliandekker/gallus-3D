@@ -23,6 +23,10 @@ namespace gallus
 			/// <param name="a_Allocator">The allocator used by the json document.</param>
 			void Serialize(rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator) const override;
 
+			/// <summary>
+			/// Deerializes sourcce data and creates an instance based on it.
+			/// </summary>
+			/// <param name="a_SrcData">The src data used for the component.</param>
 			void Deserialize(const resources::SrcData& a_SrcData) override;
 
 			/// <summary>
@@ -59,6 +63,12 @@ namespace gallus
 			void IgnoreEntity(const gameplay::EntityID& a_EntityID);
 			bool IsPointInside(const DirectX::XMFLOAT2& a_vPoint, const DirectX::XMFLOAT2& a_vPos, const DirectX::XMFLOAT2& a_vScale, const DirectX::XMFLOAT2& a_vPivot, float a_fRotation);
 		protected:
+			/// <summary>
+			/// Updates the system's component.
+			/// </summary>
+			// <param name="a_fDeltaTime">The time it took since last frame.</param>
+			void UpdateRealtime(float a_fDeltatime, UpdateTime a_UpdateTime) override;
+
 			DirectX::XMFLOAT2 m_vOffset = { 0, 0 };
 			DirectX::XMFLOAT2 m_vSize = { 1, 1 };
 

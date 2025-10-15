@@ -74,6 +74,10 @@ namespace gallus
 				/// <returns>The projection matrix used for rendering.</returns>
 				const DirectX::XMMATRIX& GetProjectionMatrix() const;
 
+				/// <summary>
+				/// Returns the size of the camera.
+				/// </summary>
+				/// <returns>Vector representing the size of the camera.</returns>
 				const DirectX::XMINT2& GetSize() const
 				{
 					return m_vSize;

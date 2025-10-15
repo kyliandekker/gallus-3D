@@ -13,6 +13,9 @@ namespace gallus
 		class TextureMetaData : public MetaData
 		{
 		public:
+			/// <summary>
+			/// Constructs meta data for a texture.
+			/// </summary>
 			TextureMetaData();
 
 			/// <summary>
@@ -27,6 +30,10 @@ namespace gallus
 			/// <param name="a_TextureType">The texture type it will be set to.</param>
 			void SetTextureType(graphics::dx12::TextureType a_TextureType);
 
+			/// <summary>
+			/// Retrieves the sprite rects stored in the file's meta data.
+			/// </summary>
+			/// <returns>The sprite rects stored in this file's meta data.</returns>
 			std::vector<graphics::dx12::SpriteRect>& GetSprites()
 			{
 				return m_aSprites;

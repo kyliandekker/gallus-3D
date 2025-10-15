@@ -219,40 +219,6 @@ namespace gallus
 				return m_System.GetSystemName();
 			}
 
-			void SpriteComponentUIView::RenderComponentGizmos(const ImVec2& a_vScenePos, const ImVec2& a_vSize, const ImVec2& a_vPanOffset, float a_fZoom)
-			{
-				if (!core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetDrawBounds())
-				{
-					return;
-				}
-
-				ImDrawList* drawList = ImGui::GetWindowDrawList();
-				ImVec2 mouseScreen = ImGui::GetMousePos();
-
-				std::lock_guard<std::recursive_mutex> lock(core::EDITOR_ENGINE->GetECS().m_EntityMutex);
-
-				if (!core::EDITOR_ENGINE->GetECS().GetSystem<gameplay::TransformSystem>().HasComponent(m_Component.GetEntityID()))
-				{
-					return;
-				}
-
-				auto& transform = core::EDITOR_ENGINE->GetECS().GetSystem<gameplay::TransformSystem>().GetComponent(m_Component.GetEntityID());
-
-				std::array<DirectX::XMFLOAT2, 4> worldCorners =
-					transform.Transform().GetWorldCorners();
-
-				ImVec2 corners[4];
-				for (int i = 0; i < 4; ++i)
-				{
-					corners[i] = a_vScenePos + a_vPanOffset +
-						ImVec2(worldCorners[i].x * a_fZoom,
-							worldCorners[i].y * a_fZoom);
-				}
-
-				// Draw bounding box polyline
-				drawList->AddPolyline(corners, 4, IM_COL32(255, 255, 255, 155), true, 2.0f);
-			}
-
 			void SpriteComponentUIView::RenderPreview()
 			{
 				if (!m_Component.GetTexture() || !m_Component.GetTexture()->CanBeDrawn())

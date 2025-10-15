@@ -112,15 +112,6 @@ namespace gallus
                     ImGui::PopStyleVar();
                 }
 
-                bool drawBounds = core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetDrawBounds();
-                if (ImGui::CheckboxButton(
-                    ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_BOUNDS), BUTTON_ID, "DRAW_BOUNDS_SCENE").c_str(), &drawBounds, m_Window.GetHeaderSize()))
-                {
-                    core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetDrawBounds(drawBounds);
-                    core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
-                }
-
-                ImGui::SameLine();
                 bool inGameMode = core::EDITOR_ENGINE->GetEditor().GetCameraMode() == editor::CameraMode::CAMERA_MODE_GAME;
                 if (ImGui::CheckboxButton(
                     ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_GAMEMODE), BUTTON_ID, "CAMERA_MODE_GAME").c_str(), &inGameMode, m_Window.GetHeaderSize()))

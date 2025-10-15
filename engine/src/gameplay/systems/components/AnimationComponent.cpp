@@ -28,10 +28,5 @@ namespace gallus
 		void AnimationComponent::Deserialize(const resources::SrcData& a_SrcData)
 		{
 		}
-
-		//---------------------------------------------------------------------
-		void AnimationComponent::UpdateRealtime(float a_fDeltaTime)
-		{
-		}
 	}
 }

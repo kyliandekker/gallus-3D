@@ -162,6 +162,10 @@ namespace gallus
 			/// <returns>A string containing the message without any category, location and severity information.</returns>
 			const std::string& GetRawMessage() const;
 
+			/// <summary>
+			/// Retrieves the icon.
+			/// </summary>
+			/// <returns>A string containing the icon.</returns>
 			const std::string& GetIcon() const;
 
 			/// <summary>
@@ -260,11 +264,19 @@ namespace gallus
 			/// <returns>Reference to the on quit event.</returns>
 			const SimpleEvent<LoggerMessage>& OnMessageLogged() const;
 
+			/// <summary>
+			/// Retrieves the logging state.
+			/// </summary>
+			/// <returns>True if logging to file is enabled, false otherwise.</returns>
 			bool LogToFile() const
 			{
 				return m_bLogToFile;
 			}
 
+			/// <summary>
+			/// Retrieves the assert level.
+			/// </summary>
+			/// <returns>The level at which the logger will throw asserts.</returns>
 			LogSeverity GetAssertLevel() const
 			{
 				return m_AssertLevel;

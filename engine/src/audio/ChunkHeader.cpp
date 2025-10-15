@@ -20,22 +20,22 @@ namespace gallus
 			memcpy(m_aChunkSize, a_DataBuffer->m_aChunkSize, sizeof(uint32_t));
 		}
 
-		uint32_t ChunkHeader::ChunkSize(bool isBigEndian) const
+		uint32_t ChunkHeader::ChunkSize(bool a_bIsBigEndian) const
 		{
 			uint32_t size32 = 0;
 			memcpy(&size32, &m_aChunkSize, sizeof(uint32_t));
-			if (isBigEndian)
+			if (a_bIsBigEndian)
 			{
 				size32 = utils::reverseBytesC<uint32_t>(reinterpret_cast<unsigned char*>(&size32));
 			}
 			return size32;
 		}
 
-		void ChunkHeader::SetChunkSize(uint32_t chunk_size, bool toBigEndian)
+		void ChunkHeader::SetChunkSize(uint32_t a_iChunkSize, bool a_bIsBigEndian)
 		{
-			uint32_t size32 = chunk_size;
+			uint32_t size32 = a_iChunkSize;
 			memcpy(this->m_aChunkSize, reinterpret_cast<char*>(&size32), sizeof(uint32_t));
-			if (toBigEndian)
+			if (a_bIsBigEndian)
 			{
 				utils::reverseBytes(reinterpret_cast<unsigned char*>(&m_aChunkSize), sizeof(uint32_t));
 			}

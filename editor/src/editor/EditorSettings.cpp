@@ -57,7 +57,6 @@ namespace gallus
                     GetFloat(a_Document[JSON_EDITOR_SETTINGS_SCENE_VAR][JSON_EDITOR_SETTINGS_SCENE_PAN_OFFSET], JSON_EDITOR_SETTINGS_SCENE_PAN_OFFSET_Y, m_vScenePanOffset.y);
                 }
                 GetInt(a_Document[JSON_EDITOR_SETTINGS_SCENE_VAR], JSON_EDITOR_SETTINGS_SCENE_LAST_OPERATION, m_iLastSceneOperation);
-                GetBool(a_Document[JSON_EDITOR_SETTINGS_SCENE_VAR], JSON_EDITOR_SETTINGS_SCENE_DRAW_BOUNDS, m_bDrawBounds);
             }
 
             return true;
@@ -88,7 +87,6 @@ namespace gallus
             scenePanOffsetDoc.AddMember(JSON_EDITOR_SETTINGS_SCENE_PAN_OFFSET_Y, m_vScenePanOffset.y, a_Allocator);
             sceneDoc.AddMember(JSON_EDITOR_SETTINGS_SCENE_PAN_OFFSET, scenePanOffsetDoc, a_Allocator);
             sceneDoc.AddMember(JSON_EDITOR_SETTINGS_SCENE_LAST_OPERATION, m_iLastSceneOperation, a_Allocator);
-            sceneDoc.AddMember(JSON_EDITOR_SETTINGS_SCENE_DRAW_BOUNDS, m_bDrawBounds, a_Allocator);
             a_Document.AddMember(JSON_EDITOR_SETTINGS_SCENE_VAR, sceneDoc, a_Allocator);
 
             return true;
@@ -236,18 +234,6 @@ namespace gallus
         int EditorSettings::GetLastSceneOperation() const
         {
             return m_iLastSceneOperation;
-        }
-
-        //---------------------------------------------------------------------
-        void EditorSettings::SetDrawBounds(bool a_bDrawBounds)
-        {
-            m_bDrawBounds = a_bDrawBounds;
-        }
-
-        //---------------------------------------------------------------------
-        bool EditorSettings::GetDrawBounds() const
-        {
-            return m_bDrawBounds;
         }
     }
 }

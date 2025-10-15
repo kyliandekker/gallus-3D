@@ -26,46 +26,46 @@ namespace gallus
 		{
 			double FPSCounter::GetFPS() const
 			{
-				return m_FPS;
+				return m_fFPS;
 			}
 
 			double FPSCounter::GetDeltaTime() const
 			{
-				return m_DeltaTime;
+				return m_fDeltaTime;
 			}
 
 			double FPSCounter::GetTotalTime() const
 			{
-				return m_TotalTime;
+				return m_fTotalTime;
 			}
 
 			void FPSCounter::Update()
 			{
-				m_FrameCounter++;
+				m_iFrameCounter++;
 
 				auto t1 = m_Clock.now();
 				std::chrono::duration<double> deltaTime = t1 - m_T0;
 				m_T0 = t1;
 
-				m_DeltaTime = deltaTime.count(); // Convert duration to seconds
+				m_fDeltaTime = deltaTime.count(); // Convert duration to seconds
 
-				m_ElapsedSeconds += m_DeltaTime;
-				m_TotalTime += m_DeltaTime;
+				m_fElapsedSeconds += m_fDeltaTime;
+				m_fTotalTime += m_fDeltaTime;
 
-				if (m_ElapsedSeconds > 1.0)
+				if (m_fElapsedSeconds > 1.0)
 				{
-					m_FPS = m_FrameCounter / m_ElapsedSeconds;
-					m_FrameCounter = 0;
-					m_ElapsedSeconds = 0.0;
+					m_fFPS = m_iFrameCounter / m_fElapsedSeconds;
+					m_iFrameCounter = 0;
+					m_fElapsedSeconds = 0.0;
 				}
 			}
 
 			void FPSCounter::Initialize()
 			{
-				m_FPS = 0.0;
-				m_FrameCounter = 0;
-				m_ElapsedSeconds = 0.0;
-				m_TotalTime = 0.0;
+				m_fFPS = 0.0;
+				m_iFrameCounter = 0;
+				m_fElapsedSeconds = 0.0;
+				m_fTotalTime = 0.0;
 				m_T0 = m_Clock.now();
 			}
 

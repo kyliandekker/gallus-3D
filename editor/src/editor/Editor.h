@@ -163,6 +163,10 @@ namespace gallus
 				m_EditorMethod = a_EditorMethod;
 			}
 
+			/// <summary>
+			/// Retrieves the editor camera.
+			/// </summary>
+			/// <returns>Returns a reference to the camera.</returns>
 			graphics::dx12::Camera& GetEditorCamera()
 			{
 				return m_EditorCamera;

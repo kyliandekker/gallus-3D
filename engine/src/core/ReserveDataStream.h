@@ -18,6 +18,9 @@ namespace gallus
 		class ReserveDataStream : public DataStream
 		{
 		public:
+			/// <summary>
+			/// Constructs a Data object.
+			/// </summary>
 			ReserveDataStream() = default;
 
 			/// <summary>

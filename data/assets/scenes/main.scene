@@ -23,8 +23,8 @@
                 },
                 "transform": {
                     "position": {
-                        "x": 190.72998046875,
-                        "y": -409.3350524902344
+                        "x": 200.0,
+                        "y": -400.0
                     },
                     "rotation": 0.0,
                     "scale": {
@@ -93,7 +93,7 @@
                 },
                 "player": {
                     "movementSpeed": 900.0,
-                    "prefab": "bullet.prefab"
+                    "bulletPrefab": "bullet.prefab"
                 },
                 "health": {
                     "health": 100.0,

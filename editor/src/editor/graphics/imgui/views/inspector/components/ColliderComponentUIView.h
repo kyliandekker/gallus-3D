@@ -36,6 +36,13 @@ namespace gallus
 					m_SizeView(a_Window)
 				{}
 
+				/// <summary>
+				/// Renders component-specific gizmos.
+				/// </summary>
+				/// <param name="a_vScenePos">The view port starting position.</param>
+				/// <param name="a_vSize">The size of the view port rect.</param>
+				/// <param name="a_vPanOffset">The panning of the scene view port.</param>
+				/// <param name="a_fZoom">The zoom of the scene view port.</param>
 				void RenderComponentGizmos(const ImVec2& a_vScenePos, const ImVec2& a_vSize, const ImVec2& a_vPanOffset, float a_fZoom) override;
 			private:
 				/// <summary>

@@ -18,7 +18,8 @@ namespace gallus
 		//---------------------------------------------------------------------
 		bool MovementSystem::Initialize()
 		{
-			m_UpdateTime = UpdateTime::UPDATE_TIME_END_FRAME;
+			m_aUpdateTimes.AddFlag(UpdateTime::UPDATE_TIME_FRAME);
+			m_aUpdateTimes.AddFlag(UpdateTime::UPDATE_TIME_POST_FRAME);
 
 			LOG_ICON(font::ICON_TRANSLATE, LOGSEVERITY_INFO_SUCCESS, LOG_CATEGORY_ECS, "Movement system initialized.");
 			return true;
@@ -38,15 +39,6 @@ namespace gallus
 			name = std::string(font::ICON_TRANSLATE) + " " + name;
 		#endif // _EDITOR
 			return name;
-		}
-
-		//---------------------------------------------------------------------
-		void MovementSystem::UpdateComponentsRealtime(float a_fDeltatime)
-		{
-			for (auto& component : m_mComponents)
-			{
-				component.second.UpdateRealtime(a_fDeltatime, core::ENGINE->GetECS().GetSystem<CollisionSystem>().GetComponents());
-			}
 		}
 	}
 }

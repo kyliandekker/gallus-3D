@@ -4,6 +4,7 @@
 #include <string>
 
 #include "gameplay/EntityID.h"
+#include "gameplay/systems/UpdateTime.h"
 
 namespace gallus
 {
@@ -19,6 +20,9 @@ namespace gallus
 		class Component
 		{
 		public:
+			/// <summary>
+			/// Deconstructs the component.
+			/// </summary>
 			virtual ~Component() = default;
 
 			/// <summary>
@@ -70,14 +74,24 @@ namespace gallus
 			/// Updates the components.
 			/// </summary>
 			/// <param name="a_fDeltaTime">Delta time.</param>
-			virtual void UpdateRealtime(float a_fDeltaTime)
-			{}
+			void UpdateRealtimeInner(float a_fDeltaTime, UpdateTime a_UpdateTime);
 
+			/// <summary>
+			/// Retrieves the Entity ID.
+			/// </summary>
+			/// <returns>A reference to the Entity ID.</returns>
 			const gameplay::EntityID& GetEntityID() const
 			{
 				return m_EntityID;
 			}
 		protected:
+			/// <summary>
+			/// Updates the components.
+			/// </summary>
+			/// <param name="a_fDeltaTime">Delta time.</param>
+			virtual void UpdateRealtime(float a_fDeltaTime, UpdateTime a_UpdateTime)
+			{}
+
 			gameplay::EntityID m_EntityID;
 			bool m_bIsDestroyed = false;
 		};

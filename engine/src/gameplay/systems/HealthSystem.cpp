@@ -15,7 +15,7 @@ namespace gallus
 		//---------------------------------------------------------------------
 		bool HealthSystem::Initialize()
 		{
-			m_UpdateTime = UpdateTime::UPDATE_TIME_POST_FRAME;
+			m_aUpdateTimes.AddFlag(UpdateTime::UPDATE_TIME_POST_FRAME);
 
 			LOG_ICON(font::ICON_HEART, LOGSEVERITY_INFO_SUCCESS, LOG_CATEGORY_ECS, "Health system initialized.");
 			return true;

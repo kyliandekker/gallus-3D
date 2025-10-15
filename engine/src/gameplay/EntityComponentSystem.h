@@ -161,11 +161,19 @@ namespace gallus
 
 			mutable std::recursive_mutex m_EntityMutex;
 
+			/// <summary>
+			/// Retrieves the event that gets called after any entity has been updated.
+			/// </summary>
+			/// <returns>A const reference to the event.</returns>
 			const SimpleEvent<>& OnEntitiesUpdated() const
 			{
 				return m_eOnEntitiesUpdated;
 			}
 
+			/// <summary>
+			/// Retrieves the event that gets called after any entity component has been updated.
+			/// </summary>
+			/// <returns>A const reference to the event.</returns>
 			const SimpleEvent<>& OnEntityComponentsUpdated() const
 			{
 				return m_eOnEntityComponentsUpdated;

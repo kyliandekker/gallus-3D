@@ -30,6 +30,9 @@ namespace gallus
 		class Engine : public System
 		{
 		public:
+			/// <summary>
+			/// Constructs the engine.
+			/// </summary>
 			Engine() = default;
 
 			/// <summary>

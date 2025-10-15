@@ -45,21 +45,37 @@ namespace gallus
 				return m_Scene;
 			}
 
+			/// <summary>
+			/// Retrieves the starting state.
+			/// </summary>
+			/// <returns>True if the game has started, false otherwise.</returns>
 			bool IsStarted() const
 			{
 				return m_bStarted;
 			}
 
+			/// <summary>
+			/// Sets the starting state.
+			/// </summary>
+			/// <param name="a_bStarted">True if the game should be started, false otherwise.</param>
 			void SetIsStarted(bool a_bStarted)
 			{
 				m_bStarted = a_bStarted;
 			}
 
+			/// <summary>
+			/// Retrieves the pause state.
+			/// </summary>
+			/// <returns>True if the game is paused, false otherwise.</returns>
 			bool IsPaused() const
 			{
 				return m_bPaused;
 			}
 
+			/// <summary>
+			/// Sets the pause state.
+			/// </summary>
+			/// <param name="a_bStarted">True if the game should be paused, false otherwise.</param>
 			void SetIsPaused(bool a_bPaused)
 			{
 				m_bPaused = a_bPaused;

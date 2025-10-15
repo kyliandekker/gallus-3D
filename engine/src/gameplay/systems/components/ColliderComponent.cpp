@@ -4,6 +4,13 @@
 
 #include "resources/SrcData.h"
 
+#include "core/Engine.h"
+
+#include "gameplay/Entity.h"
+#include "gameplay/systems/MovementSystem.h"
+#include "gameplay/systems/TransformSystem.h"
+#include "gameplay/systems/CollisionSystem.h"
+
 #define JSON_COLLIDER_COMPONENT_OFFSET_VAR "offset"
 #define JSON_COLLIDER_COMPONENT_SIZE_VAR "size"
 #define JSON_COLLIDER_COMPONENT_X_VAR "x"
@@ -63,6 +70,161 @@ namespace gallus
 		const DirectX::XMFLOAT2& ColliderComponent::GetSize() const
 		{
 			return m_vSize;
+		}
+
+		//---------------------------------------------------------------------
+		void ColliderComponent::UpdateRealtime(float a_fDeltatime, UpdateTime a_UpdateTime)
+		{
+			if (a_UpdateTime == UpdateTime::UPDATE_TIME_END_FRAME)
+			{
+				MovementSystem& movementSys = core::ENGINE->GetECS().GetSystem<MovementSystem>();
+				TransformSystem& transformSys = core::ENGINE->GetECS().GetSystem<TransformSystem>();
+				CollisionSystem& colliderSys = core::ENGINE->GetECS().GetSystem<CollisionSystem>();
+
+				// both components must exist
+				if (!movementSys.HasComponent(m_EntityID) || !transformSys.HasComponent(m_EntityID))
+				{
+					return;
+				}
+
+				MovementComponent& movementComp = movementSys.GetComponent(m_EntityID);
+				TransformComponent& transformComp = transformSys.GetComponent(m_EntityID);
+
+				DirectX::XMFLOAT2 position = transformComp.Transform().GetPosition();
+				DirectX::XMFLOAT2 scale = transformComp.Transform().GetScale();
+				DirectX::XMFLOAT2 pivot = transformComp.Transform().GetPivot();
+				float rotation = transformComp.Transform().GetRotation();
+
+				DirectX::XMFLOAT2 move = movementComp.GetTranslation();
+
+				float allowedMoveX = move.x;
+				float allowedMoveY = move.y;
+
+				auto& colliders = colliderSys.GetComponents();
+
+				// Build player's AABB
+				auto playerCorners = GetColliderWorldCorners(position, scale, pivot, rotation);
+				float minX = playerCorners[0].x;
+				float maxX = playerCorners[0].x;
+				float minY = playerCorners[0].y;
+				float maxY = playerCorners[0].y;
+
+				for (int i = 1; i < 4; ++i)
+				{
+					if (playerCorners[i].x < minX) { minX = playerCorners[i].x; }
+					if (playerCorners[i].x > maxX) { maxX = playerCorners[i].x; }
+					if (playerCorners[i].y < minY) { minY = playerCorners[i].y; }
+					if (playerCorners[i].y > maxY) { maxY = playerCorners[i].y; }
+				}
+
+				for (auto& m_ColliderPair : colliders)
+				{
+					if (m_ColliderPair.first == m_EntityID)
+					{
+						continue;
+					}
+
+					if (!transformSys.HasComponent(m_ColliderPair.first))
+					{
+						continue;
+					}
+
+					ColliderComponent& otherCollider = m_ColliderPair.second;
+					TransformComponent& otherTransform = transformSys.GetComponent(m_ColliderPair.first);
+
+					DirectX::XMFLOAT2 otherPosition = otherTransform.Transform().GetPosition();
+					DirectX::XMFLOAT2 otherScale = otherTransform.Transform().GetScale();
+					DirectX::XMFLOAT2 otherPivot = otherTransform.Transform().GetPivot();
+					float otherRotation = otherTransform.Transform().GetRotation();
+
+					auto otherCorners = otherCollider.GetColliderWorldCorners(otherPosition, otherScale, otherPivot, otherRotation);
+					float otherMinX = otherCorners[0].x;
+					float otherMaxX = otherCorners[0].x;
+					float otherMinY = otherCorners[0].y;
+					float otherMaxY = otherCorners[0].y;
+
+					for (int i = 1; i < 4; ++i)
+					{
+						if (otherCorners[i].x < otherMinX) { otherMinX = otherCorners[i].x; }
+						if (otherCorners[i].x > otherMaxX) { otherMaxX = otherCorners[i].x; }
+						if (otherCorners[i].y < otherMinY) { otherMinY = otherCorners[i].y; }
+						if (otherCorners[i].y > otherMaxY) { otherMaxY = otherCorners[i].y; }
+					}
+
+					//---------------------------------------------------------------------
+					// X-axis collision
+					if (move.x > 0.0f)
+					{
+						float dist = otherMinX - maxX;
+						if (dist >= 0.0f && dist < allowedMoveX)
+						{
+							if (maxY > otherMinY && minY < otherMaxY)
+							{
+								allowedMoveX = dist;
+								colliderSys.Collide(*this, otherCollider);
+							}
+						}
+					}
+					else if (move.x < 0.0f)
+					{
+						float dist = otherMaxX - minX;
+						if (dist <= 0.0f && dist > allowedMoveX)
+						{
+							if (maxY > otherMinY && minY < otherMaxY)
+							{
+								allowedMoveX = dist;
+								colliderSys.Collide(*this, otherCollider);
+							}
+						}
+					}
+
+					//---------------------------------------------------------------------
+					// Y-axis collision
+					if (move.y > 0.0f)
+					{
+						float dist = otherMinY - maxY;
+						if (dist >= 0.0f && dist < allowedMoveY)
+						{
+							if (maxX > otherMinX && minX < otherMaxX)
+							{
+								allowedMoveY = dist;
+								colliderSys.Collide(*this, otherCollider);
+							}
+						}
+					}
+					else if (move.y < 0.0f)
+					{
+						float dist = otherMaxY - minY;
+						if (dist <= 0.0f && dist > allowedMoveY)
+						{
+							if (maxX > otherMinX && minX < otherMaxX)
+							{
+								allowedMoveY = dist;
+								colliderSys.Collide(*this, otherCollider);
+							}
+						}
+					}
+				}
+
+				//---------------------------------------------------------------------
+				// Update movement component translation (do not modify position)
+				const float epsilon = 0.001f;
+
+				float finalMoveX = allowedMoveX;
+				float finalMoveY = allowedMoveY;
+
+				if (finalMoveX != 0.0f)
+				{
+					finalMoveX -= std::copysign(epsilon, finalMoveX);
+				}
+
+				if (finalMoveY != 0.0f)
+				{
+					finalMoveY -= std::copysign(epsilon, finalMoveY);
+				}
+
+				movementComp.SetTranslation({ finalMoveX, finalMoveY });
+			}
 		}
 
 		//---------------------------------------------------------------------

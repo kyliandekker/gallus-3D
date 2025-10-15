@@ -24,6 +24,10 @@ namespace gallus
 			/// <param name="a_Allocator">The allocator used by the json document.</param>
 			void Serialize(rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator) const override;
 
+			/// <summary>
+			/// Creates an instance based on source data.
+			/// </summary>
+			/// <param name="a_SrcData">The source data.</param>
 			void Deserialize(const resources::SrcData& a_SrcData) override;
 
 			/// <summary>
@@ -61,13 +65,13 @@ namespace gallus
 			{
 				m_fMaxHealth = a_fMaxHealth;
 			}
-
+		protected:
 			/// <summary>
 			/// Updates the components.
 			/// </summary>
 			/// <param name="a_fDeltaTime">Delta time.</param>
-			void UpdateRealtime(float a_fDeltaTime) override;
-		protected:
+			void UpdateRealtime(float a_fDeltaTime, UpdateTime a_UpdateTime) override;
+
 			float m_fHealth = 100;
 			float m_fMaxHealth = 100;
 		};

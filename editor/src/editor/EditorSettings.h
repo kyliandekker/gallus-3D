@@ -164,18 +164,6 @@ namespace gallus
 			/// </summary>
 			/// <returns>Integer representing the scene operation index.</returns>
 			int GetLastSceneOperation() const;
-
-			/// <summary>
-			/// Sets whether bounds should be drawn.
-			/// </summary>
-			/// <param name="a_bDrawBounds">True if bounds should be shown, false otherwise.</param>
-			void SetDrawBounds(bool a_bDrawBounds);
-
-			/// <summary>
-			/// Returns whether bounds should be drawn.
-			/// </summary>
-			/// <returns>True if bounds should be drawn, otherwise false.</returns>
-			bool GetDrawBounds() const;
 		private:
 			/// <summary>
 			/// Virtual method for loading specific vars.
@@ -199,7 +187,6 @@ namespace gallus
 			bool m_bShowInfoSuccess = true; /// Check for combined info-success messages.
 			bool m_bShowAwesome = true; /// Check for "awesome" log messages.
 
-			bool m_bDrawBounds = true; /// Check for drawing bounds in the scene view.
 			float m_fSceneZoom = 1.0f;
 			glm::vec2 m_vScenePanOffset = glm::vec2(0.0f, 0.0f);
 			int m_iLastSceneOperation = 7;

@@ -17,6 +17,9 @@ namespace gallus
 		class Data
 		{
 		public:
+			/// <summary>
+			/// Constructs a data object.
+			/// </summary>
 			Data() = default;
 
 			/// <summary>

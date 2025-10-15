@@ -17,7 +17,7 @@ namespace gallus
 			{
 			public:
 				/// <summary>
-				/// Constructs an <see cref="FileResourceUIView"/> for a given window.
+				/// Constructs a ui view for a given window.
 				/// </summary>
 				/// <param name="a_Window">The ImGui window for rendering the view.</param>
 				ImGuiUIView(ImGuiWindow& a_Window) : m_Window(a_Window)

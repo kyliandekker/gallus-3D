@@ -76,35 +76,20 @@ namespace gallus
 			{
 				for (auto& sys : m_aSystems)
 				{
-					if (sys->GetUpdateTime() == UpdateTime::UPDATE_TIME_FRAME)
+					if (a_bUpdateRealtime && previousUpdateRealtimeState != a_bUpdateRealtime)
 					{
-						if (a_bUpdateRealtime && previousUpdateRealtimeState != a_bUpdateRealtime)
-						{
-							sys->InitComponentsRealtime();
-						}
-						sys->UpdateComponentsRealtime(a_fDeltaTime);
+						sys->InitComponentsRealtime();
 					}
 				}
-				for (auto& sys : m_aSystems)
+				for (uint32_t i = 1; i <= static_cast<uint32_t>(UpdateTime::UPDATE_TIME_END); i <<= 1)
 				{
-					if (sys->GetUpdateTime() == UpdateTime::UPDATE_TIME_END_FRAME)
+					UpdateTime updateTime = (UpdateTime)i;
+					for (auto& sys : m_aSystems)
 					{
-						if (a_bUpdateRealtime && previousUpdateRealtimeState != a_bUpdateRealtime)
+						if (sys->GetUpdateTimes().HasFlag(updateTime))
 						{
-							sys->InitComponentsRealtime();
+							sys->UpdateComponentsRealtime(a_fDeltaTime, updateTime);
 						}
-						sys->UpdateComponentsRealtime(a_fDeltaTime);
-					}
-				}
-				for (auto& sys : m_aSystems)
-				{
-					if (sys->GetUpdateTime() == UpdateTime::UPDATE_TIME_POST_FRAME)
-					{
-						if (a_bUpdateRealtime && previousUpdateRealtimeState != a_bUpdateRealtime)
-						{
-							sys->InitComponentsRealtime();
-						}
-						sys->UpdateComponentsRealtime(a_fDeltaTime);
 					}
 				}
 			}
