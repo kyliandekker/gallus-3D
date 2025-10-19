@@ -54,14 +54,10 @@ namespace gallus
 			const DirectX::XMFLOAT2& GetSize() const;
 
 			std::array<DirectX::XMFLOAT2, 4> GetColliderWorldCorners(const DirectX::XMFLOAT2& a_vPos, const DirectX::XMFLOAT2& a_vScale, const DirectX::XMFLOAT2& a_vPivot, float a_fRotation);
-			std::array<DirectX::XMFLOAT2, 4> GetAxes(const std::array<DirectX::XMFLOAT2, 4>& corners);
 
-			static bool OverlapsOnAxis(const std::array<DirectX::XMFLOAT2, 4>& a, const std::array<DirectX::XMFLOAT2, 4>& b, const DirectX::XMFLOAT2& axis);
-			static bool CheckCollision(ColliderComponent& a, const DirectX::XMFLOAT2& posA, const DirectX::XMFLOAT2& scaleA, const DirectX::XMFLOAT2& pivotA, float rotA, ColliderComponent& b, const DirectX::XMFLOAT2& posB, const DirectX::XMFLOAT2& scaleB, const DirectX::XMFLOAT2& pivotB, float rotB);
-			float GetDistanceTo(const DirectX::XMFLOAT2& a_vPoint, const DirectX::XMFLOAT2& a_vPos, const DirectX::XMFLOAT2& a_vScale, const DirectX::XMFLOAT2& a_vPivot, float a_fRotation);
+			bool IntersectsOBB(const std::array<DirectX::XMFLOAT2, 4>& aA, const std::array<DirectX::XMFLOAT2, 4>& aB);
 
 			void IgnoreEntity(const gameplay::EntityID& a_EntityID);
-			bool IsPointInside(const DirectX::XMFLOAT2& a_vPoint, const DirectX::XMFLOAT2& a_vPos, const DirectX::XMFLOAT2& a_vScale, const DirectX::XMFLOAT2& a_vPivot, float a_fRotation);
 		protected:
 			/// <summary>
 			/// Updates the system's component.

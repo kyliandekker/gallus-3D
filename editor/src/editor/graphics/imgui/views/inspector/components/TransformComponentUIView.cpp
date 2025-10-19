@@ -1,6 +1,8 @@
 #ifndef IMGUI_DISABLE
 #ifdef _EDITOR
 
+#include <limits>
+
 #include "TransformComponentUIView.h"
 
 #include <imgui/imgui_helpers.h>
@@ -51,7 +53,7 @@ namespace gallus
 					{
 						float rotation = transformComp.Transform().GetRotation();
 						ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
-						if (ImGui::DragFloat(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "TRANSFORM_COMPONENT_ROTATION_INSPECTOR").c_str(), &rotation, 1.0f, -999999999, 99999999999))
+						if (ImGui::DragFloat(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "TRANSFORM_COMPONENT_ROTATION_INSPECTOR").c_str(), &rotation, 1.0f, std::numeric_limits<float>::min(), std::numeric_limits<float>::max()))
 						{
 							transformComp.Transform().SetRotation(rotation);
 							core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);

@@ -40,6 +40,22 @@ namespace gallus
 			void DX12Transform::SetPivot(const DirectX::XMFLOAT2& a_vPivot)
 			{
 				m_vPivot = a_vPivot;
+				if (m_vPivot.x < -0.5f)
+				{
+					m_vPivot.x = -0.5f;
+				}
+				else if (m_vPivot.x > 0.5f)
+				{
+					m_vPivot.x = 0.5f;
+				}
+				if (m_vPivot.y < -0.5f)
+				{
+					m_vPivot.y = -0.5f;
+				}
+				else if (m_vPivot.y > 0.5f)
+				{
+					m_vPivot.y = 0.5f;
+				}
 			}
 
 			//---------------------------------------------------------------------

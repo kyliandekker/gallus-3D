@@ -18,9 +18,9 @@
 #include "gameplay/systems/PlayerSystem.h"
 #include "gameplay/systems/HealthSystem.h"
 #include "gameplay/systems/CollisionSystem.h"
-#include "gameplay/systems/MovementSystem.h"
 #include "gameplay/systems/ProjectileSystem.h"
 #include "gameplay/systems/AnimationSystem.h"
+#include "gameplay/systems/RigidbodySystem.h"
 
 namespace gallus
 {
@@ -40,9 +40,9 @@ namespace gallus
 			core::ENGINE->GetECS().CreateSystem<PlayerSystem>().Initialize();
 			core::ENGINE->GetECS().CreateSystem<HealthSystem>().Initialize();
 			core::ENGINE->GetECS().CreateSystem<CollisionSystem>().Initialize();
-			core::ENGINE->GetECS().CreateSystem<MovementSystem>().Initialize();
 			core::ENGINE->GetECS().CreateSystem<ProjectileSystem>().Initialize();
 			core::ENGINE->GetECS().CreateSystem<AnimationSystem>().Initialize();
+			core::ENGINE->GetECS().CreateSystem<RigidbodySystem>().Initialize();
 
 			core::ENGINE->GetWindow().OnQuit() += std::bind(&Game::Shutdown, this);
 

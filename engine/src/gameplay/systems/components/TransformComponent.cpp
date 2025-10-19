@@ -5,6 +5,9 @@
 
 #include "resources/SrcData.h"
 
+#include "gameplay/systems/TransformSystem.h"
+#include "gameplay/EntityID.h"
+
 #define JSON_TRANSFORM_COMPONENT_POSITION_VAR "position"
 #define JSON_TRANSFORM_COMPONENT_ROTATION_VAR "rotation"
 #define JSON_TRANSFORM_COMPONENT_SCALE_VAR "scale"
@@ -57,6 +60,35 @@ namespace gallus
 			m_Transform.SetScale(a_SrcData.GetVector(JSON_TRANSFORM_COMPONENT_SCALE_VAR));
 			m_Transform.SetPivot(a_SrcData.GetVector(JSON_TRANSFORM_COMPONENT_PIVOT_VAR));
 			m_Transform.SetRotation(a_SrcData.GetFloat(JSON_TRANSFORM_COMPONENT_ROTATION_VAR));
+		}
+
+		//---------------------------------------------------------------------
+		void TransformComponent::Translate(const DirectX::XMFLOAT2& a_vTranslation)
+		{
+			m_vTranslation = {
+				m_vTranslation.x + a_vTranslation.x,
+				m_vTranslation.y + a_vTranslation.y
+			};
+		}
+
+		//---------------------------------------------------------------------
+		void TransformComponent::UpdateRealtime(float a_fDeltaTime, UpdateTime a_UpdateTime)
+		{
+			if (m_vTranslation.x == 0.0f && m_vTranslation.y == 0.0)
+			{
+				return;
+			}
+
+			TransformSystem& transformSys = core::ENGINE->GetECS().GetSystem<TransformSystem>();
+
+			TransformComponent& transformComp = transformSys.GetComponent(m_EntityID);
+			DirectX::XMFLOAT2 newPos = {
+				transformComp.Transform().GetPosition().x + m_vTranslation.x,
+				transformComp.Transform().GetPosition().y + m_vTranslation.y,
+			};
+			transformComp.Transform().SetPosition(newPos);
+
+			m_vTranslation = {};
 		}
 	}
 }

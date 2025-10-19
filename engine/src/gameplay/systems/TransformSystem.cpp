@@ -15,7 +15,7 @@ namespace gallus
 		//---------------------------------------------------------------------
 		bool TransformSystem::Initialize()
 		{
-			m_aUpdateTimes.AddFlag(UpdateTime::UPDATE_TIME_FRAME);
+			m_aUpdateTimes.AddFlag(UpdateTime::UPDATE_TIME_FRAME_APPLY);
 
 			LOG_ICON(font::ICON_AXIS, LOGSEVERITY_INFO_SUCCESS, LOG_CATEGORY_ECS, "Transform system initialized.");
 			return true;

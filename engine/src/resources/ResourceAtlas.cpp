@@ -104,6 +104,10 @@ namespace gallus
 			m_aMeshes.reserve(MAX_RESOURCES);
 
 			std::string resourceFolder = core::ARGS.GetArgument<std::string>(ASSET_PATH_ARG);
+			if (resourceFolder.empty())
+			{
+				LOG(LOGSEVERITY_ERROR, LOG_CATEGORY_ECS, "Assets folder has not been set. Please add the argument: \"assetPath=\"your/path/to/assets/folder\"\".");
+			}
 
 			m_ResourceFolder.SetPath(resourceFolder);
 			m_ResourceFolder.Scan();

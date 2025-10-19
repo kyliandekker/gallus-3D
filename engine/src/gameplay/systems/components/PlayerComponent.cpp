@@ -9,7 +9,6 @@
 
 // gameplay includes
 #include "gameplay/Entity.h"
-#include "gameplay/systems/MovementSystem.h"
 #include "gameplay/systems/TransformSystem.h"
 #include "gameplay/systems/CollisionSystem.h"
 #include "gameplay/systems/ProjectileSystem.h"
@@ -88,17 +87,6 @@ namespace gallus
 		Key w('W'), a('A'), s('S'), d('D'), left(VK_LEFT), right(VK_RIGHT), up(VK_UP), down(VK_DOWN);
         void PlayerComponent::UpdateRealtime(float a_fDeltaTime, UpdateTime a_UpdateTime)
         {
-			const Entity* entity = core::ENGINE->GetECS().GetEntity(m_EntityID);
-			if (entity == nullptr)
-			{
-				return;
-			}
-
-			if (!entity->IsActive())
-			{
-				return;
-			}
-
 			bool leftDown = left.isKeyDown();
 			bool rightDown = right.isKeyDown();
 			if (leftDown || rightDown)
@@ -123,8 +111,6 @@ namespace gallus
 					transformComp.Transform().SetRotation(180);
 				}
 			}
-
-            MovementSystem& movementSys = core::ENGINE->GetECS().GetSystem<MovementSystem>();
 
             float deltaSpeed = m_fSpeed * a_fDeltaTime;
 
@@ -159,7 +145,9 @@ namespace gallus
                 movement.y = (movement.y / length) * deltaSpeed;
             }
 
-			MovementComponent& movementComp = movementSys.GetComponent(m_EntityID);
+			TransformSystem& transformSys = core::ENGINE->GetECS().GetSystem<TransformSystem>();
+
+			TransformComponent& movementComp = transformSys.GetComponent(m_EntityID);
 			movementComp.Translate(movement);
         }
 	}

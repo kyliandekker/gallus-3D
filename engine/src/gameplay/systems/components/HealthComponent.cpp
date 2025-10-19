@@ -43,17 +43,6 @@ namespace gallus
 		//---------------------------------------------------------------------
 		void HealthComponent::UpdateRealtime(float a_fDeltaTime, UpdateTime a_UpdateTime)
 		{
-			const Entity* entity = core::ENGINE->GetECS().GetEntity(m_EntityID);
-			if (entity == nullptr)
-			{
-				return;
-			}
-
-			if (!entity->IsActive())
-			{
-				return;
-			}
-
 			if (m_fHealth <= 0)
 			{
 				core::ENGINE->GetECS().GetEntity(m_EntityID)->Destroy();

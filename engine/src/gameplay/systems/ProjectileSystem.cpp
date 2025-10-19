@@ -15,7 +15,7 @@ namespace gallus
 		//---------------------------------------------------------------------
 		bool ProjectileSystem::Initialize()
 		{
-			m_aUpdateTimes.AddFlag(UpdateTime::UPDATE_TIME_FRAME);
+			m_aUpdateTimes.AddFlag(UpdateTime::UPDATE_TIME_FRAME_BEGIN);
 
 			LOG_ICON(font::ICON_PROJECTILE, LOGSEVERITY_INFO_SUCCESS, LOG_CATEGORY_ECS, "Projectile system initialized.");
 			return true;

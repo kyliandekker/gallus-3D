@@ -81,7 +81,7 @@ namespace gallus
 						sys->InitComponentsRealtime();
 					}
 				}
-				for (uint32_t i = 1; i <= static_cast<uint32_t>(UpdateTime::UPDATE_TIME_END); i <<= 1)
+				for (uint32_t i = 1; i <= static_cast<uint32_t>(UpdateTime::UPDATE_TIME_FRAME_END); i <<= 1)
 				{
 					UpdateTime updateTime = (UpdateTime)i;
 					for (auto& sys : m_aSystems)

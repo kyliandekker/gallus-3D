@@ -16,6 +16,7 @@ set(IMGUI
     ${CMAKE_SOURCE_DIR}/external/imgui/imgui_toggle_renderer.cpp
     ${CMAKE_SOURCE_DIR}/external/imgui/implot_items.cpp
     ${CMAKE_SOURCE_DIR}/external/imgui/ImGuizmo.cpp
+    ${CMAKE_SOURCE_DIR}/external/imgui/ImSequencer.cpp
 )
 
 # Gather and set DX12 source files.

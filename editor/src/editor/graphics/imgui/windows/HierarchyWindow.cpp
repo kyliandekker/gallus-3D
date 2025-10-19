@@ -20,6 +20,7 @@
 
 // game includes
 #include "gameplay/Game.h"
+#include "gameplay/systems/TransformSystem.h"
 
 namespace gallus
 {
@@ -232,17 +233,27 @@ namespace gallus
 
 						bool
 							clicked = false,
-							right_clicked = false;
+							doubleClicked = false;
 
 						view->RenderEntity(
 							clicked,
-							right_clicked,
+							doubleClicked,
 							core::EDITOR_ENGINE->GetEditor().GetSelectable().get() == view
 						);
 
 						if (clicked)
 						{
 							SetSelectable(view);
+						}
+						if (doubleClicked)
+						{
+							gameplay::TransformSystem& transformSys = core::ENGINE->GetECS().GetSystem<gameplay::TransformSystem>();
+							if (transformSys.HasComponent(view->GetEntityID()))
+							{
+								gameplay::TransformComponent& transformComponent = transformSys.GetComponent(view->GetEntityID());
+								DirectX::XMFLOAT2 pos = { transformComponent.Transform().GetPosition().x - (graphics::dx12::RENDER_TEX_SIZE.x / 2), transformComponent.Transform().GetPosition().y - (graphics::dx12::RENDER_TEX_SIZE.y / 2) };
+								core::EDITOR_ENGINE->GetEditor().GetEditorCamera().Transform().SetPosition(pos);
+							}
 						}
 					}
 					ImGui::PopStyleVar();

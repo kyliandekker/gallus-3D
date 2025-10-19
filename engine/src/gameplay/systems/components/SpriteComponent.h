@@ -96,10 +96,7 @@ namespace gallus
 			/// Sets the sprite index.
 			/// </summary>
 			/// <param name="a_iSpriteIndex">The index the sprite should have.</param>
-			void SetSpriteIndex(int8_t a_iSpriteIndex)
-			{
-				m_iSpriteIndex = a_iSpriteIndex;
-			}
+			void SetSpriteIndex(int8_t a_iSpriteIndex);
 
 			/// <summary>
 			/// Retrieves the sprite color.

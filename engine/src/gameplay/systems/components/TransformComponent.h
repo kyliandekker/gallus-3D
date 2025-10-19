@@ -33,8 +33,39 @@ namespace gallus
 			/// </summary>
 			/// <param name="a_SrcData">The source data.</param>
 			void Deserialize(const resources::SrcData& a_SrcData) override;
+
+			/// <summary>
+			/// Retrieves the translation.
+			/// </summary>
+			/// <returns>Reference to the translation vector.</returns>
+			const DirectX::XMFLOAT2& GetTranslation() const
+			{
+				return m_vTranslation;
+			}
+
+			/// <summary>
+			/// Translates the component.
+			/// </summary>
+			/// <param name="a_vTranslation">The movement.</param>
+			void SetTranslation(const DirectX::XMFLOAT2& a_vTranslation)
+			{
+				m_vTranslation = a_vTranslation;
+			}
+
+			/// <summary>
+			/// Translates the component.
+			/// </summary>
+			/// <param name="a_vTranslation">The movement.</param>
+			void Translate(const DirectX::XMFLOAT2& a_vTranslation);
 		private:
+			/// <summary>
+			/// Updates the components.
+			/// </summary>
+			/// <param name="a_fDeltaTime">Delta time.</param>
+			void UpdateRealtime(float a_fDeltaTime, UpdateTime a_UpdateTime);
+
 			graphics::dx12::DX12Transform m_Transform;
+			DirectX::XMFLOAT2 m_vTranslation = {};
 		};
 	}
 }

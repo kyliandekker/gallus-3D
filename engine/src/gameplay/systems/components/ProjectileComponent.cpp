@@ -5,7 +5,7 @@
 #include "core/Engine.h"
 #include "gameplay/systems/CollisionSystem.h"
 #include "gameplay/systems/HealthSystem.h"
-#include "gameplay/systems/MovementSystem.h"
+#include "gameplay/systems/TransformSystem.h"
 
 namespace gallus
 {
@@ -49,10 +49,10 @@ namespace gallus
 				}
 			}
 
-			MovementSystem& movementSys = core::ENGINE->GetECS().GetSystem<MovementSystem>();
+			TransformSystem& transformSys = core::ENGINE->GetECS().GetSystem<TransformSystem>();
 
-			MovementComponent& movementComp = movementSys.GetComponent(m_EntityID);
-			movementComp.Translate(m_fVelocity);
+			TransformComponent& transformComp = transformSys.GetComponent(m_EntityID);
+			transformComp.Translate(m_fVelocity);
 		}
 	}
 }

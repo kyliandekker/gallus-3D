@@ -255,7 +255,7 @@ namespace gallus
 		void SpriteComponent::Deserialize(const resources::SrcData& a_SrcData)
 		{
 			std::string tex = a_SrcData.GetSrc(JSON_SPRITE_COMPONENT_TEX_VAR).GetString(JSON_SPRITE_COMPONENT_TEX_NAME_VAR);
-			m_iSpriteIndex = a_SrcData.GetSrc(JSON_SPRITE_COMPONENT_TEX_VAR).GetInt(JSON_SPRITE_COMPONENT_TEX_SPRITE_INDEX_VAR);
+			SetSpriteIndex(a_SrcData.GetSrc(JSON_SPRITE_COMPONENT_TEX_VAR).GetInt(JSON_SPRITE_COMPONENT_TEX_SPRITE_INDEX_VAR));
 			std::string pixelShader = a_SrcData.GetSrc(JSON_SPRITE_COMPONENT_SHADER_VAR).GetString(JSON_SPRITE_COMPONENT_SHADER_PIXEL_VAR);
 			std::string vertexShader = a_SrcData.GetSrc(JSON_SPRITE_COMPONENT_SHADER_VAR).GetString(JSON_SPRITE_COMPONENT_SHADER_VERTEX_VAR);
 			std::string mesh = a_SrcData.GetString(JSON_SPRITE_COMPONENT_MESH_VAR);
@@ -278,6 +278,28 @@ namespace gallus
 				).get());
 			}
 			cCommandQueue->Flush();
+		}
+
+		/// <summary>
+		/// Sets the sprite index.
+		/// </summary>
+		/// <param name="a_iSpriteIndex">The index the sprite should have.</param>
+		void SpriteComponent::SetSpriteIndex(int8_t a_iSpriteIndex)
+		{
+			size_t numSpriteRects = 0;
+			if (m_pTexture)
+			{
+				numSpriteRects = m_pTexture->GetSpriteRectsSize() - 1;
+			}
+			if (a_iSpriteIndex < 0)
+			{
+				a_iSpriteIndex = 0;
+			}
+			else if (a_iSpriteIndex > numSpriteRects)
+			{
+				a_iSpriteIndex = numSpriteRects;
+			}
+			m_iSpriteIndex = a_iSpriteIndex;
 		}
 	}
 }
