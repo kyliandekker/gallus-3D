@@ -7,47 +7,15 @@
 #include <imgui/ImSequencer.h>
 #include <imgui/imgui_internal.h> // for ImClamp
 
-#include "editor/core/EditorEngine.h"
 #include "graphics/imgui/font_icon.h"
+
+#include "editor/core/EditorEngine.h"
+#include "editor/graphics/imgui/EditorSelectable.h"
+
+#include "animation/AnimationTrack.h"
+#include "animation/SpriteAnimationKeyFrame.h"
+
 #include "gameplay/Game.h"
-
-struct MySequence : public ImSequencer::SequenceInterface
-{
-    struct Item
-    {
-        int mType;
-        int mFrameStart, mFrameEnd;
-    };
-
-    std::vector<Item> myItems;
-    int mFrameMin = 0;
-    int mFrameMax = 100;
-
-    virtual int GetFrameMin() const { return mFrameMin; }
-    virtual int GetFrameMax() const { return mFrameMax; }
-    virtual int GetItemCount() const { return (int)myItems.size(); }
-    virtual int GetItemTypeCount() const { return 1; }
-    virtual const char* GetItemTypeName(int) const { return "Item"; }
-    virtual const char* GetItemLabel(int index) const
-    {
-        static char buf[64];
-        snprintf(buf, 64, "Item [%d]", index);
-        return buf;
-    }
-
-    virtual void Get(int index, int** start, int** end, int* type, unsigned int* color)
-    {
-        Item& item = myItems[index];
-        if (start) *start = &item.mFrameStart;
-        if (end)   *end = &item.mFrameEnd;
-        if (type)  *type = item.mType;
-        if (color) *color = 0x00AA8080;
-    }
-
-    virtual void Add(int) {}
-    virtual void Del(int) {}
-    virtual void Duplicate(int) {}
-};
 
 //---------------------------------------------------------------------
 namespace gallus
@@ -56,10 +24,89 @@ namespace gallus
     {
         namespace imgui
         {
+            constexpr float ANIMATION_FRAME_PIXEL_WIDTH = 25.0f;
+            constexpr float LEGEND_PADDING = 25.0f;
+            constexpr float LEGEND_HEIGHT = 70.0f;
+            constexpr float TRACK_SIZE = 75;
+            int m_iSelectedKeyFrame = 0;
+
+            class SpriteAnimationKeyFrameUIView
+            {
+            public:
+                SpriteAnimationKeyFrameUIView(animation::SpriteAnimationKeyFrame& a_KeyFrame) :
+                    m_KeyFrame(a_KeyFrame)
+                {
+
+                }
+                animation::SpriteAnimationKeyFrame& m_KeyFrame;
+            };
+
+            class AnimationTrackUIView
+            {
+            public:
+                AnimationTrackUIView(animation::AnimationTrack<animation::SpriteAnimationKeyFrame>& a_AnimationTrack) : a_AnimationTrack(a_AnimationTrack)
+                {
+                    for (size_t i = 0; i < a_AnimationTrack.GetKeyFrames().size(); i++)
+                    {
+                        m_aKeyFrames.push_back(SpriteAnimationKeyFrameUIView(a_AnimationTrack.GetKeyFrames()[i]));
+                    }
+                }
+
+                void RenderTrack()
+                {
+                    ImDrawList* drawList = ImGui::GetWindowDrawList();
+                    ImVec2 startPos = ImGui::GetCursorScreenPos();
+
+                    for (size_t i = 0; i < a_AnimationTrack.GetKeyFrames().size(); i++)
+                    {
+                        int frame = a_AnimationTrack.GetKeyFrames()[i].GetFrame();
+
+                        float px = startPos.x + (frame * ANIMATION_FRAME_PIXEL_WIDTH);
+
+                        std::string keyFrameIcon = font::ICON_KEYFRAME;
+                        ImVec2 iconSize = ImGui::CalcTextSize(keyFrameIcon.c_str());
+
+                        float verticalOffset = (TRACK_SIZE - iconSize.y) / 2.0f;
+
+                        ImVec2 contentStartPos = ImVec2(px - (iconSize.x / 2), startPos.y + verticalOffset);
+                        ImGui::SetCursorScreenPos(contentStartPos);
+                        if (m_iSelectedKeyFrame == i)
+                        {
+                            ImGui::TextColored(ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent), keyFrameIcon.c_str());
+                        }
+                        else
+                        {
+                            ImGui::Text(keyFrameIcon.c_str());
+                        }
+
+                        if (ImGui::IsMouseHoveringRect(contentStartPos, ImVec2(
+                            contentStartPos.x + iconSize.x,
+                            contentStartPos.y + iconSize.y
+                        )) && ImGui::IsMouseDown(ImGuiMouseButton_Left))
+                        {
+                            m_iSelectedKeyFrame = i;
+                        }
+
+                    }
+
+                    ImGui::SetCursorPosY(ImGui::GetCursorPosY() + TRACK_SIZE);
+                }
+
+                std::vector<SpriteAnimationKeyFrameUIView> m_aKeyFrames;
+                animation::AnimationTrack<animation::SpriteAnimationKeyFrame>& a_AnimationTrack;
+            };
+
+            animation::AnimationTrack<animation::SpriteAnimationKeyFrame> m_SpriteAnimatorTrack;
+            AnimationTrackUIView* m_AnimationTrackUIView = nullptr;
+
             AnimationWindow::AnimationWindow(ImGuiWindow& a_Window)
                 : BaseWindow(a_Window, ImGuiWindowFlags_NoCollapse,
                     std::string(font::ICON_ANIMATION) + " Animation", "Animation")
-            {}
+            {
+                m_SpriteAnimatorTrack.GetKeyFrames().push_back(animation::SpriteAnimationKeyFrame(12, 0));
+                m_SpriteAnimatorTrack.GetKeyFrames().push_back(animation::SpriteAnimationKeyFrame(25, 1));
+                m_AnimationTrackUIView = new AnimationTrackUIView(m_SpriteAnimatorTrack);
+            }
 
             AnimationWindow::~AnimationWindow() {}
 
@@ -71,51 +118,6 @@ namespace gallus
                 }
 
                 BaseWindow::Update();
-            }
-
-            constexpr float ANIMATION_FRAME_PIXEL_WIDTH = 25.0f;
-            constexpr float LEGEND_PADDING = 25.0f;
-            constexpr float LEGEND_HEIGHT = 70.0f;
-            constexpr float TRACK_SIZE = 75;
-            int m_iSelectedKeyFrame = 0;
-            void RenderTrack(std::vector<int> frames)
-            {
-                ImDrawList* drawList = ImGui::GetWindowDrawList();
-                ImVec2 startPos = ImGui::GetCursorScreenPos();
-
-                for (size_t i = 0; i < frames.size(); i++)
-                {
-                    int frame = frames[i];
-
-                    float px = startPos.x + (frame * ANIMATION_FRAME_PIXEL_WIDTH);
-                    
-                    std::string keyFrameIcon = font::ICON_KEYFRAME;
-                    ImVec2 iconSize = ImGui::CalcTextSize(keyFrameIcon.c_str());
-
-                    float verticalOffset = (TRACK_SIZE - iconSize.y) / 2.0f;
-
-                    ImVec2 contentStartPos = ImVec2(px - (iconSize.x / 2), startPos.y + verticalOffset);
-                    ImGui::SetCursorScreenPos(contentStartPos);
-                    if (m_iSelectedKeyFrame == i)
-                    {
-                        ImGui::TextColored(ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent), keyFrameIcon.c_str());
-                    }
-                    else
-                    {
-                        ImGui::Text(keyFrameIcon.c_str());
-                    }
-
-                    if (ImGui::IsMouseHoveringRect(contentStartPos, ImVec2(
-                        contentStartPos.x + iconSize.x,
-                        contentStartPos.y + iconSize.y
-                    )) && ImGui::IsMouseDown(ImGuiMouseButton_Left))
-                    {
-                        m_iSelectedKeyFrame = i;
-                    }
-
-                }
-
-                ImGui::SetCursorPosY(ImGui::GetCursorPosY() + TRACK_SIZE);
             }
 
             int m_iCurrentFrame = 0;
@@ -143,10 +145,6 @@ namespace gallus
                     ImGuiWindowFlags_AlwaysHorizontalScrollbar
                 ))
                 {
-                    std::vector<int> keyFrames = {
-                        2, 20, 50, 55
-                    };
-
                     int frameMax = 300;
 
                     ImVec2 initialPos = ImGui::GetCursorScreenPos();
@@ -234,7 +232,8 @@ namespace gallus
                     ImGui::DragInt(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "CURRENT_FRAME_ANIMATION").c_str(), &m_iCurrentFrame, 1, 0, frameMax);
 
                     ImGui::SetCursorScreenPos(ImVec2(legendPos.x, legendRectMax.y));
-                    RenderTrack(keyFrames);
+
+                    m_AnimationTrackUIView->RenderTrack();
                 }
 
                 ImGui::EndChild();

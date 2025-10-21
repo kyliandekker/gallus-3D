@@ -101,8 +101,7 @@ namespace gallus
 				collisionSys.GetComponent(id).IgnoreEntity(m_EntityID);
 
 				TransformSystem& transformSys = core::ENGINE->GetECS().GetSystem<TransformSystem>();
-				auto pos = transformSys.GetComponent(m_EntityID).Transform().GetPosition();
-				pos = { pos.x - 100, pos.y };
+				const DirectX::XMFLOAT2& pos = transformSys.GetComponent(m_EntityID).Transform().GetPosition();
 				TransformComponent& transformComp = transformSys.GetComponent(id);
 				transformComp.Transform().SetPosition(pos);
 
@@ -134,10 +133,9 @@ namespace gallus
 
             if (movement.x == 0.0f && movement.y == 0.0f)
             {
-                return; // no movement
+                return; 
             }
 
-            // Normalize to avoid faster diagonal movement
             float length = sqrtf(movement.x * movement.x + movement.y * movement.y);
             if (length > 0.0f)
             {

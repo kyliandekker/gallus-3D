@@ -145,14 +145,20 @@ namespace gallus
 					{
 						Project(a, axesA[i], minA, maxA);
 						Project(b, axesA[i], minB, maxB);
-						if (maxA < minB || maxB < minA) return false;
+						if (maxA < minB || maxB < minA)
+						{
+							return false;
+						}
 					}
 
 					for (int i = 0; i < 2; ++i)
 					{
 						Project(a, axesB[i], minA, maxA);
 						Project(b, axesB[i], minB, maxB);
-						if (maxA < minB || maxB < minA) return false;
+						if (maxA < minB || maxB < minA)
+						{
+							return false;
+						}
 					}
 
 					return true;
@@ -161,8 +167,20 @@ namespace gallus
 				//---------------------------------------------------------------------
 				for (auto& colliderPair : colliders)
 				{
-					if (colliderPair.first == m_EntityID) { continue; }
-					if (!transformSys.HasComponent(colliderPair.first)) { continue; }
+					if (colliderPair.first == m_EntityID)
+					{ 
+						continue;
+					}
+					
+					if (m_aEntitiesToIgnore.contains(colliderPair.first))
+					{ 
+						continue;
+					}
+
+					if (!transformSys.HasComponent(colliderPair.first))
+					{
+						continue;
+					}
 
 					ColliderComponent& otherCollider = colliderPair.second;
 					TransformComponent& otherTransform = transformSys.GetComponent(colliderPair.first);
@@ -182,7 +200,10 @@ namespace gallus
 					if (move.x != 0.0f)
 					{
 						std::array<DirectX::XMFLOAT2, 4> movedX = playerCorners;
-						for (int i = 0; i < 4; ++i) { movedX[i].x += move.x; }
+						for (int i = 0; i < 4; ++i)
+						{ 
+							movedX[i].x += move.x; 
+						}
 
 						if (SATOverlap(movedX, otherCorners))
 						{
@@ -194,19 +215,34 @@ namespace gallus
 							{
 								float mid = (low + high) * 0.5f;
 								std::array<DirectX::XMFLOAT2, 4> test = playerCorners;
-								for (int i = 0; i < 4; ++i) { test[i].x += mid; }
+								for (int i = 0; i < 4; ++i)
+								{
+									test[i].x += mid;
+								}
 
 								if (SATOverlap(test, otherCorners))
 								{
 									// mid penetrates -> move high toward mid (reduce magnitude)
-									if (move.x > 0.0f) high = mid;
-									else low = mid;
+									if (move.x > 0.0f)
+									{
+										high = mid;
+									}
+									else
+									{
+										low = mid;
+									}
 								}
 								else
 								{
 									// mid safe -> move low toward mid (expand)
-									if (move.x > 0.0f) low = mid;
-									else high = mid;
+									if (move.x > 0.0f)
+									{
+										low = mid;
+									}
+									else
+									{
+										high = mid;
+									}
 								}
 							}
 
@@ -226,7 +262,10 @@ namespace gallus
 					if (move.y != 0.0f)
 					{
 						std::array<DirectX::XMFLOAT2, 4> movedY = playerCorners;
-						for (int i = 0; i < 4; ++i) { movedY[i].y += move.y; }
+						for (int i = 0; i < 4; ++i)
+						{
+							movedY[i].y += move.y;
+						}
 
 						if (SATOverlap(movedY, otherCorners))
 						{
@@ -237,17 +276,32 @@ namespace gallus
 							{
 								float mid = (low + high) * 0.5f;
 								std::array<DirectX::XMFLOAT2, 4> test = playerCorners;
-								for (int i = 0; i < 4; ++i) { test[i].y += mid; }
+								for (int i = 0; i < 4; ++i)
+								{
+									test[i].y += mid;
+								}
 
 								if (SATOverlap(test, otherCorners))
 								{
-									if (move.y > 0.0f) high = mid;
-									else low = mid;
+									if (move.y > 0.0f)
+									{
+										high = mid;
+									}
+									else
+									{
+										low = mid;
+									}
 								}
 								else
 								{
-									if (move.y > 0.0f) low = mid;
-									else high = mid;
+									if (move.y > 0.0f)
+									{
+										low = mid;
+									}
+									else
+									{
+										high = mid;
+									}
 								}
 							}
 

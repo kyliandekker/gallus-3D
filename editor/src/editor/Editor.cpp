@@ -15,7 +15,9 @@ namespace gallus
 		//---------------------------------------------------------------------
 		Editor::Editor() : core::ThreadedSystem::ThreadedSystem(), 
 			m_EditorSettings("editorsettings.settings")
-		{}
+		{
+			m_pSelectable = nullptr;
+		}
 
 		//---------------------------------------------------------------------
 		bool Editor::Initialize(bool a_bWait)

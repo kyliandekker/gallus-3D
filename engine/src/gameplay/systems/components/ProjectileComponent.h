@@ -30,10 +30,24 @@ namespace gallus
 			/// <summary>
 			/// Sets the velocity of the projectile.
 			/// </summary>
-			/// <param name="a_fVelocity">Sets the velocity of the projectile.</param>
-			void SetMovementSpeed(const DirectX::XMFLOAT2& a_fVelocity)
+			/// <param name="a_vVelocity">Sets the velocity of the projectile.</param>
+			void SetMovementSpeed(const DirectX::XMFLOAT2& a_vVelocity)
 			{
-				m_fVelocity = a_fVelocity;
+				m_vVelocity = a_vVelocity;
+			}
+
+			/// <summary>
+			/// Sets the damage of the projectile.
+			/// </summary>
+			/// <param name="a_fDamage">The damage the projectile should do if it hits something.</param>
+			void SetDamage(float a_fDamage)
+			{
+				m_fDamage = a_fDamage;
+			}
+
+			float GetDamage() const
+			{
+				return m_fDamage;
 			}
 		protected:
 			/// <summary>
@@ -42,7 +56,8 @@ namespace gallus
 			/// <param name="a_fDeltaTime">Delta time.</param>
 			void UpdateRealtime(float a_fDeltaTime, UpdateTime a_UpdateTime) override;
 
-			DirectX::XMFLOAT2 m_fVelocity = {};
+			DirectX::XMFLOAT2 m_vVelocity = {};
+			float m_fDamage;
 		};
 	}
 }

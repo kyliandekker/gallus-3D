@@ -73,8 +73,8 @@ namespace gallus
                 ImVec2 toolbarSize = ImVec2(ImGui::GetContentRegionAvail().x, m_Window.GetHeaderSize().y);
                 ImGui::BeginToolbar(toolbarSize);
 
-                bool prefabMode = core::EDITOR_ENGINE->GetEditor().GetEditorMethod() == editor::EditorMethod::EDITOR_METHOD_PREFAB;
-                if (prefabMode)
+                bool sceneMode = core::EDITOR_ENGINE->GetEditor().GetEditorMethod() == editor::EditorMethod::EDITOR_METHOD_SCENE;
+                if (!sceneMode)
                 {
                     ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
                     ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
@@ -106,7 +106,7 @@ namespace gallus
                 }
                 ImGui::SameLine();
 
-                if (prefabMode)
+                if (!sceneMode)
                 {
                     ImGui::PopItemFlag();
                     ImGui::PopStyleVar();
@@ -288,6 +288,12 @@ namespace gallus
                 Draw2DGrid(a_vSceneStartPos, a_vSize, m_vPanOffset, m_fZoom);
 
                 std::lock_guard<std::recursive_mutex> lock(core::EDITOR_ENGINE->GetECS().m_EntityMutex);
+
+                auto test = core::EDITOR_ENGINE->GetEditor().GetSelectable().get();
+                if (!test)
+                {
+                    return;
+                }
 
                 const HierarchyEntityUIView* entity = dynamic_cast<const HierarchyEntityUIView*>(core::EDITOR_ENGINE->GetEditor().GetSelectable().get());
                 if (!entity)

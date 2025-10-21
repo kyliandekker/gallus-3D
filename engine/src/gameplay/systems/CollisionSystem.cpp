@@ -43,7 +43,7 @@ namespace gallus
 		{
 			std::vector<CollisionInfo> results;
 
-			for (auto& [pair, info] : m_mCollision)
+			for (auto& [pair, info] : m_mCollisions)
 			{
 				if (pair.a == a_EntityID)
 				{
@@ -57,7 +57,7 @@ namespace gallus
 		//---------------------------------------------------------------------
 		void CollisionSystem::Collide(ColliderComponent& a_ColliderA, ColliderComponent& a_ColliderB, const DirectX::XMFLOAT2& a_vNormal)
 		{
-			m_mNewCollision.insert({ a_ColliderA.GetEntityID(), a_ColliderB.GetEntityID(), CollisionType::COLLISION_TYPE_NONE, a_vNormal });
+			m_mNewCollisions.insert({ a_ColliderA.GetEntityID(), a_ColliderB.GetEntityID(), CollisionType::COLLISION_TYPE_NONE, a_vNormal });
 		}
 
 		//---------------------------------------------------------------------
@@ -70,11 +70,11 @@ namespace gallus
 				std::map<CollisionEntry, CollisionInfo> tempMap;
 
 				// Remove all events that exited.
-				for (auto it = m_mCollision.begin(); it != m_mCollision.end(); )
+				for (auto it = m_mCollisions.begin(); it != m_mCollisions.end(); )
 				{
 					if (it->second.m_CollisionType == CollisionType::COLLISION_TYPE_EXIT)
 					{
-						it = m_mCollision.erase(it); // erase returns next iterator
+						it = m_mCollisions.erase(it); // erase returns next iterator
 					}
 					else
 					{
@@ -82,12 +82,12 @@ namespace gallus
 					}
 				}
 
-				for (auto& newCollision : m_mNewCollision)
+				for (auto& newCollision : m_mNewCollisions)
 				{
 					CollisionInfo info = newCollision;
 
 					// If it is already in the map, it means it already started.
-					if (m_mCollision.contains(newCollision))
+					if (m_mCollisions.contains(newCollision))
 					{
 						info.m_CollisionType = CollisionType::COLLISION_TYPE_STAY;
 					}
@@ -100,18 +100,18 @@ namespace gallus
 				}
 
 				// Set all the ones that previously had collision to exit.
-				for (auto& prePair : m_mCollision)
+				for (auto& prePair : m_mCollisions)
 				{
-					if (!m_mNewCollision.contains(prePair.second))
+					if (!m_mNewCollisions.contains(prePair.second))
 					{
-						CollisionInfo info = m_mCollision[prePair.second];
+						CollisionInfo info = m_mCollisions[prePair.second];
 						info.m_CollisionType = CollisionType::COLLISION_TYPE_EXIT;
 						tempMap.insert(std::make_pair(prePair.first, info));
 					}
 				}
 
-				m_mCollision = std::move(tempMap);
-				m_mNewCollision.clear();
+				m_mCollisions = std::move(tempMap);
+				m_mNewCollisions.clear();
 			}
 		}
 	}

@@ -26,6 +26,32 @@ namespace gallus
 
 			void ProjectileComponentUIView::RenderInner()
 			{
+				ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(m_Window.GetFontSize() / 2, m_Window.GetFontSize() / 2));
+				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, m_Window.GetFramePadding());
+
+				ImGui::StartInspectorKeyVal(ImGui::IMGUI_FORMAT_ID("", TABLE_ID, "PROJECTILE_COMPONENT_TABLE_INSPECTOR"), m_Window.GetFramePadding());
+				ImGuiWindow& window = m_Window;
+				gameplay::ProjectileComponent& projectileComp = m_Component;
+				ImGui::KeyValue([&window]
+				{
+					ImGui::AlignTextToFramePadding();
+					ImGui::DisplayHeader(window.GetBoldFont(), "Damage: ");
+				},
+					[&projectileComp]
+				{
+					float damage = projectileComp.GetDamage();
+					ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+					if (ImGui::DragFloat(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "PROJECTILE_COMPONENT_DAMAGE_INSPECTOR").c_str(), &damage, 1.0f, -999999999, 99999999999))
+					{
+						projectileComp.SetDamage(damage);
+					}
+				});
+				ImGui::EndInspectorKeyVal(m_Window.GetFramePadding());
+
+				ImGui::PopStyleVar();
+				ImGui::PopStyleVar();
+
+				ImGui::SetCursorPosY(ImGui::GetCursorPosY() - m_Window.GetFramePadding().y);
 			}
 		}
 	}

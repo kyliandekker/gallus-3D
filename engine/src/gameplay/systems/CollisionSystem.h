@@ -79,8 +79,8 @@ namespace gallus
 			// <param name="a_fDeltaTime">The time it took since last frame.</param>
 			void UpdateComponentsRealtime(float a_fDeltatime, UpdateTime a_UpdateTime) override;
 		private:
-			std::map<CollisionEntry, CollisionInfo> m_mCollision;
-			std::set<CollisionInfo> m_mNewCollision;
+			std::map<CollisionEntry, CollisionInfo> m_mCollisions;
+			std::set<CollisionInfo> m_mNewCollisions;
 		};
 	}
 }

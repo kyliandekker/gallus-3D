@@ -44,9 +44,8 @@
                 "y": 1.0
             }
         },
-        "movement": {
-            "gravity": false
-        },
-        "projectile": {}
+        "projectile": {
+            "damage": 50.0
+        }
     }
 }
