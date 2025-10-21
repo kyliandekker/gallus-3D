@@ -1,4 +1,4 @@
-#include "../exponential.hpp"
+﻿#include "../exponential.hpp"
 #include "../common.hpp"
 
 namespace glm{
@@ -117,7 +117,7 @@ namespace detail
 			T const dotValue(dot(N, I));
 			T const k(static_cast<T>(1) - eta * eta * (static_cast<T>(1) - dotValue * dotValue));
 			vec<L, T, Q> const Result =
-                (k >= static_cast<T>(0)) ? (eta * I - (eta * dotValue + std::sqrt(k)) * N) : vec<L, T, Q>(0);
+				(k >= static_cast<T>(0)) ? (eta * I - (eta * dotValue + std::sqrt(k)) * N) : vec<L, T, Q>(0);
 			return Result;
 		}
 	};
@@ -241,3 +241,4 @@ namespace detail
 #if GLM_CONFIG_SIMD == GLM_ENABLE
 #	include "func_geometric_simd.inl"
 #endif
+

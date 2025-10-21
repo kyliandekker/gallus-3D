@@ -1,9 +1,9 @@
-#include "SpriteAnimationKeyFrame.h"
+﻿#include "SpriteAnimationKeyFrame.h"
 
 namespace gallus
 {
-    namespace animation
-    {
+	namespace animation
+	{
 
-    }
+	}
 }

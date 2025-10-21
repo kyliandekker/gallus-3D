@@ -1,4 +1,4 @@
-/*-------------------------------------------------------------------------------------
+﻿/*-------------------------------------------------------------------------------------
  *
  * Copyright (c) Microsoft Corporation
  * Licensed under the MIT license
@@ -59,53 +59,53 @@ EXTERN_C const IID IID_IUnknown;
 #if defined(__cplusplus) && !defined(CINTERFACE)
 extern "C++"
 {
-    MIDL_INTERFACE("00000000-0000-0000-c000-000000000046")
-    IUnknown
-    {
-        BEGIN_INTERFACE
+	MIDL_INTERFACE("00000000-0000-0000-c000-000000000046")
+	IUnknown
+	{
+		BEGIN_INTERFACE
 
-        virtual HRESULT STDMETHODCALLTYPE QueryInterface(
-            REFIID riid,
-            void **ppvObject) = 0;
+		virtual HRESULT STDMETHODCALLTYPE QueryInterface(
+			REFIID riid,
+			void **ppvObject) = 0;
 
-        virtual ULONG STDMETHODCALLTYPE AddRef() = 0;
+		virtual ULONG STDMETHODCALLTYPE AddRef() = 0;
 
-        virtual ULONG STDMETHODCALLTYPE Release() = 0;
+		virtual ULONG STDMETHODCALLTYPE Release() = 0;
 
-        template <class Q>
-        HRESULT
-            STDMETHODCALLTYPE
-            QueryInterface(_COM_Outptr_ Q * *pp)
-        {
-            return QueryInterface(__uuidof(Q), (void **)pp);
-        }
-        END_INTERFACE
-    };
+		template <class Q>
+		HRESULT
+			STDMETHODCALLTYPE
+			QueryInterface(_COM_Outptr_ Q * *pp)
+		{
+			return QueryInterface(__uuidof(Q), (void **)pp);
+		}
+		END_INTERFACE
+	};
 }
 #ifdef __CRT_UUID_DECL
 __CRT_UUID_DECL(IUnknown, 0x00000000, 0x0000, 0x0000, 0xc0,0x00, 0x00,0x00,0x00,0x00,0x00,0x46)
 #endif
 #else
 typedef struct IUnknownVtbl {
-    BEGIN_INTERFACE
+	BEGIN_INTERFACE
 
-    /*** IUnknown methods ***/
-    HRESULT (STDMETHODCALLTYPE *QueryInterface)(
-        IUnknown *This,
-        REFIID riid,
-        void **ppvObject);
+	/*** IUnknown methods ***/
+	HRESULT (STDMETHODCALLTYPE *QueryInterface)(
+		IUnknown *This,
+		REFIID riid,
+		void **ppvObject);
 
-    ULONG (STDMETHODCALLTYPE *AddRef)(
-        IUnknown *This);
+	ULONG (STDMETHODCALLTYPE *AddRef)(
+		IUnknown *This);
 
-    ULONG (STDMETHODCALLTYPE *Release)(
-        IUnknown *This);
+	ULONG (STDMETHODCALLTYPE *Release)(
+		IUnknown *This);
 
-    END_INTERFACE
+	END_INTERFACE
 } IUnknownVtbl;
 
 interface IUnknown {
-    CONST_VTBL IUnknownVtbl* lpVtbl;
+	CONST_VTBL IUnknownVtbl* lpVtbl;
 };
 
 #ifdef COBJMACROS
@@ -122,3 +122,4 @@ interface IUnknown {
 DEFINE_GUID(IID_IUnknown, 0x00000000, 0x0000, 0x0000, 0xc0,0x00, 0x00,0x00,0x00,0x00,0x00,0x46);
 
 #endif /* __unknwnbase_h__ */
+

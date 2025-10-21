@@ -1,4 +1,4 @@
-#include "gameplay/systems/CollisionSystem.h"
+﻿#include "gameplay/systems/CollisionSystem.h"
 
 // logger includes
 #include "logger/Logger.h"
@@ -15,8 +15,8 @@ namespace gallus
 		//---------------------------------------------------------------------
 		bool CollisionSystem::Initialize()
 		{
-            m_aUpdateTimes.AddFlag(UpdateTime::UPDATE_TIME_FRAME_RESOLVE);
-            m_aUpdateTimes.AddFlag(UpdateTime::UPDATE_TIME_FRAME_END);
+			m_aUpdateTimes.AddFlag(UpdateTime::UPDATE_TIME_FRAME_RESOLVE);
+			m_aUpdateTimes.AddFlag(UpdateTime::UPDATE_TIME_FRAME_END);
 
 			LOG_ICON(font::ICON_BOUNDS, LOGSEVERITY_INFO_SUCCESS, LOG_CATEGORY_ECS, "Collision system initialized.");
 			return true;

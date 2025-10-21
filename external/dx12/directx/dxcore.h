@@ -1,4 +1,4 @@
-/************************************************************
+﻿/************************************************************
 *                                                           *
 * Copyright (c) Microsoft Corporation.                      *
 * Licensed under the MIT license.                           *
@@ -18,17 +18,17 @@
 
 STDAPI
 DXCoreCreateAdapterFactory(
-    REFIID riid,
-    _COM_Outptr_ void** ppvFactory
+	REFIID riid,
+	_COM_Outptr_ void** ppvFactory
 );
 
 template <class T>
 HRESULT
 DXCoreCreateAdapterFactory(
-    _COM_Outptr_ T** ppvFactory
+	_COM_Outptr_ T** ppvFactory
 )
 {
-    return DXCoreCreateAdapterFactory(IID_PPV_ARGS(ppvFactory));
+	return DXCoreCreateAdapterFactory(IID_PPV_ARGS(ppvFactory));
 }
 
 #endif // (_WIN32_WINNT >= _WIN32_WINNT_WIN10)
@@ -37,5 +37,6 @@ DXCoreCreateAdapterFactory(
 #pragma endregion
 
 #endif // _DXCOREEXTMODULE_H_
+
 
 

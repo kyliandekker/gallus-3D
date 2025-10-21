@@ -1,4 +1,4 @@
-#ifndef IMGUI_DISABLE
+﻿#ifndef IMGUI_DISABLE
 #ifdef _EDITOR
 
 #pragma once
@@ -106,13 +106,13 @@ struct ExplorerUIRegistrar
 
 // Macro (unchanged semantics, but uses UNIQUE_NAME for the static var)
 #define REGISTER_EXPLORER_UI(AssetTypesArray, UIViewType) \
-    static ExplorerUIRegistrar UNIQUE_NAME(_reg_)(       \
-        AssetTypesArray,                                 \
-        [](gallus::graphics::imgui::ImGuiWindow& window, \
-           gallus::graphics::imgui::ExplorerFileUIView& fileView) \
-            -> gallus::graphics::imgui::ExplorerFileUIViewInfo* { \
-            return new UIViewType(window, fileView);             \
-        });
+	static ExplorerUIRegistrar UNIQUE_NAME(_reg_)(       \
+		AssetTypesArray,                                 \
+		[](gallus::graphics::imgui::ImGuiWindow& window, \
+		   gallus::graphics::imgui::ExplorerFileUIView& fileView) \
+			-> gallus::graphics::imgui::ExplorerFileUIViewInfo* { \
+			return new UIViewType(window, fileView);             \
+		});
 
 #pragma endregion REGISTER_EXPLORER_UI_CODE
 

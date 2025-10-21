@@ -1,4 +1,4 @@
-//
+﻿//
 // DXCore Interface
 // Copyright (C) Microsoft Corporation.
 // Licensed under the MIT license.
@@ -21,205 +21,205 @@
 
 enum class DXCoreAdapterProperty : uint32_t
 {
-    InstanceLuid = 0,
-    DriverVersion = 1,
-    DriverDescription = 2,
-    HardwareID = 3, // Use HardwareIDParts instead, if available.
-    KmdModelVersion = 4,
-    ComputePreemptionGranularity = 5,
-    GraphicsPreemptionGranularity = 6,
-    DedicatedAdapterMemory = 7,
-    DedicatedSystemMemory = 8,
-    SharedSystemMemory = 9,
-    AcgCompatible = 10,
-    IsHardware = 11,
-    IsIntegrated = 12,
-    IsDetachable = 13,
-    HardwareIDParts = 14,
-    PhysicalAdapterCount = 15,
-    AdapterEngineCount = 16,
-    AdapterEngineName = 17,
+	InstanceLuid = 0,
+	DriverVersion = 1,
+	DriverDescription = 2,
+	HardwareID = 3, // Use HardwareIDParts instead, if available.
+	KmdModelVersion = 4,
+	ComputePreemptionGranularity = 5,
+	GraphicsPreemptionGranularity = 6,
+	DedicatedAdapterMemory = 7,
+	DedicatedSystemMemory = 8,
+	SharedSystemMemory = 9,
+	AcgCompatible = 10,
+	IsHardware = 11,
+	IsIntegrated = 12,
+	IsDetachable = 13,
+	HardwareIDParts = 14,
+	PhysicalAdapterCount = 15,
+	AdapterEngineCount = 16,
+	AdapterEngineName = 17,
 };
 
 enum class DXCoreAdapterState : uint32_t
 {
-    IsDriverUpdateInProgress = 0,
-    AdapterMemoryBudget = 1,
-    AdapterMemoryUsageBytes = 2,
-    AdapterMemoryUsageByProcessBytes = 3,
-    AdapterEngineRunningTimeMicroseconds = 4,
-    AdapterEngineRunningTimeByProcessMicroseconds = 5,
-    AdapterTemperatureCelsius = 6,
-    AdapterInUseProcessCount = 7,
-    AdapterInUseProcessSet = 8,
-    AdapterEngineFrequencyHertz = 9,
-    AdapterMemoryFrequencyHertz = 10
+	IsDriverUpdateInProgress = 0,
+	AdapterMemoryBudget = 1,
+	AdapterMemoryUsageBytes = 2,
+	AdapterMemoryUsageByProcessBytes = 3,
+	AdapterEngineRunningTimeMicroseconds = 4,
+	AdapterEngineRunningTimeByProcessMicroseconds = 5,
+	AdapterTemperatureCelsius = 6,
+	AdapterInUseProcessCount = 7,
+	AdapterInUseProcessSet = 8,
+	AdapterEngineFrequencyHertz = 9,
+	AdapterMemoryFrequencyHertz = 10
 };
 
 enum class DXCoreSegmentGroup : uint32_t
 {
-    Local = 0,
-    NonLocal = 1
+	Local = 0,
+	NonLocal = 1
 };
 
 enum class DXCoreNotificationType : uint32_t
 {
-    AdapterListStale = 0,
-    AdapterNoLongerValid = 1,
-    AdapterBudgetChange = 2,
-    AdapterHardwareContentProtectionTeardown = 3
+	AdapterListStale = 0,
+	AdapterNoLongerValid = 1,
+	AdapterBudgetChange = 2,
+	AdapterHardwareContentProtectionTeardown = 3
 };
 
 enum class DXCoreAdapterPreference : uint32_t
 {
-    Hardware = 0,
-    MinimumPower = 1,
-    HighPerformance = 2
+	Hardware = 0,
+	MinimumPower = 1,
+	HighPerformance = 2
 };
 
 enum class DXCoreWorkload : uint32_t
 {
-    Graphics = 0,
-    Compute = 1,
-    Media = 2,
-    MachineLearning = 3,
+	Graphics = 0,
+	Compute = 1,
+	Media = 2,
+	MachineLearning = 3,
 };
 
 enum class DXCoreRuntimeFilterFlags : uint32_t
 {
-    None = 0x0,
-    D3D11 = 0x1,
-    D3D12 = 0x2
+	None = 0x0,
+	D3D11 = 0x1,
+	D3D12 = 0x2
 };
 
 DEFINE_ENUM_FLAG_OPERATORS(DXCoreRuntimeFilterFlags)
 
 enum class DXCoreHardwareTypeFilterFlags : uint32_t
 {
-    None = 0x0,
-    GPU = 0x1,
-    ComputeAccelerator = 0x2,
-    NPU = 0x4,
-    MediaAccelerator = 0x8
+	None = 0x0,
+	GPU = 0x1,
+	ComputeAccelerator = 0x2,
+	NPU = 0x4,
+	MediaAccelerator = 0x8
 };
 
 DEFINE_ENUM_FLAG_OPERATORS(DXCoreHardwareTypeFilterFlags)
 
 struct DXCoreHardwareID
 {
-    uint32_t vendorID;
-    uint32_t deviceID;
-    uint32_t subSysID;
-    uint32_t revision;
+	uint32_t vendorID;
+	uint32_t deviceID;
+	uint32_t subSysID;
+	uint32_t revision;
 };
 
 struct DXCoreHardwareIDParts
 {
-    uint32_t vendorID;
-    uint32_t deviceID;
-    uint32_t subSystemID;
-    uint32_t subVendorID;
-    uint32_t revisionID;
+	uint32_t vendorID;
+	uint32_t deviceID;
+	uint32_t subSystemID;
+	uint32_t subVendorID;
+	uint32_t revisionID;
 };
 
 struct DXCoreAdapterMemoryBudgetNodeSegmentGroup
 {
-    uint32_t nodeIndex;
-    DXCoreSegmentGroup segmentGroup;
+	uint32_t nodeIndex;
+	DXCoreSegmentGroup segmentGroup;
 };
 
 struct DXCoreAdapterMemoryBudget
 {
-    uint64_t budget;
-    uint64_t currentUsage;
-    uint64_t availableForReservation;
-    uint64_t currentReservation;
+	uint64_t budget;
+	uint64_t currentUsage;
+	uint64_t availableForReservation;
+	uint64_t currentReservation;
 };
 
 struct DXCoreAdapterEngineIndex
 {
-    uint32_t physicalAdapterIndex;
-    uint32_t engineIndex;
+	uint32_t physicalAdapterIndex;
+	uint32_t engineIndex;
 };
 
 struct DXCoreEngineQueryInput
 {
-    DXCoreAdapterEngineIndex adapterEngineIndex;
-    uint32_t processId;
+	DXCoreAdapterEngineIndex adapterEngineIndex;
+	uint32_t processId;
 };
 
 struct DXCoreEngineQueryOutput
 {
-    uint64_t runningTime;
-    bool processQuerySucceeded;
+	uint64_t runningTime;
+	bool processQuerySucceeded;
 };
 
 enum class DXCoreMemoryType : uint32_t
 {
-    Dedicated = 0,
-    Shared = 1
+	Dedicated = 0,
+	Shared = 1
 };
 
 struct DXCoreMemoryUsage
 {
-    uint64_t committed;
-    uint64_t resident;
+	uint64_t committed;
+	uint64_t resident;
 };
 
 struct DXCoreMemoryQueryInput
 {
-    uint32_t physicalAdapterIndex;
-    DXCoreMemoryType memoryType;
+	uint32_t physicalAdapterIndex;
+	DXCoreMemoryType memoryType;
 };
 
 struct DXCoreProcessMemoryQueryInput
 {
-    uint32_t physicalAdapterIndex;
-    DXCoreMemoryType memoryType;
-    uint32_t processId;
+	uint32_t physicalAdapterIndex;
+	DXCoreMemoryType memoryType;
+	uint32_t processId;
 };
 
 struct DXCoreProcessMemoryQueryOutput
 {
-    DXCoreMemoryUsage memoryUsage;
-    bool processQuerySucceeded;
+	DXCoreMemoryUsage memoryUsage;
+	bool processQuerySucceeded;
 };
 
 struct DXCoreAdapterProcessSetQueryInput
 {
-    uint32_t arraySize;
-    _Field_size_(arraySize) uint32_t* processIds;
+	uint32_t arraySize;
+	_Field_size_(arraySize) uint32_t* processIds;
 };
 
 struct DXCoreAdapterProcessSetQueryOutput
 {
-    uint32_t processesWritten;
-    uint32_t processesTotal;
+	uint32_t processesWritten;
+	uint32_t processesTotal;
 };
 
 struct DXCoreEngineNamePropertyInput
 {
-    DXCoreAdapterEngineIndex adapterEngineIndex;
-    uint32_t engineNameLength;
-    _Field_size_(engineNameLength) wchar_t *engineName;
+	DXCoreAdapterEngineIndex adapterEngineIndex;
+	uint32_t engineNameLength;
+	_Field_size_(engineNameLength) wchar_t *engineName;
 };
 
 struct DXCoreEngineNamePropertyOutput
 {
-    uint32_t engineNameLength;
+	uint32_t engineNameLength;
 };
 
 struct DXCoreFrequencyQueryOutput
 {
-    uint64_t frequency;
-    uint64_t maxFrequency;
-    uint64_t maxOverclockedFrequency;
+	uint64_t frequency;
+	uint64_t maxFrequency;
+	uint64_t maxOverclockedFrequency;
 };
 
 typedef void (STDMETHODCALLTYPE *PFN_DXCORE_NOTIFICATION_CALLBACK)(
-    DXCoreNotificationType notificationType,
-    _In_ IUnknown *object,
-    _In_opt_ void *context);
+	DXCoreNotificationType notificationType,
+	_In_ IUnknown *object,
+	_In_opt_ void *context);
 
 static_assert(sizeof(bool) == 1, "bool assumed as one byte");
 
@@ -245,103 +245,103 @@ MIDL_INTERFACE("f0db4c7f-fe5a-42a2-bd62-f2a6cf6fc83e")
 IDXCoreAdapter : public IUnknown
 {
 public:
-    virtual bool STDMETHODCALLTYPE IsValid() = 0;
+	virtual bool STDMETHODCALLTYPE IsValid() = 0;
 
-    virtual bool STDMETHODCALLTYPE IsAttributeSupported( 
-        REFGUID attributeGUID) = 0;
+	virtual bool STDMETHODCALLTYPE IsAttributeSupported( 
+		REFGUID attributeGUID) = 0;
 
-    virtual bool STDMETHODCALLTYPE IsPropertySupported( 
-        DXCoreAdapterProperty property) = 0;
+	virtual bool STDMETHODCALLTYPE IsPropertySupported( 
+		DXCoreAdapterProperty property) = 0;
 
-    virtual HRESULT STDMETHODCALLTYPE GetProperty( 
-        DXCoreAdapterProperty property,
-        size_t bufferSize,
-        _Out_writes_bytes_(bufferSize)  void *propertyData) = 0;
+	virtual HRESULT STDMETHODCALLTYPE GetProperty( 
+		DXCoreAdapterProperty property,
+		size_t bufferSize,
+		_Out_writes_bytes_(bufferSize)  void *propertyData) = 0;
 
-    template <class T>
-    HRESULT GetProperty( 
-        DXCoreAdapterProperty property,
-        _Out_writes_bytes_(sizeof(T))  T *propertyData)
-    {
-        return GetProperty(property,
-                           sizeof(T),
-                           (void*)propertyData);
-    }
+	template <class T>
+	HRESULT GetProperty( 
+		DXCoreAdapterProperty property,
+		_Out_writes_bytes_(sizeof(T))  T *propertyData)
+	{
+		return GetProperty(property,
+						   sizeof(T),
+						   (void*)propertyData);
+	}
 
-    virtual HRESULT STDMETHODCALLTYPE GetPropertySize( 
-        DXCoreAdapterProperty property,
-        _Out_ size_t *bufferSize) = 0;
+	virtual HRESULT STDMETHODCALLTYPE GetPropertySize( 
+		DXCoreAdapterProperty property,
+		_Out_ size_t *bufferSize) = 0;
 
-    virtual bool STDMETHODCALLTYPE IsQueryStateSupported( 
-        DXCoreAdapterState property) = 0;
+	virtual bool STDMETHODCALLTYPE IsQueryStateSupported( 
+		DXCoreAdapterState property) = 0;
 
-    virtual HRESULT STDMETHODCALLTYPE QueryState( 
-        DXCoreAdapterState state,
-        size_t inputStateDetailsSize,
-        _In_reads_bytes_opt_(inputStateDetailsSize) const void *inputStateDetails,
-        size_t outputBufferSize,
-        _Out_writes_bytes_(outputBufferSize) void *outputBuffer) = 0;
+	virtual HRESULT STDMETHODCALLTYPE QueryState( 
+		DXCoreAdapterState state,
+		size_t inputStateDetailsSize,
+		_In_reads_bytes_opt_(inputStateDetailsSize) const void *inputStateDetails,
+		size_t outputBufferSize,
+		_Out_writes_bytes_(outputBufferSize) void *outputBuffer) = 0;
 
-    template <class T1, class T2>
-    HRESULT QueryState( 
-        DXCoreAdapterState state,
-        _In_reads_bytes_opt_(sizeof(T1)) const T1 *inputStateDetails,
-        _Out_writes_bytes_(sizeof(T2)) T2 *outputBuffer)
-    {
-        return QueryState(state,
-                          sizeof(T1),
-                          (const void*)inputStateDetails,
-                          sizeof(T2),
-                          (void*)outputBuffer);
-    }
+	template <class T1, class T2>
+	HRESULT QueryState( 
+		DXCoreAdapterState state,
+		_In_reads_bytes_opt_(sizeof(T1)) const T1 *inputStateDetails,
+		_Out_writes_bytes_(sizeof(T2)) T2 *outputBuffer)
+	{
+		return QueryState(state,
+						  sizeof(T1),
+						  (const void*)inputStateDetails,
+						  sizeof(T2),
+						  (void*)outputBuffer);
+	}
 
-    template <class T>
-    HRESULT QueryState( 
-        DXCoreAdapterState state,
-        _Out_writes_bytes_(sizeof(T)) T *outputBuffer)
-    {
-        return QueryState(state,
-                          0,
-                          nullptr,
-                          sizeof(T),
-                          (void*)outputBuffer);
-    }
+	template <class T>
+	HRESULT QueryState( 
+		DXCoreAdapterState state,
+		_Out_writes_bytes_(sizeof(T)) T *outputBuffer)
+	{
+		return QueryState(state,
+						  0,
+						  nullptr,
+						  sizeof(T),
+						  (void*)outputBuffer);
+	}
 
-    virtual bool STDMETHODCALLTYPE IsSetStateSupported( 
-        DXCoreAdapterState property) = 0;
+	virtual bool STDMETHODCALLTYPE IsSetStateSupported( 
+		DXCoreAdapterState property) = 0;
 
-    virtual HRESULT STDMETHODCALLTYPE SetState( 
-        DXCoreAdapterState state,
-        size_t inputStateDetailsSize,
-        _In_reads_bytes_opt_(inputStateDetailsSize) const void *inputStateDetails,
-        size_t inputDataSize,
-        _In_reads_bytes_(inputDataSize) const void *inputData) = 0;
+	virtual HRESULT STDMETHODCALLTYPE SetState( 
+		DXCoreAdapterState state,
+		size_t inputStateDetailsSize,
+		_In_reads_bytes_opt_(inputStateDetailsSize) const void *inputStateDetails,
+		size_t inputDataSize,
+		_In_reads_bytes_(inputDataSize) const void *inputData) = 0;
 
-    template <class T1, class T2>
-    HRESULT SetState( 
-        DXCoreAdapterState state,
-        const T1 *inputStateDetails,
-        const T2 *inputData)
-    {
-        return SetState(state,
-                        sizeof(T1),
-                        (const void*)inputStateDetails,
-                        sizeof(T2),
-                        (const void*)inputData);
-    }
+	template <class T1, class T2>
+	HRESULT SetState( 
+		DXCoreAdapterState state,
+		const T1 *inputStateDetails,
+		const T2 *inputData)
+	{
+		return SetState(state,
+						sizeof(T1),
+						(const void*)inputStateDetails,
+						sizeof(T2),
+						(const void*)inputData);
+	}
 
-    virtual HRESULT STDMETHODCALLTYPE GetFactory(
-        REFIID riid,
-        _COM_Outptr_ void** ppvFactory
-    ) = 0;
+	virtual HRESULT STDMETHODCALLTYPE GetFactory(
+		REFIID riid,
+		_COM_Outptr_ void** ppvFactory
+	) = 0;
 
-    template <class T>
-    HRESULT GetFactory(
-        _COM_Outptr_ T** ppvFactory
-    )
-    {
-        return GetFactory(IID_PPV_ARGS(ppvFactory));
-    }
+	template <class T>
+	HRESULT GetFactory(
+		_COM_Outptr_ T** ppvFactory
+	)
+	{
+		return GetFactory(IID_PPV_ARGS(ppvFactory));
+	}
 };
 
 /* interface IDXCoreAdapter1 */
@@ -349,25 +349,25 @@ MIDL_INTERFACE("a0783366-cfa3-43be-9d79-55b2da97c63c")
 IDXCoreAdapter1 : public IDXCoreAdapter
 {
 public:
-    virtual HRESULT STDMETHODCALLTYPE GetPropertyWithInput(
-        DXCoreAdapterProperty property,
-        size_t inputPropertyDetailsSize,
-        _In_reads_bytes_opt_(inputPropertyDetailsSize) const void *inputPropertyDetails,
-        size_t outputBufferSize,
-        _Out_writes_bytes_(outputBufferSize) void *outputBuffer) = 0;
+	virtual HRESULT STDMETHODCALLTYPE GetPropertyWithInput(
+		DXCoreAdapterProperty property,
+		size_t inputPropertyDetailsSize,
+		_In_reads_bytes_opt_(inputPropertyDetailsSize) const void *inputPropertyDetails,
+		size_t outputBufferSize,
+		_Out_writes_bytes_(outputBufferSize) void *outputBuffer) = 0;
 
-    template <class T1, class T2>
-    HRESULT GetPropertyWithInput(
-            DXCoreAdapterProperty property,
-            _In_reads_bytes_opt_(sizeof(T1)) const T1 *inputPropertyDetails,
-            _Out_writes_bytes_(sizeof(T2)) T2 *outputBuffer)
-        {
-            return GetPropertyWithInput(property,
-                                        sizeof(T1),
-                                        (const void*)inputPropertyDetails,
-                                        sizeof(T2),
-                                        (void*)outputBuffer);
-        }
+	template <class T1, class T2>
+	HRESULT GetPropertyWithInput(
+			DXCoreAdapterProperty property,
+			_In_reads_bytes_opt_(sizeof(T1)) const T1 *inputPropertyDetails,
+			_Out_writes_bytes_(sizeof(T2)) T2 *outputBuffer)
+		{
+			return GetPropertyWithInput(property,
+										sizeof(T1),
+										(const void*)inputPropertyDetails,
+										sizeof(T2),
+										(void*)outputBuffer);
+		}
 };
 
 /* interface IDXCoreAdapterList */
@@ -375,43 +375,43 @@ MIDL_INTERFACE("526c7776-40e9-459b-b711-f32ad76dfc28")
 IDXCoreAdapterList : public IUnknown
 {
 public:
-    virtual HRESULT STDMETHODCALLTYPE GetAdapter( 
-        uint32_t index,
-        REFIID riid,
-        _COM_Outptr_ void **ppvAdapter) = 0;
+	virtual HRESULT STDMETHODCALLTYPE GetAdapter( 
+		uint32_t index,
+		REFIID riid,
+		_COM_Outptr_ void **ppvAdapter) = 0;
 
-    template<class T>
-    HRESULT STDMETHODCALLTYPE GetAdapter( 
-        uint32_t index,
-        _COM_Outptr_ T **ppvAdapter)
-    {
-        return GetAdapter(index,
-                          IID_PPV_ARGS(ppvAdapter));
-    }
+	template<class T>
+	HRESULT STDMETHODCALLTYPE GetAdapter( 
+		uint32_t index,
+		_COM_Outptr_ T **ppvAdapter)
+	{
+		return GetAdapter(index,
+						  IID_PPV_ARGS(ppvAdapter));
+	}
 
-    virtual uint32_t STDMETHODCALLTYPE GetAdapterCount() = 0;
+	virtual uint32_t STDMETHODCALLTYPE GetAdapterCount() = 0;
 
-    virtual bool STDMETHODCALLTYPE IsStale() = 0;
+	virtual bool STDMETHODCALLTYPE IsStale() = 0;
 
-    virtual HRESULT STDMETHODCALLTYPE GetFactory(
-        REFIID riid,
-        _COM_Outptr_ void** ppvFactory
-    ) = 0;
+	virtual HRESULT STDMETHODCALLTYPE GetFactory(
+		REFIID riid,
+		_COM_Outptr_ void** ppvFactory
+	) = 0;
 
-    template <class T>
-    HRESULT GetFactory(
-        _COM_Outptr_ T** ppvFactory
-    )
-    {
-        return GetFactory(IID_PPV_ARGS(ppvFactory));
-    }
+	template <class T>
+	HRESULT GetFactory(
+		_COM_Outptr_ T** ppvFactory
+	)
+	{
+		return GetFactory(IID_PPV_ARGS(ppvFactory));
+	}
 
-    virtual HRESULT STDMETHODCALLTYPE Sort(
-        uint32_t numPreferences,
-        _In_reads_(numPreferences) const DXCoreAdapterPreference* preferences) = 0;
+	virtual HRESULT STDMETHODCALLTYPE Sort(
+		uint32_t numPreferences,
+		_In_reads_(numPreferences) const DXCoreAdapterPreference* preferences) = 0;
 
-    virtual bool STDMETHODCALLTYPE IsAdapterPreferenceSupported( 
-        DXCoreAdapterPreference preference) = 0;
+	virtual bool STDMETHODCALLTYPE IsAdapterPreferenceSupported( 
+		DXCoreAdapterPreference preference) = 0;
 };
 
 /* interface IDXCoreAdapterFactory */
@@ -420,49 +420,49 @@ IDXCoreAdapterFactory : public IUnknown
 {
 public:
 
-    virtual HRESULT STDMETHODCALLTYPE CreateAdapterList( 
-        uint32_t numAttributes,
-        _In_reads_(numAttributes) const GUID *filterAttributes,
-        REFIID riid,
-        _COM_Outptr_ void **ppvAdapterList) = 0;
+	virtual HRESULT STDMETHODCALLTYPE CreateAdapterList( 
+		uint32_t numAttributes,
+		_In_reads_(numAttributes) const GUID *filterAttributes,
+		REFIID riid,
+		_COM_Outptr_ void **ppvAdapterList) = 0;
 
-    template<class T>
-    HRESULT STDMETHODCALLTYPE CreateAdapterList( 
-        uint32_t numAttributes,
-        _In_reads_(numAttributes) const GUID *filterAttributes,
-        _COM_Outptr_ T **ppvAdapterList)
-    {
-        return CreateAdapterList(numAttributes,
-                                 filterAttributes,
-                                 IID_PPV_ARGS(ppvAdapterList));
-    }
+	template<class T>
+	HRESULT STDMETHODCALLTYPE CreateAdapterList( 
+		uint32_t numAttributes,
+		_In_reads_(numAttributes) const GUID *filterAttributes,
+		_COM_Outptr_ T **ppvAdapterList)
+	{
+		return CreateAdapterList(numAttributes,
+								 filterAttributes,
+								 IID_PPV_ARGS(ppvAdapterList));
+	}
 
-    virtual HRESULT STDMETHODCALLTYPE GetAdapterByLuid( 
-        const LUID &adapterLUID,
-        REFIID riid,
-        _COM_Outptr_ void **ppvAdapter) = 0;
+	virtual HRESULT STDMETHODCALLTYPE GetAdapterByLuid( 
+		const LUID &adapterLUID,
+		REFIID riid,
+		_COM_Outptr_ void **ppvAdapter) = 0;
 
-    template<class T>
-    HRESULT STDMETHODCALLTYPE GetAdapterByLuid( 
-        const LUID &adapterLUID,
-        _COM_Outptr_ T **ppvAdapter)
-    {
-        return GetAdapterByLuid(adapterLUID,
-                                IID_PPV_ARGS(ppvAdapter));
-    }
+	template<class T>
+	HRESULT STDMETHODCALLTYPE GetAdapterByLuid( 
+		const LUID &adapterLUID,
+		_COM_Outptr_ T **ppvAdapter)
+	{
+		return GetAdapterByLuid(adapterLUID,
+								IID_PPV_ARGS(ppvAdapter));
+	}
 
-    virtual bool STDMETHODCALLTYPE IsNotificationTypeSupported( 
-        DXCoreNotificationType notificationType) = 0;
+	virtual bool STDMETHODCALLTYPE IsNotificationTypeSupported( 
+		DXCoreNotificationType notificationType) = 0;
 
-    virtual HRESULT STDMETHODCALLTYPE RegisterEventNotification( 
-        _In_ IUnknown *dxCoreObject,
-        DXCoreNotificationType notificationType,
-        _In_ PFN_DXCORE_NOTIFICATION_CALLBACK callbackFunction,
-        _In_opt_ void *callbackContext,
-        _Out_ uint32_t *eventCookie) = 0;
+	virtual HRESULT STDMETHODCALLTYPE RegisterEventNotification( 
+		_In_ IUnknown *dxCoreObject,
+		DXCoreNotificationType notificationType,
+		_In_ PFN_DXCORE_NOTIFICATION_CALLBACK callbackFunction,
+		_In_opt_ void *callbackContext,
+		_Out_ uint32_t *eventCookie) = 0;
 
-    virtual HRESULT STDMETHODCALLTYPE UnregisterEventNotification( 
-        uint32_t eventCookie) = 0;
+	virtual HRESULT STDMETHODCALLTYPE UnregisterEventNotification( 
+		uint32_t eventCookie) = 0;
 };
 
 /* interface IDXCoreAdapterFactory1 */
@@ -470,28 +470,29 @@ MIDL_INTERFACE("d5682e19-6d21-401c-827a-9a51a4ea35d7")
 IDXCoreAdapterFactory1 : public IDXCoreAdapterFactory
 {
 public:
-    virtual HRESULT STDMETHODCALLTYPE CreateAdapterListByWorkload(
-        DXCoreWorkload workload,
-        DXCoreRuntimeFilterFlags runtimeFilter,
-        DXCoreHardwareTypeFilterFlags hardwareTypeFilter,
-        REFIID riid,
-        _COM_Outptr_ void **ppvAdapterList) = 0;
+	virtual HRESULT STDMETHODCALLTYPE CreateAdapterListByWorkload(
+		DXCoreWorkload workload,
+		DXCoreRuntimeFilterFlags runtimeFilter,
+		DXCoreHardwareTypeFilterFlags hardwareTypeFilter,
+		REFIID riid,
+		_COM_Outptr_ void **ppvAdapterList) = 0;
 
-    template<class T>
-    HRESULT STDMETHODCALLTYPE CreateAdapterListByWorkload(
-        DXCoreWorkload workload,
-        DXCoreRuntimeFilterFlags runtimeFilter,
-        DXCoreHardwareTypeFilterFlags hardwareTypeFilter,
-        _COM_Outptr_ T **ppvAdapterList)
-    {
-        return CreateAdapterListByWorkload(workload,
-                                           runtimeFilter,
-                                           hardwareTypeFilter,
-                                           IID_PPV_ARGS(ppvAdapterList));
-    }
+	template<class T>
+	HRESULT STDMETHODCALLTYPE CreateAdapterListByWorkload(
+		DXCoreWorkload workload,
+		DXCoreRuntimeFilterFlags runtimeFilter,
+		DXCoreHardwareTypeFilterFlags hardwareTypeFilter,
+		_COM_Outptr_ T **ppvAdapterList)
+	{
+		return CreateAdapterListByWorkload(workload,
+										   runtimeFilter,
+										   hardwareTypeFilter,
+										   IID_PPV_ARGS(ppvAdapterList));
+	}
 };
 
 #endif // __cplusplus
 
 #endif // __dxcore_interface_h__
+
 

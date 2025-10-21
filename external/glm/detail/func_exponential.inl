@@ -1,4 +1,4 @@
-/// @ref core
+﻿/// @ref core
 /// @file glm/detail/func_exponential.inl
 
 #include "../vector_relational.hpp"
@@ -91,7 +91,7 @@ namespace detail
 	}
 
 #   if GLM_HAS_CXX11_STL
-    using std::exp2;
+	using std::exp2;
 #   else
 	//exp2, ln2 = 0.69314718055994530941723212145818f
 	template<typename genType>
@@ -149,4 +149,5 @@ namespace detail
 #if GLM_CONFIG_SIMD == GLM_ENABLE
 #	include "func_exponential_simd.inl"
 #endif
+
 

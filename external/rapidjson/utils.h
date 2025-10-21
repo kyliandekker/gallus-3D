@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <rapidjson/document.h>
 #include <string>
@@ -62,7 +62,7 @@ namespace rapidjson
 	}
 
 	inline bool GetInt(const rapidjson::Value& a_Document, const std::string& a_Key, int& a_Value)
-    {
+	{
 		if (!a_Document.HasMember(a_Key.c_str()))
 		{
 			return false;
@@ -73,7 +73,7 @@ namespace rapidjson
 		}
 		a_Value = a_Document[a_Key.c_str()].GetInt();
 		return true;
-    }
+	}
 
 	// Helper to set or add a string member
 	inline void SetOrAddMember(Value& obj, const char* name, const char* value, Document::AllocatorType& allocator)

@@ -1,4 +1,4 @@
-/// @ref gtx_io
+﻿/// @ref gtx_io
 /// @file glm/gtx/io.hpp
 /// @author Jan P Springer (regnirpsj@gmail.com)
 ///
@@ -193,9 +193,10 @@ namespace glm
 
   template<typename CTy, typename CTr, typename T, qualifier Q>
 	GLM_FUNC_DECL std::basic_ostream<CTy,CTr> & operator<<(std::basic_ostream<CTy,CTr> &,
-                                                         std::pair<mat<4, 4, T, Q> const, mat<4, 4, T, Q> const> const&);
+														 std::pair<mat<4, 4, T, Q> const, mat<4, 4, T, Q> const> const&);
 
 	/// @}
 }//namespace glm
 
 #include "io.inl"
+

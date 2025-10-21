@@ -1,4 +1,4 @@
-#ifndef IMGUI_DISABLE
+﻿#ifndef IMGUI_DISABLE
 #ifdef _EDITOR
 
 #pragma once
@@ -196,17 +196,17 @@ struct ComponentUIRegistrar
 };
 
 #define REGISTER_COMPONENT_UI(ComponentType, UIViewType, SystemType) \
-    static ComponentUIRegistrar _reg_##__COUNTER__( \
-        typeid(ComponentType), \
-        [](gallus::graphics::imgui::ImGuiWindow& window, gallus::gameplay::EntityID& entityId) \
-            -> gallus::graphics::imgui::ComponentBaseUIView* { \
-            auto& sys = gallus::core::EDITOR_ENGINE->GetECS().GetSystem<SystemType>(); \
-            if (sys.HasComponent(entityId)) { \
-                auto& comp = sys.GetComponent(entityId); \
-                return new UIViewType(window, comp, sys); \
-            } \
-            return nullptr; \
-        });
+	static ComponentUIRegistrar _reg_##__COUNTER__( \
+		typeid(ComponentType), \
+		[](gallus::graphics::imgui::ImGuiWindow& window, gallus::gameplay::EntityID& entityId) \
+			-> gallus::graphics::imgui::ComponentBaseUIView* { \
+			auto& sys = gallus::core::EDITOR_ENGINE->GetECS().GetSystem<SystemType>(); \
+			if (sys.HasComponent(entityId)) { \
+				auto& comp = sys.GetComponent(entityId); \
+				return new UIViewType(window, comp, sys); \
+			} \
+			return nullptr; \
+		});
 
 #pragma endregion REGISTER_COMPONENT_UI_CODE
 

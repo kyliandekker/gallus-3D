@@ -1,4 +1,4 @@
-/*-------------------------------------------------------------------------------------
+﻿/*-------------------------------------------------------------------------------------
  *
  * Copyright (c) Microsoft Corporation
  * Licensed under the MIT license
@@ -133,21 +133,21 @@ extern "C"{
 #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_APP | WINAPI_PARTITION_GAMES)
 typedef 
 enum D3D12_COMPATIBILITY_SHARED_FLAGS
-    {
-        D3D12_COMPATIBILITY_SHARED_FLAG_NONE	= 0,
-        D3D12_COMPATIBILITY_SHARED_FLAG_NON_NT_HANDLE	= 0x1,
-        D3D12_COMPATIBILITY_SHARED_FLAG_KEYED_MUTEX	= 0x2,
-        D3D12_COMPATIBILITY_SHARED_FLAG_9_ON_12	= 0x4
-    } 	D3D12_COMPATIBILITY_SHARED_FLAGS;
+	{
+		D3D12_COMPATIBILITY_SHARED_FLAG_NONE	= 0,
+		D3D12_COMPATIBILITY_SHARED_FLAG_NON_NT_HANDLE	= 0x1,
+		D3D12_COMPATIBILITY_SHARED_FLAG_KEYED_MUTEX	= 0x2,
+		D3D12_COMPATIBILITY_SHARED_FLAG_9_ON_12	= 0x4
+	} 	D3D12_COMPATIBILITY_SHARED_FLAGS;
 
 DEFINE_ENUM_FLAG_OPERATORS( D3D12_COMPATIBILITY_SHARED_FLAGS )
 typedef 
 enum D3D12_REFLECT_SHARED_PROPERTY
-    {
-        D3D12_REFLECT_SHARED_PROPERTY_D3D11_RESOURCE_FLAGS	= 0,
-        D3D12_REFELCT_SHARED_PROPERTY_COMPATIBILITY_SHARED_FLAGS	= ( D3D12_REFLECT_SHARED_PROPERTY_D3D11_RESOURCE_FLAGS + 1 ) ,
-        D3D12_REFLECT_SHARED_PROPERTY_NON_NT_SHARED_HANDLE	= ( D3D12_REFELCT_SHARED_PROPERTY_COMPATIBILITY_SHARED_FLAGS + 1 ) 
-    } 	D3D12_REFLECT_SHARED_PROPERTY;
+	{
+		D3D12_REFLECT_SHARED_PROPERTY_D3D11_RESOURCE_FLAGS	= 0,
+		D3D12_REFELCT_SHARED_PROPERTY_COMPATIBILITY_SHARED_FLAGS	= ( D3D12_REFLECT_SHARED_PROPERTY_D3D11_RESOURCE_FLAGS + 1 ) ,
+		D3D12_REFLECT_SHARED_PROPERTY_NON_NT_SHARED_HANDLE	= ( D3D12_REFELCT_SHARED_PROPERTY_COMPATIBILITY_SHARED_FLAGS + 1 ) 
+	} 	D3D12_REFLECT_SHARED_PROPERTY;
 
 
 
@@ -164,121 +164,121 @@ extern RPC_IF_HANDLE __MIDL_itf_d3d12compatibility_0000_0000_v0_0_s_ifspec;
 EXTERN_C const IID IID_ID3D12CompatibilityDevice;
 
 #if defined(__cplusplus) && !defined(CINTERFACE)
-    
-    MIDL_INTERFACE("8f1c0e3c-fae3-4a82-b098-bfe1708207ff")
-    ID3D12CompatibilityDevice : public IUnknown
-    {
-    public:
-        virtual HRESULT STDMETHODCALLTYPE CreateSharedResource( 
-            _In_  const D3D12_HEAP_PROPERTIES *pHeapProperties,
-            D3D12_HEAP_FLAGS HeapFlags,
-            _In_  const D3D12_RESOURCE_DESC *pDesc,
-            D3D12_RESOURCE_STATES InitialResourceState,
-            _In_opt_  const D3D12_CLEAR_VALUE *pOptimizedClearValue,
-            _In_opt_  const D3D11_RESOURCE_FLAGS *pFlags11,
-            D3D12_COMPATIBILITY_SHARED_FLAGS CompatibilityFlags,
-            _In_opt_  ID3D12LifetimeTracker *pLifetimeTracker,
-            _In_opt_  ID3D12SwapChainAssistant *pOwningSwapchain,
-            REFIID riid,
-            _COM_Outptr_opt_  void **ppResource) = 0;
-        
-        virtual HRESULT STDMETHODCALLTYPE CreateSharedHeap( 
-            _In_  const D3D12_HEAP_DESC *pHeapDesc,
-            D3D12_COMPATIBILITY_SHARED_FLAGS CompatibilityFlags,
-            REFIID riid,
-            _COM_Outptr_opt_  void **ppHeap) = 0;
-        
-        virtual HRESULT STDMETHODCALLTYPE ReflectSharedProperties( 
-            _In_  ID3D12Object *pHeapOrResource,
-            D3D12_REFLECT_SHARED_PROPERTY ReflectType,
-            _Out_writes_bytes_(DataSize)  void *pData,
-            UINT DataSize) = 0;
-        
-    };
-    
-    
+	
+	MIDL_INTERFACE("8f1c0e3c-fae3-4a82-b098-bfe1708207ff")
+	ID3D12CompatibilityDevice : public IUnknown
+	{
+	public:
+		virtual HRESULT STDMETHODCALLTYPE CreateSharedResource( 
+			_In_  const D3D12_HEAP_PROPERTIES *pHeapProperties,
+			D3D12_HEAP_FLAGS HeapFlags,
+			_In_  const D3D12_RESOURCE_DESC *pDesc,
+			D3D12_RESOURCE_STATES InitialResourceState,
+			_In_opt_  const D3D12_CLEAR_VALUE *pOptimizedClearValue,
+			_In_opt_  const D3D11_RESOURCE_FLAGS *pFlags11,
+			D3D12_COMPATIBILITY_SHARED_FLAGS CompatibilityFlags,
+			_In_opt_  ID3D12LifetimeTracker *pLifetimeTracker,
+			_In_opt_  ID3D12SwapChainAssistant *pOwningSwapchain,
+			REFIID riid,
+			_COM_Outptr_opt_  void **ppResource) = 0;
+		
+		virtual HRESULT STDMETHODCALLTYPE CreateSharedHeap( 
+			_In_  const D3D12_HEAP_DESC *pHeapDesc,
+			D3D12_COMPATIBILITY_SHARED_FLAGS CompatibilityFlags,
+			REFIID riid,
+			_COM_Outptr_opt_  void **ppHeap) = 0;
+		
+		virtual HRESULT STDMETHODCALLTYPE ReflectSharedProperties( 
+			_In_  ID3D12Object *pHeapOrResource,
+			D3D12_REFLECT_SHARED_PROPERTY ReflectType,
+			_Out_writes_bytes_(DataSize)  void *pData,
+			UINT DataSize) = 0;
+		
+	};
+	
+	
 #else 	/* C style interface */
 
-    typedef struct ID3D12CompatibilityDeviceVtbl
-    {
-        BEGIN_INTERFACE
-        
-        DECLSPEC_XFGVIRT(IUnknown, QueryInterface)
-        HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
-            ID3D12CompatibilityDevice * This,
-            REFIID riid,
-            _COM_Outptr_  void **ppvObject);
-        
-        DECLSPEC_XFGVIRT(IUnknown, AddRef)
-        ULONG ( STDMETHODCALLTYPE *AddRef )( 
-            ID3D12CompatibilityDevice * This);
-        
-        DECLSPEC_XFGVIRT(IUnknown, Release)
-        ULONG ( STDMETHODCALLTYPE *Release )( 
-            ID3D12CompatibilityDevice * This);
-        
-        DECLSPEC_XFGVIRT(ID3D12CompatibilityDevice, CreateSharedResource)
-        HRESULT ( STDMETHODCALLTYPE *CreateSharedResource )( 
-            ID3D12CompatibilityDevice * This,
-            _In_  const D3D12_HEAP_PROPERTIES *pHeapProperties,
-            D3D12_HEAP_FLAGS HeapFlags,
-            _In_  const D3D12_RESOURCE_DESC *pDesc,
-            D3D12_RESOURCE_STATES InitialResourceState,
-            _In_opt_  const D3D12_CLEAR_VALUE *pOptimizedClearValue,
-            _In_opt_  const D3D11_RESOURCE_FLAGS *pFlags11,
-            D3D12_COMPATIBILITY_SHARED_FLAGS CompatibilityFlags,
-            _In_opt_  ID3D12LifetimeTracker *pLifetimeTracker,
-            _In_opt_  ID3D12SwapChainAssistant *pOwningSwapchain,
-            REFIID riid,
-            _COM_Outptr_opt_  void **ppResource);
-        
-        DECLSPEC_XFGVIRT(ID3D12CompatibilityDevice, CreateSharedHeap)
-        HRESULT ( STDMETHODCALLTYPE *CreateSharedHeap )( 
-            ID3D12CompatibilityDevice * This,
-            _In_  const D3D12_HEAP_DESC *pHeapDesc,
-            D3D12_COMPATIBILITY_SHARED_FLAGS CompatibilityFlags,
-            REFIID riid,
-            _COM_Outptr_opt_  void **ppHeap);
-        
-        DECLSPEC_XFGVIRT(ID3D12CompatibilityDevice, ReflectSharedProperties)
-        HRESULT ( STDMETHODCALLTYPE *ReflectSharedProperties )( 
-            ID3D12CompatibilityDevice * This,
-            _In_  ID3D12Object *pHeapOrResource,
-            D3D12_REFLECT_SHARED_PROPERTY ReflectType,
-            _Out_writes_bytes_(DataSize)  void *pData,
-            UINT DataSize);
-        
-        END_INTERFACE
-    } ID3D12CompatibilityDeviceVtbl;
+	typedef struct ID3D12CompatibilityDeviceVtbl
+	{
+		BEGIN_INTERFACE
+		
+		DECLSPEC_XFGVIRT(IUnknown, QueryInterface)
+		HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
+			ID3D12CompatibilityDevice * This,
+			REFIID riid,
+			_COM_Outptr_  void **ppvObject);
+		
+		DECLSPEC_XFGVIRT(IUnknown, AddRef)
+		ULONG ( STDMETHODCALLTYPE *AddRef )( 
+			ID3D12CompatibilityDevice * This);
+		
+		DECLSPEC_XFGVIRT(IUnknown, Release)
+		ULONG ( STDMETHODCALLTYPE *Release )( 
+			ID3D12CompatibilityDevice * This);
+		
+		DECLSPEC_XFGVIRT(ID3D12CompatibilityDevice, CreateSharedResource)
+		HRESULT ( STDMETHODCALLTYPE *CreateSharedResource )( 
+			ID3D12CompatibilityDevice * This,
+			_In_  const D3D12_HEAP_PROPERTIES *pHeapProperties,
+			D3D12_HEAP_FLAGS HeapFlags,
+			_In_  const D3D12_RESOURCE_DESC *pDesc,
+			D3D12_RESOURCE_STATES InitialResourceState,
+			_In_opt_  const D3D12_CLEAR_VALUE *pOptimizedClearValue,
+			_In_opt_  const D3D11_RESOURCE_FLAGS *pFlags11,
+			D3D12_COMPATIBILITY_SHARED_FLAGS CompatibilityFlags,
+			_In_opt_  ID3D12LifetimeTracker *pLifetimeTracker,
+			_In_opt_  ID3D12SwapChainAssistant *pOwningSwapchain,
+			REFIID riid,
+			_COM_Outptr_opt_  void **ppResource);
+		
+		DECLSPEC_XFGVIRT(ID3D12CompatibilityDevice, CreateSharedHeap)
+		HRESULT ( STDMETHODCALLTYPE *CreateSharedHeap )( 
+			ID3D12CompatibilityDevice * This,
+			_In_  const D3D12_HEAP_DESC *pHeapDesc,
+			D3D12_COMPATIBILITY_SHARED_FLAGS CompatibilityFlags,
+			REFIID riid,
+			_COM_Outptr_opt_  void **ppHeap);
+		
+		DECLSPEC_XFGVIRT(ID3D12CompatibilityDevice, ReflectSharedProperties)
+		HRESULT ( STDMETHODCALLTYPE *ReflectSharedProperties )( 
+			ID3D12CompatibilityDevice * This,
+			_In_  ID3D12Object *pHeapOrResource,
+			D3D12_REFLECT_SHARED_PROPERTY ReflectType,
+			_Out_writes_bytes_(DataSize)  void *pData,
+			UINT DataSize);
+		
+		END_INTERFACE
+	} ID3D12CompatibilityDeviceVtbl;
 
-    interface ID3D12CompatibilityDevice
-    {
-        CONST_VTBL struct ID3D12CompatibilityDeviceVtbl *lpVtbl;
-    };
+	interface ID3D12CompatibilityDevice
+	{
+		CONST_VTBL struct ID3D12CompatibilityDeviceVtbl *lpVtbl;
+	};
 
-    
+	
 
 #ifdef COBJMACROS
 
 
 #define ID3D12CompatibilityDevice_QueryInterface(This,riid,ppvObject)	\
-    ( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
+	( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
 
 #define ID3D12CompatibilityDevice_AddRef(This)	\
-    ( (This)->lpVtbl -> AddRef(This) ) 
+	( (This)->lpVtbl -> AddRef(This) ) 
 
 #define ID3D12CompatibilityDevice_Release(This)	\
-    ( (This)->lpVtbl -> Release(This) ) 
+	( (This)->lpVtbl -> Release(This) ) 
 
 
 #define ID3D12CompatibilityDevice_CreateSharedResource(This,pHeapProperties,HeapFlags,pDesc,InitialResourceState,pOptimizedClearValue,pFlags11,CompatibilityFlags,pLifetimeTracker,pOwningSwapchain,riid,ppResource)	\
-    ( (This)->lpVtbl -> CreateSharedResource(This,pHeapProperties,HeapFlags,pDesc,InitialResourceState,pOptimizedClearValue,pFlags11,CompatibilityFlags,pLifetimeTracker,pOwningSwapchain,riid,ppResource) ) 
+	( (This)->lpVtbl -> CreateSharedResource(This,pHeapProperties,HeapFlags,pDesc,InitialResourceState,pOptimizedClearValue,pFlags11,CompatibilityFlags,pLifetimeTracker,pOwningSwapchain,riid,ppResource) ) 
 
 #define ID3D12CompatibilityDevice_CreateSharedHeap(This,pHeapDesc,CompatibilityFlags,riid,ppHeap)	\
-    ( (This)->lpVtbl -> CreateSharedHeap(This,pHeapDesc,CompatibilityFlags,riid,ppHeap) ) 
+	( (This)->lpVtbl -> CreateSharedHeap(This,pHeapDesc,CompatibilityFlags,riid,ppHeap) ) 
 
 #define ID3D12CompatibilityDevice_ReflectSharedProperties(This,pHeapOrResource,ReflectType,pData,DataSize)	\
-    ( (This)->lpVtbl -> ReflectSharedProperties(This,pHeapOrResource,ReflectType,pData,DataSize) ) 
+	( (This)->lpVtbl -> ReflectSharedProperties(This,pHeapOrResource,ReflectType,pData,DataSize) ) 
 
 #endif /* COBJMACROS */
 
@@ -301,55 +301,55 @@ EXTERN_C const IID IID_ID3D12CompatibilityDevice;
 EXTERN_C const IID IID_D3D11On12CreatorID;
 
 #if defined(__cplusplus) && !defined(CINTERFACE)
-    
-    MIDL_INTERFACE("edbf5678-2960-4e81-8429-99d4b2630c4e")
-    D3D11On12CreatorID : public IUnknown
-    {
-    public:
-    };
-    
-    
+	
+	MIDL_INTERFACE("edbf5678-2960-4e81-8429-99d4b2630c4e")
+	D3D11On12CreatorID : public IUnknown
+	{
+	public:
+	};
+	
+	
 #else 	/* C style interface */
 
-    typedef struct D3D11On12CreatorIDVtbl
-    {
-        BEGIN_INTERFACE
-        
-        DECLSPEC_XFGVIRT(IUnknown, QueryInterface)
-        HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
-            D3D11On12CreatorID * This,
-            REFIID riid,
-            _COM_Outptr_  void **ppvObject);
-        
-        DECLSPEC_XFGVIRT(IUnknown, AddRef)
-        ULONG ( STDMETHODCALLTYPE *AddRef )( 
-            D3D11On12CreatorID * This);
-        
-        DECLSPEC_XFGVIRT(IUnknown, Release)
-        ULONG ( STDMETHODCALLTYPE *Release )( 
-            D3D11On12CreatorID * This);
-        
-        END_INTERFACE
-    } D3D11On12CreatorIDVtbl;
+	typedef struct D3D11On12CreatorIDVtbl
+	{
+		BEGIN_INTERFACE
+		
+		DECLSPEC_XFGVIRT(IUnknown, QueryInterface)
+		HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
+			D3D11On12CreatorID * This,
+			REFIID riid,
+			_COM_Outptr_  void **ppvObject);
+		
+		DECLSPEC_XFGVIRT(IUnknown, AddRef)
+		ULONG ( STDMETHODCALLTYPE *AddRef )( 
+			D3D11On12CreatorID * This);
+		
+		DECLSPEC_XFGVIRT(IUnknown, Release)
+		ULONG ( STDMETHODCALLTYPE *Release )( 
+			D3D11On12CreatorID * This);
+		
+		END_INTERFACE
+	} D3D11On12CreatorIDVtbl;
 
-    interface D3D11On12CreatorID
-    {
-        CONST_VTBL struct D3D11On12CreatorIDVtbl *lpVtbl;
-    };
+	interface D3D11On12CreatorID
+	{
+		CONST_VTBL struct D3D11On12CreatorIDVtbl *lpVtbl;
+	};
 
-    
+	
 
 #ifdef COBJMACROS
 
 
 #define D3D11On12CreatorID_QueryInterface(This,riid,ppvObject)	\
-    ( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
+	( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
 
 #define D3D11On12CreatorID_AddRef(This)	\
-    ( (This)->lpVtbl -> AddRef(This) ) 
+	( (This)->lpVtbl -> AddRef(This) ) 
 
 #define D3D11On12CreatorID_Release(This)	\
-    ( (This)->lpVtbl -> Release(This) ) 
+	( (This)->lpVtbl -> Release(This) ) 
 
 
 #endif /* COBJMACROS */
@@ -373,55 +373,55 @@ EXTERN_C const IID IID_D3D11On12CreatorID;
 EXTERN_C const IID IID_D3D9On12CreatorID;
 
 #if defined(__cplusplus) && !defined(CINTERFACE)
-    
-    MIDL_INTERFACE("fffcbb7f-15d3-42a2-841e-9d8d32f37ddd")
-    D3D9On12CreatorID : public IUnknown
-    {
-    public:
-    };
-    
-    
+	
+	MIDL_INTERFACE("fffcbb7f-15d3-42a2-841e-9d8d32f37ddd")
+	D3D9On12CreatorID : public IUnknown
+	{
+	public:
+	};
+	
+	
 #else 	/* C style interface */
 
-    typedef struct D3D9On12CreatorIDVtbl
-    {
-        BEGIN_INTERFACE
-        
-        DECLSPEC_XFGVIRT(IUnknown, QueryInterface)
-        HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
-            D3D9On12CreatorID * This,
-            REFIID riid,
-            _COM_Outptr_  void **ppvObject);
-        
-        DECLSPEC_XFGVIRT(IUnknown, AddRef)
-        ULONG ( STDMETHODCALLTYPE *AddRef )( 
-            D3D9On12CreatorID * This);
-        
-        DECLSPEC_XFGVIRT(IUnknown, Release)
-        ULONG ( STDMETHODCALLTYPE *Release )( 
-            D3D9On12CreatorID * This);
-        
-        END_INTERFACE
-    } D3D9On12CreatorIDVtbl;
+	typedef struct D3D9On12CreatorIDVtbl
+	{
+		BEGIN_INTERFACE
+		
+		DECLSPEC_XFGVIRT(IUnknown, QueryInterface)
+		HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
+			D3D9On12CreatorID * This,
+			REFIID riid,
+			_COM_Outptr_  void **ppvObject);
+		
+		DECLSPEC_XFGVIRT(IUnknown, AddRef)
+		ULONG ( STDMETHODCALLTYPE *AddRef )( 
+			D3D9On12CreatorID * This);
+		
+		DECLSPEC_XFGVIRT(IUnknown, Release)
+		ULONG ( STDMETHODCALLTYPE *Release )( 
+			D3D9On12CreatorID * This);
+		
+		END_INTERFACE
+	} D3D9On12CreatorIDVtbl;
 
-    interface D3D9On12CreatorID
-    {
-        CONST_VTBL struct D3D9On12CreatorIDVtbl *lpVtbl;
-    };
+	interface D3D9On12CreatorID
+	{
+		CONST_VTBL struct D3D9On12CreatorIDVtbl *lpVtbl;
+	};
 
-    
+	
 
 #ifdef COBJMACROS
 
 
 #define D3D9On12CreatorID_QueryInterface(This,riid,ppvObject)	\
-    ( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
+	( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
 
 #define D3D9On12CreatorID_AddRef(This)	\
-    ( (This)->lpVtbl -> AddRef(This) ) 
+	( (This)->lpVtbl -> AddRef(This) ) 
 
 #define D3D9On12CreatorID_Release(This)	\
-    ( (This)->lpVtbl -> Release(This) ) 
+	( (This)->lpVtbl -> Release(This) ) 
 
 
 #endif /* COBJMACROS */
@@ -445,55 +445,55 @@ EXTERN_C const IID IID_D3D9On12CreatorID;
 EXTERN_C const IID IID_OpenGLOn12CreatorID;
 
 #if defined(__cplusplus) && !defined(CINTERFACE)
-    
-    MIDL_INTERFACE("6bb3cd34-0d19-45ab-97ed-d720ba3dfc80")
-    OpenGLOn12CreatorID : public IUnknown
-    {
-    public:
-    };
-    
-    
+	
+	MIDL_INTERFACE("6bb3cd34-0d19-45ab-97ed-d720ba3dfc80")
+	OpenGLOn12CreatorID : public IUnknown
+	{
+	public:
+	};
+	
+	
 #else 	/* C style interface */
 
-    typedef struct OpenGLOn12CreatorIDVtbl
-    {
-        BEGIN_INTERFACE
-        
-        DECLSPEC_XFGVIRT(IUnknown, QueryInterface)
-        HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
-            OpenGLOn12CreatorID * This,
-            REFIID riid,
-            _COM_Outptr_  void **ppvObject);
-        
-        DECLSPEC_XFGVIRT(IUnknown, AddRef)
-        ULONG ( STDMETHODCALLTYPE *AddRef )( 
-            OpenGLOn12CreatorID * This);
-        
-        DECLSPEC_XFGVIRT(IUnknown, Release)
-        ULONG ( STDMETHODCALLTYPE *Release )( 
-            OpenGLOn12CreatorID * This);
-        
-        END_INTERFACE
-    } OpenGLOn12CreatorIDVtbl;
+	typedef struct OpenGLOn12CreatorIDVtbl
+	{
+		BEGIN_INTERFACE
+		
+		DECLSPEC_XFGVIRT(IUnknown, QueryInterface)
+		HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
+			OpenGLOn12CreatorID * This,
+			REFIID riid,
+			_COM_Outptr_  void **ppvObject);
+		
+		DECLSPEC_XFGVIRT(IUnknown, AddRef)
+		ULONG ( STDMETHODCALLTYPE *AddRef )( 
+			OpenGLOn12CreatorID * This);
+		
+		DECLSPEC_XFGVIRT(IUnknown, Release)
+		ULONG ( STDMETHODCALLTYPE *Release )( 
+			OpenGLOn12CreatorID * This);
+		
+		END_INTERFACE
+	} OpenGLOn12CreatorIDVtbl;
 
-    interface OpenGLOn12CreatorID
-    {
-        CONST_VTBL struct OpenGLOn12CreatorIDVtbl *lpVtbl;
-    };
+	interface OpenGLOn12CreatorID
+	{
+		CONST_VTBL struct OpenGLOn12CreatorIDVtbl *lpVtbl;
+	};
 
-    
+	
 
 #ifdef COBJMACROS
 
 
 #define OpenGLOn12CreatorID_QueryInterface(This,riid,ppvObject)	\
-    ( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
+	( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
 
 #define OpenGLOn12CreatorID_AddRef(This)	\
-    ( (This)->lpVtbl -> AddRef(This) ) 
+	( (This)->lpVtbl -> AddRef(This) ) 
 
 #define OpenGLOn12CreatorID_Release(This)	\
-    ( (This)->lpVtbl -> Release(This) ) 
+	( (This)->lpVtbl -> Release(This) ) 
 
 
 #endif /* COBJMACROS */
@@ -517,55 +517,55 @@ EXTERN_C const IID IID_OpenGLOn12CreatorID;
 EXTERN_C const IID IID_OpenCLOn12CreatorID;
 
 #if defined(__cplusplus) && !defined(CINTERFACE)
-    
-    MIDL_INTERFACE("3f76bb74-91b5-4a88-b126-20ca0331cd60")
-    OpenCLOn12CreatorID : public IUnknown
-    {
-    public:
-    };
-    
-    
+	
+	MIDL_INTERFACE("3f76bb74-91b5-4a88-b126-20ca0331cd60")
+	OpenCLOn12CreatorID : public IUnknown
+	{
+	public:
+	};
+	
+	
 #else 	/* C style interface */
 
-    typedef struct OpenCLOn12CreatorIDVtbl
-    {
-        BEGIN_INTERFACE
-        
-        DECLSPEC_XFGVIRT(IUnknown, QueryInterface)
-        HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
-            OpenCLOn12CreatorID * This,
-            REFIID riid,
-            _COM_Outptr_  void **ppvObject);
-        
-        DECLSPEC_XFGVIRT(IUnknown, AddRef)
-        ULONG ( STDMETHODCALLTYPE *AddRef )( 
-            OpenCLOn12CreatorID * This);
-        
-        DECLSPEC_XFGVIRT(IUnknown, Release)
-        ULONG ( STDMETHODCALLTYPE *Release )( 
-            OpenCLOn12CreatorID * This);
-        
-        END_INTERFACE
-    } OpenCLOn12CreatorIDVtbl;
+	typedef struct OpenCLOn12CreatorIDVtbl
+	{
+		BEGIN_INTERFACE
+		
+		DECLSPEC_XFGVIRT(IUnknown, QueryInterface)
+		HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
+			OpenCLOn12CreatorID * This,
+			REFIID riid,
+			_COM_Outptr_  void **ppvObject);
+		
+		DECLSPEC_XFGVIRT(IUnknown, AddRef)
+		ULONG ( STDMETHODCALLTYPE *AddRef )( 
+			OpenCLOn12CreatorID * This);
+		
+		DECLSPEC_XFGVIRT(IUnknown, Release)
+		ULONG ( STDMETHODCALLTYPE *Release )( 
+			OpenCLOn12CreatorID * This);
+		
+		END_INTERFACE
+	} OpenCLOn12CreatorIDVtbl;
 
-    interface OpenCLOn12CreatorID
-    {
-        CONST_VTBL struct OpenCLOn12CreatorIDVtbl *lpVtbl;
-    };
+	interface OpenCLOn12CreatorID
+	{
+		CONST_VTBL struct OpenCLOn12CreatorIDVtbl *lpVtbl;
+	};
 
-    
+	
 
 #ifdef COBJMACROS
 
 
 #define OpenCLOn12CreatorID_QueryInterface(This,riid,ppvObject)	\
-    ( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
+	( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
 
 #define OpenCLOn12CreatorID_AddRef(This)	\
-    ( (This)->lpVtbl -> AddRef(This) ) 
+	( (This)->lpVtbl -> AddRef(This) ) 
 
 #define OpenCLOn12CreatorID_Release(This)	\
-    ( (This)->lpVtbl -> Release(This) ) 
+	( (This)->lpVtbl -> Release(This) ) 
 
 
 #endif /* COBJMACROS */
@@ -589,55 +589,55 @@ EXTERN_C const IID IID_OpenCLOn12CreatorID;
 EXTERN_C const IID IID_VulkanOn12CreatorID;
 
 #if defined(__cplusplus) && !defined(CINTERFACE)
-    
-    MIDL_INTERFACE("bc806e01-3052-406c-a3e8-9fc07f048f98")
-    VulkanOn12CreatorID : public IUnknown
-    {
-    public:
-    };
-    
-    
+	
+	MIDL_INTERFACE("bc806e01-3052-406c-a3e8-9fc07f048f98")
+	VulkanOn12CreatorID : public IUnknown
+	{
+	public:
+	};
+	
+	
 #else 	/* C style interface */
 
-    typedef struct VulkanOn12CreatorIDVtbl
-    {
-        BEGIN_INTERFACE
-        
-        DECLSPEC_XFGVIRT(IUnknown, QueryInterface)
-        HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
-            VulkanOn12CreatorID * This,
-            REFIID riid,
-            _COM_Outptr_  void **ppvObject);
-        
-        DECLSPEC_XFGVIRT(IUnknown, AddRef)
-        ULONG ( STDMETHODCALLTYPE *AddRef )( 
-            VulkanOn12CreatorID * This);
-        
-        DECLSPEC_XFGVIRT(IUnknown, Release)
-        ULONG ( STDMETHODCALLTYPE *Release )( 
-            VulkanOn12CreatorID * This);
-        
-        END_INTERFACE
-    } VulkanOn12CreatorIDVtbl;
+	typedef struct VulkanOn12CreatorIDVtbl
+	{
+		BEGIN_INTERFACE
+		
+		DECLSPEC_XFGVIRT(IUnknown, QueryInterface)
+		HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
+			VulkanOn12CreatorID * This,
+			REFIID riid,
+			_COM_Outptr_  void **ppvObject);
+		
+		DECLSPEC_XFGVIRT(IUnknown, AddRef)
+		ULONG ( STDMETHODCALLTYPE *AddRef )( 
+			VulkanOn12CreatorID * This);
+		
+		DECLSPEC_XFGVIRT(IUnknown, Release)
+		ULONG ( STDMETHODCALLTYPE *Release )( 
+			VulkanOn12CreatorID * This);
+		
+		END_INTERFACE
+	} VulkanOn12CreatorIDVtbl;
 
-    interface VulkanOn12CreatorID
-    {
-        CONST_VTBL struct VulkanOn12CreatorIDVtbl *lpVtbl;
-    };
+	interface VulkanOn12CreatorID
+	{
+		CONST_VTBL struct VulkanOn12CreatorIDVtbl *lpVtbl;
+	};
 
-    
+	
 
 #ifdef COBJMACROS
 
 
 #define VulkanOn12CreatorID_QueryInterface(This,riid,ppvObject)	\
-    ( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
+	( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
 
 #define VulkanOn12CreatorID_AddRef(This)	\
-    ( (This)->lpVtbl -> AddRef(This) ) 
+	( (This)->lpVtbl -> AddRef(This) ) 
 
 #define VulkanOn12CreatorID_Release(This)	\
-    ( (This)->lpVtbl -> Release(This) ) 
+	( (This)->lpVtbl -> Release(This) ) 
 
 
 #endif /* COBJMACROS */
@@ -661,55 +661,55 @@ EXTERN_C const IID IID_VulkanOn12CreatorID;
 EXTERN_C const IID IID_DirectMLTensorFlowCreatorID;
 
 #if defined(__cplusplus) && !defined(CINTERFACE)
-    
-    MIDL_INTERFACE("cb7490ac-8a0f-44ec-9b7b-6f4cafe8e9ab")
-    DirectMLTensorFlowCreatorID : public IUnknown
-    {
-    public:
-    };
-    
-    
+	
+	MIDL_INTERFACE("cb7490ac-8a0f-44ec-9b7b-6f4cafe8e9ab")
+	DirectMLTensorFlowCreatorID : public IUnknown
+	{
+	public:
+	};
+	
+	
 #else 	/* C style interface */
 
-    typedef struct DirectMLTensorFlowCreatorIDVtbl
-    {
-        BEGIN_INTERFACE
-        
-        DECLSPEC_XFGVIRT(IUnknown, QueryInterface)
-        HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
-            DirectMLTensorFlowCreatorID * This,
-            REFIID riid,
-            _COM_Outptr_  void **ppvObject);
-        
-        DECLSPEC_XFGVIRT(IUnknown, AddRef)
-        ULONG ( STDMETHODCALLTYPE *AddRef )( 
-            DirectMLTensorFlowCreatorID * This);
-        
-        DECLSPEC_XFGVIRT(IUnknown, Release)
-        ULONG ( STDMETHODCALLTYPE *Release )( 
-            DirectMLTensorFlowCreatorID * This);
-        
-        END_INTERFACE
-    } DirectMLTensorFlowCreatorIDVtbl;
+	typedef struct DirectMLTensorFlowCreatorIDVtbl
+	{
+		BEGIN_INTERFACE
+		
+		DECLSPEC_XFGVIRT(IUnknown, QueryInterface)
+		HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
+			DirectMLTensorFlowCreatorID * This,
+			REFIID riid,
+			_COM_Outptr_  void **ppvObject);
+		
+		DECLSPEC_XFGVIRT(IUnknown, AddRef)
+		ULONG ( STDMETHODCALLTYPE *AddRef )( 
+			DirectMLTensorFlowCreatorID * This);
+		
+		DECLSPEC_XFGVIRT(IUnknown, Release)
+		ULONG ( STDMETHODCALLTYPE *Release )( 
+			DirectMLTensorFlowCreatorID * This);
+		
+		END_INTERFACE
+	} DirectMLTensorFlowCreatorIDVtbl;
 
-    interface DirectMLTensorFlowCreatorID
-    {
-        CONST_VTBL struct DirectMLTensorFlowCreatorIDVtbl *lpVtbl;
-    };
+	interface DirectMLTensorFlowCreatorID
+	{
+		CONST_VTBL struct DirectMLTensorFlowCreatorIDVtbl *lpVtbl;
+	};
 
-    
+	
 
 #ifdef COBJMACROS
 
 
 #define DirectMLTensorFlowCreatorID_QueryInterface(This,riid,ppvObject)	\
-    ( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
+	( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
 
 #define DirectMLTensorFlowCreatorID_AddRef(This)	\
-    ( (This)->lpVtbl -> AddRef(This) ) 
+	( (This)->lpVtbl -> AddRef(This) ) 
 
 #define DirectMLTensorFlowCreatorID_Release(This)	\
-    ( (This)->lpVtbl -> Release(This) ) 
+	( (This)->lpVtbl -> Release(This) ) 
 
 
 #endif /* COBJMACROS */
@@ -733,55 +733,55 @@ EXTERN_C const IID IID_DirectMLTensorFlowCreatorID;
 EXTERN_C const IID IID_DirectMLPyTorchCreatorID;
 
 #if defined(__cplusplus) && !defined(CINTERFACE)
-    
-    MIDL_INTERFACE("af029192-fba1-4b05-9116-235e06560354")
-    DirectMLPyTorchCreatorID : public IUnknown
-    {
-    public:
-    };
-    
-    
+	
+	MIDL_INTERFACE("af029192-fba1-4b05-9116-235e06560354")
+	DirectMLPyTorchCreatorID : public IUnknown
+	{
+	public:
+	};
+	
+	
 #else 	/* C style interface */
 
-    typedef struct DirectMLPyTorchCreatorIDVtbl
-    {
-        BEGIN_INTERFACE
-        
-        DECLSPEC_XFGVIRT(IUnknown, QueryInterface)
-        HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
-            DirectMLPyTorchCreatorID * This,
-            REFIID riid,
-            _COM_Outptr_  void **ppvObject);
-        
-        DECLSPEC_XFGVIRT(IUnknown, AddRef)
-        ULONG ( STDMETHODCALLTYPE *AddRef )( 
-            DirectMLPyTorchCreatorID * This);
-        
-        DECLSPEC_XFGVIRT(IUnknown, Release)
-        ULONG ( STDMETHODCALLTYPE *Release )( 
-            DirectMLPyTorchCreatorID * This);
-        
-        END_INTERFACE
-    } DirectMLPyTorchCreatorIDVtbl;
+	typedef struct DirectMLPyTorchCreatorIDVtbl
+	{
+		BEGIN_INTERFACE
+		
+		DECLSPEC_XFGVIRT(IUnknown, QueryInterface)
+		HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
+			DirectMLPyTorchCreatorID * This,
+			REFIID riid,
+			_COM_Outptr_  void **ppvObject);
+		
+		DECLSPEC_XFGVIRT(IUnknown, AddRef)
+		ULONG ( STDMETHODCALLTYPE *AddRef )( 
+			DirectMLPyTorchCreatorID * This);
+		
+		DECLSPEC_XFGVIRT(IUnknown, Release)
+		ULONG ( STDMETHODCALLTYPE *Release )( 
+			DirectMLPyTorchCreatorID * This);
+		
+		END_INTERFACE
+	} DirectMLPyTorchCreatorIDVtbl;
 
-    interface DirectMLPyTorchCreatorID
-    {
-        CONST_VTBL struct DirectMLPyTorchCreatorIDVtbl *lpVtbl;
-    };
+	interface DirectMLPyTorchCreatorID
+	{
+		CONST_VTBL struct DirectMLPyTorchCreatorIDVtbl *lpVtbl;
+	};
 
-    
+	
 
 #ifdef COBJMACROS
 
 
 #define DirectMLPyTorchCreatorID_QueryInterface(This,riid,ppvObject)	\
-    ( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
+	( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
 
 #define DirectMLPyTorchCreatorID_AddRef(This)	\
-    ( (This)->lpVtbl -> AddRef(This) ) 
+	( (This)->lpVtbl -> AddRef(This) ) 
 
 #define DirectMLPyTorchCreatorID_Release(This)	\
-    ( (This)->lpVtbl -> Release(This) ) 
+	( (This)->lpVtbl -> Release(This) ) 
 
 
 #endif /* COBJMACROS */
@@ -806,40 +806,40 @@ EXTERN_C const IID IID_DirectMLWebNNCreatorID;
 
 #if defined(__cplusplus) && !defined(CINTERFACE)
 
-    MIDL_INTERFACE("fdf01a76-1e11-450f-902b-74f04ea08094")
-    DirectMLWebNNCreatorID : public IUnknown
-    {
-    public:
-    };
+	MIDL_INTERFACE("fdf01a76-1e11-450f-902b-74f04ea08094")
+	DirectMLWebNNCreatorID : public IUnknown
+	{
+	public:
+	};
 
 
 #else 	/* C style interface */
 
-    typedef struct DirectMLWebNNCreatorIDVtbl
-    {
-        BEGIN_INTERFACE
+	typedef struct DirectMLWebNNCreatorIDVtbl
+	{
+		BEGIN_INTERFACE
 
-        DECLSPEC_XFGVIRT(IUnknown, QueryInterface)
-        HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
-            DirectMLWebNNCreatorID * This,
-            REFIID riid,
-            _COM_Outptr_  void **ppvObject);
-        
-        DECLSPEC_XFGVIRT(IUnknown, AddRef)
-        ULONG ( STDMETHODCALLTYPE *AddRef )( 
-            DirectMLWebNNCreatorID * This);
-        
-        DECLSPEC_XFGVIRT(IUnknown, Release)
-        ULONG ( STDMETHODCALLTYPE *Release )( 
-            DirectMLWebNNCreatorID * This);
-        
-        END_INTERFACE
-    } DirectMLWebNNCreatorIDVtbl;
+		DECLSPEC_XFGVIRT(IUnknown, QueryInterface)
+		HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
+			DirectMLWebNNCreatorID * This,
+			REFIID riid,
+			_COM_Outptr_  void **ppvObject);
+		
+		DECLSPEC_XFGVIRT(IUnknown, AddRef)
+		ULONG ( STDMETHODCALLTYPE *AddRef )( 
+			DirectMLWebNNCreatorID * This);
+		
+		DECLSPEC_XFGVIRT(IUnknown, Release)
+		ULONG ( STDMETHODCALLTYPE *Release )( 
+			DirectMLWebNNCreatorID * This);
+		
+		END_INTERFACE
+	} DirectMLWebNNCreatorIDVtbl;
 
-    interface DirectMLWebNNCreatorID
-    {
-        CONST_VTBL struct DirectMLWebNNCreatorIDVtbl* lpVtbl;
-    };
+	interface DirectMLWebNNCreatorID
+	{
+		CONST_VTBL struct DirectMLWebNNCreatorIDVtbl* lpVtbl;
+	};
 
 
 
@@ -847,13 +847,13 @@ EXTERN_C const IID IID_DirectMLWebNNCreatorID;
 
 
 #define DirectMLWebNNCreatorID_QueryInterface(This,riid,ppvObject)	\
-    ( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
+	( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
 
 #define DirectMLWebNNCreatorID_AddRef(This)	\
-    ( (This)->lpVtbl -> AddRef(This) ) 
+	( (This)->lpVtbl -> AddRef(This) ) 
 
 #define DirectMLWebNNCreatorID_Release(This)	\
-    ( (This)->lpVtbl -> Release(This) ) 
+	( (This)->lpVtbl -> Release(This) ) 
 
 
 #endif /* COBJMACROS */
@@ -895,5 +895,6 @@ extern RPC_IF_HANDLE __MIDL_itf_d3d12compatibility_0000_0008_v0_0_s_ifspec;
 #endif
 
 #endif
+
 
 
