@@ -12,10 +12,13 @@
 #include "editor/core/EditorEngine.h"
 #include "editor/graphics/imgui/EditorSelectable.h"
 
+#include "graphics/dx12/Texture.h"
+
 #include "animation/AnimationTrack.h"
 #include "animation/SpriteAnimationKeyFrame.h"
 
 #include "gameplay/Game.h"
+#include <editor/graphics/imgui/modals/FilePickerModal.h>
 
 //---------------------------------------------------------------------
 namespace gallus
@@ -28,38 +31,223 @@ namespace gallus
 			constexpr float LEGEND_PADDING = 25.0f;
 			constexpr float LEGEND_HEIGHT = 70.0f;
 			constexpr float TRACK_SIZE = 75;
-			int m_iSelectedKeyFrame = 0;
+			int m_iSelectedKeyFrame = -1;
 
-			class SpriteAnimationKeyFrameUIView
+			class SpriteAnimationKeyFrameUIView : public EditorSelectable
 			{
 			public:
-				SpriteAnimationKeyFrameUIView(animation::SpriteAnimationKeyFrame& a_KeyFrame) :
+				SpriteAnimationKeyFrameUIView(ImGuiWindow& a_Window, animation::SpriteAnimationKeyFrame& a_KeyFrame) : EditorSelectable(),
 					m_KeyFrame(a_KeyFrame)
 				{
 
 				}
+
+				void RenderEditorSelectable() override
+				{
+				}
+
+				animation::SpriteAnimationKeyFrame& GetKeyFrame()
+				{
+					return m_KeyFrame;
+				}
+
+				const animation::SpriteAnimationKeyFrame& GetKeyFrame() const
+				{
+					return m_KeyFrame;
+				}
+			private:
 				animation::SpriteAnimationKeyFrame& m_KeyFrame;
 			};
 
-			class AnimationTrackUIView
+			class SpriteAnimationKeyFrameInspectorUIView : public InspectorView
 			{
 			public:
-				AnimationTrackUIView(animation::AnimationTrack<animation::SpriteAnimationKeyFrame>& a_AnimationTrack) : a_AnimationTrack(a_AnimationTrack)
+				SpriteAnimationKeyFrameInspectorUIView(ImGuiWindow& a_Window, SpriteAnimationKeyFrameUIView& a_SpriteAnimationKeyFrameUIView) : InspectorView(a_Window),
+					m_SpriteAnimationKeyFrameUIView(a_SpriteAnimationKeyFrameUIView)
+				{
+					m_bShowDelete = true;
+					m_bShowPreview = true;
+				}
+
+				std::string GetName() const override
+				{
+					return "Sprite Animation Key Frame";
+				}
+
+				std::string GetIcon() const override
+				{
+					return font::ICON_KEYFRAME;
+				}
+
+				void Render() override
+				{
+					memset(m_TextureName, 0, sizeof(m_TextureName));
+					if (m_SpriteAnimationKeyFrameUIView.GetKeyFrame().GetTexture())
+					{
+						strncpy(m_TextureName, m_SpriteAnimationKeyFrameUIView.GetKeyFrame().GetTexture()->GetName().c_str(), sizeof(m_TextureName));
+						m_TextureName[sizeof(m_TextureName) - 1] = '\0';
+					}
+
+					ImGui::StartInspectorKeyVal(ImGui::IMGUI_FORMAT_ID("", TABLE_ID, "SPRITE_ANIMATION_KEY_FRAME_TABLE_INSPECTOR"), m_Window.GetFramePadding());
+					ImGuiWindow& window = m_Window;
+					ImGui::KeyValue([&window, this]
+					{
+						ImGui::AlignTextToFramePadding();
+						ImGui::DisplayHeader(window.GetBoldFont(), "Sprite Index: ");
+					},
+						[this]
+					{
+						if (!m_SpriteAnimationKeyFrameUIView.GetKeyFrame().GetTexture())
+						{
+							ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+							ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+						}
+						int maxIndex = m_SpriteAnimationKeyFrameUIView.GetKeyFrame().GetTexture() ? m_SpriteAnimationKeyFrameUIView.GetKeyFrame().GetTexture()->GetSpriteRectsSize() : 0;
+						int spriteIndex = m_SpriteAnimationKeyFrameUIView.GetKeyFrame().GetSpriteIndex();
+						ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+						if (ImGui::DragInt(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "SPRITE_ANIMATION_KEY_FRAME_SPRITE_INDEX_INSPECTOR").c_str(), &spriteIndex, 1, 0, maxIndex))
+						{
+							m_SpriteAnimationKeyFrameUIView.GetKeyFrame().SetSpriteIndex(spriteIndex);
+						}
+						if (!m_SpriteAnimationKeyFrameUIView.GetKeyFrame().GetTexture())
+						{
+							ImGui::PopItemFlag();
+							ImGui::PopStyleVar();
+						}
+					});
+					FilePickerModal* modal = dynamic_cast<FilePickerModal*>(m_Window.GetModal((int)EDITOR_MODAL::EDITOR_MODAL_FILE_PICKER));
+
+					ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(m_Window.GetFontSize() / 2, m_Window.GetFontSize() / 2));
+					ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+					ImVec2 buttonSize = ImVec2(m_Window.GetFontSize() * 2, m_Window.GetFontSize() * 2);
+
+					char* textureName = m_TextureName;
+					ImGui::KeyValue([&window]
+						{
+							ImGui::AlignTextToFramePadding();
+							ImGui::DisplayHeader(window.GetBoldFont(), "Texture: ");
+						},
+						[this, &buttonSize, textureName, modal]
+						{
+							ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+							ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x - buttonSize.x);
+							ImGui::InputText(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "SPRITE_COMPONENT_TEXTURE_NAME_INPUT_INSPECTOR").c_str(), textureName, sizeof(textureName), ImGuiInputTextFlags_ReadOnly);
+							ImGui::PopItemFlag();
+							ImGui::SameLine();
+							if (ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_FILE, BUTTON_ID, "SPRITE_COMPONENT_TEXTURE_INSPECTOR").c_str(), buttonSize))
+							{
+								if (modal)
+								{
+									modal->SetData(
+										[&](int success, gallus::resources::FileResource& resource)
+										{
+											if (success == 1)
+											{
+												auto cCommandQueue = core::EDITOR_ENGINE->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
+												m_SpriteAnimationKeyFrameUIView.GetKeyFrame().SetTexure(core::EDITOR_ENGINE->GetResourceAtlas().LoadTexture(resource.GetPath().filename().generic_string(), cCommandQueue).get());
+
+												core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
+											}
+										},
+										std::vector<gallus::resources::AssetType>{ gallus::resources::AssetType::Sprite }
+									);
+									modal->Show();
+								}
+							}
+						});
+					ImGui::EndInspectorKeyVal(m_Window.GetFramePadding());
+					ImGui::PopStyleVar();
+					ImGui::PopStyleVar();
+				}
+
+				void RenderPreview() override
+				{
+					if (!m_SpriteAnimationKeyFrameUIView.GetKeyFrame().GetTexture() || !m_SpriteAnimationKeyFrameUIView.GetKeyFrame().GetTexture()->CanBeDrawn())
+					{
+						return;
+					}
+
+					// Sprite dimensions
+					float spriteW = 0.0f;
+					float spriteH = 0.0f;
+					ImVec2 uv0, uv1;
+
+					// Get TextureMetaData
+					ImVec2 texturePos = ImGui::GetCursorPos();
+					if (m_SpriteAnimationKeyFrameUIView.GetKeyFrame().GetTexture()->GetTextureType() == graphics::dx12::TextureType::Texture2D)
+					{
+						// Full texture
+						spriteW = static_cast<float>(m_SpriteAnimationKeyFrameUIView.GetKeyFrame().GetTexture()->GetResourceDesc().Width);
+						spriteH = static_cast<float>(m_SpriteAnimationKeyFrameUIView.GetKeyFrame().GetTexture()->GetResourceDesc().Height);
+						uv0 = { 0.0f, 0.0f };
+						uv1 = { 1.0f, 1.0f };
+					}
+					else
+					{
+						const auto& sprite = m_SpriteAnimationKeyFrameUIView.GetKeyFrame().GetTexture()->GetSpriteRect(m_SpriteAnimationKeyFrameUIView.GetKeyFrame().GetSpriteIndex());
+						spriteW = static_cast<float>(sprite.width);
+						spriteH = static_cast<float>(sprite.height);
+
+						const float texWidth = static_cast<float>(m_SpriteAnimationKeyFrameUIView.GetKeyFrame().GetTexture()->GetResourceDesc().Width);
+						const float texHeight = static_cast<float>(m_SpriteAnimationKeyFrameUIView.GetKeyFrame().GetTexture()->GetResourceDesc().Height);
+
+						uv0 = { sprite.x / texWidth, sprite.y / texHeight };                              // top-left
+						uv1 = { (sprite.x + sprite.width) / texWidth, (sprite.y + sprite.height) / texHeight }; // bottom-right
+					}
+
+					ImGui::SetCursorPos(texturePos);
+					// Available region (minus padding)
+					ImVec2 avail = ImGui::GetContentRegionAvail();
+					ImVec2 padding = ImVec2();
+					avail.x -= padding.x * 2.0f;
+					avail.y -= padding.y * 2.0f;
+
+					// Fit inside available space (keep aspect ratio)
+					float scale = std::min(avail.x / spriteW, avail.y / spriteH);
+					float drawW = spriteW * scale;
+					float drawH = spriteH * scale;
+
+					// Center horizontally
+					float cursorX = ImGui::GetCursorPosX() + (avail.x - drawW) * 0.5f;
+					ImGui::SetCursorPosX(cursorX);
+
+					// Center horizontally
+					ImGui::SetCursorPosX(cursorX);
+
+					// Draw image
+					ImVec2 image_pos = ImGui::GetCursorScreenPos();
+					ImGui::Image((ImTextureID)m_SpriteAnimationKeyFrameUIView.GetKeyFrame().GetTexture()->GetGPUHandle().ptr, ImVec2(drawW, drawH), uv0, uv1);
+
+					// Draw border
+					ImDrawList* draw_list = ImGui::GetWindowDrawList();
+					draw_list->AddRect(image_pos, ImVec2(image_pos.x + drawW, image_pos.y + drawH),
+						ImGui::GetColorU32(ImGui::GetStyle().Colors[ImGuiCol_Border]));
+				}
+			private:
+				SpriteAnimationKeyFrameUIView& m_SpriteAnimationKeyFrameUIView;
+				char m_TextureName[128];
+			};
+
+			class AnimationTrackUIView : public ImGuiUIView
+			{
+			public:
+				AnimationTrackUIView(ImGuiWindow& a_Window, animation::AnimationTrack<animation::SpriteAnimationKeyFrame>& a_AnimationTrack) : ImGuiUIView(a_Window), a_AnimationTrack(a_AnimationTrack)
 				{
 					for (size_t i = 0; i < a_AnimationTrack.GetKeyFrames().size(); i++)
 					{
-						m_aKeyFrames.push_back(SpriteAnimationKeyFrameUIView(a_AnimationTrack.GetKeyFrames()[i]));
+						m_aKeyFrames.push_back(SpriteAnimationKeyFrameUIView(a_Window, a_AnimationTrack.GetKeyFrames()[i]));
 					}
 				}
 
-				void RenderTrack()
+				void Render() override
 				{
 					ImDrawList* drawList = ImGui::GetWindowDrawList();
 					ImVec2 startPos = ImGui::GetCursorScreenPos();
 
-					for (size_t i = 0; i < a_AnimationTrack.GetKeyFrames().size(); i++)
+					size_t i = 0;
+					for (SpriteAnimationKeyFrameUIView& keyFrameUIView : m_aKeyFrames)
 					{
-						int frame = a_AnimationTrack.GetKeyFrames()[i].GetFrame();
+						int frame = keyFrameUIView.GetKeyFrame().GetFrame();
 
 						float px = startPos.x + (frame * ANIMATION_FRAME_PIXEL_WIDTH);
 
@@ -85,8 +273,10 @@ namespace gallus
 						)) && ImGui::IsMouseDown(ImGuiMouseButton_Left))
 						{
 							m_iSelectedKeyFrame = i;
-						}
 
+							core::EDITOR_ENGINE->GetEditor().SetSelectable(&m_aKeyFrames[i], new SpriteAnimationKeyFrameInspectorUIView(m_Window, m_aKeyFrames[i]));
+						}
+						i++;
 					}
 
 					ImGui::SetCursorPosY(ImGui::GetCursorPosY() + TRACK_SIZE);
@@ -105,7 +295,7 @@ namespace gallus
 			{
 				m_SpriteAnimatorTrack.GetKeyFrames().push_back(animation::SpriteAnimationKeyFrame(12, 0));
 				m_SpriteAnimatorTrack.GetKeyFrames().push_back(animation::SpriteAnimationKeyFrame(25, 1));
-				m_AnimationTrackUIView = new AnimationTrackUIView(m_SpriteAnimatorTrack);
+				m_AnimationTrackUIView = new AnimationTrackUIView(a_Window, m_SpriteAnimatorTrack);
 			}
 
 			AnimationWindow::~AnimationWindow() {}
@@ -233,7 +423,7 @@ namespace gallus
 
 					ImGui::SetCursorScreenPos(ImVec2(legendPos.x, legendRectMax.y));
 
-					m_AnimationTrackUIView->RenderTrack();
+					m_AnimationTrackUIView->Render();
 				}
 
 				ImGui::EndChild();

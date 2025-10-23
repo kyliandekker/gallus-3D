@@ -8,6 +8,13 @@ namespace gallus
 	{
 		class EntityID;
 	}
+	namespace graphics
+	{
+		namespace dx12
+		{
+			class Texture;
+		}
+	}
 	namespace animation
 	{
 		class SpriteAnimationKeyFrame : public AnimationKeyFrame
@@ -20,17 +27,27 @@ namespace gallus
 			void Activate(const gameplay::EntityID& a_EntityID) override
 			{ }
 
-			int GetSpriteIndex() const
+			int GetSpriteIndex() const;
+
+			void SetSpriteIndex(int a_iSpriteIndex);
+
+			graphics::dx12::Texture* GetTexture()
 			{
-				return m_iSpriteIndex;
+				return m_pTexture;
 			}
 
-			void SetSpriteIndex(int a_iSpriteIndex)
+			const graphics::dx12::Texture* GetTexture() const
 			{
-				m_iSpriteIndex = a_iSpriteIndex;
+				return m_pTexture;
+			}
+
+			void SetTexure(graphics::dx12::Texture* a_pTexture)
+			{
+				m_pTexture = a_pTexture;
 			}
 		private:
 			int m_iSpriteIndex = 0;
+			graphics::dx12::Texture* m_pTexture = nullptr;
 		};
 	}
 }
