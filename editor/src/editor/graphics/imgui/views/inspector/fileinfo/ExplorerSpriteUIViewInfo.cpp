@@ -25,6 +25,7 @@
 #include "editor/graphics/imgui/views/ExplorerFileUIView.h"
 #include "resources/metadata/TextureMetaData.h"
 #include "editor/graphics/imgui/modals/SpriteEditorModal.h"
+#include <editor/graphics/imgui/EditorWindowsConfig.h>
 
 namespace gallus
 {
@@ -172,14 +173,12 @@ namespace gallus
 				float width = ImGui::GetContentRegionAvail().x;
 				if (metaData->GetTextureType() == graphics::dx12::TextureType::SpriteSheet && ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_IMAGE + std::string(" Open Sprite Editor"), BUTTON_ID, "OPEN_SPRITE_EDITOR_INSPECTOR").c_str(), ImVec2(width, 0)))
 				{
-					SpriteEditorModal* modal = dynamic_cast<SpriteEditorModal*>(m_Window.GetModal((int) EDITOR_MODAL::EDITOR_MODAL_SPRITE_EDITOR));
-					if (modal)
-					{
-						modal->SetData(
-							m_ExplorerFileUIView.GetFileResource()
-						);
-						modal->Show();
-					}
+					SpriteEditorModal& spriteEditorModal = m_Window.GetWindowsConfig<EditorWindowsConfig>().GetSpriteEditorModal();
+
+					spriteEditorModal.SetData(
+						m_ExplorerFileUIView.GetFileResource()
+					);
+					spriteEditorModal.Show();
 				}
 			}
 

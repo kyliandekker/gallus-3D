@@ -29,8 +29,7 @@ namespace gallus
 		enum class EditorMethod
 		{
 			EDITOR_METHOD_SCENE,
-			EDITOR_METHOD_PREFAB,
-			EDITOR_METHOD_ANIMATION
+			EDITOR_METHOD_PREFAB
 		};
 
 		enum CameraMode

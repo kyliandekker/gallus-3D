@@ -24,8 +24,7 @@ namespace gallus
 				m_iSpriteIndex(a_iSpriteIndex)
 			{}
 
-			void Activate(const gameplay::EntityID& a_EntityID) override
-			{ }
+			void Activate(gameplay::EntityID& a_EntityID) override;
 
 			int GetSpriteIndex() const;
 

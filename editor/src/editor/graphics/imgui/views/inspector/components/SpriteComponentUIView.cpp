@@ -26,6 +26,7 @@
 
 // resources
 #include "resources/FileResource.h"
+#include <editor/graphics/imgui/EditorWindowsConfig.h>
 
 namespace gallus
 {
@@ -57,7 +58,7 @@ namespace gallus
 				strncpy(m_TextureName, m_Component.GetTexture()->GetName().c_str(), sizeof(m_TextureName));
 				m_TextureName[sizeof(m_TextureName) - 1] = '\0';
 
-				FilePickerModal* modal = dynamic_cast<FilePickerModal*>(m_Window.GetModal((int) EDITOR_MODAL::EDITOR_MODAL_FILE_PICKER));
+				FilePickerModal& filePickerModal = m_Window.GetWindowsConfig<EditorWindowsConfig>().GetFilePickerModal();
 
 				ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(m_Window.GetFontSize() / 2, m_Window.GetFontSize() / 2));
 				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
@@ -73,7 +74,7 @@ namespace gallus
 						ImGui::AlignTextToFramePadding();
 						ImGui::DisplayHeader(window.GetBoldFont(), "Pixel Shader: ");
 					},
-					[&spriteComp, &buttonSize, pixelShaderName, modal]
+					[&spriteComp, &buttonSize, pixelShaderName, &filePickerModal]
 					{
 						ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
 						ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x - buttonSize.x);
@@ -82,27 +83,24 @@ namespace gallus
 						ImGui::SameLine();
 						if (ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_FILE, BUTTON_ID, "SPRITE_COMPONENT_PIXEL_SHADER_INSPECTOR").c_str(), buttonSize))
 						{
-							if (modal)
-							{
-								modal->SetData(
-									[&spriteComp](int success, gallus::resources::FileResource& resource)
+							filePickerModal.SetData(
+								[&spriteComp](int success, gallus::resources::FileResource& resource)
+								{
+									if (success == 1)
 									{
-										if (success == 1)
-										{
-											spriteComp.SetShader(
-												core::EDITOR_ENGINE->GetResourceAtlas().LoadShaderBind(
+										spriteComp.SetShader(
+											core::EDITOR_ENGINE->GetResourceAtlas().LoadShaderBind(
 												spriteComp.GetTexture()->GetName(),
 												core::EDITOR_ENGINE->GetResourceAtlas().LoadPixelShader(resource.GetPath().filename().generic_string()).get(),
 												spriteComp.GetShader()->GetVertexShader()
 											).get());
 
-											core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
-										}
-									},
-									std::vector<gallus::resources::AssetType>{ gallus::resources::AssetType::PixelShader }
-								);
-								modal->Show();
-							}
+										core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
+									}
+								},
+								std::vector<gallus::resources::AssetType>{ gallus::resources::AssetType::PixelShader }
+							);
+							filePickerModal.Show();
 						}
 					});
 				char* vertexShaderName = m_VertexShaderName;
@@ -111,7 +109,7 @@ namespace gallus
 						ImGui::AlignTextToFramePadding();
 						ImGui::DisplayHeader(window.GetBoldFont(), "Vertex Shader: ");
 					},
-					[&spriteComp, &buttonSize, vertexShaderName, modal]
+					[&spriteComp, &buttonSize, vertexShaderName, &filePickerModal]
 					{
 						ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
 						ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x - buttonSize.x);
@@ -120,27 +118,24 @@ namespace gallus
 						ImGui::SameLine();
 						if (ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_FILE, BUTTON_ID, "SPRITE_COMPONENT_VERTEX_SHADER_INSPECTOR").c_str(), buttonSize))
 						{
-							if (modal)
-							{
-								modal->SetData(
-									[&spriteComp](int success, gallus::resources::FileResource& resource)
+							filePickerModal.SetData(
+								[&spriteComp](int success, gallus::resources::FileResource& resource)
+								{
+									if (success == 1)
 									{
-										if (success == 1)
-										{
-											spriteComp.SetShader(
-												core::EDITOR_ENGINE->GetResourceAtlas().LoadShaderBind(
+										spriteComp.SetShader(
+											core::EDITOR_ENGINE->GetResourceAtlas().LoadShaderBind(
 												spriteComp.GetTexture()->GetName(),
 												spriteComp.GetShader()->GetPixelShader(),
 												core::EDITOR_ENGINE->GetResourceAtlas().LoadVertexShader(resource.GetPath().filename().generic_string()).get()
 											).get());
 
-											core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
-										}
-									},
-									std::vector<gallus::resources::AssetType>{ gallus::resources::AssetType::VertexShader }
-								);
-								modal->Show();
-							}
+										core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
+									}
+								},
+								std::vector<gallus::resources::AssetType>{ gallus::resources::AssetType::VertexShader }
+							);
+							filePickerModal.Show();
 						}
 					});
 				char* textureName = m_TextureName;
@@ -149,7 +144,7 @@ namespace gallus
 						ImGui::AlignTextToFramePadding();
 						ImGui::DisplayHeader(window.GetBoldFont(), "Texture: ");
 					},
-					[&spriteComp, &buttonSize, textureName, modal]
+					[&spriteComp, &buttonSize, textureName, &filePickerModal]
 					{
 						ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
 						ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x - buttonSize.x);
@@ -158,23 +153,20 @@ namespace gallus
 						ImGui::SameLine();
 						if (ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_FILE, BUTTON_ID, "SPRITE_COMPONENT_TEXTURE_INSPECTOR").c_str(), buttonSize))
 						{
-							if (modal)
-							{
-								modal->SetData(
-									[&spriteComp](int success, gallus::resources::FileResource& resource)
+							filePickerModal.SetData(
+								[&spriteComp](int success, gallus::resources::FileResource& resource)
+								{
+									if (success == 1)
 									{
-										if (success == 1)
-										{
-											auto cCommandQueue = core::EDITOR_ENGINE->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
-											spriteComp.SetTexture(core::EDITOR_ENGINE->GetResourceAtlas().LoadTexture(resource.GetPath().filename().generic_string(), cCommandQueue).get());
+										auto cCommandQueue = core::EDITOR_ENGINE->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
+										spriteComp.SetTexture(core::EDITOR_ENGINE->GetResourceAtlas().LoadTexture(resource.GetPath().filename().generic_string(), cCommandQueue).get());
 
-											core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
-										}
-									},
-									std::vector<gallus::resources::AssetType>{ gallus::resources::AssetType::Sprite }
-								);
-								modal->Show();
-							}
+										core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
+									}
+								},
+								std::vector<gallus::resources::AssetType>{ gallus::resources::AssetType::Sprite }
+							);
+							filePickerModal.Show();
 						}
 					});
 				ImGui::PopStyleVar();

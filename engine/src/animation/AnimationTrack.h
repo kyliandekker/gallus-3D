@@ -2,6 +2,8 @@
 
 #include <vector>
 
+#include "animation/AnimationKeyFrame.h"
+
 namespace gallus
 {
 	namespace gameplay
@@ -12,18 +14,36 @@ namespace gallus
 	constexpr float FRAME_TIME = 1 / 60.0f;
 	namespace animation
 	{
+		class AnimationTrackBase
+		{
+		public:
+			virtual void Start()
+			{ }
+
+			virtual void Update(gameplay::EntityID& a_EntityID, float a_fDeltaTime)
+			{
+				m_fAccumulatedTime += a_fDeltaTime;
+			}
+
+			virtual AnimationKeyFrame* GetKeyFrame(size_t a_iIndex) = 0;
+			virtual const AnimationKeyFrame* GetKeyFrame(size_t a_iIndex) const = 0;
+			virtual size_t GetKeyFramesSize() const = 0;
+		protected:
+			float m_fAccumulatedTime = 0.0f;
+		};
+
 		template <typename T>
-		class AnimationTrack
+		class AnimationTrack : public AnimationTrackBase
 		{
 		public:
 			AnimationTrack() = default;
 
-			void Start()
+			void Start() override
 			{ }
 
-			virtual void Update(const gameplay::EntityID& a_EntityID, float a_fDeltaTime)
+			void Update(gameplay::EntityID& a_EntityID, float a_fDeltaTime) override
 			{
-				m_fAccumulatedTime += a_fDeltaTime;
+				AnimationTrackBase::Update(a_EntityID, a_fDeltaTime);
 				for (size_t i = 0; i < m_aKeyFrames.size(); i++)
 				{
 					if (m_fAccumulatedTime >= FRAME_TIME * i)
@@ -37,6 +57,21 @@ namespace gallus
 				}
 			}
 
+			const AnimationKeyFrame* GetKeyFrame(size_t a_iIndex) const override
+			{
+				return &m_aKeyFrames[a_iIndex];
+			}
+
+			AnimationKeyFrame* GetKeyFrame(size_t a_iIndex) override
+			{
+				return &m_aKeyFrames[a_iIndex];
+			}
+
+			size_t GetKeyFramesSize() const override
+			{
+				return m_aKeyFrames.size();
+			}
+
 			const std::vector<T>& GetKeyFrames() const
 			{
 				return m_aKeyFrames;
@@ -46,9 +81,8 @@ namespace gallus
 			{
 				return m_aKeyFrames;
 			}
-		private:
+private:
 			std::vector<T> m_aKeyFrames;
-			float m_fAccumulatedTime = 0.0f;
 		};
 	}
 }

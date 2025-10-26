@@ -15,7 +15,7 @@ namespace gallus
 				m_iFrame(a_iFrame)
 			{ }
 
-			virtual void Activate(const gameplay::EntityID & a_EntityID)
+			virtual void Activate(gameplay::EntityID & a_EntityID)
 			{ }
 
 			int GetFrame() const

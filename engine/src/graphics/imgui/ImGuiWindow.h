@@ -26,8 +26,7 @@ namespace gallus
 
 		namespace imgui
 		{
-			class BaseWindow;
-			class BaseModal;
+			class ImGuiWindowsConfig;
 
 			//---------------------------------------------------------------------
 			// ImGuiWindow
@@ -175,29 +174,22 @@ namespace gallus
 					return m_vAccentColorDarker;
 				}
 
-				/// <summary>
-				/// Adds a window to the render queue.
-				/// </summary>
-				/// <param name="a_pWindow">The window to add.</param>
-				void AddWindow(BaseWindow* a_pWindow)
+				ImGuiWindowsConfig& GetWindowsConfig()
 				{
-					m_aWindows.push_back(a_pWindow);
+					return *m_pWindowsConfig;
 				}
 
-				/// <summary>
-				/// Adds a modal to the render queue.
-				/// </summary>
-				/// <param name="a_pModal">The modal to add.</param>
-				void AddModal(BaseModal* a_pModal)
+				template <typename T>
+				T& GetWindowsConfig()
 				{
-					m_aModals.push_back(a_pModal);
+					return *reinterpret_cast<T*>(m_pWindowsConfig);
 				}
 
-				/// <summary>
-				/// Retrieves a modal by index.
-				/// </summary>
-				/// <returns>Pointer to the modal, nullptr if not present.</returns>
-				BaseModal* GetModal(int a_iIndex);
+				template <typename T>
+				void SetWindowsConfig()
+				{
+					m_pWindowsConfig = new T(*this);
+				}
 			private:
 				size_t m_iSrvIndex = 0;
 
@@ -220,8 +212,7 @@ namespace gallus
 				ImVec4 m_vAccentColor;
 				ImVec4 m_vAccentColorDarker;
 
-				std::vector<BaseWindow*> m_aWindows;
-				std::vector<BaseModal*> m_aModals;
+				ImGuiWindowsConfig* m_pWindowsConfig = nullptr;
 
 				friend dx12::DX12System2D;
 			};

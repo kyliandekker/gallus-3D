@@ -29,7 +29,7 @@ namespace gallus
 	{
 		namespace imgui
 		{
-			FilePickerModal::FilePickerModal(ImGuiWindow& a_Window) : BaseModal(a_Window, std::string(font::ICON_FOLDER) + " File Explorer", "FileExplorer"), m_SearchBar(a_Window)
+			FilePickerModal::FilePickerModal(ImGuiWindow& a_Window) : BaseModal(a_Window, std::string(font::ICON_FOLDER) + " File Picker", "FilePicker"), m_SearchBar(a_Window)
 			{
 				m_SearchBar.Initialize("");
 			}

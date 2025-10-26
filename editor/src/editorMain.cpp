@@ -21,13 +21,7 @@
 
 // editor includes
 #include "editor/core/EditorEngine.h"
-#include "editor/graphics/imgui/windows/ConsoleWindow.h"
-#include "editor/graphics/imgui/windows/HierarchyWindow.h"
-#include "editor/graphics/imgui/windows/SceneWindow.h"
-#include "editor/graphics/imgui/windows/ExplorerWindow.h"
-#include "editor/graphics/imgui/windows/InspectorWindow.h"
-#include "editor/graphics/imgui/windows/ResourcesWindow.h"
-#include "editor/graphics/imgui/windows/AnimationWindow.h"
+#include "editor/graphics/imgui/EditorWindowsConfig.h"
 
 #include "editor/graphics/imgui/modals/FilePickerModal.h"
 #include "editor/graphics/imgui/modals/SpriteEditorModal.h"
@@ -58,18 +52,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR lp
 	gallus::core::ARGS.ProcessArguments(cmdLine);
 
 	gallus::graphics::imgui::ImGuiWindow& imguiWindow = gallus::core::EDITOR_ENGINE->GetDX12().GetImGuiWindow();
-	imguiWindow.AddWindow(new gallus::graphics::imgui::MainWindowDock(imguiWindow));
-	imguiWindow.AddWindow(new gallus::graphics::imgui::ResourcesWindow(imguiWindow));
-	imguiWindow.AddWindow(new gallus::graphics::imgui::ConsoleWindow(imguiWindow));
-	imguiWindow.AddWindow(new gallus::graphics::imgui::HierarchyWindow(imguiWindow));
-	imguiWindow.AddWindow(new gallus::graphics::imgui::SceneWindow(imguiWindow));
-	imguiWindow.AddWindow(new gallus::graphics::imgui::FullSceneWindow(imguiWindow));
-	imguiWindow.AddWindow(new gallus::graphics::imgui::ExplorerWindow(imguiWindow));
-	imguiWindow.AddWindow(new gallus::graphics::imgui::InspectorWindow(imguiWindow));
-	imguiWindow.AddWindow(new gallus::graphics::imgui::AnimationWindow(imguiWindow));
-
-	imguiWindow.AddModal(new gallus::graphics::imgui::FilePickerModal(imguiWindow));
-	imguiWindow.AddModal(new gallus::graphics::imgui::SpriteEditorModal(imguiWindow));
+	imguiWindow.SetWindowsConfig<gallus::graphics::imgui::EditorWindowsConfig>();
 
 	gallus::core::EDITOR_ENGINE->Initialize(hInstance, name);
 
