@@ -1,36 +1,11 @@
 {
-  "frameCount": 24,
-  "loop": true,
-  "keyframes": {
-    "0": {
-      "components": {
-        "sprite": {
-          "spriteIndex": 0,
-          "texture": "run_0.png"
-        }
-      }
-    },
-    "4": {
-      "components": {
-        "sprite": {
-          "spriteIndex": 1,
-          "texture": "run_1.png"
-        }
-      }
-    },
-    "8": {
-      "components": {
-        "sprite": {
-          "spriteIndex": 2,
-          "texture": "run_2.png"
-        },
-        "event": {
-          "name": "PlayStepSound",
-          "parameters": {
-            "volume": 0.8
-          }
-        }
-      }
+    "frameCount": 240,
+    "loop": true,
+    "keyFrames": {
+        "0": {},
+        "10": {},
+        "20": {},
+        "30": {},
+        "40": {}
     }
-  }
 }

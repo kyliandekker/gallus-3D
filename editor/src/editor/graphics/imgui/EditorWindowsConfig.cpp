@@ -15,7 +15,6 @@ namespace gallus
 				m_FullSceneWindow(a_Window),
 				m_ExplorerWindow(a_Window),
 				m_InspectorWindow(a_Window),
-				m_AnimationWindow(a_Window),
 				m_FilePickerModal(a_Window),
 				m_SpriteEditorModal(a_Window),
 				m_AnimationEditorModal(a_Window)
@@ -33,7 +32,6 @@ namespace gallus
 				m_FullSceneWindow.Initialize();
 				m_ExplorerWindow.Initialize();
 				m_InspectorWindow.Initialize();
-				m_AnimationWindow.Initialize();
 
 				m_FilePickerModal.Initialize();
 				m_SpriteEditorModal.Initialize();
@@ -51,7 +49,6 @@ namespace gallus
 				m_FullSceneWindow.Update();
 				m_ExplorerWindow.Update();
 				m_InspectorWindow.Update();
-				m_AnimationWindow.Update();
 
 				m_FilePickerModal.Update();
 				m_SpriteEditorModal.Update();

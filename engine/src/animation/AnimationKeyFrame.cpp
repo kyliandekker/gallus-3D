@@ -1,6 +1,4 @@
-﻿#include "SpriteAnimationKeyFrame.h"
-
-#include "core/Engine.h"
+#include "animation/AnimationKeyFrame.h"
 
 #include "graphics/dx12/Texture.h"
 
@@ -10,7 +8,7 @@ namespace gallus
 {
 	namespace animation
 	{
-		void SpriteAnimationKeyFrame::Activate(gameplay::EntityID& a_EntityID)
+		void AnimationKeyFrameSpriteComponent::Activate(gameplay::EntityID& a_EntityID)
 		{
 			gameplay::SpriteComponent& spriteComp = core::ENGINE->GetECS().GetSystem<gameplay::SpriteSystem>().GetComponent(a_EntityID);
 			spriteComp.SetSpriteIndex(m_iSpriteIndex);
@@ -19,13 +17,13 @@ namespace gallus
 				spriteComp.SetTexture(m_pTexture);
 			}
 		}
-		
-		int SpriteAnimationKeyFrame::GetSpriteIndex() const
+
+		int AnimationKeyFrameSpriteComponent::GetSpriteIndex() const
 		{
 			return m_iSpriteIndex;
 		}
 
-		void SpriteAnimationKeyFrame::SetSpriteIndex(int a_iSpriteIndex)
+		void AnimationKeyFrameSpriteComponent::SetSpriteIndex(int a_iSpriteIndex)
 		{
 			if (m_pTexture && a_iSpriteIndex >= m_pTexture->GetSpriteRectsSize())
 			{

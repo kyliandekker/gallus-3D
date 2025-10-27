@@ -4,9 +4,7 @@
 #include <imgui/imgui_internal.h>
 #include <string>
 
-#include "animation/SpriteAnimationKeyFrame.h"
 #include "editor/core/EditorEngine.h"
-#include "editor/graphics/imgui/views/inspector/animation/SpriteAnimationKeyFrameInspectorUIView.h"
 #include <graphics/imgui/font_icon.h>
 
 namespace gallus
@@ -15,12 +13,13 @@ namespace gallus
 	{
 		namespace imgui
 		{
-			AnimationTrackUIView::AnimationTrackUIView(ImGuiWindow& a_Window, animation::AnimationTrackBase& a_AnimationTrack) : ImGuiUIView(a_Window), a_AnimationTrack(a_AnimationTrack)
+			AnimationTrackUIView::AnimationTrackUIView(ImGuiWindow& a_Window) : ImGuiUIView(a_Window)
 			{
-				for (size_t i = 0; i < a_AnimationTrack.GetKeyFramesSize(); i++)
-				{
-					m_aKeyFrames.push_back(SpriteAnimationKeyFrameUIView(a_Window, *dynamic_cast<animation::SpriteAnimationKeyFrame*>(a_AnimationTrack.GetKeyFrame(i))));
-				}
+			}
+
+			void AnimationTrackUIView::Load(animation::AnimationTrack& a_AnimationTrack)
+			{
+				m_pAnimationTrack = &a_AnimationTrack;
 			}
 
 			constexpr float TRACK_SIZE = 50;
@@ -36,11 +35,10 @@ namespace gallus
 
 				ImGuiIO& io = ImGui::GetIO();
 
-				for (SpriteAnimationKeyFrameUIView& keyFrameUIView : m_aKeyFrames)
+				int i = 0;
+				for (animation::AnimationKeyFrame& keyFrame : m_pAnimationTrack->GetKeyFrames())
 				{
-					int frame = keyFrameUIView.GetKeyFrame().GetFrame();
-
-					float px = startPos.x + (frame * ANIMATION_FRAME_PIXEL_WIDTH);
+					float px = startPos.x + (keyFrame.GetFrame() * ANIMATION_FRAME_PIXEL_WIDTH);
 					std::string keyFrameIcon = font::ICON_KEYFRAME;
 					ImVec2 iconSize = ImGui::CalcTextSize(keyFrameIcon.c_str());
 					float verticalOffset = (TRACK_SIZE - iconSize.y) / 2.0f;
@@ -50,8 +48,7 @@ namespace gallus
 
 					ImGui::SetCursorScreenPos(contentStartPos);
 
-					SpriteAnimationKeyFrameUIView* selectedView = dynamic_cast<SpriteAnimationKeyFrameUIView*>(core::EDITOR_ENGINE->GetEditor().GetSelectable().get());
-					bool bSelected = (selectedView == &keyFrameUIView);
+					bool bSelected = m_iSelectedKeyFrame == i;
 
 					if (bSelected)
 					{
@@ -68,48 +65,36 @@ namespace gallus
 					bool bMouseDragging = ImGui::IsMouseDragging(ImGuiMouseButton_Left);
 
 					static bool s_bDragging = false;
-					static SpriteAnimationKeyFrameUIView* s_pDraggedKeyFrame = nullptr;
-					static float s_fDragOffset = 0.0f;
+					static animation::AnimationKeyFrame* s_pDraggedKeyFrame = nullptr;
 
 					// Start drag
 					if (bHovered && bMouseClicked)
 					{
-						core::EDITOR_ENGINE->GetEditor().SetSelectable(&keyFrameUIView, new SpriteAnimationKeyFrameInspectorUIView(m_Window, keyFrameUIView));
+						m_iSelectedKeyFrame = i;
+
 						s_bDragging = true;
-						s_pDraggedKeyFrame = &keyFrameUIView;
-						s_fDragOffset = io.MousePos.x - px;
+						s_pDraggedKeyFrame = &keyFrame;
 					}
 
 					// Update drag
-					if (s_bDragging && s_pDraggedKeyFrame == &keyFrameUIView && bMouseDragging)
+					if (s_bDragging && s_pDraggedKeyFrame == &keyFrame && bMouseDragging)
 					{
-						float newPx = io.MousePos.x - s_fDragOffset;
-						int newFrame = static_cast<int>((newPx - startPos.x) / ANIMATION_FRAME_PIXEL_WIDTH);
-
-						if (newFrame < 0)
-						{
-							newFrame = 0;
-						}
-
-						keyFrameUIView.GetKeyFrame().SetFrame(newFrame);
+						ImVec2 mousePos = ImGui::GetMousePos();
+						ImVec2 s_vRelativePos = mousePos - startPos;
+						keyFrame = std::round(s_vRelativePos.x / ANIMATION_FRAME_PIXEL_WIDTH);
 					}
 
 					// End drag
-					if (!bMouseDown && s_bDragging && s_pDraggedKeyFrame == &keyFrameUIView)
+					if (!bMouseDown && s_bDragging && s_pDraggedKeyFrame == &keyFrame)
 					{
 						s_bDragging = false;
 						s_pDraggedKeyFrame = nullptr;
 					}
+
+					i++;
 				}
 
-				drawList->AddLine(
-					ImVec2(animationTrackRect.Min.x, animationTrackRect.Max.y),
-					animationTrackRect.Max,
-					0xFF606060,
-					1.0f
-				);
-
-				ImGui::SetCursorScreenPos(ImVec2(animationTrackRect.Min.x, animationTrackRect.Max.y));
+				ImGui::SetCursorScreenPos(ImVec2(startPos.x, animationTrackRect.Max.y));
 			}
 		}
 	}

@@ -1,8 +1,12 @@
 ﻿#pragma once
 
-#include <vector>
+#include "resources/EngineResource.h"
+
+#include <map>
 
 #include "animation/AnimationKeyFrame.h"
+
+#include "utils/FILEPCH.h"
 
 namespace gallus
 {
@@ -14,75 +18,49 @@ namespace gallus
 	constexpr float FRAME_TIME = 1 / 60.0f;
 	namespace animation
 	{
-		class AnimationTrackBase
-		{
-		public:
-			virtual void Start()
-			{ }
-
-			virtual void Update(gameplay::EntityID& a_EntityID, float a_fDeltaTime)
-			{
-				m_fAccumulatedTime += a_fDeltaTime;
-			}
-
-			virtual AnimationKeyFrame* GetKeyFrame(size_t a_iIndex) = 0;
-			virtual const AnimationKeyFrame* GetKeyFrame(size_t a_iIndex) const = 0;
-			virtual size_t GetKeyFramesSize() const = 0;
-		protected:
-			float m_fAccumulatedTime = 0.0f;
-		};
-
-		template <typename T>
-		class AnimationTrack : public AnimationTrackBase
+		class AnimationTrack : public resources::EngineResource
 		{
 		public:
 			AnimationTrack() = default;
 
-			void Start() override
+			void Start()
 			{ }
 
-			void Update(gameplay::EntityID& a_EntityID, float a_fDeltaTime) override
+			bool LoadByPath(const fs::path& a_Path);
+
+			#ifdef _EDITOR
+			bool Save(const fs::path& a_Path) const;
+
+			void AddKeyFrame(int a_iFrame);
+			void RemoveKeyFrame(int a_iIndex);
+			void Sort();
+			#endif
+
+			bool IsValid() const override
 			{
-				AnimationTrackBase::Update(a_EntityID, a_fDeltaTime);
-				for (size_t i = 0; i < m_aKeyFrames.size(); i++)
-				{
-					if (m_fAccumulatedTime >= FRAME_TIME * i)
-					{
-						m_aKeyFrames[i].Activate(a_EntityID);
-					}
-					else
-					{
-						break;
-					}
-				}
+				return true;
 			}
 
-			const AnimationKeyFrame* GetKeyFrame(size_t a_iIndex) const override
+			bool IsLooping() const
 			{
-				return &m_aKeyFrames[a_iIndex];
+				return m_bIsLooping;
 			}
 
-			AnimationKeyFrame* GetKeyFrame(size_t a_iIndex) override
+			void SetIsLooping(bool a_bIsLooping)
 			{
-				return &m_aKeyFrames[a_iIndex];
+				m_bIsLooping = a_bIsLooping;
 			}
 
-			size_t GetKeyFramesSize() const override
+			int GetFrameCount() const
 			{
-				return m_aKeyFrames.size();
+				return m_iFrameCount;
 			}
 
-			const std::vector<T>& GetKeyFrames() const
-			{
-				return m_aKeyFrames;
-			}
-
-			std::vector<T>& GetKeyFrames()
-			{
-				return m_aKeyFrames;
-			}
-private:
-			std::vector<T> m_aKeyFrames;
+			std::vector<AnimationKeyFrame>& GetKeyFrames();
+		private:
+			std::vector<AnimationKeyFrame> m_aKeyFrames;
+			int m_iFrameCount = 0;
+			bool m_bIsLooping = false;
 		};
 	}
 }

@@ -12,6 +12,8 @@
 
 #include "graphics/imgui/views/DataTypes/StringTextInput.h"
 #include "resources/AssetType.h"
+#include "animation/AnimationTrack.h"
+#include "editor/graphics/imgui/views/inspector/animation/AnimationTrackUIView.h"
 
 namespace gallus
 {
@@ -57,6 +59,11 @@ namespace gallus
 			private:
 				std::shared_ptr<graphics::dx12::Texture> m_pPreviewTexture = nullptr;
 				gallus::resources::FileResource* m_pFile = nullptr;
+
+				animation::AnimationTrack m_AnimationTrack;
+				AnimationTrackUIView m_AnimationTrackUIView;
+
+				int m_iCurrentFrame = 0;
 			};
 		}
 	}

@@ -9,7 +9,6 @@
 #include "editor/graphics/imgui/windows/SceneWindow.h"
 #include "editor/graphics/imgui/windows/ExplorerWindow.h"
 #include "editor/graphics/imgui/windows/InspectorWindow.h"
-#include "editor/graphics/imgui/windows/AnimationWindow.h"
 
 #include "editor/graphics/imgui/modals/FilePickerModal.h"
 #include "editor/graphics/imgui/modals/SpriteEditorModal.h"
@@ -71,11 +70,6 @@ namespace gallus
 					return m_InspectorWindow;
 				}
 
-				AnimationWindow& GetAnimationWindow()
-				{
-					return m_AnimationWindow;
-				}
-
 				FilePickerModal& GetFilePickerModal()
 				{
 					return m_FilePickerModal;
@@ -100,7 +94,6 @@ namespace gallus
 				FullSceneWindow m_FullSceneWindow;
 				ExplorerWindow m_ExplorerWindow;
 				InspectorWindow m_InspectorWindow;
-				AnimationWindow m_AnimationWindow;
 
 				FilePickerModal m_FilePickerModal;
 				SpriteEditorModal m_SpriteEditorModal;
