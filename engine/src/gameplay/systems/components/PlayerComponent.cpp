@@ -12,6 +12,7 @@
 #include "gameplay/systems/TransformSystem.h"
 #include "gameplay/systems/CollisionSystem.h"
 #include "gameplay/systems/ProjectileSystem.h"
+#include "gameplay/systems/AnimationSystem.h"
 
 #define JSON_PLAYER_COMPONENT_MOVEMENT_SPEED_VAR "movementSpeed"
 #define JSON_PLAYER_COMPONENT_PREFAB_NAME "bulletPrefab"
@@ -23,6 +24,7 @@ namespace gallus
 		//---------------------------------------------------------------------
 		// PlayerComponent
 		//---------------------------------------------------------------------
+#ifdef _EDITOR
 		void PlayerComponent::Serialize(rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator) const
 		{
 			if (!a_Document.IsObject())
@@ -38,6 +40,7 @@ namespace gallus
 				a_Allocator
 			);
 		}
+#endif
 
 		//---------------------------------------------------------------------
 		void PlayerComponent::Deserialize(const resources::SrcData& a_SrcData)
@@ -83,10 +86,13 @@ namespace gallus
 			}
 		};
 
-		float bulletSpeed = 50;
+		float bulletSpeed = 5;
 		Key w('W'), a('A'), s('S'), d('D'), left(VK_LEFT), right(VK_RIGHT), up(VK_UP), down(VK_DOWN);
 		void PlayerComponent::UpdateRealtime(float a_fDeltaTime, UpdateTime a_UpdateTime)
 		{
+			AnimationSystem& animationSys = core::ENGINE->GetECS().GetSystem<AnimationSystem>();
+			AnimationComponent& animationComp = animationSys.GetComponent(m_EntityID);
+
 			bool leftDown = left.isKeyDown();
 			bool rightDown = right.isKeyDown();
 			if (leftDown || rightDown)
@@ -94,7 +100,6 @@ namespace gallus
 				gameplay::EntityID id = m_pBulletPrefab.Instantiate();
 
 				ProjectileSystem& projectileSystem = core::ENGINE->GetECS().GetSystem<ProjectileSystem>();
-				projectileSystem.GetComponent(id).SetMovementSpeed({ bulletSpeed, 0 });
 
 				CollisionSystem& collisionSys = core::ENGINE->GetECS().GetSystem<CollisionSystem>();
 				collisionSys.GetComponent(id).IgnoreEntity(id);
@@ -104,35 +109,66 @@ namespace gallus
 				const DirectX::XMFLOAT2& pos = transformSys.GetComponent(m_EntityID).Transform().GetPosition();
 				TransformComponent& transformComp = transformSys.GetComponent(id);
 				transformComp.Transform().SetPosition(pos);
-
+				
 				if (leftDown)
 				{
-					transformComp.Transform().SetRotation(180);
+					transformComp.Transform().SetRotation(-180);
+					projectileSystem.GetComponent(id).SetMovementSpeed({ -bulletSpeed, 0 });
+				}
+				else if (rightDown)
+				{
+					projectileSystem.GetComponent(id).SetMovementSpeed({ bulletSpeed, 0 });
 				}
 			}
 
 			float deltaSpeed = m_fSpeed * a_fDeltaTime;
 
 			DirectX::XMFLOAT2 movement = { 0.0f, 0.0f };
-			if (w.isKey())
+
+			bool wDown = w.isKey();
+			bool aDown = a.isKey();
+			bool sDown = s.isKey();
+			bool dDown = d.isKey();
+			if (wDown)
 			{
 				movement.y -= 1.0f;
+				animationComp.LoadAnimation("player_walk_up.anim");
 			}
-			if (s.isKey())
+			if (sDown)
 			{
 				movement.y += 1.0f;
+				animationComp.LoadAnimation("player_walk_down.anim");
 			}
-			if (a.isKey())
+			if (aDown)
 			{
 				movement.x -= 1.0f;
+				animationComp.LoadAnimation("player_walk_left.anim");
 			}
-			if (d.isKey())
+			if (dDown)
 			{
+				animationComp.LoadAnimation("player_walk_right.anim");
 				movement.x += 1.0f;
 			}
-
+			if (wDown && dDown)
+			{
+				animationComp.LoadAnimation("player_walk_up_right.anim");
+			}
+			if (wDown && aDown)
+			{
+				animationComp.LoadAnimation("player_walk_up_left.anim");
+			}
+			if (sDown && aDown)
+			{
+				animationComp.LoadAnimation("player_walk_down_left.anim");
+			}
+			if (sDown && dDown)
+			{
+				animationComp.LoadAnimation("player_walk_down_right.anim");
+			}
+			
 			if (movement.x == 0.0f && movement.y == 0.0f)
 			{
+				animationComp.LoadAnimation("player_walk_default.anim");
 				return; 
 			}
 

@@ -28,6 +28,7 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
+#ifdef _EDITOR
 		void TransformComponent::Serialize(rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator) const
 		{
 			if (!a_Document.IsObject())
@@ -52,6 +53,7 @@ namespace gallus
 			a_Document[JSON_TRANSFORM_COMPONENT_PIVOT_VAR].AddMember(JSON_TRANSFORM_COMPONENT_X_VAR, m_Transform.GetPivot().x, a_Allocator);
 			a_Document[JSON_TRANSFORM_COMPONENT_PIVOT_VAR].AddMember(JSON_TRANSFORM_COMPONENT_Y_VAR, m_Transform.GetPivot().y, a_Allocator);
 		}
+#endif
 
 		//---------------------------------------------------------------------
 		void TransformComponent::Deserialize(const resources::SrcData& a_SrcData)

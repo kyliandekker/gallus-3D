@@ -16,6 +16,7 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
+#ifdef _EDITOR
 		void AnimationComponent::Serialize(rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator) const
 		{
 			if (!a_Document.IsObject())
@@ -23,10 +24,33 @@ namespace gallus
 				return;
 			}
 		}
+#endif
 
 		//---------------------------------------------------------------------
 		void AnimationComponent::Deserialize(const resources::SrcData& a_SrcData)
 		{
+		}
+
+		//---------------------------------------------------------------------
+		void AnimationComponent::UpdateRealtime(float a_fDeltaTime, UpdateTime a_UpdateTime)
+		{
+			m_AnimationTrack.Update(m_EntityID, a_fDeltaTime);
+		}
+
+		//---------------------------------------------------------------------
+		void AnimationComponent::LoadAnimation(const std::string& a_sAnimName)
+		{
+			if (m_sAnimName == a_sAnimName)
+			{
+				return;
+			}
+			m_sAnimName = a_sAnimName;
+
+			resources::FileResource* fileResource = nullptr;
+			if (core::ENGINE->GetResourceAtlas().GetResource(m_sAnimName, fileResource))
+			{
+				m_AnimationTrack.LoadByPath(fileResource->GetPath());
+			}
 		}
 	}
 }

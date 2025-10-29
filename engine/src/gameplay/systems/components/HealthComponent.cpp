@@ -22,6 +22,7 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
+#ifdef _EDITOR
 		void HealthComponent::Serialize(rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator) const
 		{
 			if (!a_Document.IsObject())
@@ -32,6 +33,7 @@ namespace gallus
 			a_Document.AddMember(JSON_HEALTH_COMPONENT_HEALTH_VAR, m_fHealth, a_Allocator);
 			a_Document.AddMember(JSON_HEALTH_COMPONENT_MAX_HEALTH_VAR, m_fMaxHealth, a_Allocator);
 		}
+#endif
 
 		//---------------------------------------------------------------------
 		void HealthComponent::Deserialize(const resources::SrcData& a_SrcData)

@@ -1,39 +1,50 @@
-#include "animation/AnimationKeyFrame.h"
+#include "AnimationKeyFrame.h"
 
-#include "graphics/dx12/Texture.h"
-
-#include "gameplay/systems/SpriteSystem.h"
+#include "animation/AnimationTrack.h"
 
 namespace gallus
 {
 	namespace animation
 	{
-		void AnimationKeyFrameSpriteComponent::Activate(gameplay::EntityID& a_EntityID)
+		AnimationKeyFrame::~AnimationKeyFrame()
 		{
-			gameplay::SpriteComponent& spriteComp = core::ENGINE->GetECS().GetSystem<gameplay::SpriteSystem>().GetComponent(a_EntityID);
-			spriteComp.SetSpriteIndex(m_iSpriteIndex);
-			if (m_pTexture)
+			for (AnimationKeyFrameComponentBase* component : m_aAnimationKeyFrameComponents)
 			{
-				spriteComp.SetTexture(m_pTexture);
+				delete component;
+			}
+			m_aAnimationKeyFrameComponents.clear();
+		}
+
+		void AnimationKeyFrame::Activate(gameplay::EntityID& a_EntityID, AnimationTrack& a_AnimationTrack)
+		{
+			for (AnimationKeyFrameComponentBase* component : m_aAnimationKeyFrameComponents)
+			{
+				component->Activate(a_EntityID);
 			}
 		}
 
-		int AnimationKeyFrameSpriteComponent::GetSpriteIndex() const
+#ifdef _EDITOR
+		void AnimationKeyFrame::Serialize(rapidjson::Value& a_Value, rapidjson::Document::AllocatorType& a_Allocator) const
 		{
-			return m_iSpriteIndex;
-		}
+			for (AnimationKeyFrameComponentBase* component : m_aAnimationKeyFrameComponents)
+			{
+				// Create an object for this component and let it fill it.
+				rapidjson::Value componentDoc(rapidjson::kObjectType);
+				component->Serialize(componentDoc, a_Allocator);
 
-		void AnimationKeyFrameSpriteComponent::SetSpriteIndex(int a_iSpriteIndex)
+				// Create the key name as a RapidJSON string (needs allocator).
+				rapidjson::Value componentName(component->GetPropertyName().c_str(), a_Allocator);
+
+				// Add to the Components object. Use move so RapidJSON can take ownership.
+				a_Value.AddMember(std::move(componentName),
+					std::move(componentDoc),
+					a_Allocator);
+			}
+		}
+#endif
+		void AnimationKeyFrame::Deserialize(const resources::SrcData& a_SrcData)
 		{
-			if (m_pTexture && a_iSpriteIndex >= m_pTexture->GetSpriteRectsSize())
-			{
-				a_iSpriteIndex = m_pTexture->GetSpriteRectsSize() - 1;
-			}
-			if (a_iSpriteIndex < 0)
-			{
-				a_iSpriteIndex = 0;
-			}
-			m_iSpriteIndex = a_iSpriteIndex;
+
 		}
 	}
 }

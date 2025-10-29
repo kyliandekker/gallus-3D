@@ -189,6 +189,7 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
+#ifdef _EDITOR
 		void SpriteComponent::Serialize(rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator) const
 		{
 			if (!a_Document.IsObject())
@@ -250,6 +251,7 @@ namespace gallus
 				);
 			}
 		}
+#endif
 
 		//---------------------------------------------------------------------
 		void SpriteComponent::Deserialize(const resources::SrcData& a_SrcData)

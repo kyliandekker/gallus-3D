@@ -1,53 +1,35 @@
 ﻿#pragma once
 
+#include <vector>
+#ifdef _EDITOR
+#include <rapidjson/document.h>
+#endif
+
+#include "gameplay/EntityID.h"
+
+#include "AnimationKeyFrameSpriteComponent.h"
+
 namespace gallus
 {
-	namespace graphics
+	namespace resources
 	{
-		namespace dx12
-		{
-			class Texture;
-		}
-	}
-	namespace gameplay
-	{
-		class EntityID;
+		class SrcData;
 	}
 	namespace animation
 	{
-		class AnimationKeyFrameComponentBase
-		{
-		public:
-			virtual void Activate(gameplay::EntityID& a_EntityID)
-			{
-			}
-
-			bool m_bUsed = false;
-		};
-
-		class AnimationKeyFrameSpriteComponent : public AnimationKeyFrameComponentBase
-		{
-		public:
-			void Activate(gameplay::EntityID& a_EntityID) override;
-
-			int GetSpriteIndex() const;
-			void SetSpriteIndex(int a_iSpriteIndex);
-		private:
-			graphics::dx12::Texture* m_pTexture = nullptr;
-			int m_iSpriteIndex = 0;
-		};
+		class AnimationTrack;
 
 		class AnimationKeyFrame
 		{
 		public:
+			~AnimationKeyFrame();
 			AnimationKeyFrame() = default;
 
 			AnimationKeyFrame(int a_iFrame) :
 				m_iFrame(a_iFrame)
 			{ }
 
-			virtual void Activate(gameplay::EntityID & a_EntityID)
-			{ }
+			void Activate(gameplay::EntityID& a_EntityID, AnimationTrack& a_AnimationTrack);
 
 			int GetFrame() const
 			{
@@ -59,7 +41,6 @@ namespace gallus
 				m_iFrame = a_iFrame;
 			}
 
-			// Comparison operators
 			bool operator<(const AnimationKeyFrame& a_Other) const
 			{
 				return m_iFrame < a_Other.m_iFrame;
@@ -74,10 +55,55 @@ namespace gallus
 			AnimationKeyFrame(AnimationKeyFrame&&) noexcept = default;
 			AnimationKeyFrame& operator=(const AnimationKeyFrame&) = default;
 			AnimationKeyFrame& operator=(AnimationKeyFrame&&) noexcept = default;
+
+			template <typename T>
+			bool HasComponent()
+			{
+				for (AnimationKeyFrameComponentBase* component : m_aAnimationKeyFrameComponents)
+				{
+					if (dynamic_cast<T*>(component))
+					{
+						return true;
+					}
+				}
+				return false;
+			};
+
+			template <typename T>
+			T* AddComponent()
+			{
+				if (HasComponent<T>())
+				{
+					return GetComponent<T>();
+				}
+
+				T* comp = new T(*this);
+				m_aAnimationKeyFrameComponents.push_back(comp);
+				return comp;
+			};
+
+			template <typename T>
+			T* GetComponent()
+			{
+				for (AnimationKeyFrameComponentBase* component : m_aAnimationKeyFrameComponents)
+				{
+					T* castedComp = dynamic_cast<T*>(component);
+					if (castedComp)
+					{
+						return castedComp;
+					}
+				}
+				return nullptr;
+			};
+
+#ifdef _EDITOR
+			void Serialize(rapidjson::Value& a_Value, rapidjson::Document::AllocatorType& a_Allocator) const;
+#endif
+			void Deserialize(const resources::SrcData& a_SrcData);
 		private:
 			int m_iFrame = 0;
 
-			AnimationKeyFrameSpriteComponent m_AnimationKeyFrameSpriteComponent;
+			std::vector<AnimationKeyFrameComponentBase*> m_aAnimationKeyFrameComponents;
 		};
 	}
 }

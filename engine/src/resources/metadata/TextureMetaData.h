@@ -49,7 +49,7 @@ namespace gallus
 			/// </summary>
 			bool LoadMetaData(rapidjson::Document& a_Document) override;
 		private:
-			graphics::dx12::TextureType m_TextureType;
+			graphics::dx12::TextureType m_TextureType = graphics::dx12::TextureType::Texture2D;
 
 			std::vector<graphics::dx12::SpriteRect> m_aSprites = {
 			};

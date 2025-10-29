@@ -1,0 +1,14 @@
+{
+    "frameCount": 30,
+    "loop": true,
+    "keyFrames": {
+        "0": {
+            "components": {
+                "spriteComponent": {
+                    "spriteIndex": 1,
+                    "texture": "tex_walk.png"
+                }
+            }
+        }
+    }
+}

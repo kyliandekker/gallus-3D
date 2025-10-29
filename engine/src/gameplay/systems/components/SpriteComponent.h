@@ -124,12 +124,14 @@ namespace gallus
 			/// <param name="a_Camera">The camera.</param>
 			void Render(std::shared_ptr<graphics::dx12::CommandList> a_pCommandList, const EntityID& a_EntityID, const graphics::dx12::Camera& a_Camera);
 
+#ifdef _EDITOR
 			/// <summary>
 			/// Serialized the component to a json document.
 			/// </summary>
 			/// <param name="a_Document">The json document that the data will be put into.</param>
 			/// <param name="a_Allocator">The allocator used by the json document.</param>
 			void Serialize(rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator) const override;
+#endif
 
 			/// <summary>
 			/// Creates an instance based on source data.

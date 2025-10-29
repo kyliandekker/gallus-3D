@@ -42,7 +42,7 @@ namespace gallus
 					std::string((m_bFoldedOut ? font::ICON_FOLDED_OUT : font::ICON_FOLDED_IN) + GetName()),
 					FOLDOUT_ID, string_extensions::StringToUpper(GetName()) + "_INSPECTOR"), &m_bFoldedOut, ImVec2(width, size.y));
 				ImGui::SameLine();
-				if (ImGui::IconButton(ImGui::IMGUI_FORMAT_ID(font::ICON_DELETE, BUTTON_ID, string_extensions::StringToUpper(GetName()) + "_DELETE_HIERARCHY").c_str(), size, m_Window.GetIconFont()))
+				if (ImGui::IconButton(ImGui::IMGUI_FORMAT_ID(font::ICON_DELETE, BUTTON_ID, string_extensions::StringToUpper(GetName()) + "_DELETE_INSPECTOR").c_str(), size, m_Window.GetIconFont()))
 				{
 					a_System.DeleteComponent(a_Component.GetEntityID());
 				}

@@ -22,6 +22,7 @@ namespace gallus
 		//---------------------------------------------------------------------
 		// ColliderComponent
 		//---------------------------------------------------------------------
+#ifdef _EDITOR
 		void ColliderComponent::Serialize(rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator) const
 		{
 			if (!a_Document.IsObject())
@@ -39,6 +40,7 @@ namespace gallus
 			a_Document[JSON_COLLIDER_COMPONENT_SIZE_VAR].AddMember(JSON_COLLIDER_COMPONENT_X_VAR, m_vSize.x, a_Allocator);
 			a_Document[JSON_COLLIDER_COMPONENT_SIZE_VAR].AddMember(JSON_COLLIDER_COMPONENT_Y_VAR, m_vSize.y, a_Allocator);
 		}
+#endif
 
 		//---------------------------------------------------------------------
 		void ColliderComponent::Deserialize(const resources::SrcData& a_SrcData)
@@ -79,7 +81,6 @@ namespace gallus
 				TransformSystem& transformSys = core::ENGINE->GetECS().GetSystem<TransformSystem>();
 				CollisionSystem& colliderSys = core::ENGINE->GetECS().GetSystem<CollisionSystem>();
 
-				// both components must exist
 				if (!transformSys.HasComponent(m_EntityID))
 				{
 					return;
@@ -99,88 +100,136 @@ namespace gallus
 
 				auto& colliders = colliderSys.GetComponents();
 
-				// Build player's rotated corners (current)
 				auto playerCorners = GetColliderWorldCorners(position, scale, pivot, rotation);
 
-				//---------------------------------------------------------------------
-				// Helper lambdas (SAT with correct perpendicular axes)
 				auto Normalize = [](const DirectX::XMFLOAT2& v) -> DirectX::XMFLOAT2
-				{
-					float len = sqrtf(v.x * v.x + v.y * v.y);
-					if (len == 0.0f) { return { 0.0f, 0.0f }; }
-					return { v.x / len, v.y / len };
-				};
+					{
+						float len = sqrtf(v.x * v.x + v.y * v.y);
+						if (len == 0.0f)
+						{
+							return { 0.0f, 0.0f };
+						}
+						return { v.x / len, v.y / len };
+					};
 
 				auto Project = [](const std::array<DirectX::XMFLOAT2, 4>& corners, const DirectX::XMFLOAT2& axis, float& outMin, float& outMax)
-				{
-					outMin = outMax = corners[0].x * axis.x + corners[0].y * axis.y;
-					for (int i = 1; i < 4; ++i)
 					{
-						float proj = corners[i].x * axis.x + corners[i].y * axis.y;
-						if (proj < outMin) outMin = proj;
-						if (proj > outMax) outMax = proj;
-					}
-				};
+						outMin = outMax = corners[0].x * axis.x + corners[0].y * axis.y;
+						for (int i = 1; i < 4; ++i)
+						{
+							float proj = corners[i].x * axis.x + corners[i].y * axis.y;
+							if (proj < outMin) { outMin = proj; }
+							if (proj > outMax) { outMax = proj; }
+						}
+					};
 
 				auto GetAxesPerp = [&](const std::array<DirectX::XMFLOAT2, 4>& corners)
-				{
-					// Two unique edges: (1-0) and (3-0); axes are perpendicular to these edges
-					std::array<DirectX::XMFLOAT2, 2> axes;
-					DirectX::XMFLOAT2 e0 = { corners[1].x - corners[0].x, corners[1].y - corners[0].y };
-					DirectX::XMFLOAT2 e1 = { corners[3].x - corners[0].x, corners[3].y - corners[0].y };
-					// perpendicular: (-y, x)
-					axes[0] = Normalize({ -e0.y, e0.x });
-					axes[1] = Normalize({ -e1.y, e1.x });
-					return axes;
-				};
+					{
+						std::array<DirectX::XMFLOAT2, 2> axes;
+						DirectX::XMFLOAT2 e0 = { corners[1].x - corners[0].x, corners[1].y - corners[0].y };
+						DirectX::XMFLOAT2 e1 = { corners[3].x - corners[0].x, corners[3].y - corners[0].y };
+						axes[0] = Normalize({ -e0.y, e0.x });
+						axes[1] = Normalize({ -e1.y, e1.x });
+						return axes;
+					};
 
 				auto SATOverlap = [&](const std::array<DirectX::XMFLOAT2, 4>& a, const std::array<DirectX::XMFLOAT2, 4>& b) -> bool
-				{
-					auto axesA = GetAxesPerp(a);
-					auto axesB = GetAxesPerp(b);
-
-					float minA, maxA, minB, maxB;
-
-					for (int i = 0; i < 2; ++i)
 					{
-						Project(a, axesA[i], minA, maxA);
-						Project(b, axesA[i], minB, maxB);
-						if (maxA < minB || maxB < minA)
+						auto axesA = GetAxesPerp(a);
+						auto axesB = GetAxesPerp(b);
+						float minA, maxA, minB, maxB;
+						for (int i = 0; i < 2; ++i)
 						{
-							return false;
+							if (axesA[i].x == 0.0f && axesA[i].y == 0.0f) { continue; }
+							Project(a, axesA[i], minA, maxA);
+							Project(b, axesA[i], minB, maxB);
+							if (maxA < minB || maxB < minA) { return false; }
 						}
-					}
+						for (int i = 0; i < 2; ++i)
+						{
+							if (axesB[i].x == 0.0f && axesB[i].y == 0.0f) { continue; }
+							Project(a, axesB[i], minA, maxA);
+							Project(b, axesB[i], minB, maxB);
+							if (maxA < minB || maxB < minA) { return false; }
+						}
+						return true;
+					};
 
-					for (int i = 0; i < 2; ++i)
+				auto OffsetCorners = [&](const std::array<DirectX::XMFLOAT2, 4>& src, float offset, bool isX)
 					{
-						Project(a, axesB[i], minA, maxA);
-						Project(b, axesB[i], minB, maxB);
-						if (maxA < minB || maxB < minA)
+						std::array<DirectX::XMFLOAT2, 4> out = src;
+						for (int i = 0; i < 4; ++i)
 						{
-							return false;
+							if (isX) { out[i].x += offset; }
+							else { out[i].y += offset; }
 						}
-					}
+						return out;
+					};
 
-					return true;
-				};
+				auto ComputeSafeDelta = [&](float moveComponent, bool isX, const std::array<DirectX::XMFLOAT2, 4>& aPlayerCorners,
+					const std::array<DirectX::XMFLOAT2, 4>& aOtherCorners) -> float
+					{
+						if (moveComponent == 0.0f)
+						{
+							return 0.0f;
+						}
 
-				//---------------------------------------------------------------------
+						float minBound = std::min(0.0f, moveComponent);
+						float maxBound = std::max(0.0f, moveComponent);
+
+						auto cornersAtMin = OffsetCorners(aPlayerCorners, minBound, isX);
+						auto cornersAtMax = OffsetCorners(aPlayerCorners, maxBound, isX);
+
+						bool minPen = SATOverlap(cornersAtMin, aOtherCorners);
+						bool maxPen = SATOverlap(cornersAtMax, aOtherCorners);
+
+						if (!minPen && !maxPen)
+						{
+							return moveComponent;
+						}
+
+						float safe = 0.0f;
+						float pen = 0.0f;
+
+						if (!minPen && maxPen)
+						{
+							safe = minBound;
+							pen = maxBound;
+						}
+						else if (minPen && !maxPen)
+						{
+							safe = maxBound;
+							pen = minBound;
+						}
+						else
+						{
+							safe = 0.0f;
+							pen = moveComponent;
+						}
+
+						for (int it = 0; it < 12; ++it)
+						{
+							float mid = (safe + pen) * 0.5f;
+							auto test = OffsetCorners(aPlayerCorners, mid, isX);
+							if (SATOverlap(test, aOtherCorners))
+							{
+								pen = mid;
+							}
+							else
+							{
+								safe = mid;
+							}
+						}
+
+						return safe;
+					};
+
 				for (auto& colliderPair : colliders)
 				{
-					if (colliderPair.first == m_EntityID)
-					{ 
-						continue;
-					}
-					
-					if (m_aEntitiesToIgnore.contains(colliderPair.first))
-					{ 
-						continue;
-					}
-
-					if (!transformSys.HasComponent(colliderPair.first))
-					{
-						continue;
-					}
+					if (colliderPair.first == m_EntityID) { continue; }
+					if (m_aEntitiesToIgnore.contains(colliderPair.first)) { continue; }
+					if (colliderPair.second.m_aEntitiesToIgnore.contains(m_EntityID)) { continue; }
+					if (!transformSys.HasComponent(colliderPair.first)) { continue; }
 
 					ColliderComponent& otherCollider = colliderPair.second;
 					TransformComponent& otherTransform = transformSys.GetComponent(colliderPair.first);
@@ -192,120 +241,32 @@ namespace gallus
 
 					auto otherCorners = otherCollider.GetColliderWorldCorners(otherPosition, otherScale, otherPivot, otherRotation);
 
-					// Accumulate normal components for this pair
 					DirectX::XMFLOAT2 accumulatedNormal = { 0.0f, 0.0f };
 
-					//-----------------------------------------------------------------
-					// Check X movement: build player corners moved only in X and test
 					if (move.x != 0.0f)
 					{
 						std::array<DirectX::XMFLOAT2, 4> movedX = playerCorners;
-						for (int i = 0; i < 4; ++i)
-						{ 
-							movedX[i].x += move.x; 
-						}
+						for (int i = 0; i < 4; ++i) { movedX[i].x += move.x; }
 
 						if (SATOverlap(movedX, otherCorners))
 						{
-							// binary search maximal safe delta along X
-							float low = 0.0f;
-							float high = move.x;
-							// ensure correct ordering for negative moves
-							for (int it = 0; it < 8; ++it)
-							{
-								float mid = (low + high) * 0.5f;
-								std::array<DirectX::XMFLOAT2, 4> test = playerCorners;
-								for (int i = 0; i < 4; ++i)
-								{
-									test[i].x += mid;
-								}
-
-								if (SATOverlap(test, otherCorners))
-								{
-									// mid penetrates -> move high toward mid (reduce magnitude)
-									if (move.x > 0.0f)
-									{
-										high = mid;
-									}
-									else
-									{
-										low = mid;
-									}
-								}
-								else
-								{
-									// mid safe -> move low toward mid (expand)
-									if (move.x > 0.0f)
-									{
-										low = mid;
-									}
-									else
-									{
-										high = mid;
-									}
-								}
-							}
-
-							float safeDeltaX = (move.x > 0.0f) ? low : high;
+							float safeDeltaX = ComputeSafeDelta(move.x, true, playerCorners, otherCorners);
 							if ((move.x > 0.0f && safeDeltaX < allowedMoveX) || (move.x < 0.0f && safeDeltaX > allowedMoveX))
 							{
 								allowedMoveX = safeDeltaX;
 							}
-
-							// X normal contribution (pointing away from other)
 							accumulatedNormal.x = (move.x > 0.0f) ? 1.0f : -1.0f;
 						}
 					}
 
-					//-----------------------------------------------------------------
-					// Check Y movement: build player corners moved only in Y and test
 					if (move.y != 0.0f)
 					{
 						std::array<DirectX::XMFLOAT2, 4> movedY = playerCorners;
-						for (int i = 0; i < 4; ++i)
-						{
-							movedY[i].y += move.y;
-						}
+						for (int i = 0; i < 4; ++i) { movedY[i].y += move.y; }
 
 						if (SATOverlap(movedY, otherCorners))
 						{
-							// binary search maximal safe delta along Y
-							float low = 0.0f;
-							float high = move.y;
-							for (int it = 0; it < 8; ++it)
-							{
-								float mid = (low + high) * 0.5f;
-								std::array<DirectX::XMFLOAT2, 4> test = playerCorners;
-								for (int i = 0; i < 4; ++i)
-								{
-									test[i].y += mid;
-								}
-
-								if (SATOverlap(test, otherCorners))
-								{
-									if (move.y > 0.0f)
-									{
-										high = mid;
-									}
-									else
-									{
-										low = mid;
-									}
-								}
-								else
-								{
-									if (move.y > 0.0f)
-									{
-										low = mid;
-									}
-									else
-									{
-										high = mid;
-									}
-								}
-							}
-
-							float safeDeltaY = (move.y > 0.0f) ? low : high;
+							float safeDeltaY = ComputeSafeDelta(move.y, false, playerCorners, otherCorners);
 							if ((move.y > 0.0f && safeDeltaY < allowedMoveY) || (move.y < 0.0f && safeDeltaY > allowedMoveY))
 							{
 								allowedMoveY = safeDeltaY;
@@ -315,8 +276,6 @@ namespace gallus
 						}
 					}
 
-					//-----------------------------------------------------------------
-					// If we found any collision contribution, send combined normalized normal once
 					if (accumulatedNormal.x != 0.0f || accumulatedNormal.y != 0.0f)
 					{
 						float len = sqrtf(accumulatedNormal.x * accumulatedNormal.x + accumulatedNormal.y * accumulatedNormal.y);
@@ -327,29 +286,33 @@ namespace gallus
 							normalToSend.y = accumulatedNormal.y / len;
 						}
 
+						// Flip Y normal because up is -1, down is +1
+						normalToSend.y *= -1.0f;
+
 						colliderSys.Collide(*this, otherCollider, normalToSend);
 					}
 				}
 
-				//---------------------------------------------------------------------
 				const float epsilon = 0.001f;
-
 				float finalMoveX = allowedMoveX;
 				float finalMoveY = allowedMoveY;
 
 				if (finalMoveX != 0.0f)
 				{
-					finalMoveX -= std::copysign(epsilon, finalMoveX);
+					if (fabs(finalMoveX) <= epsilon) { finalMoveX = 0.0f; }
+					else { finalMoveX -= std::copysign(epsilon, finalMoveX); }
 				}
 
 				if (finalMoveY != 0.0f)
 				{
-					finalMoveY -= std::copysign(epsilon, finalMoveY);
+					if (fabs(finalMoveY) <= epsilon) { finalMoveY = 0.0f; }
+					else { finalMoveY -= std::copysign(epsilon, finalMoveY); }
 				}
 
 				transformComp.SetTranslation({ finalMoveX, finalMoveY });
 			}
 		}
+
 		//---------------------------------------------------------------------
 		std::array<DirectX::XMFLOAT2, 4> ColliderComponent::GetColliderWorldCorners(
 			const DirectX::XMFLOAT2& a_vPos,

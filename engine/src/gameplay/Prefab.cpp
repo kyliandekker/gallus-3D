@@ -46,6 +46,7 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
+#ifdef _EDITOR
 		const core::Data Prefab::GetSceneData() const
 		{
 			rapidjson::Document a_Document;
@@ -88,6 +89,7 @@ namespace gallus
 
 			return core::DataStream(buffer.GetString(), buffer.GetSize());
 		}
+#endif
 
 		//---------------------------------------------------------------------
 		gameplay::EntityID Prefab::Instantiate()

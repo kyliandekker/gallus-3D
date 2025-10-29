@@ -1,0 +1,31 @@
+{
+    "frameCount": 30,
+    "loop": true,
+    "keyFrames": {
+        "0": {
+            "components": {
+                "spriteComponent": {
+                    "spriteIndex": 3,
+                    "texture": "tex_walk.png"
+                }
+            }
+        },
+        "10": {
+            "components": {
+                "spriteComponent": {
+                    "spriteIndex": 4,
+                    "texture": "tex_walk.png"
+                }
+            }
+        },
+        "20": {
+            "components": {
+                "spriteComponent": {
+                    "spriteIndex": 5,
+                    "texture": "tex_walk.png"
+                }
+            }
+        },
+        "30": {}
+    }
+}

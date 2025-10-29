@@ -13,7 +13,8 @@ namespace gallus
 	{
 		namespace imgui
 		{
-			AnimationTrackUIView::AnimationTrackUIView(ImGuiWindow& a_Window) : ImGuiUIView(a_Window)
+			AnimationTrackUIView::AnimationTrackUIView(ImGuiWindow& a_Window) : ImGuiUIView(a_Window),
+				m_AnimationKeyFrameUIView(a_Window)
 			{
 			}
 
@@ -22,7 +23,6 @@ namespace gallus
 				m_pAnimationTrack = &a_AnimationTrack;
 			}
 
-			constexpr float TRACK_SIZE = 50;
 			void AnimationTrackUIView::Render()
 			{
 				ImDrawList* drawList = ImGui::GetWindowDrawList();
@@ -35,10 +35,17 @@ namespace gallus
 
 				ImGuiIO& io = ImGui::GetIO();
 
-				int i = 0;
-				for (animation::AnimationKeyFrame& keyFrame : m_pAnimationTrack->GetKeyFrames())
+				ANIMATION_FRAME_PIXEL_WIDTH = ANIMATION_FRAME_PIXEL_WIDTH_DEFAULT;
+				float calcLegendWidth = (m_pAnimationTrack->GetFrameCount() * ANIMATION_FRAME_PIXEL_WIDTH_DEFAULT) - LEGEND_PADDING;
+				if (calcLegendWidth < ImGui::GetContentRegionAvail().x)
 				{
-					float px = startPos.x + (keyFrame.GetFrame() * ANIMATION_FRAME_PIXEL_WIDTH);
+					ANIMATION_FRAME_PIXEL_WIDTH = (ImGui::GetContentRegionAvail().x - LEGEND_PADDING) / m_pAnimationTrack->GetFrameCount();
+				}
+	
+				int i = 0;
+				for (animation::AnimationKeyFrame* keyFrame : m_pAnimationTrack->GetKeyFrames())
+				{
+					float px = startPos.x + (keyFrame->GetFrame() * ANIMATION_FRAME_PIXEL_WIDTH);
 					std::string keyFrameIcon = font::ICON_KEYFRAME;
 					ImVec2 iconSize = ImGui::CalcTextSize(keyFrameIcon.c_str());
 					float verticalOffset = (TRACK_SIZE - iconSize.y) / 2.0f;
@@ -70,22 +77,23 @@ namespace gallus
 					// Start drag
 					if (bHovered && bMouseClicked)
 					{
-						m_iSelectedKeyFrame = i;
+						SetSelectedKeyFrame(i);
 
 						s_bDragging = true;
-						s_pDraggedKeyFrame = &keyFrame;
+						s_pDraggedKeyFrame = keyFrame;
 					}
 
 					// Update drag
-					if (s_bDragging && s_pDraggedKeyFrame == &keyFrame && bMouseDragging)
+					if (s_bDragging && s_pDraggedKeyFrame == keyFrame && bMouseDragging)
 					{
 						ImVec2 mousePos = ImGui::GetMousePos();
 						ImVec2 s_vRelativePos = mousePos - startPos;
-						keyFrame = std::round(s_vRelativePos.x / ANIMATION_FRAME_PIXEL_WIDTH);
+						int frame = std::round(s_vRelativePos.x / ANIMATION_FRAME_PIXEL_WIDTH);
+						keyFrame->SetFrame(std::clamp(frame, 0, m_pAnimationTrack->GetFrameCount()));
 					}
 
 					// End drag
-					if (!bMouseDown && s_bDragging && s_pDraggedKeyFrame == &keyFrame)
+					if (!bMouseDown && s_bDragging && s_pDraggedKeyFrame == keyFrame)
 					{
 						s_bDragging = false;
 						s_pDraggedKeyFrame = nullptr;
@@ -94,7 +102,37 @@ namespace gallus
 					i++;
 				}
 
+				ImRect lines = ImRect(
+					startPos - ImVec2(LEGEND_PADDING, 0),
+					startPos - ImVec2(LEGEND_PADDING, 0) + ImVec2(ImGui::GetContentRegionAvail().x, TRACK_SIZE)
+				);
+
+				drawList->AddLine(
+					lines.Min,
+					ImVec2(lines.Max.x, lines.Min.y),
+					0xFFFFFFFF,
+					1.0f
+				);
+
+				drawList->AddLine(
+					ImVec2(lines.Min.x, lines.Max.y),
+					ImVec2(lines.Max.x, lines.Max.y),
+					0xFFFFFFFF,
+					1.0f
+				);
+
 				ImGui::SetCursorScreenPos(ImVec2(startPos.x, animationTrackRect.Max.y));
+			}
+
+			void AnimationTrackUIView::SetSelectedKeyFrame(int a_iSelectedKeyFrame)
+			{
+				if (a_iSelectedKeyFrame < 0)
+				{
+					return;
+				}
+
+				m_iSelectedKeyFrame = a_iSelectedKeyFrame;
+				m_AnimationKeyFrameUIView.SetKeyFrame(*m_pAnimationTrack->GetKeyFrames()[a_iSelectedKeyFrame]);
 			}
 		}
 	}

@@ -34,11 +34,13 @@ namespace gallus
 			/// <returns>True if loading was successful, false otherwise.</returns>
 			bool LoadData() override;
 
+#ifdef _EDITOR
 			/// <summary>
 			/// Returns a copy of the current prefab data.
 			/// </summary>
 			/// <returns>A <see cref="core::Data"/> object representing the prefab’s data.</returns>
 			virtual const core::Data GetSceneData() const override;
+#endif
 
 			/// <summary>
 			/// Creates a copy of the data stored in the prefab and spawns it in runtime.

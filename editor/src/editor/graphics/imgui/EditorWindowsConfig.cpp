@@ -50,9 +50,9 @@ namespace gallus
 				m_ExplorerWindow.Update();
 				m_InspectorWindow.Update();
 
-				m_FilePickerModal.Update();
 				m_SpriteEditorModal.Update();
 				m_AnimationEditorModal.Update();
+				m_FilePickerModal.Update();
 			}
 		}
 	}

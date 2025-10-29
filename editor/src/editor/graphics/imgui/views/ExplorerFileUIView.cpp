@@ -194,7 +194,7 @@ namespace gallus
 
 				verticalOffset = (buttonSize.y - textSize.y) / 2.0f;
 
-				textPos = initialPos + ImVec2(300, verticalOffset);
+				textPos = initialPos + ImVec2(350, verticalOffset);
 				ImGui::SetCursorPos(textPos);
 
 				ImVec4 textColor = ImGui::GetStyleColorVec4(ImGuiCol_Text);

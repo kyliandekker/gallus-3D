@@ -17,6 +17,7 @@ namespace gallus
 	namespace gameplay
 	{
 		//---------------------------------------------------------------------
+#ifdef _EDITOR
 		void ProjectileComponent::Serialize(rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator) const
 		{
 			if (!a_Document.IsObject())
@@ -26,6 +27,7 @@ namespace gallus
 
 			a_Document.AddMember(JSON_PROJECTILE_COMPONENT_DAMAGE_VAR, m_fDamage, a_Allocator);
 		}
+#endif
 
 		//---------------------------------------------------------------------
 		void ProjectileComponent::Deserialize(const resources::SrcData& a_SrcData)

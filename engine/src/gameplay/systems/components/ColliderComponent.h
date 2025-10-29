@@ -16,12 +16,14 @@ namespace gallus
 		class ColliderComponent : public Component
 		{
 		public:
+#ifdef _EDITOR
 			/// <summary>
 			/// Serialized the component to a json document.
 			/// </summary>
 			/// <param name="a_Document">The json document that the data will be put into.</param>
 			/// <param name="a_Allocator">The allocator used by the json document.</param>
 			void Serialize(rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator) const override;
+#endif
 
 			/// <summary>
 			/// Deerializes sourcce data and creates an instance based on it.

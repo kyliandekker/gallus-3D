@@ -108,7 +108,7 @@ namespace gallus
 			return true;
 		}
 
-//#ifdef _EDITOR
+#ifdef _EDITOR
 		//---------------------------------------------------------------------
 		bool Scene::Save()
 		{
@@ -130,6 +130,7 @@ namespace gallus
 #endif // _EDITOR
 			return true;
 		}
+#endif // _EDITOR
 
 		//---------------------------------------------------------------------
 		bool Scene::Load()
@@ -141,7 +142,6 @@ namespace gallus
 
 			return file::LoadFile(m_Path, m_Data);
 		}
-//#endif // _EDITOR
 
 		//---------------------------------------------------------------------
 		void Scene::SetData(const core::Data& a_Data)
@@ -156,9 +156,9 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
+#ifdef _EDITOR
 		const core::Data Scene::GetSceneData() const
 		{
-
 			rapidjson::Document a_Document;
 			a_Document.SetObject();
 			rapidjson::Document::AllocatorType& allocator = a_Document.GetAllocator();
@@ -197,8 +197,6 @@ namespace gallus
 
 			return core::DataStream(buffer.GetString(), buffer.GetSize());
 		}
-
-#ifdef _EDITOR
 
 		//---------------------------------------------------------------------
 		const core::Observable<bool>& Scene::IsDirty() const

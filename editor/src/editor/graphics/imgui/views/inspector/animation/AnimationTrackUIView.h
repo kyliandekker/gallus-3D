@@ -9,9 +9,13 @@
 
 #include <vector>
 
-constexpr float ANIMATION_FRAME_PIXEL_WIDTH = 25.0f;
+#include "AnimationKeyFrameUIView.h"
+
+constexpr float ANIMATION_FRAME_PIXEL_WIDTH_DEFAULT = 25.0f;
+inline float ANIMATION_FRAME_PIXEL_WIDTH = 25.0f;
 constexpr float LEGEND_PADDING = 25.0f;
 constexpr float LEGEND_HEIGHT = 70.0f;
+constexpr float TRACK_SIZE = 50;
 
 namespace gallus
 {
@@ -31,19 +35,23 @@ namespace gallus
 
 				void Render() override;
 
-				animation::AnimationTrack* m_pAnimationTrack = nullptr;
-
 				int GetSelectedKeyFrame() const
 				{
 					return m_iSelectedKeyFrame;
 				}
 
-				void SetSelectedKeyFrame(int a_iSelectedKeyFrame)
+				void SetSelectedKeyFrame(int a_iSelectedKeyFrame);
+
+				AnimationKeyFrameUIView& GetKeyFrameUIView()
 				{
-					m_iSelectedKeyFrame = a_iSelectedKeyFrame;
+					return m_AnimationKeyFrameUIView;
 				}
 
 				int m_iSelectedKeyFrame = -1;
+			private:
+				animation::AnimationTrack* m_pAnimationTrack = nullptr;
+
+				AnimationKeyFrameUIView m_AnimationKeyFrameUIView;
 			};
 		}
 	}

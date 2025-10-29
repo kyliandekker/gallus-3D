@@ -175,7 +175,7 @@ namespace gallus
 				ImGuiStyle& style = ImGui::GetStyle();
 				ImVec4* colors = style.Colors;
 
-#define BLUTARCH 1
+#define BESTGAMEEVER 1
 
 #ifdef PURPLEBURGLARALARM
 				m_vAccentColor = ImVec4(0.42f, 0.34f, 0.83f, 1.00f);

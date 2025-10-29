@@ -63,7 +63,7 @@
             "components": {
                 "sprite": {
                     "texture": {
-                        "name": "tex_goomba_sprites.png",
+                        "name": "tex_walk.png",
                         "spriteIndex": 0
                     },
                     "shader": {
@@ -80,10 +80,10 @@
                 },
                 "transform": {
                     "position": {
-                        "x": 124.4048843383789,
-                        "y": -796.8025512695313
+                        "x": 920.7452392578125,
+                        "y": 412.37841796875
                     },
-                    "rotation": 1.1754943508222876e-38,
+                    "rotation": 1.1754956119909055e-38,
                     "scale": {
                         "x": 99.99999237060547,
                         "y": 99.99999237060547
@@ -94,7 +94,7 @@
                     }
                 },
                 "player": {
-                    "movementSpeed": 900.0,
+                    "movementSpeed": 500.0,
                     "bulletPrefab": "bullet.prefab"
                 },
                 "health": {
@@ -111,8 +111,9 @@
                         "y": 1.0
                     }
                 },
+                "animation": {},
                 "rigidbody": {
-                    "useGravity": true,
+                    "useGravity": false,
                     "mass": 1.0,
                     "linearDamping": 1.0
                 }
@@ -146,7 +147,7 @@
                     },
                     "rotation": 0.0,
                     "scale": {
-                        "x": 700.0,
+                        "x": 4000.0,
                         "y": 100.0
                     },
                     "pivot": {

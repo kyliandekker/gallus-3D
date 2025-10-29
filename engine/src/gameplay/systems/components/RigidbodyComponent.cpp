@@ -21,6 +21,7 @@ namespace gallus
 		//---------------------------------------------------------------------
 		// RigidbodyComponent
 		//---------------------------------------------------------------------
+#ifdef _EDITOR
 		void RigidbodyComponent::Serialize(rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator) const
 		{
 			if (!a_Document.IsObject())
@@ -33,6 +34,7 @@ namespace gallus
 			a_Document.AddMember(JSON_RIGIDBODY_COMPONENT_MASS_VAR, m_fMass, a_Allocator);
 			a_Document.AddMember(JSON_RIGIDBODY_COMPONENT_LINEAR_DAMPING_VAR, m_fLinearDamping, a_Allocator);
 		}
+#endif
 
 		//---------------------------------------------------------------------
 		void RigidbodyComponent::Deserialize(const resources::SrcData& a_SrcData)
@@ -67,7 +69,7 @@ namespace gallus
 			{
 				for (const auto& col : collisions)
 				{
-					if (col.m_vNormal.y > 0.5f) // collision below
+					if (col.m_vNormal.y < 0.0) // collision below
 					{
 						m_vVelocity.y = 0.0f;
 						m_vForce.y = 0.0f;

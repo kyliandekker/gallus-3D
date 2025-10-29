@@ -47,6 +47,7 @@ namespace gallus
 					},
 					graphics::dx12::TextureTypeToString
 					);
+				m_TextureTypeDropdown.SetValue(graphics::dx12::TextureType::Texture2D);
 
 				auto cCommandQueue = core::EDITOR_ENGINE->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
 				m_pPreviewTexture = core::EDITOR_ENGINE->GetResourceAtlas().LoadTexture(m_ExplorerFileUIView.GetFileResource().GetPath().filename().generic_string(), cCommandQueue);

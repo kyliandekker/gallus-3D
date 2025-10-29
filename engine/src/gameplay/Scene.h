@@ -46,19 +46,19 @@ namespace gallus
 			/// </summary>
 			/// <returns>True if loading was successful, false otherwise.</returns>
 			virtual bool LoadData();
-//#ifdef _EDITOR
+#ifdef _EDITOR
 			/// <summary>
 			/// Saves the current scene data to disk or a serialized format.
 			/// </summary>
 			/// <returns>True if saving was successful, false otherwise.</returns>
 			bool Save();
+#endif
 
 			/// <summary>
 			/// Loads the scene data from disk or serialized format.
 			/// </summary>
 			/// <returns>True if loading was successful, false otherwise.</returns>
 			bool Load();
-//#endif
 			/// <summary>
 			/// Sets the internal data representation of the scene.
 			/// </summary>
@@ -70,13 +70,14 @@ namespace gallus
 			/// </summary>
 			/// <returns>Constant reference to <see cref="core::Data"/>.</returns>
 			const core::Data& GetData() const;
-			
+
+#ifdef _EDITOR
 			/// <summary>
 			/// Returns a copy of the current scene data.
 			/// </summary>
 			/// <returns>A <see cref="core::Data"/> object representing the scene’s data.</returns>
 			virtual const core::Data GetSceneData() const;
-#ifdef _EDITOR
+
 			/// <summary>
 			/// Returns an observable reference indicating whether the scene has unsaved changes.
 			/// </summary>

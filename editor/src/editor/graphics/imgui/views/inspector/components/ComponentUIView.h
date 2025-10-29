@@ -42,8 +42,7 @@ namespace gallus
 			{
 			public:
 				/// <summary>
-				/// Constructs the ComponentBaseUIView with an associated ImGui window 
-				/// and entity ID.
+				/// Constructs the ComponentBaseUIView with an associated ImGui window.
 				/// </summary>
 				/// <param name="a_Window">The ImGui window for rendering the view.</param>
 				ComponentBaseUIView(ImGuiWindow& a_Window) : ImGuiUIView(a_Window)
