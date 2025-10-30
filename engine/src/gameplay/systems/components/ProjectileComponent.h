@@ -2,6 +2,8 @@
 
 #include "gameplay/systems/components/Component.h"
 
+#include "gameplay/Prefab.h"
+
 #include <DirectXMath.h>
 
 namespace gallus
@@ -60,6 +62,8 @@ namespace gallus
 
 			DirectX::XMFLOAT2 m_vVelocity = {};
 			float m_fDamage;
+			
+			gameplay::Prefab m_ExplosionPrefab;
 		};
 	}
 }

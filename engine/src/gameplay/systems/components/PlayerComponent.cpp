@@ -132,38 +132,51 @@ namespace gallus
 			if (wDown)
 			{
 				movement.y -= 1.0f;
-				animationComp.LoadAnimation("player_walk_up.anim");
 			}
 			if (sDown)
 			{
 				movement.y += 1.0f;
-				animationComp.LoadAnimation("player_walk_down.anim");
 			}
 			if (aDown)
 			{
 				movement.x -= 1.0f;
-				animationComp.LoadAnimation("player_walk_left.anim");
 			}
 			if (dDown)
 			{
-				animationComp.LoadAnimation("player_walk_right.anim");
 				movement.x += 1.0f;
 			}
+
 			if (wDown && dDown)
 			{
 				animationComp.LoadAnimation("player_walk_up_right.anim");
 			}
-			if (wDown && aDown)
+			else if (wDown && aDown)
 			{
 				animationComp.LoadAnimation("player_walk_up_left.anim");
 			}
-			if (sDown && aDown)
+			else if (sDown && aDown)
 			{
 				animationComp.LoadAnimation("player_walk_down_left.anim");
 			}
-			if (sDown && dDown)
+			else if (sDown && dDown)
 			{
 				animationComp.LoadAnimation("player_walk_down_right.anim");
+			}
+			else if (wDown)
+			{
+				animationComp.LoadAnimation("player_walk_up.anim");
+			}
+			else if (sDown)
+			{
+				animationComp.LoadAnimation("player_walk_down.anim");
+			}
+			else if (aDown)
+			{
+				animationComp.LoadAnimation("player_walk_left.anim");
+			}
+			else if (dDown)
+			{
+				animationComp.LoadAnimation("player_walk_right.anim");
 			}
 			
 			if (movement.x == 0.0f && movement.y == 0.0f)

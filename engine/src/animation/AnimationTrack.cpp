@@ -95,6 +95,9 @@ namespace gallus
                 }
             }
 
+            m_iNextKeyFrameIndex = 0;
+            m_fAccumulatedTime = 0;
+
 			return true;
 		}
 

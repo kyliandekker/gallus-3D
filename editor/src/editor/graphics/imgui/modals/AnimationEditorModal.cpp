@@ -89,7 +89,8 @@ namespace gallus
 						ImGui::GetContentRegionAvail().x - m_Window.GetFramePadding().x,
 						ImGui::GetContentRegionAvail().y - m_Window.GetFramePadding().y
 					),
-					ImGuiChildFlags_Borders | ImGuiChildFlags_ResizeX
+					ImGuiChildFlags_Borders | ImGuiChildFlags_ResizeX,
+					ImGuiWindowFlags_AlwaysHorizontalScrollbar
 				))
 				{
 					ImVec2 initialPos = ImGui::GetCursorScreenPos();

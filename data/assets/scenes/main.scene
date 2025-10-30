@@ -111,7 +111,9 @@
                         "y": 1.0
                     }
                 },
-                "animation": {},
+                "animation": {
+                    "startAnimation": ""
+                },
                 "rigidbody": {
                     "useGravity": false,
                     "mass": 1.0,

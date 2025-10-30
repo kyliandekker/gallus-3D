@@ -43,6 +43,8 @@ namespace gallus
 			void LoadAnimation(const std::string& a_sAnimName);
 		private:
 			animation::AnimationTrack m_AnimationTrack;
+			
+			std::string m_sStartAnimation;
 			std::string m_sAnimName;
 		};
 	}

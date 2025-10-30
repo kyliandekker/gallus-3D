@@ -4,6 +4,10 @@
 
 #include "core/Engine.h"
 
+#include "resources/SrcData.h"
+
+#define JSON_ANIMATION_COMPONENT_START_ANIMATION_VAR "startAnimation"
+
 namespace gallus
 {
 	namespace gameplay
@@ -13,6 +17,10 @@ namespace gallus
 		//---------------------------------------------------------------------
 		void AnimationComponent::InitRealtime()
 		{
+			if (!m_sStartAnimation.empty())
+			{
+				LoadAnimation(m_sStartAnimation);
+			}
 		}
 
 		//---------------------------------------------------------------------
@@ -23,12 +31,19 @@ namespace gallus
 			{
 				return;
 			}
+
+			a_Document.AddMember(
+				JSON_ANIMATION_COMPONENT_START_ANIMATION_VAR,
+				rapidjson::Value(m_sStartAnimation.c_str(), a_Allocator),
+				a_Allocator
+			);
 		}
 #endif
 
 		//---------------------------------------------------------------------
 		void AnimationComponent::Deserialize(const resources::SrcData& a_SrcData)
 		{
+			m_sStartAnimation = a_SrcData.GetString(JSON_ANIMATION_COMPONENT_START_ANIMATION_VAR);
 		}
 
 		//---------------------------------------------------------------------

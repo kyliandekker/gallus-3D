@@ -11,6 +11,7 @@
 #include "gameplay/systems/TransformSystem.h"
 
 #define JSON_PROJECTILE_COMPONENT_DAMAGE_VAR "damage"
+#define JSON_PROJECTILE_COMPONENT_EXPLOSION_VAR "explosion"
 
 namespace gallus
 {
@@ -26,6 +27,12 @@ namespace gallus
 			}
 
 			a_Document.AddMember(JSON_PROJECTILE_COMPONENT_DAMAGE_VAR, m_fDamage, a_Allocator);
+
+			a_Document.AddMember(
+				JSON_PROJECTILE_COMPONENT_EXPLOSION_VAR,
+				rapidjson::Value(m_ExplosionPrefab.GetPath().filename().generic_string().c_str(), a_Allocator),
+				a_Allocator
+			);
 		}
 #endif
 
@@ -33,6 +40,8 @@ namespace gallus
 		void ProjectileComponent::Deserialize(const resources::SrcData& a_SrcData)
 		{
 			m_fDamage = a_SrcData.GetFloat(JSON_PROJECTILE_COMPONENT_DAMAGE_VAR);
+			core::ENGINE->GetResourceAtlas().LoadPrefab(a_SrcData.GetString(JSON_PROJECTILE_COMPONENT_EXPLOSION_VAR), m_ExplosionPrefab);
+			m_ExplosionPrefab.Load();
 		}
 
 		//---------------------------------------------------------------------
@@ -53,6 +62,13 @@ namespace gallus
 						HealthComponent& healthComponent = healthSystem.GetComponent(c.b);
 						healthComponent.SetHealth(healthComponent.GetHealth() - m_fDamage);
 					}
+
+					gameplay::EntityID id = m_ExplosionPrefab.Instantiate();
+
+					TransformSystem& transformSys = core::ENGINE->GetECS().GetSystem<TransformSystem>();
+					const DirectX::XMFLOAT2& pos = transformSys.GetComponent(m_EntityID).Transform().GetPosition();
+					TransformComponent& transformComp = transformSys.GetComponent(id);
+					transformComp.Transform().SetPosition(pos);
 
 					// Destroy projectile on first impact.
 					core::ENGINE->GetECS().GetEntity(m_EntityID)->Destroy();

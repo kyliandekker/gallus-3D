@@ -1,11 +1,11 @@
 {
-    "name": "Bullet",
+    "name": "GameObject",
     "isActive": true,
     "components": {
         "sprite": {
             "texture": {
-                "name": "tex_bullet.png",
-                "spriteIndex": 0
+                "name": "tex_explosion.png",
+                "spriteIndex": 48
             },
             "shader": {
                 "pixel": "pixelShader.hlsl",
@@ -26,27 +26,16 @@
             },
             "rotation": 0.0,
             "scale": {
-                "x": 70.0,
-                "y": 40.0
+                "x": 150.0,
+                "y": 150.0
             },
             "pivot": {
                 "x": 0.0,
                 "y": 0.0
             }
         },
-        "collision": {
-            "offset": {
-                "x": 0.0,
-                "y": 0.0
-            },
-            "size": {
-                "x": 1.0,
-                "y": 1.0
-            }
-        },
-        "projectile": {
-            "damage": 50.0,
-			"explosion": "explosion.prefab"
+        "animation": {
+            "startAnimation": "explosion.anim"
         }
     }
 }
