@@ -19,14 +19,15 @@ namespace gallus
 	constexpr float FRAME_TIME = 1 / 60.0f;
 	namespace animation
 	{
+		enum class AnimationEvent;
 		class AnimationTrack : public resources::EngineResource
 		{
 		public:
-			AnimationTrack() = default;
+			AnimationTrack() : EngineResource()
+			{
+				m_aKeyFrames.reserve(100);
+			}
 			~AnimationTrack();
-
-			void Start()
-			{ }
 
 			bool LoadByPath(const fs::path& a_Path);
 
@@ -69,15 +70,28 @@ namespace gallus
 			{
 				m_aActiveTags.erase(a_sTag);
 			}
+			
+			void Play()
+			{
+				m_bIsPlaying = true;
+			}
 
-			std::vector<AnimationKeyFrame*>& GetKeyFrames();
+			void Stop()
+			{
+				m_bIsPlaying = false;
+			}
+
+			void ActivateEvent(gameplay::EntityID& a_EntityID, AnimationEvent a_Event);
+
+			std::vector<AnimationKeyFrame>& GetKeyFrames();
 		private:
-			std::vector<AnimationKeyFrame*> m_aKeyFrames;
+			std::vector<AnimationKeyFrame> m_aKeyFrames;
 			std::set<std::string> m_aActiveTags;
 
 			int m_iFrameCount = 0;
 			int m_iNextKeyFrameIndex = 0;
 			bool m_bIsLooping = false;
+			bool m_bIsPlaying = false;
 
 			float m_fAccumulatedTime = 0.0f;
 		};

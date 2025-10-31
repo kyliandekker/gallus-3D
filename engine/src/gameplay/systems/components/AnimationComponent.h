@@ -41,10 +41,30 @@ namespace gallus
 			void UpdateRealtime(float a_fDeltaTime, UpdateTime a_UpdateTime) override;
 
 			void LoadAnimation(const std::string& a_sAnimName);
+
+			void Start()
+			{
+				m_AnimationTrack.Play();
+			}
+
+			void Stop()
+			{
+				m_AnimationTrack.Stop();
+			}
+
+			void SetStartingAnimation(const std::string a_sStartingAnimation)
+			{
+				m_sStartingAnimation = a_sStartingAnimation;
+			}
+
+			const std::string& GetStartingAnimation() const
+			{
+				return m_sStartingAnimation;
+			}
 		private:
 			animation::AnimationTrack m_AnimationTrack;
 			
-			std::string m_sStartAnimation;
+			std::string m_sStartingAnimation;
 			std::string m_sAnimName;
 		};
 	}

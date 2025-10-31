@@ -5,7 +5,7 @@
 #include <string>
 
 #include "editor/core/EditorEngine.h"
-#include <graphics/imgui/font_icon.h>
+#include "graphics/imgui/font_icon.h"
 
 namespace gallus
 {
@@ -15,11 +15,11 @@ namespace gallus
 		{
 			AnimationTrackUIView::AnimationTrackUIView(ImGuiWindow& a_Window) : ImGuiUIView(a_Window),
 				m_AnimationKeyFrameUIView(a_Window)
-			{
-			}
+			{ }
 
 			void AnimationTrackUIView::Load(animation::AnimationTrack& a_AnimationTrack)
 			{
+				m_iSelectedKeyFrame = -1;
 				m_pAnimationTrack = &a_AnimationTrack;
 			}
 
@@ -43,9 +43,9 @@ namespace gallus
 				}
 	
 				int i = 0;
-				for (animation::AnimationKeyFrame* keyFrame : m_pAnimationTrack->GetKeyFrames())
+				for (animation::AnimationKeyFrame& keyFrame : m_pAnimationTrack->GetKeyFrames())
 				{
-					float px = startPos.x + (keyFrame->GetFrame() * ANIMATION_FRAME_PIXEL_WIDTH);
+					float px = startPos.x + (keyFrame.GetFrame() * ANIMATION_FRAME_PIXEL_WIDTH);
 					std::string keyFrameIcon = font::ICON_KEYFRAME;
 					ImVec2 iconSize = ImGui::CalcTextSize(keyFrameIcon.c_str());
 					float verticalOffset = (TRACK_SIZE - iconSize.y) / 2.0f;
@@ -80,20 +80,20 @@ namespace gallus
 						SetSelectedKeyFrame(i);
 
 						s_bDragging = true;
-						s_pDraggedKeyFrame = keyFrame;
+						s_pDraggedKeyFrame = &keyFrame;
 					}
 
 					// Update drag
-					if (s_bDragging && s_pDraggedKeyFrame == keyFrame && bMouseDragging)
+					if (s_bDragging && s_pDraggedKeyFrame == &keyFrame && bMouseDragging)
 					{
 						ImVec2 mousePos = ImGui::GetMousePos();
 						ImVec2 s_vRelativePos = mousePos - startPos;
 						int frame = std::round(s_vRelativePos.x / ANIMATION_FRAME_PIXEL_WIDTH);
-						keyFrame->SetFrame(std::clamp(frame, 0, m_pAnimationTrack->GetFrameCount()));
+						keyFrame.SetFrame(std::clamp(frame, 0, m_pAnimationTrack->GetFrameCount()));
 					}
 
 					// End drag
-					if (!bMouseDown && s_bDragging && s_pDraggedKeyFrame == keyFrame)
+					if (!bMouseDown && s_bDragging && s_pDraggedKeyFrame == &keyFrame)
 					{
 						s_bDragging = false;
 						s_pDraggedKeyFrame = nullptr;
@@ -132,7 +132,7 @@ namespace gallus
 				}
 
 				m_iSelectedKeyFrame = a_iSelectedKeyFrame;
-				m_AnimationKeyFrameUIView.SetKeyFrame(*m_pAnimationTrack->GetKeyFrames()[a_iSelectedKeyFrame]);
+				m_AnimationKeyFrameUIView.SetKeyFrame(m_pAnimationTrack->GetKeyFrames()[a_iSelectedKeyFrame]);
 			}
 		}
 	}

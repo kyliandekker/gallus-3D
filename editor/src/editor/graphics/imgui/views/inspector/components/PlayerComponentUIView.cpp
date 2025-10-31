@@ -50,48 +50,45 @@ namespace gallus
 				FilePickerModal& filePickerModal = m_Window.GetWindowsConfig<EditorWindowsConfig>().GetFilePickerModal();
 
 				ImGui::StartInspectorKeyVal(ImGui::IMGUI_FORMAT_ID("", TABLE_ID, "PLAYER_COMPONENT_TABLE_INSPECTOR"), m_Window.GetFramePadding() / 2);
-				ImGuiWindow& window = m_Window;
-				gameplay::PlayerComponent& playerComp = m_Component;
-				ImGui::KeyValue([&window]
+				ImGui::KeyValue([this]
 					{
 						ImGui::AlignTextToFramePadding();
-						ImGui::DisplayHeader(window.GetBoldFont(), "Movement Speed: ");
+						ImGui::DisplayHeader(m_Window.GetBoldFont(), "Movement Speed: ");
 					},
-					[&playerComp]
+					[this]
 					{
-						float speed = playerComp.GetSpeed();
+						float speed = m_Component.GetSpeed();
 						ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
 						if (ImGui::DragFloat(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "PLAYER_COMPONENT_SPEED_INSPECTOR").c_str(), &speed, 1.0f, -999999999, 99999999999))
 						{
-							playerComp.SetSpeed(speed);
+							m_Component.SetSpeed(speed);
 						}
 					});
-				ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(window.GetFontSize() / 2, window.GetFontSize() / 2));
+				ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(m_Window.GetFontSize() / 2, m_Window.GetFontSize() / 2));
 
-				char* prefabNameStr = m_sPrefabName;
-				ImGui::KeyValue([&window]
+				ImGui::KeyValue([this]
 					{
 						ImGui::AlignTextToFramePadding();
-						ImGui::DisplayHeader(window.GetBoldFont(), "Bullet Prefab: ");
+						ImGui::DisplayHeader(m_Window.GetBoldFont(), "Bullet Prefab: ");
 					},
-					[&playerComp, &filePickerModal, &window, prefabNameStr]
+					[this, &filePickerModal]
 					{
 						ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
-						ImVec2 buttonSize = ImVec2(window.GetFontSize() * 2, window.GetFontSize() * 2);
+						ImVec2 buttonSize = ImVec2(m_Window.GetFontSize() * 2, m_Window.GetFontSize() * 2);
 						ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
 						ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x - buttonSize.x);
-						ImGui::InputText(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "PLAYER_COMPONENT_BULLET_PREFAB_NAME_INPUT_INSPECTOR").c_str(), prefabNameStr, sizeof(prefabNameStr), ImGuiInputTextFlags_ReadOnly);
+						ImGui::InputText(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "PLAYER_COMPONENT_BULLET_PREFAB_NAME_INPUT_INSPECTOR").c_str(), m_sPrefabName, sizeof(m_sPrefabName), ImGuiInputTextFlags_ReadOnly);
 						ImGui::PopItemFlag();
 						ImGui::SameLine();
 						if (ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_FILE, BUTTON_ID, "PLAYER_COMPONENT_BULLET_PREFAB_INSPECTOR").c_str(), buttonSize))
 						{
 							filePickerModal.SetData(
-								[&playerComp](int success, gallus::resources::FileResource& resource)
+								[this](int success, gallus::resources::FileResource& resource)
 								{
 									if (success == 1)
 									{
-										playerComp.GetBulletPrefab().SetPath(resource.GetPath().filename().generic_string());
-										playerComp.GetBulletPrefab().Load();
+										m_Component.GetBulletPrefab().SetPath(resource.GetPath().filename().generic_string());
+										m_Component.GetBulletPrefab().Load();
 									}
 								},
 								std::vector<gallus::resources::AssetType>{ gallus::resources::AssetType::Prefab }

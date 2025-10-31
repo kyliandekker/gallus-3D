@@ -95,7 +95,9 @@ namespace gallus
 
 			bool leftDown = left.isKeyDown();
 			bool rightDown = right.isKeyDown();
-			if (leftDown || rightDown)
+			bool upDown = up.isKeyDown();
+			bool downDown = down.isKeyDown();
+			if (leftDown || rightDown || upDown || downDown)
 			{
 				gameplay::EntityID id = m_pBulletPrefab.Instantiate();
 
@@ -118,6 +120,16 @@ namespace gallus
 				else if (rightDown)
 				{
 					projectileSystem.GetComponent(id).SetMovementSpeed({ bulletSpeed, 0 });
+				}
+				else if (upDown)
+				{
+					transformComp.Transform().SetRotation(-90);
+					projectileSystem.GetComponent(id).SetMovementSpeed({ 0, -bulletSpeed });
+				}
+				else if (downDown)
+				{
+					transformComp.Transform().SetRotation(90);
+					projectileSystem.GetComponent(id).SetMovementSpeed({ 0, bulletSpeed });
 				}
 			}
 
@@ -149,39 +161,48 @@ namespace gallus
 			if (wDown && dDown)
 			{
 				animationComp.LoadAnimation("player_walk_up_right.anim");
+				animationComp.Start();
 			}
 			else if (wDown && aDown)
 			{
 				animationComp.LoadAnimation("player_walk_up_left.anim");
+				animationComp.Start();
 			}
 			else if (sDown && aDown)
 			{
 				animationComp.LoadAnimation("player_walk_down_left.anim");
+				animationComp.Start();
 			}
 			else if (sDown && dDown)
 			{
 				animationComp.LoadAnimation("player_walk_down_right.anim");
+				animationComp.Start();
 			}
 			else if (wDown)
 			{
 				animationComp.LoadAnimation("player_walk_up.anim");
+				animationComp.Start();
 			}
 			else if (sDown)
 			{
 				animationComp.LoadAnimation("player_walk_down.anim");
+				animationComp.Start();
 			}
 			else if (aDown)
 			{
 				animationComp.LoadAnimation("player_walk_left.anim");
+				animationComp.Start();
 			}
 			else if (dDown)
 			{
 				animationComp.LoadAnimation("player_walk_right.anim");
+				animationComp.Start();
 			}
 			
 			if (movement.x == 0.0f && movement.y == 0.0f)
 			{
 				animationComp.LoadAnimation("player_walk_default.anim");
+				animationComp.Start();
 				return; 
 			}
 

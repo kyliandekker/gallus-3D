@@ -14,19 +14,18 @@ namespace gallus
 		{
 			void AnimationKeyFrameSpriteComponentUIView::RenderInner()
 			{
-				memset(m_TextureName, 0, sizeof(m_TextureName));
+				memset(m_sTextureName, 0, sizeof(m_sTextureName));
 				if (m_Component.GetTexture())
 				{
-					strncpy(m_TextureName, m_Component.GetTexture()->GetName().c_str(), sizeof(m_TextureName));
-					m_TextureName[sizeof(m_TextureName) - 1] = '\0';
+					strncpy(m_sTextureName, m_Component.GetTexture()->GetName().c_str(), sizeof(m_sTextureName));
+					m_sTextureName[sizeof(m_sTextureName) - 1] = '\0';
 				}
 
 				ImGui::StartInspectorKeyVal(ImGui::IMGUI_FORMAT_ID("", TABLE_ID, "SPRITE_ANIMATION_KEY_FRAME_TABLE_INSPECTOR"), m_Window.GetFramePadding());
-				ImGuiWindow& window = m_Window;
-				ImGui::KeyValue([&window, this]
+				ImGui::KeyValue([this]
 					{
 						ImGui::AlignTextToFramePadding();
-						ImGui::DisplayHeader(window.GetBoldFont(), "Sprite Index: ");
+						ImGui::DisplayHeader(m_Window.GetBoldFont(), "Sprite Index: ");
 					},
 					[this]
 					{
@@ -55,17 +54,16 @@ namespace gallus
 				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
 				ImVec2 buttonSize = ImVec2(m_Window.GetFontSize() * 2, m_Window.GetFontSize() * 2);
 
-				char* textureName = m_TextureName;
-				ImGui::KeyValue([&window]
+				ImGui::KeyValue([this]
 					{
 						ImGui::AlignTextToFramePadding();
-						ImGui::DisplayHeader(window.GetBoldFont(), "Texture: ");
+						ImGui::DisplayHeader(m_Window.GetBoldFont(), "Texture: ");
 					},
-					[this, &buttonSize, textureName, &filePickerModal, &animationEditorModal]
+					[this, &buttonSize, &filePickerModal, &animationEditorModal]
 					{
 						ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
 						ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x - buttonSize.x);
-						ImGui::InputText(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "SPRITE_COMPONENT_TEXTURE_NAME_INPUT_INSPECTOR").c_str(), textureName, sizeof(textureName), ImGuiInputTextFlags_ReadOnly);
+						ImGui::InputText(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "SPRITE_COMPONENT_TEXTURE_NAME_INPUT_INSPECTOR").c_str(), m_sTextureName, sizeof(m_sTextureName), ImGuiInputTextFlags_ReadOnly);
 						ImGui::PopItemFlag();
 						ImGui::SameLine();
 						if (ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_FILE, BUTTON_ID, "SPRITE_COMPONENT_TEXTURE_INSPECTOR").c_str(), buttonSize))

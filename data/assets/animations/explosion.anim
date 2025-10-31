@@ -393,6 +393,13 @@
                     "texture": "tex_explosion.png"
                 }
             }
+        },
+        "280": {
+            "components": {
+                "eventComponent": {
+                    "eventName": ""
+                }
+            }
         }
     }
 }

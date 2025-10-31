@@ -18,7 +18,12 @@ namespace gallus
 		//---------------------------------------------------------------------
 		void HealthComponent::InitRealtime()
 		{
+			if (m_bInitialized)
+			{
+				return;
+			}
 			m_fHealth = m_fMaxHealth;
+			Component::InitRealtime();
 		}
 
 		//---------------------------------------------------------------------

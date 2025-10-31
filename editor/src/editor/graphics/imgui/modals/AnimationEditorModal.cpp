@@ -26,6 +26,9 @@
 #include "editor/graphics/imgui/views/ExplorerFileUIView.h"
 #include "editor/graphics/imgui/views/inspector/animation/AnimationKeyFrameComponentBaseUIView.h"
 
+#include "animation/AnimationKeyFrameSpriteComponent.h"
+#include "animation/AnimationKeyFrameEventComponent.h"
+
 namespace gallus
 {
 	namespace graphics
@@ -211,18 +214,26 @@ namespace gallus
 					ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, m_Window.GetFramePadding());
 					if (m_AnimationTrackUIView.m_iSelectedKeyFrame > -1 && m_AnimationTrackUIView.m_iSelectedKeyFrame < m_AnimationTrack.GetKeyFrames().size())
 					{
-						animation::AnimationKeyFrame* keyFrame = m_AnimationTrack.GetKeyFrames()[m_AnimationTrackUIView.m_iSelectedKeyFrame];
+						animation::AnimationKeyFrame& keyFrame = m_AnimationTrack.GetKeyFrames()[m_AnimationTrackUIView.m_iSelectedKeyFrame];
 
 						m_AnimationTrackUIView.GetKeyFrameUIView().Render();
 
 						float width = ImGui::GetContentRegionAvail().x;
 
-						if (!keyFrame->HasComponent<animation::AnimationKeyFrameSpriteComponent>())
+						if (!keyFrame.HasComponent<animation::AnimationKeyFrameSpriteComponent>())
 						{
-							if (ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_FOLDER + std::string(" Add Component"), BUTTON_ID, "ADD_COMPONENT_ANIMATION_MODAL").c_str(), ImVec2(width, 0)))
+							if (ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_IMAGE + std::string(" Add Sprite Component"), BUTTON_ID, "ADD_SPRITE_COMPONENT_ANIMATION_MODAL").c_str(), ImVec2(width, 0)))
 							{
-								keyFrame->AddComponent<animation::AnimationKeyFrameSpriteComponent>();
-								m_AnimationTrackUIView.GetKeyFrameUIView().SetKeyFrame(*keyFrame);
+								keyFrame.AddComponent<animation::AnimationKeyFrameSpriteComponent>();
+								m_AnimationTrackUIView.GetKeyFrameUIView().SetKeyFrame(keyFrame);
+							}
+						}
+						if (!keyFrame.HasComponent<animation::AnimationKeyFrameEventComponent>())
+						{
+							if (ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_CIRCLE_ERROR + std::string(" Add Event Component"), BUTTON_ID, "ADD_EVENT_COMPONENT_ANIMATION_MODAL").c_str(), ImVec2(width, 0)))
+							{
+								keyFrame.AddComponent<animation::AnimationKeyFrameEventComponent>();
+								m_AnimationTrackUIView.GetKeyFrameUIView().SetKeyFrame(keyFrame);
 							}
 						}
 					}

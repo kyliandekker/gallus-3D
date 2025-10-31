@@ -14,14 +14,13 @@ namespace gallus
 		namespace imgui
 		{
 			/// <summary>
-			/// UI view for rendering and interacting with the ColliderComponent in the ImGui editor.
-			/// Inherits from ComponentUIView and provides specific rendering for position, rotation and scale of the transform.
+			/// UI view for rendering and interacting with the animation sprite component in the ImGui editor.
 			/// </summary>
 			class AnimationKeyFrameSpriteComponentUIView : public AnimationKeyFrameComponentUIView<animation::AnimationKeyFrameSpriteComponent>
 			{
 			public:
 				/// <summary>
-				/// Constructs the SpriteComponentUIView with specific views for the position, rotation and scale.
+				/// Constructs the SpriteComponentUIView.
 				/// </summary>
 				/// <param name="a_Window">The ImGui window for rendering the view.</param>
 				/// <param name="a_SpriteComponent">The SpriteComponentUIView to display and edit.</param>
@@ -39,7 +38,7 @@ namespace gallus
 				/// <returns>The name of the UI component.</returns>
 				std::string GetName() const override;
 
-				char m_TextureName[128];
+				char m_sTextureName[128];
 			};
 		}
 	}

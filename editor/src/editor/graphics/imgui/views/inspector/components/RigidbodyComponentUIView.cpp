@@ -32,49 +32,47 @@ namespace gallus
 				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, m_Window.GetFramePadding());
 
 				ImGui::StartInspectorKeyVal(ImGui::IMGUI_FORMAT_ID("", TABLE_ID, "Rigidbody_COMPONENT_TABLE_INSPECTOR"), m_Window.GetFramePadding());
-				ImGuiWindow& window = m_Window;
-				gameplay::RigidbodyComponent& rigidbodyComp = m_Component;
-				ImGui::KeyValue([&window]
+				ImGui::KeyValue([this]
 					{
 						ImGui::AlignTextToFramePadding();
-						ImGui::DisplayHeader(window.GetBoldFont(), "Gravity: ");
+						ImGui::DisplayHeader(m_Window.GetBoldFont(), "Gravity: ");
 					},
-					[&rigidbodyComp]
+					[this]
 					{
-						bool gravity = rigidbodyComp.UseGravity();
+						bool gravity = m_Component.UseGravity();
 						if (ImGui::Toggle(ImGui::IMGUI_FORMAT_ID("", CHECKBOX_ID, "RIGIDBODY_COMPONENT_USE_GRAVITY_INSPECTOR").c_str(), &gravity))
 						{
-							rigidbodyComp.SetUseGravity(gravity);
+							m_Component.SetUseGravity(gravity);
 							core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
 						}
 					});
-				ImGui::KeyValue([&window]
+				ImGui::KeyValue([this]
 					{
 						ImGui::AlignTextToFramePadding();
-						ImGui::DisplayHeader(window.GetBoldFont(), "Mass: ");
+						ImGui::DisplayHeader(m_Window.GetBoldFont(), "Mass: ");
 					},
-					[&rigidbodyComp]
+					[this]
 					{
-						float mass = rigidbodyComp.GetMass();
+						float mass = m_Component.GetMass();
 						ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
 						if (ImGui::DragFloat(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "RIGIDBODY_COMPONENT_MASS_INSPECTOR").c_str(), &mass, 0.5f, 0.0001f, std::numeric_limits<float>::max()))
 						{
-							rigidbodyComp.SetMass(mass);
+							m_Component.SetMass(mass);
 							core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
 						}
 					});
-				ImGui::KeyValue([&window]
+				ImGui::KeyValue([this]
 					{
 						ImGui::AlignTextToFramePadding();
-						ImGui::DisplayHeader(window.GetBoldFont(), "Linear Dampening: ");
+						ImGui::DisplayHeader(m_Window.GetBoldFont(), "Linear Dampening: ");
 					},
-					[&rigidbodyComp]
+					[this]
 					{
-						float linearDamping = rigidbodyComp.GetLinearDamping();
+						float linearDamping = m_Component.GetLinearDamping();
 						ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
 						if (ImGui::DragFloat(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "RIGIDBODY_COMPONENT_LINEAR_DAMPING_INSPECTOR").c_str(), &linearDamping, 0.1f, 0.0f, 1.0f))
 						{
-							rigidbodyComp.SetLinearDamping(linearDamping);
+							m_Component.SetLinearDamping(linearDamping);
 							core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
 						}
 					});

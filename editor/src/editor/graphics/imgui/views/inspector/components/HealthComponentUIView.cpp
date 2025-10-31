@@ -29,34 +29,32 @@ namespace gallus
 				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, m_Window.GetFramePadding());
 
 				ImGui::StartInspectorKeyVal(ImGui::IMGUI_FORMAT_ID("", TABLE_ID, "HEALTH_COMPONENT_TABLE_INSPECTOR"), m_Window.GetFramePadding());
-				ImGuiWindow& window = m_Window;
-				gameplay::HealthComponent& healthComp = m_Component;
-				ImGui::KeyValue([&window]
+				ImGui::KeyValue([this]
 					{
 						ImGui::AlignTextToFramePadding();
-						ImGui::DisplayHeader(window.GetBoldFont(), "Health: ");
+						ImGui::DisplayHeader(m_Window.GetBoldFont(), "Health: ");
 					},
-					[&healthComp]
+					[this]
 					{
-						float health = healthComp.GetHealth();
+						float health = m_Component.GetHealth();
 						ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
 						if (ImGui::DragFloat(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "HEALTH_COMPONENT_HEALTH_INSPECTOR").c_str(), &health, 1.0f, -999999999, 99999999999))
 						{
-							healthComp.SetHealth(health);
+							m_Component.SetHealth(health);
 						}
 					});
-				ImGui::KeyValue([&window]
+				ImGui::KeyValue([this]
 					{
 						ImGui::AlignTextToFramePadding();
-						ImGui::DisplayHeader(window.GetBoldFont(), "Max Health: ");
+						ImGui::DisplayHeader(m_Window.GetBoldFont(), "Max Health: ");
 					},
-					[&healthComp]
+					[this]
 					{
-						float maxHealth = healthComp.GetHealth();
+						float maxHealth = m_Component.GetHealth();
 						ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
 						if (ImGui::DragFloat(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "HEALTH_COMPONENT_MAX_HEALTH_INSPECTOR").c_str(), &maxHealth, 1.0f, -999999999, 99999999999))
 						{
-							healthComp.SetMaxHealth(maxHealth);
+							m_Component.SetMaxHealth(maxHealth);
 						}
 					});
 				ImGui::EndInspectorKeyVal(m_Window.GetFramePadding());

@@ -89,14 +89,12 @@ namespace gallus
 					{
 						if (componentsDoc.HasMember(system->GetPropertyName().c_str()))
 						{
-							gameplay::Component* component = system->GetBaseComponent(id);
+							const rapidjson::Value& testMember = componentsDoc[system->GetPropertyName().c_str()];
+							gameplay::Component* component = system->CreateBaseComponent(id, testMember);
 							if (!component)
 							{
 								continue;
 							}
-
-							const rapidjson::Value& testMember = componentsDoc[system->GetPropertyName().c_str()];
-							component->Deserialize(resources::SrcData(testMember));
 						}
 					}
 				}

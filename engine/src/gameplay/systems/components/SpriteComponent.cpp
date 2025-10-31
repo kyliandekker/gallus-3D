@@ -43,6 +43,7 @@ namespace gallus
 		void SpriteComponent::Init(const gameplay::EntityID& a_EntityID)
 		{
 			Component::Init(a_EntityID);
+
 			m_pShaderBind = core::ENGINE->GetResourceAtlas().GetDefaultShaderBind().get();
 			m_pTexture = core::ENGINE->GetResourceAtlas().GetDefaultTexture().get();
 			m_pMesh = core::ENGINE->GetResourceAtlas().GetDefaultMesh().get();
@@ -274,7 +275,7 @@ namespace gallus
 			if (!vertexShader.empty() && !pixelShader.empty())
 			{
 				SetShader(core::ENGINE->GetResourceAtlas().LoadShaderBind(
-					tex,
+					pixelShader,
 					core::ENGINE->GetResourceAtlas().LoadPixelShader(pixelShader).get(),
 					core::ENGINE->GetResourceAtlas().LoadVertexShader(vertexShader).get()
 				).get());

@@ -12,6 +12,8 @@
 #include "core/Engine.h"
 #include "core/FlagEnum.h"
 
+#include "resources/SrcData.h"
+
 // gameplay includes
 #include "gameplay/EntityID.h"
 #include "gameplay/systems/components/Component.h"
@@ -87,7 +89,7 @@ namespace gallus
 			/// Creates a component in the entity component system.
 			/// </summary>
 			/// <param name="a_ID"></param>
-			virtual Component* CreateBaseComponent(const EntityID& a_ID) = 0;
+			virtual Component* CreateBaseComponent(const EntityID& a_ID, const resources::SrcData& a_SrcData = resources::SrcData()) = 0;
 
 			const core::FlagEnum<UpdateTime>& GetUpdateTimes() const
 			{
@@ -121,7 +123,7 @@ namespace gallus
 			/// Creates a component in the entity component system.
 			/// </summary>
 			/// <param name="a_ID"></param>
-			Component* CreateBaseComponent(const EntityID& a_ID) override
+			Component* CreateBaseComponent(const EntityID& a_ID, const resources::SrcData& a_SrcData = resources::SrcData()) override
 			{
 				if (!HasComponent(a_ID))
 				{
@@ -131,6 +133,7 @@ namespace gallus
 				core::ENGINE->GetECS().OnEntityComponentsUpdated().invoke();
 				Component& comp = m_mComponents.at(a_ID);
 				comp.Init(a_ID);
+				comp.Deserialize(a_SrcData);
 				return &comp;
 			}
 
@@ -165,7 +168,22 @@ namespace gallus
 					return m_mComponents.at(a_ID);
 				}
 
-				CreateBaseComponent(a_ID);
+				return CreateComponent(a_ID);
+			}
+
+			/// <summary>
+			/// Retrieves a component by entity id.
+			/// </summary>
+			/// <param name="a_ID">The entity that will be checked.</param>
+			/// <returns>Reference to the component if the entity existed, otherwise it gets created and returns that.</returns>
+			ComponentType& CreateComponent(const EntityID& a_ID, const resources::SrcData& a_SrcData = resources::SrcData())
+			{
+				if (HasComponent(a_ID))
+				{
+					return m_mComponents.at(a_ID);
+				}
+
+				CreateBaseComponent(a_ID, a_SrcData);
 				return m_mComponents.at(a_ID);
 			}
 

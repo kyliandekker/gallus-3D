@@ -7,7 +7,7 @@
 
 #include "gameplay/EntityID.h"
 
-#include "AnimationKeyFrameSpriteComponent.h"
+#include "animation/AnimationKeyFrameComponentBase.h"
 
 namespace gallus
 {

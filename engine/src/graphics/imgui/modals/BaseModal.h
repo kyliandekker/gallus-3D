@@ -67,6 +67,8 @@ namespace gallus
 					m_sName, /// The name of the window.
 					m_sWindowID; /// The ID of the window.
 
+				bool m_bCallShow =  false;
+
 				bool m_bShow = false; // Whether the modal should be shown.
 			};
 		}

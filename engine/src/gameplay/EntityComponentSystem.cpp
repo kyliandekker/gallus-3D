@@ -76,10 +76,7 @@ namespace gallus
 			{
 				for (auto& sys : m_aSystems)
 				{
-					if (a_bUpdateRealtime && previousUpdateRealtimeState != a_bUpdateRealtime)
-					{
-						sys->InitComponentsRealtime();
-					}
+					sys->InitComponentsRealtime();
 				}
 				for (uint32_t i = 1; i <= static_cast<uint32_t>(UpdateTime::UPDATE_TIME_FRAME_END); i <<= 1)
 				{

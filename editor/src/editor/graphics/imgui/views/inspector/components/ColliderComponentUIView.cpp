@@ -32,37 +32,33 @@ namespace gallus
 				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, m_Window.GetFramePadding());
 
 				ImGui::StartInspectorKeyVal(ImGui::IMGUI_FORMAT_ID("", TABLE_ID, "COLLIDER_COMPONENT_TABLE_INSPECTOR"), m_Window.GetFramePadding());
-				ImGuiWindow& window = m_Window;
-				gameplay::ColliderComponent& colliderComp = m_Component;
-				Vector2View<DirectX::XMFLOAT2>& offsetView = m_OffsetView;
-				ImGui::KeyValue([&window]
+				ImGui::KeyValue([this]
 					{
 						ImGui::AlignTextToFramePadding();
-						ImGui::DisplayHeader(window.GetBoldFont(), "Offset: ");
+						ImGui::DisplayHeader(m_Window.GetBoldFont(), "Offset: ");
 					},
-					[&offsetView, &colliderComp]
+					[this]
 					{
 						ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
-						offsetView.SetValue(colliderComp.GetOffset());
-						if (offsetView.Render("COLLIDER_COMPONENT_OFFSET_INSPECTOR", 0.01f))
+						m_OffsetView.SetValue(m_Component.GetOffset());
+						if (m_OffsetView.Render("COLLIDER_COMPONENT_OFFSET_INSPECTOR", 0.01f))
 						{
-							colliderComp.SetOffset(offsetView.GetValue());
+							m_Component.SetOffset(m_OffsetView.GetValue());
 							core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
 						}
 					});
-				Vector2View<DirectX::XMFLOAT2>& sizeView = m_SizeView;
-				ImGui::KeyValue([&window]
+				ImGui::KeyValue([this]
 					{
 						ImGui::AlignTextToFramePadding();
-						ImGui::DisplayHeader(window.GetBoldFont(), "Size: ");
+						ImGui::DisplayHeader(m_Window.GetBoldFont(), "Size: ");
 					},
-					[&sizeView, &colliderComp]
+					[this]
 					{
 						ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
-						sizeView.SetValue(colliderComp.GetSize());
-						if (sizeView.Render("COLLIDER_COMPONENT_SIZE_INSPECTOR", 0.01f))
+						m_SizeView.SetValue(m_Component.GetSize());
+						if (m_SizeView.Render("COLLIDER_COMPONENT_SIZE_INSPECTOR", 0.01f))
 						{
-							colliderComp.SetSize(sizeView.GetValue());
+							m_Component.SetSize(m_SizeView.GetValue());
 							core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
 						}
 					});

@@ -40,6 +40,7 @@ namespace gallus
 			/// </summary>
 			virtual void InitRealtime()
 			{
+				m_bInitialized = true;
 			}
 
 #ifdef _EDITOR
@@ -96,6 +97,7 @@ namespace gallus
 			virtual void UpdateRealtime(float a_fDeltaTime, UpdateTime a_UpdateTime)
 			{}
 
+			bool m_bInitialized = false;
 			gameplay::EntityID m_EntityID;
 			bool m_bIsDestroyed = false;
 		};

@@ -11,6 +11,9 @@
 #include "core/DataStream.h"
 #include "resources/SrcData.h"
 
+#include "AnimationKeyFrameSpriteComponent.h"
+#include "AnimationKeyFrameEventComponent.h"
+
 #define ANIMATION_TRACK_FRAME_COUNT_VAR "frameCount"
 #define ANIMATION_TRACK_LOOP_VAR "loop"
 #define ANIMATION_TRACK_KEY_FRAMES_VAR "keyFrames"
@@ -35,15 +38,13 @@ namespace gallus
 		//	}
 		//}
 
+        //---------------------------------------------------------------------
         AnimationTrack::~AnimationTrack()
         {
-            for (AnimationKeyFrame* keyFrame : m_aKeyFrames)
-            {
-                delete keyFrame;
-            }
             m_aKeyFrames.clear();
         }
 
+        //---------------------------------------------------------------------
         bool AnimationTrack::LoadByPath(const fs::path& a_Path)
 		{
 			core::Data data;
@@ -75,7 +76,8 @@ namespace gallus
                     int frame = std::stoi(it->name.GetString());
                     const rapidjson::Value& keyframeObj = it->value;
 
-                    AnimationKeyFrame* keyFrame = new AnimationKeyFrame(frame);
+                    m_aKeyFrames.emplace_back(frame);
+                    AnimationKeyFrame& keyFrame = m_aKeyFrames[m_aKeyFrames.size() - 1];
                 
                     if (keyframeObj.HasMember("components") && keyframeObj["components"].IsObject())
                     {
@@ -84,14 +86,21 @@ namespace gallus
                         // Sprite component
                         if (components.HasMember("spriteComponent") && components["spriteComponent"].IsObject())
                         {
-                            AnimationKeyFrameSpriteComponent* spriteComp = keyFrame->AddComponent<AnimationKeyFrameSpriteComponent>();
+                            AnimationKeyFrameSpriteComponent* spriteComp = keyFrame.AddComponent<AnimationKeyFrameSpriteComponent>();
 
                             const rapidjson::Value& sprite = components["spriteComponent"];
                             spriteComp->Deserialize(resources::SrcData(sprite));
                         }
+                        // Event component
+                        if (components.HasMember("eventComponent") && components["eventComponent"].IsObject())
+                        {
+                            AnimationKeyFrameEventComponent* eventComp = keyFrame.AddComponent<AnimationKeyFrameEventComponent>();
+
+                            const rapidjson::Value& sprite = components["eventComponent"];
+                            eventComp->Deserialize(resources::SrcData(sprite));
+                        }
                     }
 
-                    m_aKeyFrames.emplace_back(keyFrame);
                 }
             }
 
@@ -104,17 +113,22 @@ namespace gallus
         //---------------------------------------------------------------------
         void AnimationTrack::Update(gameplay::EntityID& a_EntityID, float a_fDeltaTime)
         {
+            if (!m_bIsPlaying)
+            {
+                return;
+            }
+
             m_fAccumulatedTime += a_fDeltaTime;
 
             // Loop over keyframes that are due
             while (m_iNextKeyFrameIndex < m_aKeyFrames.size())
             {
-                int keyFrameNumber = m_aKeyFrames[m_iNextKeyFrameIndex]->GetFrame(); // actual frame number
+                int keyFrameNumber = m_aKeyFrames[m_iNextKeyFrameIndex].GetFrame(); // actual frame number
                 float keyFrameTime = keyFrameNumber * FRAME_TIME;
 
                 if (m_fAccumulatedTime >= keyFrameTime)
                 {
-                    m_aKeyFrames[m_iNextKeyFrameIndex]->Activate(a_EntityID, *this);
+                    m_aKeyFrames[m_iNextKeyFrameIndex].Activate(a_EntityID, *this);
                     m_iNextKeyFrameIndex++;  // only increment after successfully activating a keyframe
                 }
                 else
@@ -124,16 +138,25 @@ namespace gallus
             }
 
             // Reset if animation is done
-            if (m_bIsLooping && !m_aKeyFrames.empty() && m_iNextKeyFrameIndex >= m_aKeyFrames.size())
+            if (!m_aKeyFrames.empty() && m_iNextKeyFrameIndex >= m_aKeyFrames.size())
             {
                 m_fAccumulatedTime = 0.0f;
                 m_iNextKeyFrameIndex = 0;
+                if (!m_bIsLooping)
+                {
+                    m_bIsPlaying = false;
+                }
             }
         }
 
+        //---------------------------------------------------------------------
+        void AnimationTrack::ActivateEvent(gameplay::EntityID& a_EntityID, AnimationEvent a_Event)
+        {
+
+        }
 
         //---------------------------------------------------------------------
-        std::vector<AnimationKeyFrame*>& AnimationTrack::GetKeyFrames()
+        std::vector<AnimationKeyFrame>& AnimationTrack::GetKeyFrames()
         {
             return m_aKeyFrames;
         }
@@ -151,12 +174,12 @@ namespace gallus
             // Keyframes object
             rapidjson::Value keyframesObj(rapidjson::kObjectType);
 
-            for (const AnimationKeyFrame* keyFrame : m_aKeyFrames)
+            for (const AnimationKeyFrame& keyFrame : m_aKeyFrames)
             {
                 rapidjson::Value keyframeObj(rapidjson::kObjectType);
                 rapidjson::Value componentsObj(rapidjson::kObjectType);
 
-                keyFrame->Serialize(componentsObj, doc.GetAllocator());
+                keyFrame.Serialize(componentsObj, doc.GetAllocator());
 
                 if (!componentsObj.ObjectEmpty())
                 {
@@ -164,7 +187,7 @@ namespace gallus
                 }
 
                 // Convert frame index to string key
-                std::string frameStr = std::to_string(keyFrame->GetFrame());
+                std::string frameStr = std::to_string(keyFrame.GetFrame());
                 keyframesObj.AddMember(rapidjson::Value(frameStr.c_str(), doc.GetAllocator()), keyframeObj, doc.GetAllocator());
             }
 
@@ -182,14 +205,14 @@ namespace gallus
         //---------------------------------------------------------------------
         void AnimationTrack::AddKeyFrame(int a_iFrame)
         {
-            for (AnimationKeyFrame* keyFrame : m_aKeyFrames)
+            for (AnimationKeyFrame& keyFrame : m_aKeyFrames)
             {
-                if (keyFrame->GetFrame() == a_iFrame)
+                if (keyFrame.GetFrame() == a_iFrame)
                 {
                     return;
                 }
             }
-            m_aKeyFrames.emplace_back(new AnimationKeyFrame(a_iFrame));
+            m_aKeyFrames.emplace_back(a_iFrame);
             Sort();
         }
 
@@ -203,7 +226,14 @@ namespace gallus
         //---------------------------------------------------------------------
         void AnimationTrack::Sort()
         {
-            std::sort(m_aKeyFrames.begin(), m_aKeyFrames.end());
+            std::sort(
+                m_aKeyFrames.begin(),
+                m_aKeyFrames.end(),
+                [](const AnimationKeyFrame& a, const AnimationKeyFrame& b)
+                {
+                    return a.GetFrame() < b.GetFrame();
+                }
+            );
         }
 #endif
 	}
