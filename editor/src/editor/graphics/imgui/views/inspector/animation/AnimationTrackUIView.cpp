@@ -7,14 +7,15 @@
 #include "editor/core/EditorEngine.h"
 #include "graphics/imgui/font_icon.h"
 
+#include "editor/graphics/imgui/views/inspector/animation/AnimationKeyFrameInspectorUIView.h"
+
 namespace gallus
 {
 	namespace graphics
 	{
 		namespace imgui
 		{
-			AnimationTrackUIView::AnimationTrackUIView(ImGuiWindow& a_Window) : ImGuiUIView(a_Window),
-				m_AnimationKeyFrameUIView(a_Window)
+			AnimationTrackUIView::AnimationTrackUIView(ImGuiWindow& a_Window) : ImGuiUIView(a_Window)
 			{ }
 
 			void AnimationTrackUIView::Load(animation::AnimationTrack& a_AnimationTrack)
@@ -34,6 +35,11 @@ namespace gallus
 				);
 
 				ImGuiIO& io = ImGui::GetIO();
+
+				if (!m_pAnimationTrack)
+				{
+					return;
+				}
 
 				ANIMATION_FRAME_PIXEL_WIDTH = ANIMATION_FRAME_PIXEL_WIDTH_DEFAULT;
 				float calcLegendWidth = (m_pAnimationTrack->GetFrameCount() * ANIMATION_FRAME_PIXEL_WIDTH_DEFAULT) - LEGEND_PADDING;
@@ -132,7 +138,8 @@ namespace gallus
 				}
 
 				m_iSelectedKeyFrame = a_iSelectedKeyFrame;
-				m_AnimationKeyFrameUIView.SetKeyFrame(m_pAnimationTrack->GetKeyFrames()[a_iSelectedKeyFrame]);
+
+				core::EDITOR_ENGINE->GetEditor().SetSelectable(nullptr, new AnimationKeyFrameInspectorUIView(m_Window, m_pAnimationTrack->GetKeyFrames()[m_iSelectedKeyFrame]));
 			}
 		}
 	}

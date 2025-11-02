@@ -11,7 +11,7 @@ namespace gallus
 {
 	namespace animation
 	{
-		void AnimationKeyFrameSpriteComponent::Activate(gameplay::EntityID& a_EntityID)
+		void AnimationKeyFrameSpriteComponent::Activate(gameplay::EntityID& a_EntityID, AnimationTrack& a_AnimationTrack)
 		{
 			gameplay::SpriteComponent& spriteComp = core::ENGINE->GetECS().GetSystem<gameplay::SpriteSystem>().GetComponent(a_EntityID);
 			spriteComp.SetSpriteIndex(m_iSpriteIndex);

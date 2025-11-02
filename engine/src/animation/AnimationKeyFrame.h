@@ -23,7 +23,6 @@ namespace gallus
 		{
 		public:
 			~AnimationKeyFrame();
-			AnimationKeyFrame() = default;
 
 			AnimationKeyFrame(int a_iFrame) :
 				m_iFrame(a_iFrame)

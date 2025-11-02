@@ -17,6 +17,8 @@ namespace gallus
 	}
 	namespace animation
 	{
+		class AnimationTrack;
+
 		class AnimationKeyFrameTagComponent : public AnimationKeyFrameComponentBase
 		{
 		public:
@@ -24,7 +26,7 @@ namespace gallus
 			{
 			}
 
-			void Activate(gameplay::EntityID& a_EntityID) override;
+			void Activate(gameplay::EntityID& a_EntityID, AnimationTrack& a_AnimationTrack) override;
 
 			std::string GetName() const override
 			{

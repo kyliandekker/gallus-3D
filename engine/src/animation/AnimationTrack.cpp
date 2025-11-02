@@ -14,6 +14,8 @@
 #include "AnimationKeyFrameSpriteComponent.h"
 #include "AnimationKeyFrameEventComponent.h"
 
+#include "core/Engine.h"
+
 #define ANIMATION_TRACK_FRAME_COUNT_VAR "frameCount"
 #define ANIMATION_TRACK_LOOP_VAR "loop"
 #define ANIMATION_TRACK_KEY_FRAMES_VAR "keyFrames"
@@ -152,7 +154,18 @@ namespace gallus
         //---------------------------------------------------------------------
         void AnimationTrack::ActivateEvent(gameplay::EntityID& a_EntityID, AnimationEvent a_Event)
         {
-
+            switch (a_Event)
+            {
+                case AnimationEvent::AnimationEvent_Delete:
+                {
+                    core::ENGINE->GetECS().GetEntity(a_EntityID)->Destroy();
+                }
+                default:
+                case AnimationEvent::AnimationEvent_None:
+                {
+                    break;
+                }
+            }
         }
 
         //---------------------------------------------------------------------

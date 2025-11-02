@@ -16,6 +16,7 @@ namespace gallus
 	namespace animation
 	{
 		class AnimationKeyFrame;
+		class AnimationTrack;
 
 		class AnimationKeyFrameComponentBase
 		{
@@ -23,7 +24,7 @@ namespace gallus
 			AnimationKeyFrameComponentBase(AnimationKeyFrame& a_KeyFrame) : m_KeyFrame(a_KeyFrame)
 			{}
 
-			virtual void Activate(gameplay::EntityID& a_EntityID)
+			virtual void Activate(gameplay::EntityID& a_EntityID, AnimationTrack& a_AnimationTrack)
 			{}
 
 			virtual std::string GetName() const = 0;

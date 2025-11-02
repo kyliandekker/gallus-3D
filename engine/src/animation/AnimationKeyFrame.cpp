@@ -19,7 +19,7 @@ namespace gallus
 		{
 			for (AnimationKeyFrameComponentBase* component : m_aAnimationKeyFrameComponents)
 			{
-				component->Activate(a_EntityID);
+				component->Activate(a_EntityID, a_AnimationTrack);
 			}
 		}
 

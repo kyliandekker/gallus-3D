@@ -26,7 +26,7 @@ namespace gallus
 			{
 			}
 
-			void Activate(gameplay::EntityID& a_EntityID) override;
+			void Activate(gameplay::EntityID& a_EntityID, AnimationTrack& a_AnimationTrack) override;
 
 			std::string GetName() const override
 			{

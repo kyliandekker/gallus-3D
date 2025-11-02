@@ -5,12 +5,16 @@
 
 #include "resources/SrcData.h"
 
+#include "animation/AnimationKeyFrame.h"
+#include "animation/AnimationTrack.h"
+
 namespace gallus
 {
 	namespace animation
 	{
-		void AnimationKeyFrameEventComponent::Activate(gameplay::EntityID& a_EntityID)
+		void AnimationKeyFrameEventComponent::Activate(gameplay::EntityID& a_EntityID, AnimationTrack& a_AnimationTrack)
 		{
+			a_AnimationTrack.ActivateEvent(a_EntityID, m_Event);
 		}
 
 #ifdef _EDITOR

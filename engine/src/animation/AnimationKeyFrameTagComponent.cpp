@@ -9,7 +9,7 @@ namespace gallus
 {
 	namespace animation
 	{
-		void AnimationKeyFrameTagComponent::Activate(gameplay::EntityID& a_EntityID)
+		void AnimationKeyFrameTagComponent::Activate(gameplay::EntityID& a_EntityID, AnimationTrack& a_AnimationTrack)
 		{
 		}
 

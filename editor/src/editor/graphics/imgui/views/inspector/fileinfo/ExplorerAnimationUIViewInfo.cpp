@@ -25,6 +25,7 @@
 // resources
 #include "resources/FileResource.h"
 #include <editor/graphics/imgui/EditorWindowsConfig.h>
+#include <imgui/imgui_internal.h>
 
 namespace gallus
 {
@@ -41,12 +42,13 @@ namespace gallus
 				float width = ImGui::GetContentRegionAvail().x;
 				if (ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_FILE_MODEL + std::string(" Open Animation"), BUTTON_ID, "OPEN_ANIMATION_FILE_INSPECTOR").c_str(), ImVec2(width, 0)))
 				{
-					AnimationEditorModal& animationEditorModal = m_Window.GetWindowsConfig<EditorWindowsConfig>().GetAnimationEditorModal();
+					AnimationWindow& animationWindow = m_Window.GetWindowsConfig<EditorWindowsConfig>().GetAnimationWindow();
 
-					animationEditorModal.SetData(
+					animationWindow.SetData(
 						m_ExplorerFileUIView.GetFileResource()
 					);
-					animationEditorModal.Show();
+
+					animationWindow.Focus();
 				}
 			}
 		}

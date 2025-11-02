@@ -48,7 +48,6 @@ namespace gallus
 						}
 					});
 				FilePickerModal& filePickerModal = m_Window.GetWindowsConfig<EditorWindowsConfig>().GetFilePickerModal();
-				AnimationEditorModal& animationEditorModal = m_Window.GetWindowsConfig<EditorWindowsConfig>().GetAnimationEditorModal();
 
 				ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(m_Window.GetFontSize() / 2, m_Window.GetFontSize() / 2));
 				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
@@ -59,7 +58,7 @@ namespace gallus
 						ImGui::AlignTextToFramePadding();
 						ImGui::DisplayHeader(m_Window.GetBoldFont(), "Texture: ");
 					},
-					[this, &buttonSize, &filePickerModal, &animationEditorModal]
+					[this, &buttonSize, &filePickerModal]
 					{
 						ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
 						ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x - buttonSize.x);
@@ -69,7 +68,7 @@ namespace gallus
 						if (ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_FILE, BUTTON_ID, "SPRITE_COMPONENT_TEXTURE_INSPECTOR").c_str(), buttonSize))
 						{
 							filePickerModal.SetData(
-								[this, &animationEditorModal](int success, gallus::resources::FileResource& resource)
+								[this](int success, gallus::resources::FileResource& resource)
 								{
 									if (success == 1)
 									{
@@ -78,11 +77,9 @@ namespace gallus
 
 										core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
 									}
-									animationEditorModal.Show();
 								},
 								std::vector<gallus::resources::AssetType>{ gallus::resources::AssetType::Sprite }
 							);
-							animationEditorModal.Hide();
 							filePickerModal.Show();
 						}
 					});

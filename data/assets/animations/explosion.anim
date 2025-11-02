@@ -397,7 +397,7 @@
         "280": {
             "components": {
                 "eventComponent": {
-                    "eventName": ""
+                    "event": 1
                 }
             }
         }

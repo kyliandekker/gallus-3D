@@ -72,6 +72,12 @@ namespace gallus
 					showRender = WindowBegin();
 				}
 
+				if (m_bFocusMyWindow)
+				{
+					ImGui::SetWindowFocus(); // focuses the current window
+					m_bFocusMyWindow = false;
+				}
+
 				if (showRender)
 				{
 					Render();

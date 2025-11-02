@@ -42,16 +42,9 @@ namespace gallus
 
 				void SetSelectedKeyFrame(int a_iSelectedKeyFrame);
 
-				AnimationKeyFrameUIView& GetKeyFrameUIView()
-				{
-					return m_AnimationKeyFrameUIView;
-				}
-
 				int m_iSelectedKeyFrame = -1;
 			private:
 				animation::AnimationTrack* m_pAnimationTrack = nullptr;
-
-				AnimationKeyFrameUIView m_AnimationKeyFrameUIView;
 			};
 		}
 	}

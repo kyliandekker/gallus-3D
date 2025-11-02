@@ -23,7 +23,7 @@ namespace gallus
 			AnimationKeyFrameSpriteComponent(AnimationKeyFrame& a_KeyFrame) : AnimationKeyFrameComponentBase(a_KeyFrame)
 			{}
 
-			void Activate(gameplay::EntityID& a_EntityID) override;
+			void Activate(gameplay::EntityID& a_EntityID, AnimationTrack& a_AnimationTrack) override;
 
 			int GetSpriteIndex() const;
 			void SetSpriteIndex(int a_iSpriteIndex);
