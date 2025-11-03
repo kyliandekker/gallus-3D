@@ -23,7 +23,7 @@
                 },
                 "transform": {
                     "position": {
-                        "x": 200.0,
+                        "x": 201.89999389648438,
                         "y": -400.0
                     },
                     "rotation": 0.0,
@@ -80,8 +80,8 @@
                 },
                 "transform": {
                     "position": {
-                        "x": 920.7452392578125,
-                        "y": 412.37841796875
+                        "x": 892.9450073242188,
+                        "y": 411.4779968261719
                     },
                     "rotation": 1.1754956119909055e-38,
                     "scale": {
@@ -95,7 +95,7 @@
                 },
                 "player": {
                     "movementSpeed": 500.0,
-                    "bulletPrefab": "bullet.prefab"
+                    "bulletPrefab": ""
                 },
                 "health": {
                     "health": 100.0,
@@ -112,7 +112,7 @@
                     }
                 },
                 "animation": {
-                    "startAnimation": ""
+                    "startingAnimation": ""
                 },
                 "rigidbody": {
                     "useGravity": false,

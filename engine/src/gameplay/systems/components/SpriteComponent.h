@@ -4,6 +4,8 @@
 
 #include "editor/EditorExpose.h"
 
+#include "resources/AssetType.h"
+
 #include "graphics/dx12/DX12PCH.h"
 
 #include <memory>
@@ -152,7 +154,7 @@ namespace gallus
 			DirectX::XMFLOAT4 m_vColor = { 1, 1, 1, 1 };
 
 			BEGIN_EXPOSED_FIELDS(SpriteComponent)
-				EXPOSE_FIELD(SpriteComponent, m_iSpriteIndex, "Sprite Index", FieldOptions{ .type = EditorWidgetType::DragInt })
+				EXPOSE_FIELD(SpriteComponent, m_iSpriteIndex, "Sprite Index", FieldOptions{ .type = EditorWidgetType::DragInt8 })
 			END_EXPOSED_FIELDS(SpriteComponent)
 		};
 	}

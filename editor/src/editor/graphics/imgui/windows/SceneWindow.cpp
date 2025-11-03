@@ -16,7 +16,6 @@
 #include "editor/core/EditorEngine.h"
 #include "editor/graphics/imgui/views/HierarchyEntityUIView.h"
 #include "editor/graphics/imgui/views/inspector/EntityInspectorView.h"
-#include "editor/graphics/imgui/views/inspector/components/ComponentUIView.h"
 
 // gameplay includes
 #include "gameplay/Game.h"

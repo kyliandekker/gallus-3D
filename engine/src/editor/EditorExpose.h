@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <cstddef>
+#include "resources/AssetType.h"
 
 namespace gallus
 {
@@ -10,7 +11,10 @@ namespace gallus
 	{
 		None,
 		DragFloat,
-		DragInt,
+		DragInt8,
+		DragInt16,
+		DragInt32,
+		DragInt64,
 		Checkbox,
 		Toggle,
 		InputText,
@@ -19,18 +23,11 @@ namespace gallus
 		Object
 	};
 
-	enum class AssetType
-	{
-		None,
-		Texture,
-		Material
-	};
-
 	// Field options with default values
 	struct FieldOptions
 	{
 		EditorWidgetType type = EditorWidgetType::None;
-		AssetType assetType = AssetType::None;
+		resources::AssetType assetType;
 		std::string min = "";
 		std::string max = "";
 	};
