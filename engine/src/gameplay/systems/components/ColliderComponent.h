@@ -2,6 +2,8 @@
 
 #include "gameplay/systems/components/Component.h"
 
+#include "editor/EditorExpose.h"
+
 #include <DirectXMath.h>
 #include <array>
 #include <set>
@@ -60,6 +62,11 @@ namespace gallus
 			bool IntersectsOBB(const std::array<DirectX::XMFLOAT2, 4>& aA, const std::array<DirectX::XMFLOAT2, 4>& aB);
 
 			void IgnoreEntity(const gameplay::EntityID& a_EntityID);
+
+			std::string GetName() const override
+			{
+				return "ColliderComponent";
+			}
 		protected:
 			/// <summary>
 			/// Updates the system's component.
@@ -71,6 +78,11 @@ namespace gallus
 			DirectX::XMFLOAT2 m_vSize = { 1, 1 };
 
 			std::set<gameplay::EntityID> m_aEntitiesToIgnore;
+
+			BEGIN_EXPOSED_FIELDS(ColliderComponent)
+				EXPOSE_FIELD(ColliderComponent, m_vOffset, "Offset", FieldOptions{ .type = EditorWidgetType::Vector2Field })
+				EXPOSE_FIELD(ColliderComponent, m_vSize, "Size", FieldOptions{ .type = EditorWidgetType::Vector2Field })
+			END_EXPOSED_FIELDS(ColliderComponent)
 		};
 	}
 }

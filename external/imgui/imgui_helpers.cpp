@@ -213,8 +213,6 @@ namespace ImGui
 
 	bool StartInspectorKeyVal(const std::string& a_sId, const ImVec2& a_vFramePadding)
 	{
-		ImGui::SetCursorPosY(ImGui::GetCursorPosY() - (a_vFramePadding.y / 2));
-
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(a_vFramePadding.x, a_vFramePadding.x / 2));
 		ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, a_vFramePadding);
 		bool b = ImGui::BeginTable(a_sId.c_str(), 2, ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_BordersInnerH | ImGuiTableFlags_BordersInnerV);
@@ -226,9 +224,9 @@ namespace ImGui
 	void KeyValue(std::function<void()> a_Key, std::function<void()> a_Val)
 	{
 		ImGui::TableNextRow();
-		ImGui::TableNextColumn();
+		ImGui::TableSetColumnIndex(0);
 		a_Key();
-		ImGui::TableNextColumn();
+		ImGui::TableSetColumnIndex(1);
 		a_Val();
 	}
 
@@ -237,8 +235,6 @@ namespace ImGui
 		ImGui::EndTable();
 		ImGui::PopStyleVar();
 		ImGui::PopStyleVar();
-
-		ImGui::SetCursorPosY(ImGui::GetCursorPosY() - (a_vFramePadding.y / 2));
 	}
 
 	bool VectorEdit2(const char* label, float col[2], float a_fSpeed, float a_fMin, float a_fMax)

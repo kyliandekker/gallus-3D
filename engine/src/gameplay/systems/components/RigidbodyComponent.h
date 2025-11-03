@@ -2,6 +2,8 @@
 
 #include <DirectXMath.h>
 
+#include "editor/EditorExpose.h"
+
 #include "gameplay/systems/components/Component.h"
 
 namespace gallus
@@ -88,6 +90,11 @@ namespace gallus
 			{
 				return m_fLinearDamping;
 			}
+
+			std::string GetName() const override
+			{
+				return "RigidbodyComponent";
+			}
 		protected:
 			/// <summary>
 			/// Updates the components.
@@ -103,6 +110,12 @@ namespace gallus
 
 			float m_fMass = 1.0f;
 			float m_fLinearDamping = 0.98f;
+
+			BEGIN_EXPOSED_FIELDS(RigidbodyComponent)
+				EXPOSE_FIELD(RigidbodyComponent, m_bUseGravity, "Use Gravity", FieldOptions{ .type = EditorWidgetType::Toggle })
+				EXPOSE_FIELD(RigidbodyComponent, m_fMass, "Mass", FieldOptions{ .type = EditorWidgetType::DragFloat, .min = "0.0001", .max = "9999999" })
+				EXPOSE_FIELD(RigidbodyComponent, m_fLinearDamping, "Linear Damping", FieldOptions{ .type = EditorWidgetType::DragFloat, .min = "0.01", .max = "1.0f" })
+			END_EXPOSED_FIELDS(RigidbodyComponent)
 		};
 	}
 }

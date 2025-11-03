@@ -289,28 +289,28 @@ namespace gallus
 
 				std::lock_guard<std::recursive_mutex> lock(core::EDITOR_ENGINE->GetECS().m_EntityMutex);
 
-				auto test = core::EDITOR_ENGINE->GetEditor().GetSelectable().get();
-				if (!test)
-				{
-					return;
-				}
+				//auto test = core::EDITOR_ENGINE->GetEditor().GetSelectable().get();
+				//if (!test)
+				//{
+				//	return;
+				//}
 
-				const HierarchyEntityUIView* entity = dynamic_cast<const HierarchyEntityUIView*>(core::EDITOR_ENGINE->GetEditor().GetSelectable().get());
-				if (!entity)
-				{
-					return;
-				}
+				//const HierarchyEntityUIView* entity = dynamic_cast<const HierarchyEntityUIView*>(core::EDITOR_ENGINE->GetEditor().GetSelectable().get());
+				//if (!entity)
+				//{
+				//	return;
+				//}
 
-				EntityInspectorView* entityInspectorView = dynamic_cast<EntityInspectorView*>(core::EDITOR_ENGINE->GetEditor().GetInspectorView());
-				if (!entityInspectorView)
-				{
-					return;
-				}
+				//EntityInspectorView* entityInspectorView = dynamic_cast<EntityInspectorView*>(core::EDITOR_ENGINE->GetEditor().GetInspectorView());
+				//if (!entityInspectorView)
+				//{
+				//	return;
+				//}
 
-				for (ComponentBaseUIView* component : entityInspectorView->GetComponents())
-				{
-					component->RenderComponentGizmos(a_vSceneStartPos, a_vSize, m_vPanOffset, m_fZoom);
-				}
+				//for (ComponentBaseUIView* component : entityInspectorView->GetComponents())
+				//{
+				//	component->RenderComponentGizmos(a_vSceneStartPos, a_vSize, m_vPanOffset, m_fZoom);
+				//}
 			}
 
 			//---------------------------------------------------------------------

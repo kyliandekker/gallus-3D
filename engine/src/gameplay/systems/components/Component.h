@@ -8,6 +8,8 @@
 #include "gameplay/EntityID.h"
 #include "gameplay/systems/UpdateTime.h"
 
+#include "editor/EditorExpose.h"
+
 namespace gallus
 {
 	namespace resources
@@ -19,7 +21,7 @@ namespace gallus
 		//---------------------------------------------------------------------
 		// Component
 		//---------------------------------------------------------------------
-		class Component
+		class Component : public IExposableToEditor
 		{
 		public:
 			/// <summary>
@@ -51,7 +53,6 @@ namespace gallus
 			/// <param name="a_Allocator">The allocator used by the json document.</param>
 			virtual void Serialize(rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator) const = 0;
 #endif
-			
 			/// <summary>
 			/// Creates an instance based on source data.
 			/// </summary>
@@ -89,6 +90,8 @@ namespace gallus
 			{
 				return m_EntityID;
 			}
+
+			virtual std::string GetName() const = 0;
 		protected:
 			/// <summary>
 			/// Updates the components.

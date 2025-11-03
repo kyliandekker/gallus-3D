@@ -1,12 +1,13 @@
 #pragma once
 
+#include "gameplay/systems/components/Component.h"
+
+#include "editor/EditorExpose.h"
+
 #include "graphics/dx12/DX12PCH.h"
 
 #include <memory>
 #include <glm/vec4.hpp>
-
-// gameplay includes
-#include "gameplay/systems/components/Component.h"
 
 namespace gallus
 {
@@ -138,12 +139,21 @@ namespace gallus
 			/// </summary>
 			/// <param name="a_SrcData">The source data.</param>
 			void Deserialize(const resources::SrcData& a_SrcData) override;
+
+			std::string GetName() const override
+			{
+				return "SpriteComponent";
+			}
 		private:
 			graphics::dx12::Mesh* m_pMesh = nullptr;
 			graphics::dx12::DX12ShaderBind* m_pShaderBind = nullptr;
 			graphics::dx12::Texture* m_pTexture = nullptr;
 			int8_t m_iSpriteIndex = 0;
 			DirectX::XMFLOAT4 m_vColor = { 1, 1, 1, 1 };
+
+			BEGIN_EXPOSED_FIELDS(SpriteComponent)
+				EXPOSE_FIELD(SpriteComponent, m_iSpriteIndex, "Sprite Index", FieldOptions{ .type = EditorWidgetType::DragInt })
+			END_EXPOSED_FIELDS(SpriteComponent)
 		};
 	}
 }

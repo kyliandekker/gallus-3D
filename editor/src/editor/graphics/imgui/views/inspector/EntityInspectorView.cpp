@@ -6,9 +6,11 @@
 #include <typeindex>
 #include <unordered_map>
 #include <imgui/imgui_helpers.h>
+#include <imgui/imgui_toggle.h>
 
 // core includes
 #include "editor/core/EditorEngine.h"
+#include "editor/EditorExpose.h"
 
 // graphics includes
 #include "graphics/imgui/font_icon.h"
@@ -21,8 +23,140 @@
 #include "gameplay/Game.h"
 #include "gameplay/ECSBaseSystem.h"
 
+#include "utils/string_extensions.h"
+
 namespace gallus
 {
+	template<typename T>
+	void ShowEditorFieldFromObject(T* obj, const EditorFieldInfo& field)
+	{
+		void* ptr = reinterpret_cast<char*>(obj) + field.m_iOffset;
+
+		std::function<void()> func = [] {};
+
+		bool showTable = true;
+		std::string fieldId = ImGui::IMGUI_FORMAT_ID("", INPUT_ID, string_extensions::StringToUpper(field.m_sUIName) + "_INSPECTOR");
+		switch (field.m_Options.type)
+		{
+			case EditorWidgetType::DragFloat:
+			{
+				float* value = reinterpret_cast<float*>(ptr);
+				func = [value, &field, &fieldId]
+					{
+						float max = 0.0f;
+						float min = 0.0f;
+						if (!field.m_Options.max.empty())
+						{
+							max = std::stof(field.m_Options.max);
+						}
+						if (!field.m_Options.min.empty())
+						{
+							min = std::stof(field.m_Options.min);
+						}
+						ImGui::DragFloat(fieldId.c_str(), value, 1, min, max);
+					};
+				break;
+			}
+			case EditorWidgetType::DragInt:
+			{
+				int* value = reinterpret_cast<int*>(ptr);
+				func = [value, &field, &fieldId]
+					{
+						int max = 0.0f;
+						int min = 0.0f;
+						if (!field.m_Options.max.empty())
+						{
+							max = std::stoi(field.m_Options.max);
+						}
+						if (!field.m_Options.min.empty())
+						{
+							min = std::stoi(field.m_Options.min);
+						}
+						ImGui::DragInt(fieldId.c_str(), value, 1, min, max);
+					};
+				break;
+			}
+			case EditorWidgetType::Checkbox:
+			{
+				bool* value = reinterpret_cast<bool*>(ptr);
+				func = [&field, &fieldId, value]
+					{
+						ImGui::Checkbox(fieldId.c_str(), value);
+					};
+				break;
+			}
+			case EditorWidgetType::Toggle:
+			{
+				bool* value = reinterpret_cast<bool*>(ptr);
+				func = [&field, &fieldId, value]
+					{
+						ImGui::Toggle(fieldId.c_str(), value);
+					};
+				break;
+			}
+			case EditorWidgetType::Vector2Field:
+			{
+				DirectX::XMFLOAT2* value = reinterpret_cast<DirectX::XMFLOAT2*>(ptr);
+				float val[2] = {
+					value->x,
+					value->y,
+				};
+				float max = 0.0f;
+				float min = 0.0f;
+				if (!field.m_Options.max.empty())
+				{
+					max = std::stof(field.m_Options.max);
+				}
+				if (!field.m_Options.min.empty())
+				{
+					min = std::stof(field.m_Options.min);
+				}
+				if (ImGui::VectorEdit2(fieldId.c_str(), val, 0.1f, min, max))
+				{
+					value->x = val[0];
+					value->y = val[1];
+				}
+				break;
+			}
+			case EditorWidgetType::Object:
+			{
+				showTable = false;
+				IExposableToEditor* editorObject = reinterpret_cast<IExposableToEditor*>(ptr);
+				for (const EditorFieldInfo& field : editorObject->GetEditorFields())
+				{
+					ShowEditorFieldFromObject(editorObject, field);
+				}
+				break;
+			}
+			default:
+			{
+				break;
+			}
+		}
+
+		if (showTable)
+		{
+			ImGui::KeyValue([&field]
+				{
+					ImGui::AlignTextToFramePadding();
+					ImGui::DisplayHeader(core::EDITOR_ENGINE->GetDX12().GetImGuiWindow().GetBoldFont(), field.m_sUIName);
+				}, func);
+		}
+	}
+
+	template<typename T>
+	void RenderEditorForObject(T* obj)
+	{
+		const auto& fields = obj->GetEditorFields();
+
+		std::string id = ImGui::IMGUI_FORMAT_ID("", TABLE_ID, string_extensions::StringToUpper(obj->GetName()) + "_INSPECTOR");
+		ImGui::StartInspectorKeyVal(id, core::EDITOR_ENGINE->GetDX12().GetImGuiWindow().GetFramePadding());
+		for (const EditorFieldInfo& field : fields)
+		{
+			ShowEditorFieldFromObject(obj, field);
+		}
+		ImGui::EndInspectorKeyVal(ImVec2());
+	}
 	namespace graphics
 	{
 		namespace imgui
@@ -32,10 +166,6 @@ namespace gallus
 			//---------------------------------------------------------------------
 			EntityInspectorView::~EntityInspectorView()
 			{
-				for (ComponentBaseUIView* view : m_aComponents)
-				{
-					delete view;
-				}
 			}
 
 			//---------------------------------------------------------------------
@@ -52,15 +182,15 @@ namespace gallus
 
 				gameplay::EntityID& entityId = m_pEntity->GetEntityID();
 
-				for (auto& [type, factory] : GetComponentUIFactoryRegistry())
+				for (auto* sys : core::EDITOR_ENGINE->GetECS().GetSystems())
 				{
-					if (ComponentBaseUIView* view = factory(m_Window, entityId))
+					auto* comp = sys->GetBaseComponent(entityId);
+
+					std::string id = ImGui::IMGUI_FORMAT_ID("",
+						FOLDOUT_ID, string_extensions::StringToUpper(comp->GetName()) + "_INSPECTOR");
+					if (sys->HasComponent(entityId))
 					{
-						if (view)
-						{
-							m_bShowPreview = true;
-						}
-						m_aComponents.push_back(view);
+						m_aExpanded.insert(std::make_pair(id, false));
 					}
 				}
 			}
@@ -105,20 +235,56 @@ namespace gallus
 					return;
 				}
 
-				if (!m_aComponents.empty())
-				{
-					ImGui::SetCursorPosY(0);
-				}
+				gameplay::EntityID& entityId = m_pEntity->GetEntityID();
+
 				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
-				for (ComponentBaseUIView* component : m_aComponents)
+				for (auto* sys : core::EDITOR_ENGINE->GetECS().GetSystems())
 				{
 					ImGui::SetCursorPosX(0);
 					float width = ImGui::GetContentRegionAvail().x + m_Window.GetFramePadding().x;
 					ImGui::SetNextItemWidth(width);
-					component->Render();
-					ImGui::SetCursorPosY(ImGui::GetCursorPosY() + m_Window.GetFramePadding().y);
-				}
+					if (sys->HasComponent(entityId))
+					{
+						auto* comp = sys->GetBaseComponent(entityId);
 
+						ImVec2 size = m_Window.GetHeaderSize();
+
+						float width = ImGui::GetContentRegionAvail().x + m_Window.GetFramePadding().x;
+						width -= size.x;
+						ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0);
+						ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+
+						ImVec2 foldOutButtonPos = ImGui::GetCursorScreenPos();
+
+						std::string id = ImGui::IMGUI_FORMAT_ID("",
+							FOLDOUT_ID, string_extensions::StringToUpper(comp->GetName()) + "_INSPECTOR");
+						ImGui::FoldOutButton(
+							std::string((m_aExpanded[id] ? font::ICON_FOLDED_OUT : font::ICON_FOLDED_IN) + sys->GetSystemName() + id).c_str(), &m_aExpanded[id], ImVec2(width, size.y));
+						ImGui::SameLine();
+						if (ImGui::IconButton(ImGui::IMGUI_FORMAT_ID(font::ICON_DELETE, BUTTON_ID, string_extensions::StringToUpper(GetName()) + "_DELETE_INSPECTOR").c_str(), size, m_Window.GetIconFont()))
+						{
+							sys->DeleteComponent(entityId);
+						}
+
+						//ImGui::SetCursorScreenPos(ImVec2(foldOutButtonPos.x, foldOutButtonPos.y + size.y));
+
+						ImGui::PopStyleVar();
+						ImGui::PopStyleVar();
+
+						if (m_aExpanded[id])
+						{
+							//ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(m_Window.GetFramePadding().x, 0));
+							//ImGui::Indent(m_Window.GetFramePadding().x * 4);
+							RenderEditorForObject(comp);
+							//ImGui::Unindent(m_Window.GetFramePadding().x * 4);
+							//ImGui::PopStyleVar();
+						}
+					}
+				}
+				ImGui::PopStyleVar();
+
+				ImGui::SetCursorPosY(ImGui::GetCursorPosY() + m_Window.GetFramePadding().y);
+				
 				float width = ImGui::GetContentRegionAvail().x;
 				if (ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_FOLDER + std::string(" Add Component"), BUTTON_ID, "ADD_COMPONENT_INSPECTOR").c_str(), ImVec2(width, 0)))
 				{
@@ -129,9 +295,6 @@ namespace gallus
 
 					ImGui::OpenPopup(ImGui::IMGUI_FORMAT_ID("", POPUP_WINDOW_ID, "ADD_COMPONENT_MENU_INSPECTOR").c_str());
 				}
-				ImGui::PopStyleVar();
-
-				gameplay::EntityID& entityId = m_pEntity->GetEntityID();
 
 				gameplay::EntityComponentSystem& ecs = core::EDITOR_ENGINE->GetECS();
 				ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, m_Window.GetFramePadding());
@@ -159,19 +322,19 @@ namespace gallus
 			//---------------------------------------------------------------------
 			void EntityInspectorView::RenderPreview()
 			{
-				ComponentBaseUIView* view = nullptr;
-				for (ComponentBaseUIView* component : m_aComponents)
-				{
-					if (component->ShowPreview() && (!view || component->GetPreviewPriority() > view->GetPreviewPriority()))
-					{
-						view = component;
-					}
-				}
+				//ComponentBaseUIView* view = nullptr;
+				//for (ComponentBaseUIView* component : m_aComponents)
+				//{
+				//	if (component->ShowPreview() && (!view || component->GetPreviewPriority() > view->GetPreviewPriority()))
+				//	{
+				//		view = component;
+				//	}
+				//}
 
-				if (view)
-				{
-					view->RenderPreview();
-				}
+				//if (view)
+				//{
+				//	view->RenderPreview();
+				//}
 			}
 		}
 	}

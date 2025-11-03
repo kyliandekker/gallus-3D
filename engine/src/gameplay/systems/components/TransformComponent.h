@@ -2,6 +2,8 @@
 
 #include "gameplay/systems/components/Component.h"
 
+#include "editor/EditorExpose.h"
+
 // graphics includes
 #include "graphics/dx12/DX12Transform.h"
 
@@ -59,6 +61,11 @@ namespace gallus
 			/// </summary>
 			/// <param name="a_vTranslation">The movement.</param>
 			void Translate(const DirectX::XMFLOAT2& a_vTranslation);
+
+			std::string GetName() const override
+			{
+				return "TransformComponent";
+			}
 		private:
 			/// <summary>
 			/// Updates the components.
@@ -68,6 +75,10 @@ namespace gallus
 
 			graphics::dx12::DX12Transform m_Transform;
 			DirectX::XMFLOAT2 m_vTranslation = {};
+
+			BEGIN_EXPOSED_FIELDS(TransformComponent)
+				EXPOSE_FIELD(TransformComponent, m_Transform, "Transform", FieldOptions{ .type = EditorWidgetType::Object })
+			END_EXPOSED_FIELDS(TransformComponent)
 		};
 	}
 }

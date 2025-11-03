@@ -2,6 +2,8 @@
 
 #include "gameplay/systems/components/Component.h"
 
+#include "editor/EditorExpose.h"
+
 #include <map>
 
 #include "gameplay/Prefab.h"
@@ -66,6 +68,11 @@ namespace gallus
 			{
 				return m_pBulletPrefab;
 			}
+
+			std::string GetName() const override
+			{
+				return "PlayerComponent";
+			}
 		protected:
 			/// <summary>
 			/// Updates the components.
@@ -75,6 +82,10 @@ namespace gallus
 
 			float m_fSpeed = 200;
 			gameplay::Prefab m_pBulletPrefab;
+
+			BEGIN_EXPOSED_FIELDS(PlayerComponent)
+				EXPOSE_FIELD(PlayerComponent, m_fSpeed, "Speed", FieldOptions{ .type = EditorWidgetType::DragFloat })
+			END_EXPOSED_FIELDS(PlayerComponent)
 		};
 	}
 }

@@ -61,11 +61,19 @@ namespace gallus
 			{
 				return m_sStartingAnimation;
 			}
+
+			std::string GetName() const override
+			{
+				return "AnimationComponent";
+			}
 		private:
 			animation::AnimationTrack m_AnimationTrack;
 			
 			std::string m_sStartingAnimation;
 			std::string m_sAnimName;
+
+			BEGIN_EXPOSED_FIELDS(AnimationComponent)
+			END_EXPOSED_FIELDS(AnimationComponent)
 		};
 	}
 }

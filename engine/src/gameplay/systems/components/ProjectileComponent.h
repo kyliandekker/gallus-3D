@@ -2,6 +2,8 @@
 
 #include "gameplay/systems/components/Component.h"
 
+#include "editor/EditorExpose.h"
+
 #include "gameplay/Prefab.h"
 
 #include <DirectXMath.h>
@@ -53,6 +55,11 @@ namespace gallus
 			{
 				return m_fDamage;
 			}
+
+			std::string GetName() const override
+			{
+				return "ProjectileComponent";
+			}
 		protected:
 			/// <summary>
 			/// Updates the components.
@@ -64,6 +71,10 @@ namespace gallus
 			float m_fDamage;
 			
 			gameplay::Prefab m_ExplosionPrefab;
+
+			BEGIN_EXPOSED_FIELDS(ProjectileComponent)
+				EXPOSE_FIELD(ProjectileComponent, m_fDamage, "Speed", FieldOptions{ .type = EditorWidgetType::DragFloat })
+			END_EXPOSED_FIELDS(ProjectileComponent)
 		};
 	}
 }

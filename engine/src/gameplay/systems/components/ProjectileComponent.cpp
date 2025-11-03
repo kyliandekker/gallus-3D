@@ -40,8 +40,8 @@ namespace gallus
 		void ProjectileComponent::Deserialize(const resources::SrcData& a_SrcData)
 		{
 			m_fDamage = a_SrcData.GetFloat(JSON_PROJECTILE_COMPONENT_DAMAGE_VAR);
-			core::ENGINE->GetResourceAtlas().LoadPrefab(a_SrcData.GetString(JSON_PROJECTILE_COMPONENT_EXPLOSION_VAR), m_ExplosionPrefab);
-			m_ExplosionPrefab.Load();
+			//core::ENGINE->GetResourceAtlas().LoadPrefab(a_SrcData.GetString(JSON_PROJECTILE_COMPONENT_EXPLOSION_VAR), m_ExplosionPrefab);
+			//m_ExplosionPrefab.Load();
 		}
 
 		//---------------------------------------------------------------------
