@@ -4,6 +4,8 @@
 #include <string>
 #include <filesystem>
 
+#include "editor/EditorExpose.h"
+
 // resources
 #include "resources/AssetType.h"
 
@@ -26,7 +28,7 @@ namespace gallus
 		/// <summary>
 		/// Represents an engine resource with details like category, type and name.
 		/// </summary>
-		class EngineResource
+		class EngineResource : public IExposableToEditor
 		{
 		public:
 			/// <summary>
@@ -140,6 +142,9 @@ namespace gallus
 			std::filesystem::path m_Path;
 
 			friend class ResourceAtlas;
+
+			BEGIN_EXPOSED_FIELDS(EngineResource)
+			END_EXPOSED_FIELDS(EngineResource)
 		};
 	}
 }

@@ -20,7 +20,8 @@ namespace gallus
 		InputText,
 		Vector2Field,
 		AssetPicker,
-		Object
+		Object,
+		ObjectPtr
 	};
 
 	// Field options with default values

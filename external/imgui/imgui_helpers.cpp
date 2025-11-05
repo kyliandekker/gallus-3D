@@ -8,6 +8,7 @@
 #include <imgui/imgui_internal.h>
 #include <algorithm>
 #include <unordered_set>
+#include <set>
 
 namespace ImGui
 {
@@ -122,9 +123,11 @@ namespace ImGui
 			(void*) str);
 	}
 
-	std::string IMGUI_FORMAT_ID(const std::string& a_Text, const char* a_ID, const std::string& a_IDName)
+	std::set<std::string> m_aIds;
+	std::string IMGUI_FORMAT_ID(const std::string& a_sText, const std::string& a_sID, const std::string& a_sIDName)
 	{
-		std::string fullId = a_Text + a_ID + a_IDName;
+		std::string fullId = a_sText + "###" + a_sID + a_sIDName;
+		m_aIds.insert(fullId);
 		return fullId;
 	}
 

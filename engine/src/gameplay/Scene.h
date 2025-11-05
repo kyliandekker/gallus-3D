@@ -75,13 +75,13 @@ namespace gallus
 			/// <summary>
 			/// Returns a copy of the current scene data.
 			/// </summary>
-			/// <returns>A <see cref="core::Data"/> object representing the scene’s data.</returns>
+			/// <returns>A <see cref="core::Data"/> object representing the sceneï¿½s data.</returns>
 			virtual const core::Data GetSceneData() const;
 
 			/// <summary>
 			/// Returns an observable reference indicating whether the scene has unsaved changes.
 			/// </summary>
-			/// <returns>Observable boolean indicating the scene’s dirty state.</returns>
+			/// <returns>Observable boolean indicating the sceneï¿½s dirty state.</returns>
 			const core::Observable<bool>& IsDirty() const;
 			
 			/// <summary>
@@ -103,6 +103,9 @@ namespace gallus
 #ifdef _EDITOR
 			core::Observable<bool> m_fIsDirty;
 #endif
+
+			BEGIN_EXPOSED_FIELDS(Scene)
+			END_EXPOSED_FIELDS(Scene)
 		};
 	}
 }

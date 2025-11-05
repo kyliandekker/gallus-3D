@@ -15,6 +15,8 @@
 #include "editor/graphics/imgui/modals/FilePickerModal.h"
 #include <editor/graphics/imgui/EditorWindowsConfig.h>
 
+#include "graphics/dx12/Texture.h"
+
 // graphics includes
 #include "graphics/imgui/font_icon.h"
 
@@ -158,11 +160,13 @@ namespace gallus
 				}
 				case EditorWidgetType::AssetPicker:
 				{
-					resources::EngineResource** pValuePtr = reinterpret_cast<resources::EngineResource**>(ptr);
-					resources::EngineResource* value = (pValuePtr ? *pValuePtr : nullptr);
-					func = [&field, &fieldId, value]
+					gallus::resources::EngineResource** pValuePtr = reinterpret_cast<gallus::resources::EngineResource**>(ptr);
+
+					func = [&field, &fieldId, pValuePtr, ptr]
 						{
-							std::string name = value ? value->GetName() : "<null>";
+							gallus::resources::EngineResource* value = (pValuePtr && *pValuePtr) ? *pValuePtr : nullptr;
+							std::string name = (value != nullptr) ? value->GetName() : "<null>";
+
 							char buf[256];
 							strncpy_s(buf, sizeof(buf), name.c_str(), sizeof(buf) - 1);
 							buf[sizeof(buf) - 1] = '\0';
@@ -172,21 +176,27 @@ namespace gallus
 							ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(core::EDITOR_ENGINE->GetDX12().GetImGuiWindow().GetFontSize() / 2, core::EDITOR_ENGINE->GetDX12().GetImGuiWindow().GetFontSize() / 2));
 							ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
 							ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x - buttonSize.x);
-							ImGui::InputText(ImGui::IMGUI_FORMAT_ID(fieldId, INPUT_ID, "").c_str(), buf, sizeof(buf), ImGuiInputTextFlags_ReadOnly);
+							ImGui::InputText(fieldId.c_str(), buf, sizeof(buf), ImGuiInputTextFlags_ReadOnly);
 							ImGui::PopItemFlag();
 							ImGui::SameLine();
-							if (ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_FILE + fieldId, BUTTON_ID, "").c_str(), buttonSize))
+							if (ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_FILE, fieldId + BUTTON_ID, "").c_str(), buttonSize))
 							{
 								FilePickerModal& filePickerModal = core::EDITOR_ENGINE->GetDX12().GetImGuiWindow().GetWindowsConfig<EditorWindowsConfig>().GetFilePickerModal();
 								filePickerModal.SetData(
-									[value](int success, gallus::resources::FileResource& resource)
+									[pValuePtr](int success, gallus::resources::FileResource& resource)
 									{
 										if (success == 1)
 										{
+											auto cCommandQueue = core::EDITOR_ENGINE->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
+
+											*pValuePtr = core::EDITOR_ENGINE->GetResourceAtlas()
+												.LoadTexture(resource.GetPath().filename().generic_string(), cCommandQueue)
+												.get();
+
 											core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
 										}
 									},
-									std::vector<gallus::resources::AssetType>{ value->GetResourceType() });
+									std::vector<gallus::resources::AssetType>{ field.m_Options.assetType });
 								filePickerModal.Show();
 							}
 							ImGui::PopStyleVar();
@@ -196,15 +206,37 @@ namespace gallus
 				case EditorWidgetType::Object:
 				{
 					showTable = false;
-					IExposableToEditor* editorObject = reinterpret_cast<IExposableToEditor*>(ptr);
+					IExposableToEditor* editorObject = dynamic_cast<IExposableToEditor*>(reinterpret_cast<IExposableToEditor*>(ptr));
+					if (editorObject == nullptr)
+					{
+						return;
+					}
 
-					ImGui::Spacing();
-					ImGui::SeparatorText(field.m_sUIName);
 					std::string nestedId = ImGui::IMGUI_FORMAT_ID("", TABLE_ID, string_extensions::StringToUpper(field.m_sUIName) + "_NESTED_INSPECTOR");
 
 					for (const EditorFieldInfo& subField : editorObject->GetEditorFields())
 					{
 						ShowEditorFieldFromObject(editorObject, subField);
+					}
+
+					break;
+				}
+				case EditorWidgetType::ObjectPtr:
+				{
+					showTable = false;
+
+					IExposableToEditor** ppEditorObject = reinterpret_cast<IExposableToEditor**>(ptr);
+					IExposableToEditor* pEditorObject = (ppEditorObject ? *ppEditorObject : nullptr);
+
+					if (!pEditorObject)
+					{
+						ImGui::TextDisabled("<null>");
+						return;
+					}
+
+					for (const EditorFieldInfo& subField : pEditorObject->GetEditorFields())
+					{
+						ShowEditorFieldFromObject(pEditorObject, subField);
 					}
 
 					break;

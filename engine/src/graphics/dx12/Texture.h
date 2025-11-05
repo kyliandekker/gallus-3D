@@ -263,8 +263,6 @@ namespace gallus
 				D3D12_SHADER_RESOURCE_VIEW_DESC m_SrvDesc;
 
 				TextureType m_TextureType = TextureType::Texture2D;
-
-				SpriteUV m_CurrentUV;
 				std::vector<SpriteRect> m_aSpriteRects;
 			};
 		}

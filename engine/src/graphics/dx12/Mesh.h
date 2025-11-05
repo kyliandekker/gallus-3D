@@ -126,6 +126,9 @@ namespace gallus
 				void SetMeshData(const MeshPartData& a_aData, const std::shared_ptr<CommandQueue> a_pCommandQueue);
 			private:
 				std::vector<MeshPartData> m_aMeshData;
+
+				BEGIN_EXPOSED_FIELDS(Mesh)
+				END_EXPOSED_FIELDS(Mesh)
 			};
 		}
 	}

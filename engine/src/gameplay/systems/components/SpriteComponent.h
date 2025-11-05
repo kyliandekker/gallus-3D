@@ -154,6 +154,8 @@ namespace gallus
 			DirectX::XMFLOAT4 m_vColor = { 1, 1, 1, 1 };
 
 			BEGIN_EXPOSED_FIELDS(SpriteComponent)
+				EXPOSE_FIELD(SpriteComponent, m_pShaderBind, "Shader Bind", FieldOptions{ .type = EditorWidgetType::ObjectPtr })
+				EXPOSE_FIELD(SpriteComponent, m_pTexture, "Texture", FieldOptions{ .type = EditorWidgetType::AssetPicker, .assetType = resources::AssetType::Sprite })
 				EXPOSE_FIELD(SpriteComponent, m_iSpriteIndex, "Sprite Index", FieldOptions{ .type = EditorWidgetType::DragInt8 })
 			END_EXPOSED_FIELDS(SpriteComponent)
 		};

@@ -94,6 +94,9 @@ namespace gallus
 			bool m_bIsPlaying = false;
 
 			float m_fAccumulatedTime = 0.0f;
+
+			BEGIN_EXPOSED_FIELDS(AnimationTrack)
+			END_EXPOSED_FIELDS(AnimationTrack)
 		};
 	}
 }
