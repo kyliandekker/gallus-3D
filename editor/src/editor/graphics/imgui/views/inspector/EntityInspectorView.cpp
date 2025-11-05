@@ -183,15 +183,18 @@ namespace gallus
 							{
 								FilePickerModal& filePickerModal = core::EDITOR_ENGINE->GetDX12().GetImGuiWindow().GetWindowsConfig<EditorWindowsConfig>().GetFilePickerModal();
 								filePickerModal.SetData(
-									[pValuePtr](int success, gallus::resources::FileResource& resource)
+									[pValuePtr, value](int success, gallus::resources::FileResource& resource)
 									{
 										if (success == 1)
 										{
 											auto cCommandQueue = core::EDITOR_ENGINE->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
 
-											*pValuePtr = core::EDITOR_ENGINE->GetResourceAtlas()
-												.LoadTexture(resource.GetPath().filename().generic_string(), cCommandQueue)
-												.get();
+											if (value->GetResourceType() == resources::AssetType::Sprite)
+											{
+												*pValuePtr = core::EDITOR_ENGINE->GetResourceAtlas()
+													.LoadTexture(resource.GetPath().filename().generic_string(), cCommandQueue)
+													.get();
+											}
 
 											core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
 										}
