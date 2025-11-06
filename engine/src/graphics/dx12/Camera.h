@@ -82,6 +82,11 @@ namespace gallus
 				{
 					return m_vSize;
 				}
+
+				const std::string GetName() const
+				{
+					return "Transform";
+				}
 			private:
 				DirectX::XMINT2 m_vSize;
 				DX12Transform m_Transform;

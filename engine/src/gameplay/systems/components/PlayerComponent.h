@@ -68,11 +68,6 @@ namespace gallus
 			{
 				return m_pBulletPrefab;
 			}
-
-			std::string GetName() const override
-			{
-				return "PlayerComponent";
-			}
 		protected:
 			/// <summary>
 			/// Updates the components.
@@ -85,6 +80,7 @@ namespace gallus
 
 			BEGIN_EXPOSED_FIELDS(PlayerComponent)
 				EXPOSE_FIELD(PlayerComponent, m_fSpeed, "Speed", FieldOptions{ .type = EditorWidgetType::DragFloat })
+				EXPOSE_FIELD(PlayerComponent, m_pBulletPrefab, "Bullet Prefab", FieldOptions{ .type = EditorWidgetType::AssetPicker, .assetType = resources::AssetType::Prefab })
 			END_EXPOSED_FIELDS(PlayerComponent)
 		};
 	}

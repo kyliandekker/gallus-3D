@@ -117,7 +117,7 @@ namespace gallus
 			/// Returns the name of the resource.
 			/// </summary>
 			/// <returns>Name of the resource.</returns>
-			const std::string& GetName() const;
+			const std::string GetName() const;
 
 			/// <summary>
 			/// Returns the path of the resource.

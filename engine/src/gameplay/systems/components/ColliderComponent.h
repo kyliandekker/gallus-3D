@@ -62,11 +62,6 @@ namespace gallus
 			bool IntersectsOBB(const std::array<DirectX::XMFLOAT2, 4>& aA, const std::array<DirectX::XMFLOAT2, 4>& aB);
 
 			void IgnoreEntity(const gameplay::EntityID& a_EntityID);
-
-			std::string GetName() const override
-			{
-				return "ColliderComponent";
-			}
 		protected:
 			/// <summary>
 			/// Updates the system's component.

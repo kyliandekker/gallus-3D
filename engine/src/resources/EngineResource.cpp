@@ -86,7 +86,7 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		const std::string& EngineResource::GetName() const
+		const std::string EngineResource::GetName() const
 		{
 			return m_sName;
 		}

@@ -20,6 +20,7 @@ namespace gallus
 		InputText,
 		Vector2Field,
 		AssetPicker,
+		AssetPickerPtr,
 		Object,
 		ObjectPtr
 	};

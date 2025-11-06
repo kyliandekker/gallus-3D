@@ -55,11 +55,6 @@ namespace gallus
 			{
 				return m_fDamage;
 			}
-
-			std::string GetName() const override
-			{
-				return "ProjectileComponent";
-			}
 		protected:
 			/// <summary>
 			/// Updates the components.

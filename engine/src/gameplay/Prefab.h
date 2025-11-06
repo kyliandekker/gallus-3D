@@ -19,14 +19,19 @@ namespace gallus
 			/// <summary>
 			/// Constructs an empty prefab.
 			/// </summary>
-			Prefab() = default;
+			Prefab() : Scene()
+			{
+				m_AssetType = resources::AssetType::Prefab;
+			}
 
 			/// <summary>
 			/// Constructs a prefab with a given name.
 			/// </summary>
 			/// <param name="a_sName">Name of the resource.</param>
 			Prefab(const std::string& a_sName) : Scene(a_sName)
-			{}
+			{
+				m_AssetType = resources::AssetType::Prefab;
+			}
 
 			/// <summary>
 			/// Loads the prefab data from its associated resource source.

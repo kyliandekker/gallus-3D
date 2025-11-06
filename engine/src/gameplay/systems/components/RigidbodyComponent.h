@@ -90,11 +90,6 @@ namespace gallus
 			{
 				return m_fLinearDamping;
 			}
-
-			std::string GetName() const override
-			{
-				return "RigidbodyComponent";
-			}
 		protected:
 			/// <summary>
 			/// Updates the components.

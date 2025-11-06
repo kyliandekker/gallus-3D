@@ -90,8 +90,6 @@ namespace gallus
 			{
 				return m_EntityID;
 			}
-
-			virtual std::string GetName() const = 0;
 		protected:
 			/// <summary>
 			/// Updates the components.

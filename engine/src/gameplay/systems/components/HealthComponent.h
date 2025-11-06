@@ -69,11 +69,6 @@ namespace gallus
 			{
 				m_fMaxHealth = a_fMaxHealth;
 			}
-
-			std::string GetName() const override
-			{
-				return "HealthComponent";
-			}
 		protected:
 			/// <summary>
 			/// Updates the components.

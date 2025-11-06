@@ -32,14 +32,19 @@ namespace gallus
 			/// <summary>
 			/// Constructs an empty scene.
 			/// </summary>
-			Scene() = default;
+			Scene() : resources::EngineResource()
+			{
+				m_AssetType = resources::AssetType::Scene;
+			}
 
 			/// <summary>
 			/// Constructs a scene with a given name.
 			/// </summary>
 			/// <param name="a_sName">Name of the resource.</param>
 			Scene(const std::string& a_sName) : resources::EngineResource(a_sName)
-			{}
+			{
+				m_AssetType = resources::AssetType::Scene;
+			}
 
 			/// <summary>
 			/// Loads the scene data from its associated resource source.

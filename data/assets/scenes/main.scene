@@ -95,7 +95,7 @@
                 },
                 "player": {
                     "movementSpeed": 500.0,
-                    "bulletPrefab": ""
+                    "bulletPrefab": "bullet.prefab"
                 },
                 "health": {
                     "health": 100.0,

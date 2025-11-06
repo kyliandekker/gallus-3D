@@ -141,11 +141,6 @@ namespace gallus
 			/// </summary>
 			/// <param name="a_SrcData">The source data.</param>
 			void Deserialize(const resources::SrcData& a_SrcData) override;
-
-			std::string GetName() const override
-			{
-				return "SpriteComponent";
-			}
 		private:
 			graphics::dx12::Mesh* m_pMesh = nullptr;
 			graphics::dx12::DX12ShaderBind* m_pShaderBind = nullptr;
@@ -155,7 +150,7 @@ namespace gallus
 
 			BEGIN_EXPOSED_FIELDS(SpriteComponent)
 				EXPOSE_FIELD(SpriteComponent, m_pShaderBind, "Shader Bind", FieldOptions{ .type = EditorWidgetType::ObjectPtr })
-				EXPOSE_FIELD(SpriteComponent, m_pTexture, "Texture", FieldOptions{ .type = EditorWidgetType::AssetPicker, .assetType = resources::AssetType::Sprite })
+				EXPOSE_FIELD(SpriteComponent, m_pTexture, "Texture", FieldOptions{ .type = EditorWidgetType::AssetPickerPtr, .assetType = resources::AssetType::Sprite })
 				EXPOSE_FIELD(SpriteComponent, m_iSpriteIndex, "Sprite Index", FieldOptions{ .type = EditorWidgetType::DragInt8 })
 			END_EXPOSED_FIELDS(SpriteComponent)
 		};

@@ -61,11 +61,6 @@ namespace gallus
 			/// </summary>
 			/// <param name="a_vTranslation">The movement.</param>
 			void Translate(const DirectX::XMFLOAT2& a_vTranslation);
-
-			std::string GetName() const override
-			{
-				return "TransformComponent";
-			}
 		private:
 			/// <summary>
 			/// Updates the components.
