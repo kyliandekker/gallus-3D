@@ -15,7 +15,7 @@ namespace gallus
 		//---------------------------------------------------------------------
 		bool SpriteSystem::Initialize()
 		{
-			LOG(LOGSEVERITY_INFO_SUCCESS, LOG_CATEGORY_ECS, "Mesh system initialized.");
+			LOG_ICON(font::ICON_IMAGE, LOGSEVERITY_INFO_SUCCESS, LOG_CATEGORY_ECS, "Sprite system initialized.");
 			return true;
 		}
 

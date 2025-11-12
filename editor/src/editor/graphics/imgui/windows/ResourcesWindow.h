@@ -12,7 +12,7 @@
 
 namespace gallus
 {
-	namespace core
+	namespace resources
 	{
 		class EngineResource;
 	}
@@ -52,7 +52,7 @@ namespace gallus
 				/// </summary>
 				void Render() override;
 			private:
-				void RenderResource(core::EngineResource* a_pResource);
+				void RenderResource(resources::EngineResource* a_pResource);
 
 				bool
 					m_bTexturesFoldedOut = false,

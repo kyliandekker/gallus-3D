@@ -6,20 +6,29 @@
 #include <typeindex>
 #include <unordered_map>
 #include <imgui/imgui_helpers.h>
+#include <imgui/imgui_toggle.h>
+#include <imgui/imgui_internal.h>
 
 // core includes
 #include "editor/core/EditorEngine.h"
+#include "editor/EditorExpose.h"
+#include "editor/graphics/imgui/modals/FilePickerModal.h"
+#include "editor/graphics/imgui/EditorWindowsConfig.h"
+
+#include "graphics/dx12/Texture.h"
 
 // graphics includes
 #include "graphics/imgui/font_icon.h"
 
 // editor includes
 #include "editor/graphics/imgui/views/HierarchyEntityUIView.h"
-#include "editor/graphics/imgui/views/inspector/components/ComponentUIView.h"
 
 // game includes
 #include "gameplay/Game.h"
 #include "gameplay/ECSBaseSystem.h"
+
+#include "utils/string_extensions.h"
+#include "editor/graphics/imgui/RenderEditorExposable.h"
 
 namespace gallus
 {
@@ -32,10 +41,6 @@ namespace gallus
 			//---------------------------------------------------------------------
 			EntityInspectorView::~EntityInspectorView()
 			{
-				for (ComponentBaseUIView* view : m_aComponents)
-				{
-					delete view;
-				}
 			}
 
 			//---------------------------------------------------------------------
@@ -52,15 +57,16 @@ namespace gallus
 
 				gameplay::EntityID& entityId = m_pEntity->GetEntityID();
 
-				for (auto& [type, factory] : GetComponentUIFactoryRegistry())
+				for (auto* sys : core::EDITOR_ENGINE->GetECS().GetSystems())
 				{
-					if (ComponentBaseUIView* view = factory(m_Window, entityId))
+					if (sys->HasComponent(entityId))
 					{
-						if (view)
-						{
-							m_bShowPreview = true;
-						}
-						m_aComponents.push_back(view);
+						auto* comp = sys->GetBaseComponent(entityId);
+
+						std::string id = ImGui::IMGUI_FORMAT_ID("",
+							FOLDOUT_ID, string_extensions::StringToUpper(comp->GetTypeName()) + "_INSPECTOR");
+
+						m_aExpanded.insert(std::make_pair(id, false));
 					}
 				}
 			}
@@ -105,20 +111,52 @@ namespace gallus
 					return;
 				}
 
-				if (!m_aComponents.empty())
-				{
-					ImGui::SetCursorPosY(0);
-				}
+				gameplay::EntityID& entityId = m_pEntity->GetEntityID();
+
+				ImGui::SetCursorPosY(0);
 				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
-				for (ComponentBaseUIView* component : m_aComponents)
+				for (auto* sys : core::EDITOR_ENGINE->GetECS().GetSystems())
 				{
 					ImGui::SetCursorPosX(0);
 					float width = ImGui::GetContentRegionAvail().x + m_Window.GetFramePadding().x;
 					ImGui::SetNextItemWidth(width);
-					component->Render();
-					ImGui::SetCursorPosY(ImGui::GetCursorPosY() + m_Window.GetFramePadding().y);
-				}
+					if (sys->HasComponent(entityId))
+					{
+						auto* comp = sys->GetBaseComponent(entityId);
 
+						ImVec2 size = m_Window.GetHeaderSize();
+
+						float width = ImGui::GetContentRegionAvail().x + m_Window.GetFramePadding().x;
+						width -= size.x;
+						ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0);
+						ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+
+						ImVec2 foldOutButtonPos = ImGui::GetCursorScreenPos();
+
+						std::string id = ImGui::IMGUI_FORMAT_ID("",
+							FOLDOUT_ID, string_extensions::StringToUpper(comp->GetTypeName()) + "_INSPECTOR");
+						ImGui::FoldOutButton(
+							std::string((m_aExpanded[id] ? font::ICON_FOLDED_OUT : font::ICON_FOLDED_IN) + sys->GetSystemName() + id).c_str(), &m_aExpanded[id], ImVec2(width, size.y));
+						ImGui::SameLine();
+						if (ImGui::IconButton(ImGui::IMGUI_FORMAT_ID(font::ICON_DELETE, BUTTON_ID, id + "_DELETE_INSPECTOR").c_str(), size, m_Window.GetIconFont()))
+						{
+							sys->DeleteComponent(entityId);
+						}
+
+						ImGui::PopStyleVar();
+						ImGui::PopStyleVar();
+
+						if (m_aExpanded[id])
+						{
+							RenderEditorForObject(comp);
+						}
+					}
+				}
+				ImGui::PopStyleVar();
+
+				ImGui::SetCursorPosX(0 + m_Window.GetFramePadding().x);
+				ImGui::SetCursorPosY(ImGui::GetCursorPosY() + m_Window.GetFramePadding().y);
+				
 				float width = ImGui::GetContentRegionAvail().x;
 				if (ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_FOLDER + std::string(" Add Component"), BUTTON_ID, "ADD_COMPONENT_INSPECTOR").c_str(), ImVec2(width, 0)))
 				{
@@ -129,9 +167,6 @@ namespace gallus
 
 					ImGui::OpenPopup(ImGui::IMGUI_FORMAT_ID("", POPUP_WINDOW_ID, "ADD_COMPONENT_MENU_INSPECTOR").c_str());
 				}
-				ImGui::PopStyleVar();
-
-				gameplay::EntityID& entityId = m_pEntity->GetEntityID();
 
 				gameplay::EntityComponentSystem& ecs = core::EDITOR_ENGINE->GetECS();
 				ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, m_Window.GetFramePadding());
@@ -159,19 +194,19 @@ namespace gallus
 			//---------------------------------------------------------------------
 			void EntityInspectorView::RenderPreview()
 			{
-				ComponentBaseUIView* view = nullptr;
-				for (ComponentBaseUIView* component : m_aComponents)
-				{
-					if (component->ShowPreview() && (!view || component->GetPreviewPriority() > view->GetPreviewPriority()))
-					{
-						view = component;
-					}
-				}
+				//ComponentBaseUIView* view = nullptr;
+				//for (ComponentBaseUIView* component : m_aComponents)
+				//{
+				//	if (component->ShowPreview() && (!view || component->GetPreviewPriority() > view->GetPreviewPriority()))
+				//	{
+				//		view = component;
+				//	}
+				//}
 
-				if (view)
-				{
-					view->RenderPreview();
-				}
+				//if (view)
+				//{
+				//	view->RenderPreview();
+				//}
 			}
 		}
 	}

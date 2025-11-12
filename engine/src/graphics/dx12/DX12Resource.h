@@ -1,7 +1,7 @@
 #pragma once
 
 #include "DX12PCH.h"
-#include "core/EngineResource.h"
+#include "resources/EngineResource.h"
 
 #include <string>
 #include <filesystem>
@@ -19,7 +19,7 @@ namespace gallus
 			/// <summary>
 			/// Wrapper for a DX12 resource, providing utility functions.
 			/// </summary>
-			class DX12Resource : public core::EngineResource
+			class DX12Resource : public resources::EngineResource
 			{
 			public:
 				/// <summary>

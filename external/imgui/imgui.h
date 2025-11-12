@@ -1758,6 +1758,7 @@ enum ImGuiCol_
 	ImGuiCol_NavWindowingDimBg,     // Darken/colorize entire screen behind the CTRL+TAB window list, when active
 	ImGuiCol_ModalWindowDimBg,      // Darken/colorize entire screen behind a modal window, when one is active
 	ImGuiCol_TextColorAccent,      // Darken/colorize entire screen behind a modal window, when one is active
+	ImGuiCol_TextColorAccentDarker,      // Darken/colorize entire screen behind a modal window, when one is active
 	ImGuiCol_COUNT,
 
 #ifndef IMGUI_DISABLE_OBSOLETE_FUNCTIONS

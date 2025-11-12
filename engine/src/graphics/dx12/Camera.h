@@ -2,6 +2,8 @@
 
 #include "DX12PCH.h"
 
+#include <DirectXMath.h>
+
 // graphics includes
 #include "graphics/dx12/DX12Transform.h"
 
@@ -11,6 +13,7 @@ namespace gallus
 	{
 		namespace dx12
 		{
+			constexpr DirectX::XMFLOAT2 RENDER_TEX_SIZE = { 1920, 1080 };
 #ifdef _EDITOR
 			enum CameraMode
 			{
@@ -71,9 +74,18 @@ namespace gallus
 				/// <returns>The projection matrix used for rendering.</returns>
 				const DirectX::XMMATRIX& GetProjectionMatrix() const;
 
+				/// <summary>
+				/// Returns the size of the camera.
+				/// </summary>
+				/// <returns>Vector representing the size of the camera.</returns>
 				const DirectX::XMINT2& GetSize() const
 				{
 					return m_vSize;
+				}
+
+				const std::string GetName() const
+				{
+					return "Transform";
 				}
 			private:
 				DirectX::XMINT2 m_vSize;

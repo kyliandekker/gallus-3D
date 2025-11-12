@@ -1,4 +1,4 @@
-/// @ref core
+﻿/// @ref core
 /// @file glm/detail/func_common.inl
 
 #include "../vector_relational.hpp"
@@ -288,7 +288,7 @@ namespace detail
 			"'sign' only accept signed inputs");
 
 		return detail::compute_sign<1, genFIType, defaultp,
-                                    std::numeric_limits<genFIType>::is_iec559, detail::is_aligned<highp>::value>::call(vec<1, genFIType>(x)).x;
+									std::numeric_limits<genFIType>::is_iec559, detail::is_aligned<highp>::value>::call(vec<1, genFIType>(x)).x;
 	}
 
 	template<length_t L, typename T, qualifier Q>
@@ -790,3 +790,4 @@ namespace detail
 #if GLM_CONFIG_SIMD == GLM_ENABLE
 #	include "func_common_simd.inl"
 #endif
+

@@ -1,20 +1,32 @@
 #pragma once
 
+#ifdef _EDITOR
 #include <rapidjson/document.h>
+#endif
 #include <string>
 
 #include "gameplay/EntityID.h"
+#include "gameplay/systems/UpdateTime.h"
+
+#include "editor/EditorExpose.h"
 
 namespace gallus
 {
+	namespace resources
+	{
+		class SrcData;
+	}
 	namespace gameplay
 	{
 		//---------------------------------------------------------------------
 		// Component
 		//---------------------------------------------------------------------
-		class Component
+		class Component : public IExposableToEditor
 		{
 		public:
+			/// <summary>
+			/// Deconstructs the component.
+			/// </summary>
 			virtual ~Component() = default;
 
 			/// <summary>
@@ -30,21 +42,22 @@ namespace gallus
 			/// </summary>
 			virtual void InitRealtime()
 			{
+				m_bInitialized = true;
 			}
 
+#ifdef _EDITOR
 			/// <summary>
 			/// Serialized the component to a json document.
 			/// </summary>
 			/// <param name="a_Document">The json document that the data will be put into.</param>
 			/// <param name="a_Allocator">The allocator used by the json document.</param>
 			virtual void Serialize(rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator) const = 0;
-
+#endif
 			/// <summary>
-			/// Deserializes data from a json document and loads it into the component.
+			/// Creates an instance based on source data.
 			/// </summary>
-			/// <param name="a_Document">The json document that contains the data.</param>
-			/// <param name="a_Allocator">The allocator used by the json document.</param>
-			virtual void Deserialize(const rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator) = 0;
+			/// <param name="a_SrcData">The source data.</param>
+			virtual void Deserialize(const resources::SrcData& a_SrcData) = 0;
 
 			/// <summary>
 			/// Checks whether the component is destroyed.
@@ -67,14 +80,25 @@ namespace gallus
 			/// Updates the components.
 			/// </summary>
 			/// <param name="a_fDeltaTime">Delta time.</param>
-			virtual void UpdateRealtime(float a_fDeltaTime)
-			{}
+			void UpdateRealtimeInner(float a_fDeltaTime, UpdateTime a_UpdateTime);
 
+			/// <summary>
+			/// Retrieves the Entity ID.
+			/// </summary>
+			/// <returns>A reference to the Entity ID.</returns>
 			const gameplay::EntityID& GetEntityID() const
 			{
 				return m_EntityID;
 			}
 		protected:
+			/// <summary>
+			/// Updates the components.
+			/// </summary>
+			/// <param name="a_fDeltaTime">Delta time.</param>
+			virtual void UpdateRealtime(float a_fDeltaTime, UpdateTime a_UpdateTime)
+			{}
+
+			bool m_bInitialized = false;
 			gameplay::EntityID m_EntityID;
 			bool m_bIsDestroyed = false;
 		};

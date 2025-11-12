@@ -77,6 +77,16 @@ namespace gallus
 				/// </summary>
 				/// <returns>True if window is in full screen mode, otherwise false.</returns>
 				bool IsFullScreen() const;
+
+				const std::string& GetId()
+				{
+					return m_sWindowID;
+				}
+
+				void Focus()
+				{
+					m_bFocusMyWindow = true;
+				}
 			protected:
 				ImGuiWindowFlags m_Flags = 0; /// The flags associated with certain window behaviours.
 				ImVec2 m_vSize = ImVec2(0, 0); /// The current size of the window.
@@ -86,6 +96,7 @@ namespace gallus
 				bool m_bFullScreen = false; /// Whether the window is in full screen mode or not.
 				bool m_bEnabled = true; /// Whether the window is enabled or not.
 				bool m_bRenderWindowItself = false; /// Whether the window only needs to render the elements or the window around it.
+				bool m_bFocusMyWindow = false;
 			};
 		}
 	}

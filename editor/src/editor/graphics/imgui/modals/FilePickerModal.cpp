@@ -29,7 +29,7 @@ namespace gallus
 	{
 		namespace imgui
 		{
-			FilePickerModal::FilePickerModal(ImGuiWindow& a_Window) : BaseModal(a_Window, std::string(font::ICON_FOLDER) + " File Explorer", "FileExplorer"), m_SearchBar(a_Window)
+			FilePickerModal::FilePickerModal(ImGuiWindow& a_Window) : BaseModal(a_Window, std::string(font::ICON_FOLDER) + " File Picker", "FilePicker"), m_SearchBar(a_Window)
 			{
 				m_SearchBar.Initialize("");
 			}
@@ -38,7 +38,7 @@ namespace gallus
 			{
 				auto cCommandQueue = core::EDITOR_ENGINE->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
 				m_pPreviewTexture = core::EDITOR_ENGINE->GetResourceAtlas().LoadTexture(a_sName, cCommandQueue);
-				m_pPreviewTexture->SetResourceCategory(gallus::core::EngineResourceCategory::Editor);
+				m_pPreviewTexture->SetResourceCategory(gallus::resources::EngineResourceCategory::Editor);
 			}
 
 			void FilePickerModal::Render()

@@ -9,6 +9,8 @@
 // core
 #include "core/DataStream.h"
 
+#include "resources/SrcData.h"
+
 // logger
 #include "logger/Logger.h"
 
@@ -44,6 +46,7 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
+#ifdef _EDITOR
 		const core::Data Prefab::GetSceneData() const
 		{
 			rapidjson::Document a_Document;
@@ -86,6 +89,7 @@ namespace gallus
 
 			return core::DataStream(buffer.GetString(), buffer.GetSize());
 		}
+#endif
 
 		//---------------------------------------------------------------------
 		gameplay::EntityID Prefab::Instantiate()
@@ -137,14 +141,13 @@ namespace gallus
 			{
 				if (componentsDoc.HasMember(system->GetPropertyName().c_str()))
 				{
-					gameplay::Component* component = system->GetBaseComponent(id);
+					const rapidjson::Value& testMember = componentsDoc[system->GetPropertyName().c_str()];
+
+					gameplay::Component* component = system->CreateBaseComponent(id, resources::SrcData(testMember));
 					if (!component)
 					{
 						continue;
 					}
-
-					const rapidjson::Value& testMember = componentsDoc[system->GetPropertyName().c_str()];
-					component->Deserialize(testMember, document.GetAllocator());
 				}
 			}
 

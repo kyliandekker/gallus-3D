@@ -60,6 +60,9 @@ namespace gallus
 				size_t m_iVertexStride = 0;
 
 				D3D12_VERTEX_BUFFER_VIEW m_VertexBufferView;
+
+				BEGIN_EXPOSED_FIELDS(VertexBuffer)
+				END_EXPOSED_FIELDS(VertexBuffer)
 			};
 		}
 	}

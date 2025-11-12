@@ -24,7 +24,7 @@ namespace gallus
 				font::ICON_FILE_AUDIO,
 				font::ICON_FILE_MUSIC,
 				font::ICON_FILE_VO,
-				font::ICON_FILE, // TODO: FIND ICON ANIMATION
+				font::ICON_FILE_ANIMATION, // TODO: FIND ICON ANIMATION
 				font::ICON_FILE_SETTINGS, // TODO: FIND ICON SHADER
 				font::ICON_FILE_SETTINGS, // TODO: FIND ICON SHADER
 				font::ICON_FILE_MODEL,
@@ -194,7 +194,7 @@ namespace gallus
 
 				verticalOffset = (buttonSize.y - textSize.y) / 2.0f;
 
-				textPos = initialPos + ImVec2(300, verticalOffset);
+				textPos = initialPos + ImVec2(350, verticalOffset);
 				ImGui::SetCursorPos(textPos);
 
 				ImVec4 textColor = ImGui::GetStyleColorVec4(ImGuiCol_Text);

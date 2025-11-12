@@ -24,50 +24,48 @@ namespace gallus
 	{
 		namespace dx12
 		{
-			constexpr glm::ivec2 RENDER_TEX_SIZE = glm::ivec2(1920, 1080);
-
 			double FPSCounter::GetFPS() const
 			{
-				return m_FPS;
+				return m_fFPS;
 			}
 
 			double FPSCounter::GetDeltaTime() const
 			{
-				return m_DeltaTime;
+				return m_fDeltaTime;
 			}
 
 			double FPSCounter::GetTotalTime() const
 			{
-				return m_TotalTime;
+				return m_fTotalTime;
 			}
 
 			void FPSCounter::Update()
 			{
-				m_FrameCounter++;
+				m_iFrameCounter++;
 
 				auto t1 = m_Clock.now();
 				std::chrono::duration<double> deltaTime = t1 - m_T0;
 				m_T0 = t1;
 
-				m_DeltaTime = deltaTime.count(); // Convert duration to seconds
+				m_fDeltaTime = deltaTime.count(); // Convert duration to seconds
 
-				m_ElapsedSeconds += m_DeltaTime;
-				m_TotalTime += m_DeltaTime;
+				m_fElapsedSeconds += m_fDeltaTime;
+				m_fTotalTime += m_fDeltaTime;
 
-				if (m_ElapsedSeconds > 1.0)
+				if (m_fElapsedSeconds > 1.0)
 				{
-					m_FPS = m_FrameCounter / m_ElapsedSeconds;
-					m_FrameCounter = 0;
-					m_ElapsedSeconds = 0.0;
+					m_fFPS = m_iFrameCounter / m_fElapsedSeconds;
+					m_iFrameCounter = 0;
+					m_fElapsedSeconds = 0.0;
 				}
 			}
 
 			void FPSCounter::Initialize()
 			{
-				m_FPS = 0.0;
-				m_FrameCounter = 0;
-				m_ElapsedSeconds = 0.0;
-				m_TotalTime = 0.0;
+				m_fFPS = 0.0;
+				m_iFrameCounter = 0;
+				m_fElapsedSeconds = 0.0;
+				m_fTotalTime = 0.0;
 				m_T0 = m_Clock.now();
 			}
 
@@ -222,23 +220,23 @@ namespace gallus
 #endif // IMGUI_DISABLE
 
 				std::shared_ptr<Texture> texture = core::ENGINE->GetResourceAtlas().LoadTexture("tex_missing.png", cCommandQueue); // Default texture.
-				texture->SetResourceCategory(core::EngineResourceCategory::Missing);
+				texture->SetResourceCategory(resources::EngineResourceCategory::Missing);
 				texture->SetIsDestroyable(false);
 
 				std::shared_ptr<PixelShader> pixelShader = core::ENGINE->GetResourceAtlas().LoadPixelShader("pixelShader.hlsl"); // Default shader.
 				std::shared_ptr<VertexShader> vertexShader = core::ENGINE->GetResourceAtlas().LoadVertexShader("vertexShader.hlsl"); // Default shader.
-				pixelShader->SetResourceCategory(core::EngineResourceCategory::Missing);
+				pixelShader->SetResourceCategory(resources::EngineResourceCategory::Missing);
 				pixelShader->SetIsDestroyable(false);
-				vertexShader->SetResourceCategory(core::EngineResourceCategory::Missing);
+				vertexShader->SetResourceCategory(resources::EngineResourceCategory::Missing);
 				vertexShader->SetIsDestroyable(false);
 
 				std::shared_ptr<DX12ShaderBind> shaderBind = core::ENGINE->GetResourceAtlas().LoadShaderBind("defaultShaderBind", pixelShader.get(), vertexShader.get()); // Default shader.
 
 				std::shared_ptr<PixelShader> renderTexPixelShader = core::ENGINE->GetResourceAtlas().LoadPixelShader("renderTexPixelShader.hlsl"); // Default render tex shader.
 				std::shared_ptr<VertexShader> renderTexVertexShader = core::ENGINE->GetResourceAtlas().LoadVertexShader("renderTexVertexShader.hlsl"); // Default render tex shader.
-				renderTexPixelShader->SetResourceCategory(core::EngineResourceCategory::Missing);
+				renderTexPixelShader->SetResourceCategory(resources::EngineResourceCategory::Missing);
 				renderTexPixelShader->SetIsDestroyable(false);
-				renderTexVertexShader->SetResourceCategory(core::EngineResourceCategory::Missing);
+				renderTexVertexShader->SetResourceCategory(resources::EngineResourceCategory::Missing);
 				renderTexVertexShader->SetIsDestroyable(false);
 
 				std::shared_ptr<DX12ShaderBind> renderTexShaderBind = core::ENGINE->GetResourceAtlas().LoadShaderBind("renderTexShaderBind", renderTexPixelShader.get(), renderTexVertexShader.get()); // Render Tex shader.
@@ -246,7 +244,7 @@ namespace gallus
 				std::shared_ptr<Mesh> mesh = core::ENGINE->GetResourceAtlas().LoadMesh("square"); // Default mesh.
 				MeshPartData& squarePrimitive = s_PRIMITIVES[(int)PRIMITIVES::SQUARE];
 				mesh->SetMeshData(squarePrimitive, cCommandQueue);
-				mesh->SetResourceCategory(core::EngineResourceCategory::Missing);
+				mesh->SetResourceCategory(resources::EngineResourceCategory::Missing);
 				mesh->SetIsDestroyable(false);
 
 				cCommandQueue->Flush();
@@ -844,6 +842,11 @@ namespace gallus
 			//---------------------------------------------------------------------
 			void DX12System2D::Render2D(std::shared_ptr<CommandQueue> a_pCommandQueue, std::shared_ptr<CommandList> a_pCommandList, D3D12_CPU_DESCRIPTOR_HANDLE a_RTVHandle)
 			{
+				if (!m_pActiveCamera)
+				{
+					return;
+				}
+
 				a_pCommandList->GetCommandList()->OMSetRenderTargets(1, &a_RTVHandle, FALSE, nullptr);
 				a_pCommandList->GetCommandList()->SetGraphicsRootSignature(m_pRootSignature.Get());
 
@@ -866,7 +869,7 @@ namespace gallus
 				std::lock_guard<std::recursive_mutex> lock(core::ENGINE->GetECS().m_EntityMutex);
 				for (auto& pair : core::ENGINE->GetECS().GetSystem<gameplay::SpriteSystem>().GetComponents())
 				{
-					pair.second.Render(a_pCommandList, pair.first, m_Camera);
+					pair.second.Render(a_pCommandList, pair.first, *m_pActiveCamera);
 				}
 
 				m_eOnRender(a_pCommandList);

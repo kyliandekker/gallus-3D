@@ -3,37 +3,54 @@
 #include <rapidjson/utils.h>
 
 #include "core/Engine.h"
+
+#include "resources/SrcData.h"
+
 #include "gameplay/systems/CollisionSystem.h"
 #include "gameplay/systems/HealthSystem.h"
-#include "gameplay/systems/MovementSystem.h"
+#include "gameplay/systems/TransformSystem.h"
+
+#define JSON_PROJECTILE_COMPONENT_DAMAGE_VAR "damage"
+#define JSON_PROJECTILE_COMPONENT_EXPLOSION_VAR "explosion"
 
 namespace gallus
 {
 	namespace gameplay
 	{
 		//---------------------------------------------------------------------
+#ifdef _EDITOR
 		void ProjectileComponent::Serialize(rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator) const
 		{
 			if (!a_Document.IsObject())
 			{
 				return;
 			}
-		}
 
-		//---------------------------------------------------------------------
-		void ProjectileComponent::Deserialize(const rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator)
-		{
-			if (!a_Document.IsObject())
+			a_Document.AddMember(JSON_PROJECTILE_COMPONENT_DAMAGE_VAR, m_fDamage, a_Allocator);
+
+			if (m_ExplosionPrefab)
 			{
-				return;
+				a_Document.AddMember(
+					JSON_PROJECTILE_COMPONENT_EXPLOSION_VAR,
+					rapidjson::Value(m_ExplosionPrefab->GetPath().filename().generic_string().c_str(), a_Allocator),
+					a_Allocator
+				);
 			}
 		}
+#endif
 
 		//---------------------------------------------------------------------
-		void ProjectileComponent::UpdateRealtime(float a_fDeltaTime)
+		void ProjectileComponent::Deserialize(const resources::SrcData& a_SrcData)
+		{
+			m_fDamage = a_SrcData.GetFloat(JSON_PROJECTILE_COMPONENT_DAMAGE_VAR);
+			m_ExplosionPrefab = core::ENGINE->GetResourceAtlas().LoadPrefab(a_SrcData.GetString(JSON_PROJECTILE_COMPONENT_EXPLOSION_VAR)).get();
+		}
+
+		//---------------------------------------------------------------------
+		void ProjectileComponent::UpdateRealtime(float a_fDeltaTime, UpdateTime a_UpdateTime)
 		{
 			CollisionSystem& collisionSystem = core::ENGINE->GetECS().GetSystem<CollisionSystem>();
-			auto collisions = collisionSystem.GetCollisions(m_EntityID);
+			std::vector<CollisionInfo> collisions = collisionSystem.GetCollisions(m_EntityID);
 
 			HealthSystem& healthSystem = core::ENGINE->GetECS().GetSystem<HealthSystem>();
 
@@ -45,18 +62,28 @@ namespace gallus
 					if (healthSystem.HasComponent(c.b))
 					{
 						HealthComponent& healthComponent = healthSystem.GetComponent(c.b);
-						healthComponent.SetHealth(healthComponent.GetHealth() - 100);
+						healthComponent.SetHealth(healthComponent.GetHealth() - m_fDamage);
 					}
 
-					// Destroy projectile on first impact.
-					core::ENGINE->GetECS().GetEntity(m_EntityID)->Destroy();
+					if (m_ExplosionPrefab)
+					{
+						gameplay::EntityID id = m_ExplosionPrefab->Instantiate();
+
+						TransformSystem& transformSys = core::ENGINE->GetECS().GetSystem<TransformSystem>();
+						const DirectX::XMFLOAT2& pos = transformSys.GetComponent(m_EntityID).Transform().GetPosition();
+						TransformComponent& transformComp = transformSys.GetComponent(id);
+						transformComp.Transform().SetPosition(pos);
+
+						// Destroy projectile on first impact.
+						core::ENGINE->GetECS().GetEntity(m_EntityID)->Destroy();
+					}
 				}
 			}
 
-			MovementSystem& movementSys = core::ENGINE->GetECS().GetSystem<MovementSystem>();
+			TransformSystem& transformSys = core::ENGINE->GetECS().GetSystem<TransformSystem>();
 
-			MovementComponent& movementComp = movementSys.GetComponent(m_EntityID);
-			movementComp.Translate(m_fVelocity);
+			TransformComponent& transformComp = transformSys.GetComponent(m_EntityID);
+			transformComp.Translate(m_vVelocity);
 		}
 	}
 }

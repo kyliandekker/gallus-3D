@@ -6,7 +6,7 @@
 #include "editor/graphics/imgui/views/inspector/InspectorView.h"
 
 #include <string>
-#include <vector>
+#include <map>
 
 namespace gallus
 {
@@ -49,16 +49,11 @@ namespace gallus
 				void Render() override;
 
 				void RenderPreview() override;
-
-				std::vector<ComponentBaseUIView*>& GetComponents()
-				{
-					return m_aComponents;
-				}
 			protected:
 				HierarchyEntityUIView& m_HierarchyEntityUIView;
 				gameplay::Entity* m_pEntity = nullptr;
 
-				std::vector<ComponentBaseUIView*> m_aComponents; /// A list of component UI views associated with this entity.
+				std::map<std::string, bool> m_aExpanded; // A list of component booleans.
 			};
 		}
 	}

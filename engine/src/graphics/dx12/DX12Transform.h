@@ -1,5 +1,7 @@
 #pragma once
 
+#include "editor/EditorExpose.h"
+
 #include <DirectXMath.h>
 #include <array>
 
@@ -12,7 +14,7 @@ namespace gallus
 			//---------------------------------------------------------------------
 			// DX12Transform
 			//---------------------------------------------------------------------
-			class DX12Transform
+			class DX12Transform : public IExposableToEditor
 			{
 			public:
 				DX12Transform();
@@ -90,9 +92,16 @@ namespace gallus
 				std::array<DirectX::XMFLOAT2, 4> GetWorldCorners() const;
 			private:
 				DirectX::XMFLOAT2 m_vPosition = { 0, 0 };
-				float m_fRotationDegrees = 0.0f; // rotation around Z axis
 				DirectX::XMFLOAT2 m_vScale = { 1, 1 };
-				DirectX::XMFLOAT2 m_vPivot = { 0.0f, 0.0f };
+				DirectX::XMFLOAT2 m_vPivot = { -0.5f, -0.5f };
+				float m_fRotationDegrees = 0.0f; // rotation around Z axis
+
+				BEGIN_EXPOSED_FIELDS(DX12Transform)
+					EXPOSE_FIELD(DX12Transform, m_vPosition, "Position", FieldOptions{ .type = EditorWidgetType::Vector2Field })
+					EXPOSE_FIELD(DX12Transform, m_vScale, "Scale", FieldOptions{ .type = EditorWidgetType::Vector2Field })
+					EXPOSE_FIELD(DX12Transform, m_vPivot, "Pivot", FieldOptions{ .type = EditorWidgetType::Vector2Field, .min = "-0.5", .max = "0.5" })
+					EXPOSE_FIELD(DX12Transform, m_fRotationDegrees, "Rotation", FieldOptions{ .type = EditorWidgetType::DragFloat })
+				END_EXPOSED_FIELDS(DX12Transform)
 			};
 		}
 	}

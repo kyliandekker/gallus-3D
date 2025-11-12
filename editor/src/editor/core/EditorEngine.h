@@ -5,12 +5,6 @@
 
 namespace gallus
 {
-	enum class EDITOR_MODAL
-	{
-		EDITOR_MODAL_FILE_PICKER,
-		EDITOR_MODAL_SPRITE_EDITOR,
-	};
-
 	namespace core
 	{
 		//---------------------------------------------------------------------

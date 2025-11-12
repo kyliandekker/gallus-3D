@@ -1,4 +1,4 @@
-namespace glm
+﻿namespace glm
 {
 	template<typename genType>
 	GLM_FUNC_QUALIFIER GLM_CONSTEXPR genType identity()
@@ -145,9 +145,10 @@ namespace glm
 	GLM_FUNC_QUALIFIER mat<4, 4, T, Q> lookAt(vec<3, T, Q> const& eye, vec<3, T, Q> const& center, vec<3, T, Q> const& up)
 	{
 #       if (GLM_CONFIG_CLIP_CONTROL & GLM_CLIP_CONTROL_LH_BIT)
-            return lookAtLH(eye, center, up);
+			return lookAtLH(eye, center, up);
 #       else
-            return lookAtRH(eye, center, up);
+			return lookAtRH(eye, center, up);
 #       endif
 	}
 }//namespace glm
+

@@ -1,8 +1,9 @@
 #pragma once
 
+// base class
 #include "core/System.h"
 
-// gameplay includes
+// gameplay
 #include "gameplay/Scene.h"
 
 namespace gallus
@@ -44,21 +45,37 @@ namespace gallus
 				return m_Scene;
 			}
 
+			/// <summary>
+			/// Retrieves the starting state.
+			/// </summary>
+			/// <returns>True if the game has started, false otherwise.</returns>
 			bool IsStarted() const
 			{
 				return m_bStarted;
 			}
 
+			/// <summary>
+			/// Sets the starting state.
+			/// </summary>
+			/// <param name="a_bStarted">True if the game should be started, false otherwise.</param>
 			void SetIsStarted(bool a_bStarted)
 			{
 				m_bStarted = a_bStarted;
 			}
 
+			/// <summary>
+			/// Retrieves the pause state.
+			/// </summary>
+			/// <returns>True if the game is paused, false otherwise.</returns>
 			bool IsPaused() const
 			{
 				return m_bPaused;
 			}
 
+			/// <summary>
+			/// Sets the pause state.
+			/// </summary>
+			/// <param name="a_bStarted">True if the game should be paused, false otherwise.</param>
 			void SetIsPaused(bool a_bPaused)
 			{
 				m_bPaused = a_bPaused;
@@ -66,7 +83,12 @@ namespace gallus
 
 			float GetFps() const
 			{
-				return m_Fps;
+				return m_fFps;
+			}
+
+			float GetDeltaTime() const
+			{
+				return m_fDeltaTime;
 			}
 		private:
 			/// <summary>
@@ -80,7 +102,8 @@ namespace gallus
 			bool m_bStarted = false;
 			bool m_bPaused = false;
 
-			float m_Fps;
+			float m_fFps;
+			float m_fDeltaTime;
 		};
 		inline extern Game GAME = {};
 	}

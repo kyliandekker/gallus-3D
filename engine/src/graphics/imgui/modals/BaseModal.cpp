@@ -47,7 +47,11 @@ namespace gallus
 					return;
 				}
 
-				ImGui::OpenPopup(ImGui::IMGUI_FORMAT_ID(m_sName, POPUP_WINDOW_ID, m_sWindowID).c_str());
+				if (m_bCallShow)
+				{
+					ImGui::OpenPopup(ImGui::IMGUI_FORMAT_ID(m_sName, POPUP_WINDOW_ID, m_sWindowID).c_str());
+					m_bCallShow = false;
+				}
 
 				ImVec2 center = ImVec2(ImGui::GetIO().DisplaySize.x * 0.5f, ImGui::GetIO().DisplaySize.y * 0.5f);
 				ImVec2 size = ImGui::GetIO().DisplaySize; // Adjust as needed
@@ -74,12 +78,14 @@ namespace gallus
 			void BaseModal::Show()
 			{
 				m_bShow = true;
+				m_bCallShow = true;
 			}
 
 			//---------------------------------------------------------------------
 			void BaseModal::Hide()
 			{
 				m_bShow = false;
+				m_bCallShow = false;
 			}
 		}
 	}

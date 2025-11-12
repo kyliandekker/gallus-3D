@@ -23,6 +23,7 @@ namespace gallus
 			Prefab,
 			ShaderBind,
 			Mesh,
+			AnimationGraph
 		};
 
 		/// <summary>
@@ -36,19 +37,19 @@ namespace gallus
 			{
 				case AssetType::Scene:
 				{
-					return "Scene File";
+					return "Scene";
 				}
 				case AssetType::Sprite:
 				{
-					return "Sprite File";
+					return "Sprite";
 				}
 				case AssetType::Sound:
 				{
-					return "Sound File";
+					return "Sound";
 				}
 				case AssetType::Song:
 				{
-					return "Song File";
+					return "Song";
 				}
 				case AssetType::VO:
 				{
@@ -56,15 +57,15 @@ namespace gallus
 				}
 				case AssetType::Animation:
 				{
-					return "Animation File";
+					return "Animation";
 				}
 				case AssetType::PixelShader:
 				{
-					return "Pixel Shader File";
+					return "Pixel Shader";
 				}
 				case AssetType::VertexShader:
 				{
-					return "Vertex Shader File";
+					return "Vertex Shader";
 				}
 				case AssetType::ShaderBind:
 				{
@@ -73,6 +74,10 @@ namespace gallus
 				case AssetType::Mesh:
 				{
 					return "Mesh";
+				}
+				case AssetType::AnimationGraph:
+				{
+					return "Animation Graph";
 				}
 				default:
 				{

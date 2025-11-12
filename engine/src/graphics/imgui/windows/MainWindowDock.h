@@ -25,6 +25,9 @@ namespace gallus
 				/// <param name="a_Window">The ImGui window for rendering the view.</param>
 				MainWindowDock(ImGuiWindow& a_Window);
 
+				/// <summary>
+				/// Renders the element.
+				/// </summary>
 				void Render() override;
 			};
 		}

@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include "graphics/dx12/DX12System2D.h"
+
 #include "logger/Logger.h"
 
 namespace gallus
@@ -13,12 +15,15 @@ namespace gallus
 		//---------------------------------------------------------------------
 		Editor::Editor() : core::ThreadedSystem::ThreadedSystem(), 
 			m_EditorSettings("editorsettings.settings")
-		{}
+		{
+			m_pSelectable = nullptr;
+		}
 
 		//---------------------------------------------------------------------
 		bool Editor::Initialize(bool a_bWait)
 		{
-			m_CurrentScene.SetResourceCategory(core::EngineResourceCategory::Editor);
+			m_CurrentScene.SetResourceCategory(resources::EngineResourceCategory::Editor);
+			m_EditorCamera.Init(graphics::dx12::RENDER_TEX_SIZE.x, graphics::dx12::RENDER_TEX_SIZE.y);
 
 			LOG(LOGSEVERITY_INFO, LOG_CATEGORY_EDITOR, "Initializing editor.");
 

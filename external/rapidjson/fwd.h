@@ -1,4 +1,4 @@
-// Tencent is pleased to support the open source community by making RapidJSON available.
+﻿// Tencent is pleased to support the open source community by making RapidJSON available.
 // 
 // Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
 //
@@ -139,9 +139,9 @@ typedef GenericSchemaDocument<Value, CrtAllocator> SchemaDocument;
 typedef IGenericRemoteSchemaDocumentProvider<SchemaDocument> IRemoteSchemaDocumentProvider;
 
 template <
-    typename SchemaDocumentType,
-    typename OutputHandler,
-    typename StateAllocator>
+	typename SchemaDocumentType,
+	typename OutputHandler,
+	typename StateAllocator>
 class GenericSchemaValidator;
 
 typedef GenericSchemaValidator<SchemaDocument, BaseReaderHandler<UTF8<char>, void>, CrtAllocator> SchemaValidator;
@@ -149,3 +149,4 @@ typedef GenericSchemaValidator<SchemaDocument, BaseReaderHandler<UTF8<char>, voi
 RAPIDJSON_NAMESPACE_END
 
 #endif // RAPIDJSON_RAPIDJSONFWD_H_
+

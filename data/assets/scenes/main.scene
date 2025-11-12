@@ -1,7 +1,7 @@
 {
     "entities": [
         {
-            "name": "New GameObject",
+            "name": "Other Character",
             "isActive": true,
             "components": {
                 "sprite": {
@@ -23,13 +23,17 @@
                 },
                 "transform": {
                     "position": {
-                        "x": 1356.6251220703126,
-                        "y": 523.6795654296875
+                        "x": 201.89999389648438,
+                        "y": -400.0
                     },
                     "rotation": 0.0,
                     "scale": {
-                        "x": 160.00010681152345,
-                        "y": 160.00010681152345
+                        "x": 100.0,
+                        "y": 100.0
+                    },
+                    "pivot": {
+                        "x": 0.0,
+                        "y": 0.0
                     }
                 },
                 "health": {
@@ -38,23 +42,28 @@
                 },
                 "collision": {
                     "offset": {
-                        "x": 0.008558748289942742,
-                        "y": 0.02567622996866703
+                        "x": 0.0,
+                        "y": 0.0
                     },
                     "size": {
-                        "x": 0.7774724960327148,
-                        "y": 0.9486474990844727
+                        "x": 1.0,
+                        "y": 1.0
                     }
+                },
+                "rigidbody": {
+                    "useGravity": true,
+                    "mass": 1.0,
+                    "linearDamping": 1.0
                 }
             }
         },
         {
-            "name": "New GameObject (1)",
+            "name": "Player",
             "isActive": true,
             "components": {
                 "sprite": {
                     "texture": {
-                        "name": "tex_goomba_sprites.png",
+                        "name": "tex_walk.png",
                         "spriteIndex": 0
                     },
                     "shader": {
@@ -71,18 +80,22 @@
                 },
                 "transform": {
                     "position": {
-                        "x": 467.2524108886719,
-                        "y": 582.2111206054688
+                        "x": 892.9450073242188,
+                        "y": 411.4779968261719
                     },
-                    "rotation": 0.0,
+                    "rotation": 1.1754956119909055e-38,
                     "scale": {
-                        "x": 148.79989624023438,
-                        "y": 148.79989624023438
+                        "x": 99.99999237060547,
+                        "y": 99.99999237060547
+                    },
+                    "pivot": {
+                        "x": 0.0,
+                        "y": 0.0
                     }
                 },
                 "player": {
-                    "movementSpeed": 900.0,
-                    "prefab": "bullet.prefab"
+                    "movementSpeed": 500.0,
+                    "bulletPrefab": "bullet.prefab"
                 },
                 "health": {
                     "health": 100.0,
@@ -90,16 +103,117 @@
                 },
                 "collision": {
                     "offset": {
-                        "x": -0.03708789125084877,
-                        "y": 0.048499539494514468
+                        "x": 0.0,
+                        "y": 0.0
                     },
                     "size": {
-                        "x": 0.8231191635131836,
-                        "y": 0.9030008316040039
+                        "x": 1.0,
+                        "y": 1.0
                     }
                 },
-                "movement": {
-                    "gravity": true
+                "animation": {
+                    "startingAnimation": ""
+                },
+                "rigidbody": {
+                    "useGravity": false,
+                    "mass": 1.0,
+                    "linearDamping": 1.0
+                }
+            }
+        },
+        {
+            "name": "Ground",
+            "isActive": true,
+            "components": {
+                "sprite": {
+                    "texture": {
+                        "name": "tex_missing.png",
+                        "spriteIndex": 0
+                    },
+                    "shader": {
+                        "pixel": "pixelShader.hlsl",
+                        "vertex": "vertexShader.hlsl"
+                    },
+                    "mesh": "square",
+                    "color": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "transform": {
+                    "position": {
+                        "x": 0.0,
+                        "y": 200.0
+                    },
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 4000.0,
+                        "y": 100.0
+                    },
+                    "pivot": {
+                        "x": -0.5,
+                        "y": -0.5
+                    }
+                },
+                "collision": {
+                    "offset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "size": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            }
+        },
+        {
+            "name": "Ground 2",
+            "isActive": true,
+            "components": {
+                "sprite": {
+                    "texture": {
+                        "name": "tex_missing.png",
+                        "spriteIndex": 0
+                    },
+                    "shader": {
+                        "pixel": "pixelShader.hlsl",
+                        "vertex": "vertexShader.hlsl"
+                    },
+                    "mesh": "square",
+                    "color": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "transform": {
+                    "position": {
+                        "x": 772.9171142578125,
+                        "y": 732.0892944335938
+                    },
+                    "rotation": 335.1360778808594,
+                    "scale": {
+                        "x": 516.8297729492188,
+                        "y": 99.99999237060547
+                    },
+                    "pivot": {
+                        "x": -0.5,
+                        "y": -0.5
+                    }
+                },
+                "collision": {
+                    "offset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "size": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
                 }
             }
         }

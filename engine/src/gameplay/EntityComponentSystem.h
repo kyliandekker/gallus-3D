@@ -73,6 +73,11 @@ namespace gallus
 			/// <summary>
 			/// Gets entity info from a specific entity.
 			/// </summary>
+			const Entity* GetEntityByName(const std::string& a_sName) const;
+
+			/// <summary>
+			/// Gets entity info from a specific entity.
+			/// </summary>
 			/// <param name="a_ID">The entity.</param>
 			Entity* GetEntity(const EntityID& a_ID);
 
@@ -156,11 +161,19 @@ namespace gallus
 
 			mutable std::recursive_mutex m_EntityMutex;
 
+			/// <summary>
+			/// Retrieves the event that gets called after any entity has been updated.
+			/// </summary>
+			/// <returns>A const reference to the event.</returns>
 			const SimpleEvent<>& OnEntitiesUpdated() const
 			{
 				return m_eOnEntitiesUpdated;
 			}
 
+			/// <summary>
+			/// Retrieves the event that gets called after any entity component has been updated.
+			/// </summary>
+			/// <returns>A const reference to the event.</returns>
 			const SimpleEvent<>& OnEntityComponentsUpdated() const
 			{
 				return m_eOnEntityComponentsUpdated;

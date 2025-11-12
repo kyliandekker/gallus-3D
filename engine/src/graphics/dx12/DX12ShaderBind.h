@@ -1,7 +1,7 @@
 #pragma once
 
 #include "graphics/dx12/DX12PCH.h"
-#include "core/EngineResource.h"
+#include "resources/EngineResource.h"
 
 #include <wrl.h>
 #include <memory>
@@ -16,7 +16,7 @@ namespace gallus
 			class PixelShader;
 			class VertexShader;
 
-			class DX12ShaderBind : public core::EngineResource
+			class DX12ShaderBind : public resources::EngineResource
 			{
 			public:
 				/// <summary>
@@ -88,6 +88,11 @@ namespace gallus
 				const VertexShader* m_pVertexShader = nullptr;
 
 				Microsoft::WRL::ComPtr<ID3D12PipelineState> m_pPipelineState = nullptr;
+
+				BEGIN_EXPOSED_FIELDS(DX12ShaderBind)
+					EXPOSE_FIELD(DX12ShaderBind, m_pPixelShader, "Pixel Shader", FieldOptions{ .type = EditorWidgetType::AssetPickerPtr, .assetType = resources::AssetType::PixelShader })
+					EXPOSE_FIELD(DX12ShaderBind, m_pVertexShader, "Vertex Shader", FieldOptions{ .type = EditorWidgetType::AssetPickerPtr, .assetType = resources::AssetType::VertexShader })
+				END_EXPOSED_FIELDS(DX12ShaderBind)
 			};
 		}
 	}

@@ -2,6 +2,8 @@
 
 #include "gameplay/systems/components/Component.h"
 
+#include "editor/EditorExpose.h"
+
 #include <map>
 
 #include "gameplay/Prefab.h"
@@ -16,19 +18,20 @@ namespace gallus
 		class PlayerComponent : public Component
 		{
 		public:
+#ifdef _EDITOR
 			/// <summary>
 			/// Serialized the component to a json document.
 			/// </summary>
 			/// <param name="a_Document">The json document that the data will be put into.</param>
 			/// <param name="a_Allocator">The allocator used by the json document.</param>
 			void Serialize(rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator) const override;
+#endif
 
 			/// <summary>
-			/// Deserializes data from a json document and loads it into the component.
+			/// Creates an instance based on source data.
 			/// </summary>
-			/// <param name="a_Document">The json document that contains the data.</param>
-			/// <param name="a_Allocator">The allocator used by the json document.</param>
-			void Deserialize(const rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator) override;
+			/// <param name="a_SrcData">The source data.</param>
+			void Deserialize(const resources::SrcData& a_SrcData) override;
 
 			/// <summary>
 			/// Retrieves the movement speed.
@@ -49,23 +52,36 @@ namespace gallus
 			}
 
 			/// <summary>
+			/// Retrieves the bullet prefab.
+			/// </summary>
+			/// <returns>Prefab containing the bullet.</returns>
+			gameplay::Prefab* GetBulletPrefab()
+			{
+				return m_pBulletPrefab;
+			}
+
+			/// <summary>
+			/// Retrieves the bullet prefab.
+			/// </summary>
+			/// <returns>Prefab containing the bullet.</returns>
+			const gameplay::Prefab* GetBulletPrefab() const
+			{
+				return m_pBulletPrefab;
+			}
+		protected:
+			/// <summary>
 			/// Updates the components.
 			/// </summary>
 			/// <param name="a_fDeltaTime">Delta time.</param>
-			void UpdateRealtime(float a_fDeltaTime);
+			void UpdateRealtime(float a_fDeltaTime, UpdateTime a_UpdateTime);
 
-			gameplay::Prefab& GetPrefab()
-			{
-				return m_pPrefab;
-			}
-
-			const gameplay::Prefab& GetPrefab() const
-			{
-				return m_pPrefab;
-			}
-		protected:
 			float m_fSpeed = 200;
-			gameplay::Prefab m_pPrefab;
+			gameplay::Prefab* m_pBulletPrefab = nullptr;
+
+			BEGIN_EXPOSED_FIELDS(PlayerComponent)
+				EXPOSE_FIELD(PlayerComponent, m_fSpeed, "Speed", FieldOptions{ .type = EditorWidgetType::DragFloat })
+				EXPOSE_FIELD(PlayerComponent, m_pBulletPrefab, "Bullet Prefab", FieldOptions{ .type = EditorWidgetType::AssetPickerPtr, .assetType = resources::AssetType::Prefab })
+			END_EXPOSED_FIELDS(PlayerComponent)
 		};
 	}
 }

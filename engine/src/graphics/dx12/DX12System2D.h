@@ -67,14 +67,22 @@ namespace gallus
 			class FPSCounter
 			{
 			public:
-
 				/// <summary>
 				/// Retrieves the current frames per second (FPS).
 				/// </summary>
 				/// <returns>The FPS as a double.</returns>
 				double GetFPS() const;
+
+				/// <summary>
+				/// Retrieves the delta time.
+				/// </summary>
+				/// <returns>The delta time as a double.</returns>
 				double GetDeltaTime() const;
 
+				/// <summary>
+				/// Retrieves the total time passed.
+				/// </summary>
+				/// <returns>The total time passed as a double.</returns>
 				double GetTotalTime() const;
 			private:
 				friend class DX12System2D;
@@ -89,11 +97,11 @@ namespace gallus
 				/// </summary>
 				void Initialize();
 
-				double m_FPS = 0.0; /// The FPS as a double.
-				uint64_t m_FrameCounter = 0; /// The number of frames.
-				double m_DeltaTime = 0.0; /// The number of seconds since the last frame.
-				double m_ElapsedSeconds = 0.0; /// The number of seconds since the last frame.
-				double m_TotalTime = 0.0; /// The number of seconds since the last frame.
+				double m_fFPS = 0.0; /// The FPS as a double.
+				uint64_t m_iFrameCounter = 0; /// The number of frames.
+				double m_fDeltaTime = 0.0; /// The number of seconds since the last frame.
+				double m_fElapsedSeconds = 0.0; /// The number of seconds since the last frame.
+				double m_fTotalTime = 0.0; /// The number of seconds since the last frame.
 				std::chrono::high_resolution_clock m_Clock; /// The clock.
 				std::chrono::steady_clock::time_point m_T0 = m_Clock.now(); /// The clock from first frame.
 			};
@@ -141,6 +149,11 @@ namespace gallus
 					return m_Camera;
 				}
 			protected:
+				/// <summary>
+				/// Indicates whether the thread should sleep or wake to run work.
+				/// Must be implemented by subclasses.
+				/// </summary>
+				/// <returns>True if thread should sleep (wait), false to proceed immediately.</returns>
 				bool Sleep() const override
 				{
 					return true;
@@ -317,11 +330,37 @@ namespace gallus
 				/// </summary>
 				void UpdateRenderTargetViews();
 
+				/// <summary>
+				/// Retrieves the fps info.
+				/// </summary>
+				/// <returns>Reference to the fps class containing all fps info.</returns>
 				const FPSCounter& GetFPS() const
 				{
 					return m_FpsCounter;
 				}
 
+				/// <summary>
+				/// Retrieves the camera.
+				/// </summary>
+				/// <returns>Reference to the camera.</returns>
+				Camera& GetActiveCamera()
+				{
+					return *m_pActiveCamera;
+				}
+
+				/// <summary>
+				/// Sets the active camera.
+				/// </summary>
+				/// <param name="a_Camera">The new active camera.</param>
+				void SetActiveCamera(Camera& a_Camera)
+				{
+					m_pActiveCamera = &a_Camera;
+				}
+
+				/// <summary>
+				/// Retrieves the render texture.
+				/// </summary>
+				/// <returns>Pointer to the render texture.</returns>
 				std::shared_ptr<Texture> GetRenderTexture();
 
 				SimpleEvent<DX12System2D&> m_eOnInitialize;
@@ -346,8 +385,16 @@ namespace gallus
 				/// <returns>True if creation was successful, otherwise false.</returns>
 				bool CreateRootSignature();
 
+				/// <summary>
+				/// Creates the render texture.
+				/// </summary>
+				/// <param name="a_vSize">The size of the render texture.</param>
 				void CreateRenderTexture(const glm::ivec2& a_vSize);
 
+				/// <summary>
+				/// Method called after successful resize.
+				/// </summary>
+				/// <param name="a_vSize">The size of the window.</param>
 				void AfterResize(const glm::ivec2& a_vSize);
 
 				Microsoft::WRL::ComPtr<IDXGIAdapter4> m_pAdapter = nullptr;
@@ -385,6 +432,7 @@ namespace gallus
 				FPSCounter m_FpsCounter;
 
 				Camera m_Camera;
+				Camera* m_pActiveCamera = &m_Camera;
 			};
 		}
 	}

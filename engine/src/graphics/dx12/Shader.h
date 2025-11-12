@@ -1,7 +1,7 @@
 #pragma once
 
 #include "graphics/dx12/DX12PCH.h"
-#include "core/EngineResource.h"
+#include "resources/EngineResource.h"
 
 #include <string>
 #include <wrl.h>
@@ -24,7 +24,7 @@ namespace gallus
 			/// Represents a GPU shader program resource in the engine.
 			/// Wraps vertex and pixel shaders, compiling them and creating a pipeline state object (PSO).
 			/// </summary>
-			class Shader : public core::EngineResource
+			class Shader : public resources::EngineResource
 			{
 			public:
 				/// <summary>
@@ -42,7 +42,7 @@ namespace gallus
 				static Microsoft::WRL::ComPtr<ID3DBlob> CompileShader(const fs::path& a_sFilePath, const std::string& a_sEntryPoint, const std::string& a_sTarget);
 
 				/// <summary>
-				/// Loads and compiles shaders using logical resource names, resolving them through the engine’s resource system.
+				/// Loads and compiles shaders using logical resource names, resolving them through the engineï¿½s resource system.
 				/// </summary>
 				/// <param name="a_sShader">The resource name of the shader.</param>
 				/// <returns>True if loading and compilation were successful, false otherwise.</returns>
@@ -55,6 +55,10 @@ namespace gallus
 				/// <returns>True if loading and compilation were successful, false otherwise.</returns>
 				virtual bool LoadByPath(const fs::path& a_ShaderPath);
 
+				/// <summary>
+				/// Retrieves the shader blob data.
+				/// </summary>
+				/// <returns>Pointer to the shader blob data.</returns>
 				const Microsoft::WRL::ComPtr<ID3DBlob> GetShaderBlob() const
 				{
 					return m_pShaderBlob;
@@ -83,7 +87,7 @@ namespace gallus
 				PixelShader() = default;
 
 				/// <summary>
-				/// Loads and compiles shaders using logical resource names, resolving them through the engine’s resource system.
+				/// Loads and compiles shaders using logical resource names, resolving them through the engineï¿½s resource system.
 				/// </summary>
 				/// <param name="a_sShader">The resource name of the pixel shader.</param>
 				/// <returns>True if loading and compilation were successful, false otherwise.</returns>
@@ -97,6 +101,9 @@ namespace gallus
 				bool LoadByPath(const fs::path& a_PixelShaderPath) override;
 			protected:
 				friend class ResourceAtlas;
+
+				BEGIN_EXPOSED_FIELDS(PixelShader)
+				END_EXPOSED_FIELDS(PixelShader)
 			};
 
 			class VertexShader : public Shader
@@ -108,7 +115,7 @@ namespace gallus
 				VertexShader() = default;
 
 				/// <summary>
-				/// Loads and compiles shaders using logical resource names, resolving them through the engine’s resource system.
+				/// Loads and compiles shaders using logical resource names, resolving them through the engineï¿½s resource system.
 				/// </summary>
 				/// <param name="a_sShader">The resource name of the vertex shader.</param>
 				/// <returns>True if loading and compilation were successful, false otherwise.</returns>
@@ -122,6 +129,9 @@ namespace gallus
 				bool LoadByPath(const fs::path& a_VertexShaderPath) override;
 			protected:
 				friend class ResourceAtlas;
+
+				BEGIN_EXPOSED_FIELDS(VertexShader)
+				END_EXPOSED_FIELDS(VertexShader)
 			};
 		}
 	}

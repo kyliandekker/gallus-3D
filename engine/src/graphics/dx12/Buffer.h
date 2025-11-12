@@ -43,6 +43,9 @@ namespace gallus
 				/// <param name="a_iNumElements">The number of elements in the buffer.</param>
 				/// <param name="a_iElementSize">The size in bytes of a single element.</param>
 				virtual void CreateViews(size_t a_iNumElements, size_t a_iElementSize);
+
+				BEGIN_EXPOSED_FIELDS(Buffer)
+				END_EXPOSED_FIELDS(Buffer)
 			};
 		}
 	}

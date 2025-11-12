@@ -1,0 +1,405 @@
+{
+    "frameCount": 280,
+    "loop": false,
+    "keyFrames": {
+        "0": {
+            "components": {
+                "sprite": {
+                    "spriteIndex": 0,
+                    "texture": "tex_explosion.png"
+                }
+            }
+        },
+        "1": {
+            "components": {
+                "sprite": {
+                    "spriteIndex": 1,
+                    "texture": "tex_explosion.png"
+                }
+            }
+        },
+        "2": {
+            "components": {
+                "sprite": {
+                    "spriteIndex": 2,
+                    "texture": "tex_explosion.png"
+                }
+            }
+        },
+        "3": {
+            "components": {
+                "sprite": {
+                    "spriteIndex": 3,
+                    "texture": "tex_explosion.png"
+                }
+            }
+        },
+        "4": {
+            "components": {
+                "sprite": {
+                    "spriteIndex": 4,
+                    "texture": "tex_explosion.png"
+                }
+            }
+        },
+        "5": {
+            "components": {
+                "sprite": {
+                    "spriteIndex": 5,
+                    "texture": "tex_explosion.png"
+                }
+            }
+        },
+        "6": {
+            "components": {
+                "sprite": {
+                    "spriteIndex": 6,
+                    "texture": "tex_explosion.png"
+                }
+            }
+        },
+        "7": {
+            "components": {
+                "sprite": {
+                    "spriteIndex": 7,
+                    "texture": "tex_explosion.png"
+                }
+            }
+        },
+        "8": {
+            "components": {
+                "sprite": {
+                    "spriteIndex": 8,
+                    "texture": "tex_explosion.png"
+                }
+            }
+        },
+        "9": {
+            "components": {
+                "sprite": {
+                    "spriteIndex": 9,
+                    "texture": "tex_explosion.png"
+                }
+            }
+        },
+        "10": {
+            "components": {
+                "sprite": {
+                    "spriteIndex": 10,
+                    "texture": "tex_explosion.png"
+                }
+            }
+        },
+        "11": {
+            "components": {
+                "sprite": {
+                    "spriteIndex": 11,
+                    "texture": "tex_explosion.png"
+                }
+            }
+        },
+        "12": {
+            "components": {
+                "sprite": {
+                    "spriteIndex": 12,
+                    "texture": "tex_explosion.png"
+                }
+            }
+        },
+        "13": {
+            "components": {
+                "sprite": {
+                    "spriteIndex": 13,
+                    "texture": "tex_explosion.png"
+                }
+            }
+        },
+        "14": {
+            "components": {
+                "sprite": {
+                    "spriteIndex": 14,
+                    "texture": "tex_explosion.png"
+                }
+            }
+        },
+        "15": {
+            "components": {
+                "sprite": {
+                    "spriteIndex": 15,
+                    "texture": "tex_explosion.png"
+                }
+            }
+        },
+        "16": {
+            "components": {
+                "sprite": {
+                    "spriteIndex": 16,
+                    "texture": "tex_explosion.png"
+                }
+            }
+        },
+        "17": {
+            "components": {
+                "sprite": {
+                    "spriteIndex": 17,
+                    "texture": "tex_explosion.png"
+                }
+            }
+        },
+        "18": {
+            "components": {
+                "sprite": {
+                    "spriteIndex": 18,
+                    "texture": "tex_explosion.png"
+                }
+            }
+        },
+        "19": {
+            "components": {
+                "sprite": {
+                    "spriteIndex": 19,
+                    "texture": "tex_explosion.png"
+                }
+            }
+        },
+        "20": {
+            "components": {
+                "sprite": {
+                    "spriteIndex": 20,
+                    "texture": "tex_explosion.png"
+                }
+            }
+        },
+        "21": {
+            "components": {
+                "sprite": {
+                    "spriteIndex": 21,
+                    "texture": "tex_explosion.png"
+                }
+            }
+        },
+        "22": {
+            "components": {
+                "sprite": {
+                    "spriteIndex": 22,
+                    "texture": "tex_explosion.png"
+                }
+            }
+        },
+        "23": {
+            "components": {
+                "sprite": {
+                    "spriteIndex": 23,
+                    "texture": "tex_explosion.png"
+                }
+            }
+        },
+        "24": {
+            "components": {
+                "sprite": {
+                    "spriteIndex": 24,
+                    "texture": "tex_explosion.png"
+                }
+            }
+        },
+        "25": {
+            "components": {
+                "sprite": {
+                    "spriteIndex": 25,
+                    "texture": "tex_explosion.png"
+                }
+            }
+        },
+        "26": {
+            "components": {
+                "sprite": {
+                    "spriteIndex": 26,
+                    "texture": "tex_explosion.png"
+                }
+            }
+        },
+        "27": {
+            "components": {
+                "sprite": {
+                    "spriteIndex": 27,
+                    "texture": "tex_explosion.png"
+                }
+            }
+        },
+        "28": {
+            "components": {
+                "sprite": {
+                    "spriteIndex": 28,
+                    "texture": "tex_explosion.png"
+                }
+            }
+        },
+        "29": {
+            "components": {
+                "sprite": {
+                    "spriteIndex": 29,
+                    "texture": "tex_explosion.png"
+                }
+            }
+        },
+        "30": {
+            "components": {
+                "sprite": {
+                    "spriteIndex": 30,
+                    "texture": "tex_explosion.png"
+                }
+            }
+        },
+        "31": {
+            "components": {
+                "sprite": {
+                    "spriteIndex": 31,
+                    "texture": "tex_explosion.png"
+                }
+            }
+        },
+        "32": {
+            "components": {
+                "sprite": {
+                    "spriteIndex": 32,
+                    "texture": "tex_explosion.png"
+                }
+            }
+        },
+        "33": {
+            "components": {
+                "sprite": {
+                    "spriteIndex": 33,
+                    "texture": "tex_explosion.png"
+                }
+            }
+        },
+        "34": {
+            "components": {
+                "sprite": {
+                    "spriteIndex": 34,
+                    "texture": "tex_explosion.png"
+                }
+            }
+        },
+        "35": {
+            "components": {
+                "sprite": {
+                    "spriteIndex": 35,
+                    "texture": "tex_explosion.png"
+                }
+            }
+        },
+        "36": {
+            "components": {
+                "sprite": {
+                    "spriteIndex": 36,
+                    "texture": "tex_explosion.png"
+                }
+            }
+        },
+        "37": {
+            "components": {
+                "sprite": {
+                    "spriteIndex": 37,
+                    "texture": "tex_explosion.png"
+                }
+            }
+        },
+        "38": {
+            "components": {
+                "sprite": {
+                    "spriteIndex": 38,
+                    "texture": "tex_explosion.png"
+                }
+            }
+        },
+        "39": {
+            "components": {
+                "sprite": {
+                    "spriteIndex": 39,
+                    "texture": "tex_explosion.png"
+                }
+            }
+        },
+        "40": {
+            "components": {
+                "sprite": {
+                    "spriteIndex": 40,
+                    "texture": "tex_explosion.png"
+                }
+            }
+        },
+        "41": {
+            "components": {
+                "sprite": {
+                    "spriteIndex": 41,
+                    "texture": "tex_explosion.png"
+                }
+            }
+        },
+        "42": {
+            "components": {
+                "sprite": {
+                    "spriteIndex": 42,
+                    "texture": "tex_explosion.png"
+                }
+            }
+        },
+        "43": {
+            "components": {
+                "sprite": {
+                    "spriteIndex": 43,
+                    "texture": "tex_explosion.png"
+                }
+            }
+        },
+        "44": {
+            "components": {
+                "sprite": {
+                    "spriteIndex": 44,
+                    "texture": "tex_explosion.png"
+                }
+            }
+        },
+        "45": {
+            "components": {
+                "sprite": {
+                    "spriteIndex": 45,
+                    "texture": "tex_explosion.png"
+                }
+            }
+        },
+        "46": {
+            "components": {
+                "sprite": {
+                    "spriteIndex": 46,
+                    "texture": "tex_explosion.png"
+                }
+            }
+        },
+        "47": {
+            "components": {
+                "sprite": {
+                    "spriteIndex": 47,
+                    "texture": "tex_explosion.png"
+                }
+            }
+        },
+        "48": {
+            "components": {
+                "sprite": {
+                    "spriteIndex": 48,
+                    "texture": "tex_explosion.png"
+                }
+            }
+        },
+        "280": {
+            "components": {
+                "event": {
+                    "event": 1
+                }
+            }
+        }
+    }
+}

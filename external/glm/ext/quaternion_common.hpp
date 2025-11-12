@@ -1,4 +1,4 @@
-/// @ref ext_quaternion_common
+﻿/// @ref ext_quaternion_common
 /// @file glm/ext/quaternion_common.hpp
 ///
 /// @defgroup ext_quaternion_common GLM_EXT_quaternion_common
@@ -76,20 +76,20 @@ namespace glm
 	template<typename T, qualifier Q>
 	GLM_FUNC_DECL qua<T, Q> slerp(qua<T, Q> const& x, qua<T, Q> const& y, T a);
 
-    /// Spherical linear interpolation of two quaternions with multiple spins over rotation axis.
-    /// The interpolation always take the short path when the spin count is positive and long path
-    /// when count is negative. Rotation is performed at constant speed.
-    ///
-    /// @param x A quaternion
-    /// @param y A quaternion
-    /// @param a Interpolation factor. The interpolation is defined beyond the range [0, 1].
-    /// @param k Additional spin count. If Value is negative interpolation will be on "long" path.
-    ///
-    /// @tparam T A floating-point scalar type
-    /// @tparam S An integer scalar type
-    /// @tparam Q A value from qualifier enum
-    template<typename T, typename S, qualifier Q>
-    GLM_FUNC_DECL qua<T, Q> slerp(qua<T, Q> const& x, qua<T, Q> const& y, T a, S k);
+	/// Spherical linear interpolation of two quaternions with multiple spins over rotation axis.
+	/// The interpolation always take the short path when the spin count is positive and long path
+	/// when count is negative. Rotation is performed at constant speed.
+	///
+	/// @param x A quaternion
+	/// @param y A quaternion
+	/// @param a Interpolation factor. The interpolation is defined beyond the range [0, 1].
+	/// @param k Additional spin count. If Value is negative interpolation will be on "long" path.
+	///
+	/// @tparam T A floating-point scalar type
+	/// @tparam S An integer scalar type
+	/// @tparam Q A value from qualifier enum
+	template<typename T, typename S, qualifier Q>
+	GLM_FUNC_DECL qua<T, Q> slerp(qua<T, Q> const& x, qua<T, Q> const& y, T a, S k);
 
 	/// Returns the q conjugate.
 	///
@@ -133,3 +133,4 @@ namespace glm
 } //namespace glm
 
 #include "quaternion_common.inl"
+

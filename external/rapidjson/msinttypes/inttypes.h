@@ -1,4 +1,4 @@
-// ISO C9x  compliant inttypes.h for Microsoft Visual Studio
+﻿// ISO C9x  compliant inttypes.h for Microsoft Visual Studio
 // Based on ISO/IEC 9899:TC2 Committee draft (May 6, 2005) WG14/N1124 
 // 
 //  Copyright (c) 2006-2013 Alexander Chemeris
@@ -295,9 +295,9 @@ imaxdiv_t __cdecl imaxdiv(intmax_t numer, intmax_t denom)
    result.rem = numer % denom;
 
    if (numer < 0 && result.rem > 0) {
-      // did division wrong; must fix up
-      ++result.quot;
-      result.rem -= denom;
+	  // did division wrong; must fix up
+	  ++result.quot;
+	  result.rem -= denom;
    }
 
    return result;
@@ -314,3 +314,4 @@ imaxdiv_t __cdecl imaxdiv(intmax_t numer, intmax_t denom)
 #endif // _MSC_VER >= 1800
 
 #endif // _MSC_INTTYPES_H_ ]
+

@@ -23,25 +23,26 @@ namespace gallus
 			COLLISION_TYPE_EXIT
 		};
 
-		struct CollisionInfo
+		struct CollisionEntry
 		{
 			EntityID a;
 			EntityID b;
 
-			bool operator==(const CollisionInfo& other) const noexcept
+			bool operator==(const CollisionEntry& other) const noexcept
 			{
 				return a == other.a && b == other.b;
 			}
 
-			bool operator<(const CollisionInfo& other) const noexcept
+			bool operator<(const CollisionEntry& other) const noexcept
 			{
 				return std::tie(a, b) < std::tie(other.a, other.b);
 			}
 		};
 
-		struct CollisionEvent : public CollisionInfo
+		struct CollisionInfo : public CollisionEntry
 		{
 			CollisionType m_CollisionType;
+			DirectX::XMFLOAT2 m_vNormal;
 		};
 
 		//---------------------------------------------------------------------
@@ -68,14 +69,18 @@ namespace gallus
 			/// <returns>A string containing the name of the system.</returns>
 			std::string GetSystemName() const override;
 
-			std::vector<CollisionEvent> GetCollisions(EntityID a_EntityID) const;
+			std::vector<CollisionInfo> GetCollisions(EntityID a_EntityID) const;
 
-			void Collide(ColliderComponent& a_ColliderA, ColliderComponent& a_ColliderB);
+			void Collide(ColliderComponent& a_ColliderA, ColliderComponent& a_ColliderB, const DirectX::XMFLOAT2& a_vNormal);
 
-			void UpdateComponentsRealtime(float a_fDeltatime) override;
+			/// <summary>
+			/// Updates the system's components.
+			/// </summary>
+			// <param name="a_fDeltaTime">The time it took since last frame.</param>
+			void UpdateComponentsRealtime(float a_fDeltatime, UpdateTime a_UpdateTime) override;
 		private:
-			std::map<CollisionInfo, CollisionType> m_mCollision;
-			std::set<CollisionInfo> m_mNewCollision;
+			std::map<CollisionEntry, CollisionInfo> m_mCollisions;
+			std::set<CollisionInfo> m_mNewCollisions;
 		};
 	}
 }

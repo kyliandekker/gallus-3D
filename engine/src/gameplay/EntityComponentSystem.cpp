@@ -76,35 +76,17 @@ namespace gallus
 			{
 				for (auto& sys : m_aSystems)
 				{
-					if (sys->GetUpdateTime() == UpdateTime::UPDATE_TIME_FRAME)
-					{
-						if (a_bUpdateRealtime && previousUpdateRealtimeState != a_bUpdateRealtime)
-						{
-							sys->InitComponentsRealtime();
-						}
-						sys->UpdateComponentsRealtime(a_fDeltaTime);
-					}
+					sys->InitComponentsRealtime();
 				}
-				for (auto& sys : m_aSystems)
+				for (uint32_t i = 1; i <= static_cast<uint32_t>(UpdateTime::UPDATE_TIME_FRAME_END); i <<= 1)
 				{
-					if (sys->GetUpdateTime() == UpdateTime::UPDATE_TIME_END_FRAME)
+					UpdateTime updateTime = (UpdateTime)i;
+					for (auto& sys : m_aSystems)
 					{
-						if (a_bUpdateRealtime && previousUpdateRealtimeState != a_bUpdateRealtime)
+						if (sys->GetUpdateTimes().HasFlag(updateTime))
 						{
-							sys->InitComponentsRealtime();
+							sys->UpdateComponentsRealtime(a_fDeltaTime, updateTime);
 						}
-						sys->UpdateComponentsRealtime(a_fDeltaTime);
-					}
-				}
-				for (auto& sys : m_aSystems)
-				{
-					if (sys->GetUpdateTime() == UpdateTime::UPDATE_TIME_POST_FRAME)
-					{
-						if (a_bUpdateRealtime && previousUpdateRealtimeState != a_bUpdateRealtime)
-						{
-							sys->InitComponentsRealtime();
-						}
-						sys->UpdateComponentsRealtime(a_fDeltaTime);
 					}
 				}
 			}
@@ -157,6 +139,22 @@ namespace gallus
 				{
 					return e.GetEntityID() == a_ID;
 				});
+
+			if (it != m_aEntities.end())
+			{
+				return &(*it);
+			}
+
+			return nullptr;
+		}
+
+		const Entity* EntityComponentSystem::GetEntityByName(const std::string& a_sName) const
+		{
+			auto it = std::find_if(m_aEntities.begin(), m_aEntities.end(),
+				[&](const Entity& e)
+			{
+				return e.GetName() == a_sName;
+			});
 
 			if (it != m_aEntities.end())
 			{

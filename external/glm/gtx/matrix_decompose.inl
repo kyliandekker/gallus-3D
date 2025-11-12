@@ -1,4 +1,4 @@
-/// @ref gtx_matrix_decompose
+﻿/// @ref gtx_matrix_decompose
 
 #include "../gtc/constants.hpp"
 #include "../gtc/epsilon.hpp"
@@ -173,9 +173,9 @@ namespace detail
 			k = Next[j];
 
 #           ifdef GLM_FORCE_QUAT_DATA_XYZW
-                int off = 0;
+				int off = 0;
 #           else
-                int off = 1;
+				int off = 1;
 #           endif
 
 			root = sqrt(Row[i][i] - Row[j][j] - Row[k][k] + static_cast<T>(1.0));
@@ -190,3 +190,4 @@ namespace detail
 		return true;
 	}
 }//namespace glm
+

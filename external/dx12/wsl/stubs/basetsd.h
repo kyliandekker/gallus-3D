@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation.
+﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
 #pragma once
@@ -86,23 +86,23 @@ typedef const wchar_t *LPCWSTR, *PCWSTR;
 
 typedef struct tagRECTL
 {
-    LONG left;
-    LONG top;
-    LONG right;
-    LONG bottom;
+	LONG left;
+	LONG top;
+	LONG right;
+	LONG bottom;
 } RECTL;
 
 typedef struct tagPOINT
 {
-    int x;
-    int y;
+	int x;
+	int y;
 } POINT;
 
 typedef struct _GUID {
-    uint32_t Data1;
-    uint16_t Data2;
-    uint16_t Data3;
-    uint8_t  Data4[ 8 ];
+	uint32_t Data1;
+	uint16_t Data2;
+	uint16_t Data3;
+	uint8_t  Data4[ 8 ];
 } GUID;
 
 #ifdef INITGUID
@@ -125,21 +125,21 @@ typedef GUID CLSID;
 
 __inline int InlineIsEqualGUID(REFGUID rguid1, REFGUID rguid2)
 {
-    return (
-        ((uint32_t *)&rguid1)[0] == ((uint32_t *)&rguid2)[0] &&
-        ((uint32_t *)&rguid1)[1] == ((uint32_t *)&rguid2)[1] &&
-        ((uint32_t *)&rguid1)[2] == ((uint32_t *)&rguid2)[2] &&
-        ((uint32_t *)&rguid1)[3] == ((uint32_t *)&rguid2)[3]);
+	return (
+		((uint32_t *)&rguid1)[0] == ((uint32_t *)&rguid2)[0] &&
+		((uint32_t *)&rguid1)[1] == ((uint32_t *)&rguid2)[1] &&
+		((uint32_t *)&rguid1)[2] == ((uint32_t *)&rguid2)[2] &&
+		((uint32_t *)&rguid1)[3] == ((uint32_t *)&rguid2)[3]);
 }
 
 inline bool operator==(REFGUID guidOne, REFGUID guidOther)
 {
-    return !!InlineIsEqualGUID(guidOne, guidOther);
+	return !!InlineIsEqualGUID(guidOne, guidOther);
 }
 
 inline bool operator!=(REFGUID guidOne, REFGUID guidOther)
 {
-    return !(guidOne == guidOther);
+	return !(guidOne == guidOther);
 }
 
 #else
@@ -231,11 +231,11 @@ inline bool operator!=(REFGUID guidOne, REFGUID guidOther)
 interface IUnknown;
 extern "C++"
 {
-    template<typename T> void** IID_PPV_ARGS_Helper(T** pp)
-    {
-        (void)static_cast<IUnknown*>(*pp);
-        return reinterpret_cast<void**>(pp);
-    }
+	template<typename T> void** IID_PPV_ARGS_Helper(T** pp)
+	{
+		(void)static_cast<IUnknown*>(*pp);
+		return reinterpret_cast<void**>(pp);
+	}
 }
 #define IID_PPV_ARGS(ppType) __uuidof (**(ppType)), IID_PPV_ARGS_Helper (ppType)
 #else
@@ -287,22 +287,22 @@ typedef LONG HRESULT;
 
 typedef struct _LUID
 {
-    ULONG LowPart;
-    LONG HighPart;
+	ULONG LowPart;
+	LONG HighPart;
 } LUID;
 
 typedef struct _RECT
 {
-    int left;
-    int top;
-    int right;
-    int bottom;
+	int left;
+	int top;
+	int right;
+	int bottom;
 } RECT;
 
 typedef union _LARGE_INTEGER {
   struct {
-    uint32_t LowPart;
-    uint32_t HighPart;
+	uint32_t LowPart;
+	uint32_t HighPart;
   } u;
   int64_t QuadPart;
 } LARGE_INTEGER;
@@ -310,8 +310,8 @@ typedef LARGE_INTEGER *PLARGE_INTEGER;
 
 typedef union _ULARGE_INTEGER {
   struct {
-    uint32_t LowPart;
-    uint32_t HighPart;
+	uint32_t LowPart;
+	uint32_t HighPart;
   } u;
   uint64_t QuadPart;
 } ULARGE_INTEGER;
@@ -319,14 +319,14 @@ typedef ULARGE_INTEGER *PULARGE_INTEGER;
 
 #define DECLARE_HANDLE(name)                                                   \
   struct name##__ {                                                            \
-    int unused;                                                                \
+	int unused;                                                                \
   };                                                                           \
   typedef struct name##__ *name
 
 typedef struct _SECURITY_ATTRIBUTES {
-    DWORD nLength;
-    LPVOID lpSecurityDescriptor;
-    WINBOOL bInheritHandle;
+	DWORD nLength;
+	LPVOID lpSecurityDescriptor;
+	WINBOOL bInheritHandle;
 } SECURITY_ATTRIBUTES;
 
 struct STATSTG;
@@ -337,39 +337,39 @@ struct STATSTG;
 // used to define flags. Use DEFINE_ENUM_FLAG_OPERATORS(YOUR_TYPE) to enable these
 // operators on YOUR_TYPE.
 extern "C++" {
-    template <size_t S>
-    struct _ENUM_FLAG_INTEGER_FOR_SIZE;
+	template <size_t S>
+	struct _ENUM_FLAG_INTEGER_FOR_SIZE;
 
-    template <>
-    struct _ENUM_FLAG_INTEGER_FOR_SIZE<1>
-    {
-        typedef int8_t type;
-    };
+	template <>
+	struct _ENUM_FLAG_INTEGER_FOR_SIZE<1>
+	{
+		typedef int8_t type;
+	};
 
-    template <>
-    struct _ENUM_FLAG_INTEGER_FOR_SIZE<2>
-    {
-        typedef int16_t type;
-    };
+	template <>
+	struct _ENUM_FLAG_INTEGER_FOR_SIZE<2>
+	{
+		typedef int16_t type;
+	};
 
-    template <>
-    struct _ENUM_FLAG_INTEGER_FOR_SIZE<4>
-    {
-        typedef int32_t type;
-    };
+	template <>
+	struct _ENUM_FLAG_INTEGER_FOR_SIZE<4>
+	{
+		typedef int32_t type;
+	};
 
-    template <>
-    struct _ENUM_FLAG_INTEGER_FOR_SIZE<8>
-    {
-        typedef int64_t type;
-    };
+	template <>
+	struct _ENUM_FLAG_INTEGER_FOR_SIZE<8>
+	{
+		typedef int64_t type;
+	};
 
-    // used as an approximation of std::underlying_type<T>
-    template <class T>
-    struct _ENUM_FLAG_SIZED_INTEGER
-    {
-        typedef typename _ENUM_FLAG_INTEGER_FOR_SIZE<sizeof(T)>::type type;
-    };
+	// used as an approximation of std::underlying_type<T>
+	template <class T>
+	struct _ENUM_FLAG_SIZED_INTEGER
+	{
+		typedef typename _ENUM_FLAG_INTEGER_FOR_SIZE<sizeof(T)>::type type;
+	};
 
 }
 #define DEFINE_ENUM_FLAG_OPERATORS(ENUMTYPE) \
@@ -396,11 +396,12 @@ inline ENUMTYPE &operator ^= (ENUMTYPE &a, ENUMTYPE b) { return (ENUMTYPE &)(((_
 // this variable.  Error 527 has to do with unreachable code.
 // -restore restores checking to the -save state
 #define UNREFERENCED_PARAMETER(P) \
-    /*lint -save -e527 -e530 */ \
-    { \
-        (P) = (P); \
-    } \
-    /*lint -restore */
+	/*lint -save -e527 -e530 */ \
+	{ \
+		(P) = (P); \
+	} \
+	/*lint -restore */
 #else
 #define UNREFERENCED_PARAMETER(P) (P)
 #endif
+

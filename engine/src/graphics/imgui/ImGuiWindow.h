@@ -26,8 +26,7 @@ namespace gallus
 
 		namespace imgui
 		{
-			class BaseWindow;
-			class BaseModal;
+			class ImGuiWindowsConfig;
 
 			//---------------------------------------------------------------------
 			// ImGuiWindow
@@ -167,28 +166,30 @@ namespace gallus
 				}
 
 				/// <summary>
-				/// Adds a window to the render queue.
+				/// Retrieves the accent (main) color of the application.
 				/// </summary>
-				/// <param name="a_pWindow">The window to add.</param>
-				void AddWindow(BaseWindow* a_pWindow)
+				/// <returns>A vector containing the color.</returns>
+				const ImVec4& GetAccentColorDarker() const
 				{
-					m_aWindows.push_back(a_pWindow);
+					return m_vAccentColorDarker;
 				}
 
-				/// <summary>
-				/// Adds a modal to the render queue.
-				/// </summary>
-				/// <param name="a_pModal">The modal to add.</param>
-				void AddModal(BaseModal* a_pModal)
+				ImGuiWindowsConfig& GetWindowsConfig()
 				{
-					m_aModals.push_back(a_pModal);
+					return *m_pWindowsConfig;
 				}
 
-				/// <summary>
-				/// Retrieves a modal by index.
-				/// </summary>
-				/// <returns>Pointer to the modal, nullptr if not present.</returns>
-				BaseModal* GetModal(int a_iIndex);
+				template <typename T>
+				T& GetWindowsConfig()
+				{
+					return *reinterpret_cast<T*>(m_pWindowsConfig);
+				}
+
+				template <typename T>
+				void SetWindowsConfig()
+				{
+					m_pWindowsConfig = new T(*this);
+				}
 			private:
 				size_t m_iSrvIndex = 0;
 
@@ -209,9 +210,9 @@ namespace gallus
 				ImVec2 m_vHeaderSize;
 
 				ImVec4 m_vAccentColor;
+				ImVec4 m_vAccentColorDarker;
 
-				std::vector<BaseWindow*> m_aWindows;
-				std::vector<BaseModal*> m_aModals;
+				ImGuiWindowsConfig* m_pWindowsConfig = nullptr;
 
 				friend dx12::DX12System2D;
 			};

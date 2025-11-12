@@ -51,7 +51,7 @@ namespace gallus
 				BaseWindow::Update();
 			}
 
-			void ResourcesWindow::RenderResource(core::EngineResource* a_pResource)
+			void ResourcesWindow::RenderResource(resources::EngineResource* a_pResource)
 			{
 				if (!a_pResource)
 				{
@@ -79,7 +79,6 @@ namespace gallus
 				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, m_Window.GetWindowPadding());
 				ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, m_Window.GetWindowPadding());
 				ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, m_Window.GetWindowPadding());
-				ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, m_Window.GetWindowPadding());
 
 				ImGui::SetCursorPosY(ImGui::GetCursorPos().y + m_Window.GetFramePadding().y);
 				ImGui::SetCursorPosX(ImGui::GetCursorPos().x + m_Window.GetFramePadding().x);
@@ -206,7 +205,6 @@ namespace gallus
 				}
 				ImGui::EndChild();
 
-				ImGui::PopStyleVar();
 				ImGui::PopStyleVar();
 				ImGui::PopStyleVar();
 				ImGui::PopStyleVar();

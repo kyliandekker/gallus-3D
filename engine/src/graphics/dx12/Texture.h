@@ -203,20 +203,40 @@ namespace gallus
 				/// <returns>True if drawable, false otherwise.</returns>
 				bool CanBeDrawn() const;
 
+				/// <summary>
+				/// Adds a sprite rect to the rects array.
+				/// </summary>
+				/// <param name="a_Rect">The sprite rect that should be added.</param>
 				void AddSpriteRect(const SpriteRect& a_Rect);
 
+				/// <summary>
+				/// Loads texture metadata.
+				/// </summary>
 				void LoadMetaData();
 
+				/// <summary>
+				/// Retrieves the texture type.
+				/// </summary>
+				/// <returns>The texture type.</returns>
 				TextureType GetTextureType() const
 				{
 					return m_TextureType;
 				}
 
+				/// <summary>
+				/// Retrieves the amount of sprite rects.
+				/// </summary>
+				/// <returns>The size of sprite rects that are registered.</returns>
 				size_t GetSpriteRectsSize() const
 				{
 					return m_aSpriteRects.size();
 				}
 
+				/// <summary>
+				/// Retrieves a sprite rect by index.
+				/// </summary>
+				/// <param name="a_iIndex">The sprite index.</param>
+				/// <returns>The sprite rect that was requested.</returns>
 				SpriteRect GetSpriteRect(int8_t a_iIndex)
 				{
 					if (a_iIndex >= m_aSpriteRects.size())
@@ -227,9 +247,15 @@ namespace gallus
 					return m_aSpriteRects[a_iIndex];
 				}
 
+				/// <summary>
+				/// Retrieves a sprite rect's UV.
+				/// </summary>
+				/// <param name="a_iIndex">The sprite index.</param>
+				/// <returns>The sprite uvs calculated from the rect.</returns>
+				SpriteUV GetSpriteUV(int a_iIndex) const;
+
 				~Texture();
 			private:
-				SpriteUV GetSpriteUV(int a_iIndex) const;
 
 				friend DX12System2D;
 
@@ -238,8 +264,6 @@ namespace gallus
 				D3D12_SHADER_RESOURCE_VIEW_DESC m_SrvDesc;
 
 				TextureType m_TextureType = TextureType::Texture2D;
-
-				SpriteUV m_CurrentUV;
 				std::vector<SpriteRect> m_aSpriteRects;
 			};
 		}

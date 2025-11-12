@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation.
+﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
 #pragma once
@@ -9,17 +9,17 @@
 
 constexpr inline bool ConstexprIsEqualGUID(REFGUID a, REFGUID b)
 {
-    return a.Data1 == b.Data1 &&
-        a.Data2 == b.Data2 &&
-        a.Data3 == b.Data3 &&
-        a.Data4[0] == b.Data4[0] &&
-        a.Data4[1] == b.Data4[1] &&
-        a.Data4[2] == b.Data4[2] &&
-        a.Data4[3] == b.Data4[3] &&
-        a.Data4[4] == b.Data4[4] &&
-        a.Data4[5] == b.Data4[5] &&
-        a.Data4[6] == b.Data4[6] &&
-        a.Data4[7] == b.Data4[7];
+	return a.Data1 == b.Data1 &&
+		a.Data2 == b.Data2 &&
+		a.Data3 == b.Data3 &&
+		a.Data4[0] == b.Data4[0] &&
+		a.Data4[1] == b.Data4[1] &&
+		a.Data4[2] == b.Data4[2] &&
+		a.Data4[3] == b.Data4[3] &&
+		a.Data4[4] == b.Data4[4] &&
+		a.Data4[5] == b.Data4[5] &&
+		a.Data4[6] == b.Data4[6] &&
+		a.Data4[7] == b.Data4[7];
 }
 
 template <typename T> GUID uuidof() = delete;
@@ -52,7 +52,7 @@ static_assert(ConstexprIsEqualGUID(uuidof<InterfaceName>(), __uuidof(InterfaceNa
 #define WINADAPTER_IID(InterfaceName, l, w1, w2, b1, b2, b3, b4, b5, b6, b7, b8) \
 template <> constexpr GUID uuidof<InterfaceName>() \
 { \
-    return { l, w1, w2, { b1, b2,  b3,  b4,  b5,  b6,  b7,  b8 } }; \
+	return { l, w1, w2, { b1, b2,  b3,  b4,  b5,  b6,  b7,  b8 } }; \
 } \
 __CRT_UUID_DECL(InterfaceName, l, w1, w2, b1, b2, b3, b4, b5, b6, b7, b8) \
 _WINADAPTER_ASSERT_IID(InterfaceName)
@@ -60,7 +60,7 @@ _WINADAPTER_ASSERT_IID(InterfaceName)
 #define WINADAPTER_IID(InterfaceName, l, w1, w2, b1, b2, b3, b4, b5, b6, b7, b8) \
 template <> constexpr GUID uuidof<InterfaceName>() \
 { \
-    return { l, w1, w2, { b1, b2,  b3,  b4,  b5,  b6,  b7,  b8 } }; \
+	return { l, w1, w2, { b1, b2,  b3,  b4,  b5,  b6,  b7,  b8 } }; \
 } \
 _WINADAPTER_ASSERT_IID(InterfaceName)
 #endif /* defined(_WIN32) && defined(__MINGW32__) */
@@ -195,3 +195,4 @@ WINADAPTER_IID(IDXCoreAdapterList, 0x526c7776, 0x40e9, 0x459b, 0xb7, 0x11, 0xf3,
 WINADAPTER_IID(IDXCoreAdapter, 0xf0db4c7f, 0xfe5a, 0x42a2, 0xbd, 0x62, 0xf2, 0xa6, 0xcf, 0x6f, 0xc8, 0x3e);
 WINADAPTER_IID(IDXCoreAdapter1, 0xa0783366, 0xcfa3, 0x43be, 0x9d, 0x79, 0x55, 0xb2, 0xda, 0x97, 0xc6, 0x3c);
 #endif
+

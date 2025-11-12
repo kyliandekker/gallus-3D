@@ -42,8 +42,14 @@ namespace gallus
 		{
 			friend class AssetDatabase;
 		public:
+			/// <summary>
+			/// Constructs a file resource.
+			/// </summary>
 			FileResource();
 
+			/// <summary>
+			/// Deconstructs a file resource.
+			/// </summary>
 			~FileResource();
 
 			/// <summary>
@@ -52,6 +58,10 @@ namespace gallus
 			/// <returns>The path of the resource.</returns>
 			const fs::path& GetPath() const;
 
+			/// <summary>
+			/// Sets the path of the file resource.
+			/// </summary>
+			/// <param name="a_Path">The new path.</param>
 			void SetPath(const fs::path& a_Path)
 			{
 				m_Path = a_Path;
@@ -93,34 +103,67 @@ namespace gallus
 			/// <returns>True if the successful, otherwise false.</returns>
 			bool GetFileData(core::Data& a_Data) const;
 
+			/// <summary>
+			/// Retrieves the children of this file resource.
+			/// </summary>
+			/// <returns>A vector containing all child file resources.</returns>
 			std::vector<FileResource>& GetChildren()
 			{
 				return m_aChildren;
 			}
 
+			/// <summary>
+			/// Retrieves the meta data (if it exists).
+			/// </summary>
+			/// <returns>A pointer to the meta data.</returns>
 			MetaData* GetMetaData()
 			{
 				return m_MetaData;
 			}
 
+			/// <summary>
+			/// Retrieves the meta data (if it exists).
+			/// </summary>
+			/// <returns>A pointer to the meta data.</returns>
 			const MetaData* GetMetaData() const
 			{
 				return m_MetaData;
 			}
 
+			/// <summary>
+			/// Retrieves the meta data and casts it (if it exists).
+			/// </summary>
+			/// <returns>A pointer to the meta data.</returns>
 			template<typename T>
 			T* GetMetaData()
 			{
 				return static_cast<T*>(m_MetaData);
 			}
 
+			/// <summary>
+			/// Retrieves the meta data and casts it (if it exists).
+			/// </summary>
+			/// <returns>A pointer to the meta data.</returns>
 			template<typename T>
 			const T* GetMetaData() const
 			{
 				return static_cast<T*>(m_MetaData);
 			}
 
+			/// <summary>
+			/// Tries and finds a file by name.
+			/// </summary>
+			/// <param name="a_sName">The name to search for.</param>
+			/// <param name="a_pFileResource">The file resource if found.</param>
+			/// <returns>True if successful, false otherwise.</returns>
 			bool Find(const std::string& a_sName, FileResource*& a_pFileResource);
+
+			/// <summary>
+			/// Tries and finds a file by path.
+			/// </summary>
+			/// <param name="a_Path">The path to search for.</param>
+			/// <param name="a_pFileResource">The file resource if found.</param>
+			/// <returns>True if successful, false otherwise.</returns>
 			bool Find(const fs::path& a_Path, FileResource*& a_pFileResource);
 		protected:
 			std::vector<FileResource> m_aChildren; /// Child resources (only used for folders).

@@ -19,8 +19,9 @@ namespace gallus
 		//---------------------------------------------------------------------
 		// LoggerMessage
 		//---------------------------------------------------------------------
-		LoggerMessage::LoggerMessage(const std::string& a_sRawMessage, const std::string& a_sCategory, const fs::path& a_Location, uint32_t a_iLine, LogSeverity a_Severity, const std::chrono::system_clock::time_point& a_Time) :
+		LoggerMessage::LoggerMessage(const std::string& a_sRawMessage, const std::string& a_sIcon, const std::string& a_sCategory, const fs::path& a_Location, uint32_t a_iLine, LogSeverity a_Severity, const std::chrono::system_clock::time_point& a_Time) :
 			m_sRawMessage(a_sRawMessage),
+			m_sIcon(a_sIcon),
 			m_sCategory(a_sCategory),
 			m_Location(a_Location),
 			m_iLine(a_iLine),
@@ -32,6 +33,12 @@ namespace gallus
 		const std::string& LoggerMessage::GetRawMessage() const
 		{
 			return m_sRawMessage;
+		}
+
+		//---------------------------------------------------------------------
+		const std::string& LoggerMessage::GetIcon() const
+		{
+			return m_sIcon;
 		}
 
 		//---------------------------------------------------------------------
@@ -224,33 +231,33 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		void Logger::Log(LogSeverity a_Severity, const char* a_sCategory, const char* a_sMessage, const char* a_sFile, int a_iLine)
+		void Logger::Log(const std::string& a_sIcon, LogSeverity a_Severity, const std::string& a_sCategory, const std::string& a_sMessage, const std::string& a_sFile, int a_iLine)
 		{
-			PrintMessage(a_Severity, a_sCategory, a_sMessage, a_sFile, a_iLine);
+			PrintMessage(a_sIcon, a_Severity, a_sCategory, a_sMessage, a_sFile, a_iLine);
 		}
 
 		//---------------------------------------------------------------------
-		void Logger::LogF(LogSeverity a_Severity, const char* a_sCategory, const char* a_sMessage, const char* a_sFile, int a_iLine, ...)
+		void Logger::LogF(const std::string& a_sIcon, LogSeverity a_Severity, const std::string& a_sCategory, const std::string& a_sMessage, const std::string& a_sFile, int a_iLine, ...)
 		{
 			va_list va_format_list;
 			va_start(va_format_list, a_iLine);
 
-			const size_t buffersize = vsnprintf(NULL, 0, a_sMessage, va_format_list) + 1;
+			const size_t buffersize = vsnprintf(NULL, 0, a_sMessage.c_str(), va_format_list) + 1;
 			char* formatted_message = (char*) malloc(buffersize);
-			vsnprintf(formatted_message, buffersize, a_sMessage, va_format_list);
+			vsnprintf(formatted_message, buffersize, a_sMessage.c_str(), va_format_list);
 
-			PrintMessage(a_Severity, a_sCategory, formatted_message, a_sFile, a_iLine);
+			PrintMessage(a_sIcon, a_Severity, a_sCategory, formatted_message, a_sFile, a_iLine);
 
 			free(formatted_message);
 		}
 
 		//---------------------------------------------------------------------
-		void Logger::PrintMessage(LogSeverity a_Severity, const char* a_sCategory, const char* a_sMessage, const char* a_sFile, int a_iLine)
+		void Logger::PrintMessage(const std::string& a_sIcon, LogSeverity a_Severity, const std::string& a_sCategory, const std::string& a_sMessage, const std::string& a_sFile, int a_iLine)
 		{
 			const std::string fileName = a_sFile;
 
 			std::scoped_lock lock(m_MessagesMutex);
-			m_Messages.push(LoggerMessage(a_sMessage, a_sCategory, fileName, a_iLine, a_Severity, std::chrono::system_clock::now()));
+			m_Messages.push(LoggerMessage(a_sMessage, a_sIcon, a_sCategory, fileName, a_iLine, a_Severity, std::chrono::system_clock::now()));
 
 			WakeUp();
 		}

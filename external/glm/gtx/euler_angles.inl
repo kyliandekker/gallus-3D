@@ -1,4 +1,4 @@
-/// @ref gtx_euler_angles
+﻿/// @ref gtx_euler_angles
 
 #include "compatibility.hpp" // glm::atan2
 
@@ -181,40 +181,40 @@ namespace glm
 		return eulerAngleZ(angleZ) * eulerAngleY(angleY);
 	}
 
-    template<typename T>
-    GLM_FUNC_QUALIFIER mat<4, 4, T, defaultp> eulerAngleXYZ
-    (
-     T const& t1,
-     T const& t2,
-     T const& t3
-     )
-    {
-        T c1 = glm::cos(-t1);
-        T c2 = glm::cos(-t2);
-        T c3 = glm::cos(-t3);
-        T s1 = glm::sin(-t1);
-        T s2 = glm::sin(-t2);
-        T s3 = glm::sin(-t3);
+	template<typename T>
+	GLM_FUNC_QUALIFIER mat<4, 4, T, defaultp> eulerAngleXYZ
+	(
+	 T const& t1,
+	 T const& t2,
+	 T const& t3
+	 )
+	{
+		T c1 = glm::cos(-t1);
+		T c2 = glm::cos(-t2);
+		T c3 = glm::cos(-t3);
+		T s1 = glm::sin(-t1);
+		T s2 = glm::sin(-t2);
+		T s3 = glm::sin(-t3);
 
-        mat<4, 4, T, defaultp> Result;
-        Result[0][0] = c2 * c3;
-        Result[0][1] =-c1 * s3 + s1 * s2 * c3;
-        Result[0][2] = s1 * s3 + c1 * s2 * c3;
-        Result[0][3] = static_cast<T>(0);
-        Result[1][0] = c2 * s3;
-        Result[1][1] = c1 * c3 + s1 * s2 * s3;
-        Result[1][2] =-s1 * c3 + c1 * s2 * s3;
-        Result[1][3] = static_cast<T>(0);
-        Result[2][0] =-s2;
-        Result[2][1] = s1 * c2;
-        Result[2][2] = c1 * c2;
-        Result[2][3] = static_cast<T>(0);
-        Result[3][0] = static_cast<T>(0);
-        Result[3][1] = static_cast<T>(0);
-        Result[3][2] = static_cast<T>(0);
-        Result[3][3] = static_cast<T>(1);
-        return Result;
-    }
+		mat<4, 4, T, defaultp> Result;
+		Result[0][0] = c2 * c3;
+		Result[0][1] =-c1 * s3 + s1 * s2 * c3;
+		Result[0][2] = s1 * s3 + c1 * s2 * c3;
+		Result[0][3] = static_cast<T>(0);
+		Result[1][0] = c2 * s3;
+		Result[1][1] = c1 * c3 + s1 * s2 * s3;
+		Result[1][2] =-s1 * c3 + c1 * s2 * s3;
+		Result[1][3] = static_cast<T>(0);
+		Result[2][0] =-s2;
+		Result[2][1] = s1 * c2;
+		Result[2][2] = c1 * c2;
+		Result[2][3] = static_cast<T>(0);
+		Result[3][0] = static_cast<T>(0);
+		Result[3][1] = static_cast<T>(0);
+		Result[3][2] = static_cast<T>(0);
+		Result[3][3] = static_cast<T>(1);
+		return Result;
+	}
 
 	template<typename T>
 	GLM_FUNC_QUALIFIER mat<4, 4, T, defaultp> eulerAngleYXZ
@@ -693,22 +693,22 @@ namespace glm
 		return yawPitchRoll(angles.z, angles.x, angles.y);
 	}
 
-    template<typename T>
-    GLM_FUNC_DECL void extractEulerAngleXYZ(mat<4, 4, T, defaultp> const& M,
-                                            T & t1,
-                                            T & t2,
-                                            T & t3)
-    {
-        T T1 = glm::atan2<T, defaultp>(M[2][1], M[2][2]);
-        T C2 = glm::sqrt(M[0][0]*M[0][0] + M[1][0]*M[1][0]);
-        T T2 = glm::atan2<T, defaultp>(-M[2][0], C2);
-        T S1 = glm::sin(T1);
-        T C1 = glm::cos(T1);
-        T T3 = glm::atan2<T, defaultp>(S1*M[0][2] - C1*M[0][1], C1*M[1][1] - S1*M[1][2  ]);
-        t1 = -T1;
-        t2 = -T2;
-        t3 = -T3;
-    }
+	template<typename T>
+	GLM_FUNC_DECL void extractEulerAngleXYZ(mat<4, 4, T, defaultp> const& M,
+											T & t1,
+											T & t2,
+											T & t3)
+	{
+		T T1 = glm::atan2<T, defaultp>(M[2][1], M[2][2]);
+		T C2 = glm::sqrt(M[0][0]*M[0][0] + M[1][0]*M[1][0]);
+		T T2 = glm::atan2<T, defaultp>(-M[2][0], C2);
+		T S1 = glm::sin(T1);
+		T C1 = glm::cos(T1);
+		T T3 = glm::atan2<T, defaultp>(S1*M[0][2] - C1*M[0][1], C1*M[1][1] - S1*M[1][2  ]);
+		t1 = -T1;
+		t2 = -T2;
+		t3 = -T3;
+	}
 
 	template <typename T>
 	GLM_FUNC_QUALIFIER void extractEulerAngleYXZ(mat<4, 4, T, defaultp> const & M,
@@ -897,3 +897,4 @@ namespace glm
 		t3 = T3;
 	}
 }//namespace glm
+

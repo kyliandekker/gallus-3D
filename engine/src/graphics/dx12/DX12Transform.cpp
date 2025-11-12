@@ -11,10 +11,11 @@ namespace gallus
 			//---------------------------------------------------------------------
 			// DX12Transform
 			//---------------------------------------------------------------------
-			DX12Transform::DX12Transform()
-				: m_vPosition{ 0.0f, 0.0f },
-				m_fRotationDegrees(0),
-				m_vScale{ 1.0f, 1.0f }
+			DX12Transform::DX12Transform() : 
+				m_vPosition{ 0.0f, 0.0f },
+				m_vScale{ 1.0f, 1.0f },
+				m_vPivot{ -0.5f, -0.5f },
+				m_fRotationDegrees(0)
 			{}
 
 			//---------------------------------------------------------------------
@@ -39,6 +40,22 @@ namespace gallus
 			void DX12Transform::SetPivot(const DirectX::XMFLOAT2& a_vPivot)
 			{
 				m_vPivot = a_vPivot;
+				if (m_vPivot.x < -0.5f)
+				{
+					m_vPivot.x = -0.5f;
+				}
+				else if (m_vPivot.x > 0.5f)
+				{
+					m_vPivot.x = 0.5f;
+				}
+				if (m_vPivot.y < -0.5f)
+				{
+					m_vPivot.y = -0.5f;
+				}
+				else if (m_vPivot.y > 0.5f)
+				{
+					m_vPivot.y = 0.5f;
+				}
 			}
 
 			//---------------------------------------------------------------------

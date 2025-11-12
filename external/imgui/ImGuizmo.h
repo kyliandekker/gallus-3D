@@ -1,4 +1,4 @@
-// https://github.com/CedricGuillemet/ImGuizmo
+﻿// https://github.com/CedricGuillemet/ImGuizmo
 // v1.91.3 WIP
 //
 // The MIT License(MIT)
@@ -48,19 +48,19 @@ void EditTransform(const Camera& camera, matrix_t& matrix)
    static ImGuizmo::OPERATION mCurrentGizmoOperation(ImGuizmo::ROTATE);
    static ImGuizmo::MODE mCurrentGizmoMode(ImGuizmo::WORLD);
    if (ImGui::IsKeyPressed(90))
-      mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
+	  mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
    if (ImGui::IsKeyPressed(69))
-      mCurrentGizmoOperation = ImGuizmo::ROTATE;
+	  mCurrentGizmoOperation = ImGuizmo::ROTATE;
    if (ImGui::IsKeyPressed(82)) // r Key
-      mCurrentGizmoOperation = ImGuizmo::SCALE;
+	  mCurrentGizmoOperation = ImGuizmo::SCALE;
    if (ImGui::RadioButton("Translate", mCurrentGizmoOperation == ImGuizmo::TRANSLATE))
-      mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
+	  mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
    ImGui::SameLine();
    if (ImGui::RadioButton("Rotate", mCurrentGizmoOperation == ImGuizmo::ROTATE))
-      mCurrentGizmoOperation = ImGuizmo::ROTATE;
+	  mCurrentGizmoOperation = ImGuizmo::ROTATE;
    ImGui::SameLine();
    if (ImGui::RadioButton("Scale", mCurrentGizmoOperation == ImGuizmo::SCALE))
-      mCurrentGizmoOperation = ImGuizmo::SCALE;
+	  mCurrentGizmoOperation = ImGuizmo::SCALE;
    float matrixTranslation[3], matrixRotation[3], matrixScale[3];
    ImGuizmo::DecomposeMatrixToComponents(matrix.m16, matrixTranslation, matrixRotation, matrixScale);
    ImGui::InputFloat3("Tr", matrixTranslation, 3);
@@ -70,32 +70,32 @@ void EditTransform(const Camera& camera, matrix_t& matrix)
 
    if (mCurrentGizmoOperation != ImGuizmo::SCALE)
    {
-      if (ImGui::RadioButton("Local", mCurrentGizmoMode == ImGuizmo::LOCAL))
-         mCurrentGizmoMode = ImGuizmo::LOCAL;
-      ImGui::SameLine();
-      if (ImGui::RadioButton("World", mCurrentGizmoMode == ImGuizmo::WORLD))
-         mCurrentGizmoMode = ImGuizmo::WORLD;
+	  if (ImGui::RadioButton("Local", mCurrentGizmoMode == ImGuizmo::LOCAL))
+		 mCurrentGizmoMode = ImGuizmo::LOCAL;
+	  ImGui::SameLine();
+	  if (ImGui::RadioButton("World", mCurrentGizmoMode == ImGuizmo::WORLD))
+		 mCurrentGizmoMode = ImGuizmo::WORLD;
    }
    static bool useSnap(false);
    if (ImGui::IsKeyPressed(83))
-      useSnap = !useSnap;
+	  useSnap = !useSnap;
    ImGui::Checkbox("", &useSnap);
    ImGui::SameLine();
    vec_t snap;
    switch (mCurrentGizmoOperation)
    {
    case ImGuizmo::TRANSLATE:
-      snap = config.mSnapTranslation;
-      ImGui::InputFloat3("Snap", &snap.x);
-      break;
+	  snap = config.mSnapTranslation;
+	  ImGui::InputFloat3("Snap", &snap.x);
+	  break;
    case ImGuizmo::ROTATE:
-      snap = config.mSnapRotation;
-      ImGui::InputFloat("Angle Snap", &snap.x);
-      break;
+	  snap = config.mSnapRotation;
+	  ImGui::InputFloat("Angle Snap", &snap.x);
+	  break;
    case ImGuizmo::SCALE:
-      snap = config.mSnapScale;
-      ImGui::InputFloat("Scale Snap", &snap.x);
-      break;
+	  snap = config.mSnapScale;
+	  ImGui::InputFloat("Scale Snap", &snap.x);
+	  break;
    }
    ImGuiIO& io = ImGui::GetIO();
    ImGuizmo::SetRect(0, 0, io.DisplaySize.x, io.DisplaySize.y);
@@ -179,38 +179,38 @@ namespace IMGUIZMO_NAMESPACE
    // translation is applied in world space
    enum OPERATION
    {
-      TRANSLATE_X      = (1u << 0),
-      TRANSLATE_Y      = (1u << 1),
-      TRANSLATE_Z      = (1u << 2),
-      ROTATE_X         = (1u << 3),
-      ROTATE_Y         = (1u << 4),
-      ROTATE_Z         = (1u << 5),
-      ROTATE_SCREEN    = (1u << 6),
-      SCALE_X          = (1u << 7),
-      SCALE_Y          = (1u << 8),
-      SCALE_Z          = (1u << 9),
-      BOUNDS           = (1u << 10),
-      SCALE_XU         = (1u << 11),
-      SCALE_YU         = (1u << 12),
-      SCALE_ZU         = (1u << 13),
-      SPRITE_BOUNDS         = (1u << 14),
+	  TRANSLATE_X      = (1u << 0),
+	  TRANSLATE_Y      = (1u << 1),
+	  TRANSLATE_Z      = (1u << 2),
+	  ROTATE_X         = (1u << 3),
+	  ROTATE_Y         = (1u << 4),
+	  ROTATE_Z         = (1u << 5),
+	  ROTATE_SCREEN    = (1u << 6),
+	  SCALE_X          = (1u << 7),
+	  SCALE_Y          = (1u << 8),
+	  SCALE_Z          = (1u << 9),
+	  BOUNDS           = (1u << 10),
+	  SCALE_XU         = (1u << 11),
+	  SCALE_YU         = (1u << 12),
+	  SCALE_ZU         = (1u << 13),
+	  SPRITE_BOUNDS         = (1u << 14),
 
-      TRANSLATE = TRANSLATE_X | TRANSLATE_Y | TRANSLATE_Z,
-      ROTATE = ROTATE_X | ROTATE_Y | ROTATE_Z | ROTATE_SCREEN,
-      SCALE = SCALE_X | SCALE_Y | SCALE_Z,
-      SCALEU = SCALE_XU | SCALE_YU | SCALE_ZU, // universal
-      UNIVERSAL = TRANSLATE | ROTATE | SCALEU
+	  TRANSLATE = TRANSLATE_X | TRANSLATE_Y | TRANSLATE_Z,
+	  ROTATE = ROTATE_X | ROTATE_Y | ROTATE_Z | ROTATE_SCREEN,
+	  SCALE = SCALE_X | SCALE_Y | SCALE_Z,
+	  SCALEU = SCALE_XU | SCALE_YU | SCALE_ZU, // universal
+	  UNIVERSAL = TRANSLATE | ROTATE | SCALEU
    };
 
    inline OPERATION operator|(OPERATION lhs, OPERATION rhs)
    {
-     return static_cast<OPERATION>(static_cast<int>(lhs) | static_cast<int>(rhs));
+	 return static_cast<OPERATION>(static_cast<int>(lhs) | static_cast<int>(rhs));
    }
 
    enum MODE
    {
-      LOCAL,
-      WORLD
+	  LOCAL,
+	  WORLD
    };
 
    IMGUI_API bool Manipulate(const float* view, const float* projection, OPERATION operation, MODE mode, float* matrix, float* deltaMatrix = NULL, const float* snap = NULL, const float* localBounds = NULL, const float* boundsSnap = NULL);
@@ -269,39 +269,40 @@ namespace IMGUIZMO_NAMESPACE
 
    enum COLOR
    {
-      DIRECTION_X,      // directionColor[0]
-      DIRECTION_Y,      // directionColor[1]
-      DIRECTION_Z,      // directionColor[2]
-      PLANE_X,          // planeColor[0]
-      PLANE_Y,          // planeColor[1]
-      PLANE_Z,          // planeColor[2]
-      SELECTION,        // selectionColor
-      INACTIVE,         // inactiveColor
-      TRANSLATION_LINE, // translationLineColor
-      SCALE_LINE,
-      ROTATION_USING_BORDER,
-      ROTATION_USING_FILL,
-      HATCHED_AXIS_LINES,
-      TEXT,
-      TEXT_SHADOW,
-      COUNT
+	  DIRECTION_X,      // directionColor[0]
+	  DIRECTION_Y,      // directionColor[1]
+	  DIRECTION_Z,      // directionColor[2]
+	  PLANE_X,          // planeColor[0]
+	  PLANE_Y,          // planeColor[1]
+	  PLANE_Z,          // planeColor[2]
+	  SELECTION,        // selectionColor
+	  INACTIVE,         // inactiveColor
+	  TRANSLATION_LINE, // translationLineColor
+	  SCALE_LINE,
+	  ROTATION_USING_BORDER,
+	  ROTATION_USING_FILL,
+	  HATCHED_AXIS_LINES,
+	  TEXT,
+	  TEXT_SHADOW,
+	  COUNT
    };
 
    struct Style
    {
-      IMGUI_API Style();
+	  IMGUI_API Style();
 
-      float TranslationLineThickness;   // Thickness of lines for translation gizmo
-      float TranslationLineArrowSize;   // Size of arrow at the end of lines for translation gizmo
-      float RotationLineThickness;      // Thickness of lines for rotation gizmo
-      float RotationOuterLineThickness; // Thickness of line surrounding the rotation gizmo
-      float ScaleLineThickness;         // Thickness of lines for scale gizmo
-      float ScaleLineCircleSize;        // Size of circle at the end of lines for scale gizmo
-      float HatchedAxisLineThickness;   // Thickness of hatched axis lines
-      float CenterCircleSize;           // Size of circle at the center of the translate/scale gizmo
+	  float TranslationLineThickness;   // Thickness of lines for translation gizmo
+	  float TranslationLineArrowSize;   // Size of arrow at the end of lines for translation gizmo
+	  float RotationLineThickness;      // Thickness of lines for rotation gizmo
+	  float RotationOuterLineThickness; // Thickness of line surrounding the rotation gizmo
+	  float ScaleLineThickness;         // Thickness of lines for scale gizmo
+	  float ScaleLineCircleSize;        // Size of circle at the end of lines for scale gizmo
+	  float HatchedAxisLineThickness;   // Thickness of hatched axis lines
+	  float CenterCircleSize;           // Size of circle at the center of the translate/scale gizmo
 
-      ImVec4 Colors[COLOR::COUNT];
+	  ImVec4 Colors[COLOR::COUNT];
    };
 
    IMGUI_API Style& GetStyle();
 }
+

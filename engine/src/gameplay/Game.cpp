@@ -1,15 +1,16 @@
-﻿#include "Game.h"
+﻿// header
+#include "Game.h"
 
 // core includes
 #include "core/Engine.h"
-
-// logger includes
-#include "logger/Logger.h"
 
 // graphics includes
 #include "graphics/dx12/CommandQueue.h"
 #include "graphics/dx12/CommandList.h"
 #include "graphics/dx12/Texture.h"
+
+// logger includes
+#include "logger/Logger.h"
 
 // gameplay includes
 #include "gameplay/systems/SpriteSystem.h"
@@ -17,8 +18,9 @@
 #include "gameplay/systems/PlayerSystem.h"
 #include "gameplay/systems/HealthSystem.h"
 #include "gameplay/systems/CollisionSystem.h"
-#include "gameplay/systems/MovementSystem.h"
 #include "gameplay/systems/ProjectileSystem.h"
+#include "gameplay/systems/AnimationSystem.h"
+#include "gameplay/systems/RigidbodySystem.h"
 
 namespace gallus
 {
@@ -31,15 +33,16 @@ namespace gallus
 		{
 			LOG(LOGSEVERITY_INFO, LOG_CATEGORY_GAME, "Initializing game.");
 
-			m_Scene.SetResourceCategory(core::EngineResourceCategory::Game);
+			m_Scene.SetResourceCategory(resources::EngineResourceCategory::Game);
 
 			core::ENGINE->GetECS().CreateSystem<SpriteSystem>().Initialize();
 			core::ENGINE->GetECS().CreateSystem<TransformSystem>().Initialize();
 			core::ENGINE->GetECS().CreateSystem<PlayerSystem>().Initialize();
 			core::ENGINE->GetECS().CreateSystem<HealthSystem>().Initialize();
 			core::ENGINE->GetECS().CreateSystem<CollisionSystem>().Initialize();
-			core::ENGINE->GetECS().CreateSystem<MovementSystem>().Initialize();
 			core::ENGINE->GetECS().CreateSystem<ProjectileSystem>().Initialize();
+			core::ENGINE->GetECS().CreateSystem<AnimationSystem>().Initialize();
+			core::ENGINE->GetECS().CreateSystem<RigidbodySystem>().Initialize();
 
 			core::ENGINE->GetWindow().OnQuit() += std::bind(&Game::Shutdown, this);
 
@@ -48,7 +51,6 @@ namespace gallus
 #ifndef _EDITOR
 			core::ENGINE->GetResourceAtlas().LoadScene("main.scene", m_Scene);
 			m_Scene.LoadData();
-
 			m_bStarted = true;
 #endif
 
@@ -85,12 +87,26 @@ namespace gallus
 
 				int updatesThisFrame = 0;
 
+				m_fDeltaTime = FIXED_TIMESTEP;
 				while (lag >= FIXED_TIMESTEP)
 				{
 					bool updateRealtime = m_bStarted && !m_bPaused;
 					core::ENGINE->GetECS().Update(FIXED_TIMESTEP, updateRealtime);
 					lag -= FIXED_TIMESTEP;
 					updatesThisFrame++;
+
+					if (updateRealtime)
+					{
+						const gameplay::Entity* player = core::ENGINE->GetECS().GetEntityByName("Player");
+
+						if (player)
+						{
+							gameplay::TransformSystem& transformSys = core::ENGINE->GetECS().GetSystem<gameplay::TransformSystem>();
+							gameplay::TransformComponent& transformComponent = transformSys.GetComponent(player->GetEntityID());
+							DirectX::XMFLOAT2 pos = { transformComponent.Transform().GetPosition().x - (graphics::dx12::RENDER_TEX_SIZE.x / 2), transformComponent.Transform().GetPosition().y - (graphics::dx12::RENDER_TEX_SIZE.y / 2) };
+							core::ENGINE->GetDX12().GetActiveCamera().Transform().SetPosition(pos);
+						}
+					}
 				}
 
 				fpsFrames += updatesThisFrame;
@@ -98,7 +114,7 @@ namespace gallus
 				if (fpsTimer >= 1.0)
 				{
 					// m_Fps reflects how many fixed updates we actually managed per second
-					m_Fps = static_cast<double>(fpsFrames) / fpsTimer;
+					m_fFps = static_cast<double>(fpsFrames) / fpsTimer;
 					fpsFrames = 0;
 					fpsTimer = 0.0;
 				}

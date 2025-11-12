@@ -21,8 +21,8 @@
 #include "graphics/imgui/font_arial.h"
 #include "graphics/imgui/font_icon.h"
 #include "graphics/imgui/themes.h"
-#include "graphics/imgui/windows/BaseWindow.h"
-#include "graphics/imgui/modals/BaseModal.h"
+
+#include "graphics/imgui/ImGuiWindowsConfig.h"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -65,14 +65,7 @@ namespace gallus
 			//---------------------------------------------------------------------
 			bool ImGuiWindow::InitializeWindows()
 			{
-				for (BaseWindow* window : m_aWindows)
-				{
-					window->Initialize();
-				}
-				for (BaseModal* window : m_aModals)
-				{
-					window->Initialize();
-				}
+				m_pWindowsConfig->Initialize();
 				return true;
 			}
 
@@ -151,7 +144,7 @@ namespace gallus
 
 				ImFontConfig font_config_icon_capital;
 				font_config_icon_capital.FontDataOwnedByAtlas = false;
-				m_pCapitalIconFont = io.Fonts->AddFontFromMemoryTTF(&font::ICON, sizeof(font::ICON), m_vHeaderSize.x, &font_config_icon_capital, icons_ranges_b);
+				m_pCapitalIconFont = io.Fonts->AddFontFromMemoryTTF(&font::ICON, sizeof(font::ICON), m_fFontSize * 2, &font_config_icon_capital, icons_ranges_b);
 
 				ImFontConfig icons_config_b;
 				icons_config_b.FontDataOwnedByAtlas = false;
@@ -193,6 +186,16 @@ namespace gallus
 #elif REDMOND
 				m_vAccentColor = ImVec4(0.63f, 0.36f, 0.32f, 1.00f);
 #endif
+				float m_fDarkenFactor = 0.5f; // 80% brightness
+
+				ImVec4 m_vDarkerColor = ImVec4(
+					m_vAccentColor.x * m_fDarkenFactor,
+					m_vAccentColor.y * m_fDarkenFactor,
+					m_vAccentColor.z * m_fDarkenFactor,
+					m_vAccentColor.w
+				);
+
+				colors[ImGuiCol_TextColorAccentDarker] = m_vDarkerColor;
 				colors[ImGuiCol_Text] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
 				colors[ImGuiCol_TextDisabled] = ImVec4(0.24f, 0.24f, 0.24f, 1.00f);
 				colors[ImGuiCol_WindowBg] = ImVec4(0.14f, 0.14f, 0.14f, 1.00f);
@@ -323,18 +326,9 @@ namespace gallus
 
 				const ImGuiIO& io = ImGui::GetIO();
 
-				if (!m_aWindows.empty())
+				if (m_pWindowsConfig)
 				{
-					m_aWindows[0]->SetSize(ImVec2(io.DisplaySize.x, io.DisplaySize.y));
-					for (BaseWindow* window : m_aWindows)
-					{
-						window->Update();
-					}
-				}
-
-				for (BaseModal* modal : m_aModals)
-				{
-					modal->Update();
+					m_pWindowsConfig->Render();
 				}
 
 				UpdateMouseCursor();
@@ -451,16 +445,6 @@ namespace gallus
 			const ImVec2& ImGuiWindow::GetHeaderSize() const
 			{
 				return m_vHeaderSize;
-			}
-
-			//---------------------------------------------------------------------
-			BaseModal* ImGuiWindow::GetModal(int a_iIndex)
-			{
-				if (a_iIndex >= m_aModals.size())
-				{
-					return nullptr;
-				}
-				return m_aModals[a_iIndex];
 			}
 		}
 	}

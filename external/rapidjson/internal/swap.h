@@ -1,4 +1,4 @@
-// Tencent is pleased to support the open source community by making RapidJSON available.
+﻿// Tencent is pleased to support the open source community by making RapidJSON available.
 //
 // Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
 //
@@ -27,13 +27,13 @@ namespace internal {
 
 //! Custom swap() to avoid dependency on C++ <algorithm> header
 /*! \tparam T Type of the arguments to swap, should be instantiated with primitive C++ types only.
-    \note This has the same semantics as std::swap().
+	\note This has the same semantics as std::swap().
 */
 template <typename T>
 inline void Swap(T& a, T& b) RAPIDJSON_NOEXCEPT {
-    T tmp = a;
-        a = b;
-        b = tmp;
+	T tmp = a;
+		a = b;
+		b = tmp;
 }
 
 } // namespace internal
@@ -44,3 +44,4 @@ RAPIDJSON_DIAG_POP
 #endif
 
 #endif // RAPIDJSON_INTERNAL_SWAP_H_
+

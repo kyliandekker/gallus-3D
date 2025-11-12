@@ -25,9 +25,13 @@ namespace gallus
 			class StringDropdown : public ImGuiUIView
 			{
 			public:
-				StringDropdown() = default;
 				/// <summary>
-				/// Constructor for StringDropdown.
+				/// Constructs a string dropdown.
+				/// </summary>
+				StringDropdown() = default;
+
+				/// <summary>
+				/// Constructs a string dropdown.
 				/// </summary>
 				/// <param name="a_Window">The ImGui window for rendering the view.</param>
 				StringDropdown(ImGuiWindow& a_Window) : ImGuiUIView(a_Window)

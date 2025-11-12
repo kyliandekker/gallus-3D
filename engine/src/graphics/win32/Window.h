@@ -144,6 +144,10 @@ namespace gallus
 				/// </summary>
 				void SaveSettings();
 
+				/// <summary>
+				/// Enables or disables resizing of the window.
+				/// </summary>
+				/// <param name="a_bResizingAllowed">True to enable resizing, false otherwise.</param>
 				void SetResizingAllowed(bool a_bResizingAllowed);
 
 				std::mutex g_EventMutex;
@@ -173,6 +177,11 @@ namespace gallus
 				/// <param name="a_vPosition">The position the window will be rendered at.</param>
 				void SetPosition(const glm::ivec2& a_vPosition);
 
+				/// <summary>
+				/// Indicates whether the thread should sleep or wake to run work.
+				/// Must be implemented by subclasses.
+				/// </summary>
+				/// <returns>True if thread should sleep (wait), false to proceed immediately.</returns>
 				bool Sleep() const override
 				{
 					return true;
