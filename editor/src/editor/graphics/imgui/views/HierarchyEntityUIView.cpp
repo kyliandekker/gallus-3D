@@ -130,6 +130,11 @@ namespace gallus
 					ImGui::PopStyleVar();
 				}
 			}
+
+			void HierarchyEntityUIView::RenderGizmos(const ImVec2& a_vScenePos, const ImVec2& a_vSize, const ImVec2& a_vPanOffset, float a_fZoom)
+			{
+
+			}
 		}
 	}
 }

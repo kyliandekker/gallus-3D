@@ -1,5 +1,7 @@
 #pragma once
 
+#include <imgui/imgui.h>
+
 namespace gallus
 {
 	class EditorFieldInfo;
@@ -9,8 +11,9 @@ namespace gallus
 	{
 		namespace imgui
 		{
-			void ShowEditorFieldFromObject(IExposableToEditor* obj, const EditorFieldInfo& field);
-			void RenderEditorForObject(IExposableToEditor* obj);
+			bool ShowEditorFieldFromObject(IExposableToEditor* a_pObject, const EditorFieldInfo& a_Field);
+			bool RenderObjectFields(IExposableToEditor* a_pObject);
+			bool RenderObjectGizmos(const ImVec2& a_vScenePos, const ImVec2& a_vSize, const ImVec2& a_vPanOffset, float a_fZoom, IExposableToEditor* a_pObject);
 		}
 	}
 }

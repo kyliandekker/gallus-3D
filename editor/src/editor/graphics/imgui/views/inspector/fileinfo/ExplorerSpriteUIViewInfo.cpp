@@ -135,6 +135,7 @@ namespace gallus
 						[previewTex]
 					{
 						ImGui::Text(std::to_string(previewTex->GetResourceDesc().Width).c_str());
+						return false;
 					});
 					ImGui::KeyValue([&window]
 					{
@@ -144,6 +145,7 @@ namespace gallus
 						[previewTex]
 					{
 						ImGui::Text(std::to_string(previewTex->GetResourceDesc().Height).c_str());
+						return false;
 					});
 					ImGui::KeyValue([&window]
 					{
@@ -153,6 +155,7 @@ namespace gallus
 						[previewTex]
 					{
 						ImGui::Text(std::to_string(GetFormatChannelCount(previewTex->GetResourceDesc().Format)).c_str());
+						return false;
 					});
 				}
 				ImGui::KeyValue([&window]
@@ -163,11 +166,13 @@ namespace gallus
 					[&textureTypeDropdown, &explorerFileUIView, metaData]
 				{
 					ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
-					if (textureTypeDropdown.Render(ImGui::IMGUI_FORMAT_ID("", COMBO_ID, "TEXTURE_TYPE_SPRITE_EXPLORER_ITEM_INSPECTOR").c_str()))
+					bool changed = textureTypeDropdown.Render(ImGui::IMGUI_FORMAT_ID("", COMBO_ID, "TEXTURE_TYPE_SPRITE_EXPLORER_ITEM_INSPECTOR").c_str());
+					if (changed)
 					{
 						metaData->SetTextureType(textureTypeDropdown.GetValue());
 						metaData->Save(explorerFileUIView.GetFileResource().GetPath());
 					}
+					return false;
 				});
 				ImGui::EndInspectorKeyVal(m_Window.GetFramePadding());
 

@@ -42,20 +42,34 @@ namespace gallus
 
 			void LoadAnimation(const std::string& a_sAnimName);
 
+			/// <summary>
+			/// Updates the components.
+			/// </summary>
+			/// <param name="a_fDeltaTime">Delta time.</param>
+			void UpdateRealtimeInner(float a_fDeltaTime, UpdateTime a_UpdateTime) override;
+
+			/// <summary>
+			/// Starts the playback of the component.
+			/// </summary>
 			void Start()
 			{
-				m_AnimationTrack.Play();
+				m_bIsPlaying = true;
 			}
 
+			/// <summary>
+			/// Stops the playback of the component.
+			/// </summary>
 			void Stop()
 			{
-				m_AnimationTrack.Stop();
+				m_bIsPlaying = false;
 			}
 
+#ifdef _EDITOR
 			void SetStartingAnimation(const std::string a_sStartingAnimation)
 			{
 				m_sStartingAnimation = a_sStartingAnimation;
 			}
+#endif
 
 			const std::string& GetStartingAnimation() const
 			{
@@ -67,8 +81,18 @@ namespace gallus
 			std::string m_sStartingAnimation;
 			std::string m_sAnimName;
 
-			BEGIN_EXPOSED_FIELDS(AnimationComponent)
-			END_EXPOSED_FIELDS(AnimationComponent)
+			int m_iNextKeyFrameIndex = 0;
+			bool m_bIsLooping = false;
+			bool m_bIsPlaying = false;
+			float m_fAccumulatedTime = 0.0f;
+
+#ifdef _EDITOR	
+			BEGIN_EXPOSE_FIELDS(AnimationComponent)
+			END_EXPOSE_FIELDS(AnimationComponent)
+			BEGIN_EXPOSE_GIZMOS(AnimationComponent)
+			END_EXPOSE_GIZMOS(AnimationComponent)
+			END_EXPOSE_TO_EDITOR(AnimationComponent)
+#endif		  	
 		};
 	}
 }

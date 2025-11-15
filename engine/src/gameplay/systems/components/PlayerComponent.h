@@ -78,10 +78,15 @@ namespace gallus
 			float m_fSpeed = 200;
 			gameplay::Prefab* m_pBulletPrefab = nullptr;
 
-			BEGIN_EXPOSED_FIELDS(PlayerComponent)
-				EXPOSE_FIELD(PlayerComponent, m_fSpeed, "Speed", FieldOptions{ .type = EditorWidgetType::DragFloat })
-				EXPOSE_FIELD(PlayerComponent, m_pBulletPrefab, "Bullet Prefab", FieldOptions{ .type = EditorWidgetType::AssetPickerPtr, .assetType = resources::AssetType::Prefab })
-			END_EXPOSED_FIELDS(PlayerComponent)
+#ifdef _EDITOR
+			BEGIN_EXPOSE_FIELDS(PlayerComponent)
+				EXPOSE_FIELD(PlayerComponent, m_fSpeed, "Speed", FieldOptions{ .type = EditorFieldWidgetType::DragFloat })
+				EXPOSE_FIELD(PlayerComponent, m_pBulletPrefab, "Bullet Prefab", FieldOptions{ .type = EditorFieldWidgetType::AssetPickerPtr, .assetType = resources::AssetType::Prefab })
+			END_EXPOSE_FIELDS(PlayerComponent)
+			BEGIN_EXPOSE_GIZMOS(PlayerComponent)
+			END_EXPOSE_GIZMOS(PlayerComponent)
+			END_EXPOSE_TO_EDITOR(PlayerComponent)
+#endif
 		};
 	}
 }

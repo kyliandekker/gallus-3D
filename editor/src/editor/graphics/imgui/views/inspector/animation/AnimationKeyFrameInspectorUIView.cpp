@@ -21,6 +21,7 @@
 #include "utils/string_extensions.h"
 
 #include "animation/AnimationKeyFrame.h"
+#include "animation/AnimationTrack.h"
 
 namespace gallus
 {
@@ -36,7 +37,7 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			AnimationKeyFrameInspectorUIView::AnimationKeyFrameInspectorUIView(ImGuiWindow& a_Window, animation::AnimationKeyFrame& a_KeyFrame) : InspectorView(a_Window), m_KeyFrame(a_KeyFrame)
+			AnimationKeyFrameInspectorUIView::AnimationKeyFrameInspectorUIView(ImGuiWindow& a_Window, animation::AnimationKeyFrame& a_KeyFrame, animation::AnimationTrack& a_AnimationTrack) : InspectorView(a_Window), m_KeyFrame(a_KeyFrame), m_AnimationTrack(a_AnimationTrack)
 			{
 				m_bShowDelete = true;
 			}
@@ -54,12 +55,18 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
+			void AnimationKeyFrameInspectorUIView::OnDelete()
+			{
+				m_AnimationTrack.RemoveKeyFrame(m_KeyFrame);
+			}
+
+			//---------------------------------------------------------------------
 			void AnimationKeyFrameInspectorUIView::Render()
 			{
 				ImGui::SetCursorPosY(0);
 				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
 
-				for (auto* test : m_KeyFrame.GetComponents())
+				for (animation::AnimationKeyFrameComponentBase* component : m_KeyFrame.GetComponents())
 				{
 					ImGui::SetCursorPosX(0);
 					float width = ImGui::GetContentRegionAvail().x + m_Window.GetFramePadding().x;
@@ -74,13 +81,16 @@ namespace gallus
 					ImVec2 foldOutButtonPos = ImGui::GetCursorScreenPos();
 
 					std::string id = ImGui::IMGUI_FORMAT_ID("",
-						FOLDOUT_ID, string_extensions::StringToUpper(test->GetTypeName()) + "_INSPECTOR");
+						FOLDOUT_ID, string_extensions::StringToUpper(component->GetTypeName()) + "_INSPECTOR");
 
 					ImGui::FoldOutButton(
-						std::string((m_aExpanded[id] ? font::ICON_FOLDED_OUT : font::ICON_FOLDED_IN) + std::string(test->GetName()) + id).c_str(), &m_aExpanded[id], ImVec2(width, size.y));
+						std::string((m_aExpanded[id] ? font::ICON_FOLDED_OUT : font::ICON_FOLDED_IN) + std::string(component->GetName()) + id).c_str(), &m_aExpanded[id], ImVec2(width, size.y));
 					ImGui::SameLine();
 					if (ImGui::IconButton(ImGui::IMGUI_FORMAT_ID(font::ICON_DELETE, BUTTON_ID, id + "_DELETE_INSPECTOR").c_str(), size, m_Window.GetIconFont()))
 					{
+						m_KeyFrame.RemoveComponent(component);
+
+						m_KeyFrame.GetAnimationTrack()->SetIsDirty(true);
 					}
 
 					ImGui::PopStyleVar();
@@ -88,7 +98,10 @@ namespace gallus
 
 					if (m_aExpanded[id])
 					{
-						RenderEditorForObject(test);
+						if (RenderObjectFields(component))
+						{
+							m_KeyFrame.GetAnimationTrack()->SetIsDirty(true);
+						}
 					}
 				}
 

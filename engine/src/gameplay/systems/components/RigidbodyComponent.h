@@ -106,11 +106,16 @@ namespace gallus
 			float m_fMass = 1.0f;
 			float m_fLinearDamping = 0.98f;
 
-			BEGIN_EXPOSED_FIELDS(RigidbodyComponent)
-				EXPOSE_FIELD(RigidbodyComponent, m_bUseGravity, "Use Gravity", FieldOptions{ .type = EditorWidgetType::Toggle })
-				EXPOSE_FIELD(RigidbodyComponent, m_fMass, "Mass", FieldOptions{ .type = EditorWidgetType::DragFloat, .min = "0.0001", .max = "9999999" })
-				EXPOSE_FIELD(RigidbodyComponent, m_fLinearDamping, "Linear Damping", FieldOptions{ .type = EditorWidgetType::DragFloat, .min = "0.01", .max = "1.0f" })
-			END_EXPOSED_FIELDS(RigidbodyComponent)
+#ifdef _EDITOR
+			BEGIN_EXPOSE_FIELDS(RigidbodyComponent)
+				EXPOSE_FIELD(RigidbodyComponent, m_bUseGravity, "Use Gravity", FieldOptions{ .type = EditorFieldWidgetType::Toggle })
+				EXPOSE_FIELD(RigidbodyComponent, m_fMass, "Mass", FieldOptions{ .type = EditorFieldWidgetType::DragFloat, .min = "0.0001", .max = "9999999" })
+				EXPOSE_FIELD(RigidbodyComponent, m_fLinearDamping, "Linear Damping", FieldOptions{ .type = EditorFieldWidgetType::DragFloat, .min = "0.01", .max = "1.0f" })
+			END_EXPOSE_FIELDS(RigidbodyComponent)
+			BEGIN_EXPOSE_GIZMOS(RigidbodyComponent)
+			END_EXPOSE_GIZMOS(RigidbodyComponent)
+			END_EXPOSE_TO_EDITOR(RigidbodyComponent)
+#endif
 		};
 	}
 }

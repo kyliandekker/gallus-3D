@@ -14,12 +14,14 @@ namespace gallus
 {
 	namespace animation
 	{
-		void AnimationKeyFrameEventComponent::Activate(gameplay::EntityID& a_EntityID, AnimationTrack& a_AnimationTrack)
+		//---------------------------------------------------------------------
+		void AnimationKeyFrameEventComponent::Activate(gameplay::EntityID& a_EntityID)
 		{
-			a_AnimationTrack.ActivateEvent(a_EntityID, m_Event);
+			m_KeyFrame.GetAnimationTrack()->ActivateEvent(a_EntityID, m_Event);
 		}
 
 #ifdef _EDITOR
+		//---------------------------------------------------------------------
 		void AnimationKeyFrameEventComponent::Serialize(rapidjson::Value& a_Value, rapidjson::Document::AllocatorType& a_Allocator)  const
 		{
 			int event = (int) m_Event;
@@ -31,11 +33,13 @@ namespace gallus
 		}
 #endif _EDITOR
 
+		//---------------------------------------------------------------------
 		void AnimationKeyFrameEventComponent::Deserialize(const resources::SrcData& a_SrcData)
 		{
 			m_Event = a_SrcData.GetEnum<AnimationEvent>("event");
 		}
 
+		//---------------------------------------------------------------------
 		std::string AnimationKeyFrameEventComponent::GetName() const
 		{
 			std::string name = "Event";

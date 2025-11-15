@@ -148,7 +148,10 @@ namespace gallus
 
 						if (m_aExpanded[id])
 						{
-							RenderEditorForObject(comp);
+							if (RenderObjectFields(comp))
+							{
+								core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
+							}
 						}
 					}
 				}

@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef _EDITOR
+
 #include <string>
 #include <vector>
 #include <functional>
@@ -8,7 +10,7 @@
 
 namespace gallus
 {
-	enum class EditorWidgetType
+	enum class EditorFieldWidgetType
 	{
 		None,
 		DragFloat,
@@ -24,19 +26,31 @@ namespace gallus
 		Object,
 		ObjectPtr,
 		EnumDropdown,
-		TexturePreview,
+		TexturePreview
+	};
+
+	enum class EditorGizmoType
+	{
+		None,
+		Transform
 	};
 
 	// Field options with default values
 	struct FieldOptions
 	{
-		EditorWidgetType type = EditorWidgetType::None;
+		EditorFieldWidgetType type = EditorFieldWidgetType::None;
 		resources::AssetType assetType;
 		std::string min = "";
 		std::string max = "";
 		std::function<std::string(int)> enumToStringFunc; // returns string name for index
 
 		size_t relatedIndexFieldOffset = 0;
+	};
+
+	// Gizmo options with default values
+	struct GizmoOptions
+	{
+		EditorGizmoType type = EditorGizmoType::None;
 	};
 
 	// Editor field with direct memory access
@@ -48,17 +62,28 @@ namespace gallus
 		FieldOptions m_Options;
 	};
 
-	// Interface
+	// Forward-declare interface so EditorGizmoInfo can mention it (minimal change)
+	class IExposableToEditor;
+
+	struct EditorGizmoInfo
+	{
+		const char* m_sName;
+		size_t m_iOffset;
+		GizmoOptions m_Options;
+	};
+
+	// Interface (full definition)
 	class IExposableToEditor
 	{
 	public:
 		virtual const std::vector<EditorFieldInfo>& GetEditorFields() const = 0;
+		virtual const std::vector<EditorGizmoInfo>& GetEditorGizmos() const = 0;
 		virtual const char* GetTypeName() const = 0;
 		virtual ~IExposableToEditor() = default;
 	};
 
-	// Macros
-	#define BEGIN_EXPOSED_FIELDS(CLASSNAME) \
+	// Macros (fields)
+	#define BEGIN_EXPOSE_FIELDS(CLASSNAME) \
 	public: \
 		static const std::vector<EditorFieldInfo>& StaticEditorFields() \
 		{ \
@@ -67,12 +92,31 @@ namespace gallus
 	#define EXPOSE_FIELD(CLASSNAME, VAR, UINAME, ...) \
 		{ #VAR, offsetof(CLASSNAME, VAR), UINAME, __VA_ARGS__ },
 
-	#define END_EXPOSED_FIELDS(CLASSNAME) \
+	#define END_EXPOSE_FIELDS(CLASSNAME) \
 			}; \
 			return fields; \
-		} \
-	const std::vector<EditorFieldInfo>& GetEditorFields() const override { return CLASSNAME::StaticEditorFields(); } \
-	const char* GetTypeName() const override { return #CLASSNAME; }
+		}
+
+	// Gizmos (fields)
+#define BEGIN_EXPOSE_GIZMOS(CLASSNAME) \
+	public: \
+		static const std::vector<EditorGizmoInfo>& StaticEditorGizmos() \
+		{ \
+			static std::vector<EditorGizmoInfo> gizmos = {
+
+#define EXPOSE_GIZMO(CLASSNAME, VAR, ...) \
+		{ #VAR, offsetof(CLASSNAME, VAR), __VA_ARGS__ },
+
+#define END_EXPOSE_GIZMOS(CLASSNAME) \
+			}; \
+			return gizmos; \
+		}
+
+	// End-of-class helper: keep as before
+	#define END_EXPOSE_TO_EDITOR(CLASSNAME) \
+		const std::vector<EditorFieldInfo>& GetEditorFields() const override { return CLASSNAME::StaticEditorFields(); } \
+		const std::vector<EditorGizmoInfo>& GetEditorGizmos() const override { return CLASSNAME::StaticEditorGizmos(); } \
+		const char* GetTypeName() const override { return #CLASSNAME; }
 
 	template<typename TEnum>
 	inline std::function<std::string(int)> MakeEnumToStringFunc(std::string(*toStringFunc)(TEnum))
@@ -87,7 +131,7 @@ namespace gallus
 
 	// Macro that produces the FieldOptions aggregate inline (fits your EXPOSE_FIELD usage)
 	#define EXPOSE_ENUM_FIELD_OPTIONS(EnumType, ToStringFunc) \
-		FieldOptions{ .type = EditorWidgetType::EnumDropdown, .enumToStringFunc = MakeEnumToStringFunc<EnumType>(ToStringFunc) }
+		FieldOptions{ .type = EditorFieldWidgetType::EnumDropdown, .enumToStringFunc = MakeEnumToStringFunc<EnumType>(ToStringFunc) }
 
 	// Convenience macro that assumes your to-string function is named EnumTypeToString
 	#define EXPOSE_ENUM_FIELD_OPTIONS_AUTO(EnumType) \
@@ -101,3 +145,5 @@ namespace gallus
 	#define EXPOSE_ENUM_FIELD_AUTO(Class, Var, UIName, EnumType) \
 		EXPOSE_ENUM_FIELD(Class, Var, UIName, EnumType, EnumType##ToString)
 }
+
+#endif

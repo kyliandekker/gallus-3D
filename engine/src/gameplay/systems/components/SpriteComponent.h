@@ -148,15 +148,20 @@ namespace gallus
 			int8_t m_iSpriteIndex = 0;
 			DirectX::XMFLOAT4 m_vColor = { 1, 1, 1, 1 };
 
-			BEGIN_EXPOSED_FIELDS(SpriteComponent)
-				EXPOSE_FIELD(SpriteComponent, m_pShaderBind, "Shader Bind", FieldOptions{ .type = EditorWidgetType::ObjectPtr })
-				EXPOSE_FIELD(SpriteComponent, m_pTexture, "Texture", FieldOptions{ .type = EditorWidgetType::AssetPickerPtr, .assetType = resources::AssetType::Sprite })
-				EXPOSE_FIELD(SpriteComponent, m_iSpriteIndex, "Sprite Index", FieldOptions{ .type = EditorWidgetType::DragInt8 })
+#ifdef _EDITOR
+			BEGIN_EXPOSE_FIELDS(SpriteComponent)
+				EXPOSE_FIELD(SpriteComponent, m_pShaderBind, "Shader Bind", FieldOptions{ .type = EditorFieldWidgetType::ObjectPtr })
+				EXPOSE_FIELD(SpriteComponent, m_pTexture, "Texture", FieldOptions{ .type = EditorFieldWidgetType::AssetPickerPtr, .assetType = resources::AssetType::Sprite })
+				EXPOSE_FIELD(SpriteComponent, m_iSpriteIndex, "Sprite Index", FieldOptions{ .type = EditorFieldWidgetType::DragInt8 })
 				EXPOSE_FIELD(SpriteComponent, m_pTexture, "Texture Preview", FieldOptions{
-				.type = EditorWidgetType::TexturePreview,
+				.type = EditorFieldWidgetType::TexturePreview,
 				.relatedIndexFieldOffset = offsetof(SpriteComponent, m_iSpriteIndex)
 					})
-			END_EXPOSED_FIELDS(SpriteComponent)
+			END_EXPOSE_FIELDS(SpriteComponent)
+			BEGIN_EXPOSE_GIZMOS(SpriteComponent)
+			END_EXPOSE_GIZMOS(SpriteComponent)
+			END_EXPOSE_TO_EDITOR(SpriteComponent)
+#endif
 		};
 	}
 }

@@ -1,6 +1,8 @@
 #pragma once
 
+#ifdef _EDITOR
 #include "editor/EditorExpose.h"
+#endif
 
 #include <DirectXMath.h>
 #include <array>
@@ -14,7 +16,10 @@ namespace gallus
 			//---------------------------------------------------------------------
 			// DX12Transform
 			//---------------------------------------------------------------------
-			class DX12Transform : public IExposableToEditor
+			class DX12Transform
+#ifdef _EDITOR
+				: public IExposableToEditor
+#endif
 			{
 			public:
 				DX12Transform();
@@ -96,12 +101,17 @@ namespace gallus
 				DirectX::XMFLOAT2 m_vPivot = { -0.5f, -0.5f };
 				float m_fRotationDegrees = 0.0f; // rotation around Z axis
 
-				BEGIN_EXPOSED_FIELDS(DX12Transform)
-					EXPOSE_FIELD(DX12Transform, m_vPosition, "Position", FieldOptions{ .type = EditorWidgetType::Vector2Field })
-					EXPOSE_FIELD(DX12Transform, m_vScale, "Scale", FieldOptions{ .type = EditorWidgetType::Vector2Field })
-					EXPOSE_FIELD(DX12Transform, m_vPivot, "Pivot", FieldOptions{ .type = EditorWidgetType::Vector2Field, .min = "-0.5", .max = "0.5" })
-					EXPOSE_FIELD(DX12Transform, m_fRotationDegrees, "Rotation", FieldOptions{ .type = EditorWidgetType::DragFloat })
-				END_EXPOSED_FIELDS(DX12Transform)
+#ifdef _EDITOR
+			BEGIN_EXPOSE_FIELDS(DX12Transform)
+				EXPOSE_FIELD(DX12Transform, m_vPosition, "Position", FieldOptions{ .type = EditorFieldWidgetType::Vector2Field })
+				EXPOSE_FIELD(DX12Transform, m_vScale, "Scale", FieldOptions{ .type = EditorFieldWidgetType::Vector2Field })
+				EXPOSE_FIELD(DX12Transform, m_vPivot, "Pivot", FieldOptions{ .type = EditorFieldWidgetType::Vector2Field, .min = "-0.5", .max = "0.5" })
+				EXPOSE_FIELD(DX12Transform, m_fRotationDegrees, "Rotation", FieldOptions{ .type = EditorFieldWidgetType::DragFloat })
+			END_EXPOSE_FIELDS(DX12Transform)
+			BEGIN_EXPOSE_GIZMOS(DX12Transform)
+			END_EXPOSE_GIZMOS(DX12Transform)
+			END_EXPOSE_TO_EDITOR(DX12Transform)
+#endif
 			};
 		}
 	}

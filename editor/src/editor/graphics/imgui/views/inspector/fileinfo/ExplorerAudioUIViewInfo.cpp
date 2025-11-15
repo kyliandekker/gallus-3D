@@ -85,6 +85,7 @@ namespace gallus
 						explorerFileUIView.GetFileResource().GetMetaData()->SetAssetType(assetTypeDropdown.GetValue());
 						explorerFileUIView.SetIcon();
 						explorerFileUIView.GetFileResource().GetMetaData()->Save(explorerFileUIView.GetFileResource().GetPath());
+						return false;
 					}
 				});
 
@@ -101,6 +102,7 @@ namespace gallus
 						[&fmt_chunk]
 					{
 						ImGui::Text(std::to_string(fmt_chunk.m_iBitsPerSample).c_str());
+						return false;
 					});
 					ImGui::KeyValue([&window]
 					{
@@ -110,6 +112,7 @@ namespace gallus
 						[&fmt_chunk]
 					{
 						ImGui::Text(std::to_string(fmt_chunk.m_iNumChannels).c_str());
+						return false;
 					});
 					ImGui::KeyValue([&window]
 					{
@@ -119,15 +122,18 @@ namespace gallus
 						[&fmt_chunk]
 					{
 						ImGui::Text(std::to_string(fmt_chunk.m_iSampleRate).c_str());
+						return false;
 					});
 					ImGui::KeyValue([&window]
 					{
 						ImGui::AlignTextToFramePadding();
 						ImGui::DisplayHeader(window.GetBoldFont(), "Byte Rate: ");
+						return false;
 					},
 						[&fmt_chunk]
 					{
 						ImGui::Text(std::to_string(fmt_chunk.m_iByteRate).c_str());
+						return false;
 					});
 				}
 
@@ -144,6 +150,7 @@ namespace gallus
 						[&data_chunk]
 					{
 						ImGui::Text(std::to_string(data_chunk.ChunkSize()).c_str());
+						return false;
 					});
 				}
 
@@ -159,6 +166,7 @@ namespace gallus
 						ImGui::Text(
 							audio::FormatDuration(audio::PosToSeconds(data_chunk.ChunkSize(), fmt_chunk.m_iByteRate), true).c_str()
 						);
+						return false;
 					});
 				}
 				ImGui::EndInspectorKeyVal(m_Window.GetFramePadding());

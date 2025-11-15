@@ -16,6 +16,7 @@
 #include "editor/core/EditorEngine.h"
 #include "editor/graphics/imgui/views/HierarchyEntityUIView.h"
 #include "editor/graphics/imgui/views/inspector/EntityInspectorView.h"
+#include "editor/graphics/imgui/RenderEditorExposable.h"
 
 // gameplay includes
 #include "gameplay/Game.h"
@@ -286,30 +287,12 @@ namespace gallus
 				DrawGizmos(a_vSceneStartPos, a_vSize, m_vPanOffset, m_fZoom);
 				Draw2DGrid(a_vSceneStartPos, a_vSize, m_vPanOffset, m_fZoom);
 
+				if (core::EDITOR_ENGINE->GetEditor().GetSelectable().get())
+				{
+					//RenderObjectGizmos(a_vSceneStartPos, a_vSize, m_vPanOffset, m_fZoom, core::EDITOR_ENGINE->GetEditor().GetSelectable().get()->GetExposable);
+				}
+
 				std::lock_guard<std::recursive_mutex> lock(core::EDITOR_ENGINE->GetECS().m_EntityMutex);
-
-				//auto test = core::EDITOR_ENGINE->GetEditor().GetSelectable().get();
-				//if (!test)
-				//{
-				//	return;
-				//}
-
-				//const HierarchyEntityUIView* entity = dynamic_cast<const HierarchyEntityUIView*>(core::EDITOR_ENGINE->GetEditor().GetSelectable().get());
-				//if (!entity)
-				//{
-				//	return;
-				//}
-
-				//EntityInspectorView* entityInspectorView = dynamic_cast<EntityInspectorView*>(core::EDITOR_ENGINE->GetEditor().GetInspectorView());
-				//if (!entityInspectorView)
-				//{
-				//	return;
-				//}
-
-				//for (ComponentBaseUIView* component : entityInspectorView->GetComponents())
-				//{
-				//	component->RenderComponentGizmos(a_vSceneStartPos, a_vSize, m_vPanOffset, m_fZoom);
-				//}
 			}
 
 			//---------------------------------------------------------------------

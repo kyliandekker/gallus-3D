@@ -24,7 +24,7 @@ namespace gallus
 			if (!m_sStartingAnimation.empty())
 			{
 				LoadAnimation(m_sStartingAnimation);
-				m_AnimationTrack.Play();
+				Start();
 			}
 			Component::InitRealtime();
 		}
@@ -71,6 +71,46 @@ namespace gallus
 			if (core::ENGINE->GetResourceAtlas().GetResource(m_sAnimName, fileResource))
 			{
 				m_AnimationTrack.LoadByPath(fileResource->GetPath());
+			}
+		}
+
+		void AnimationComponent::UpdateRealtimeInner(float a_fDeltaTime, UpdateTime a_UpdateTime)
+		{
+			if (!m_bIsPlaying)
+			{
+				return;
+			}
+
+			m_fAccumulatedTime += a_fDeltaTime;
+
+
+			// Loop over keyframes that are due
+			while (m_iNextKeyFrameIndex < m_AnimationTrack.GetKeyFrames().size())
+			{
+				animation::AnimationKeyFrame* keyFrame = m_AnimationTrack.GetKeyFrames()[m_iNextKeyFrameIndex];
+				int keyFrameNumber = keyFrame->GetFrame(); // actual frame number
+				float keyFrameTime = keyFrameNumber * FRAME_TIME;
+
+				if (m_fAccumulatedTime >= keyFrameTime)
+				{
+					keyFrame->Activate(m_EntityID);
+					m_iNextKeyFrameIndex++;  // only increment after successfully activating a keyframe
+				}
+				else
+				{
+					break; // next keyframe is not yet due
+				}
+			}
+
+			// Reset if animation is done
+			if (!m_AnimationTrack.GetKeyFrames().empty() && m_iNextKeyFrameIndex >= m_AnimationTrack.GetKeyFrames().size())
+			{
+				m_fAccumulatedTime = 0.0f;
+				m_iNextKeyFrameIndex = 0;
+				if (!m_AnimationTrack.IsLooping())
+				{
+					m_bIsPlaying = false;
+				}
 			}
 		}
 	}

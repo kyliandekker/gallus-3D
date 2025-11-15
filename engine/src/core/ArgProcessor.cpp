@@ -6,12 +6,14 @@ namespace gallus
 {
 	namespace core
 	{
+		//---------------------------------------------------------------------
 		bool hasCommandArg(const std::string& args, const std::string& argName)
 		{
 			std::string search = argName + "=";
 			return args.find(search) != std::string::npos;
 		}
 
+		//---------------------------------------------------------------------
 		std::string getCommandArgStr(const std::string& args, const std::string& argName, const std::string& defaultVal)
 		{
 			if (!hasCommandArg(args, argName))
@@ -56,11 +58,13 @@ namespace gallus
 			}
 		}
 
+		//---------------------------------------------------------------------
 		int getCommandArgInt(const std::string& args, const std::string& argName, const int& defaultVal)
 		{
 			return std::stoi(getCommandArgStr(args, argName, std::to_string(defaultVal)));
 		}
 
+		//---------------------------------------------------------------------
 		void ArgProcessor::ProcessArguments(const std::string& a_sArgs)
 		{
 			for (auto& arg : m_aArgs)

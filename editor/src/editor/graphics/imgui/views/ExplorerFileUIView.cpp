@@ -175,7 +175,7 @@ namespace gallus
 
 				ImVec2 contentStartPos = ImVec2(initialPos.x + m_Window.GetFontSize(), initialPos.y + verticalOffset);
 				ImGui::SetCursorPos(contentStartPos);
-				ImGui::Text(m_sIcon.c_str());
+				ImGui::TextColored(AssetTypeToColor(m_FileResource.GetMetaData()->GetAssetType()), m_sIcon.c_str());
 
 				ImGui::PopFont();
 
@@ -259,7 +259,7 @@ namespace gallus
 					float horizontalOffset = (m_vSize.x - iconSize.x) / 2.0f;
 					ImVec2 iconPos = ImVec2(initialScreenPos.x + horizontalOffset, initialScreenPos.y + m_Window.GetFontSize());
 					ImGui::SetCursorScreenPos(iconPos);
-					ImGui::TextUnformatted(m_sIcon.c_str());
+					ImGui::TextColored(AssetTypeToColor(m_FileResource.GetMetaData()->GetAssetType()), m_sIcon.c_str());
 					ImGui::PopFont();
 
 					// Draw file name under icon

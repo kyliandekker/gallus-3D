@@ -4,7 +4,11 @@
 #include <string>
 #include <filesystem>
 
+#ifdef _EDITOR
 #include "editor/EditorExpose.h"
+#endif
+
+#include "core/Observable.h"
 
 // resources
 #include "resources/AssetType.h"
@@ -28,7 +32,10 @@ namespace gallus
 		/// <summary>
 		/// Represents an engine resource with details like category, type and name.
 		/// </summary>
-		class EngineResource : public IExposableToEditor
+		class EngineResource
+#ifdef _EDITOR
+			: public IExposableToEditor
+#endif
 		{
 		public:
 			/// <summary>
@@ -130,11 +137,31 @@ namespace gallus
 			/// </summary>
 			/// <param name="a_Path">The path.</param>
 			void SetPath(const std::filesystem::path& a_Path);
+
+#ifdef _EDITOR
+			bool IsDirty() const
+			{
+				return m_bIsDirty;
+			}
+
+			core::Observable<bool>& IsDirty()
+			{
+				return m_bIsDirty;
+			}
+
+			void SetIsDirty(bool a_bIsDirty)
+			{
+				m_bIsDirty = a_bIsDirty;
+			}
+#endif
 		protected:
 			bool m_bIsDestroyable = true; // Whether it is destroyable once created.
 			bool m_bIsLocked = false; // Whether the resource can be overridden in the atlas.
 			bool m_bIsUnique = false; // Whether the resource can be shared in the atlas.
 
+#ifdef _EDITOR
+			core::Observable<bool> m_bIsDirty;
+#endif
 			EngineResourceCategory m_ResourceCategory = EngineResourceCategory::Unknown;
 			resources::AssetType m_AssetType;
 
@@ -143,8 +170,13 @@ namespace gallus
 
 			friend class ResourceAtlas;
 
-			BEGIN_EXPOSED_FIELDS(EngineResource)
-			END_EXPOSED_FIELDS(EngineResource)
+#ifdef _EDITOR
+			BEGIN_EXPOSE_FIELDS(EngineResource)
+			END_EXPOSE_FIELDS(EngineResource)
+			BEGIN_EXPOSE_GIZMOS(EngineResource)
+			END_EXPOSE_GIZMOS(EngineResource)
+			END_EXPOSE_TO_EDITOR(EngineResource)
+#endif
 		};
 	}
 }

@@ -49,10 +49,12 @@ namespace gallus
 					[&assetTypeDropdown, &explorerFileUIView]
 				{
 					ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
-					if (assetTypeDropdown.Render(ImGui::IMGUI_FORMAT_ID("", COMBO_ID, "ASSETTYPE_SHADER_EXPLORER_ITEM_INSPECTOR").c_str()))
+					bool changed = assetTypeDropdown.Render(ImGui::IMGUI_FORMAT_ID("", COMBO_ID, "ASSETTYPE_SHADER_EXPLORER_ITEM_INSPECTOR").c_str());
+					if (changed)
 					{
 						explorerFileUIView.GetFileResource().GetMetaData()->SetAssetType(assetTypeDropdown.GetValue());
 					}
+					return changed;
 				});
 				ImGui::EndInspectorKeyVal(m_Window.GetFramePadding());
 			}

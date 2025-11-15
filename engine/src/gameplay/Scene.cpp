@@ -36,7 +36,7 @@ namespace gallus
 			}
 
 #ifdef _EDITOR
-			m_fIsDirty = false;
+			m_bIsDirty = false;
 #endif // _EDITOR
 
 			rapidjson::Document document;
@@ -89,8 +89,8 @@ namespace gallus
 					{
 						if (componentsDoc.HasMember(system->GetPropertyName().c_str()))
 						{
-							const rapidjson::Value& testMember = componentsDoc[system->GetPropertyName().c_str()];
-							gameplay::Component* component = system->CreateBaseComponent(id, testMember);
+							const rapidjson::Value& srcData = componentsDoc[system->GetPropertyName().c_str()];
+							const gameplay::Component* component = system->CreateBaseComponent(id, srcData);
 							if (!component)
 							{
 								continue;
@@ -100,9 +100,6 @@ namespace gallus
 				}
 			}
 
-#ifdef _EDITOR
-			m_fIsDirty = true;
-#endif // _EDITOR
 			return true;
 		}
 
@@ -124,7 +121,7 @@ namespace gallus
 			}
 
 #ifdef _EDITOR
-			m_fIsDirty = false;
+			m_bIsDirty = false;
 #endif // _EDITOR
 			return true;
 		}
@@ -194,20 +191,6 @@ namespace gallus
 			a_Document.Accept(writer);
 
 			return core::DataStream(buffer.GetString(), buffer.GetSize());
-		}
-
-		//---------------------------------------------------------------------
-		const core::Observable<bool>& Scene::IsDirty() const
-		{
-			return m_fIsDirty;
-		}
-
-		//---------------------------------------------------------------------
-		void Scene::SetIsDirty(bool a_fIsDirty)
-		{
-			m_fIsDirty = a_fIsDirty;
-
-			SetData(GetSceneData());
 		}
 #endif // _EDITOR
 	}

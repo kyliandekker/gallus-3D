@@ -89,10 +89,15 @@ namespace gallus
 
 				Microsoft::WRL::ComPtr<ID3D12PipelineState> m_pPipelineState = nullptr;
 
-				BEGIN_EXPOSED_FIELDS(DX12ShaderBind)
-					EXPOSE_FIELD(DX12ShaderBind, m_pPixelShader, "Pixel Shader", FieldOptions{ .type = EditorWidgetType::AssetPickerPtr, .assetType = resources::AssetType::PixelShader })
-					EXPOSE_FIELD(DX12ShaderBind, m_pVertexShader, "Vertex Shader", FieldOptions{ .type = EditorWidgetType::AssetPickerPtr, .assetType = resources::AssetType::VertexShader })
-				END_EXPOSED_FIELDS(DX12ShaderBind)
+#ifdef _EDITOR
+				BEGIN_EXPOSE_FIELDS(DX12ShaderBind)
+					EXPOSE_FIELD(DX12ShaderBind, m_pPixelShader, "Pixel Shader", FieldOptions{ .type = EditorFieldWidgetType::AssetPickerPtr, .assetType = resources::AssetType::PixelShader })
+					EXPOSE_FIELD(DX12ShaderBind, m_pVertexShader, "Vertex Shader", FieldOptions{ .type = EditorFieldWidgetType::AssetPickerPtr, .assetType = resources::AssetType::VertexShader })
+				END_EXPOSE_FIELDS(DX12ShaderBind)
+				BEGIN_EXPOSE_GIZMOS(DX12ShaderBind)
+				END_EXPOSE_GIZMOS(DX12ShaderBind)
+				END_EXPOSE_TO_EDITOR(DX12ShaderBind)
+#endif
 			};
 		}
 	}

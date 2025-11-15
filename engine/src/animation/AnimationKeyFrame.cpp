@@ -6,6 +6,7 @@ namespace gallus
 {
 	namespace animation
 	{
+		//---------------------------------------------------------------------
 		AnimationKeyFrame::~AnimationKeyFrame()
 		{
 			for (AnimationKeyFrameComponentBase* component : m_aAnimationKeyFrameComponents)
@@ -15,15 +16,17 @@ namespace gallus
 			m_aAnimationKeyFrameComponents.clear();
 		}
 
-		void AnimationKeyFrame::Activate(gameplay::EntityID& a_EntityID, AnimationTrack& a_AnimationTrack)
+		//---------------------------------------------------------------------
+		void AnimationKeyFrame::Activate(gameplay::EntityID& a_EntityID)
 		{
 			for (AnimationKeyFrameComponentBase* component : m_aAnimationKeyFrameComponents)
 			{
-				component->Activate(a_EntityID, a_AnimationTrack);
+				component->Activate(a_EntityID);
 			}
 		}
 
 #ifdef _EDITOR
+		//---------------------------------------------------------------------
 		void AnimationKeyFrame::Serialize(rapidjson::Value& a_Value, rapidjson::Document::AllocatorType& a_Allocator) const
 		{
 			for (AnimationKeyFrameComponentBase* component : m_aAnimationKeyFrameComponents)
@@ -42,9 +45,30 @@ namespace gallus
 			}
 		}
 #endif
+		//---------------------------------------------------------------------
 		void AnimationKeyFrame::Deserialize(const resources::SrcData& a_SrcData)
 		{
+			//if (a_SrcData.HasMember("components") && a_SrcData["components"].IsObject())
+			//{
+			//	const rapidjson::Value& components = a_SrcData["components"];
 
+			//	// Sprite component
+			//	if (components.HasMember("sprite") && components["sprite"].IsObject())
+			//	{
+			//		AnimationKeyFrameSpriteComponent* spriteComp = keyFrame.AddComponent<AnimationKeyFrameSpriteComponent>();
+
+			//		const rapidjson::Value& sprite = components["sprite"];
+			//		spriteComp->Deserialize(resources::SrcData(sprite));
+			//	}
+			//	// Event component
+			//	if (components.HasMember("event") && components["event"].IsObject())
+			//	{
+			//		AnimationKeyFrameEventComponent* eventComp = keyFrame.AddComponent<AnimationKeyFrameEventComponent>();
+
+			//		const rapidjson::Value& sprite = components["event"];
+			//		eventComp->Deserialize(resources::SrcData(sprite));
+			//	}
+			//}
 		}
 	}
 }

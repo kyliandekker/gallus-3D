@@ -12,7 +12,8 @@ namespace gallus
 {
 	namespace animation
 	{
-		void AnimationKeyFrameSpriteComponent::Activate(gameplay::EntityID& a_EntityID, AnimationTrack& a_AnimationTrack)
+		//---------------------------------------------------------------------
+		void AnimationKeyFrameSpriteComponent::Activate(gameplay::EntityID& a_EntityID)
 		{
 			gameplay::SpriteComponent& spriteComp = core::ENGINE->GetECS().GetSystem<gameplay::SpriteSystem>().GetComponent(a_EntityID);
 			spriteComp.SetSpriteIndex(m_iSpriteIndex);
@@ -22,11 +23,14 @@ namespace gallus
 			}
 		}
 
+#ifdef _EDITOR
+		//---------------------------------------------------------------------
 		int AnimationKeyFrameSpriteComponent::GetSpriteIndex() const
 		{
 			return m_iSpriteIndex;
 		}
 
+		//---------------------------------------------------------------------
 		void AnimationKeyFrameSpriteComponent::SetSpriteIndex(int a_iSpriteIndex)
 		{
 			if (m_pTexture && a_iSpriteIndex >= m_pTexture->GetSpriteRectsSize())
@@ -39,7 +43,9 @@ namespace gallus
 			}
 			m_iSpriteIndex = a_iSpriteIndex;
 		}
+#endif
 
+		//---------------------------------------------------------------------
 		std::string AnimationKeyFrameSpriteComponent::GetName() const
 		{
 			std::string name = "Sprite";
@@ -50,6 +56,7 @@ namespace gallus
 		}
 
 #ifdef _EDITOR
+		//---------------------------------------------------------------------
 		void AnimationKeyFrameSpriteComponent::Serialize(rapidjson::Value& a_Value, rapidjson::Document::AllocatorType& a_Allocator)  const
 		{
 			a_Value.AddMember("spriteIndex", m_iSpriteIndex, a_Allocator);
@@ -61,6 +68,8 @@ namespace gallus
 			);
 		}
 #endif _EDITOR
+
+		//---------------------------------------------------------------------
 		void AnimationKeyFrameSpriteComponent::Deserialize(const resources::SrcData& a_SrcData)
 		{
 			std::string tex = a_SrcData.GetString("texture");
@@ -69,7 +78,7 @@ namespace gallus
 			std::shared_ptr<graphics::dx12::CommandQueue> cCommandQueue = core::ENGINE->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
 			if (!tex.empty())
 			{
-				SetTexture(core::ENGINE->GetResourceAtlas().LoadTexture(tex, cCommandQueue).get());
+				m_pTexture = core::ENGINE->GetResourceAtlas().LoadTexture(tex, cCommandQueue).get();
 			}
 			cCommandQueue->Flush();
 		}

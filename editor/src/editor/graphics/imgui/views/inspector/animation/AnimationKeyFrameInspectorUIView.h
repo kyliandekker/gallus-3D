@@ -15,6 +15,7 @@ namespace gallus
 	namespace animation
 	{
 		class AnimationKeyFrame;
+		class AnimationTrack;
 	}
 	namespace graphics
 	{
@@ -42,15 +43,19 @@ namespace gallus
 				/// </summary>
 				/// <param name="a_Window">The ImGui window for rendering the view.</param>
 				/// <param name="a_KeyFrame">The key frame that will be shown in the view.</param>
-				AnimationKeyFrameInspectorUIView(ImGuiWindow& a_Window, animation::AnimationKeyFrame& a_KeyFrame);
+				/// <param name="a_AnimationTrack">The animation track related to the key frame.</param>
+				AnimationKeyFrameInspectorUIView(ImGuiWindow& a_Window, animation::AnimationKeyFrame& a_KeyFrame, animation::AnimationTrack& a_AnimationTrack);
 
 				std::string GetName() const override;
 
 				std::string GetIcon() const override;
 
+				void OnDelete() override;
+
 				void Render() override;
 			protected:
 				animation::AnimationKeyFrame& m_KeyFrame;
+				animation::AnimationTrack& m_AnimationTrack;
 
 				std::map<std::string, bool> m_aExpanded; // A list of component booleans.
 			};

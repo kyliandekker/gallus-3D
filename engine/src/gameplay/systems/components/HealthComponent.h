@@ -79,10 +79,15 @@ namespace gallus
 			float m_fHealth = 100;
 			float m_fMaxHealth = 100;
 
-			BEGIN_EXPOSED_FIELDS(HealthComponent)
-				EXPOSE_FIELD(HealthComponent, m_fHealth, "Health", FieldOptions{ .type = EditorWidgetType::DragFloat, .min = "0", .max = "1000" })
-				EXPOSE_FIELD(HealthComponent, m_fMaxHealth, "Max Health", FieldOptions{ .type = EditorWidgetType::DragFloat, .min = "0", .max = "1000" })
-			END_EXPOSED_FIELDS(HealthComponent)
+#ifdef _EDITOR
+			BEGIN_EXPOSE_FIELDS(HealthComponent)
+				EXPOSE_FIELD(HealthComponent, m_fHealth, "Health", FieldOptions{ .type = EditorFieldWidgetType::DragFloat, .min = "0", .max = "1000" })
+				EXPOSE_FIELD(HealthComponent, m_fMaxHealth, "Max Health", FieldOptions{ .type = EditorFieldWidgetType::DragFloat, .min = "0", .max = "1000" })
+			END_EXPOSE_FIELDS(HealthComponent)
+			BEGIN_EXPOSE_GIZMOS(HealthComponent)
+			END_EXPOSE_GIZMOS(HealthComponent)
+			END_EXPOSE_TO_EDITOR(HealthComponent)
+#endif
 		};
 	}
 }

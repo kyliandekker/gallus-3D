@@ -8,7 +8,9 @@
 #include "gameplay/EntityID.h"
 #include "gameplay/systems/UpdateTime.h"
 
+#ifdef _EDITOR
 #include "editor/EditorExpose.h"
+#endif
 
 namespace gallus
 {
@@ -21,7 +23,10 @@ namespace gallus
 		//---------------------------------------------------------------------
 		// Component
 		//---------------------------------------------------------------------
-		class Component : public IExposableToEditor
+		class Component
+#ifdef _EDITOR
+			: public IExposableToEditor
+#endif
 		{
 		public:
 			/// <summary>
@@ -80,7 +85,7 @@ namespace gallus
 			/// Updates the components.
 			/// </summary>
 			/// <param name="a_fDeltaTime">Delta time.</param>
-			void UpdateRealtimeInner(float a_fDeltaTime, UpdateTime a_UpdateTime);
+			virtual void UpdateRealtimeInner(float a_fDeltaTime, UpdateTime a_UpdateTime);
 
 			/// <summary>
 			/// Retrieves the Entity ID.

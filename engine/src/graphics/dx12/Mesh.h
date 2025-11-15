@@ -127,8 +127,13 @@ namespace gallus
 			private:
 				std::vector<MeshPartData> m_aMeshData;
 
-				BEGIN_EXPOSED_FIELDS(Mesh)
-				END_EXPOSED_FIELDS(Mesh)
+#ifdef _EDITOR
+				BEGIN_EXPOSE_FIELDS(Mesh)
+				END_EXPOSE_FIELDS(Mesh)
+				BEGIN_EXPOSE_GIZMOS(Mesh)
+				END_EXPOSE_GIZMOS(Mesh)
+				END_EXPOSE_TO_EDITOR(Mesh)
+#endif
 			};
 		}
 	}

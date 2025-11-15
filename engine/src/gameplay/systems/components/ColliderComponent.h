@@ -74,10 +74,15 @@ namespace gallus
 
 			std::set<gameplay::EntityID> m_aEntitiesToIgnore;
 
-			BEGIN_EXPOSED_FIELDS(ColliderComponent)
-				EXPOSE_FIELD(ColliderComponent, m_vOffset, "Offset", FieldOptions{ .type = EditorWidgetType::Vector2Field })
-				EXPOSE_FIELD(ColliderComponent, m_vSize, "Size", FieldOptions{ .type = EditorWidgetType::Vector2Field })
-			END_EXPOSED_FIELDS(ColliderComponent)
+#ifdef _EDITOR
+			BEGIN_EXPOSE_FIELDS(ColliderComponent)
+				EXPOSE_FIELD(ColliderComponent, m_vOffset, "Offset", FieldOptions{ .type = EditorFieldWidgetType::Vector2Field })
+				EXPOSE_FIELD(ColliderComponent, m_vSize, "Size", FieldOptions{ .type = EditorFieldWidgetType::Vector2Field })
+			END_EXPOSE_FIELDS(ColliderComponent)
+			BEGIN_EXPOSE_GIZMOS(ColliderComponent)
+			END_EXPOSE_GIZMOS(ColliderComponent)
+			END_EXPOSE_TO_EDITOR(ColliderComponent)
+#endif											   	
 		};
 	}
 }

@@ -102,8 +102,13 @@ namespace gallus
 			protected:
 				friend class ResourceAtlas;
 
-				BEGIN_EXPOSED_FIELDS(PixelShader)
-				END_EXPOSED_FIELDS(PixelShader)
+#ifdef _EDITOR
+				BEGIN_EXPOSE_FIELDS(PixelShader)
+				END_EXPOSE_FIELDS(PixelShader)
+				BEGIN_EXPOSE_GIZMOS(PixelShader)
+				END_EXPOSE_GIZMOS(PixelShader)
+				END_EXPOSE_TO_EDITOR(PixelShader)
+#endif
 			};
 
 			class VertexShader : public Shader
@@ -130,8 +135,13 @@ namespace gallus
 			protected:
 				friend class ResourceAtlas;
 
-				BEGIN_EXPOSED_FIELDS(VertexShader)
-				END_EXPOSED_FIELDS(VertexShader)
+#ifdef _EDITOR
+				BEGIN_EXPOSE_FIELDS(VertexShader)
+				END_EXPOSE_FIELDS(VertexShader)
+				BEGIN_EXPOSE_GIZMOS(VertexShader)
+				END_EXPOSE_GIZMOS(VertexShader)
+				END_EXPOSE_TO_EDITOR(VertexShader)
+#endif
 			};
 		}
 	}

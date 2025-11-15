@@ -1,6 +1,8 @@
 #pragma once
 
+#ifdef _EDITOR
 #include <string>
+#endif
 
 namespace gallus
 {
@@ -12,6 +14,7 @@ namespace gallus
 			AnimationEvent_Delete
 		};
 
+#ifdef _EDITOR
 		/// <summary>
 		/// Converts an animation event enumeration value to its corresponding string representation.
 		/// </summary>
@@ -35,5 +38,6 @@ namespace gallus
 				}
 			}
 		}
+#endif
 	}
 }

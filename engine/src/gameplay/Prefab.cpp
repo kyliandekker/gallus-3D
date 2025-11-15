@@ -25,7 +25,7 @@ namespace gallus
 		bool Prefab::LoadData()
 		{
 #ifdef _EDITOR
-			m_fIsDirty = false;
+			m_bIsDirty = false;
 #endif // _EDITOR
 
 			// Clear all entities.
@@ -40,7 +40,7 @@ namespace gallus
 			}
 
 #ifdef _EDITOR
-			m_fIsDirty = true;
+			m_bIsDirty = true;
 #endif // _EDITOR
 			return true;
 		}
@@ -141,9 +141,9 @@ namespace gallus
 			{
 				if (componentsDoc.HasMember(system->GetPropertyName().c_str()))
 				{
-					const rapidjson::Value& testMember = componentsDoc[system->GetPropertyName().c_str()];
+					const rapidjson::Value& srcData = componentsDoc[system->GetPropertyName().c_str()];
 
-					gameplay::Component* component = system->CreateBaseComponent(id, resources::SrcData(testMember));
+					gameplay::Component* component = system->CreateBaseComponent(id, resources::SrcData(srcData));
 					if (!component)
 					{
 						continue;

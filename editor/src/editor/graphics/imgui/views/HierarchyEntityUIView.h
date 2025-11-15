@@ -52,6 +52,12 @@ namespace gallus
 				{
 					return m_sIcon;
 				}
+
+				void RenderGizmos(
+					const ImVec2& a_vScenePos,
+					const ImVec2& a_vSize,
+					const ImVec2& a_vPanOffset,
+					float a_fZoom) override;
 			private:
 				gameplay::EntityID& m_EntityID;
 				std::string m_sIcon;

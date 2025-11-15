@@ -17,6 +17,8 @@
 #include "graphics/dx12/Shader.h"
 #include "gameplay/Prefab.h"
 
+#include "graphics/dx12/DX12Transform.h"
+
 namespace gallus
 {
 	namespace graphics
@@ -85,24 +87,27 @@ namespace gallus
 				return false;
 			}
 
-			void ShowObject(IExposableToEditor* obj)
+			bool ShowObject(IExposableToEditor* obj)
 			{
 				if (!obj)
 				{
 					ImGui::TextDisabled("<null>");
-					return;
+					return false;
 				}
 
+				bool changed = false;
 				for (const EditorFieldInfo& subField : obj->GetEditorFields())
 				{
-					ShowEditorFieldFromObject(obj, subField);
+					changed = ShowEditorFieldFromObject(obj, subField);
 				}
-
+				return changed;
 			}
 
-			void ShowAssetPicker(const std::string& a_sId, gallus::resources::EngineResource* a_pValue, gallus::resources::EngineResource** a_pValuePtr, const EditorFieldInfo& a_Field)
+			bool ShowAssetPicker(const std::string& a_sId, gallus::resources::EngineResource* a_pValue, gallus::resources::EngineResource** a_pValuePtr, const EditorFieldInfo& a_Field)
 			{
-				std::string name = (a_pValue != nullptr) ? a_pValue->GetName() : "<null>";
+				bool changed = false;
+
+				const std::string name = (a_pValue != nullptr) ? a_pValue->GetName() : "<null>";
 
 				char buf[256];
 				strncpy_s(buf, sizeof(buf), name.c_str(), sizeof(buf) - 1);
@@ -120,14 +125,19 @@ namespace gallus
 				{
 					FilePickerModal& filePickerModal = core::EDITOR_ENGINE->GetDX12().GetImGuiWindow().GetWindowsConfig<EditorWindowsConfig>().GetFilePickerModal();
 					filePickerModal.SetData(
-						[a_pValuePtr, a_pValue](int success, gallus::resources::FileResource& resource)
+						[&changed, a_pValuePtr, a_pValue](int success, gallus::resources::FileResource& resource)
 					{
 						if (success == 1)
 						{
-							auto cCommandQueue = core::EDITOR_ENGINE->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
+							if (!a_pValue)
+							{
+								return;
+							}
 
 							if (a_pValue->GetResourceType() == resources::AssetType::Sprite)
 							{
+								auto cCommandQueue = core::EDITOR_ENGINE->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
+
 								*a_pValuePtr = core::EDITOR_ENGINE->GetResourceAtlas()
 									.LoadTexture(resource.GetPath().filename().generic_string(), cCommandQueue)
 									.get();
@@ -150,14 +160,16 @@ namespace gallus
 									.LoadPrefab(resource.GetPath().filename().generic_string())
 									.get();
 							}
-
-							core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
+							
+							changed = true;
 						}
 					},
 						std::vector<gallus::resources::AssetType>{ a_Field.m_Options.assetType });
 					filePickerModal.Show();
 				}
 				ImGui::PopStyleVar();
+
+				return changed;
 			}
 
 			bool ShowEnumDropdown(const std::string& a_sId, int* a_pValue, const EditorFieldInfo& a_Field)
@@ -241,166 +253,177 @@ namespace gallus
 				return false; // read-only
 			}
 
-			void ShowEditorFieldFromObject(IExposableToEditor* obj, const EditorFieldInfo& field)
+			bool ShowEditorFieldFromObject(IExposableToEditor* a_pObject, const EditorFieldInfo& a_Field)
 			{
-				void* ptr = reinterpret_cast<char*>(obj) + field.m_iOffset;
+				void* ptr = reinterpret_cast<char*>(a_pObject) + a_Field.m_iOffset;
 
-				std::function<void()> func = [] {};
+				std::function<bool()> func = [] { return false; };
 
 				bool showTable = true;
-				std::string fieldId = ImGui::IMGUI_FORMAT_ID("", INPUT_ID, string_extensions::StringToUpper(field.m_sUIName) + "_INSPECTOR");
-				switch (field.m_Options.type)
+				std::string fieldId = ImGui::IMGUI_FORMAT_ID("", INPUT_ID, string_extensions::StringToUpper(a_Field.m_sUIName) + "_INSPECTOR");
+				switch (a_Field.m_Options.type)
 				{
-					case EditorWidgetType::DragFloat:
+					case EditorFieldWidgetType::DragFloat:
 					{
 						float* value = reinterpret_cast<float*>(ptr);
-						func = [value, &field, &fieldId]
+						func = [value, &a_Field, &fieldId]
 						{
-							ShowDragFloat(fieldId, value, field);
+							return ShowDragFloat(fieldId, value, a_Field);
 						};
 						break;
 					}
-					case EditorWidgetType::DragInt8:
+					case EditorFieldWidgetType::DragInt8:
 					{
-						func = [ptr, &field, &fieldId]
+						func = [ptr, &a_Field, &fieldId]
 						{
 							int8_t* value = reinterpret_cast<int8_t*>(ptr);
 							int temp = static_cast<int64_t>(*value);
 
-							if (ShowDragInt(fieldId, temp, field))
+							bool changed = ShowDragInt(fieldId, temp, a_Field);
+							if (changed)
 							{
 								*value = static_cast<int8_t>(temp);
 							}
+							return changed;
 						};
 						break;
 					}
 
-					case EditorWidgetType::DragInt16:
+					case EditorFieldWidgetType::DragInt16:
 					{
-						func = [ptr, &field, &fieldId]
+						func = [ptr, &a_Field, &fieldId]
 						{
 							int16_t* value = reinterpret_cast<int16_t*>(ptr);
 							int temp = static_cast<int64_t>(*value);
 
-							if (ShowDragInt(fieldId, temp, field))
+							bool changed = ShowDragInt(fieldId, temp, a_Field);
+							if (changed)
 							{
 								*value = static_cast<int16_t>(temp);
 							}
+							return changed;
 						};
 						break;
 					}
 
-					case EditorWidgetType::DragInt32:
+					case EditorFieldWidgetType::DragInt32:
 					{
-						func = [ptr, &field, &fieldId]
+						func = [ptr, &a_Field, &fieldId]
 						{
 							int32_t* value = reinterpret_cast<int32_t*>(ptr);
 							int temp = static_cast<int64_t>(*value);
 
-							if (ShowDragInt(fieldId, temp, field))
+							bool changed = ShowDragInt(fieldId, temp, a_Field);
+							if (changed)
 							{
 								*value = static_cast<int32_t>(temp);
 							}
+							return changed;
 						};
 						break;
 					}
 
-					case EditorWidgetType::DragInt64:
+					case EditorFieldWidgetType::DragInt64:
 					{
-						func = [ptr, &field, &fieldId]
+						func = [ptr, &a_Field, &fieldId]
 						{
 							int64_t* value = reinterpret_cast<int64_t*>(ptr);
 							int temp = *value;
 
-							if (ShowDragInt(fieldId, temp, field))
+							bool changed = ShowDragInt(fieldId, temp, a_Field);
+							if (changed)
 							{
 								*value = temp;
 							}
+							return changed;
 						};
 						break;
 					}
-					case EditorWidgetType::Checkbox:
+					case EditorFieldWidgetType::Checkbox:
 					{
 						bool* value = reinterpret_cast<bool*>(ptr);
-						func = [&field, &fieldId, value]
+						func = [&a_Field, &fieldId, value]
 						{
-							ImGui::Checkbox(fieldId.c_str(), value);
+							return ImGui::Checkbox(fieldId.c_str(), value);
 						};
 						break;
 					}
-					case EditorWidgetType::Toggle:
+					case EditorFieldWidgetType::Toggle:
 					{
 						bool* value = reinterpret_cast<bool*>(ptr);
-						func = [&field, &fieldId, value]
+						func = [&a_Field, &fieldId, value]
 						{
-							ImGui::Toggle(fieldId.c_str(), value);
+							return ImGui::Toggle(fieldId.c_str(), value);
 						};
 						break;
 					}
-					case EditorWidgetType::Vector2Field:
+					case EditorFieldWidgetType::Vector2Field:
 					{
 						DirectX::XMFLOAT2* value = reinterpret_cast<DirectX::XMFLOAT2*>(ptr);
-						func = [&field, &fieldId, value]
+						func = [&a_Field, &fieldId, value]
 						{
-							ShowVector2(fieldId, *value, field);
+							return ShowVector2(fieldId, *value, a_Field);
 						};
 						break;
 					}
-					case EditorWidgetType::AssetPickerPtr:
+					case EditorFieldWidgetType::AssetPickerPtr:
 					{
 						gallus::resources::EngineResource** pValuePtr = reinterpret_cast<gallus::resources::EngineResource**>(ptr);
 						
-						func = [&field, &fieldId, pValuePtr, ptr]
+						func = [&a_Field, &fieldId, pValuePtr, ptr]
 						{
 							gallus::resources::EngineResource* value = (pValuePtr && *pValuePtr) ? *pValuePtr : nullptr;
-							ShowAssetPicker(fieldId, value, pValuePtr, field);
+							return ShowAssetPicker(fieldId, value, pValuePtr, a_Field);
 						};
 						break;
 					}
-					case EditorWidgetType::Object:
+					case EditorFieldWidgetType::Object:
 					{
 						showTable = false;
 						IExposableToEditor* editorObject = dynamic_cast<IExposableToEditor*>(reinterpret_cast<IExposableToEditor*>(ptr));
 
-						ShowObject(editorObject);
+						return ShowObject(editorObject);
 						break;
 					}
-					case EditorWidgetType::ObjectPtr:
+					case EditorFieldWidgetType::ObjectPtr:
 					{
 						showTable = false;
 
 						IExposableToEditor** ppEditorObject = reinterpret_cast<IExposableToEditor**>(ptr);
 						IExposableToEditor* pEditorObject = (ppEditorObject ? *ppEditorObject : nullptr);
 
-						ShowObject(pEditorObject);
+						return ShowObject(pEditorObject);
 						break;
 					}
-					case EditorWidgetType::EnumDropdown:
+					case EditorFieldWidgetType::EnumDropdown:
 					{
-						func = [ptr, &field, &fieldId]
+						func = [ptr, &a_Field, &fieldId]
 						{
 							int* enumValue = reinterpret_cast<int*>(ptr);
 							int temp = *enumValue;
 
-							if (ShowEnumDropdown(fieldId, &temp, field))
+							bool changed = ShowEnumDropdown(fieldId, &temp, a_Field);
+							if (changed)
 							{
 								*enumValue = temp;
 							}
+							return changed;
 						};
 						break;
 					}
-					case EditorWidgetType::TexturePreview:
+					case EditorFieldWidgetType::TexturePreview:
 					{
-						func = [ptr, &field, obj]()
+						func = [ptr, &a_Field, a_pObject]()
 						{
 							// texture pointer
 							graphics::dx12::Texture* tex = *reinterpret_cast<graphics::dx12::Texture**>(ptr);
 
 							// sprite index is int8_t
-							int8_t* spriteIndexPtr = reinterpret_cast<int8_t*>(reinterpret_cast<char*>(obj) + field.m_Options.relatedIndexFieldOffset);
+							int8_t* spriteIndexPtr = reinterpret_cast<int8_t*>(reinterpret_cast<char*>(a_pObject) + a_Field.m_Options.relatedIndexFieldOffset);
 							int spriteIndex = spriteIndexPtr ? static_cast<int>(*spriteIndexPtr) : 0;
 
-							ShowTexturePreview(field.m_sUIName, tex, spriteIndex);
+							ShowTexturePreview(a_Field.m_sUIName, tex, spriteIndex);
+							return false;
 						};
 						break;
 					}
@@ -412,29 +435,120 @@ namespace gallus
 
 				if (showTable)
 				{
-					ImGui::KeyValue([&field]
+					return ImGui::KeyValue([&a_Field]
 					{
 						ImGui::AlignTextToFramePadding();
-						ImGui::DisplayHeader(core::EDITOR_ENGINE->GetDX12().GetImGuiWindow().GetBoldFont(), field.m_sUIName);
+						ImGui::DisplayHeader(core::EDITOR_ENGINE->GetDX12().GetImGuiWindow().GetBoldFont(), a_Field.m_sUIName);
 					}, func);
 				}
+
+				return false;
 			}
 
-			void RenderEditorForObject(IExposableToEditor* obj)
+			bool RenderObjectFields(IExposableToEditor* a_pObject)
 			{
-				const auto& fields = obj->GetEditorFields();
+				const auto& fields = a_pObject->GetEditorFields();
 
-				std::string id = ImGui::IMGUI_FORMAT_ID("", TABLE_ID, string_extensions::StringToUpper(std::string(obj->GetTypeName())) + "_INSPECTOR");
+				std::string id = ImGui::IMGUI_FORMAT_ID("", TABLE_ID, string_extensions::StringToUpper(std::string(a_pObject->GetTypeName())) + "_INSPECTOR");
 				bool tableActive = ImGui::StartInspectorKeyVal(id, core::EDITOR_ENGINE->GetDX12().GetImGuiWindow().GetFramePadding());
 
+				bool changed = false;
 				if (tableActive)
 				{
 					for (const EditorFieldInfo& field : fields)
 					{
-						ShowEditorFieldFromObject(obj, field);
+						if (ShowEditorFieldFromObject(a_pObject, field))
+						{
+							changed = true;
+						}
 					}
 					ImGui::EndInspectorKeyVal(ImVec2());
 				}
+
+				return changed;
+			}
+
+			void ShowTransformGizmo(const ImVec2& a_vScenePos, const ImVec2& a_vSize, const ImVec2& a_vPanOffset, float a_fZoom, graphics::dx12::DX12Transform& a_Transform)
+			{
+				DirectX::XMMATRIX pivotOffset = DirectX::XMMatrixTranslation(a_Transform.GetPivot().x, a_Transform.GetPivot().y, 0.0f);
+				DirectX::XMMATRIX objectMat = a_Transform.GetWorldMatrix();
+				objectMat = objectMat * pivotOffset;;
+
+				graphics::dx12::Camera& cam = core::ENGINE->GetDX12().GetActiveCamera();
+
+				// Get transformation matrices
+				DirectX::XMMATRIX viewMat = cam.GetViewMatrix();
+				const DirectX::XMMATRIX& projMat = cam.GetProjectionMatrix();
+
+				// Convert DirectX matrices to float[16] format for ImGuizmo
+				float objectFloat[16];
+				DirectX::XMStoreFloat4x4(reinterpret_cast<DirectX::XMFLOAT4X4*>(objectFloat), objectMat);
+				float viewFloat[16];
+				DirectX::XMStoreFloat4x4(reinterpret_cast<DirectX::XMFLOAT4X4*>(viewFloat), viewMat);
+				float projFloat[16];
+				DirectX::XMStoreFloat4x4(reinterpret_cast<DirectX::XMFLOAT4X4*>(projFloat), projMat);
+
+				if (ImGui::IsKeyPressed(ImGuiKey_T) || ImGui::IsKeyPressed(ImGuiKey_P))
+				{
+					core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetLastSceneOperation((int) ImGuizmo::TRANSLATE);
+					core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
+				}
+				if (ImGui::IsKeyPressed(ImGuiKey_R))
+				{
+					core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetLastSceneOperation((int) ImGuizmo::ROTATE_Z);
+					core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
+				}
+				if (ImGui::IsKeyPressed(ImGuiKey_S))
+				{
+					core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetLastSceneOperation((int) ImGuizmo::SCALE);
+					core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
+				}
+
+				bool useSnap = ImGui::IsKeyDown(ImGuiKey_LeftShift);
+				float snap = useSnap ? 1.0f : 0.0f;
+
+				// Render the gizmo (check if manipulation occurred)
+				if (ImGuizmo::Manipulate(
+					viewFloat,
+					projFloat,
+					(ImGuizmo::OPERATION) core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetLastSceneOperation(),
+					ImGuizmo::LOCAL,
+					objectFloat, 0, &snap))
+				{
+					DirectX::XMMATRIX result = DirectX::XMLoadFloat4x4(reinterpret_cast<DirectX::XMFLOAT4X4*>(objectFloat));
+					result = result * DirectX::XMMatrixInverse(nullptr, pivotOffset);
+
+					a_Transform.SetWorldMatrix(result);
+
+					core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
+				}
+			}
+
+			bool RenderObjectGizmos(const ImVec2& a_vScenePos, const ImVec2& a_vSize, const ImVec2& a_vPanOffset, float a_fZoom, IExposableToEditor* a_pObject)
+			{
+				if (!a_pObject)
+				{
+					return false;
+				}
+
+				const auto& gizmos = a_pObject->GetEditorGizmos();
+
+				for (const EditorGizmoInfo& gizmo : gizmos)
+				{
+					void* ptr = reinterpret_cast<char*>(a_pObject) + gizmo.m_iOffset;
+
+					switch (gizmo.m_Options.type)
+					{
+						case EditorGizmoType::Transform:
+						{
+							graphics::dx12::DX12Transform* value = reinterpret_cast<graphics::dx12::DX12Transform*>(ptr);
+							ShowTransformGizmo(a_vScenePos, a_vSize, a_vPanOffset, a_fZoom, *value);
+							break;
+						}
+					}
+				}
+
+				return true;
 			}
 }
 	}

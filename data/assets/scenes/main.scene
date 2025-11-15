@@ -6,7 +6,7 @@
             "components": {
                 "sprite": {
                     "texture": {
-                        "name": "tex_missing.png",
+                        "name": "tex_goomba_sprites.png",
                         "spriteIndex": 4
                     },
                     "shader": {

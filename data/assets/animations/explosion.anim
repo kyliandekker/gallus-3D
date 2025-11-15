@@ -7,7 +7,8 @@
                 "sprite": {
                     "spriteIndex": 0,
                     "texture": "tex_explosion.png"
-                }
+                },
+                "sound": {}
             }
         },
         "1": {

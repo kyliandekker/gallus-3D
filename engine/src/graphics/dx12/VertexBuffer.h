@@ -61,8 +61,13 @@ namespace gallus
 
 				D3D12_VERTEX_BUFFER_VIEW m_VertexBufferView;
 
-				BEGIN_EXPOSED_FIELDS(VertexBuffer)
-				END_EXPOSED_FIELDS(VertexBuffer)
+#ifdef _EDITOR
+				BEGIN_EXPOSE_FIELDS(VertexBuffer)
+				END_EXPOSE_FIELDS(VertexBuffer)
+				BEGIN_EXPOSE_GIZMOS(VertexBuffer)
+				END_EXPOSE_GIZMOS(VertexBuffer)
+				END_EXPOSE_TO_EDITOR(VertexBuffer)
+#endif
 			};
 		}
 	}

@@ -58,8 +58,13 @@ namespace gallus
 
 				D3D12_INDEX_BUFFER_VIEW m_IndexBufferView;
 
-				BEGIN_EXPOSED_FIELDS(IndexBuffer)
-				END_EXPOSED_FIELDS(IndexBuffer)
+#ifdef _EDITOR
+				BEGIN_EXPOSE_FIELDS(IndexBuffer)
+				END_EXPOSE_FIELDS(IndexBuffer)
+				BEGIN_EXPOSE_GIZMOS(IndexBuffer)
+				END_EXPOSE_GIZMOS(IndexBuffer)
+				END_EXPOSE_TO_EDITOR(IndexBuffer)
+#endif
 			};
 		}
 	}

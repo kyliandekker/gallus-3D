@@ -49,9 +49,9 @@ namespace gallus
 				}
 	
 				int i = 0;
-				for (animation::AnimationKeyFrame& keyFrame : m_pAnimationTrack->GetKeyFrames())
+				for (animation::AnimationKeyFrame* keyFrame : m_pAnimationTrack->GetKeyFrames())
 				{
-					float px = startPos.x + (keyFrame.GetFrame() * ANIMATION_FRAME_PIXEL_WIDTH);
+					float px = startPos.x + (keyFrame->GetFrame() * ANIMATION_FRAME_PIXEL_WIDTH);
 					std::string keyFrameIcon = font::ICON_KEYFRAME;
 					ImVec2 iconSize = ImGui::CalcTextSize(keyFrameIcon.c_str());
 					float verticalOffset = (TRACK_SIZE - iconSize.y) / 2.0f;
@@ -86,20 +86,22 @@ namespace gallus
 						SetSelectedKeyFrame(i);
 
 						s_bDragging = true;
-						s_pDraggedKeyFrame = &keyFrame;
+						s_pDraggedKeyFrame = keyFrame;
 					}
 
 					// Update drag
-					if (s_bDragging && s_pDraggedKeyFrame == &keyFrame && bMouseDragging)
+					if (s_bDragging && s_pDraggedKeyFrame == keyFrame && bMouseDragging)
 					{
 						ImVec2 mousePos = ImGui::GetMousePos();
 						ImVec2 s_vRelativePos = mousePos - startPos;
 						int frame = std::round(s_vRelativePos.x / ANIMATION_FRAME_PIXEL_WIDTH);
-						keyFrame.SetFrame(std::clamp(frame, 0, m_pAnimationTrack->GetFrameCount()));
+						keyFrame->SetFrame(std::clamp(frame, 0, m_pAnimationTrack->GetFrameCount()));
+
+						keyFrame->GetAnimationTrack()->SetIsDirty(true);
 					}
 
 					// End drag
-					if (!bMouseDown && s_bDragging && s_pDraggedKeyFrame == &keyFrame)
+					if (!bMouseDown && s_bDragging && s_pDraggedKeyFrame == keyFrame)
 					{
 						s_bDragging = false;
 						s_pDraggedKeyFrame = nullptr;
@@ -120,7 +122,7 @@ namespace gallus
 
 				m_iSelectedKeyFrame = a_iSelectedKeyFrame;
 
-				core::EDITOR_ENGINE->GetEditor().SetSelectable(nullptr, new AnimationKeyFrameInspectorUIView(m_Window, m_pAnimationTrack->GetKeyFrames()[m_iSelectedKeyFrame]));
+				core::EDITOR_ENGINE->GetEditor().SetSelectable(nullptr, new AnimationKeyFrameInspectorUIView(m_Window, *m_pAnimationTrack->GetKeyFrames()[m_iSelectedKeyFrame], *m_pAnimationTrack));
 			}
 		}
 	}

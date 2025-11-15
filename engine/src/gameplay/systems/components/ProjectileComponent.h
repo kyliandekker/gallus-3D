@@ -67,10 +67,15 @@ namespace gallus
 			
 			gameplay::Prefab* m_ExplosionPrefab = nullptr;
 
-			BEGIN_EXPOSED_FIELDS(ProjectileComponent)
-				EXPOSE_FIELD(ProjectileComponent, m_fDamage, "Speed", FieldOptions{ .type = EditorWidgetType::DragFloat })
-				EXPOSE_FIELD(ProjectileComponent, m_ExplosionPrefab, "Explosion Prefab", FieldOptions{ .type = EditorWidgetType::AssetPickerPtr, .assetType = resources::AssetType::Prefab })
-			END_EXPOSED_FIELDS(ProjectileComponent)
+#ifdef _EDITOR
+			BEGIN_EXPOSE_FIELDS(ProjectileComponent)
+				EXPOSE_FIELD(ProjectileComponent, m_fDamage, "Speed", FieldOptions{ .type = EditorFieldWidgetType::DragFloat })
+				EXPOSE_FIELD(ProjectileComponent, m_ExplosionPrefab, "Explosion Prefab", FieldOptions{ .type = EditorFieldWidgetType::AssetPickerPtr, .assetType = resources::AssetType::Prefab })
+			END_EXPOSE_FIELDS(ProjectileComponent)
+			BEGIN_EXPOSE_GIZMOS(ProjectileComponent)
+			END_EXPOSE_GIZMOS(ProjectileComponent)
+			END_EXPOSE_TO_EDITOR(ProjectileComponent)
+#endif
 		};
 	}
 }

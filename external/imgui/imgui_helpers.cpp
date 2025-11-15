@@ -224,13 +224,13 @@ namespace ImGui
 		return b;
 	}
 
-	void KeyValue(std::function<void()> a_Key, std::function<void()> a_Val)
+	bool KeyValue(std::function<void()> a_Key, std::function<bool()> a_Val)
 	{
 		ImGui::TableNextRow();
 		ImGui::TableSetColumnIndex(0);
 		a_Key();
 		ImGui::TableSetColumnIndex(1);
-		a_Val();
+		return a_Val();
 	}
 
 	void EndInspectorKeyVal(const ImVec2& a_vFramePadding)

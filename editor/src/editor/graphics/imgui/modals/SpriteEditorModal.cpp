@@ -528,17 +528,18 @@ namespace gallus
 						},
 						[&spriteUV, &textureSize]
 						{
-							ImGui::PushItemWidth(75);
-							if (ImGui::DragInt(ImGui::IMGUI_FORMAT_ID("", BUTTON_ID, "X_SPRITE_EDITOR_MODAL").c_str(), &spriteUV.x, 1.0f, textureSize.x))
-							{
-								spriteUV.x = std::clamp(spriteUV.x, 0, textureSize.x - spriteUV.height);
-							}
-							ImGui::SameLine();
-							if (ImGui::DragInt(ImGui::IMGUI_FORMAT_ID("", BUTTON_ID, "Y_SPRITE_EDITOR_MODAL").c_str(), &spriteUV.y, 1.0f, textureSize.y))
-							{
-								spriteUV.y = std::clamp(spriteUV.y, 0, textureSize.y - spriteUV.width);
-							}
-							ImGui::PopItemWidth();
+							//ImGui::PushItemWidth(75);
+							//if (ImGui::DragInt(ImGui::IMGUI_FORMAT_ID("", BUTTON_ID, "X_SPRITE_EDITOR_MODAL").c_str(), &spriteUV.x, 1.0f, textureSize.x))
+							//{
+							//	spriteUV.x = std::clamp(spriteUV.x, 0, textureSize.x - spriteUV.height);
+							//}
+							//ImGui::SameLine();
+							//if (ImGui::DragInt(ImGui::IMGUI_FORMAT_ID("", BUTTON_ID, "Y_SPRITE_EDITOR_MODAL").c_str(), &spriteUV.y, 1.0f, textureSize.y))
+							//{
+							//	spriteUV.y = std::clamp(spriteUV.y, 0, textureSize.y - spriteUV.width);
+							//}
+							//ImGui::PopItemWidth();
+							return false;
 						});
 					ImGui::KeyValue([&window]
 						{
@@ -547,17 +548,20 @@ namespace gallus
 						},
 						[&spriteUV, &textureSize]
 						{
-							ImGui::PushItemWidth(75);
-							if (ImGui::DragInt(ImGui::IMGUI_FORMAT_ID("", BUTTON_ID, "WIDTH_SPRITE_EDITOR_MODAL").c_str(), &spriteUV.width, 1.0f, textureSize.x))
-							{
-								spriteUV.width = std::clamp(spriteUV.width, 1, textureSize.x - spriteUV.x);
-							}
-							ImGui::SameLine();
-							if (ImGui::DragInt(ImGui::IMGUI_FORMAT_ID("", BUTTON_ID, "HEIGHT_SPRITE_EDITOR_MODAL").c_str(), &spriteUV.height, 1.0f, textureSize.y))
-							{
-								spriteUV.height = std::clamp(spriteUV.height, 1, textureSize.y - spriteUV.y);
-							}
-							ImGui::PopItemWidth();
+							//ImGui::PushItemWidth(75);
+							//bool changed = ImGui::DragInt(ImGui::IMGUI_FORMAT_ID("", BUTTON_ID, "WIDTH_SPRITE_EDITOR_MODAL").c_str(), &spriteUV.width, 1.0f, textureSize.x);
+							//if ()
+							//{
+							//	spriteUV.width = std::clamp(spriteUV.width, 1, textureSize.x - spriteUV.x);
+							//}
+							//ImGui::SameLine();
+							//if (ImGui::DragInt(ImGui::IMGUI_FORMAT_ID("", BUTTON_ID, "HEIGHT_SPRITE_EDITOR_MODAL").c_str(), &spriteUV.height, 1.0f, textureSize.y))
+							//{
+							//	spriteUV.height = std::clamp(spriteUV.height, 1, textureSize.y - spriteUV.y);
+							//}
+							//ImGui::PopItemWidth();
+
+							return false;
 						});
 					ImGui::PopStyleVar();
 					ImGui::EndInspectorKeyVal(m_Window.GetFramePadding());

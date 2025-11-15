@@ -67,11 +67,39 @@ namespace gallus
 
 				float topPosY = ImGui::GetCursorPosY();
 
+				bool wasDirty = m_AnimationTrack.IsDirty();
+				bool wasValid = m_AnimationTrack.IsValid();
+				if (!wasDirty || !wasValid)
+				{
+					ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+					ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+				}
 
 				if (ImGui::IconButton(
 					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_SAVE), BUTTON_ID, "SAVE_ANIMATION_MODAL").c_str(), m_Window.GetHeaderSize(), m_Window.GetIconFont(), ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent)))
 				{
 					m_AnimationTrack.Save(m_pFile->GetPath());
+
+					m_AnimationTrack.SetIsDirty(false);
+
+					// TODO: Reload existing resource if loaded in atlas.
+					//if (core::EDITOR_ENGINE->GetResourceAtlas().HasTexture(m_pFileResource->GetPath().filename().generic_string()))
+					//{
+					//	core::EDITOR_ENGINE->GetResourceAtlas().LoadTexture(m_pFileResource->GetPath().filename().generic_string())->LoadMetaData();
+					//}
+				}
+				
+				if (!wasDirty || !wasValid)
+				{
+					ImGui::PopItemFlag();
+					ImGui::PopStyleVar();
+				}
+
+				bool wasInvalid = m_AnimationTrackUIView.GetSelectedKeyFrame() < 0 || m_AnimationTrackUIView.GetSelectedKeyFrame() >= m_AnimationTrack.GetKeyFrames().size();
+				if (!wasValid || wasInvalid)
+				{
+					ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+					ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
 				}
 
 				ImGui::SameLine();
@@ -80,6 +108,8 @@ namespace gallus
 					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_ADD_KEYFRAME), BUTTON_ID, "ADD_KEYFRAME_ANIMATION_MODAL").c_str(), m_Window.GetHeaderSize(), m_Window.GetIconFont(), ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent)))
 				{
 					m_AnimationTrack.AddKeyFrame(m_iCurrentFrame);
+
+					m_AnimationTrack.SetIsDirty(true);
 				}
 
 				ImGui::SameLine();
@@ -89,23 +119,45 @@ namespace gallus
 				{
 					m_AnimationTrack.RemoveKeyFrame(m_AnimationTrackUIView.GetSelectedKeyFrame());
 					m_AnimationTrackUIView.SetSelectedKeyFrame(-1);
+
+					m_AnimationTrack.SetIsDirty(true);
+				}
+
+				if (!wasValid || wasInvalid)
+				{
+					ImGui::PopItemFlag();
+					ImGui::PopStyleVar();
 				}
 
 				ImGui::SameLine();
+
+				if (!wasValid)
+				{
+					ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+					ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+				}
 
 				bool isLooping = m_AnimationTrack.IsLooping();
-
-				if (ImGui::Toggle(ImGui::IMGUI_FORMAT_ID("", CHECKBOX_ID, "IS_LOOPING_ANIMATION_MODAL").c_str(), &isLooping))
+				if (ImGui::CheckboxButton(
+					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_REFRESH), BUTTON_ID, "IS_LOOPING_ANIMATION_MODAL").c_str(), &isLooping, ImVec2(toolbarSize.y, toolbarSize.y)))
 				{
 					m_AnimationTrack.SetIsLooping(isLooping);
-					core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
+
+					m_AnimationTrack.SetIsDirty(true);
+				}
+
+				if (!wasValid)
+				{
+					ImGui::PopItemFlag();
+					ImGui::PopStyleVar();
 				}
 
 				ImGui::SameLine();
 
-				ImGui::SetNextItemWidth(100);
-				ImGui::DragInt(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "CURRENT_FRAME_ANIMATION_MODAL").c_str(), &m_iCurrentFrame, 1, 0, m_AnimationTrack.GetFrameCount());
+				const int frameCount = m_AnimationTrack.GetFrameCount() == 0 ? 100 : m_AnimationTrack.GetFrameCount();
 
+				ImGui::SetNextItemWidth(100);
+				ImGui::DragInt(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "CURRENT_FRAME_ANIMATION_MODAL").c_str(), &m_iCurrentFrame, 1, 0, frameCount, "Frame %i");
 
 				ImVec2 endPos = ImGui::GetCursorPos();
 
@@ -161,7 +213,6 @@ namespace gallus
 
 					int halfModFrameCount = modFrameCount / 2;
 
-					int frameCount = m_AnimationTrack.GetFrameCount() == 0 ? 100 : m_AnimationTrack.GetFrameCount();
 					for (int i = frameMin; i <= frameCount; i += frameStep)
 					{
 						bool baseIndex = ((i % modFrameCount) == 0) || (i == frameCount || i == frameMin);
