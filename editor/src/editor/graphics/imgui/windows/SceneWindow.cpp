@@ -14,9 +14,7 @@
 
 // editor includes
 #include "editor/core/EditorEngine.h"
-#include "editor/graphics/imgui/views/HierarchyEntityUIView.h"
-#include "editor/graphics/imgui/views/inspector/EntityInspectorView.h"
-#include "editor/graphics/imgui/RenderEditorExposable.h"
+#include "editor/graphics/imgui/selectables/EntityEditorSelectable.h"
 
 // gameplay includes
 #include "gameplay/Game.h"
@@ -84,7 +82,7 @@ namespace gallus
 				if (ImGui::CheckboxButton(
 					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_PLAY), BUTTON_ID, "PLAY_SCENE").c_str(), &isStarted, m_Window.GetHeaderSize()))
 				{
-					core::EDITOR_ENGINE->GetEditor().SetSelectable(nullptr, nullptr);
+					core::EDITOR_ENGINE->GetEditor().SetSelectable(nullptr);
 					if (isStarted)
 					{
 						gameplay::GAME.GetScene().Load();
@@ -287,12 +285,15 @@ namespace gallus
 				DrawGizmos(a_vSceneStartPos, a_vSize, m_vPanOffset, m_fZoom);
 				Draw2DGrid(a_vSceneStartPos, a_vSize, m_vPanOffset, m_fZoom);
 
-				if (core::EDITOR_ENGINE->GetEditor().GetSelectable().get())
+				if (!core::EDITOR_ENGINE->GetEditor().GetSelectable().get())
 				{
-					//RenderObjectGizmos(a_vSceneStartPos, a_vSize, m_vPanOffset, m_fZoom, core::EDITOR_ENGINE->GetEditor().GetSelectable().get()->GetExposable);
+					return;
 				}
 
-				std::lock_guard<std::recursive_mutex> lock(core::EDITOR_ENGINE->GetECS().m_EntityMutex);
+				if (core::EDITOR_ENGINE->GetEditor().GetSelectable().get()->RenderGizmos(a_vSceneStartPos, a_vSize, m_vPanOffset, m_fZoom))
+				{
+					core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
+				}
 			}
 
 			//---------------------------------------------------------------------
@@ -530,7 +531,7 @@ namespace gallus
 				bool isStarted = gameplay::GAME.IsStarted();
 				if (ImGui::IsKeyDown(ImGuiKey_Escape))
 				{
-					core::EDITOR_ENGINE->GetEditor().SetSelectable(nullptr, nullptr);
+					core::EDITOR_ENGINE->GetEditor().SetSelectable(nullptr);
 					core::EDITOR_ENGINE->GetEditor().GetScene().LoadData();
 					gameplay::GAME.SetIsStarted(false);
 				}
@@ -552,7 +553,7 @@ namespace gallus
 				if (ImGui::CheckboxButton(
 					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_PLAY), BUTTON_ID, "PLAY_FULL_SCENE").c_str(), &isStarted, m_Window.GetHeaderSize()))
 				{
-					core::EDITOR_ENGINE->GetEditor().SetSelectable(nullptr, nullptr);
+					core::EDITOR_ENGINE->GetEditor().SetSelectable(nullptr);
 					if (isStarted)
 					{
 						gameplay::GAME.GetScene().Load();

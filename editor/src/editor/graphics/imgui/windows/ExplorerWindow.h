@@ -19,7 +19,7 @@
 #include "graphics/imgui/views/DataTypes/StringTextInput.h"
 
 // graphics includes
-#include "editor/graphics/imgui/views/ExplorerFileUIView.h"
+#include "editor/graphics/imgui/selectables/FileEditorSelectable.h"
 
 namespace gallus
 {
@@ -79,9 +79,9 @@ namespace gallus
 				/// <param name="a_Resource">Pointer to the file resource.</param>
 				/// <param name="a_Indent">Amount of indents.</param>
 				/// <param name="a_InitialPos">The starting pos for indent 0.</param>
-				void RenderFolder(ExplorerFileUIView& a_Resource, int a_Indent, const ImVec2& a_InitialPos);
+				void RenderFolder(FileEditorSelectable& a_Resource, int a_Indent, const ImVec2& a_InitialPos);
 
-				void SetSelectable(ExplorerFileUIView* a_pView);
+				void SetSelectable(FileEditorSelectable* a_pView);
 
 				/// <summary>
 				/// Callback function for when the scanning of the explorer has been completed.
@@ -90,17 +90,17 @@ namespace gallus
 
 				void OnSelectableChanged(const EditorSelectable* oldVal, const EditorSelectable* newVal);
 
-				void OnViewedFolderChanged(const ExplorerFileUIView* oldVal, const ExplorerFileUIView* newVal);
+				void OnViewedFolderChanged(const FileEditorSelectable* oldVal, const FileEditorSelectable* newVal);
 
 				ExplorerViewMode m_ExplorerViewMode = ExplorerViewMode::ExplorerViewMode_List; // How are explorer resources shown?
 
 				bool m_bNeedsRescan = true; /// Whether the explorer needs to refresh the results shown in the explorer window.
 				bool m_bNeedsRefresh = true; /// Whether the explorer needs to refresh the results shown in the explorer window.
 
-				std::vector<ExplorerFileUIView> m_aExplorerItems;
-				std::vector<ExplorerFileUIView*> m_aFilteredExplorerItems;
+				std::vector<FileEditorSelectable> m_aExplorerItems;
+				std::vector<FileEditorSelectable*> m_aFilteredExplorerItems;
 
-				core::Observable<ExplorerFileUIView*> m_pViewedFolder; /// Selected resource used for context menu.
+				core::Observable<FileEditorSelectable*> m_pViewedFolder; /// Selected resource used for context menu.
 
 				SearchBarInput m_SearchBar; /// Search bar to filter specific explorer items in the explorer window.
 

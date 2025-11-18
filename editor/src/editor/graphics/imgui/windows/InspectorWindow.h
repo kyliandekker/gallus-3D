@@ -13,7 +13,7 @@
 #include "graphics/imgui/views/DataTypes/StringTextInput.h"
 
 // editor includes
-#include "editor/graphics/imgui/views/ExplorerFileUIView.h"
+#include "editor/graphics/imgui/selectables/FileEditorSelectable.h"
 
 namespace gallus
 {

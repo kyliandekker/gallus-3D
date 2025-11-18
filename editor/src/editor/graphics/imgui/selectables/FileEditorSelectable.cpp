@@ -1,7 +1,7 @@
 #ifndef IMGUI_DISABLE
 #ifdef _EDITOR
 
-#include "ExplorerFileUIView.h"
+#include "FileEditorSelectable.h"
 
 #include <imgui/imgui_helpers.h>
 
@@ -10,30 +10,23 @@
 #include "graphics/imgui/font_icon.h"
 #include "resources/AssetType.h"
 
+#include "editor/core/EditorEngine.h"
+#include "editor/graphics/imgui/selectables/file/FileEditorSelectables.h"
+
 namespace gallus
 {
 	namespace graphics
 	{
 		namespace imgui
 		{
-			const std::vector<std::string> RESOURCE_ICONS =
-			{
-				font::ICON_FOLDER,
-				font::ICON_FILE_SCENE,
-				font::ICON_FILE_IMAGE,
-				font::ICON_FILE_AUDIO,
-				font::ICON_FILE_MUSIC,
-				font::ICON_FILE_VO,
-				font::ICON_FILE_ANIMATION, // TODO: FIND ICON ANIMATION
-				font::ICON_FILE_SETTINGS, // TODO: FIND ICON SHADER
-				font::ICON_FILE_SETTINGS, // TODO: FIND ICON SHADER
-				font::ICON_FILE_MODEL,
-			};
-
-			ExplorerFileUIView::ExplorerFileUIView(ImGuiWindow& a_Window, gallus::resources::FileResource& a_FileResource, ExplorerFileUIView* a_pParent, bool a_bGetChildren) : ImGuiUIView(a_Window),
+			FileEditorSelectable::FileEditorSelectable(ImGuiWindow& a_Window, gallus::resources::FileResource& a_FileResource, FileEditorSelectable* a_pParent, bool a_bGetChildren) : EditorSelectable(a_Window),
 				m_FileResource(a_FileResource),
 				m_pParent(a_pParent)
 			{
+				m_bShowRename = true;
+				m_bShowDelete = true;
+				m_bShowShowInExplorer = true;
+
 				SetIcon();
 				SetDisplayName(m_FileResource.GetPath().filename().generic_string());
 
@@ -46,36 +39,117 @@ namespace gallus
 				}
 			}
 
-			void ExplorerFileUIView::SetIcon()
+			void FileEditorSelectable::Select()
+			{
+				m_pFileEditorSelectable;
+				switch (m_FileResource.GetMetaData()->GetAssetType())
+				{
+					case resources::AssetType::Folder:
+					{
+						m_pFileEditorSelectable = new FileEditorSelectables(m_Window, *this);
+						break;
+					}
+					case resources::AssetType::Scene:
+					{
+						m_pFileEditorSelectable = new SceneFileEditorSelectables(m_Window, *this);
+						break;
+					}
+					case resources::AssetType::Sprite:
+					{
+						m_pFileEditorSelectable = new SpriteFileEditorSelectables(m_Window, *this);
+						break;
+					}
+					case resources::AssetType::Sound:
+					{
+						m_pFileEditorSelectable = new AudioFileEditorSelectables(m_Window, *this);
+						break;
+					}
+					case resources::AssetType::Song:
+					{
+						m_pFileEditorSelectable = new AudioFileEditorSelectables(m_Window, *this);
+						break;
+					}
+					case resources::AssetType::VO:
+					{
+						m_pFileEditorSelectable = new AudioFileEditorSelectables(m_Window, *this);
+						break;
+					}
+					case resources::AssetType::Animation:
+					{
+						m_pFileEditorSelectable = new AnimationFileEditorSelectables(m_Window, *this);
+						break;
+					}
+					case resources::AssetType::PixelShader:
+					{
+						m_pFileEditorSelectable = new ShaderFileEditorSelectables(m_Window, *this);
+						break;
+					}
+					case resources::AssetType::VertexShader:
+					{
+						m_pFileEditorSelectable = new ShaderFileEditorSelectables(m_Window, *this);
+						break;
+					}
+					case resources::AssetType::Prefab:
+					{
+						m_pFileEditorSelectable = new PrefabFileEditorSelectables(m_Window, *this);
+						break;
+					}
+					case resources::AssetType::ShaderBind:
+					{
+						m_pFileEditorSelectable = nullptr;
+						break;
+					}
+					case resources::AssetType::Mesh:
+					{
+						m_pFileEditorSelectable = nullptr;
+						break;
+					}
+					case resources::AssetType::AnimationGraph:
+					{
+						m_pFileEditorSelectable = nullptr;
+						break;
+					}
+				}
+			}
+
+			void FileEditorSelectable::Deselect()
+			{
+				if (m_pFileEditorSelectable)
+				{
+					delete m_pFileEditorSelectable;
+				}
+			}
+
+			void FileEditorSelectable::SetIcon()
 			{
 				if (!m_FileResource.GetMetaData())
 				{
 					return;
 				}
-				m_sIcon = RESOURCE_ICONS[(int) m_FileResource.GetMetaData()->GetAssetType()];
+				m_sIcon = AssetTypeToFileIcon(m_FileResource.GetMetaData()->GetAssetType());
 			}
 
-			const std::string& ExplorerFileUIView::GetIcon() const
+			std::string FileEditorSelectable::GetIcon() const
 			{
 				return m_sIcon;
 			}
 
-			void ExplorerFileUIView::SetIcon(const std::string& a_sIcon)
+			void FileEditorSelectable::SetIcon(const std::string& a_sIcon)
 			{
 				m_sIcon = a_sIcon;
 			}
 
-			bool ExplorerFileUIView::IsFoldedOut() const
+			bool FileEditorSelectable::IsFoldedOut() const
 			{
 				return m_bIsFoldedOut;
 			}
 
-			void ExplorerFileUIView::SetFoldedOut(bool a_bIsFoldedOut)
+			void FileEditorSelectable::SetFoldedOut(bool a_bIsFoldedOut)
 			{
 				m_bIsFoldedOut = a_bIsFoldedOut;
 			}
 
-			void ExplorerFileUIView::RenderTree(bool& a_bClicked, bool& a_bRightClicked, bool a_bSelected, int a_iIndent, const ImVec2& a_vInitialPos, bool a_bInContextMenu)
+			void FileEditorSelectable::RenderTree(bool& a_bClicked, bool& a_bRightClicked, bool a_bSelected, int a_iIndent, const ImVec2& a_vInitialPos, bool a_bInContextMenu)
 			{
 				ImGui::SetCursorPos(ImVec2(a_vInitialPos.x, ImGui::GetCursorPos().y));
 				ImVec2 buttonStart = ImGui::GetCursorScreenPos();
@@ -144,7 +218,7 @@ namespace gallus
 				ImGui::SetCursorPos(ImVec2(a_vInitialPos.x, a_vInitialPos.y + buttonSize.y));
 			}
 
-			void ExplorerFileUIView::RenderList(bool& a_bClicked, bool& a_bRightClicked, bool& a_bDoubleClicked, bool a_bSelected, bool a_bInContextMenu)
+			void FileEditorSelectable::RenderList(bool& a_bClicked, bool& a_bRightClicked, bool& a_bDoubleClicked, bool a_bSelected, bool a_bInContextMenu)
 			{
 				ImVec2 initialPos = ImGui::GetCursorPos();
 				ImVec2 buttonStart = ImGui::GetCursorScreenPos();
@@ -222,7 +296,7 @@ namespace gallus
 				return result + ellipsis;
 			}
 
-			void ExplorerFileUIView::RenderGrid(const ImVec2& m_vSize, bool& a_bClicked, bool& a_bRightClicked, bool& a_bDoubleClicked, bool a_bSelected, bool a_bInContextMenu)
+			void FileEditorSelectable::RenderGrid(const ImVec2& m_vSize, bool& a_bClicked, bool& a_bRightClicked, bool& a_bDoubleClicked, bool a_bSelected, bool a_bInContextMenu)
 			{
 				ImVec2 initialPos = ImGui::GetCursorPos();
 				ImVec2 initialScreenPos = ImGui::GetCursorScreenPos();
@@ -275,7 +349,7 @@ namespace gallus
 				ImGui::EndChild();
 			}
 
-			bool ExplorerFileUIView::HasFolders() const
+			bool FileEditorSelectable::HasFolders() const
 			{
 				for (const gallus::resources::FileResource& resource : m_FileResource.GetChildren())
 				{
@@ -287,14 +361,50 @@ namespace gallus
 				return false;
 			}
 
-			bool ExplorerFileUIView::SearchForPath(const fs::path& a_Path, ExplorerFileUIView*& a_pExplorerFile)
+						//---------------------------------------------------------------------
+			void FileEditorSelectable::OnRename(const std::string& a_sName)
+			{
+				m_FileResource.Rename(a_sName);
+			}
+
+			//---------------------------------------------------------------------
+			void FileEditorSelectable::OnDelete()
+			{
+				m_FileResource.Delete();
+
+				core::EDITOR_ENGINE->GetEditor().GetAssetDatabase().Rescan();
+			}
+
+			//---------------------------------------------------------------------
+			void FileEditorSelectable::OnShowInExplorer()
+			{
+				file::OpenInExplorer(m_FileResource.GetPath().parent_path().lexically_normal());
+			}
+
+			//---------------------------------------------------------------------
+			std::string FileEditorSelectable::GetName() const
+			{
+				return m_FileResource.GetPath().filename().generic_string();
+			}
+
+			void FileEditorSelectable::RenderEditorFields()
+			{
+				if (!m_pFileEditorSelectable)
+				{
+					return;
+				}
+
+				m_pFileEditorSelectable->Render(*this);
+			}
+
+			bool FileEditorSelectable::SearchForPath(const fs::path& a_Path, FileEditorSelectable*& a_pExplorerFile)
 			{
 				if (m_FileResource.GetPath() == a_Path)
 				{
 					a_pExplorerFile = this;
 					return true;
 				}
-				for (ExplorerFileUIView& view : m_aChildren)
+				for (FileEditorSelectable& view : m_aChildren)
 				{
 					if (view.SearchForPath(a_Path, a_pExplorerFile))
 					{

@@ -18,8 +18,7 @@
 
 // editor includes
 #include "editor/core/EditorEngine.h"
-#include "editor/graphics/imgui/views/ExplorerFileUIView.h"
-#include "editor/graphics/imgui/views/inspector/ExplorerFileInspectorView.h"
+#include "editor/graphics/imgui/selectables/FileEditorSelectable.h"
 
 // resources
 #include "resources/FileResource.h"
@@ -69,7 +68,7 @@ namespace gallus
 				BaseWindow::Update();
 			}
 
-			void ExplorerWindow::RenderFolder(ExplorerFileUIView& a_Resource, int a_Indent, const ImVec2& a_InitialPos)
+			void ExplorerWindow::RenderFolder(FileEditorSelectable& a_Resource, int a_Indent, const ImVec2& a_InitialPos)
 			{
 				bool
 					clicked = false,
@@ -87,7 +86,7 @@ namespace gallus
 
 				if (a_Resource.IsFoldedOut())
 				{
-					for (ExplorerFileUIView& child : a_Resource.GetChildren())
+					for (FileEditorSelectable& child : a_Resource.GetChildren())
 					{
 						if (child.GetFileResource().GetMetaData()->GetAssetType() == gallus::resources::AssetType::Folder)
 						{
@@ -120,8 +119,8 @@ namespace gallus
 
 					if (!m_PreviousViewedFolderPath.empty())
 					{
-						ExplorerFileUIView* viewedFolder = nullptr;
-						for (ExplorerFileUIView& view : m_aExplorerItems)
+						FileEditorSelectable* viewedFolder = nullptr;
+						for (FileEditorSelectable& view : m_aExplorerItems)
 						{
 							view.SearchForPath(m_PreviousViewedFolderPath, viewedFolder);
 						}
@@ -135,7 +134,7 @@ namespace gallus
 				{
 					m_aFilteredExplorerItems.clear();
 
-					for (ExplorerFileUIView& view : m_pViewedFolder.get()->GetChildren())
+					for (FileEditorSelectable& view : m_pViewedFolder.get()->GetChildren())
 					{
 						if (m_SearchBar.GetString().empty() || string_extensions::StringToLower(view.GetFileResource().GetPath().filename().generic_string()).find(m_SearchBar.GetString()) != std::string::npos)
 						{
@@ -145,8 +144,8 @@ namespace gallus
 
 					if (!m_PreviousSelectablePath.empty())
 					{
-						ExplorerFileUIView* viewedFolder = nullptr;
-						for (ExplorerFileUIView& view : m_aExplorerItems)
+						FileEditorSelectable* viewedFolder = nullptr;
+						for (FileEditorSelectable& view : m_aExplorerItems)
 						{
 							view.SearchForPath(m_PreviousSelectablePath, viewedFolder);
 						}
@@ -232,7 +231,7 @@ namespace gallus
 					))
 				{
 					ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
-					for (ExplorerFileUIView& view : m_aExplorerItems)
+					for (FileEditorSelectable& view : m_aExplorerItems)
 					{
 						RenderFolder(view, 0, ImGui::GetCursorPos());
 					}
@@ -264,7 +263,7 @@ namespace gallus
 							))
 						{
 							int count = m_pViewedFolder.get()->GetParent() ? 1 : 0;
-							for (ExplorerFileUIView* view : m_aFilteredExplorerItems)
+							for (FileEditorSelectable* view : m_aFilteredExplorerItems)
 							{
 								if (!view)
 								{
@@ -319,7 +318,7 @@ namespace gallus
 
 								if (clicked)
 								{
-									core::EDITOR_ENGINE->GetEditor().SetSelectable(view, new ExplorerFileInspectorView(m_Window, *view));
+									core::EDITOR_ENGINE->GetEditor().SetSelectable(view);
 								}
 							}
 						}
@@ -332,19 +331,19 @@ namespace gallus
 
 				if (doRescan)
 				{
-					const ExplorerFileUIView* derivedPtr = dynamic_cast<const ExplorerFileUIView*>(core::EDITOR_ENGINE->GetEditor().GetSelectable().get());
+					const FileEditorSelectable* derivedPtr = dynamic_cast<const FileEditorSelectable*>(core::EDITOR_ENGINE->GetEditor().GetSelectable().get());
 					if (derivedPtr)
 					{
-						core::EDITOR_ENGINE->GetEditor().SetSelectable(nullptr, nullptr);
+						core::EDITOR_ENGINE->GetEditor().SetSelectable(nullptr);
 					}
 
 					core::EDITOR_ENGINE->GetEditor().GetAssetDatabase().Rescan();
 				}
 			}
 
-			void ExplorerWindow::SetSelectable(ExplorerFileUIView* a_pView)
+			void ExplorerWindow::SetSelectable(FileEditorSelectable* a_pView)
 			{
-				core::EDITOR_ENGINE->GetEditor().SetSelectable(a_pView, a_pView ? new ExplorerFileInspectorView(m_Window, *a_pView) : nullptr);
+				core::EDITOR_ENGINE->GetEditor().SetSelectable(a_pView);
 			}
 
 			void ExplorerWindow::OnScanCompleted()
@@ -360,7 +359,7 @@ namespace gallus
 					return;
 				}
 
-				const ExplorerFileUIView* derivedPtr = dynamic_cast<const ExplorerFileUIView*>(newVal);
+				const FileEditorSelectable* derivedPtr = dynamic_cast<const FileEditorSelectable*>(newVal);
 				if (!derivedPtr) // New selectable is NOT an explorer file, so we must reset the previous folder path.
 				{
 					m_PreviousSelectablePath = fs::path();
@@ -371,7 +370,7 @@ namespace gallus
 				}
 			}
 
-			void ExplorerWindow::OnViewedFolderChanged(const ExplorerFileUIView* oldVal, const ExplorerFileUIView* newVal)
+			void ExplorerWindow::OnViewedFolderChanged(const FileEditorSelectable* oldVal, const FileEditorSelectable* newVal)
 			{
 				if (!newVal)
 				{

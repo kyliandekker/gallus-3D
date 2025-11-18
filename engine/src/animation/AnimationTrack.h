@@ -111,6 +111,14 @@ namespace gallus
 			{
 				m_bIsLooping = a_bIsLooping;
 			}
+
+			/// <summary>
+			/// Sets the amount of frames in the animation track.
+			/// </summary>
+			void SetFrameCount(int a_iFrameCount)
+			{
+				m_iFrameCount = a_iFrameCount;
+			}
 #endif
 			/// <summary>
 			/// Retrieves the amount of frames in the animation track.

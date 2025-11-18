@@ -6,6 +6,7 @@
 #include "graphics/imgui/views/ImGuiUIView.h"
 
 #include <string>
+#include <map>
 
 // editor includes
 #include "editor/graphics/imgui/EditorSelectable.h"
@@ -15,6 +16,7 @@ namespace gallus
 	namespace gameplay
 	{
 		class EntityID;
+		class Entity;
 	}
 	namespace graphics
 	{
@@ -22,17 +24,11 @@ namespace gallus
 		{
 			class ImGuiWindow;
 
-			class HierarchyEntityUIView : public ImGuiUIView, public EditorSelectable
+			class EntityEditorSelectable : public EditorSelectable
 			{
 			public:
-				HierarchyEntityUIView(ImGuiWindow& a_Window, gameplay::EntityID& a_EntityID);
+				EntityEditorSelectable(ImGuiWindow& a_Window, gameplay::EntityID& a_EntityID);
 
-				/// <summary>
-				/// Renders the entity UI with selection and click interaction.
-				/// </summary>
-				/// <param name="a_bClicked">Reference to a boolean indicating if the entity was clicked.</param>
-				/// <param name="a_bDoubleClicked">Reference to a boolean indicating if the entity was double clicked.</param>
-				/// <param name="a_bSelected">Boolean indicating if the entity is currently selected.</param>
 				void RenderEntity(bool& a_bClicked, bool& a_bDoubleClicked, bool a_bSelected);
 
 				void Render() override
@@ -48,19 +44,28 @@ namespace gallus
 					return m_EntityID;
 				}
 
-				const std::string& GetIcon()
-				{
-					return m_sIcon;
-				}
-
-				void RenderGizmos(
+				bool RenderGizmos(
 					const ImVec2& a_vScenePos,
 					const ImVec2& a_vSize,
 					const ImVec2& a_vPanOffset,
 					float a_fZoom) override;
+
+				void OnRename(const std::string& a_sName) override;
+
+				void OnDelete() override;
+
+				std::string GetName() const override;
+
+				std::string GetIcon() const override;
+
+				void RenderEditorFields() override;
 			private:
 				gameplay::EntityID& m_EntityID;
 				std::string m_sIcon;
+
+				gameplay::Entity* m_pEntity = nullptr;
+
+				std::map<std::string, bool> m_aExpanded; // A list of component booleans.
 			};
 		}
 	}

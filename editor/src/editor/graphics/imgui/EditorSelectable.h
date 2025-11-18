@@ -4,6 +4,9 @@
 #pragma once
 
 #include <imgui/imgui.h>
+#include <string>
+
+#include "graphics/imgui/views/ImGuiUIView.h"
 
 namespace gallus
 {
@@ -11,15 +14,71 @@ namespace gallus
 	{
 		namespace imgui
 		{
-			class EditorSelectable
+			class EditorSelectable : public ImGuiUIView
 			{
 			public:
-				virtual void RenderGizmos(
+				EditorSelectable(ImGuiWindow& a_Window) : ImGuiUIView(a_Window)
+				{}
+
+				virtual bool RenderGizmos(
 					const ImVec2& a_vScenePos,
 					const ImVec2& a_vSize,
 					const ImVec2& a_vPanOffset,
 					float a_fZoom)
-				{ }
+				{
+					return false;
+				}
+
+				virtual void RenderEditorFields()
+				{}
+
+				void Render() override
+				{}
+
+				virtual void OnRename(const std::string& a_sName)
+				{}
+
+				virtual void OnDelete()
+				{}
+
+				virtual void OnShowInExplorer()
+				{}
+
+				virtual std::string GetName() const
+				{
+					return "";
+				}
+
+				virtual std::string GetIcon() const
+				{
+					return "";
+				}
+
+				bool GetShowRename() const
+				{
+					return m_bShowRename;
+				}
+
+				bool GetShowDelete() const
+				{
+					return m_bShowDelete;
+				}
+
+				bool GetShowShowInExplorer() const
+				{
+					return m_bShowShowInExplorer;
+				}
+
+				virtual void Select()
+				{}
+
+				virtual void Deselect()
+				{}
+			protected:
+				bool
+					m_bShowRename = false,
+					m_bShowDelete = false,
+					m_bShowShowInExplorer = false;
 			};
 		}
 	}

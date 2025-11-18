@@ -23,7 +23,7 @@
 
 // graphics includes
 #include "resources/FileResource.h"
-#include "editor/graphics/imgui/views/ExplorerFileUIView.h"
+#include "editor/graphics/imgui/selectables/FileEditorSelectable.h"
 #include "resources/metadata/TextureMetaData.h"
 
 namespace gallus
@@ -36,6 +36,7 @@ namespace gallus
 			{
 			}
 
+			//---------------------------------------------------------------------
 			void SpriteEditorModal::LoadTexture(const std::string& a_sName)
 			{
 				auto cCommandQueue = core::EDITOR_ENGINE->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
@@ -43,6 +44,7 @@ namespace gallus
 				m_pPreviewTexture->SetResourceCategory(gallus::resources::EngineResourceCategory::Editor);
 			}
 
+			//---------------------------------------------------------------------
 			void SpriteEditorModal::Render()
 			{
 				if (!m_pTextureMetaData)
@@ -103,6 +105,7 @@ namespace gallus
 				ImGui::EndChild();
 			}
 
+			//---------------------------------------------------------------------
 			void SpriteEditorModal::RenderToolbar()
 			{
 				RenderFloatingToolbar();
@@ -168,6 +171,7 @@ namespace gallus
 				}
 			}
 
+			//---------------------------------------------------------------------
 			void SpriteEditorModal::HandleGlobalControls(const ImVec2& a_vWindowSize)
 			{
 				ImVec2 childPos = ImGui::GetCursorScreenPos();
@@ -220,6 +224,7 @@ namespace gallus
 				}
 			}
 
+			//---------------------------------------------------------------------
 			void SpriteEditorModal::RenderRect(int8_t a_iIndex, const ImVec2& a_vImgMin, const ImVec2& a_vImgMax)
 			{
 				if (a_iIndex == -1 || a_iIndex >= m_pTextureMetaData->GetSprites().size())
@@ -238,6 +243,7 @@ namespace gallus
 				dl->AddRect(rectMin, rectMax, color, 0, 0, 1.0f);
 			}
 
+			//---------------------------------------------------------------------
 			void SpriteEditorModal::HandleRectSelection(int8_t a_iIndex, const ImVec2& a_vImgMin, const ImVec2& a_vImgMax)
 			{
 				if (a_iIndex == -1 || a_iIndex >= m_pTextureMetaData->GetSprites().size())
@@ -278,6 +284,7 @@ namespace gallus
 				}
 			}
 
+			//---------------------------------------------------------------------
 			void SpriteEditorModal::GetSpriteMinMax(int8_t a_iIndex, ImVec2& a_vMin, ImVec2& a_vMax, const ImVec2& a_vImgMin, const ImVec2& a_vImgMax)
 			{
 				graphics::dx12::SpriteRect& r = m_pTextureMetaData->GetSprites()[a_iIndex];
@@ -291,6 +298,7 @@ namespace gallus
 				a_vMax = a_vImgMin + rectMaxTex * m_fZoom;
 			}
 
+			//---------------------------------------------------------------------
 			bool SpriteEditorModal::InteractWithRect(const ImVec2& a_vImgMin, const ImVec2& a_vImgMax)
 			{
 				if (m_iCurrentSprite == -1 || m_iCurrentSprite >= m_pTextureMetaData->GetSprites().size())
@@ -430,6 +438,7 @@ namespace gallus
 				return m_bResizing || m_bDragging;
 			}
 
+			//---------------------------------------------------------------------
 			void SpriteEditorModal::DrawRectInteraction(const ImVec2& a_vImgMin, const ImVec2& a_vImgMax)
 			{
 				if (m_iCurrentSprite == -1 || m_iCurrentSprite >= m_pTextureMetaData->GetSprites().size())
@@ -477,6 +486,7 @@ namespace gallus
 				}
 			}
 
+			//---------------------------------------------------------------------
 			void SpriteEditorModal::SetData(resources::FileResource& a_FileResource)
 			{
 				m_pFileResource = &a_FileResource;
@@ -484,6 +494,7 @@ namespace gallus
 				LoadTexture(m_pFileResource->GetPath().filename().generic_string());
 			}
 
+			//---------------------------------------------------------------------
 			ImVec2 m_vFloatingPanelPos = ImVec2(50, 50);
 			void SpriteEditorModal::RenderFloatingToolbar()
 			{

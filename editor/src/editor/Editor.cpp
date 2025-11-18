@@ -6,6 +6,8 @@
 
 #include "logger/Logger.h"
 
+#include "editor/graphics/imgui/EditorSelectable.h"
+
 namespace gallus
 {
 	namespace editor
@@ -42,6 +44,20 @@ namespace gallus
 		{
 			LOG(LOGSEVERITY_INFO, LOG_CATEGORY_EDITOR, "Destroying editor.");
 			return ThreadedSystem::Destroy();
+		}
+
+		//---------------------------------------------------------------------
+		void Editor::SetSelectable(graphics::imgui::EditorSelectable* a_pSelectable)
+		{
+			if (m_pSelectable)
+			{
+				m_pSelectable.get()->Deselect();
+			}
+			m_pSelectable = a_pSelectable;
+			if (m_pSelectable)
+			{
+				m_pSelectable.get()->Select();
+			}
 		}
 
 		//---------------------------------------------------------------------

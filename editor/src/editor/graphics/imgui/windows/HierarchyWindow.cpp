@@ -16,7 +16,6 @@
 
 // editor includes
 #include "editor/core/EditorEngine.h"
-#include "editor/graphics/imgui/views/inspector/EntityInspectorView.h"
 
 // game includes
 #include "gameplay/Game.h"
@@ -98,7 +97,7 @@ namespace gallus
 						m_aEntities.emplace_back(m_Window, entity.GetEntityID());
 					}
 
-					for (HierarchyEntityUIView& view : m_aEntities)
+					for (EntityEditorSelectable& view : m_aEntities)
 					{
 						gameplay::Entity* entity = core::EDITOR_ENGINE->GetECS().GetEntity(view.GetEntityID());
 						if (!entity)
@@ -117,7 +116,7 @@ namespace gallus
 						auto it = std::find_if(
 							m_aEntities.begin(),
 							m_aEntities.end(),
-							[prevEntityID](const HierarchyEntityUIView& view)
+							[prevEntityID](const EntityEditorSelectable& view)
 							{
 								return view.GetEntityID() == prevEntityID;
 							}
@@ -224,7 +223,7 @@ namespace gallus
 					))
 				{
 					ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
-					for (HierarchyEntityUIView* view : m_aFilteredEntities)
+					for (EntityEditorSelectable* view : m_aFilteredEntities)
 					{
 						if (!view)
 						{
@@ -262,10 +261,10 @@ namespace gallus
 
 				if (spawnEntity)
 				{
-					const HierarchyEntityUIView* derivedPtr = dynamic_cast<const HierarchyEntityUIView*>(core::EDITOR_ENGINE->GetEditor().GetSelectable().get());
+					const EntityEditorSelectable* derivedPtr = dynamic_cast<const EntityEditorSelectable*>(core::EDITOR_ENGINE->GetEditor().GetSelectable().get());
 					if (derivedPtr)
 					{
-						core::EDITOR_ENGINE->GetEditor().SetSelectable(nullptr, nullptr);
+						core::EDITOR_ENGINE->GetEditor().SetSelectable(nullptr);
 					}
 
 					core::EDITOR_ENGINE->GetECS().CreateEntity(core::EDITOR_ENGINE->GetECS().GetUniqueName("New GameObject"));
@@ -286,9 +285,9 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			void HierarchyWindow::SetSelectable(HierarchyEntityUIView* a_EntityView)
+			void HierarchyWindow::SetSelectable(EntityEditorSelectable* a_EntityView)
 			{
-				core::EDITOR_ENGINE->GetEditor().SetSelectable(a_EntityView, a_EntityView ? new EntityInspectorView(m_Window, *a_EntityView) : nullptr);
+				core::EDITOR_ENGINE->GetEditor().SetSelectable(a_EntityView);
 			}
 
 			//---------------------------------------------------------------------
@@ -299,7 +298,7 @@ namespace gallus
 					return;
 				}
 
-				const HierarchyEntityUIView* derivedPtr = dynamic_cast<const HierarchyEntityUIView*>(newVal);
+				const EntityEditorSelectable* derivedPtr = dynamic_cast<const EntityEditorSelectable*>(newVal);
 				if (!derivedPtr) // New selectable is NOT an entity, so we must reset the previous folder path.
 				{
 					m_PreviousEntityID.SetInvalid();

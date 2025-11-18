@@ -1,7 +1,7 @@
 #ifndef IMGUI_DISABLE
 #ifdef _EDITOR
 
-#include "AnimationKeyFrameInspectorUIView.h"
+#include "AnimationKeyFrameEditorSelectable.h"
 
 #include <typeindex>
 #include <unordered_map>
@@ -30,38 +30,38 @@ namespace gallus
 		namespace imgui
 		{
 			//---------------------------------------------------------------------
-			// AnimationKeyFrameInspectorUIView
+			// AnimationKeyFrameEditorSelectable
 			//---------------------------------------------------------------------
-			AnimationKeyFrameInspectorUIView::~AnimationKeyFrameInspectorUIView()
+			AnimationKeyFrameEditorSelectable::~AnimationKeyFrameEditorSelectable()
 			{
 			}
 
 			//---------------------------------------------------------------------
-			AnimationKeyFrameInspectorUIView::AnimationKeyFrameInspectorUIView(ImGuiWindow& a_Window, animation::AnimationKeyFrame& a_KeyFrame, animation::AnimationTrack& a_AnimationTrack) : InspectorView(a_Window), m_KeyFrame(a_KeyFrame), m_AnimationTrack(a_AnimationTrack)
+			AnimationKeyFrameEditorSelectable::AnimationKeyFrameEditorSelectable(ImGuiWindow& a_Window, animation::AnimationKeyFrame& a_KeyFrame, animation::AnimationTrack& a_AnimationTrack) : EditorSelectable(a_Window), m_KeyFrame(a_KeyFrame), m_AnimationTrack(a_AnimationTrack)
 			{
 				m_bShowDelete = true;
 			}
 
 			//---------------------------------------------------------------------
-			std::string AnimationKeyFrameInspectorUIView::GetName() const
+			std::string AnimationKeyFrameEditorSelectable::GetName() const
 			{
 				return "Animation Track";
 			}
 
 			//---------------------------------------------------------------------
-			std::string AnimationKeyFrameInspectorUIView::GetIcon() const
+			std::string AnimationKeyFrameEditorSelectable::GetIcon() const
 			{
 				return font::ICON_ANIMATION;
 			}
 
 			//---------------------------------------------------------------------
-			void AnimationKeyFrameInspectorUIView::OnDelete()
+			void AnimationKeyFrameEditorSelectable::OnDelete()
 			{
 				m_AnimationTrack.RemoveKeyFrame(m_KeyFrame);
 			}
 
 			//---------------------------------------------------------------------
-			void AnimationKeyFrameInspectorUIView::Render()
+			void AnimationKeyFrameEditorSelectable::Render()
 			{
 				ImGui::SetCursorPosY(0);
 				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));

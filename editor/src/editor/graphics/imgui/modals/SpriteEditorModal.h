@@ -35,7 +35,7 @@ namespace gallus
 		{
 			class ImGuiWindow;
 
-			class ExplorerFileUIView;
+			class FileEditorSelectable;
 
 			class SpriteEditorModal : public BaseModal
 			{

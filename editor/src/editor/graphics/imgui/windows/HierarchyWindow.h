@@ -14,7 +14,7 @@
 #include "gameplay/EntityID.h"
 
 // editor includes
-#include "editor/graphics/imgui/views/HierarchyEntityUIView.h"
+#include "editor/graphics/imgui/selectables/EntityEditorSelectable.h"
 
 namespace gallus
 {
@@ -77,7 +77,7 @@ namespace gallus
 				/// </summary>
 				void UpdateEntityComponents();
 
-				void SetSelectable(HierarchyEntityUIView* a_EntityView);
+				void SetSelectable(EntityEditorSelectable* a_EntityView);
 
 				void OnSelectableChanged(const EditorSelectable* oldVal, const EditorSelectable* newVal);
 
@@ -88,8 +88,8 @@ namespace gallus
 				bool m_bNeedsRefresh = true; /// Whether the hierarchy needs to refresh the results shown in the hierarchy window.
 
 				gameplay::EntityID m_PreviousEntityID;
-				std::vector<HierarchyEntityUIView> m_aEntities; /// List of entities shown in the hierarchy window.
-				std::vector<HierarchyEntityUIView*> m_aFilteredEntities; /// List of entities shown in the hierarchy window.
+				std::vector<EntityEditorSelectable> m_aEntities; /// List of entities shown in the hierarchy window.
+				std::vector<EntityEditorSelectable*> m_aFilteredEntities; /// List of entities shown in the hierarchy window.
 				std::vector<std::string> m_aEntityIcons; /// List of entities shown in the hierarchy window.
 
 				SearchBarInput m_SearchBar; /// Search bar to filter specific messages in the hierarchy window.

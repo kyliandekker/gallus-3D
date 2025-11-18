@@ -468,7 +468,7 @@ namespace gallus
 				return changed;
 			}
 
-			void ShowTransformGizmo(const ImVec2& a_vScenePos, const ImVec2& a_vSize, const ImVec2& a_vPanOffset, float a_fZoom, graphics::dx12::DX12Transform& a_Transform)
+			bool ShowTransformGizmo(const ImVec2& a_vScenePos, const ImVec2& a_vSize, const ImVec2& a_vPanOffset, float a_fZoom, graphics::dx12::DX12Transform& a_Transform)
 			{
 				DirectX::XMMATRIX pivotOffset = DirectX::XMMatrixTranslation(a_Transform.GetPivot().x, a_Transform.GetPivot().y, 0.0f);
 				DirectX::XMMATRIX objectMat = a_Transform.GetWorldMatrix();
@@ -520,8 +520,10 @@ namespace gallus
 
 					a_Transform.SetWorldMatrix(result);
 
-					core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
+					return true;
 				}
+
+				return false;
 			}
 
 			bool RenderObjectGizmos(const ImVec2& a_vScenePos, const ImVec2& a_vSize, const ImVec2& a_vPanOffset, float a_fZoom, IExposableToEditor* a_pObject)
@@ -532,7 +534,8 @@ namespace gallus
 				}
 
 				const auto& gizmos = a_pObject->GetEditorGizmos();
-
+				
+				bool changed = false;
 				for (const EditorGizmoInfo& gizmo : gizmos)
 				{
 					void* ptr = reinterpret_cast<char*>(a_pObject) + gizmo.m_iOffset;
@@ -542,13 +545,16 @@ namespace gallus
 						case EditorGizmoType::Transform:
 						{
 							graphics::dx12::DX12Transform* value = reinterpret_cast<graphics::dx12::DX12Transform*>(ptr);
-							ShowTransformGizmo(a_vScenePos, a_vSize, a_vPanOffset, a_fZoom, *value);
+							if (ShowTransformGizmo(a_vScenePos, a_vSize, a_vPanOffset, a_fZoom, *value))
+							{
+								changed = true;
+							}
 							break;
 						}
 					}
 				}
 
-				return true;
+				return changed;
 			}
 }
 	}

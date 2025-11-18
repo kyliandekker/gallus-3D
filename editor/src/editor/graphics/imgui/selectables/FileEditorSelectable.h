@@ -3,8 +3,6 @@
 
 #pragma once
 
-#include "graphics/imgui/views/ImGuiUIView.h"
-
 #include <imgui/imgui.h>
 #include <string>
 #include <vector>
@@ -26,17 +24,22 @@ namespace gallus
 		namespace imgui
 		{
 			class ImGuiWindow;
+			class FileEditorSelectables;
 
-			class ExplorerFileUIView : public ImGuiUIView, public EditorSelectable
+			class FileEditorSelectable : public EditorSelectable
 			{
 			public:
-				ExplorerFileUIView(ImGuiWindow& a_Window, gallus::resources::FileResource& a_FileResource, ExplorerFileUIView* a_pParent = nullptr, bool a_bGetChildren = true);
+				FileEditorSelectable(ImGuiWindow& a_Window, gallus::resources::FileResource& a_FileResource, FileEditorSelectable* a_pParent = nullptr, bool a_bGetChildren = true);
+
+				void Select() override;
+
+				void Deselect() override;
 
 				/// <summary>
 				/// Retrieves the icon string for the resource.
 				/// </summary>
 				/// <returns>A reference to the icon string.</returns>
-				const std::string& GetIcon() const;
+				std::string GetIcon() const override;
 
 				void SetIcon();
 
@@ -99,7 +102,7 @@ namespace gallus
 				void Render() override
 				{}
 
-				std::vector<ExplorerFileUIView>& GetChildren()
+				std::vector<FileEditorSelectable>& GetChildren()
 				{
 					return m_aChildren;
 				}
@@ -114,7 +117,7 @@ namespace gallus
 					return m_FileResource;
 				}
 
-				ExplorerFileUIView* GetParent()
+				FileEditorSelectable* GetParent()
 				{
 					return m_pParent;
 				}
@@ -124,15 +127,27 @@ namespace gallus
 					m_sDisplayName = a_sDisplayName;
 				}
 
-				bool SearchForPath(const fs::path& a_Path, ExplorerFileUIView*& a_pExplorerFile);
+				bool SearchForPath(const fs::path& a_Path, FileEditorSelectable*& a_pExplorerFile);
+
+				void OnRename(const std::string& a_sName) override;
+
+				void OnDelete() override;
+
+				void OnShowInExplorer() override;
+
+				std::string GetName() const override;
+
+				void RenderEditorFields() override;
 			private:
 				gallus::resources::FileResource& m_FileResource;
 				std::string m_sDisplayName; /// The name that will be displayed in imgui.
 				std::string m_sIcon; /// The icon of the resource.
 				bool m_bIsFoldedOut = false; /// Whether the node is folded out.
 
-				ExplorerFileUIView* m_pParent = nullptr;
-				std::vector<ExplorerFileUIView> m_aChildren;
+				FileEditorSelectables* m_pFileEditorSelectable = nullptr;
+
+				FileEditorSelectable* m_pParent = nullptr;
+				std::vector<FileEditorSelectable> m_aChildren;
 			};
 		}
 	}

@@ -7,7 +7,7 @@
 #include "editor/core/EditorEngine.h"
 #include "graphics/imgui/font_icon.h"
 
-#include "editor/graphics/imgui/views/inspector/animation/AnimationKeyFrameInspectorUIView.h"
+#include "editor/graphics/imgui/selectables/AnimationKeyFrameEditorSelectable.h"
 
 namespace gallus
 {
@@ -122,7 +122,7 @@ namespace gallus
 
 				m_iSelectedKeyFrame = a_iSelectedKeyFrame;
 
-				core::EDITOR_ENGINE->GetEditor().SetSelectable(nullptr, new AnimationKeyFrameInspectorUIView(m_Window, *m_pAnimationTrack->GetKeyFrames()[m_iSelectedKeyFrame], *m_pAnimationTrack));
+				core::EDITOR_ENGINE->GetEditor().SetSelectable(nullptr);
 			}
 		}
 	}

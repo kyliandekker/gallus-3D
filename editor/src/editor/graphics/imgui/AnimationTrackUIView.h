@@ -5,7 +5,7 @@
 #include "animation/AnimationTrack.h"
 #include "animation/AnimationKeyFrame.h"
 
-//#include "editor/graphics/imgui/views/inspector/animation/AnimationKeyFrameUIView.h"
+//#include "editor/graphics/imgui/views/AnimationKeyFrameUIView.h"
 
 #include <vector>
 

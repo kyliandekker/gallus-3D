@@ -21,7 +21,7 @@
 
 // graphics includes
 #include "resources/FileResource.h"
-#include "editor/graphics/imgui/views/ExplorerFileUIView.h"
+#include "editor/graphics/imgui/selectables/FileEditorSelectable.h"
 
 namespace gallus
 {
@@ -29,11 +29,15 @@ namespace gallus
 	{
 		namespace imgui
 		{
+			//---------------------------------------------------------------------
+			// FilePickerModal
+			//---------------------------------------------------------------------
 			FilePickerModal::FilePickerModal(ImGuiWindow& a_Window) : BaseModal(a_Window, std::string(font::ICON_FOLDER) + " File Picker", "FilePicker"), m_SearchBar(a_Window)
 			{
 				m_SearchBar.Initialize("");
 			}
 
+			//---------------------------------------------------------------------
 			void FilePickerModal::LoadTexture(const std::string& a_sName)
 			{
 				auto cCommandQueue = core::EDITOR_ENGINE->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
@@ -41,13 +45,14 @@ namespace gallus
 				m_pPreviewTexture->SetResourceCategory(gallus::resources::EngineResourceCategory::Editor);
 			}
 
+			//---------------------------------------------------------------------
 			void FilePickerModal::Render()
 			{
 				if (m_bNeedsRefresh)
 				{
 					m_aFilteredFileResources.clear();
 
-					for (ExplorerFileUIView& view : m_aResources)
+					for (FileEditorSelectable& view : m_aResources)
 					{
 						if (m_SearchBar.GetString().empty() || string_extensions::StringToLower(view.GetFileResource().GetPath().filename().generic_string()).find(m_SearchBar.GetString()) != std::string::npos)
 						{
@@ -83,7 +88,7 @@ namespace gallus
 					ImGuiChildFlags_Borders
 					))
 				{
-					for (ExplorerFileUIView* view : m_aFilteredFileResources)
+					for (FileEditorSelectable* view : m_aFilteredFileResources)
 					{
 						bool
 							clicked = false,
@@ -162,7 +167,8 @@ namespace gallus
 				ImGui::PopStyleVar();
 			}
 
-			void RecursiveFind(gallus::resources::FileResource& a_File, std::vector<gallus::resources::AssetType>& a_aFileTypes, std::vector<ExplorerFileUIView>& a_aResources, ImGuiWindow& a_Window)
+			//---------------------------------------------------------------------
+			void RecursiveFind(gallus::resources::FileResource& a_File, std::vector<gallus::resources::AssetType>& a_aFileTypes, std::vector<FileEditorSelectable>& a_aResources, ImGuiWindow& a_Window)
 			{
 				for (gallus::resources::FileResource& fileResource : a_File.GetChildren())
 				{
@@ -177,6 +183,7 @@ namespace gallus
 				}
 			}
 
+			//---------------------------------------------------------------------
 			void FilePickerModal::Show()
 			{
 				m_aResources.clear();
@@ -186,6 +193,7 @@ namespace gallus
 				BaseModal::Show();
 			}
 
+			//---------------------------------------------------------------------
 			void FilePickerModal::SetData(const std::function<void(int, gallus::resources::FileResource&)>& a_Callback, const std::vector<gallus::resources::AssetType>& a_aFileTypes)
 			{
 				m_pSelectedFileResource = nullptr;

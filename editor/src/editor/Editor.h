@@ -6,7 +6,6 @@
 
 #include "core/Observable.h"
 
-#include "graphics/imgui/views/inspector/InspectorView.h"
 #include "graphics/dx12/Camera.h"
 
 #include "editor/EditorSettings.h"
@@ -42,7 +41,7 @@ namespace gallus
 		// Editor
 		//---------------------------------------------------------------------
 		/// <summary>
-		/// Editor class that contains all editor-related data such as currently selected item, asset database, preview texture, etc.
+		/// Editor class that contains all editor-related data such as currently selected item, asset database, etc.
 		/// </summary>
 		class Editor : public core::ThreadedSystem
 		{
@@ -97,38 +96,10 @@ namespace gallus
 			}
 
 			/// <summary>
-			/// Retrieves the currently selected inspector view item.
-			/// </summary>
-			/// <returns>Pointer to the current selectable (can be null).</returns>
-			const graphics::imgui::InspectorView* GetInspectorView() const
-			{
-				return m_pInspectorView;
-			}
-
-			/// <summary>
 			/// Sets the selectable and inspector view.
 			/// </summary>
 			/// <param name="a_pSelectable">.The new selectable (can be null).</param>
-			/// <param name="a_pInspectorView">The new inspector view (can be null).</param>
-			void SetSelectable(graphics::imgui::EditorSelectable* a_pSelectable, graphics::imgui::InspectorView* a_pInspectorView)
-			{
-				if (m_pInspectorView)
-				{
-					delete m_pInspectorView;
-					m_pInspectorView = nullptr;
-				}
-				m_pSelectable = a_pSelectable;
-				m_pInspectorView = a_pInspectorView;
-			}
-
-			/// <summary>
-			/// Retrieves the currently inspector view.
-			/// </summary>
-			/// <returns>Pointer to the current inspector view (can be null).</returns>
-			graphics::imgui::InspectorView* GetInspectorView()
-			{
-				return m_pInspectorView;
-			}
+			void SetSelectable(graphics::imgui::EditorSelectable* a_pSelectable);
 
 			std::mutex m_EditorMutex;
 
@@ -211,7 +182,6 @@ namespace gallus
 			editor::AssetDatabase m_AssetDatabase;
 
 			core::Observable<graphics::imgui::EditorSelectable*> m_pSelectable;
-			graphics::imgui::InspectorView* m_pInspectorView = nullptr;
 
 			gameplay::Scene m_CurrentScene;
 			gameplay::Prefab m_Prefab;

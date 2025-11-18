@@ -11,7 +11,6 @@
 #include "graphics/imgui/font_icon.h"
 
 // editor includes
-#include "editor/graphics/imgui/views/inspector/InspectorView.h"
 #include "editor/core/EditorEngine.h"
 
 // gameplay includes
@@ -23,8 +22,6 @@ namespace gallus
 	{
 		namespace imgui
 		{
-			constexpr float PREVIEW_SECTION_SIZE = 300;
-
 			InspectorWindow::InspectorWindow(ImGuiWindow& a_Window) : BaseWindow(a_Window, ImGuiWindowFlags_NoCollapse, std::string(font::ICON_CIRCLE_INFO) + " Inspector", "Inspector"), m_NameInput(a_Window)
 			{
 				m_NameInput.Initialize("");
@@ -53,8 +50,8 @@ namespace gallus
 
 				std::lock_guard<std::mutex> lock(core::EDITOR_ENGINE->GetEditor().m_EditorMutex);
 
-				InspectorView* inspectorView = core::EDITOR_ENGINE->GetEditor().GetInspectorView();
-				if (!inspectorView)
+				EditorSelectable* selectable = core::EDITOR_ENGINE->GetEditor().GetSelectable();
+				if (!selectable)
 				{
 					return;
 				}
@@ -74,7 +71,7 @@ namespace gallus
 					ImGuiChildFlags_None
 					))
 				{
-					std::string icon = inspectorView->GetIcon();
+					std::string icon = selectable->GetIcon();
 
 					if (!icon.empty())
 					{
@@ -106,17 +103,17 @@ namespace gallus
 
 						ImGui::SameLine();
 
-						if (!inspectorView->GetShowRename())
+						if (!selectable->GetShowRename())
 						{
 							ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
 						}
-						m_NameInput.SetString(inspectorView->GetName());
+						m_NameInput.SetString(selectable->GetName());
 						ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
 						if (m_NameInput.Render(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "NAME_INSPECTOR").c_str(), ImGuiInputTextFlags_EnterReturnsTrue))
 						{
-							inspectorView->OnRename(m_NameInput.GetString());
+							selectable->OnRename(m_NameInput.GetString());
 						}
-						if (!inspectorView->GetShowRename())
+						if (!selectable->GetShowRename())
 						{
 							ImGui::PopItemFlag();
 						}
@@ -133,17 +130,17 @@ namespace gallus
 
 				ImGui::PushFont(m_Window.GetIconFont());
 
-				if (inspectorView->GetShowShowInExplorer())
+				if (selectable->GetShowShowInExplorer())
 				{
 					if (ImGui::TextButton(
 						ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_FOLDER_SHOW), BUTTON_ID, "SHOW_IN_EXPLORER_INSPECTOR").c_str(), m_Window.GetHeaderSize()))
 					{
-						inspectorView->OnShowInExplorer();
+						selectable->OnShowInExplorer();
 					}
 					ImGui::SameLine();
 				}
 				bool deleteView = false;
-				if (inspectorView->GetShowDelete())
+				if (selectable->GetShowDelete())
 				{
 					if (ImGui::TextButton(
 						ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_DELETE), BUTTON_ID, "DELETE_INSPECTOR").c_str(), m_Window.GetHeaderSize()))
@@ -159,41 +156,24 @@ namespace gallus
 
 				ImGui::SetCursorPos(ImVec2(toolbarPos.x, toolbarPos.y + toolbarSize.y));
 
-				float previewSize = inspectorView->GetShowPreview() ? PREVIEW_SECTION_SIZE : 0;
-
 				ImGui::SetCursorPos(ImVec2(ImGui::GetCursorPos().x + m_Window.GetFramePadding().x, ImGui::GetCursorPos().y + m_Window.GetFramePadding().y));
 				if (ImGui::BeginChild(
 					ImGui::IMGUI_FORMAT_ID("", CHILD_ID, "INSPECTOR_VIEW").c_str(),
 					ImVec2(
 					ImGui::GetContentRegionAvail().x - m_Window.GetFramePadding().x,
-					(ImGui::GetContentRegionAvail().y - previewSize) - m_Window.GetFramePadding().y),
+					(ImGui::GetContentRegionAvail().y) - m_Window.GetFramePadding().y),
 					ImGuiChildFlags_Borders))
 				{
-					inspectorView->Render();
+					selectable->RenderEditorFields();
 				}
 				ImGui::EndChild();
-
-				if (inspectorView->GetShowPreview())
-				{
-					ImGui::SetCursorPos(ImVec2(ImGui::GetCursorPos().x + m_Window.GetFramePadding().x, ImGui::GetCursorPos().y));
-					if (ImGui::BeginChild(
-						ImGui::IMGUI_FORMAT_ID("", CHILD_ID, "INSPECTOR_VIEW_PREVIEW").c_str(),
-						ImVec2(
-						ImGui::GetContentRegionAvail().x - m_Window.GetFramePadding().x,
-						PREVIEW_SECTION_SIZE - m_Window.GetFramePadding().y),
-						ImGuiChildFlags_Borders))
-					{
-						inspectorView->RenderPreview();
-					}
-					ImGui::EndChild();
-				}
 
 				ImGui::PopStyleVar();
 				ImGui::PopStyleVar();
 
 				if (deleteView)
 				{
-					inspectorView->OnDelete();
+					selectable->OnDelete();
 				}
 			}
 		}

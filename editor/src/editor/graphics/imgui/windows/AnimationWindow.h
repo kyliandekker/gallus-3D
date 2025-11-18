@@ -8,7 +8,7 @@
 #include "graphics/imgui/views/DataTypes/StringTextInput.h"
 #include "resources/AssetType.h"
 #include "animation/AnimationTrack.h"
-#include "editor/graphics/imgui/views/inspector/animation/AnimationTrackUIView.h"
+#include "editor/graphics/imgui/AnimationTrackUIView.h"
 
 namespace gallus
 {
@@ -27,7 +27,7 @@ namespace gallus
 		namespace imgui
 		{
 			class ImGuiWindow;
-			class ExplorerFileUIView;
+			class FileEditorSelectable;
 
 			//---------------------------------------------------------------------
 			// AnimationWindow
