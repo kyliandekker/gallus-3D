@@ -70,6 +70,11 @@ namespace gallus
 
 			void ExplorerWindow::RenderFolder(FileEditorSelectable& a_Resource, int a_Indent, const ImVec2& a_InitialPos)
 			{
+				if (a_Resource.GetFileResource().GetMetaData()->GetAssetType() != gallus::resources::AssetType::Folder)
+				{
+					return;
+				}
+
 				bool
 					clicked = false,
 					right_clicked = false;
@@ -88,10 +93,7 @@ namespace gallus
 				{
 					for (FileEditorSelectable& child : a_Resource.GetChildren())
 					{
-						if (child.GetFileResource().GetMetaData()->GetAssetType() == gallus::resources::AssetType::Folder)
-						{
-							RenderFolder(child, a_Indent + 1, ImGui::GetCursorPos());
-						}
+						RenderFolder(child, a_Indent + 1, ImGui::GetCursorPos());
 					}
 				}
 			}

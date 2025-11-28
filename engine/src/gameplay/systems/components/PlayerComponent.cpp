@@ -50,7 +50,11 @@ namespace gallus
 		void PlayerComponent::Deserialize(const resources::SrcData& a_SrcData)
 		{
 			m_fSpeed = a_SrcData.GetFloat(JSON_PLAYER_COMPONENT_MOVEMENT_SPEED_VAR);
-			m_pBulletPrefab = core::ENGINE->GetResourceAtlas().LoadPrefab(a_SrcData.GetString(JSON_PLAYER_COMPONENT_PREFAB_NAME)).get();
+			std::string bulletPrefabName = a_SrcData.GetString(JSON_PLAYER_COMPONENT_PREFAB_NAME);
+			if (!bulletPrefabName.empty())
+			{
+				m_pBulletPrefab = core::ENGINE->GetResourceAtlas().LoadPrefab(bulletPrefabName).get();
+			}
 		}
 
 		float bulletSpeed = 5;
