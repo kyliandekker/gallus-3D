@@ -28,6 +28,17 @@ namespace gallus
 		{
 			class ImGuiWindowsConfig;
 
+#define BESTGAMEEVER 1
+
+#ifdef PURPLEBURGLARALARM
+			static ImVec4 g_vAccentColor = ImVec4(0.42f, 0.34f, 0.83f, 1.00f);
+#elif BESTGAMEEVER
+			static ImVec4 g_vAccentColor = ImVec4(0.71f, 0.32f, 0.08f, 1.00f);
+#elif BLUTARCH
+			static ImVec4 g_vAccentColor = ImVec4(0.35f, 0.5f, 0.6f, 1.00f);
+#elif REDMOND
+			static ImVec4 g_vAccentColor = ImVec4(0.63f, 0.36f, 0.32f, 1.00f);
+#endif
 			//---------------------------------------------------------------------
 			// ImGuiWindow
 			//---------------------------------------------------------------------

@@ -1,24 +1,5 @@
 project(game)
 
-# Gather and set IMGUI source files.
-set(IMGUI
-    ${CMAKE_SOURCE_DIR}/external/imgui/imgui.cpp
-    ${CMAKE_SOURCE_DIR}/external/imgui/imgui_draw.cpp
-    ${CMAKE_SOURCE_DIR}/external/imgui/backends/imgui_impl_dx12.cpp
-    ${CMAKE_SOURCE_DIR}/external/imgui/backends/imgui_impl_win32.cpp
-    ${CMAKE_SOURCE_DIR}/external/imgui/imgui_widgets.cpp
-    ${CMAKE_SOURCE_DIR}/external/imgui/imgui_helpers.cpp
-    ${CMAKE_SOURCE_DIR}/external/imgui/imgui_tables.cpp
-    ${CMAKE_SOURCE_DIR}/external/imgui/implot.cpp
-    ${CMAKE_SOURCE_DIR}/external/imgui/imgui_toggle.cpp
-    ${CMAKE_SOURCE_DIR}/external/imgui/imgui_toggle_palette.cpp
-    ${CMAKE_SOURCE_DIR}/external/imgui/imgui_toggle_presets.cpp
-    ${CMAKE_SOURCE_DIR}/external/imgui/imgui_toggle_renderer.cpp
-    ${CMAKE_SOURCE_DIR}/external/imgui/implot_items.cpp
-    ${CMAKE_SOURCE_DIR}/external/imgui/ImGuizmo.cpp
-    ${CMAKE_SOURCE_DIR}/external/imgui/ImSequencer.cpp
-)
-
 # Gather and set DX12 source files.
 set(DX12
     ${CMAKE_SOURCE_DIR}/external/dx12/directx/d3dx12_property_format_table.cpp

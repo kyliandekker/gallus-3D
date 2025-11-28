@@ -398,6 +398,20 @@ namespace ImGui
 
 		return value_changed;
 	}
+
+	void ShowTooltip(const std::string& a_sText)
+	{
+		if (a_sText.empty())
+		{
+			return;
+		}
+		if (ImGui::IsItemHovered())
+		{
+			ImGui::BeginTooltip();
+			ImGui::Text(a_sText.c_str());
+			ImGui::EndTooltip();
+		}
+	}
 }
 
 #endif

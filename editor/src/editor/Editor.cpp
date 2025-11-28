@@ -28,6 +28,7 @@ namespace gallus
 			m_EditorCamera.Init(graphics::dx12::RENDER_TEX_SIZE.x, graphics::dx12::RENDER_TEX_SIZE.y);
 
 			LOG(LOGSEVERITY_INFO, LOG_CATEGORY_EDITOR, "Initializing editor.");
+			LOG(LOGSEVERITY_WARNING, LOG_CATEGORY_EDITOR, "This is a test.");
 
 			return ThreadedSystem::Initialize(a_bWait);
 		}

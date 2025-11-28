@@ -44,13 +44,14 @@ namespace gallus
 			//---------------------------------------------------------------------
 			void ResourcesWindow::Update()
 			{
-				if (gameplay::GAME.IsStarted() && !gameplay::GAME.IsPaused())
+				if (core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetFullScreenPlayMode())
 				{
 					return;
 				}
 				BaseWindow::Update();
 			}
 
+			//---------------------------------------------------------------------
 			void ResourcesWindow::RenderResource(resources::EngineResource* a_pResource)
 			{
 				if (!a_pResource)

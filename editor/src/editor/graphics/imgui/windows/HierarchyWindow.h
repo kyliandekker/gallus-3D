@@ -81,8 +81,6 @@ namespace gallus
 
 				void OnSelectableChanged(const EditorSelectable* oldVal, const EditorSelectable* newVal);
 
-				void SaveScene();
-
 				void OnSceneDirty(const bool oldVal, const bool newVal);
 
 				bool m_bNeedsRefresh = true; /// Whether the hierarchy needs to refresh the results shown in the hierarchy window.

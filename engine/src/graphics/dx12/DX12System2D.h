@@ -6,7 +6,6 @@
 #include <glm/vec2.hpp>
 #include <memory>
 #include <mutex>
-#include <chrono>
 
 // core includes
 #include "core/Event.h"
@@ -17,6 +16,7 @@
 #ifndef IMGUI_DISABLE
 #include "graphics/imgui/ImGuiWindow.h"
 #endif // IMGUI_DISABLE
+#include "graphics/dx12/FPSCounter.h"
 
 // gameplay includes
 #include "gameplay/systems/components/SpriteComponent.h"
@@ -59,51 +59,6 @@ namespace gallus
 				SPRITE_COLOR = 2,    // b1: Sprite rect UVs (float2 uv0, float2 uv1)
 				TEX_SRV = 3,            // Texture2D texture0 : register(t0);
 				NumRootParameters = 4
-			};
-
-			/// <summary>
-			/// Tracks and calculates frames per second (FPS).
-			/// </summary>
-			class FPSCounter
-			{
-			public:
-				/// <summary>
-				/// Retrieves the current frames per second (FPS).
-				/// </summary>
-				/// <returns>The FPS as a double.</returns>
-				double GetFPS() const;
-
-				/// <summary>
-				/// Retrieves the delta time.
-				/// </summary>
-				/// <returns>The delta time as a double.</returns>
-				double GetDeltaTime() const;
-
-				/// <summary>
-				/// Retrieves the total time passed.
-				/// </summary>
-				/// <returns>The total time passed as a double.</returns>
-				double GetTotalTime() const;
-			private:
-				friend class DX12System2D;
-
-				/// <summary>
-				/// Updates the FPS counter.
-				/// </summary>
-				void Update();
-
-				/// <summary>
-				/// Initializes the FPS counter.
-				/// </summary>
-				void Initialize();
-
-				double m_fFPS = 0.0; /// The FPS as a double.
-				uint64_t m_iFrameCounter = 0; /// The number of frames.
-				double m_fDeltaTime = 0.0; /// The number of seconds since the last frame.
-				double m_fElapsedSeconds = 0.0; /// The number of seconds since the last frame.
-				double m_fTotalTime = 0.0; /// The number of seconds since the last frame.
-				std::chrono::high_resolution_clock m_Clock; /// The clock.
-				std::chrono::steady_clock::time_point m_T0 = m_Clock.now(); /// The clock from first frame.
 			};
 
 			//---------------------------------------------------------------------
@@ -249,6 +204,8 @@ namespace gallus
 				/// </summary>
 				void Loop() override;
 
+				void NewFrame(float a_fDeltaTime);
+
 				/// <summary>
 				/// Processes win32 window events.
 				/// </summary>
@@ -366,6 +323,12 @@ namespace gallus
 				SimpleEvent<DX12System2D&> m_eOnInitialize;
 				SimpleEvent<std::shared_ptr<dx12::CommandList>> m_eOnRender;
 				SimpleEvent<const glm::ivec2&, const glm::ivec2&> m_eOnResize;
+				Event<float> m_eOnNewFrame;
+
+				const Event<float>& OnNewFrame() const
+				{
+					return m_eOnNewFrame;
+				}
 			protected:
 				/// <summary>
 				/// Creates the command queues.

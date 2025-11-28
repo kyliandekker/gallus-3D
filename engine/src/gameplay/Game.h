@@ -3,6 +3,10 @@
 // base class
 #include "core/System.h"
 
+#include "core/Observable.h"
+#include "core/Event.h"
+#include "graphics/dx12/FPSCounter.h"
+
 // gameplay
 #include "gameplay/Scene.h"
 
@@ -51,6 +55,15 @@ namespace gallus
 			/// <returns>True if the game has started, false otherwise.</returns>
 			bool IsStarted() const
 			{
+				return m_bStarted.get();
+			}
+
+			/// <summary>
+			/// Retrieves the starting state.
+			/// </summary>
+			/// <returns>True if the game has started, false otherwise.</returns>
+			const core::Observable<bool>& IsStartedObs() const
+			{
 				return m_bStarted;
 			}
 
@@ -81,15 +94,17 @@ namespace gallus
 				m_bPaused = a_bPaused;
 			}
 
-			float GetFps() const
+			const graphics::FPSCounter& GetFPS() const
 			{
-				return m_fFps;
+				return m_FpsCounter;
 			}
 
-			float GetDeltaTime() const
+			const Event<float>& OnNewFrame() const
 			{
-				return m_fDeltaTime;
+				return m_eOnNewFrame;
 			}
+
+			void NewFrame(float a_fDeltaTime);
 		private:
 			/// <summary>
 			/// Callback for closing the window.
@@ -98,12 +113,12 @@ namespace gallus
 
 			// There can only be one scene and setting a new one cleans up the old one automatically.
 			gallus::gameplay::Scene m_Scene;
+			Event<float> m_eOnNewFrame;
 
-			bool m_bStarted = false;
+			core::Observable<bool> m_bStarted;
 			bool m_bPaused = false;
 
-			float m_fFps;
-			float m_fDeltaTime;
+			graphics::FPSCounter m_FpsCounter;
 		};
 		inline extern Game GAME = {};
 	}

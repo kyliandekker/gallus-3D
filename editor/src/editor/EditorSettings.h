@@ -130,6 +130,30 @@ namespace gallus
 			bool GetShowAwesome() const;
 
 			/// <summary>
+			/// Sets whether the grid should be shown.
+			/// </summary>
+			/// <param name="a_bShowGrid">True to show the grid, false otherwise.</param>
+			void SetShowGrid(bool a_bShowGrid);
+
+			/// <summary>
+			/// Checks if the grid should be shown.
+			/// </summary>
+			/// <returns>True if grid is shown, false otherwise.</param>
+			bool GetShowGrid() const;
+
+			/// <summary>
+			/// Sets whether play mode should open in full screen.
+			/// </summary>
+			/// <param name="a_bFullScreenPlayMode">True to set play mode to full screen, false otherwise.</param>
+			void SetFullScreenPlayMode(bool a_bFullScreenPlayMode);
+
+			/// <summary>
+			/// Checks if play mode is in full screen.
+			/// </summary>
+			/// <returns>True if play mode is set to full screen, false otherwise.</param>
+			bool GetFullScreenPlayMode() const;
+
+			/// <summary>
 			/// Sets the scene zoom.
 			/// </summary>
 			/// <param name="a_fSceneZoom">The amount of zoom.</param>
@@ -164,6 +188,18 @@ namespace gallus
 			/// </summary>
 			/// <returns>Integer representing the scene operation index.</returns>
 			int GetLastSceneOperation() const;
+
+			/// <summary>
+			/// Sets whether FPS should be shown in decimals.
+			/// </summary>
+			/// <param name="a_bFPSPrecision">True to round up FPS numbers, false to show full numbers.</param>
+			void SetFPSPrecision(bool a_bFPSPrecision);
+
+			/// <summary>
+			/// Determines whether FPS should be shown in decimals.
+			/// </summary>
+			/// <returns>True if FPS numbers are rounded up, false otherwise.</param>
+			bool GetFPSPrecision() const;
 		private:
 			/// <summary>
 			/// Virtual method for loading specific vars.
@@ -187,9 +223,14 @@ namespace gallus
 			bool m_bShowInfoSuccess = true; /// Check for combined info-success messages.
 			bool m_bShowAwesome = true; /// Check for "awesome" log messages.
 
+			bool m_bShowGrid = false;
+			bool m_bFullScreenPlayMode = false;
+
 			float m_fSceneZoom = 1.0f;
 			glm::vec2 m_vScenePanOffset = glm::vec2(0.0f, 0.0f);
 			int m_iLastSceneOperation = 7;
+
+			bool m_bFPSPrecision = false;
 		};
 	}
 }

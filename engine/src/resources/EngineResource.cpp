@@ -8,21 +8,25 @@ namespace gallus
 		//---------------------------------------------------------------------
 		// EngineResource
 		//---------------------------------------------------------------------
-		EngineResource::EngineResource(const std::string& a_sName) : m_sName(a_sName)
-		{}
-
-		//---------------------------------------------------------------------
-		void EngineResource::Destroy()
+		bool EngineResource::Destroy()
 		{
 			if (!m_bIsDestroyable)
 			{
-				return;
+				return false;
 			}
 
-			m_ResourceCategory = EngineResourceCategory::Unknown;
-			m_bIsDestroyable = true;
-			m_sName = "";
+#ifdef _LOAD_BY_PATH
 			m_Path = "";
+#endif
+			m_sName = "";
+			m_ResourceCategory = EngineResourceCategory::Unknown;
+			m_AssetType = resources::AssetType::None;
+			m_bIsDestroyable = true;
+			m_bIsLocked = false;
+			m_bIsUnique = false;
+			m_bIsDirty = false;
+
+			return true;
 		}
 
 		//---------------------------------------------------------------------
@@ -91,17 +95,44 @@ namespace gallus
 			return m_sName;
 		}
 
+#ifdef _LOAD_BY_PATH
 		//---------------------------------------------------------------------
 		const std::filesystem::path& EngineResource::GetPath() const
 		{
 			return m_Path;
 		}
+#endif
 
 		//---------------------------------------------------------------------
-		void EngineResource::SetPath(const std::filesystem::path& a_Path)
+		bool EngineResource::LoadByName(const std::string& a_sName)
 		{
+			if (!Destroy())
+			{
+				return false;
+			}
+
+#ifdef _LOAD_BY_PATH
+			m_Path = "";
+#endif
+			m_sName = a_sName;
+
+			return true;
+		}
+
+#ifdef _LOAD_BY_PATH
+		//---------------------------------------------------------------------
+		void EngineResource::LoadByPath(const fs::path & a_Path)
+		{
+			if (!Destroy())
+			{
+				return false;
+			}
+
 			m_Path = a_Path;
 			m_sName = a_Path.filename().generic_string();
+
+			return true;
 		}
+#endif
 	}
 }

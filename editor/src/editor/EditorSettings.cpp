@@ -17,6 +17,9 @@
 #define JSON_EDITOR_SETTINGS_CONSOLE_INFOSUCCESS_VAR "infoSuccess"
 #define JSON_EDITOR_SETTINGS_CONSOLE_AWESOME_VAR "awesome"
 
+#define JSON_EDITOR_SETTINGS_SHOW_GRID_VAR "showGrid"
+#define JSON_EDITOR_SETTINGS_PLAY_MODE_VAR "playMode"
+
 #define JSON_EDITOR_SETTINGS_SCENE_VAR "scene"
 #define JSON_EDITOR_SETTINGS_SCENE_ZOOM "zoom"
 #define JSON_EDITOR_SETTINGS_SCENE_PAN_OFFSET "panOffset"
@@ -57,6 +60,8 @@ namespace gallus
 					GetFloat(a_Document[JSON_EDITOR_SETTINGS_SCENE_VAR][JSON_EDITOR_SETTINGS_SCENE_PAN_OFFSET], JSON_EDITOR_SETTINGS_SCENE_PAN_OFFSET_Y, m_vScenePanOffset.y);
 				}
 				GetInt(a_Document[JSON_EDITOR_SETTINGS_SCENE_VAR], JSON_EDITOR_SETTINGS_SCENE_LAST_OPERATION, m_iLastSceneOperation);
+				GetBool(a_Document[JSON_EDITOR_SETTINGS_SCENE_VAR], JSON_EDITOR_SETTINGS_SHOW_GRID_VAR, m_bShowGrid);
+				GetBool(a_Document[JSON_EDITOR_SETTINGS_SCENE_VAR], JSON_EDITOR_SETTINGS_PLAY_MODE_VAR, m_bFullScreenPlayMode);
 			}
 
 			return true;
@@ -87,6 +92,8 @@ namespace gallus
 			scenePanOffsetDoc.AddMember(JSON_EDITOR_SETTINGS_SCENE_PAN_OFFSET_Y, m_vScenePanOffset.y, a_Allocator);
 			sceneDoc.AddMember(JSON_EDITOR_SETTINGS_SCENE_PAN_OFFSET, scenePanOffsetDoc, a_Allocator);
 			sceneDoc.AddMember(JSON_EDITOR_SETTINGS_SCENE_LAST_OPERATION, m_iLastSceneOperation, a_Allocator);
+			sceneDoc.AddMember(JSON_EDITOR_SETTINGS_SHOW_GRID_VAR, m_bShowGrid, a_Allocator);
+			sceneDoc.AddMember(JSON_EDITOR_SETTINGS_PLAY_MODE_VAR, m_bFullScreenPlayMode, a_Allocator);
 			a_Document.AddMember(JSON_EDITOR_SETTINGS_SCENE_VAR, sceneDoc, a_Allocator);
 
 			return true;
@@ -201,6 +208,30 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
+		void EditorSettings::SetShowGrid(bool a_bShowGrid)
+		{
+			m_bShowGrid = a_bShowGrid;
+		}
+
+		//---------------------------------------------------------------------
+		bool EditorSettings::GetShowGrid() const
+		{
+			return m_bShowGrid;
+		}
+
+		//---------------------------------------------------------------------
+		void EditorSettings::SetFullScreenPlayMode(bool a_bFullScreenPlayMode)
+		{
+			m_bFullScreenPlayMode = a_bFullScreenPlayMode;
+		}
+
+		//---------------------------------------------------------------------
+		bool EditorSettings::GetFullScreenPlayMode() const
+		{
+			return m_bFullScreenPlayMode;
+		}
+
+		//---------------------------------------------------------------------
 		void EditorSettings::SetSceneZoom(float a_fSceneZoom)
 		{
 			m_fSceneZoom = a_fSceneZoom;
@@ -234,6 +265,18 @@ namespace gallus
 		int EditorSettings::GetLastSceneOperation() const
 		{
 			return m_iLastSceneOperation;
+		}
+
+		//---------------------------------------------------------------------
+		void EditorSettings::SetFPSPrecision(bool a_bFPSPrecision)
+		{
+			m_bFPSPrecision = a_bFPSPrecision;
+		}
+
+		//---------------------------------------------------------------------
+		bool EditorSettings::GetFPSPrecision() const
+		{
+			return m_bFPSPrecision;
 		}
 	}
 }

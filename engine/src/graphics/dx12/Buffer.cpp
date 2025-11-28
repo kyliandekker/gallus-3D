@@ -7,17 +7,16 @@ namespace gallus
 		namespace dx12
 		{
 			//---------------------------------------------------------------------
-			// Buffer
-			//---------------------------------------------------------------------
-			Buffer::Buffer(const std::string& a_sName) : DX12Resource(a_sName)
-			{}
-
-			//---------------------------------------------------------------------
-			Buffer::Buffer(const D3D12_RESOURCE_DESC& a_ResDesc,
-				size_t a_iNumElements, size_t a_iElementSize,
-				const std::string& a_sName) : DX12Resource(a_sName)
+			bool Buffer::LoadByName(const std::string& a_sName, const D3D12_RESOURCE_DESC& a_ResDesc, size_t a_iNumElements, size_t a_iElementSize)
 			{
+				if (!DX12Resource::LoadByName(a_sName))
+				{
+					return false;
+				}
+
 				CreateViews(a_iNumElements, a_iElementSize);
+
+				return true;
 			}
 
 			//---------------------------------------------------------------------

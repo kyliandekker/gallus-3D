@@ -50,7 +50,7 @@ namespace gallus
 				}
 				core::EDITOR_ENGINE->GetDX12().SetActiveCamera(*cam);
 
-				if (gameplay::GAME.IsStarted() && !gameplay::GAME.IsPaused())
+				if (core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetFullScreenPlayMode())
 				{
 					return;
 				}
@@ -110,11 +110,29 @@ namespace gallus
 					ImGui::PopStyleVar();
 				}
 
+				bool showGrid = core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetShowGrid();
+				if (ImGui::CheckboxButton(
+					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_SCENE), BUTTON_ID, "SHOW_GRID_SCENE").c_str(), &showGrid, m_Window.GetHeaderSize()))
+				{
+					core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetShowGrid(showGrid);
+					core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
+				}
+				ImGui::SameLine();
+
 				bool inGameMode = core::EDITOR_ENGINE->GetEditor().GetCameraMode() == editor::CameraMode::CAMERA_MODE_GAME;
 				if (ImGui::CheckboxButton(
-					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_GAMEMODE), BUTTON_ID, "CAMERA_MODE_GAME").c_str(), &inGameMode, m_Window.GetHeaderSize()))
+					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_CAMERA), BUTTON_ID, "CAMERA_MODE_GAME_SCENE").c_str(), &inGameMode, m_Window.GetHeaderSize()))
 				{
 					core::EDITOR_ENGINE->GetEditor().SetCameraMode(inGameMode ? editor::CameraMode::CAMERA_MODE_GAME : editor::CameraMode::CAMERA_MODE_SCENE);
+				}
+				ImGui::SameLine();
+
+				bool inFullScreen = core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetFullScreenPlayMode();
+				if (ImGui::CheckboxButton(
+					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_GAMEMODE), BUTTON_ID, "FULL_SCREEN_PLAY_MODE_SCENE").c_str(), &inFullScreen, m_Window.GetHeaderSize()))
+				{
+					core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetFullScreenPlayMode(inFullScreen);
+					core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
 				}
 
 				ImGui::EndToolbar(ImVec2(0, 0));
@@ -186,7 +204,7 @@ namespace gallus
 
 				if (core::EDITOR_ENGINE->GetEditor().GetCameraMode() == editor::CameraMode::CAMERA_MODE_SCENE)
 				{
-					HandleCameraInput(gameplay::GAME.GetDeltaTime(), imageScreenPos, textureSize);
+					HandleCameraInput(core::EDITOR_ENGINE->GetDX12().GetFPS().GetDeltaTime(), imageScreenPos, textureSize);
 
 					DrawComponentGizmos(imageScreenPos, textureSize);
 				}
@@ -219,6 +237,11 @@ namespace gallus
 				const ImVec2& a_vPanOffset,
 				float a_fZoom)
 			{
+				if (!core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetShowGrid())
+				{
+					return;
+				}
+
 				ImDrawList* drawList = ImGui::GetWindowDrawList();
 
 				const float baseSpacing = 100.0f;
@@ -442,7 +465,7 @@ namespace gallus
 			void FullSceneWindow::Update()
 			{
 				m_bFullScreen = true;
-				if (!gameplay::GAME.IsStarted() || gameplay::GAME.IsPaused())
+				if (!core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetFullScreenPlayMode())
 				{
 					return;
 				}
@@ -579,6 +602,15 @@ namespace gallus
 					ImGui::PopStyleVar();
 				}
 
+				ImGui::SameLine();
+				bool inFullScreen = core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetFullScreenPlayMode();
+				if (ImGui::CheckboxButton(
+					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_GAMEMODE), BUTTON_ID, "FULL_SCREEN_PLAY_MODE_FULL_SCENE").c_str(), &inFullScreen, m_Window.GetHeaderSize()))
+				{
+					core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetFullScreenPlayMode(inFullScreen);
+					core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
+				}
+
 				ImGui::EndToolbar(ImVec2(0, 0));
 				ImGui::SetCursorPos(ImVec2(startToolbarPos.x, startToolbarPos.y + toolbarSize.y + m_Window.GetFramePadding().y));
 
@@ -633,7 +665,7 @@ namespace gallus
 				}
 
 				{
-					std::string fpsValue = std::to_string(static_cast<uint64_t>(std::round(gameplay::GAME.GetFps()))) + " game fps";
+					std::string fpsValue = std::to_string(static_cast<uint64_t>(std::round(gameplay::GAME.GetFPS().GetFPS()))) + " game fps";
 
 					ImGui::PushFont(m_Window.GetCapitalFont());
 					ImGui::SetCursorScreenPos(ImVec2(image_pos.x + drawW - (ImGui::CalcTextSize(fpsValue.c_str()).x + m_Window.GetWindowPadding().x), image_pos.y + (m_Window.GetFontSize() * 2) + m_Window.GetWindowPadding().y));

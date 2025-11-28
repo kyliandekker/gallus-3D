@@ -33,9 +33,14 @@ namespace gallus
 			m_Window.SetTitle(a_sName);
 
 			const glm::ivec2 size = m_Window.GetRealSize();
-			m_DX12.Initialize(true, m_Window.GetHWnd(), size, &m_Window);
+			if (!m_DX12.Initialize(true, m_Window.GetHWnd(), size, &m_Window))
+			{
+				return false;
+			}
 
 			m_ECS.Initialize();
+
+			m_InputSystem.Initialize(false);
 
 			System::Initialize();
 
@@ -61,6 +66,8 @@ namespace gallus
 		bool Engine::Destroy()
 		{
 			LOG(LOGSEVERITY_INFO, LOG_CATEGORY_ENGINE, "Destroying engine.");
+
+			m_ECS.Destroy();
 
 			m_ECS.Destroy();
 
@@ -92,6 +99,12 @@ namespace gallus
 		graphics::dx12::DX12System2D& Engine::GetDX12()
 		{
 			return m_DX12;
+		}
+
+		//---------------------------------------------------------------------
+		input::InputSystem& Engine::GetInputSystem()
+		{
+			return m_InputSystem;
 		}
 
 		//---------------------------------------------------------------------

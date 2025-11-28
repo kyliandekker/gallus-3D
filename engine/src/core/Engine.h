@@ -14,6 +14,8 @@
 #include "graphics/dx12/DX12System2D.h"
 #include "graphics/win32/Window.h"
 
+#include "input/InputSystem.h"
+
 // gameplay includes
 #include "gameplay/EntityComponentSystem.h"
 
@@ -68,6 +70,12 @@ namespace gallus
 			graphics::dx12::DX12System2D& GetDX12();
 
 			/// <summary>
+			/// Retrieves the input system.
+			/// </summary>
+			/// <returns>Reference to the input system.</returns>
+			input::InputSystem& GetInputSystem();
+
+			/// <summary>
 			/// Retrieves the ecs.
 			/// </summary>
 			/// <returns>Reference to the ecs.</returns>
@@ -100,6 +108,7 @@ namespace gallus
 			resources::ResourceAtlas m_ResourceAtlas;
 			graphics::win32::Window m_Window;
 			graphics::dx12::DX12System2D m_DX12;
+			input::InputSystem m_InputSystem;
 			gameplay::EntityComponentSystem m_ECS;
 
 			std::filesystem::path m_sSaveDirectory;

@@ -77,9 +77,47 @@ namespace gallus
 			{
 			public:
 				/// <summary>
+				/// Constructs an empty texture.
+				/// </summary>
+				Texture() : DX12Resource()
+				{
+					m_AssetType = resources::AssetType::Sprite;
+				}
+
+				/// <summary>
+				/// Creates a texture by name but does not fill it with texture data. Useful for render textures.
+				/// </summary>
+				/// <param name="a_sName">Name of the texture.</param>
+				/// <param name="a_Description">Description of the texture.</param>
+				/// <param name="a_Heap">Heap properties.</param>
+				/// <param name="a_ResourceState">The resource state the texture will be transitioned into after successful creation.</param>
+				/// <returns></returns>
+				bool LoadByName(const std::string& a_sName, const D3D12_RESOURCE_DESC& a_Description, const D3D12_HEAP_PROPERTIES& a_Heap = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), const D3D12_RESOURCE_STATES a_ResourceState = D3D12_RESOURCE_STATE_COMMON);
+
+				/// <summary>
+				/// Loads a texture by name.
+				/// </summary>
+				/// <param name="a_sName">Name of the texture.</param>
+				/// <param name="a_pCommandList">The command list used for updating resources.</param>
+				/// <param name="a_Heap">Heap properties.</param>
+				/// <param name="a_ResourceState">The resource state the texture will be transitioned into after successful creation.</param>
+				/// <returns></returns>
+				bool LoadByName(const std::string& a_sName, std::shared_ptr<CommandList> a_pCommandList, const D3D12_HEAP_PROPERTIES& a_Heap = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), const D3D12_RESOURCE_STATES a_ResourceState = D3D12_RESOURCE_STATE_COMMON);
+
+#ifdef _LOAD_BY_PATH
+				/// <summary>
+				/// Loads a texture by path.
+				/// </summary>
+				/// <param name="a_Path">The path to the texture.</param>
+				/// <param name="a_pCommandList">The command list used for updating resources.</param>
+				/// <returns></returns>
+				bool LoadByPath(const fs::path& a_Path, std::shared_ptr<CommandQueue> a_pCommandQueue);
+#endif
+
+				/// <summary>
 				/// Destroys the texture and sets it to invalid (it still exists in the texture atlas, however).
 				/// </summary>
-				void Destroy() override;
+				bool Destroy() override;
 
 				/// <summary>
 				/// Checks whether the texture supports SRV.
@@ -142,34 +180,6 @@ namespace gallus
 				/// </summary>
 				/// <returns>CPU Descriptor handle of the SRV.</returns>
 				CD3DX12_CPU_DESCRIPTOR_HANDLE GetCPUHandle();
-
-				/// <summary>
-				/// Creates a texture by name but does not fill it with texture data. Useful for render textures.
-				/// </summary>
-				/// <param name="a_sName">Name of the texture.</param>
-				/// <param name="a_Description">Description of the texture.</param>
-				/// <param name="a_Heap">Heap properties.</param>
-				/// <param name="a_ResourceState">The resource state the texture will be transitioned into after successful creation.</param>
-				/// <returns></returns>
-				bool LoadByName(const std::string& a_sName, const D3D12_RESOURCE_DESC& a_Description, const D3D12_HEAP_PROPERTIES& a_Heap = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), const D3D12_RESOURCE_STATES a_ResourceState = D3D12_RESOURCE_STATE_COMMON);
-
-				/// <summary>
-				/// Loads a texture by name.
-				/// </summary>
-				/// <param name="a_sName">Name of the texture.</param>
-				/// <param name="a_pCommandList">The command list used for updating resources.</param>
-				/// <param name="a_Heap">Heap properties.</param>
-				/// <param name="a_ResourceState">The resource state the texture will be transitioned into after successful creation.</param>
-				/// <returns></returns>
-				bool LoadByName(const std::string& a_sName, std::shared_ptr<CommandList> a_pCommandList, const D3D12_HEAP_PROPERTIES& a_Heap = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), const D3D12_RESOURCE_STATES a_ResourceState = D3D12_RESOURCE_STATE_COMMON);
-
-				/// <summary>
-				/// Loads a texture by path.
-				/// </summary>
-				/// <param name="a_Path">The path to the texture.</param>
-				/// <param name="a_pCommandList">The command list used for updating resources.</param>
-				/// <returns></returns>
-				bool LoadByPath(const fs::path& a_Path, std::shared_ptr<CommandQueue> a_pCommandQueue);
 
 				/// <summary>
 				/// Uploads a texture to the heap.

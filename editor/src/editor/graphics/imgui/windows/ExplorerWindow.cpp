@@ -61,7 +61,7 @@ namespace gallus
 
 			void ExplorerWindow::Update()
 			{
-				if (gameplay::GAME.IsStarted() && !gameplay::GAME.IsPaused())
+				if (core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetFullScreenPlayMode())
 				{
 					return;
 				}

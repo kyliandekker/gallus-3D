@@ -28,8 +28,22 @@ namespace gallus
 		//---------------------------------------------------------------------
 		// Scene
 		//---------------------------------------------------------------------
+		void Scene::Reset()
+		{
+			SetPath("");
+			SetData(core::Data());
+			LoadData();
+		}
+
+		//---------------------------------------------------------------------
 		bool Scene::LoadData()
 		{
+			// Clear all entities.
+			core::ENGINE->GetECS().Clear();
+			while (!core::ENGINE->GetECS().GetEntities().empty())
+			{
+			}
+
 			if (m_Data.empty())
 			{
 				return false;
@@ -46,12 +60,6 @@ namespace gallus
 			{
 				LOG(LOGSEVERITY_ERROR, LOG_CATEGORY_GAME, "Something went wrong when trying to load scene data.");
 				return false;
-			}
-
-			// Clear all entities.
-			core::ENGINE->GetECS().Clear();
-			while (!core::ENGINE->GetECS().GetEntities().empty())
-			{
 			}
 
 			// Load entities and systems.

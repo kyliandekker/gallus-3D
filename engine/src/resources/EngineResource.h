@@ -2,7 +2,9 @@
 
 // external
 #include <string>
-#include <filesystem>
+#ifdef _LOAD_BY_PATH
+#include "utils/FILEPCH.h"
+#endif
 
 #ifdef _EDITOR
 #include "editor/EditorExpose.h"
@@ -46,13 +48,7 @@ namespace gallus
 			/// <summary>
 			/// Destroys an engine resource.
 			/// </summary>
-			virtual void Destroy();
-
-			/// <summary>
-			/// Constructs an engine resource with a given name.
-			/// </summary>
-			/// <param name="a_sName">Name of the resource.</param>
-			EngineResource(const std::string& a_sName);
+			virtual bool Destroy();
 
 			/// <summary>
 			/// Returns whether the resource is a valid resource.
@@ -126,17 +122,29 @@ namespace gallus
 			/// <returns>Name of the resource.</returns>
 			const std::string GetName() const;
 
+#ifdef _LOAD_BY_PATH
 			/// <summary>
 			/// Returns the path of the resource.
 			/// </summary>
 			/// <returns>Path of the resource.</returns>
 			const std::filesystem::path& GetPath() const;
+#endif // _LOAD_BY_PATH
 
 			/// <summary>
-			/// Sets the path of the resource.
+			/// Loads a resource by name.
 			/// </summary>
-			/// <param name="a_Path">The path.</param>
-			void SetPath(const std::filesystem::path& a_Path);
+			/// <param name="a_sName">Name of the resource.</param>
+			/// <returns></returns>
+			virtual bool LoadByName(const std::string& a_sName);
+
+#ifdef _LOAD_BY_PATH
+			/// <summary>
+			/// Loads a resource by path.
+			/// </summary>
+			/// <param name="a_Path">The path to the resource.</param>
+			/// <returns></returns>
+			virtual bool LoadByPath(const fs::path& a_Path);
+#endif
 
 #ifdef _EDITOR
 			bool IsDirty() const
@@ -163,12 +171,12 @@ namespace gallus
 			core::Observable<bool> m_bIsDirty;
 #endif
 			EngineResourceCategory m_ResourceCategory = EngineResourceCategory::Unknown;
-			resources::AssetType m_AssetType;
+			resources::AssetType m_AssetType = resources::AssetType::None;
 
 			std::string m_sName;
+#ifdef _LOAD_BY_PATH
 			std::filesystem::path m_Path;
-
-			friend class ResourceAtlas;
+#endif
 
 #ifdef _EDITOR
 			BEGIN_EXPOSE_FIELDS(EngineResource)

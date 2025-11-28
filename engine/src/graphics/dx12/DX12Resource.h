@@ -30,31 +30,45 @@ namespace gallus
 				/// <summary>
 				/// Destroys the dx12 resource.
 				/// </summary>
-				void Destroy() override;
+				bool Destroy() override;
 
 				/// <summary>
-				/// Constructs a dx12 resource with a given name.
+				/// Loads a resource by name.
 				/// </summary>
+				/// <param name="a_sName">Name of the resource.</param>
+				/// <returns></returns>
+				virtual bool LoadByName(const std::string& a_sName) override;
+
+				/// <summary>
+				/// Loads a resource by name.
+				/// </summary>
+				/// <param name="a_sName">Name of the resource.</param>
 				/// <param name="a_ResourceDesc">Resource description.</param>
-				/// <param name="a_sName">Name of the resource.</param>
-				DX12Resource(const D3D12_RESOURCE_DESC& a_ResourceDesc, const std::string& a_sName);
-
-				/// <summary>
-				/// Constructs a dx12 resource with a given name.
-				/// </summary>
-				/// <param name="a_sName">Name of the resource.</param>
-				DX12Resource(const std::string& a_sName);
-				virtual ~DX12Resource();
-
-				/// <summary>
-				/// Constructs a dx12 resource with a given name.
-				/// </summary>
-				/// <param name="a_ResourceDesc">Resource description.</param>
-				/// <param name="a_sName">Name of the resource.</param>
 				/// <param name="a_Heap">Heap property options.</param>
 				/// <param name="a_ResourceState">Resource state it will transition into.</param>
 				/// <param name="a_pOptimizedClearValue">Clear value of the resource.</param>
-				bool CreateResource(const D3D12_RESOURCE_DESC& a_ResourceDesc, const std::string& a_sName, const D3D12_HEAP_PROPERTIES& a_Heap = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), const D3D12_RESOURCE_STATES a_ResourceState = D3D12_RESOURCE_STATE_COMMON, const D3D12_CLEAR_VALUE* a_pOptimizedClearValue = nullptr);
+				/// <returns></returns>
+				virtual bool LoadByName(const std::string& a_sName, const D3D12_RESOURCE_DESC& a_ResourceDesc, const D3D12_HEAP_PROPERTIES& a_Heap = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), const D3D12_RESOURCE_STATES a_ResourceState = D3D12_RESOURCE_STATE_COMMON, const D3D12_CLEAR_VALUE* a_pOptimizedClearValue = nullptr);
+
+#ifdef _LOAD_BY_PATH
+				/// <summary>
+				/// Loads a resource by path.
+				/// </summary>
+				/// <param name="a_Path">The path to the resource.</param>
+				/// <returns></returns>
+				virtual bool LoadByPath(const fs::path& a_Path) override;
+
+				/// <summary>
+				/// Loads a resource by path.
+				/// </summary>
+				/// <param name="a_Path">The path to the resource.</param>
+				/// <param name="a_ResourceDesc">Resource description.</param>
+				/// <param name="a_Heap">Heap property options.</param>
+				/// <param name="a_ResourceState">Resource state it will transition into.</param>
+				/// <param name="a_pOptimizedClearValue">Clear value of the resource.</param>
+				/// <returns></returns>
+				virtual bool LoadByPath(const fs::path& a_Path, const D3D12_RESOURCE_DESC& a_ResourceDesc, const D3D12_HEAP_PROPERTIES& a_Heap = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), const D3D12_RESOURCE_STATES a_ResourceState = D3D12_RESOURCE_STATE_COMMON, const D3D12_CLEAR_VALUE* a_pOptimizedClearValue = nullptr);
+#endif
 
 				/// <summary>
 				/// Returns whether the resource is a valid resource.
@@ -106,12 +120,10 @@ namespace gallus
 				/// <param name="a_NewState">The new state.</param>
 				void Transition(std::shared_ptr<CommandList> a_pCommandList, D3D12_RESOURCE_STATES a_NewState);
 			protected:
-				D3D12_FEATURE_DATA_FORMAT_SUPPORT m_FormatSupport{};
 				Microsoft::WRL::ComPtr<ID3D12Resource> m_pResource = nullptr;
-				std::wstring m_wsName;
+				D3D12_FEATURE_DATA_FORMAT_SUPPORT m_FormatSupport{};
+				std::wstring m_wsName = L"";
 				D3D12_RESOURCE_STATES m_CurrentState = D3D12_RESOURCE_STATE_COMMON;
-
-				friend class ResourceAtlas;
 			};
 		}
 	}

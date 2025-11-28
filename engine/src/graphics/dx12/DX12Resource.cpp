@@ -19,50 +19,43 @@ namespace gallus
 			//---------------------------------------------------------------------
 			// DX12Resource
 			//---------------------------------------------------------------------
-			DX12Resource::DX12Resource(const D3D12_RESOURCE_DESC& a_ResourceDesc, const std::string& a_sName)
+			bool DX12Resource::Destroy()
 			{
-				CreateResource(a_ResourceDesc, a_sName);
-			}
-
-			//---------------------------------------------------------------------
-			void DX12Resource::Destroy()
-			{
-				if (!m_bIsDestroyable)
+				if (!EngineResource::Destroy())
 				{
 					return;
 				}
-
-				m_wsName = L"";
-				m_FormatSupport = {};
-				EngineResource::Destroy();
-			}
-
-			//---------------------------------------------------------------------
-			DX12Resource::DX12Resource(const std::string& a_sName) : EngineResource(a_sName)
-			{
-				m_wsName = std::wstring(m_sName.begin(), m_sName.end());
-			}
-
-			//---------------------------------------------------------------------
-			DX12Resource::~DX12Resource()
-			{}
-
-			//---------------------------------------------------------------------
-			bool DX12Resource::CreateResource(const D3D12_RESOURCE_DESC& a_ResourceDesc, const std::string& a_sName, const D3D12_HEAP_PROPERTIES& a_Heap, const D3D12_RESOURCE_STATES a_ResourceState, const D3D12_CLEAR_VALUE* a_pOptimizedClearValue)
-			{
+				
 				if (m_pResource)
 				{
-					// Resources that cannot be destroyed cannot be overridden.
-					if (!m_bIsDestroyable)
-					{
-						return false;
-					}
 					m_pResource.Reset();
+				}
+				m_FormatSupport = {};
+				m_wsName = L"";
+				m_CurrentState = D3D12_RESOURCE_STATE_COMMON;
+			}
+
+			//---------------------------------------------------------------------
+			bool DX12Resource::LoadByName(const std::string& a_sName)
+			{
+				if (!EngineResource::LoadByName(a_sName))
+				{
+					return false;
+				}
+				m_wsName = std::wstring(m_sName.begin(), m_sName.end());
+
+				return true;
+			}
+
+			//---------------------------------------------------------------------
+			bool DX12Resource::LoadByName(const std::string& a_sName, const D3D12_RESOURCE_DESC& a_ResourceDesc, const D3D12_HEAP_PROPERTIES& a_Heap, const D3D12_RESOURCE_STATES a_ResourceState, const D3D12_CLEAR_VALUE* a_pOptimizedClearValue)
+			{
+				if (!LoadByName(a_sName))
+				{
+					return false;
 				}
 
 				Microsoft::WRL::ComPtr<ID3D12Device2>& device = core::ENGINE->GetDX12().GetDevice();
-
-				m_sName = a_sName;
 				if (device->CreateCommittedResource(
 					&a_Heap,
 					D3D12_HEAP_FLAG_NONE,
@@ -76,13 +69,44 @@ namespace gallus
 					return false;
 				}
 
-				m_wsName = std::wstring(m_sName.begin(), m_sName.end());
+				if (!m_pResource)
+				{
+					LOGF(LOGSEVERITY_ERROR, LOG_CATEGORY_DX12, "Resource is null: \"%s\".", a_sName.c_str());
+					return false;
+				}
+
 				m_pResource->SetName(m_wsName.c_str());
 
 				CheckFeatureSupport();
 
 				return true;
 			}
+
+#ifdef _LOAD_BY_PATH
+			//---------------------------------------------------------------------
+			bool DX12Resource::LoadByPath(const fs::path& a_Path)
+			{
+				if (!EngineResource::LoadByPath(a_Path))
+				{
+					return false;
+				}
+				m_wsName = std::wstring(m_sName.begin(), m_sName.end());
+
+				return true;
+			}
+
+			//---------------------------------------------------------------------
+			bool DX12Resource::LoadByPath(const fs::path& a_Path, const D3D12_RESOURCE_DESC& a_ResourceDesc, const D3D12_HEAP_PROPERTIES& a_Heap, const D3D12_RESOURCE_STATES a_ResourceState, const D3D12_CLEAR_VALUE* a_pOptimizedClearValue)
+			{
+				if (!EngineResource::LoadByPath(a_Path))
+				{
+					return false;
+				}
+				LoadByName(m_sName, a_ResourceDesc, a_Heap, a_ResourceState, a_pOptimizedClearValue);
+
+				return true;
+			}
+#endif
 
 			//---------------------------------------------------------------------
 			bool DX12Resource::IsValid() const
@@ -123,6 +147,8 @@ namespace gallus
 			//---------------------------------------------------------------------
 			void DX12Resource::SetResource(Microsoft::WRL::ComPtr<ID3D12Resource> a_pResource)
 			{
+				// TODO: Fix. This is not safe.
+
 				// Resources that cannot be destroyed cannot be overridden.
 				if (!m_bIsDestroyable)
 				{

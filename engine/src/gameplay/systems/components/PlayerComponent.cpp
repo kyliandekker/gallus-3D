@@ -13,6 +13,7 @@
 #include "gameplay/systems/CollisionSystem.h"
 #include "gameplay/systems/ProjectileSystem.h"
 #include "gameplay/systems/AnimationSystem.h"
+#include "input/InputSystem.h"
 
 #define JSON_PLAYER_COMPONENT_MOVEMENT_SPEED_VAR "movementSpeed"
 #define JSON_PLAYER_COMPONENT_PREFAB_NAME "bulletPrefab"
@@ -52,54 +53,25 @@ namespace gallus
 			m_pBulletPrefab = core::ENGINE->GetResourceAtlas().LoadPrefab(a_SrcData.GetString(JSON_PLAYER_COMPONENT_PREFAB_NAME)).get();
 		}
 
-#include <Windows.h>
-
-		struct Key
-		{
-			char key;
-			bool pressed = false;
-
-			Key(char key) : key(key)
-			{
-
-			}
-
-			bool isKeyDown()
-			{
-				if (GetKeyState(key) & 0x8000)
-				{
-					if (!pressed)
-					{
-						pressed = true;
-						return true;
-					}
-					return false;
-				}
-				else
-				{
-					pressed = false;
-				}
-				return false;
-			}
-
-			bool isKey()
-			{
-				return GetKeyState(key) & 0x8000;
-			}
-		};
-
 		float bulletSpeed = 5;
-		Key w('W'), a('A'), s('S'), d('D'), left(VK_LEFT), right(VK_RIGHT), up(VK_UP), down(VK_DOWN);
 		void PlayerComponent::UpdateRealtime(float a_fDeltaTime, UpdateTime a_UpdateTime)
 		{
 			AnimationSystem& animationSys = core::ENGINE->GetECS().GetSystem<AnimationSystem>();
 			AnimationComponent& animationComp = animationSys.GetComponent(m_EntityID);
 
-			bool leftDown = left.isKeyDown();
-			bool rightDown = right.isKeyDown();
-			bool upDown = up.isKeyDown();
-			bool downDown = down.isKeyDown();
-			if (leftDown || rightDown || upDown || downDown)
+			input::InputSystem& inputSys = core::ENGINE->GetInputSystem();
+
+			bool left = inputSys.IsDoubleDown(VK_LEFT);
+			bool right = inputSys.IsDoubleDown(VK_RIGHT);
+			bool up = inputSys.IsDoubleDown(VK_UP);
+			bool down = inputSys.IsDoubleDown(VK_DOWN);
+
+			bool w = inputSys.IsKey('W');
+			bool a = inputSys.IsKey('A');
+			bool s = inputSys.IsKey('S');
+			bool d = inputSys.IsKey('D');
+
+			if (left || right || up || down)
 			{
 				if (m_pBulletPrefab)
 				{
@@ -116,21 +88,21 @@ namespace gallus
 					TransformComponent& transformComp = transformSys.GetComponent(id);
 					transformComp.Transform().SetPosition(pos);
 
-					if (leftDown)
+					if (left)
 					{
 						transformComp.Transform().SetRotation(-180);
 						projectileSystem.GetComponent(id).SetMovementSpeed({ -bulletSpeed, 0 });
 					}
-					else if (rightDown)
+					else if (right)
 					{
 						projectileSystem.GetComponent(id).SetMovementSpeed({ bulletSpeed, 0 });
 					}
-					else if (upDown)
+					else if (up)
 					{
 						transformComp.Transform().SetRotation(-90);
 						projectileSystem.GetComponent(id).SetMovementSpeed({ 0, -bulletSpeed });
 					}
-					else if (downDown)
+					else if (down)
 					{
 						transformComp.Transform().SetRotation(90);
 						projectileSystem.GetComponent(id).SetMovementSpeed({ 0, bulletSpeed });
@@ -142,63 +114,59 @@ namespace gallus
 
 			DirectX::XMFLOAT2 movement = { 0.0f, 0.0f };
 
-			bool wDown = w.isKey();
-			bool aDown = a.isKey();
-			bool sDown = s.isKey();
-			bool dDown = d.isKey();
-			if (wDown)
+			if (w)
 			{
 				movement.y -= 1.0f;
 			}
-			if (sDown)
-			{
-				movement.y += 1.0f;
-			}
-			if (aDown)
+			if (a)
 			{
 				movement.x -= 1.0f;
 			}
-			if (dDown)
+			if (s)
+			{
+				movement.y += 1.0f;
+			}
+			if (d)
 			{
 				movement.x += 1.0f;
 			}
 
-			if (wDown && dDown)
+			if (w && d)
 			{
 				animationComp.LoadAnimation("player_walk_up_right.anim");
 				animationComp.Start();
 			}
-			else if (wDown && aDown)
+			else if (w && a)
 			{
 				animationComp.LoadAnimation("player_walk_up_left.anim");
 				animationComp.Start();
 			}
-			else if (sDown && aDown)
+			else if (s && a)
 			{
 				animationComp.LoadAnimation("player_walk_down_left.anim");
 				animationComp.Start();
 			}
-			else if (sDown && dDown)
+			else if (s && d)
 			{
 				animationComp.LoadAnimation("player_walk_down_right.anim");
 				animationComp.Start();
 			}
-			else if (wDown)
+			else if (w)
 			{
 				animationComp.LoadAnimation("player_walk_up.anim");
 				animationComp.Start();
 			}
-			else if (sDown)
-			{
-				animationComp.LoadAnimation("player_walk_down.anim");
-				animationComp.Start();
-			}
-			else if (aDown)
+			else if (a)
 			{
 				animationComp.LoadAnimation("player_walk_left.anim");
 				animationComp.Start();
 			}
-			else if (dDown)
+			else if (s)
+			{
+				animationComp.LoadAnimation("player_walk_down.anim");
+				animationComp.Start();
+			}
+			else if (d)
 			{
 				animationComp.LoadAnimation("player_walk_right.anim");
 				animationComp.Start();

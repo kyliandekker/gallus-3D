@@ -91,8 +91,8 @@ namespace gallus
 
 #ifdef _EDITOR
 				BEGIN_EXPOSE_FIELDS(DX12ShaderBind)
-					EXPOSE_FIELD(DX12ShaderBind, m_pPixelShader, "Pixel Shader", FieldOptions{ .type = EditorFieldWidgetType::AssetPickerPtr, .assetType = resources::AssetType::PixelShader })
-					EXPOSE_FIELD(DX12ShaderBind, m_pVertexShader, "Vertex Shader", FieldOptions{ .type = EditorFieldWidgetType::AssetPickerPtr, .assetType = resources::AssetType::VertexShader })
+					EXPOSE_FIELD(DX12ShaderBind, m_pPixelShader, "Pixel Shader", FieldOptions{ .type = EditorFieldWidgetType::AssetPickerPtr, .assetType = resources::AssetType::PixelShader, .description = "Pointer to the pixel shader asset used for rendering this object. Can be nullptr if no specific pixel shader is assigned." })
+					EXPOSE_FIELD(DX12ShaderBind, m_pVertexShader, "Vertex Shader", FieldOptions{ .type = EditorFieldWidgetType::AssetPickerPtr, .assetType = resources::AssetType::VertexShader, .description = "Pointer to the vertex shader asset used for rendering this object. Can be nullptr if no specific vertex shader is assigned." })
 				END_EXPOSE_FIELDS(DX12ShaderBind)
 				BEGIN_EXPOSE_GIZMOS(DX12ShaderBind)
 				END_EXPOSE_GIZMOS(DX12ShaderBind)

@@ -2,7 +2,7 @@
 
 #include "graphics/imgui/ImGuiWindowsConfig.h"
 
-#include "graphics/imgui/windows/MainWindowDock.h"
+#include "editor/graphics/imgui/windows/EditorWindowDock.h"
 #include "editor/graphics/imgui/windows/ResourcesWindow.h"
 #include "editor/graphics/imgui/windows/ConsoleWindow.h"
 #include "editor/graphics/imgui/windows/HierarchyWindow.h"
@@ -10,6 +10,7 @@
 #include "editor/graphics/imgui/windows/ExplorerWindow.h"
 #include "editor/graphics/imgui/windows/InspectorWindow.h"
 #include "editor/graphics/imgui/windows/AnimationWindow.h"
+#include "editor/graphics/imgui/windows/StatsWindow.h"
 
 #include "editor/graphics/imgui/modals/FilePickerModal.h"
 #include "editor/graphics/imgui/modals/SpriteEditorModal.h"
@@ -30,9 +31,9 @@ namespace gallus
 				void Initialize() override;
 				void Render() override;
 
-				MainWindowDock& GetMainWindowDock()
+				EditorWindowDock& GetEditorWindowDock()
 				{
-					return m_MainWindowDock;
+					return m_EditorWindowDock;
 				}
 
 				ResourcesWindow& GetResourcesWindow()
@@ -75,6 +76,11 @@ namespace gallus
 					return m_AnimationWindow;
 				}
 
+				StatsWindow& GetStatsWindow()
+				{
+					return m_StatsWindow;
+				}
+
 				FilePickerModal& GetFilePickerModal()
 				{
 					return m_FilePickerModal;
@@ -85,7 +91,7 @@ namespace gallus
 					return m_SpriteEditorModal;
 				}
 			private:
-				MainWindowDock m_MainWindowDock;
+				EditorWindowDock m_EditorWindowDock;
 
 				ResourcesWindow m_ResourcesWindow;
 				ConsoleWindow m_ConsoleWindow;
@@ -95,6 +101,7 @@ namespace gallus
 				ExplorerWindow m_ExplorerWindow;
 				InspectorWindow m_InspectorWindow;
 				AnimationWindow m_AnimationWindow;
+				StatsWindow m_StatsWindow;
 
 				FilePickerModal m_FilePickerModal;
 				SpriteEditorModal m_SpriteEditorModal;

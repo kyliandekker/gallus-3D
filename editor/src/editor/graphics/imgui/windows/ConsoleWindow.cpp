@@ -4,6 +4,7 @@
 #include "ConsoleWindow.h"
 
 #include <imgui/imgui_helpers.h>
+#include <imgui/imgui_internal.h>
 
 // utils includes
 #include "utils/string_extensions.h"
@@ -49,7 +50,7 @@ namespace gallus
 				BaseWindow::Update();
 			}
 
-			ImVec4 colors_arr[8] =
+			ImVec4 S_ICON_COLORS[8] =
 			{
 				ImGui::ConvertColorsRgba(255, 0, 0, 255),
 				ImGui::ConvertColorsRgba(255, 0, 0, 255),
@@ -58,6 +59,18 @@ namespace gallus
 				ImGui::ConvertColorsRgba(0, 148, 255, 255),
 				ImGui::ConvertColorsRgba(76, 255, 0, 255),
 				ImGui::ConvertColorsRgba(127, 146, 255, 255),
+				ImGui::ConvertColorsRgba(255, 110, 220, 255),
+			};
+
+			ImVec4 S_TEXT_COLORS[8] =
+			{
+				ImGui::ConvertColorsRgba(255, 0, 0, 255),
+				ImGui::ConvertColorsRgba(255, 0, 0, 255),
+				ImGui::ConvertColorsRgba(255, 216, 0, 255),
+				ImGui::ConvertColorsRgba(255, 255, 255, 255),
+				ImGui::ConvertColorsRgba(255, 255, 255, 255),
+				ImGui::ConvertColorsRgba(76, 255, 0, 255),
+				ImGui::ConvertColorsRgba(255, 255, 255, 255),
 				ImGui::ConvertColorsRgba(255, 110, 220, 255),
 			};
 
@@ -137,7 +150,7 @@ namespace gallus
 				ImGui::SameLine();
 				bool showInfo = editorSettings.GetShowInfo();
 				if (ImGui::IconCheckboxButton(
-					ImGui::IMGUI_FORMAT_ID(LogSeverityToIcon(LOGSEVERITY_INFO).c_str(), BUTTON_ID, "SHOW_INFO_CONSOLE").c_str(), &showInfo, m_Window.GetHeaderSize(), m_Window.GetIconFont(), colors_arr[LOGSEVERITY_INFO]))
+					ImGui::IMGUI_FORMAT_ID(LogSeverityToIcon(LOGSEVERITY_INFO).c_str(), BUTTON_ID, "SHOW_INFO_CONSOLE").c_str(), &showInfo, m_Window.GetHeaderSize(), m_Window.GetIconFont(), S_ICON_COLORS[LOGSEVERITY_INFO]))
 				{
 					editorSettings.SetShowInfo(showInfo);
 					editorSettings.Save();
@@ -147,7 +160,7 @@ namespace gallus
 				ImGui::SameLine();
 				bool showTest = editorSettings.GetShowTest();
 				if (ImGui::IconCheckboxButton(
-					ImGui::IMGUI_FORMAT_ID(LogSeverityToIcon(LOGSEVERITY_TEST).c_str(), BUTTON_ID, "SHOW_TEST_CONSOLE").c_str(), &showTest, m_Window.GetHeaderSize(), m_Window.GetIconFont(), colors_arr[LOGSEVERITY_TEST]))
+					ImGui::IMGUI_FORMAT_ID(LogSeverityToIcon(LOGSEVERITY_TEST).c_str(), BUTTON_ID, "SHOW_TEST_CONSOLE").c_str(), &showTest, m_Window.GetHeaderSize(), m_Window.GetIconFont(), S_ICON_COLORS[LOGSEVERITY_TEST]))
 				{
 					editorSettings.SetShowTest(showTest);
 					editorSettings.Save();
@@ -157,7 +170,7 @@ namespace gallus
 				ImGui::SameLine();
 				bool showWarning = editorSettings.GetShowWarning();
 				if (ImGui::IconCheckboxButton(
-					ImGui::IMGUI_FORMAT_ID(LogSeverityToIcon(LOGSEVERITY_WARNING).c_str(), BUTTON_ID, "SHOW_WARNING_CONSOLE").c_str(), &showWarning, m_Window.GetHeaderSize(), m_Window.GetIconFont(), colors_arr[LOGSEVERITY_WARNING]))
+					ImGui::IMGUI_FORMAT_ID(LogSeverityToIcon(LOGSEVERITY_WARNING).c_str(), BUTTON_ID, "SHOW_WARNING_CONSOLE").c_str(), &showWarning, m_Window.GetHeaderSize(), m_Window.GetIconFont(), S_ICON_COLORS[LOGSEVERITY_WARNING]))
 				{
 					editorSettings.SetShowWarning(showWarning);
 					editorSettings.Save();
@@ -167,7 +180,7 @@ namespace gallus
 				ImGui::SameLine();
 				bool showError = editorSettings.GetShowError();
 				if (ImGui::IconCheckboxButton(
-					ImGui::IMGUI_FORMAT_ID(LogSeverityToIcon(LOGSEVERITY_ERROR).c_str(), BUTTON_ID, "SHOW_ERROR_CONSOLE").c_str(), &showError, m_Window.GetHeaderSize(), m_Window.GetIconFont(), colors_arr[LOGSEVERITY_ERROR]))
+					ImGui::IMGUI_FORMAT_ID(LogSeverityToIcon(LOGSEVERITY_ERROR).c_str(), BUTTON_ID, "SHOW_ERROR_CONSOLE").c_str(), &showError, m_Window.GetHeaderSize(), m_Window.GetIconFont(), S_ICON_COLORS[LOGSEVERITY_ERROR]))
 				{
 					editorSettings.SetShowError(showError);
 					editorSettings.Save();
@@ -177,7 +190,7 @@ namespace gallus
 				ImGui::SameLine();
 				bool showAssert = editorSettings.GetShowAssert();
 				if (ImGui::IconCheckboxButton(
-					ImGui::IMGUI_FORMAT_ID(LogSeverityToIcon(LOGSEVERITY_ASSERT).c_str(), BUTTON_ID, "SHOW_ASSERT_CONSOLE").c_str(), &showAssert, m_Window.GetHeaderSize(), m_Window.GetIconFont(), colors_arr[LOGSEVERITY_ASSERT]))
+					ImGui::IMGUI_FORMAT_ID(LogSeverityToIcon(LOGSEVERITY_ASSERT).c_str(), BUTTON_ID, "SHOW_ASSERT_CONSOLE").c_str(), &showAssert, m_Window.GetHeaderSize(), m_Window.GetIconFont(), S_ICON_COLORS[LOGSEVERITY_ASSERT]))
 				{
 					editorSettings.SetShowAssert(showAssert);
 					editorSettings.Save();
@@ -187,7 +200,7 @@ namespace gallus
 				ImGui::SameLine();
 				bool showSuccess = editorSettings.GetShowSuccess();
 				if (ImGui::IconCheckboxButton(
-					ImGui::IMGUI_FORMAT_ID(LogSeverityToIcon(LOGSEVERITY_SUCCESS).c_str(), BUTTON_ID, "SHOW_SUCCESS_CONSOLE").c_str(), &showSuccess, m_Window.GetHeaderSize(), m_Window.GetIconFont(), colors_arr[LOGSEVERITY_SUCCESS]))
+					ImGui::IMGUI_FORMAT_ID(LogSeverityToIcon(LOGSEVERITY_SUCCESS).c_str(), BUTTON_ID, "SHOW_SUCCESS_CONSOLE").c_str(), &showSuccess, m_Window.GetHeaderSize(), m_Window.GetIconFont(), S_ICON_COLORS[LOGSEVERITY_SUCCESS]))
 				{
 					editorSettings.SetShowSuccess(showSuccess);
 					editorSettings.Save();
@@ -197,7 +210,7 @@ namespace gallus
 				ImGui::SameLine();
 				bool showInfoSuccess = editorSettings.GetShowInfoSuccess();
 				if (ImGui::IconCheckboxButton(
-					ImGui::IMGUI_FORMAT_ID(LogSeverityToIcon(LOGSEVERITY_INFO_SUCCESS).c_str(), BUTTON_ID, "SHOW_INFO_SUCCESS_CONSOLE").c_str(), &showInfoSuccess, m_Window.GetHeaderSize(), m_Window.GetIconFont(), colors_arr[LOGSEVERITY_INFO_SUCCESS]))
+					ImGui::IMGUI_FORMAT_ID(LogSeverityToIcon(LOGSEVERITY_INFO_SUCCESS).c_str(), BUTTON_ID, "SHOW_INFO_SUCCESS_CONSOLE").c_str(), &showInfoSuccess, m_Window.GetHeaderSize(), m_Window.GetIconFont(), S_ICON_COLORS[LOGSEVERITY_INFO_SUCCESS]))
 				{
 					editorSettings.SetShowInfoSuccess(showInfoSuccess);
 					editorSettings.Save();
@@ -207,7 +220,7 @@ namespace gallus
 				ImGui::SameLine();
 				bool showAwesome = editorSettings.GetShowAwesome();
 				if (ImGui::IconCheckboxButton(
-					ImGui::IMGUI_FORMAT_ID(LogSeverityToIcon(LOGSEVERITY_AWESOME).c_str(), BUTTON_ID, "SHOW_AWESOME_CONSOLE").c_str(), &showAwesome, m_Window.GetHeaderSize(), m_Window.GetIconFont(), colors_arr[LOGSEVERITY_AWESOME]))
+					ImGui::IMGUI_FORMAT_ID(LogSeverityToIcon(LOGSEVERITY_AWESOME).c_str(), BUTTON_ID, "SHOW_AWESOME_CONSOLE").c_str(), &showAwesome, m_Window.GetHeaderSize(), m_Window.GetIconFont(), S_ICON_COLORS[LOGSEVERITY_AWESOME]))
 				{
 					editorSettings.SetShowAwesome(showAwesome);
 					editorSettings.Save();
@@ -251,47 +264,80 @@ namespace gallus
 					std::lock_guard<std::mutex> lock(MESSAGE_MUTEX);
 					for (size_t i = 0; i < m_aFilteredMessages.size(); i++)
 					{
-						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + (m_Window.GetFramePadding().x * 2));
+						ImVec2 startingPos = ImGui::GetCursorScreenPos();
 
 						auto& message = m_aMessages[m_aFilteredMessages[i]];
+						ImVec4 color = S_ICON_COLORS[message.GetSeverity()];
 
-						ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (m_Window.GetFramePadding().x * 2));
-						ImVec4 color = colors_arr[message.GetSeverity()];
+						time_t time_t = std::chrono::system_clock::to_time_t(message.GetTime());
+						std::string id = ImGui::IMGUI_FORMAT_ID("",
+							FOLDOUT_ID, string_extensions::StringToUpper(std::to_string(i) + "_" + std::to_string(time_t) + "_" + message.GetCategory() + "_MESSAGE_LOGGER"));
+
+						ImVec2 buttonSize = ImVec2(ImGui::GetContentRegionAvail().x, m_Window.GetFontSize() + (m_Window.GetFramePadding().y * 2));
+						if (ImGui::InvisibleButton(id.c_str(), buttonSize))
+						{
+							m_aExpanded[id] = !m_aExpanded[id];
+						}
+
+						ImGui::SetCursorScreenPos(startingPos + m_Window.GetFramePadding());
+
+						std::string foldoutIcon = m_aExpanded[id] ? font::ICON_FOLDED_OUT : font::ICON_FOLDED_IN;
 
 						ImGui::PushFont(m_Window.GetIconFont());
-						ImVec2 pos = ImGui::GetCursorPos();
+						ImVec2 pos = ImGui::GetCursorScreenPos();
 						ImVec2 iconSize = ImGui::CalcTextSize(message.GetIcon().c_str());
+
+						ImGui::TextUnformatted(foldoutIcon.c_str());
+
+						pos.x += m_Window.GetFontSize();
+						ImGui::SetCursorScreenPos(pos);
+
 						ImGui::TextColored(color, message.GetIcon().c_str());
 						ImGui::PopFont();
 
-						ImGui::SetCursorPos(ImVec2(
+						ImGui::SetCursorScreenPos(ImVec2(
 							pos.x + iconSize.x + (m_Window.GetFontSize() / 2),
 							pos.y + (iconSize.y - ImGui::CalcTextSize(message.GetRawMessage().c_str()).y) * 0.5f));
-						ImGui::TextUnformatted(message.GetRawMessage().c_str());
+						ImGui::TextColored(S_TEXT_COLORS[message.GetSeverity()], message.GetRawMessage().c_str());
 
-						time_t time_t = std::chrono::system_clock::to_time_t(message.GetTime());
-						struct tm buf;
-
-						localtime_s(&buf, &time_t);
-
-						std::string s(30, '\0');
-						std::strftime(&s[0], s.size(), "%Y-%m-%d %H:%M:%S", &buf);
-
-						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + m_Window.GetFramePadding().x);
-						ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (m_Window.GetFramePadding().x * 2));
-						ImGui::TextColored(ImVec4(1, 1, 1, 0.5f), s.c_str());
-						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + m_Window.GetFramePadding().x);
-						ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (m_Window.GetFramePadding().x * 2));
-						ImGui::TextColored(ImVec4(1, 1, 1, 0.5f), message.GetLocation().generic_string().c_str());
-
-						ImGui::SetCursorPosX(ImGui::GetContentRegionAvail().x - ImGui::CalcTextSize(message.GetCategory().c_str()).x);
-						ImGui::PushFont(m_Window.GetBoldFont());
-						ImGui::TextColored(ImGui::GetStyleColorVec4(ImGuiCol_HeaderActive), message.GetCategory().c_str());
-						ImGui::PopFont();
-
-						if (i < m_aFilteredMessages.size() - 1)
+						if (m_aExpanded[id])
 						{
-							ImGui::Separator();
+							ImGui::Indent();
+
+							ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+
+							struct tm buf;
+
+							localtime_s(&buf, &time_t);
+
+							std::string s(30, '\0');
+							std::strftime(&s[0], s.size(), "%Y-%m-%d %H:%M:%S", &buf);
+
+							ImGui::TextColored(ImVec4(1, 1, 1, 0.5f), s.c_str());
+
+							ImVec2 fileTextSize = ImGui::CalcTextSize(message.GetLocation().generic_string().c_str());
+							ImRect rect =
+							{
+								ImGui::GetCursorScreenPos(),
+								ImGui::GetCursorScreenPos() + fileTextSize,
+							};
+							ImGui::TextColored(ImVec4(1, 1, 1, 0.5f), message.GetLocation().generic_string().c_str());
+							std::string filePath = message.GetLocation().generic_string();
+							int line = message.GetLine();
+							if (ImGui::IsMouseHoveringRect(rect.Min, rect.Max))
+							{
+								ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
+
+								if (ImGui::IsMouseClicked(0))
+								{
+									std::string cmd = "code -g \"" + filePath + "\":" + std::to_string(line);
+									system(cmd.c_str()); 
+								}
+							}
+
+							ImGui::PopStyleVar();
+
+							ImGui::Unindent();
 						}
 
 						if (scrollToBottom)

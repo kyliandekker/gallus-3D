@@ -8,7 +8,6 @@
 
 // external
 #include <vector>
-#include <mutex>
 
 namespace gallus
 {
@@ -26,19 +25,19 @@ namespace gallus
 			// ResourcesWindow
 			//---------------------------------------------------------------------
 			/// <summary>
-			/// A window that displays and manages the logger messages of the project.
+			/// A window that displays the resources currently loaded in the atlas.
 			/// </summary>
 			class ResourcesWindow : public BaseWindow
 			{
 			public:
 				/// <summary>
-				/// Constructs a console window.
+				/// Constructs a resources window.
 				/// </summary>
 				/// <param name="a_Window">The ImGui window for rendering the view.</param>
 				ResourcesWindow(ImGuiWindow& a_Window);
 
 				/// <summary>
-				/// Cleans up and destroys the console window.
+				/// Cleans up and destroys the resources window.
 				/// </summary>
 				~ResourcesWindow();
 
@@ -48,7 +47,7 @@ namespace gallus
 				void Update() override;
 
 				/// <summary>
-				/// Renders the console window.
+				/// Renders the resources window.
 				/// </summary>
 				void Render() override;
 			private:

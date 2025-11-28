@@ -29,6 +29,7 @@ namespace ImGui
 #define FOLDOUT_ID "FOLDOUT_"
 #define COLOR_WHEEL_ID "COLOR_WHEEL_"
 #define TABLE_ID "TABLE_"
+#define PLOT_ID "PLOT_"
 
 	bool CheckboxButton(const char* a_Label, bool* a_pValue, const ImVec2& a_Size = ImVec2(0, 0), const ImVec4& a_Color = ImVec4(1, 1, 1, 1));
 	bool TextButton(const char* a_Label, const ImVec2& a_Size = ImVec2(0, 0), const ImVec4& a_Color = ImVec4(1, 1, 1, 1));
@@ -79,6 +80,9 @@ namespace ImGui
 
 	bool VectorEdit2(const char* label, float col[2], float a_fSpeed = 1.0f, float a_fMin = -999999999999999, float a_fMax = 9999999999999999);
 	bool IVectorEdit2(const char* label, int col[2]);
+
+	bool ButtonWToolTip();
+	void ShowTooltip(const std::string& a_sText);
 }
 
 #endif

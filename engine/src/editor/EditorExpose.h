@@ -43,6 +43,7 @@ namespace gallus
 		std::string min = "";
 		std::string max = "";
 		std::function<std::string(int)> enumToStringFunc; // returns string name for index
+		std::string description;
 
 		size_t relatedIndexFieldOffset = 0;
 	};

@@ -8,7 +8,7 @@
 #include "graphics/imgui/views/DataTypes/StringTextInput.h"
 #include "resources/AssetType.h"
 #include "animation/AnimationTrack.h"
-#include "editor/graphics/imgui/AnimationTrackUIView.h"
+#include "editor/graphics/imgui/selectables/AnimationKeyFrameEditorSelectable.h"
 
 namespace gallus
 {
@@ -28,6 +28,12 @@ namespace gallus
 		{
 			class ImGuiWindow;
 			class FileEditorSelectable;
+
+			constexpr float ANIMATION_FRAME_PIXEL_WIDTH_DEFAULT = 25.0f;
+			inline float ANIMATION_FRAME_PIXEL_WIDTH = 25.0f;
+			constexpr float LEGEND_PADDING = 25.0f;
+			constexpr float LEGEND_HEIGHT = 70.0f;
+			constexpr float TRACK_SIZE = 50;
 
 			//---------------------------------------------------------------------
 			// AnimationWindow
@@ -65,13 +71,16 @@ namespace gallus
 				/// <param name="a_File">The animation file.</param>
 				void SetData(gallus::resources::FileResource& a_File);
 			protected:
+				void SetCurrentFrame(int a_iIndex);
+
 				std::shared_ptr<graphics::dx12::Texture> m_pPreviewTexture = nullptr;
 				gallus::resources::FileResource* m_pFile = nullptr;
 
 				animation::AnimationTrack m_AnimationTrack;
-				AnimationTrackUIView m_AnimationTrackUIView;
+				std::vector<AnimationKeyFrameEditorSelectable> m_KeyFrameSelectables;
 
 				int m_iCurrentFrame = 0;
+				int m_iSelectedKeyFrame = -1;
 			};
 		}
 	}

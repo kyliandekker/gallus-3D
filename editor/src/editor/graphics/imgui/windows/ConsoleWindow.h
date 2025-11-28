@@ -7,6 +7,7 @@
 
 #include <vector>
 #include <mutex>
+#include <map>
 
 #include "logger/Logger.h"
 #include "graphics/imgui/views/DataTypes/StringTextInput.h"
@@ -80,6 +81,8 @@ namespace gallus
 				std::vector<size_t> m_aFilteredMessages; /// List of messages shown in the console window.
 
 				SearchBarInput m_SearchBar; /// Search bar to filter specific messages in the console window.
+
+				std::map<std::string, bool> m_aExpanded; // A list of logger message booleans.
 			};
 		}
 	}

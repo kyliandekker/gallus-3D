@@ -61,7 +61,7 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			void AnimationKeyFrameEditorSelectable::Render()
+			void AnimationKeyFrameEditorSelectable::RenderEditorFields()
 			{
 				ImGui::SetCursorPosY(0);
 				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));

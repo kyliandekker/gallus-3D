@@ -57,6 +57,8 @@ namespace gallus
 
 				CreateImGui();
 
+				core::ENGINE->GetWindow().m_eOnWinProc += std::bind(&ImGuiWindow::UpdateMouseCursor, this);
+
 				LOG(LOGSEVERITY_SUCCESS, LOG_CATEGORY_EDITOR, "Initialized ImGui.");
 
 				return System::Initialize();
@@ -72,6 +74,8 @@ namespace gallus
 			//---------------------------------------------------------------------
 			bool ImGuiWindow::Destroy()
 			{
+				core::ENGINE->GetWindow().m_eOnWinProc -= std::bind(&ImGuiWindow::UpdateMouseCursor, this);
+
 				ImGui_ImplDX12_Shutdown();
 				ImGui_ImplWin32_Shutdown();
 				ImPlot::DestroyContext();
@@ -120,7 +124,6 @@ namespace gallus
 				ImGuiIO& io = ImGui::GetIO();
 				io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
 				io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
-				io.ConfigFlags &= ~ImGuiConfigFlags_NoMouseCursorChange;
 
 				(void) io;
 
@@ -175,24 +178,13 @@ namespace gallus
 				ImGuiStyle& style = ImGui::GetStyle();
 				ImVec4* colors = style.Colors;
 
-#define BESTGAMEEVER 1
-
-#ifdef PURPLEBURGLARALARM
-				m_vAccentColor = ImVec4(0.42f, 0.34f, 0.83f, 1.00f);
-#elif BESTGAMEEVER
-				m_vAccentColor = ImVec4(0.71f, 0.32f, 0.08f, 1.00f);
-#elif BLUTARCH
-				m_vAccentColor = ImVec4(0.35f, 0.5f, 0.6f, 1.00f);
-#elif REDMOND
-				m_vAccentColor = ImVec4(0.63f, 0.36f, 0.32f, 1.00f);
-#endif
 				float m_fDarkenFactor = 0.5f; // 80% brightness
 
 				ImVec4 m_vDarkerColor = ImVec4(
-					m_vAccentColor.x * m_fDarkenFactor,
-					m_vAccentColor.y * m_fDarkenFactor,
-					m_vAccentColor.z * m_fDarkenFactor,
-					m_vAccentColor.w
+					g_vAccentColor.x * m_fDarkenFactor,
+					g_vAccentColor.y * m_fDarkenFactor,
+					g_vAccentColor.z * m_fDarkenFactor,
+					g_vAccentColor.w
 				);
 
 				colors[ImGuiCol_TextColorAccentDarker] = m_vDarkerColor;
@@ -221,9 +213,9 @@ namespace gallus
 				colors[ImGuiCol_ButtonHovered] = ImVec4(0.24f, 0.24f, 0.24f, 1.00f);
 				colors[ImGuiCol_ButtonActive] = ImVec4(0.15f, 0.15f, 0.15f, 1.00f);
 				colors[ImGuiCol_Header] = ImVec4(0.24f, 0.24f, 0.24f, 1.00f);
-				colors[ImGuiCol_HeaderHovered] = ImVec4(m_vAccentColor.x, m_vAccentColor.y, m_vAccentColor.z, 0.5f);
+				colors[ImGuiCol_HeaderHovered] = ImVec4(g_vAccentColor.x, g_vAccentColor.y, g_vAccentColor.z, 0.5f);
 				//colors[ImGuiCol_HeaderActive] = ImVec4(0.24f, 0.24f, 0.24f, 1.00f);
-				colors[ImGuiCol_HeaderActive] = m_vAccentColor;
+				colors[ImGuiCol_HeaderActive] = g_vAccentColor;
 				colors[ImGuiCol_Separator] = ImVec4(0.43f, 0.43f, 0.50f, 0.50f);
 				colors[ImGuiCol_SeparatorHovered] = ImVec4(0.43f, 0.43f, 0.50f, 0.50f);
 				colors[ImGuiCol_SeparatorActive] = ImVec4(0.43f, 0.43f, 0.50f, 0.50f);
@@ -232,7 +224,7 @@ namespace gallus
 				colors[ImGuiCol_ResizeGripActive] = ImVec4(0.24f, 0.24f, 0.24f, 1.00f);
 				colors[ImGuiCol_Tab] = ImVec4(0.14f, 0.14f, 0.14f, 1.00f);
 				colors[ImGuiCol_TabHovered] = ImVec4(0.24f, 0.24f, 0.24f, 1.00f);
-				colors[ImGuiCol_TabActive] = m_vAccentColor;
+				colors[ImGuiCol_TabActive] = g_vAccentColor;
 				colors[ImGuiCol_TabUnfocused] = ImVec4(0.14f, 0.14f, 0.14f, 1.00f);
 				colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.24f, 0.24f, 0.24f, 1.00f);
 				colors[ImGuiCol_PlotLines] = ImVec4(0.86f, 0.93f, 0.89f, 1.00f);
@@ -245,7 +237,7 @@ namespace gallus
 				colors[ImGuiCol_NavWindowingHighlight] = ImVec4(0.86f, 0.93f, 0.89f, 1.00f);
 				colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.14f, 0.14f, 0.14f, 1.00f);
 				colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.14f, 0.14f, 0.14f, 1.00f);
-				colors[ImGuiCol_TextColorAccent] = m_vAccentColor;
+				colors[ImGuiCol_TextColorAccent] = g_vAccentColor;
 #ifndef _RENDER_TEX
 				float transparency = 0.4;
 				ImGui::GetStyle().Colors[ImGuiCol_FrameBg].w = transparency;
@@ -277,7 +269,7 @@ namespace gallus
 
 				ImPlotStyle& pStyle = ImPlot::GetStyle();
 				colors = pStyle.Colors;
-				colors[ImPlotCol_Line] = m_vAccentColor;
+				colors[ImPlotCol_Line] = g_vAccentColor;
 			}
 
 			//---------------------------------------------------------------------
@@ -331,8 +323,6 @@ namespace gallus
 					m_pWindowsConfig->Render();
 				}
 
-				UpdateMouseCursor();
-
 				ImGui::PopFont();
 
 				ImGui::EndFrame();
@@ -346,40 +336,62 @@ namespace gallus
 			{
 				if (ImGui::IsAnyItemHovered())
 				{
-					// Set the cursor to a hand pointer
-					if (ImGui::GetMouseCursor() == ImGuiMouseCursor_Arrow)
+					ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
+				}
+
+				LPTSTR win32_cursor = IDC_ARROW; 
+				ImGuiMouseCursor imgui_cursor = ImGui::GetMouseCursor();
+				switch (imgui_cursor)
+				{
+					case ImGuiMouseCursor_TextInput:
 					{
-						ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
+						win32_cursor = IDC_IBEAM;
+						break;
 					}
-
-					ImGuiIO& io = ImGui::GetIO();
-					ImGuiMouseCursor imgui_cursor = ImGui::GetMouseCursor();
-					if (io.MouseDrawCursor || imgui_cursor == ImGuiMouseCursor_None)
+					case ImGuiMouseCursor_ResizeAll:
 					{
-						::SetCursor(NULL);
+						win32_cursor = IDC_SIZEALL;
+						break;
 					}
-					else
+					case ImGuiMouseCursor_ResizeNS:
 					{
-						// Map ImGui cursor types to Win32 system cursors
-						LPTSTR win32_cursor = IDC_ARROW; // Default arrow
-
-						switch (imgui_cursor)
-						{
-							case ImGuiMouseCursor_TextInput:    win32_cursor = IDC_IBEAM; break;
-							case ImGuiMouseCursor_ResizeAll:    win32_cursor = IDC_SIZEALL; break;
-							case ImGuiMouseCursor_ResizeNS:     win32_cursor = IDC_SIZENS; break;
-							case ImGuiMouseCursor_ResizeEW:     win32_cursor = IDC_SIZEWE; break;
-							case ImGuiMouseCursor_ResizeNESW:   win32_cursor = IDC_SIZENESW; break;
-							case ImGuiMouseCursor_ResizeNWSE:   win32_cursor = IDC_SIZENWSE; break;
-							case ImGuiMouseCursor_Hand:         win32_cursor = IDC_HAND; break;
-							case ImGuiMouseCursor_NotAllowed:   win32_cursor = IDC_NO; break;
-							default:                            win32_cursor = IDC_ARROW; break;
-						}
-
-						// Set the system cursor using Win32 API
-						::SetCursor(LoadCursor(NULL, win32_cursor));
+						win32_cursor = IDC_SIZENS;
+						break;
+					}
+					case ImGuiMouseCursor_ResizeEW:
+					{
+						win32_cursor = IDC_SIZEWE;
+						break;
+					}
+					case ImGuiMouseCursor_ResizeNESW:
+					{
+						win32_cursor = IDC_SIZENESW;
+						break;
+					}
+					case ImGuiMouseCursor_ResizeNWSE:
+					{
+						win32_cursor = IDC_SIZENWSE;
+						break;
+					}
+					case ImGuiMouseCursor_Hand:
+					{
+						win32_cursor = IDC_HAND;
+						break;
+					}
+					case ImGuiMouseCursor_NotAllowed:
+					{
+						win32_cursor = IDC_NO;
+						break;
+					}
+					default:
+					{
+						win32_cursor = IDC_ARROW;
+						break;
 					}
 				}
+
+				// Set the system cursor using Win32 API
+				::SetCursor(LoadCursor(NULL, win32_cursor));
 			}
 
 			//---------------------------------------------------------------------

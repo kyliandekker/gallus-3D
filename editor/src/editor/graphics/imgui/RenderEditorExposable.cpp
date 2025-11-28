@@ -167,6 +167,7 @@ namespace gallus
 						std::vector<gallus::resources::AssetType>{ a_Field.m_Options.assetType });
 					filePickerModal.Show();
 				}
+				ImGui::ShowTooltip(a_Field.m_Options.description);
 				ImGui::PopStyleVar();
 
 				return changed;
@@ -231,6 +232,7 @@ namespace gallus
 					}
 					ImGui::EndCombo();
 				}
+				ImGui::ShowTooltip(a_Field.m_Options.description);
 
 				return changed;
 			}
@@ -268,7 +270,9 @@ namespace gallus
 						float* value = reinterpret_cast<float*>(ptr);
 						func = [value, &a_Field, &fieldId]
 						{
-							return ShowDragFloat(fieldId, value, a_Field);
+							bool val = ShowDragFloat(fieldId, value, a_Field);
+							ImGui::ShowTooltip(a_Field.m_Options.description);
+							return val;
 						};
 						break;
 					}
@@ -280,6 +284,7 @@ namespace gallus
 							int temp = static_cast<int64_t>(*value);
 
 							bool changed = ShowDragInt(fieldId, temp, a_Field);
+							ImGui::ShowTooltip(a_Field.m_Options.description);
 							if (changed)
 							{
 								*value = static_cast<int8_t>(temp);
@@ -297,6 +302,7 @@ namespace gallus
 							int temp = static_cast<int64_t>(*value);
 
 							bool changed = ShowDragInt(fieldId, temp, a_Field);
+							ImGui::ShowTooltip(a_Field.m_Options.description);
 							if (changed)
 							{
 								*value = static_cast<int16_t>(temp);
@@ -314,6 +320,7 @@ namespace gallus
 							int temp = static_cast<int64_t>(*value);
 
 							bool changed = ShowDragInt(fieldId, temp, a_Field);
+							ImGui::ShowTooltip(a_Field.m_Options.description);
 							if (changed)
 							{
 								*value = static_cast<int32_t>(temp);
@@ -331,6 +338,7 @@ namespace gallus
 							int temp = *value;
 
 							bool changed = ShowDragInt(fieldId, temp, a_Field);
+							ImGui::ShowTooltip(a_Field.m_Options.description);
 							if (changed)
 							{
 								*value = temp;
@@ -344,7 +352,9 @@ namespace gallus
 						bool* value = reinterpret_cast<bool*>(ptr);
 						func = [&a_Field, &fieldId, value]
 						{
-							return ImGui::Checkbox(fieldId.c_str(), value);
+							bool val = ImGui::Checkbox(fieldId.c_str(), value);
+							ImGui::ShowTooltip(a_Field.m_Options.description);
+							return val;
 						};
 						break;
 					}
@@ -353,7 +363,9 @@ namespace gallus
 						bool* value = reinterpret_cast<bool*>(ptr);
 						func = [&a_Field, &fieldId, value]
 						{
-							return ImGui::Toggle(fieldId.c_str(), value);
+							bool val = ImGui::Toggle(fieldId.c_str(), value);
+							ImGui::ShowTooltip(a_Field.m_Options.description);
+							return val;
 						};
 						break;
 					}
@@ -362,7 +374,9 @@ namespace gallus
 						DirectX::XMFLOAT2* value = reinterpret_cast<DirectX::XMFLOAT2*>(ptr);
 						func = [&a_Field, &fieldId, value]
 						{
-							return ShowVector2(fieldId, *value, a_Field);
+							bool val = ShowVector2(fieldId, *value, a_Field);
+							ImGui::ShowTooltip(a_Field.m_Options.description);
+							return val;
 						};
 						break;
 					}
@@ -403,6 +417,7 @@ namespace gallus
 							int temp = *enumValue;
 
 							bool changed = ShowEnumDropdown(fieldId, &temp, a_Field);
+							ImGui::ShowTooltip(a_Field.m_Options.description);
 							if (changed)
 							{
 								*enumValue = temp;
@@ -439,6 +454,7 @@ namespace gallus
 					{
 						ImGui::AlignTextToFramePadding();
 						ImGui::DisplayHeader(core::EDITOR_ENGINE->GetDX12().GetImGuiWindow().GetBoldFont(), a_Field.m_sUIName);
+						ImGui::ShowTooltip(a_Field.m_Options.description);
 					}, func);
 				}
 

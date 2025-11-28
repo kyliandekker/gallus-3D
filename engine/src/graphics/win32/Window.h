@@ -164,6 +164,7 @@ namespace gallus
 				/// <returns>A 2D vector representing the x and y position of the window.</returns>
 				glm::ivec2 GetPosition() const;
 
+				SimpleEvent<> m_eOnWinProc;
 			protected:
 				/// <summary>
 				/// Sets the size of the window.
@@ -193,8 +194,6 @@ namespace gallus
 				/// <param name="a_sTitle">The title for the window.</param>
 				void SetTitleInternal(const std::string& a_sTitle);
 
-				LPTSTR m_Cursor = IDC_ARROW;
-
 				/// <summary>
 				/// Generic size method that changes the size and position of the window.
 				/// </summary>
@@ -223,7 +222,7 @@ namespace gallus
 
 				WindowSettings m_WindowSettings;
 
-				SimpleEvent<> m_OnQuit;
+				SimpleEvent<> m_eOnQuit;
 				std::queue<WindowsMsg> m_EventQueue;
 
 				HWND m_hWnd = NULL;

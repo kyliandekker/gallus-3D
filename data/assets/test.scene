@@ -1,0 +1,9 @@
+{
+    "entities": [
+        {
+            "name": "New GameObject",
+            "isActive": true,
+            "components": {}
+        }
+    ]
+}

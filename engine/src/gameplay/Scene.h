@@ -37,14 +37,7 @@ namespace gallus
 				m_AssetType = resources::AssetType::Scene;
 			}
 
-			/// <summary>
-			/// Constructs a scene with a given name.
-			/// </summary>
-			/// <param name="a_sName">Name of the resource.</param>
-			Scene(const std::string& a_sName) : resources::EngineResource(a_sName)
-			{
-				m_AssetType = resources::AssetType::Scene;
-			}
+			void Reset();
 
 			/// <summary>
 			/// Loads the scene data from its associated resource source.
@@ -58,12 +51,12 @@ namespace gallus
 			/// <returns>True if saving was successful, false otherwise.</returns>
 			bool Save();
 #endif
-
 			/// <summary>
 			/// Loads the scene data from disk or serialized format.
 			/// </summary>
 			/// <returns>True if loading was successful, false otherwise.</returns>
 			bool Load();
+
 			/// <summary>
 			/// Sets the internal data representation of the scene.
 			/// </summary>

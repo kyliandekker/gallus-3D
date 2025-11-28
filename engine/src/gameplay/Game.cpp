@@ -46,6 +46,8 @@ namespace gallus
 
 			core::ENGINE->GetWindow().OnQuit() += std::bind(&Game::Shutdown, this);
 
+			m_bStarted = false;
+
 			System::Initialize();
 
 #ifndef _EDITOR
@@ -66,60 +68,37 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		constexpr double FIXED_TIMESTEP = 1.0 / 60.0; // 60 FPS -> 16.66 ms
 		void Game::Loop()
 		{
-			using clock = std::chrono::high_resolution_clock;
-			auto previous = clock::now();
-			double lag = 0.0;
-
-			double fpsTimer = 0.0;
-			int fpsFrames = 0;
+			m_FpsCounter.Initialize();
+			m_FpsCounter.SetTargetFPS(60); 
+			m_FpsCounter.m_eOnNewFrame += std::bind(&Game::NewFrame, this, std::placeholders::_1);
 
 			while (m_bRunning.load())
 			{
-				auto current = clock::now();
-				std::chrono::duration<double> elapsed = current - previous;
-				previous = current;
+				m_FpsCounter.Update();
+			}
+		}
 
-				lag += elapsed.count();
-				fpsTimer += elapsed.count();
+		//---------------------------------------------------------------------
+		void Game::NewFrame(float a_fDeltaTime)
+		{
+			m_eOnNewFrame(m_FpsCounter.GetFPS());
 
-				int updatesThisFrame = 0;
+			bool updateRealtime = m_bStarted && !m_bPaused;
+			core::ENGINE->GetECS().Update(a_fDeltaTime, updateRealtime);
 
-				m_fDeltaTime = FIXED_TIMESTEP;
-				while (lag >= FIXED_TIMESTEP)
+			if (updateRealtime)
+			{
+				const gameplay::Entity* player = core::ENGINE->GetECS().GetEntityByName("Player");
+
+				if (player)
 				{
-					bool updateRealtime = m_bStarted && !m_bPaused;
-					core::ENGINE->GetECS().Update(FIXED_TIMESTEP, updateRealtime);
-					lag -= FIXED_TIMESTEP;
-					updatesThisFrame++;
-
-					if (updateRealtime)
-					{
-						const gameplay::Entity* player = core::ENGINE->GetECS().GetEntityByName("Player");
-
-						if (player)
-						{
-							gameplay::TransformSystem& transformSys = core::ENGINE->GetECS().GetSystem<gameplay::TransformSystem>();
-							gameplay::TransformComponent& transformComponent = transformSys.GetComponent(player->GetEntityID());
-							DirectX::XMFLOAT2 pos = { transformComponent.Transform().GetPosition().x - (graphics::dx12::RENDER_TEX_SIZE.x / 2), transformComponent.Transform().GetPosition().y - (graphics::dx12::RENDER_TEX_SIZE.y / 2) };
-							core::ENGINE->GetDX12().GetActiveCamera().Transform().SetPosition(pos);
-						}
-					}
+					gameplay::TransformSystem& transformSys = core::ENGINE->GetECS().GetSystem<gameplay::TransformSystem>();
+					gameplay::TransformComponent& transformComponent = transformSys.GetComponent(player->GetEntityID());
+					DirectX::XMFLOAT2 pos = { transformComponent.Transform().GetPosition().x - (graphics::dx12::RENDER_TEX_SIZE.x / 2), transformComponent.Transform().GetPosition().y - (graphics::dx12::RENDER_TEX_SIZE.y / 2) };
+					core::ENGINE->GetDX12().GetActiveCamera().Transform().SetPosition(pos);
 				}
-
-				fpsFrames += updatesThisFrame;
-
-				if (fpsTimer >= 1.0)
-				{
-					// m_Fps reflects how many fixed updates we actually managed per second
-					m_fFps = static_cast<double>(fpsFrames) / fpsTimer;
-					fpsFrames = 0;
-					fpsTimer = 0.0;
-				}
-
-				std::this_thread::sleep_for(std::chrono::milliseconds(1));
 			}
 		}
 

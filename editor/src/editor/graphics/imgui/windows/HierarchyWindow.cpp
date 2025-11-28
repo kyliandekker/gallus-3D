@@ -16,6 +16,7 @@
 
 // editor includes
 #include "editor/core/EditorEngine.h"
+#include "editor/EditorGlobalFunctions.h"
 
 // game includes
 #include "gameplay/Game.h"
@@ -68,7 +69,7 @@ namespace gallus
 			//---------------------------------------------------------------------
 			void HierarchyWindow::Update()
 			{
-				if (gameplay::GAME.IsStarted() && !gameplay::GAME.IsPaused())
+				if (core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetFullScreenPlayMode())
 				{
 					return;
 				}
@@ -177,7 +178,7 @@ namespace gallus
 				if (ImGui::IconButton(
 					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_SAVE), BUTTON_ID, "SAVE_HIERARCHY").c_str(), m_Window.GetHeaderSize(), m_Window.GetIconFont(), ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent)))
 				{
-					SaveScene();
+					editor::SaveScene();
 				}
 
 				ImVec2 endPos = ImGui::GetCursorPos();
@@ -190,7 +191,7 @@ namespace gallus
 
 				if (ImGui::IsKeyDown(ImGuiMod_Ctrl) && ImGui::IsKeyPressed(ImGuiKey_S) && wasDirty)
 				{
-					SaveScene();
+					editor::SaveScene();
 				}
 
 				ImGui::PopStyleVar();
@@ -306,27 +307,6 @@ namespace gallus
 				else // New selectable is an entity, set folder path.
 				{
 					m_PreviousEntityID = derivedPtr->GetEntityID();
-				}
-			}
-
-			//---------------------------------------------------------------------
-			void HierarchyWindow::SaveScene()
-			{
-				if (core::EDITOR_ENGINE->GetEditor().GetScene().GetPath().empty())
-				{
-					fs::path scenePath;
-					if (file::SaveFile(scenePath, {
-						{ L"Scene Files (*.scene)", L"*.scene" },
-						{ L"Prefab Files (*.prefab)", L"*.prefab" },
-					}, core::EDITOR_ENGINE->GetResourceAtlas().GetResourceFolder().GetPath()))
-					{
-						core::EDITOR_ENGINE->GetEditor().GetScene().SetPath(scenePath);
-						core::EDITOR_ENGINE->GetEditor().GetScene().Save();
-					}
-				}
-				else
-				{
-					core::EDITOR_ENGINE->GetEditor().GetScene().Save();
 				}
 			}
 

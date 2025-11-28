@@ -23,9 +23,6 @@
 #include "editor/core/EditorEngine.h"
 #include "editor/graphics/imgui/EditorWindowsConfig.h"
 
-#include "editor/graphics/imgui/modals/FilePickerModal.h"
-#include "editor/graphics/imgui/modals/SpriteEditorModal.h"
-
 int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR lpCmdLine, _In_ int nShowCmd)
 {
 	SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE);

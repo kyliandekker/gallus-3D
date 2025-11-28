@@ -118,7 +118,7 @@ namespace gallus
 			}
 			case LOGSEVERITY_TEST:
 			{
-				return font::ICON_CIRCLE_INFO;
+				return font::ICON_CIRCLE_TEST;
 			}
 			case LOGSEVERITY_SUCCESS:
 			{

@@ -81,8 +81,8 @@ namespace gallus
 
 #ifdef _EDITOR
 			BEGIN_EXPOSE_FIELDS(HealthComponent)
-				EXPOSE_FIELD(HealthComponent, m_fHealth, "Health", FieldOptions{ .type = EditorFieldWidgetType::DragFloat, .min = "0", .max = "1000" })
-				EXPOSE_FIELD(HealthComponent, m_fMaxHealth, "Max Health", FieldOptions{ .type = EditorFieldWidgetType::DragFloat, .min = "0", .max = "1000" })
+				EXPOSE_FIELD(HealthComponent, m_fHealth, "Health", FieldOptions{ .type = EditorFieldWidgetType::DragFloat, .min = "0", .max = "1000", .description = "The current health of the entity. Represents how much damage it can take before being destroyed or dying." })
+				EXPOSE_FIELD(HealthComponent, m_fMaxHealth, "Max Health", FieldOptions{ .type = EditorFieldWidgetType::DragFloat, .min = "0", .max = "1000", .description = "The maximum health the entity can have." })
 			END_EXPOSE_FIELDS(HealthComponent)
 			BEGIN_EXPOSE_GIZMOS(HealthComponent)
 			END_EXPOSE_GIZMOS(HealthComponent)

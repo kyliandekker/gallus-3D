@@ -1,10 +1,11 @@
-#pragma once
+﻿#pragma once
 
 #include <string>
 
 #ifdef _EDITOR
 #include <imgui/imgui.h>
 #include "graphics/imgui/font_icon.h"
+#include "graphics/imgui/ImGuiWindow.h"
 #endif
 
 namespace gallus
@@ -16,6 +17,7 @@ namespace gallus
 		/// </summary>
 		enum class AssetType
 		{
+			None,
 			Folder,
 			Scene,
 			Sprite,
@@ -40,6 +42,10 @@ namespace gallus
 		{
 			switch (a_AssetType)
 			{
+				case AssetType::None:
+				{
+					return "None";
+				}
 				case AssetType::Folder:
 				{
 					return "Folder";
@@ -98,191 +104,248 @@ namespace gallus
 				}
 			}
 		}
-
+	}
 #ifdef _EDITOR
-		inline ImVec4 ToImVec4(int r, int g, int b, int a)
+	namespace graphics
+	{
+		namespace imgui
+		{
+		inline ImVec4 Shade(const ImVec4& color, float factor)
 		{
 			return ImVec4(
-				static_cast<float>(r) / 255.0f,
-				static_cast<float>(g) / 255.0f,
-				static_cast<float>(b) / 255.0f,
-				static_cast<float>(a) / 255.0f
+				color.x * factor,
+				color.y * factor,
+				color.z * factor,
+				color.w
 			);
 		}
 
-		inline ImVec4 AssetTypeToColor(AssetType a_AssetType)
+		inline ImVec4 ShiftWithinFamily(const ImVec4& base, float slot, float totalSlots)
 		{
+			float h, s, v;
+			ImGui::ColorConvertRGBtoHSV(base.x, base.y, base.z, h, s, v);
+
+			const float maxHueDelta = 0.083f; 
+
+			float offset = ((slot / (totalSlots - 1.0f)) - 0.5f) * 2.0f * maxHueDelta;
+
+			// If saturation is too low → modify value instead
+			if (s < 0.25f)
+			{
+				float vShift = offset * 0.6f;
+				v = std::clamp(v + vShift, 0.1f, 1.0f);
+			}
+			else
+			{
+				h = fmodf(h + offset, 1.0f);
+				if (h < 0.0f)
+				{
+					h += 1.0f;
+				}
+
+				// Prevent neon edge cases
+				s = std::clamp(s * (1.0f - fabs(offset) * 0.5f), 0.1f, 1.0f);
+			}
+
+			ImVec4 out;
+			ImGui::ColorConvertHSVtoRGB(h, s, v, out.x, out.y, out.z);
+			out.w = base.w;
+			return out;
+		}
+
+		inline ImVec4 AssetTypeToColor(resources::AssetType a_AssetType)
+		{
+			const ImVec4 base = g_vAccentColor;
+
 			switch (a_AssetType)
 			{
-				case AssetType::Scene:
-				case AssetType::Prefab:
+				case resources::AssetType::Scene:
 				{
-					return ToImVec4(255, 131, 48, 255);
+					return ShiftWithinFamily(base, 0, 6);
 				}
-				case AssetType::Sprite:
+				case resources::AssetType::Prefab:
 				{
-					return ToImVec4(38, 127, 0, 255);
+					return ShiftWithinFamily(base, 0, 6);
 				}
-				case AssetType::Sound:
-				case AssetType::Song:
-				case AssetType::VO:
+				case resources::AssetType::Sprite:
 				{
-					return ToImVec4(0, 148, 255, 255);
+					return ShiftWithinFamily(base, 1, 6);
 				}
-				case AssetType::Animation:
-				case AssetType::AnimationGraph:
+				case resources::AssetType::Sound:
 				{
-					return ToImVec4(255, 178, 189, 255);
+					return ShiftWithinFamily(base, 2, 6);
 				}
-				case AssetType::PixelShader:
-				case AssetType::VertexShader:
-				case AssetType::ShaderBind:
+				case resources::AssetType::Song:
 				{
-					return ToImVec4(170, 0, 0, 255);
+					return ShiftWithinFamily(base, 2, 6);
 				}
-				case AssetType::Mesh:
+				case resources::AssetType::VO:
 				{
-					return ToImVec4(0, 206, 206, 255);
+					return ShiftWithinFamily(base, 2, 6);
 				}
-				case AssetType::Folder:
+				case resources::AssetType::Animation:
+				{
+					return ShiftWithinFamily(base, 3, 6);
+				}
+				case resources::AssetType::AnimationGraph:
+				{
+					return ShiftWithinFamily(base, 3, 6);
+				}
+				case resources::AssetType::PixelShader:
+				{
+					return ShiftWithinFamily(base, 4, 6);
+				}
+				case resources::AssetType::VertexShader:
+				{
+					return ShiftWithinFamily(base, 4, 6);
+				}
+				case resources::AssetType::ShaderBind:
+				{
+					return ShiftWithinFamily(base, 4, 6);
+				}
+				case resources::AssetType::Mesh:
+				{
+					return ShiftWithinFamily(base, 5, 6);
+				}
 				default:
 				{
-					return ToImVec4(255, 255, 255, 255);
+					return base;
 				}
 			}
 		}
 
-		/// <summary>
-		/// Converts an asset type enumeration value to its corresponding file icon.
-		/// </summary>
-		/// <param name="a_AssetType">The asset type to convert.</param>
-		/// <returns>A string containing the file icon.</returns>
-		inline std::string AssetTypeToFileIcon(AssetType a_AssetType)
-		{
-			switch (a_AssetType)
+			/// <summary>
+			/// Converts an asset type enumeration value to its corresponding file icon.
+			/// </summary>
+			/// <param name="a_AssetType">The asset type to convert.</param>
+			/// <returns>A string containing the file icon.</returns>
+			inline std::string AssetTypeToFileIcon(resources::AssetType a_AssetType)
 			{
-				case AssetType::Folder:
+				switch (a_AssetType)
 				{
-					return font::ICON_FILE_FOLDER;
-				}
-				case AssetType::Scene:
-				{
-					return font::ICON_FILE_SCENE;
-				}
-				case AssetType::Sprite:
-				{
-					return font::ICON_FILE_IMAGE;
-				}
-				case AssetType::Sound:
-				{
-					return font::ICON_FILE_AUDIO;
-				}
-				case AssetType::Song:
-				{
-					return font::ICON_FILE_MUSIC;
-				}
-				case AssetType::VO:
-				{
-					return font::ICON_FILE_VO;
-				}
-				case AssetType::Animation:
-				{
-					return font::ICON_FILE_ANIMATION;
-				}
-				case AssetType::PixelShader:
-				{
-					return font::ICON_FILE_SETTINGS;
-				}
-				case AssetType::VertexShader:
-				{
-					return font::ICON_FILE_SETTINGS;
-				}
-				case AssetType::Prefab:
-				{
-					return font::ICON_FILE_MODEL;
-				}
-				case AssetType::ShaderBind:
-				{
-					return font::ICON_FILE_SETTINGS;
-				}
-				case AssetType::Mesh:
-				{
-					return font::ICON_FILE_MODEL;
-				}
-				case AssetType::AnimationGraph:
-				{
-					return font::ICON_FILE_ANIMATION;
-				}
-				default:
-				{
-					return "";
+					case resources::AssetType::Folder:
+					{
+						return font::ICON_FILE_FOLDER;
+					}
+					case resources::AssetType::Scene:
+					{
+						return font::ICON_FILE_SCENE;
+					}
+					case resources::AssetType::Sprite:
+					{
+						return font::ICON_FILE_IMAGE;
+					}
+					case resources::AssetType::Sound:
+					{
+						return font::ICON_FILE_AUDIO;
+					}
+					case resources::AssetType::Song:
+					{
+						return font::ICON_FILE_MUSIC;
+					}
+					case resources::AssetType::VO:
+					{
+						return font::ICON_FILE_VO;
+					}
+					case resources::AssetType::Animation:
+					{
+						return font::ICON_FILE_ANIMATION;
+					}
+					case resources::AssetType::PixelShader:
+					{
+						return font::ICON_FILE_SETTINGS;
+					}
+					case resources::AssetType::VertexShader:
+					{
+						return font::ICON_FILE_SETTINGS;
+					}
+					case resources::AssetType::Prefab:
+					{
+						return font::ICON_FILE_MODEL;
+					}
+					case resources::AssetType::ShaderBind:
+					{
+						return font::ICON_FILE_SETTINGS;
+					}
+					case resources::AssetType::Mesh:
+					{
+						return font::ICON_FILE_MODEL;
+					}
+					case resources::AssetType::AnimationGraph:
+					{
+						return font::ICON_FILE_ANIMATION;
+					}
+					default:
+					{
+						return "";
+					}
 				}
 			}
-		}
 
-		/// <summary>
-		/// Converts an asset type enumeration value to its corresponding icon.
-		/// </summary>
-		/// <param name="a_AssetType">The asset type to convert.</param>
-		/// <returns>A string containing the icon.</returns>
-		//inline std::string AssetTypeToIcon(AssetType a_AssetType)
-		//{
-		//	switch (a_AssetType)
-		//	{
-		//		case AssetType::Scene:
-		//		{
-		//			return font::ICON_GRID;
-		//		}
-		//		case AssetType::Sprite:
-		//		{
-		//			return font::ICON_IMAGE;
-		//		}
-		//		case AssetType::Sound:
-		//		{
-		//			return font::ICON_AUDIO;
-		//		}
-		//		case AssetType::Song:
-		//		{
-		//			return font::ICON_MUSIC;
-		//		}
-		//		case AssetType::VO:
-		//		{
-		//			return font::ICON_VO;
-		//		}
-		//		case AssetType::Animation:
-		//		{
-		//			return font::ICON_ANIMATION;
-		//		}
-		//		case AssetType::PixelShader:
-		//		{
-		//			return font::ICON_SETTINGS;
-		//		}
-		//		case AssetType::VertexShader:
-		//		{
-		//			return font::ICON_SETTINGS;
-		//		}
-		//		case AssetType::Prefab:
-		//		{
-		//			return font::ICON_MODEL;
-		//		}
-		//		case AssetType::ShaderBind:
-		//		{
-		//			return font::ICON_SETTINGS;
-		//		}
-		//		case AssetType::Mesh:
-		//		{
-		//			return font::ICON_MODEL;
-		//		}
-		//		case AssetType::AnimationGraph:
-		//		{
-		//			return "Animation Graph";
-		//		}
-		//		default:
-		//		{
-		//			return "";
-		//		}
-		//	}
-		//}
-#endif
+			/// <summary>
+			/// Converts an asset type enumeration value to its corresponding icon.
+			/// </summary>
+			/// <param name="a_AssetType">The asset type to convert.</param>
+			/// <returns>A string containing the icon.</returns>
+			//inline std::string AssetTypeToIcon(AssetType a_AssetType)
+			//{
+			//	switch (a_AssetType)
+			//	{
+			//		case AssetType::Scene:
+			//		{
+			//			return font::ICON_GRID;
+			//		}
+			//		case AssetType::Sprite:
+			//		{
+			//			return font::ICON_IMAGE;
+			//		}
+			//		case AssetType::Sound:
+			//		{
+			//			return font::ICON_AUDIO;
+			//		}
+			//		case AssetType::Song:
+			//		{
+			//			return font::ICON_MUSIC;
+			//		}
+			//		case AssetType::VO:
+			//		{
+			//			return font::ICON_VO;
+			//		}
+			//		case AssetType::Animation:
+			//		{
+			//			return font::ICON_ANIMATION;
+			//		}
+			//		case AssetType::PixelShader:
+			//		{
+			//			return font::ICON_SETTINGS;
+			//		}
+			//		case AssetType::VertexShader:
+			//		{
+			//			return font::ICON_SETTINGS;
+			//		}
+			//		case AssetType::Prefab:
+			//		{
+			//			return font::ICON_MODEL;
+			//		}
+			//		case AssetType::ShaderBind:
+			//		{
+			//			return font::ICON_SETTINGS;
+			//		}
+			//		case AssetType::Mesh:
+			//		{
+			//			return font::ICON_MODEL;
+			//		}
+			//		case AssetType::AnimationGraph:
+			//		{
+			//			return "Animation Graph";
+			//		}
+			//		default:
+			//		{
+			//			return "";
+			//		}
+			//	}
+			//}
+		}
 	}
+#endif
 }

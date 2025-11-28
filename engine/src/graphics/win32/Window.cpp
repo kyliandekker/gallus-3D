@@ -5,6 +5,8 @@
 // logger includes
 #include "logger/Logger.h"
 
+#include <imgui/imgui.h>
+
 namespace gallus
 {
 	namespace graphics
@@ -40,12 +42,13 @@ namespace gallus
 			//---------------------------------------------------------------------
 			LRESULT Window::WndProcHandler(HWND a_hWnd, UINT a_iMsg, WPARAM a_wParam, LPARAM a_lParam)
 			{
+				m_eOnWinProc();
 				switch (a_iMsg)
 				{
 					case WM_DESTROY:
 					{
 						PostQuitMessage(0);
-						m_OnQuit();
+						m_eOnQuit();
 						return 0;
 					}
 					case WM_EXITSIZEMOVE:
@@ -246,7 +249,7 @@ namespace gallus
 			//---------------------------------------------------------------------
 			const SimpleEvent<>& Window::OnQuit() const
 			{
-				return m_OnQuit;
+				return m_eOnQuit;
 			}
 
 			//---------------------------------------------------------------------
