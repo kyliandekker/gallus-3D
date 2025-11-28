@@ -79,24 +79,30 @@ namespace gallus
 				{
 					if (ImGui::MenuItem(ImGui::IMGUI_FORMAT_ID(font::ICON_CUBE + std::string(" Create Entity"), MENU_ITEM_ID, "CREATE_ENTITY_EDITOR").c_str(), "CTRL+SHIFT+N"))
 					{
+						core::EDITOR_ENGINE->GetECS().CreateEntity(core::EDITOR_ENGINE->GetECS().GetUniqueName("New GameObject"));
+						core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
 					}
 					ImGui::Separator();
-					if (dynamic_cast<graphics::imgui::EntityEditorSelectable*>(core::EDITOR_ENGINE->GetEditor().GetSelectable().get()))
+					if (graphics::imgui::EntityEditorSelectable* ent = dynamic_cast<graphics::imgui::EntityEditorSelectable*>(core::EDITOR_ENGINE->GetEditor().GetSelectable().get()))
 					{
 						if (ImGui::MenuItem(ImGui::IMGUI_FORMAT_ID(font::ICON_DELETE + std::string(" Delete Entity"), MENU_ITEM_ID, "DELETE_ENTITY_EDITOR").c_str(), "DEL"))
 						{
+							ent->OnDelete();
 						}
 						if (ImGui::MenuItem(ImGui::IMGUI_FORMAT_ID(font::ICON_COPY + std::string(" Duplicate Entity"), MENU_ITEM_ID, "DUPLICATE_ENTITY_EDITOR").c_str(), "CTRL+D"))
 						{
+							// TODO: Duplicate
 						}
 					}
-					if (dynamic_cast<graphics::imgui::FileEditorSelectable*>(core::EDITOR_ENGINE->GetEditor().GetSelectable().get()))
+					if (graphics::imgui::FileEditorSelectable* file = dynamic_cast<graphics::imgui::FileEditorSelectable*>(core::EDITOR_ENGINE->GetEditor().GetSelectable().get()))
 					{
 						if (ImGui::MenuItem(ImGui::IMGUI_FORMAT_ID(font::ICON_DELETE + std::string(" Delete File"), MENU_ITEM_ID, "DELETE_ENTITY_EDITOR").c_str(), "DEL"))
 						{
+							file->OnDelete();
 						}
 						if (ImGui::MenuItem(ImGui::IMGUI_FORMAT_ID(font::ICON_FOLDER_SHOW + std::string(" Open File In Explorer"), MENU_ITEM_ID, "DUPLICATE_ENTITY_EDITOR").c_str(), "CTRL+D"))
 						{
+							file->OnShowInExplorer();
 						}
 					}
 					ImGui::EndMenu();
