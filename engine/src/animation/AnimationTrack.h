@@ -143,7 +143,7 @@ namespace gallus
 			bool m_bIsLooping = false;
 
 #ifdef _EDITOR
-			BEGIN_EXPOSE_FIELDS(AnimationTrack)
+			BEGIN_EXPOSE_FIELDS_PARENT(AnimationTrack, resources::EngineResource)
 			END_EXPOSE_FIELDS(AnimationTrack)
 			BEGIN_EXPOSE_GIZMOS(AnimationTrack)
 			END_EXPOSE_GIZMOS(AnimationTrack)

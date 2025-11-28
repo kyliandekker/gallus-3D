@@ -393,7 +393,8 @@ namespace gallus
 			{
 				m_pFile = &a_File;
 
-				if (m_AnimationTrack.LoadByPath(a_File.GetPath()))
+				fs::path animationPath = a_File.GetPath();
+				if (m_AnimationTrack.LoadByPath(animationPath))
 				{
 					for (auto& keyFrame : m_AnimationTrack.GetKeyFrames())
 					{

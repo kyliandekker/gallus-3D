@@ -84,20 +84,33 @@ namespace gallus
 		virtual ~IExposableToEditor() = default;
 	};
 
-	// Macros (fields)
+	// No parent
 #define BEGIN_EXPOSE_FIELDS(CLASSNAME) \
-	public: \
-		static const std::vector<EditorFieldInfo>& StaticEditorFields() \
-		{ \
-			static std::vector<EditorFieldInfo> fields = {
+    public: \
+        static const std::vector<EditorFieldInfo>& StaticEditorFields() \
+        { \
+            static std::vector<EditorFieldInfo> fields = []() { \
+                std::vector<EditorFieldInfo> f;
 
-	#define EXPOSE_FIELD(CLASSNAME, VAR, UINAME, FIELD_OPTIONS) \
-		{ #VAR, offsetof(CLASSNAME, VAR), UINAME, FIELD_OPTIONS },
 
-	#define END_EXPOSE_FIELDS(CLASSNAME) \
-			}; \
-			return fields; \
-		}
+// With parent
+#define BEGIN_EXPOSE_FIELDS_PARENT(CLASSNAME, PARENT) \
+    public: \
+        static const std::vector<EditorFieldInfo>& StaticEditorFields() \
+        { \
+            static std::vector<EditorFieldInfo> fields = []() { \
+                std::vector<EditorFieldInfo> f; \
+                const auto& parentFields = PARENT::StaticEditorFields(); \
+                f.insert(f.end(), parentFields.begin(), parentFields.end());
+
+#define EXPOSE_FIELD(CLASSNAME, VAR, UINAME, FIELD_OPTIONS) \
+                f.push_back({ #VAR, offsetof(CLASSNAME, VAR), UINAME, FIELD_OPTIONS });
+
+#define END_EXPOSE_FIELDS(CLASSNAME) \
+                return f; \
+            }(); \
+            return fields; \
+        }
 
 	// Gizmos (fields)
 #define BEGIN_EXPOSE_GIZMOS(CLASSNAME) \

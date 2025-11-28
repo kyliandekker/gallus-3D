@@ -85,11 +85,14 @@ namespace gallus
 					core::EDITOR_ENGINE->GetEditor().SetSelectable(nullptr);
 					if (isStarted)
 					{
-						gameplay::GAME.GetScene().LoadByPath(core::EDITOR_ENGINE->GetEditor().GetScene().GetPath());
+						const fs::path scenePath = core::EDITOR_ENGINE->GetEditor().GetScene().GetPath();
+						gameplay::GAME.GetScene().LoadByPath(scenePath);
 						gameplay::GAME.GetScene().LoadData();
 					}
 					else
 					{
+						const fs::path scenePath = core::EDITOR_ENGINE->GetEditor().GetScene().GetPath();
+						core::EDITOR_ENGINE->GetEditor().GetScene().LoadByPath(scenePath);
 						core::EDITOR_ENGINE->GetEditor().GetScene().LoadData();
 					}
 					gameplay::GAME.SetIsStarted(isStarted);
@@ -579,11 +582,14 @@ namespace gallus
 					core::EDITOR_ENGINE->GetEditor().SetSelectable(nullptr);
 					if (isStarted)
 					{
-						gameplay::GAME.GetScene().LoadByPath(core::EDITOR_ENGINE->GetEditor().GetScene().GetPath());
+						const fs::path scenePath = core::EDITOR_ENGINE->GetEditor().GetScene().GetPath();
+						gameplay::GAME.GetScene().LoadByPath(scenePath);
 						gameplay::GAME.GetScene().LoadData();
 					}
 					else
 					{
+						const fs::path scenePath = core::EDITOR_ENGINE->GetEditor().GetScene().GetPath();
+						core::EDITOR_ENGINE->GetEditor().GetScene().LoadByPath(scenePath);
 						core::EDITOR_ENGINE->GetEditor().GetScene().LoadData();
 					}
 					gameplay::GAME.SetIsStarted(isStarted);

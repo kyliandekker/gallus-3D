@@ -216,6 +216,44 @@
                     }
                 }
             }
+        },
+        {
+            "name": "New GameObject",
+            "isActive": true,
+            "components": {
+                "sprite": {
+                    "texture": {
+                        "name": "tex_missing.png",
+                        "spriteIndex": 0
+                    },
+                    "shader": {
+                        "pixel": "pixelShader.hlsl",
+                        "vertex": "vertexShader.hlsl"
+                    },
+                    "mesh": "square",
+                    "color": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "transform": {
+                    "position": {
+                        "x": 609.5733032226563,
+                        "y": 493.1081848144531
+                    },
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 80.0,
+                        "y": 80.0
+                    },
+                    "pivot": {
+                        "x": 0.0,
+                        "y": 0.0
+                    }
+                }
+            }
         }
     ]
 }

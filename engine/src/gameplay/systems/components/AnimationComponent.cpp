@@ -70,7 +70,8 @@ namespace gallus
 			resources::FileResource* fileResource = nullptr;
 			if (core::ENGINE->GetResourceAtlas().GetResource(m_sAnimName, fileResource))
 			{
-				m_AnimationTrack.LoadByPath(fileResource->GetPath());
+				fs::path animationTrack = fileResource->GetPath();
+				m_AnimationTrack.LoadByPath(animationTrack);
 			}
 		}
 

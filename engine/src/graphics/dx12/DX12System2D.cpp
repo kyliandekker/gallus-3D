@@ -187,6 +187,8 @@ namespace gallus
 				vertexShader->SetIsDestroyable(false);
 
 				std::shared_ptr<DX12ShaderBind> shaderBind = core::ENGINE->GetResourceAtlas().LoadShaderBind("defaultShaderBind", pixelShader.get(), vertexShader.get()); // Default shader.
+				shaderBind->SetResourceCategory(resources::EngineResourceCategory::Missing);
+				shaderBind->SetIsDestroyable(false);
 
 				std::shared_ptr<PixelShader> renderTexPixelShader = core::ENGINE->GetResourceAtlas().LoadPixelShader("renderTexPixelShader.hlsl"); // Default render tex shader.
 				std::shared_ptr<VertexShader> renderTexVertexShader = core::ENGINE->GetResourceAtlas().LoadVertexShader("renderTexVertexShader.hlsl"); // Default render tex shader.
@@ -196,6 +198,8 @@ namespace gallus
 				renderTexVertexShader->SetIsDestroyable(false);
 
 				std::shared_ptr<DX12ShaderBind> renderTexShaderBind = core::ENGINE->GetResourceAtlas().LoadShaderBind("renderTexShaderBind", renderTexPixelShader.get(), renderTexVertexShader.get()); // Render Tex shader.
+				renderTexShaderBind->SetResourceCategory(resources::EngineResourceCategory::Missing);
+				renderTexShaderBind->SetIsDestroyable(false);
 
 				std::shared_ptr<Mesh> mesh = core::ENGINE->GetResourceAtlas().LoadMesh("square"); // Default mesh.
 				MeshPartData& squarePrimitive = s_PRIMITIVES[(int)PRIMITIVES::SQUARE];
@@ -909,6 +913,8 @@ namespace gallus
 				texDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
 
 				m_pRenderTexture = core::ENGINE->GetResourceAtlas().LoadTextureByDescription("RenderTexture", texDesc);
+				m_pRenderTexture->SetResourceCategory(resources::EngineResourceCategory::System);
+				m_pRenderTexture->SetIsDestroyable(false);
 			}
 		}
 	}

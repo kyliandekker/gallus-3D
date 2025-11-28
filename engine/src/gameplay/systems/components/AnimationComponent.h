@@ -87,7 +87,7 @@ namespace gallus
 			float m_fAccumulatedTime = 0.0f;
 
 #ifdef _EDITOR	
-			BEGIN_EXPOSE_FIELDS(AnimationComponent)
+			BEGIN_EXPOSE_FIELDS_PARENT(AnimationComponent, Component)
 			END_EXPOSE_FIELDS(AnimationComponent)
 			BEGIN_EXPOSE_GIZMOS(AnimationComponent)
 			END_EXPOSE_GIZMOS(AnimationComponent)

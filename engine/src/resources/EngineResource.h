@@ -30,6 +30,29 @@ namespace gallus
 
 		inline std::string EngineResourceCategoryToString(EngineResourceCategory resourceCategory)
 		{
+			switch (resourceCategory)
+			{
+				case EngineResourceCategory::Unknown:
+				{
+					return "Unknown";
+				}
+				case EngineResourceCategory::Missing:
+				{
+					return "Missing";
+				}
+				case EngineResourceCategory::Editor:
+				{
+					return "Editor";
+				}
+				case EngineResourceCategory::System:
+				{
+					return "System";
+				}
+				case EngineResourceCategory::Game:
+				{
+					return "Game";
+				}
+			}
 			return "";
 		}
 
@@ -185,21 +208,21 @@ namespace gallus
 
 #ifdef _EDITOR
 			BEGIN_EXPOSE_FIELDS(EngineResource)
-				EXPOSE_FIELD(EngineResource, m_bIsDestroyable, "Is Destroyable", (FieldOptions{ .type = EditorFieldWidgetType::Checkbox, .description = ".", .disabled = true }))
-				EXPOSE_FIELD(EngineResource, m_bIsLocked, "Is Locked", (FieldOptions{ .type = EditorFieldWidgetType::Checkbox, .description = ".", .disabled = true }))
-				EXPOSE_FIELD(EngineResource, m_bIsUnique, "Is Unique", (FieldOptions{ .type = EditorFieldWidgetType::Checkbox, .description = ".", .disabled = true }))
+				EXPOSE_FIELD(EngineResource, m_bIsDestroyable, "Is Destroyable", (FieldOptions{ .type = EditorFieldWidgetType::Checkbox, .description = "Indicates if this resource can be destroyed or deleted.", .disabled = true }))
+				EXPOSE_FIELD(EngineResource, m_bIsLocked, "Is Locked", (FieldOptions{ .type = EditorFieldWidgetType::Checkbox, .description = "Indicates if this resource is locked from modifications.", .disabled = true }))
+				EXPOSE_FIELD(EngineResource, m_bIsUnique, "Is Unique", (FieldOptions{ .type = EditorFieldWidgetType::Checkbox, .description = "Specifies if this resource is unique and cannot have duplicates.", .disabled = true }))
 				EXPOSE_FIELD(EngineResource, m_ResourceCategory, "Resource Category",
 					(FieldOptions{
 						.type = EditorFieldWidgetType::EnumDropdown,
 						.enumToStringFunc = MakeEnumToStringFunc<EngineResourceCategory>(EngineResourceCategoryToString),
-						.description = ".",
+						.description = "The category this resource belongs to, used for organizational purposes..",
 						.disabled = true
 					}))
 				EXPOSE_FIELD(EngineResource, m_AssetType, "Asset Type",
 					(FieldOptions{
 						.type = EditorFieldWidgetType::EnumDropdown,
 						.enumToStringFunc = MakeEnumToStringFunc<AssetType>(AssetTypeToString),
-						.description = ".",
+						.description = "The specific type of asset this resource represents.",
 						.disabled = true
 					}))
 			END_EXPOSE_FIELDS(EngineResource)

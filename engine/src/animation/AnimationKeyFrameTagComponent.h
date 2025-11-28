@@ -85,7 +85,7 @@ namespace gallus
 			std::string m_sTag;
 
 #ifdef _EDITOR
-			BEGIN_EXPOSE_FIELDS(AnimationKeyFrameTagComponent)
+			BEGIN_EXPOSE_FIELDS_PARENT(AnimationKeyFrameTagComponent, AnimationKeyFrameComponentBase)
 			END_EXPOSE_FIELDS(AnimationKeyFrameTagComponent)
 			BEGIN_EXPOSE_GIZMOS(AnimationKeyFrameTagComponent)
 			END_EXPOSE_GIZMOS(AnimationKeyFrameTagComponent)

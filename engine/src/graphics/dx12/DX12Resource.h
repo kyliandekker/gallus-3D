@@ -131,7 +131,7 @@ namespace gallus
 				D3D12_RESOURCE_STATES m_CurrentState = D3D12_RESOURCE_STATE_COMMON;
 
 #ifdef _EDITOR
-				BEGIN_EXPOSE_FIELDS(DX12Resource)
+				BEGIN_EXPOSE_FIELDS_PARENT(DX12Resource, resources::EngineResource)
 					//EXPOSE_ENUM_FIELD_AUTO(DX12Resource, m_CurrentState, "Current State", D3D12_RESOURCE_STATES, FieldOptions{ .disabled = true, .description = "." })
 				END_EXPOSE_FIELDS(DX12Resource)
 				BEGIN_EXPOSE_GIZMOS(DX12Resource)

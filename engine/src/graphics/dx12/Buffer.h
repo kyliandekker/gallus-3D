@@ -37,7 +37,7 @@ namespace gallus
 				virtual void CreateViews(size_t a_iNumElements, size_t a_iElementSize);
 
 #ifdef _EDITOR
-			BEGIN_EXPOSE_FIELDS(Buffer)
+			BEGIN_EXPOSE_FIELDS_PARENT(Buffer, DX12Resource)
 			END_EXPOSE_FIELDS(Buffer)
 			BEGIN_EXPOSE_GIZMOS(Buffer)
 			END_EXPOSE_GIZMOS(Buffer)

@@ -68,7 +68,7 @@ namespace gallus
 			gameplay::Prefab* m_ExplosionPrefab = nullptr;
 
 #ifdef _EDITOR
-			BEGIN_EXPOSE_FIELDS(ProjectileComponent)
+			BEGIN_EXPOSE_FIELDS_PARENT(ProjectileComponent, Component)
 				EXPOSE_FIELD(ProjectileComponent, m_fDamage, "Damage", (FieldOptions{ .type = EditorFieldWidgetType::DragFloat, .description = "The amount of damage this projectile deals when it hits a target." }))
 				EXPOSE_FIELD(ProjectileComponent, m_ExplosionPrefab, "Explosion Prefab", (FieldOptions{ .type = EditorFieldWidgetType::AssetPickerPtr, .assetType = resources::AssetType::Prefab, .description = "Pointer to a prefab that is spawned when the projectile explodes or impacts. Can be nullptr if no explosion effect is used." }))
 			END_EXPOSE_FIELDS(ProjectileComponent)

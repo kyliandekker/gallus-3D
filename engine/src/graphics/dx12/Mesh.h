@@ -128,7 +128,7 @@ namespace gallus
 				std::vector<MeshPartData> m_aMeshData;
 
 #ifdef _EDITOR
-				BEGIN_EXPOSE_FIELDS(Mesh)
+				BEGIN_EXPOSE_FIELDS_PARENT(Mesh, resources::EngineResource)
 				END_EXPOSE_FIELDS(Mesh)
 				BEGIN_EXPOSE_GIZMOS(Mesh)
 				END_EXPOSE_GIZMOS(Mesh)

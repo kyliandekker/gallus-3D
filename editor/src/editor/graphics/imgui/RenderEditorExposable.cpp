@@ -455,7 +455,25 @@ namespace gallus
 						ImGui::AlignTextToFramePadding();
 						ImGui::DisplayHeader(core::EDITOR_ENGINE->GetDX12().GetImGuiWindow().GetBoldFont(), a_Field.m_sUIName);
 						ImGui::ShowTooltip(a_Field.m_Options.description);
-					}, func);
+						}, [func, &a_Field]() {
+							bool wasDisabled = a_Field.m_Options.disabled;
+							if (wasDisabled)
+							{
+
+								ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+								ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+							}
+
+							bool success = func();
+
+							if (wasDisabled)
+							{
+								ImGui::PopItemFlag();
+								ImGui::PopStyleVar();
+							}
+
+							return success;
+						});
 				}
 
 				return false;

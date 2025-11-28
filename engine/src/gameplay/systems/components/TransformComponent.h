@@ -73,7 +73,7 @@ namespace gallus
 
 			void ShowTransformGizmo();
 #ifdef _EDITOR
-			BEGIN_EXPOSE_FIELDS(TransformComponent)
+			BEGIN_EXPOSE_FIELDS_PARENT(TransformComponent, Component)
 				EXPOSE_FIELD(TransformComponent, m_Transform, "Transform", (FieldOptions{ .type = EditorFieldWidgetType::Object }))
 			END_EXPOSE_FIELDS(TransformComponent)
 			BEGIN_EXPOSE_GIZMOS(TransformComponent)

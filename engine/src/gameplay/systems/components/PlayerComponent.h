@@ -79,7 +79,7 @@ namespace gallus
 			gameplay::Prefab* m_pBulletPrefab = nullptr;
 
 #ifdef _EDITOR
-			BEGIN_EXPOSE_FIELDS(PlayerComponent)
+			BEGIN_EXPOSE_FIELDS_PARENT(PlayerComponent, Component)
 				EXPOSE_FIELD(PlayerComponent, m_fSpeed, "Speed", (FieldOptions{ .type = EditorFieldWidgetType::DragFloat, .description = "The movement speed of the player. Determines how fast the player moves in units per second." }))
 				EXPOSE_FIELD(PlayerComponent, m_pBulletPrefab, "Bullet Prefab", (FieldOptions{ .type = EditorFieldWidgetType::AssetPickerPtr, .assetType = resources::AssetType::Prefab, .description = "Pointer to the bullet prefab spawned when the player fires. Can be nullptr if no projectile is assigned." }))
 			END_EXPOSE_FIELDS(PlayerComponent)

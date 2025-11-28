@@ -266,9 +266,6 @@ namespace gallus
 
 				~Texture();
 			private:
-
-				friend DX12System2D;
-
 				Microsoft::WRL::ComPtr<ID3D12Resource> m_pResourceUploadHeap = nullptr;
 				int32_t m_iSRVIndex = -1;
 				D3D12_SHADER_RESOURCE_VIEW_DESC m_SrvDesc;

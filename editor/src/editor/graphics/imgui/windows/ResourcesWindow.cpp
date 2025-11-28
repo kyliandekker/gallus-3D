@@ -102,13 +102,18 @@ namespace gallus
 
 					if (m_bTexturesFoldedOut)
 					{
-						ImGui::Indent();
 						auto& textures = core::EDITOR_ENGINE->GetResourceAtlas().GetTextures();
 						for (std::shared_ptr<graphics::dx12::Texture> texture : textures)
 						{
-							RenderObjectFields(texture.get());
+							ImGui::Indent();
+							if (ImGui::CollapsingHeader(ImGui::IMGUI_FORMAT_ID(texture.get()->GetName(), FOLDOUT_ID, "TEX_" + texture.get()->GetName()).c_str()))
+							{
+								ImGui::Indent();
+								RenderObjectFields(texture.get());
+								ImGui::Unindent();
+							}
+							ImGui::Unindent();
 						}
-						ImGui::Unindent();
 					}
 
 					ImGui::FoldOutButton(
@@ -118,19 +123,18 @@ namespace gallus
 
 					if (m_bMeshesFoldedOut)
 					{
-						ImGui::Indent();
 						auto& meshes = core::EDITOR_ENGINE->GetResourceAtlas().GetMeshes();
-						if (ImGui::BeginTable("###Meshes", 3))
+						for (std::shared_ptr<graphics::dx12::Mesh> mesh : meshes)
 						{
-							for (std::shared_ptr<graphics::dx12::Mesh> mesh : meshes)
+							ImGui::Indent();
+							if (ImGui::CollapsingHeader(ImGui::IMGUI_FORMAT_ID(mesh.get()->GetName(), FOLDOUT_ID, "MESH_" + mesh.get()->GetName()).c_str()))
 							{
-								ImGui::TableNextRow();
-								ImGui::TableNextColumn();
-								RenderResource(mesh.get());
+								ImGui::Indent();
+								RenderObjectFields(mesh.get());
+								ImGui::Unindent();
 							}
-							ImGui::EndTable();
+							ImGui::Unindent();
 						}
-						ImGui::Unindent();
 					}
 
 					ImGui::FoldOutButton(
@@ -140,19 +144,18 @@ namespace gallus
 
 					if (m_bPixelShadersFoldedOut)
 					{
-						ImGui::Indent();
 						auto& pixelShaders = core::EDITOR_ENGINE->GetResourceAtlas().GetPixelShaders();
-						if (ImGui::BeginTable("###PixelShaders", 3))
+						for (std::shared_ptr<graphics::dx12::PixelShader> shader : pixelShaders)
 						{
-							for (std::shared_ptr<graphics::dx12::PixelShader> shader : pixelShaders)
+							ImGui::Indent();
+							if (ImGui::CollapsingHeader(ImGui::IMGUI_FORMAT_ID(shader.get()->GetName(), FOLDOUT_ID, "PIXEL_SHADER_" + shader.get()->GetName()).c_str()))
 							{
-								ImGui::TableNextRow();
-								ImGui::TableNextColumn();
-								RenderResource(shader.get());
+								ImGui::Indent();
+								RenderObjectFields(shader.get());
+								ImGui::Unindent();
 							}
-							ImGui::EndTable();
+							ImGui::Unindent();
 						}
-						ImGui::Unindent();
 					}
 
 					ImGui::FoldOutButton(
@@ -162,19 +165,18 @@ namespace gallus
 
 					if (m_bVertexShadersFoldedOut)
 					{
-						ImGui::Indent();
 						auto& vertexShaders = core::EDITOR_ENGINE->GetResourceAtlas().GetVertexShaders();
-						if (ImGui::BeginTable("###VertexShaders", 3))
+						for (std::shared_ptr<graphics::dx12::VertexShader> shader : vertexShaders)
 						{
-							for (std::shared_ptr<graphics::dx12::VertexShader> shader : vertexShaders)
+							ImGui::Indent();
+							if (ImGui::CollapsingHeader(ImGui::IMGUI_FORMAT_ID(shader.get()->GetName(), FOLDOUT_ID, "VERTEX_SHADER_" + shader.get()->GetName()).c_str()))
 							{
-								ImGui::TableNextRow();
-								ImGui::TableNextColumn();
-								RenderResource(shader.get());
+								ImGui::Indent();
+								RenderObjectFields(shader.get());
+								ImGui::Unindent();
 							}
-							ImGui::EndTable();
+							ImGui::Unindent();
 						}
-						ImGui::Unindent();
 					}
 
 					ImGui::FoldOutButton(
@@ -184,19 +186,18 @@ namespace gallus
 
 					if (m_bShaderBindsFoldedOut)
 					{
-						ImGui::Indent();
 						auto& shaderBinds = core::EDITOR_ENGINE->GetResourceAtlas().GetShaderBinds();
-						if (ImGui::BeginTable("###ShaderBinds", 3))
+						for (std::shared_ptr<graphics::dx12::DX12ShaderBind> shader : shaderBinds)
 						{
-							for (std::shared_ptr<graphics::dx12::DX12ShaderBind> shader : shaderBinds)
+							ImGui::Indent();
+							if (ImGui::CollapsingHeader(ImGui::IMGUI_FORMAT_ID(shader.get()->GetName(), FOLDOUT_ID, "SHADER_BIND_" + shader.get()->GetName()).c_str()))
 							{
-								ImGui::TableNextRow();
-								ImGui::TableNextColumn();
-								RenderResource(shader.get());
+								ImGui::Indent();
+								RenderObjectFields(shader.get());
+								ImGui::Unindent();
 							}
-							ImGui::EndTable();
+							ImGui::Unindent();
 						}
-						ImGui::Unindent();
 					}
 				}
 				ImGui::EndChild();

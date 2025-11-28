@@ -94,7 +94,7 @@ namespace gallus
 		protected:
 			core::Data m_Data;
 #ifdef _EDITOR
-			BEGIN_EXPOSE_FIELDS(Scene)
+			BEGIN_EXPOSE_FIELDS_PARENT(Scene, resources::EngineResource)
 			END_EXPOSE_FIELDS(Scene)
 			BEGIN_EXPOSE_GIZMOS(Scene)
 			END_EXPOSE_GIZMOS(Scene)

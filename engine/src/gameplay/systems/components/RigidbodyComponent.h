@@ -107,10 +107,10 @@ namespace gallus
 			float m_fLinearDamping = 0.98f;
 
 #ifdef _EDITOR
-			BEGIN_EXPOSE_FIELDS(RigidbodyComponent)
+			BEGIN_EXPOSE_FIELDS_PARENT(RigidbodyComponent, Component)
 				EXPOSE_FIELD(RigidbodyComponent, m_bUseGravity, "Use Gravity", (FieldOptions{ .type = EditorFieldWidgetType::Toggle, .description = "Determines whether the object is affected by gravity. When true, the rigidbody will accelerate downward according to the physics system; when false, it will ignore gravity." }))
 				EXPOSE_FIELD(RigidbodyComponent, m_fMass, "Mass", (FieldOptions{ .type = EditorFieldWidgetType::DragFloat, .min = "0.0001", .max = "9999999", .description = "The mass of the rigidbody. Affects how forces influence the object; higher mass makes it harder to accelerate.  " }))
-				EXPOSE_FIELD(RigidbodyComponent, m_fLinearDamping, "Linear Damping", (FieldOptions{ .type = EditorFieldWidgetType::DragFloat, .min = "0.01", .max = "1.0f", .description = "The linear damping factor applied to the rigidbody’s velocity. Values closer to 1 reduce movement slowly, values closer to 0 slow the object more quickly over time." }))
+				EXPOSE_FIELD(RigidbodyComponent, m_fLinearDamping, "Linear Damping", (FieldOptions{ .type = EditorFieldWidgetType::DragFloat, .min = "0.01", .max = "1.0f", .description = "The linear damping factor applied to the rigidbodyï¿½s velocity. Values closer to 1 reduce movement slowly, values closer to 0 slow the object more quickly over time." }))
 			END_EXPOSE_FIELDS(RigidbodyComponent)
 			BEGIN_EXPOSE_GIZMOS(RigidbodyComponent)
 			END_EXPOSE_GIZMOS(RigidbodyComponent)

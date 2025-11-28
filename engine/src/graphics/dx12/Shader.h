@@ -74,8 +74,13 @@ namespace gallus
 				}
 			protected:
 				Microsoft::WRL::ComPtr<ID3DBlob> m_pShaderBlob = nullptr;
-
-				friend class ResourceAtlas;
+#ifdef _EDITOR
+				BEGIN_EXPOSE_FIELDS_PARENT(Shader, resources::EngineResource)
+				END_EXPOSE_FIELDS(Shader)
+				BEGIN_EXPOSE_GIZMOS(Shader)
+				END_EXPOSE_GIZMOS(Shader)
+				END_EXPOSE_TO_EDITOR(Shader)
+#endif
 			};
 
 			class PixelShader : public Shader
@@ -100,10 +105,8 @@ namespace gallus
 				/// <returns>True if loading and compilation were successful, false otherwise.</returns>
 				bool LoadByPath(const fs::path& a_PixelShaderPath) override;
 			protected:
-				friend class ResourceAtlas;
-
 #ifdef _EDITOR
-				BEGIN_EXPOSE_FIELDS(PixelShader)
+				BEGIN_EXPOSE_FIELDS_PARENT(PixelShader, Shader)
 				END_EXPOSE_FIELDS(PixelShader)
 				BEGIN_EXPOSE_GIZMOS(PixelShader)
 				END_EXPOSE_GIZMOS(PixelShader)
@@ -133,10 +136,8 @@ namespace gallus
 				/// <returns>True if loading and compilation were successful, false otherwise.</returns>
 				bool LoadByPath(const fs::path& a_VertexShaderPath) override;
 			protected:
-				friend class ResourceAtlas;
-
 #ifdef _EDITOR
-				BEGIN_EXPOSE_FIELDS(VertexShader)
+				BEGIN_EXPOSE_FIELDS_PARENT(VertexShader, Shader)
 				END_EXPOSE_FIELDS(VertexShader)
 				BEGIN_EXPOSE_GIZMOS(VertexShader)
 				END_EXPOSE_GIZMOS(VertexShader)

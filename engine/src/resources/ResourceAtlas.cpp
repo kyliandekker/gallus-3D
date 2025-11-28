@@ -258,7 +258,8 @@ namespace gallus
 				return false;
 			}
 
-			a_Scene.LoadByPath(fileResource->GetPath());
+			fs::path scenePath = fileResource->GetPath();
+			a_Scene.LoadByPath(scenePath);
 
 			return true;
 //#else
@@ -289,7 +290,8 @@ namespace gallus
 			std::shared_ptr<gameplay::Prefab> prefab = GetResource(m_aPrefabs, a_sName, fileResource->GetPath());
 			if (!prefab->IsValid())
 			{
-				prefab->LoadByPath(fileResource->GetPath());
+				fs::path prefabPath = fileResource->GetPath();
+				prefab->LoadByPath(prefabPath);
 			}
 			return prefab;
 		}
