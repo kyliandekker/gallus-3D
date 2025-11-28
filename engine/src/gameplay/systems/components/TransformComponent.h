@@ -74,10 +74,10 @@ namespace gallus
 			void ShowTransformGizmo();
 #ifdef _EDITOR
 			BEGIN_EXPOSE_FIELDS(TransformComponent)
-				EXPOSE_FIELD(TransformComponent, m_Transform, "Transform", FieldOptions{ .type = EditorFieldWidgetType::Object })
+				EXPOSE_FIELD(TransformComponent, m_Transform, "Transform", (FieldOptions{ .type = EditorFieldWidgetType::Object }))
 			END_EXPOSE_FIELDS(TransformComponent)
 			BEGIN_EXPOSE_GIZMOS(TransformComponent)
-				EXPOSE_GIZMO(TransformComponent, m_Transform, GizmoOptions{ EditorGizmoType::Transform })
+				EXPOSE_GIZMO(TransformComponent, m_Transform, (GizmoOptions{ EditorGizmoType::Transform }))
 			END_EXPOSE_GIZMOS(TransformComponent)
 			END_EXPOSE_TO_EDITOR(TransformComponent)
 #endif

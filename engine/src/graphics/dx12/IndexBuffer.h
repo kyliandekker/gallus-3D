@@ -19,16 +19,6 @@ namespace gallus
 			{
 			public:
 				/// <summary>
-				/// Constructs an index buffer with an optional debug name.
-				/// </summary>
-				/// <param name="string">The debug name of the buffer resource (default empty).</param>
-				IndexBuffer(const std::string& string = "");
-
-				/// <summary>
-				/// Destroys the index buffer and releases GPU resources.
-				/// </summary>
-				virtual ~IndexBuffer();
-								/// <summary>
 				/// Creates the index buffer view (IBV) based on the number of elements and element size.
 				/// </summary>
 				/// <param name="a_iNumElements">The number of indices stored in the buffer.</param>

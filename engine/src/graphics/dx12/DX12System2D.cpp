@@ -128,7 +128,8 @@ namespace gallus
 #endif // LOG_DX!2
 				for (size_t i = 0; i < g_iBufferCount; i++)
 				{
-					m_BackBuffers[i] = std::make_shared<DX12Resource>("BackBuffer_" + std::to_string(i));
+					m_BackBuffers[i] = std::make_shared<DX12Resource>();
+					m_BackBuffers[i]->LoadByName("BackBuffer_" + std::to_string(i));
 				}
 
 				// Create the swap chain.

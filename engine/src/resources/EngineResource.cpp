@@ -121,7 +121,7 @@ namespace gallus
 
 #ifdef _LOAD_BY_PATH
 		//---------------------------------------------------------------------
-		void EngineResource::LoadByPath(const fs::path & a_Path)
+		bool EngineResource::LoadByPath(const fs::path & a_Path)
 		{
 			if (!Destroy())
 			{

@@ -23,6 +23,7 @@
 
 // game includes
 #include "gameplay/Game.h"
+#include <editor/graphics/imgui/RenderEditorExposable.h>
 
 namespace gallus
 {
@@ -103,15 +104,9 @@ namespace gallus
 					{
 						ImGui::Indent();
 						auto& textures = core::EDITOR_ENGINE->GetResourceAtlas().GetTextures();
-						if (ImGui::BeginTable("###Textures", 3))
+						for (std::shared_ptr<graphics::dx12::Texture> texture : textures)
 						{
-							for (std::shared_ptr<graphics::dx12::Texture> texture : textures)
-							{
-								ImGui::TableNextRow();
-								ImGui::TableNextColumn();
-								RenderResource(texture.get());
-							}
-							ImGui::EndTable();
+							RenderObjectFields(texture.get());
 						}
 						ImGui::Unindent();
 					}

@@ -22,6 +22,30 @@ namespace gallus
 	namespace gameplay
 	{
 		//---------------------------------------------------------------------
+		bool Prefab::LoadByName(const std::string& a_sName)
+		{
+			if (!Scene::LoadByName(a_sName))
+			{
+				return false;
+			}
+			m_AssetType = resources::AssetType::Prefab;
+
+			return true;
+		}
+
+		//---------------------------------------------------------------------
+		bool Prefab::LoadByPath(const fs::path& a_Path)
+		{
+			if (!Scene::LoadByPath(a_Path))
+			{
+				return false;
+			}
+			m_AssetType = resources::AssetType::Prefab;
+
+			return true;
+		}
+
+		//---------------------------------------------------------------------
 		bool Prefab::LoadData()
 		{
 #ifdef _EDITOR

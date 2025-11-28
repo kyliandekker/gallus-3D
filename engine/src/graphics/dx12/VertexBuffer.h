@@ -21,17 +21,6 @@ namespace gallus
 			{
 			public:
 				/// <summary>
-				/// Constructs a vertex buffer with an optional debug name.
-				/// </summary>
-				/// <param name="a_sName">The debug name of the buffer resource (default empty).</param>
-				VertexBuffer(const std::string& a_sName = "");
-
-				/// <summary>
-				/// Destroys the vertex buffer and releases GPU resources.
-				/// </summary>
-				virtual ~VertexBuffer();
-
-				/// <summary>
 				/// Creates the vertex buffer view (VBV) based on the number of elements and element size.
 				/// </summary>
 				/// <param name="a_iNumElements">The number of vertices stored in the buffer.</param>

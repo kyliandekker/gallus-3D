@@ -88,7 +88,7 @@ namespace gallus
 
 #ifdef _EDITOR
 			BEGIN_EXPOSE_FIELDS(AnimationKeyFrameEventComponent)
-				EXPOSE_ENUM_FIELD_AUTO(AnimationKeyFrameEventComponent, m_Event, "Event Type", AnimationEvent)
+				//EXPOSE_ENUM_FIELD_AUTO(AnimationKeyFrameEventComponent, m_Event, "Event Type", AnimationEvent)
 			END_EXPOSE_FIELDS(AnimationKeyFrameEventComponent)
 			BEGIN_EXPOSE_GIZMOS(AnimationKeyFrameEventComponent)
 			END_EXPOSE_GIZMOS(AnimationKeyFrameEventComponent)

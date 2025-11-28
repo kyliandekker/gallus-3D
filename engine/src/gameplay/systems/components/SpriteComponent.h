@@ -150,13 +150,13 @@ namespace gallus
 
 #ifdef _EDITOR
 			BEGIN_EXPOSE_FIELDS(SpriteComponent)
-				EXPOSE_FIELD(SpriteComponent, m_pShaderBind, "Shader Bind", FieldOptions{ .type = EditorFieldWidgetType::ObjectPtr })
-				EXPOSE_FIELD(SpriteComponent, m_pTexture, "Texture", FieldOptions{ .type = EditorFieldWidgetType::AssetPickerPtr, .assetType = resources::AssetType::Sprite, .description = "Pointer to the texture asset used by this sprite. Can be nullptr if no texture is assigned. Determines the visual appearance of the sprite." })
-				EXPOSE_FIELD(SpriteComponent, m_iSpriteIndex, "Sprite Index", FieldOptions{ .type = EditorFieldWidgetType::DragInt8, .description = "Index of the sprite within a texture atlas. Used when the texture contains multiple sprites to select which one is displayed." })
-				EXPOSE_FIELD(SpriteComponent, m_pTexture, "Texture Preview", FieldOptions{
+				EXPOSE_FIELD(SpriteComponent, m_pShaderBind, "Shader Bind", (FieldOptions{ .type = EditorFieldWidgetType::ObjectPtr }))
+				EXPOSE_FIELD(SpriteComponent, m_pTexture, "Texture", (FieldOptions{ .type = EditorFieldWidgetType::AssetPickerPtr, .assetType = resources::AssetType::Sprite, .description = "Pointer to the texture asset used by this sprite. Can be nullptr if no texture is assigned. Determines the visual appearance of the sprite." }))
+				EXPOSE_FIELD(SpriteComponent, m_iSpriteIndex, "Sprite Index", (FieldOptions{ .type = EditorFieldWidgetType::DragInt8, .description = "Index of the sprite within a texture atlas. Used when the texture contains multiple sprites to select which one is displayed." }))
+				EXPOSE_FIELD(SpriteComponent, m_pTexture, "Texture Preview", (FieldOptions{
 				.type = EditorFieldWidgetType::TexturePreview,
 				.relatedIndexFieldOffset = offsetof(SpriteComponent, m_iSpriteIndex)
-					})
+					}))
 			END_EXPOSE_FIELDS(SpriteComponent)
 			BEGIN_EXPOSE_GIZMOS(SpriteComponent)
 			END_EXPOSE_GIZMOS(SpriteComponent)

@@ -28,11 +28,40 @@ namespace gallus
 		//---------------------------------------------------------------------
 		// Scene
 		//---------------------------------------------------------------------
-		void Scene::Reset()
+		bool Scene::Destroy()
 		{
-			SetPath("");
-			SetData(core::Data());
-			LoadData();
+			if (!EngineResource::Destroy())
+			{
+				return false;
+			}
+
+			m_Data = core::Data();
+
+			return true;
+		}
+
+		//---------------------------------------------------------------------
+		bool Scene::LoadByName(const std::string& a_sName)
+		{
+			if (!EngineResource::LoadByName(a_sName))
+			{
+				return false;
+			}
+			m_AssetType = resources::AssetType::Scene;
+
+			return true;
+		}
+
+		//---------------------------------------------------------------------
+		bool Scene::LoadByPath(const fs::path& a_Path)
+		{
+			if (!EngineResource::LoadByPath(a_Path))
+			{
+				return false;
+			}
+			m_AssetType = resources::AssetType::Scene;
+			
+			return file::LoadFile(m_Path, m_Data);
 		}
 
 		//---------------------------------------------------------------------
@@ -134,23 +163,6 @@ namespace gallus
 			return true;
 		}
 #endif // _EDITOR
-
-		//---------------------------------------------------------------------
-		bool Scene::Load()
-		{
-			if (m_Path.empty())
-			{
-				return false;
-			}
-
-			return file::LoadFile(m_Path, m_Data);
-		}
-
-		//---------------------------------------------------------------------
-		void Scene::SetData(const core::Data& a_Data)
-		{
-			m_Data = a_Data;
-		}
 
 		//---------------------------------------------------------------------
 		const core::Data& Scene::GetData() const

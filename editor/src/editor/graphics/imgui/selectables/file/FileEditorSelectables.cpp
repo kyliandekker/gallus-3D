@@ -36,14 +36,12 @@ namespace gallus
 					core::Data data;
 					a_FileEditorSelectable.GetFileResource().GetFileData(data);
 
-					gameplay::GAME.GetScene().SetData(data);
-					gameplay::GAME.GetScene().SetPath(a_FileEditorSelectable.GetFileResource().GetPath());
+					gameplay::GAME.GetScene().LoadByPath(a_FileEditorSelectable.GetFileResource().GetPath());
 					gameplay::GAME.GetScene().LoadData();
 
 					core::EDITOR_ENGINE->GetEditor().SetEditorMethod(editor::EditorMethod::EDITOR_METHOD_SCENE);
 
-					core::EDITOR_ENGINE->GetEditor().GetScene().SetData(data);
-					core::EDITOR_ENGINE->GetEditor().GetScene().SetPath(a_FileEditorSelectable.GetFileResource().GetPath());
+					core::EDITOR_ENGINE->GetEditor().GetScene().LoadByPath(a_FileEditorSelectable.GetFileResource().GetPath());
 					core::EDITOR_ENGINE->GetEditor().GetScene().LoadData();
 				}
 			}
@@ -71,13 +69,11 @@ namespace gallus
 					core::Data data;
 					a_FileEditorSelectable.GetFileResource().GetFileData(data);
 
-					gameplay::GAME.GetScene().SetData(core::Data());
-					gameplay::GAME.GetScene().SetPath("");
+					gameplay::GAME.GetScene().Destroy();
 
 					core::EDITOR_ENGINE->GetEditor().SetEditorMethod(editor::EditorMethod::EDITOR_METHOD_PREFAB);
 
-					core::EDITOR_ENGINE->GetEditor().GetScene().SetData(data);
-					core::EDITOR_ENGINE->GetEditor().GetScene().SetPath(a_FileEditorSelectable.GetFileResource().GetPath());
+					core::EDITOR_ENGINE->GetEditor().GetScene().LoadByPath(a_FileEditorSelectable.GetFileResource().GetPath());
 					core::EDITOR_ENGINE->GetEditor().GetScene().LoadData();
 				}
 			}

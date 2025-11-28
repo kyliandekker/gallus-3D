@@ -14,7 +14,7 @@ namespace gallus
 			//---------------------------------------------------------------------
 			// MainWindowDock
 			//---------------------------------------------------------------------
-			MainWindowDock::MainWindowDock(ImGuiWindow& a_Window) : BaseWindow(a_Window, ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoDocking, "", "DockSpace", true)
+			MainWindowDock::MainWindowDock(ImGuiWindow& a_Window) : BaseWindow(a_Window, ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_MenuBar, "", "DockSpace", true)
 			{}
 
 			//---------------------------------------------------------------------

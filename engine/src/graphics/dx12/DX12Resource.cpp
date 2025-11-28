@@ -23,7 +23,7 @@ namespace gallus
 			{
 				if (!EngineResource::Destroy())
 				{
-					return;
+					return false;
 				}
 				
 				if (m_pResource)
@@ -33,6 +33,7 @@ namespace gallus
 				m_FormatSupport = {};
 				m_wsName = L"";
 				m_CurrentState = D3D12_RESOURCE_STATE_COMMON;
+				return true;
 			}
 
 			//---------------------------------------------------------------------
@@ -102,7 +103,30 @@ namespace gallus
 				{
 					return false;
 				}
-				LoadByName(m_sName, a_ResourceDesc, a_Heap, a_ResourceState, a_pOptimizedClearValue);
+
+				Microsoft::WRL::ComPtr<ID3D12Device2>& device = core::ENGINE->GetDX12().GetDevice();
+				if (device->CreateCommittedResource(
+					&a_Heap,
+					D3D12_HEAP_FLAG_NONE,
+					&a_ResourceDesc,
+					a_ResourceState,
+					a_pOptimizedClearValue,
+					IID_PPV_ARGS(&m_pResource)
+				))
+				{
+					LOGF(LOGSEVERITY_ERROR, LOG_CATEGORY_DX12, "Failed creating committed resource: \"%s\".", a_Path.generic_string().c_str());
+					return false;
+				}
+
+				if (!m_pResource)
+				{
+					LOGF(LOGSEVERITY_ERROR, LOG_CATEGORY_DX12, "Resource is null: \"%s\".", a_Path.generic_string().c_str());
+					return false;
+				}
+
+				m_pResource->SetName(m_wsName.c_str());
+
+				CheckFeatureSupport();
 
 				return true;
 			}

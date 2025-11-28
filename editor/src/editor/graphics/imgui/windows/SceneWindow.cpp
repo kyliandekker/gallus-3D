@@ -85,7 +85,7 @@ namespace gallus
 					core::EDITOR_ENGINE->GetEditor().SetSelectable(nullptr);
 					if (isStarted)
 					{
-						gameplay::GAME.GetScene().Load();
+						gameplay::GAME.GetScene().LoadByPath(core::EDITOR_ENGINE->GetEditor().GetScene().GetPath());
 						gameplay::GAME.GetScene().LoadData();
 					}
 					else
@@ -579,7 +579,7 @@ namespace gallus
 					core::EDITOR_ENGINE->GetEditor().SetSelectable(nullptr);
 					if (isStarted)
 					{
-						gameplay::GAME.GetScene().Load();
+						gameplay::GAME.GetScene().LoadByPath(core::EDITOR_ENGINE->GetEditor().GetScene().GetPath());
 						gameplay::GAME.GetScene().LoadData();
 					}
 					else

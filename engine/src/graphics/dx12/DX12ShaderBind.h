@@ -22,12 +22,15 @@ namespace gallus
 				/// <summary>
 				/// Constructs an empty shader resource.
 				/// </summary>
-				DX12ShaderBind();
+				DX12ShaderBind()
+				{
+					m_AssetType = resources::AssetType::ShaderBind;
+				}
 
 				/// <summary>
 				/// Constructs a shader resource.
 				/// </summary>
-				DX12ShaderBind(const std::string& a_sName, const PixelShader* a_PixelShader, const VertexShader* a_VertexShader);
+				bool LoadByName(const std::string& a_sName, const PixelShader* a_pPixelShader, const VertexShader* a_pVertexShader);
 
 				/// <summary>
 				/// Creates the pipe line state.
@@ -91,8 +94,8 @@ namespace gallus
 
 #ifdef _EDITOR
 				BEGIN_EXPOSE_FIELDS(DX12ShaderBind)
-					EXPOSE_FIELD(DX12ShaderBind, m_pPixelShader, "Pixel Shader", FieldOptions{ .type = EditorFieldWidgetType::AssetPickerPtr, .assetType = resources::AssetType::PixelShader, .description = "Pointer to the pixel shader asset used for rendering this object. Can be nullptr if no specific pixel shader is assigned." })
-					EXPOSE_FIELD(DX12ShaderBind, m_pVertexShader, "Vertex Shader", FieldOptions{ .type = EditorFieldWidgetType::AssetPickerPtr, .assetType = resources::AssetType::VertexShader, .description = "Pointer to the vertex shader asset used for rendering this object. Can be nullptr if no specific vertex shader is assigned." })
+					EXPOSE_FIELD(DX12ShaderBind, m_pPixelShader, "Pixel Shader", (FieldOptions{ .type = EditorFieldWidgetType::AssetPickerPtr, .assetType = resources::AssetType::PixelShader, .description = "Pointer to the pixel shader asset used for rendering this object. Can be nullptr if no specific pixel shader is assigned." }))
+					EXPOSE_FIELD(DX12ShaderBind, m_pVertexShader, "Vertex Shader", (FieldOptions{ .type = EditorFieldWidgetType::AssetPickerPtr, .assetType = resources::AssetType::VertexShader, .description = "Pointer to the vertex shader asset used for rendering this object. Can be nullptr if no specific vertex shader is assigned." }))
 				END_EXPOSE_FIELDS(DX12ShaderBind)
 				BEGIN_EXPOSE_GIZMOS(DX12ShaderBind)
 				END_EXPOSE_GIZMOS(DX12ShaderBind)

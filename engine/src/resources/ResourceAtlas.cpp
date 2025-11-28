@@ -239,7 +239,8 @@ namespace gallus
 				}
 			}
 
-			std::shared_ptr<graphics::dx12::DX12ShaderBind> shaderBind = std::make_shared<graphics::dx12::DX12ShaderBind>(a_sName, a_PixelShader, a_VertexShader);
+			std::shared_ptr<graphics::dx12::DX12ShaderBind> shaderBind = std::make_shared<graphics::dx12::DX12ShaderBind>();
+			shaderBind->LoadByName(a_sName, a_PixelShader, a_VertexShader);
 			shaderBind->CreatePipelineState();
 			m_aShaderBinds.push_back(shaderBind);
 
@@ -257,9 +258,7 @@ namespace gallus
 				return false;
 			}
 
-			a_Scene = gameplay::Scene(a_sName);
-			a_Scene.SetPath(fileResource->GetPath());
-			a_Scene.Load();
+			a_Scene.LoadByPath(fileResource->GetPath());
 
 			return true;
 //#else
@@ -290,9 +289,8 @@ namespace gallus
 			std::shared_ptr<gameplay::Prefab> prefab = GetResource(m_aPrefabs, a_sName, fileResource->GetPath());
 			if (!prefab->IsValid())
 			{
-				prefab->SetPath(fileResource->GetPath());
+				prefab->LoadByPath(fileResource->GetPath());
 			}
-			prefab->Load();
 			return prefab;
 		}
 

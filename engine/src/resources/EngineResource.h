@@ -28,6 +28,11 @@ namespace gallus
 			Game // This is for any resource created by the game code.
 		};
 
+		inline std::string EngineResourceCategoryToString(EngineResourceCategory resourceCategory)
+		{
+			return "";
+		}
+
 		//---------------------------------------------------------------------
 		// EngineResource
 		//---------------------------------------------------------------------
@@ -180,6 +185,23 @@ namespace gallus
 
 #ifdef _EDITOR
 			BEGIN_EXPOSE_FIELDS(EngineResource)
+				EXPOSE_FIELD(EngineResource, m_bIsDestroyable, "Is Destroyable", (FieldOptions{ .type = EditorFieldWidgetType::Checkbox, .description = ".", .disabled = true }))
+				EXPOSE_FIELD(EngineResource, m_bIsLocked, "Is Locked", (FieldOptions{ .type = EditorFieldWidgetType::Checkbox, .description = ".", .disabled = true }))
+				EXPOSE_FIELD(EngineResource, m_bIsUnique, "Is Unique", (FieldOptions{ .type = EditorFieldWidgetType::Checkbox, .description = ".", .disabled = true }))
+				EXPOSE_FIELD(EngineResource, m_ResourceCategory, "Resource Category",
+					(FieldOptions{
+						.type = EditorFieldWidgetType::EnumDropdown,
+						.enumToStringFunc = MakeEnumToStringFunc<EngineResourceCategory>(EngineResourceCategoryToString),
+						.description = ".",
+						.disabled = true
+					}))
+				EXPOSE_FIELD(EngineResource, m_AssetType, "Asset Type",
+					(FieldOptions{
+						.type = EditorFieldWidgetType::EnumDropdown,
+						.enumToStringFunc = MakeEnumToStringFunc<AssetType>(AssetTypeToString),
+						.description = ".",
+						.disabled = true
+					}))
 			END_EXPOSE_FIELDS(EngineResource)
 			BEGIN_EXPOSE_GIZMOS(EngineResource)
 			END_EXPOSE_GIZMOS(EngineResource)

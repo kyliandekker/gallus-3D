@@ -119,7 +119,7 @@ namespace gallus
 				textureDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
 				textureDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
 
-				if (!DX12Resource::LoadByPath(m_sName, textureDesc))
+				if (!DX12Resource::LoadByPath(a_Path, textureDesc))
 				{
 					LOG(LOGSEVERITY_ERROR, LOG_CATEGORY_DX12, "Failed creating resource.");
 					return false;
@@ -173,7 +173,7 @@ namespace gallus
 
 				if (!DX12Resource::Destroy())
 				{
-					return;
+					return false;
 				}
 
 				if (IsSrvIndexValid())
@@ -185,8 +185,11 @@ namespace gallus
 				{
 					m_pResourceUploadHeap.Reset();
 				}
+
+				return true;
 			}
 
+			//---------------------------------------------------------------------
 			Texture::~Texture()
 			{
 				Destroy();

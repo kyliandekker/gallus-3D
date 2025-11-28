@@ -30,7 +30,10 @@ namespace gallus
 				{
 					if (ImGui::MenuItem(ImGui::IMGUI_FORMAT_ID(font::ICON_SCENE + std::string(" New Scene"), MENU_ITEM_ID, "NEW_SCENE_EDITOR").c_str(), "CTRL+N"))
 					{
-						gameplay::GAME.GetScene().Reset();
+						gameplay::GAME.GetScene().Destroy();
+						gameplay::GAME.GetScene().LoadData();
+						core::EDITOR_ENGINE->GetEditor().GetScene().Destroy();
+						core::EDITOR_ENGINE->GetEditor().GetScene().LoadData();
 					}
 					if (ImGui::MenuItem(ImGui::IMGUI_FORMAT_ID(font::ICON_FILE_SCENE + std::string(" Open Scene"), MENU_ITEM_ID, "OPEN_SCENE_EDITOR").c_str(), "CTRL+O"))
 					{
@@ -42,9 +45,10 @@ namespace gallus
 							core::Data data;
 							if (file::LoadFile(scenePath, data))
 							{
-								gameplay::GAME.GetScene().SetData(data);
-								gameplay::GAME.GetScene().SetPath(scenePath);
+								gameplay::GAME.GetScene().LoadByPath(scenePath);
 								gameplay::GAME.GetScene().LoadData();
+								core::EDITOR_ENGINE->GetEditor().GetScene().LoadByPath(scenePath);
+								core::EDITOR_ENGINE->GetEditor().GetScene().LoadData();
 
 								core::EDITOR_ENGINE->GetEditor().SetEditorMethod(editor::EditorMethod::EDITOR_METHOD_SCENE);
 							}

@@ -9,14 +9,6 @@ namespace gallus
 			//---------------------------------------------------------------------
 			// VertexBuffer
 			//---------------------------------------------------------------------
-			VertexBuffer::VertexBuffer(const std::string& a_sName) : Buffer(a_sName)
-			{}
-
-			//---------------------------------------------------------------------
-			VertexBuffer::~VertexBuffer()
-			{}
-
-			//---------------------------------------------------------------------
 			void VertexBuffer::CreateViews(size_t a_iNumElements, size_t a_iElementSize)
 			{
 				m_iNumVertices = a_iNumElements;

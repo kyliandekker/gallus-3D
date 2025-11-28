@@ -25,13 +25,20 @@ namespace gallus
 			}
 
 			/// <summary>
-			/// Constructs a prefab with a given name.
+			/// Loads a resource by name.
 			/// </summary>
 			/// <param name="a_sName">Name of the resource.</param>
-			Prefab(const std::string& a_sName) : Scene(a_sName)
-			{
-				m_AssetType = resources::AssetType::Prefab;
-			}
+			/// <returns></returns>
+			virtual bool LoadByName(const std::string& a_sName) override;
+
+#ifdef _LOAD_BY_PATH
+			/// <summary>
+			/// Loads a resource by path.
+			/// </summary>
+			/// <param name="a_Path">The path to the resource.</param>
+			/// <returns></returns>
+			virtual bool LoadByPath(const fs::path& a_Path) override;
+#endif
 
 			/// <summary>
 			/// Loads the prefab data from its associated resource source.

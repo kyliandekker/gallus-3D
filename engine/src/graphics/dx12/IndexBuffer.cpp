@@ -11,14 +11,6 @@ namespace gallus
 			//---------------------------------------------------------------------
 			// IndexBuffer
 			//---------------------------------------------------------------------
-			IndexBuffer::IndexBuffer(const std::string& a_sName) : Buffer(a_sName)
-			{}
-
-			//---------------------------------------------------------------------
-			IndexBuffer::~IndexBuffer()
-			{}
-
-			//---------------------------------------------------------------------
 			void IndexBuffer::CreateViews(size_t a_iNumElements, size_t a_iElementSize)
 			{
 				assert(a_iElementSize == 2 || a_iElementSize == 4 && "Indices must be 16, or 32-bit integers.");

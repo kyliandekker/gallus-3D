@@ -66,7 +66,7 @@ namespace gallus
 			audio::Sound* m_pSound = nullptr;
 			
 			BEGIN_EXPOSE_FIELDS(AnimationKeyFrameSoundComponent)
-				EXPOSE_FIELD(AnimationKeyFrameSoundComponent, m_pSound, "Sound", FieldOptions{ .type = EditorFieldWidgetType::AssetPickerPtr, .assetType = resources::AssetType::Sound })
+				EXPOSE_FIELD(AnimationKeyFrameSoundComponent, m_pSound, "Sound", (FieldOptions{ .type = EditorFieldWidgetType::AssetPickerPtr, .assetType = resources::AssetType::Sound }))
 			END_EXPOSE_FIELDS(AnimationKeyFrameSoundComponent)
 			BEGIN_EXPOSE_GIZMOS(AnimationKeyFrameSoundComponent)
 			END_EXPOSE_GIZMOS(AnimationKeyFrameSoundComponent)

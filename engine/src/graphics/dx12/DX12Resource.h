@@ -12,6 +12,11 @@ namespace gallus
 	{
 		namespace dx12
 		{
+			inline std::string D3D12_RESOURCE_STATESToString(D3D12_RESOURCE_STATES state)
+			{
+				return "";
+			}
+
 			class CommandList;
 			//---------------------------------------------------------------------
 			// DX12Resource
@@ -124,6 +129,15 @@ namespace gallus
 				D3D12_FEATURE_DATA_FORMAT_SUPPORT m_FormatSupport{};
 				std::wstring m_wsName = L"";
 				D3D12_RESOURCE_STATES m_CurrentState = D3D12_RESOURCE_STATE_COMMON;
+
+#ifdef _EDITOR
+				BEGIN_EXPOSE_FIELDS(DX12Resource)
+					//EXPOSE_ENUM_FIELD_AUTO(DX12Resource, m_CurrentState, "Current State", D3D12_RESOURCE_STATES, FieldOptions{ .disabled = true, .description = "." })
+				END_EXPOSE_FIELDS(DX12Resource)
+				BEGIN_EXPOSE_GIZMOS(DX12Resource)
+				END_EXPOSE_GIZMOS(DX12Resource)
+				END_EXPOSE_TO_EDITOR(DX12Resource)
+#endif
 			};
 		}
 	}

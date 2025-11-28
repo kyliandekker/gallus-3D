@@ -37,7 +37,26 @@ namespace gallus
 				m_AssetType = resources::AssetType::Scene;
 			}
 
-			void Reset();
+			/// <summary>
+			/// Destroys the scene.
+			/// </summary>
+			virtual bool Destroy() override;
+
+			/// <summary>
+			/// Loads a resource by name.
+			/// </summary>
+			/// <param name="a_sName">Name of the resource.</param>
+			/// <returns></returns>
+			virtual bool LoadByName(const std::string& a_sName) override;
+
+#ifdef _LOAD_BY_PATH
+			/// <summary>
+			/// Loads a resource by path.
+			/// </summary>
+			/// <param name="a_Path">The path to the resource.</param>
+			/// <returns></returns>
+			virtual bool LoadByPath(const fs::path& a_Path) override;
+#endif
 
 			/// <summary>
 			/// Loads the scene data from its associated resource source.
@@ -51,18 +70,6 @@ namespace gallus
 			/// <returns>True if saving was successful, false otherwise.</returns>
 			bool Save();
 #endif
-			/// <summary>
-			/// Loads the scene data from disk or serialized format.
-			/// </summary>
-			/// <returns>True if loading was successful, false otherwise.</returns>
-			bool Load();
-
-			/// <summary>
-			/// Sets the internal data representation of the scene.
-			/// </summary>
-			/// <param name="a_Data">A <see cref="core::Data"/> object containing scene information.</param>
-			void SetData(const core::Data& a_Data);
-
 			/// <summary>
 			/// Returns a constant reference to the internal scene data.
 			/// </summary>

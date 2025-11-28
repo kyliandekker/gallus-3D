@@ -97,12 +97,12 @@ namespace gallus
 
 #ifdef _EDITOR
 			BEGIN_EXPOSE_FIELDS(AnimationKeyFrameSpriteComponent)
-				EXPOSE_FIELD(AnimationKeyFrameSpriteComponent, m_pTexture, "Texture", FieldOptions{ .type = EditorFieldWidgetType::AssetPickerPtr, .assetType = resources::AssetType::Sprite })
-				EXPOSE_FIELD(AnimationKeyFrameSpriteComponent, m_iSpriteIndex, "Sprite Index", FieldOptions{ .type = EditorFieldWidgetType::DragInt8 })
-				EXPOSE_FIELD(AnimationKeyFrameSpriteComponent, m_pTexture, "Texture Preview", FieldOptions{
+				EXPOSE_FIELD(AnimationKeyFrameSpriteComponent, m_pTexture, "Texture", (FieldOptions{ .type = EditorFieldWidgetType::AssetPickerPtr, .assetType = resources::AssetType::Sprite }))
+				EXPOSE_FIELD(AnimationKeyFrameSpriteComponent, m_iSpriteIndex, "Sprite Index", (FieldOptions{ .type = EditorFieldWidgetType::DragInt8 }))
+				EXPOSE_FIELD(AnimationKeyFrameSpriteComponent, m_pTexture, "Texture Preview", (FieldOptions{
 				.type = EditorFieldWidgetType::TexturePreview,
 				.relatedIndexFieldOffset = offsetof(AnimationKeyFrameSpriteComponent, m_iSpriteIndex)
-					})
+					}))
 			END_EXPOSE_FIELDS(AnimationKeyFrameSpriteComponent)
 			BEGIN_EXPOSE_GIZMOS(AnimationKeyFrameSpriteComponent)
 			END_EXPOSE_GIZMOS(AnimationKeyFrameSpriteComponent)

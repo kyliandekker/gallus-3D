@@ -43,7 +43,7 @@ namespace gallus
 			//---------------------------------------------------------------------
 			void ConsoleWindow::Update()
 			{
-				if (gameplay::GAME.IsStarted() && !gameplay::GAME.IsPaused())
+				if (core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetFullScreenPlayMode())
 				{
 					return;
 				}

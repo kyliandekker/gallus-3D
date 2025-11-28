@@ -76,8 +76,8 @@ namespace gallus
 
 #ifdef _EDITOR
 			BEGIN_EXPOSE_FIELDS(ColliderComponent)
-				EXPOSE_FIELD(ColliderComponent, m_vOffset, "Offset", FieldOptions{ .type = EditorFieldWidgetType::Vector2Field, .description = "The local offset of the collider relative to the object’s pivot or position. Adjusts where the collider is positioned without moving the object itself." })
-				EXPOSE_FIELD(ColliderComponent, m_vSize, "Size", FieldOptions{ .type = EditorFieldWidgetType::Vector2Field, .description = "The size of the collider in local space. Determines the width and height of the collision area." })
+				EXPOSE_FIELD(ColliderComponent, m_vOffset, "Offset", (FieldOptions{ .type = EditorFieldWidgetType::Vector2Field, .description = "The local offset of the collider relative to the object’s pivot or position. Adjusts where the collider is positioned without moving the object itself." }))
+				EXPOSE_FIELD(ColliderComponent, m_vSize, "Size", (FieldOptions{ .type = EditorFieldWidgetType::Vector2Field, .description = "The size of the collider in local space. Determines the width and height of the collision area." }))
 			END_EXPOSE_FIELDS(ColliderComponent)
 			BEGIN_EXPOSE_GIZMOS(ColliderComponent)
 			END_EXPOSE_GIZMOS(ColliderComponent)

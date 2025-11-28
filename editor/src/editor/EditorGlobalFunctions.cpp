@@ -16,7 +16,7 @@ namespace gallus
 					{ L"Prefab Files (*.prefab)", L"*.prefab" },
 					}, core::EDITOR_ENGINE->GetResourceAtlas().GetResourceFolder().GetPath()))
 				{
-					core::EDITOR_ENGINE->GetEditor().GetScene().SetPath(scenePath);
+					core::EDITOR_ENGINE->GetEditor().GetScene().LoadByPath(scenePath);
 					core::EDITOR_ENGINE->GetEditor().GetScene().Save();
 				}
 			}

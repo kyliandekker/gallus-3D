@@ -44,6 +44,7 @@ namespace gallus
 		std::string max = "";
 		std::function<std::string(int)> enumToStringFunc; // returns string name for index
 		std::string description;
+		bool disabled = false;
 
 		size_t relatedIndexFieldOffset = 0;
 	};
@@ -84,14 +85,14 @@ namespace gallus
 	};
 
 	// Macros (fields)
-	#define BEGIN_EXPOSE_FIELDS(CLASSNAME) \
+#define BEGIN_EXPOSE_FIELDS(CLASSNAME) \
 	public: \
 		static const std::vector<EditorFieldInfo>& StaticEditorFields() \
 		{ \
 			static std::vector<EditorFieldInfo> fields = {
 
-	#define EXPOSE_FIELD(CLASSNAME, VAR, UINAME, ...) \
-		{ #VAR, offsetof(CLASSNAME, VAR), UINAME, __VA_ARGS__ },
+	#define EXPOSE_FIELD(CLASSNAME, VAR, UINAME, FIELD_OPTIONS) \
+		{ #VAR, offsetof(CLASSNAME, VAR), UINAME, FIELD_OPTIONS },
 
 	#define END_EXPOSE_FIELDS(CLASSNAME) \
 			}; \
@@ -105,8 +106,8 @@ namespace gallus
 		{ \
 			static std::vector<EditorGizmoInfo> gizmos = {
 
-#define EXPOSE_GIZMO(CLASSNAME, VAR, ...) \
-		{ #VAR, offsetof(CLASSNAME, VAR), __VA_ARGS__ },
+#define EXPOSE_GIZMO(CLASSNAME, VAR, GIZMO_OPTIONS) \
+		{ #VAR, offsetof(CLASSNAME, VAR), GIZMO_OPTIONS },
 
 #define END_EXPOSE_GIZMOS(CLASSNAME) \
 			}; \
@@ -114,7 +115,7 @@ namespace gallus
 		}
 
 	// End-of-class helper: keep as before
-	#define END_EXPOSE_TO_EDITOR(CLASSNAME) \
+#define END_EXPOSE_TO_EDITOR(CLASSNAME) \
 		const std::vector<EditorFieldInfo>& GetEditorFields() const override { return CLASSNAME::StaticEditorFields(); } \
 		const std::vector<EditorGizmoInfo>& GetEditorGizmos() const override { return CLASSNAME::StaticEditorGizmos(); } \
 		const char* GetTypeName() const override { return #CLASSNAME; }
@@ -124,27 +125,19 @@ namespace gallus
 	{
 		// returns a std::function that editor code will call with an int index
 		return [toStringFunc](int value) -> std::string
-		{
-			// Cast the int to the enum type and forward to user's converter
-			return toStringFunc(static_cast<TEnum>(value));
-		};
+			{
+				// Cast the int to the enum type and forward to user's converter
+				return toStringFunc(static_cast<TEnum>(value));
+			};
 	}
 
-	// Macro that produces the FieldOptions aggregate inline (fits your EXPOSE_FIELD usage)
-	#define EXPOSE_ENUM_FIELD_OPTIONS(EnumType, ToStringFunc) \
-		FieldOptions{ .type = EditorFieldWidgetType::EnumDropdown, .enumToStringFunc = MakeEnumToStringFunc<EnumType>(ToStringFunc) }
+	 // Handy macro that hides the FieldOptions completely and expands to EXPOSE_FIELD for a single-line usage
+#define EXPOSE_ENUM_FIELD(Class, Var, UIName, EnumType, ToStringFunc, FIELD_OPTIONS) \
+		EXPOSE_FIELD(Class, Var, UIName, FIELD_OPTIONS)
 
-	// Convenience macro that assumes your to-string function is named EnumTypeToString
-	#define EXPOSE_ENUM_FIELD_OPTIONS_AUTO(EnumType) \
-		EXPOSE_ENUM_FIELD_OPTIONS(EnumType, EnumType##ToString)
-
-	// Handy macro that hides the FieldOptions completely and expands to EXPOSE_FIELD for a single-line usage
-	#define EXPOSE_ENUM_FIELD(Class, Var, UIName, EnumType, ToStringFunc) \
-		EXPOSE_FIELD(Class, Var, UIName, EXPOSE_ENUM_FIELD_OPTIONS(EnumType, ToStringFunc))
-
-	// Convenience auto macro using EnumTypeToString naming convention
-	#define EXPOSE_ENUM_FIELD_AUTO(Class, Var, UIName, EnumType) \
-		EXPOSE_ENUM_FIELD(Class, Var, UIName, EnumType, EnumType##ToString)
+	 // Convenience auto macro using EnumTypeToString naming convention
+#define EXPOSE_ENUM_FIELD_AUTO(Class, Var, UIName, EnumType, FIELD_OPTIONS) \
+		EXPOSE_ENUM_FIELD(Class, Var, UIName, EnumType, EnumType##ToString, FIELD_OPTIONS)
 }
 
 #endif

@@ -17,17 +17,18 @@ namespace gallus
 		namespace dx12
 		{
 			//---------------------------------------------------------------------
-			DX12ShaderBind::DX12ShaderBind() : resources::EngineResource()
+			bool DX12ShaderBind::LoadByName(const std::string& a_sName, const PixelShader* a_pPixelShader, const VertexShader* a_pVertexShader) 
 			{
-				m_AssetType = resources::AssetType::ShaderBind;
-			}
+				if (!EngineResource::LoadByName(a_sName))
+				{
+					return false;
+				}
 
-			//---------------------------------------------------------------------
-			DX12ShaderBind::DX12ShaderBind(const std::string& a_sName, const PixelShader* a_PixelShader, const VertexShader* a_VertexShader) : resources::EngineResource(a_sName),
-				m_pPixelShader(a_PixelShader),
-				m_pVertexShader(a_VertexShader)
-			{
+				m_pPixelShader = a_pPixelShader;
+				m_pVertexShader = a_pVertexShader;
 				m_AssetType = resources::AssetType::ShaderBind;
+
+				return true;
 			}
 
 			//---------------------------------------------------------------------
