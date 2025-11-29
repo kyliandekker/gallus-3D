@@ -24,7 +24,9 @@ namespace gallus
 			m_bIsDestroyable = true;
 			m_bIsLocked = false;
 			m_bIsUnique = false;
+#ifdef _EDITOR
 			m_bIsDirty = false;
+#endif
 
 			return true;
 		}

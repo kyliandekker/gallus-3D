@@ -162,6 +162,23 @@ namespace gallus
 				}
 				ImGui::SameLine();
 
+				bool isDelete = ImGui::IsKeyPressed(ImGuiKey_Delete);
+				bool isDuplicate = (ImGui::IsKeyPressed(ImGuiKey_D) && ImGui::IsKeyDown(ImGuiKey::ImGuiKey_LeftCtrl)) || (ImGui::IsKeyPressed(ImGuiKey_LeftCtrl) && ImGui::IsKeyDown(ImGuiKey::ImGuiKey_D));
+				if (isDelete || isDuplicate)
+				{
+					if (graphics::imgui::EntityEditorSelectable* ent = dynamic_cast<graphics::imgui::EntityEditorSelectable*>(core::EDITOR_ENGINE->GetEditor().GetSelectable().get()))
+					{
+						if (isDelete)
+						{
+							ent->OnDelete();
+						}
+						else if (isDuplicate)
+						{
+							// TODO: Duplicate functionality.
+						}
+					}
+				}
+
 				if (prefabMode)
 				{
 					ImGui::PopItemFlag();

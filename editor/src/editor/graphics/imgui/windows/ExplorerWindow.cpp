@@ -161,6 +161,18 @@ namespace gallus
 					m_bNeedsRefresh = false;
 				}
 
+				bool isDelete = ImGui::IsKeyPressed(ImGuiKey_Delete);
+				if (isDelete)
+				{
+					if (graphics::imgui::FileEditorSelectable* file = dynamic_cast<graphics::imgui::FileEditorSelectable*>(core::EDITOR_ENGINE->GetEditor().GetSelectable().get()))
+					{
+						if (file)
+						{
+							file->OnDelete();
+						}
+					}
+				}
+
 				ImVec2 toolbarSize = ImVec2(ImGui::GetContentRegionAvail().x, m_Window.GetHeaderSize().y);
 				ImGui::BeginToolbar(toolbarSize);
 
