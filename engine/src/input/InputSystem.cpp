@@ -73,7 +73,8 @@ namespace gallus
         }
 
         void InputSystem::Loop()
-        {}
+        {
+        }
 
         bool InputSystem::Sleep() const
         {

@@ -31,6 +31,10 @@ namespace gallus
 			class CommandList;
 		}
 	}
+	namespace animation
+	{
+		class AnimationTrack;
+	}
 	namespace gameplay
 	{
 		class Scene;
@@ -125,6 +129,11 @@ namespace gallus
 			std::shared_ptr<gameplay::Prefab> LoadPrefab(const std::string& a_sName);
 
 			/// <summary>
+			/// Loads an animation.
+			/// </summary>
+			std::shared_ptr<animation::AnimationTrack> LoadAnimationTrack(const std::string& a_sName);
+
+			/// <summary>
 			/// Checks whether a mesh with the given name is already loaded.
 			/// </summary>
 			bool HasMesh(const std::string& a_sName);
@@ -183,6 +192,11 @@ namespace gallus
 			/// Gets the list of loaded meshes.
 			/// </summary>
 			const std::vector<std::shared_ptr<graphics::dx12::Mesh>>& GetMeshes() const;
+
+			/// <summary>
+			/// Gets the list of loaded animations.
+			/// </summary>
+			const std::vector<std::shared_ptr<animation::AnimationTrack>>& GetAnimationTracks() const;
 
 //#ifdef _EDITOR
 			/// <summary>
@@ -248,6 +262,7 @@ namespace gallus
 			std::vector<std::shared_ptr<graphics::dx12::DX12ShaderBind>> m_aShaderBinds;
 			std::vector<std::shared_ptr<graphics::dx12::Mesh>> m_aMeshes;
 			std::vector<std::shared_ptr<gameplay::Prefab>> m_aPrefabs;
+			std::vector<std::shared_ptr<animation::AnimationTrack>> m_aAnimationTracks;
 
 //#ifdef _EDITOR
 			resources::FileResource m_ResourceFolder;

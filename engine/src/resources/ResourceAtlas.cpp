@@ -16,6 +16,8 @@
 #include "graphics/dx12/CommandList.h"
 #include "graphics/dx12/CommandQueue.h"
 
+#include "animation/AnimationTrack.h"
+
 // logger
 #include "logger/Logger.h"
 
@@ -280,20 +282,47 @@ namespace gallus
 		//---------------------------------------------------------------------
 		std::shared_ptr<gameplay::Prefab> ResourceAtlas::LoadPrefab(const std::string& a_sName)
 		{
-			resources::FileResource* fileResource = nullptr;
-			if (!GetResource(a_sName, fileResource))
-			{
-				LOG(LogSeverity::LOGSEVERITY_ERROR, "Could not find resource: \"%s\".", a_sName.c_str());
-				return nullptr;
-			}
-
-			std::shared_ptr<gameplay::Prefab> prefab = GetResource(m_aPrefabs, a_sName, fileResource->GetPath());
+			std::shared_ptr<gameplay::Prefab> prefab = GetResource(m_aPrefabs, a_sName, fs::path());
 			if (!prefab->IsValid())
 			{
-				fs::path prefabPath = fileResource->GetPath();
-				prefab->LoadByPath(prefabPath);
+				//#ifdef _EDITOR
+				resources::FileResource* fileResource = nullptr;
+				if (!GetResource(a_sName, fileResource))
+				{
+					LOG(LogSeverity::LOGSEVERITY_ERROR, "Could not find resource: \"%s\".", a_sName.c_str());
+					return nullptr;
+				}
+
+				fs::path vertexShaderPath = fileResource->GetPath().lexically_normal();
+				prefab->LoadByPath(vertexShaderPath);
+				//#else
+				// 
+				//#endif // _EDITOR
 			}
 			return prefab;
+		}
+
+		//---------------------------------------------------------------------
+		std::shared_ptr<animation::AnimationTrack> ResourceAtlas::LoadAnimationTrack(const std::string& a_sName)
+		{
+			std::shared_ptr<animation::AnimationTrack> animation = GetResource(m_aAnimationTracks, a_sName, fs::path());
+			if (!animation->IsValid())
+			{
+				//#ifdef _EDITOR
+				resources::FileResource* fileResource = nullptr;
+				if (!GetResource(a_sName, fileResource))
+				{
+					LOG(LogSeverity::LOGSEVERITY_ERROR, "Could not find resource: \"%s\".", a_sName.c_str());
+					return nullptr;
+				}
+
+				fs::path vertexShaderPath = fileResource->GetPath().lexically_normal();
+				animation->LoadByPath(vertexShaderPath);
+				//#else
+				// 
+				//#endif // _EDITOR
+			}
+			return animation;
 		}
 
 		//---------------------------------------------------------------------
@@ -366,6 +395,11 @@ namespace gallus
 		const std::vector<std::shared_ptr<graphics::dx12::Mesh>>& ResourceAtlas::GetMeshes() const
 		{
 			return m_aMeshes;
+		}
+
+		const std::vector<std::shared_ptr<animation::AnimationTrack>>& ResourceAtlas::GetAnimationTracks() const
+		{
+			return m_aAnimationTracks;
 		}
 	}
 }

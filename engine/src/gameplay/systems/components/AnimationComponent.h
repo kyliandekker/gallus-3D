@@ -76,10 +76,9 @@ namespace gallus
 				return m_sStartingAnimation;
 			}
 		private:
-			animation::AnimationTrack m_AnimationTrack;
+			animation::AnimationTrack* m_AnimationTrack = nullptr;
 			
 			std::string m_sStartingAnimation;
-			std::string m_sAnimName;
 
 			int m_iNextKeyFrameIndex = 0;
 			bool m_bIsLooping = false;

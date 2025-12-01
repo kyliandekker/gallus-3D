@@ -55,28 +55,34 @@ namespace gallus
 		//---------------------------------------------------------------------
 		void AnimationComponent::UpdateRealtime(float a_fDeltaTime, UpdateTime a_UpdateTime)
 		{
-			m_AnimationTrack.Update(m_EntityID, a_fDeltaTime);
+			if (!m_AnimationTrack)
+			{
+				return;
+			}
+			m_AnimationTrack->Update(m_EntityID, a_fDeltaTime);
 		}
 
 		//---------------------------------------------------------------------
 		void AnimationComponent::LoadAnimation(const std::string& a_sAnimName)
 		{
-			if (m_sAnimName == a_sAnimName)
+			if (m_AnimationTrack && m_AnimationTrack->GetName() == a_sAnimName)
 			{
 				return;
 			}
-			m_sAnimName = a_sAnimName;
 
-			resources::FileResource* fileResource = nullptr;
-			if (core::ENGINE->GetResourceAtlas().GetResource(m_sAnimName, fileResource))
-			{
-				fs::path animationTrack = fileResource->GetPath();
-				m_AnimationTrack.LoadByPath(animationTrack);
-			}
+			m_AnimationTrack = core::ENGINE->GetResourceAtlas().LoadAnimationTrack(a_sAnimName).get();
+			m_iNextKeyFrameIndex = 0;
+			m_fAccumulatedTime = 0.0f;
 		}
 
+		//---------------------------------------------------------------------
 		void AnimationComponent::UpdateRealtimeInner(float a_fDeltaTime, UpdateTime a_UpdateTime)
 		{
+			if (!m_AnimationTrack)
+			{
+				return;
+			}
+
 			if (!m_bIsPlaying)
 			{
 				return;
@@ -84,11 +90,10 @@ namespace gallus
 
 			m_fAccumulatedTime += a_fDeltaTime;
 
-
 			// Loop over keyframes that are due
-			while (m_iNextKeyFrameIndex < m_AnimationTrack.GetKeyFrames().size())
+			while (m_iNextKeyFrameIndex < m_AnimationTrack->GetKeyFrames().size())
 			{
-				animation::AnimationKeyFrame* keyFrame = m_AnimationTrack.GetKeyFrames()[m_iNextKeyFrameIndex];
+				animation::AnimationKeyFrame* keyFrame = m_AnimationTrack->GetKeyFrames()[m_iNextKeyFrameIndex];
 				int keyFrameNumber = keyFrame->GetFrame(); // actual frame number
 				float keyFrameTime = keyFrameNumber * FRAME_TIME;
 
@@ -104,11 +109,11 @@ namespace gallus
 			}
 
 			// Reset if animation is done
-			if (!m_AnimationTrack.GetKeyFrames().empty() && m_iNextKeyFrameIndex >= m_AnimationTrack.GetKeyFrames().size())
+			if (!m_AnimationTrack->GetKeyFrames().empty() && m_iNextKeyFrameIndex >= m_AnimationTrack->GetKeyFrames().size())
 			{
 				m_fAccumulatedTime = 0.0f;
 				m_iNextKeyFrameIndex = 0;
-				if (!m_AnimationTrack.IsLooping())
+				if (!m_AnimationTrack->IsLooping())
 				{
 					m_bIsPlaying = false;
 				}
