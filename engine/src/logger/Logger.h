@@ -2,6 +2,7 @@
 
 #include "core/System.h"
 
+// external
 #include <assert.h>
 #include <queue>
 #include <thread>
@@ -9,12 +10,13 @@
 #include <mutex>
 #include <chrono>
 
-// core includes
+// core
 #include "core/Event.h"
 
+// graphics
 #include "graphics/imgui/font_icon.h"
 
-// utils includes
+// utils
 #include "utils/file_abstractions.h"
 
 namespace gallus

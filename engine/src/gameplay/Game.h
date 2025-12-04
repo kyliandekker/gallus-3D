@@ -3,8 +3,11 @@
 // base class
 #include "core/System.h"
 
+// core
 #include "core/Observable.h"
 #include "core/Event.h"
+
+// graphics
 #include "graphics/dx12/FPSCounter.h"
 
 // gameplay

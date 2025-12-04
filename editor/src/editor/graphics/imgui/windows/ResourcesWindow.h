@@ -3,7 +3,6 @@
 
 #pragma once
 
-// base class
 #include "graphics/imgui/windows/BaseWindow.h"
 
 // external

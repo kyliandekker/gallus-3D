@@ -3,25 +3,28 @@
 
 #include "AnimationKeyFrameEditorSelectable.h"
 
+// external
 #include <typeindex>
 #include <unordered_map>
 #include <imgui/imgui_helpers.h>
 
-// core includes
-#include "editor/core/EditorEngine.h"
-
-// graphics includes
+// graphics
 #include "graphics/imgui/font_icon.h"
 
+// gameplay
+#include "animation/AnimationKeyFrame.h"
+#include "animation/AnimationTrack.h"
+
+// utils
+#include "utils/string_extensions.h"
+
+// gameplay
 #include "gameplay/Game.h"
 #include "gameplay/ECSBaseSystem.h"
 
+// editor
+#include "editor/core/EditorEngine.h"
 #include "editor/graphics/imgui/RenderEditorExposable.h"
-
-#include "utils/string_extensions.h"
-
-#include "animation/AnimationKeyFrame.h"
-#include "animation/AnimationTrack.h"
 
 namespace gallus
 {

@@ -1,9 +1,13 @@
 #pragma once
 
+// external
 #include <cstdint>
 #include <cstdio>
 
+// utils
 #include "utils/file_abstractions.h"
+
+// audio
 #include "audio/ChunkFilter.h"
 
 namespace gallus

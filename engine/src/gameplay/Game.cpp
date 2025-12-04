@@ -1,18 +1,17 @@
-﻿// header
-#include "Game.h"
+﻿#include "Game.h"
 
-// core includes
+// core
 #include "core/Engine.h"
 
-// graphics includes
+// graphics
 #include "graphics/dx12/CommandQueue.h"
 #include "graphics/dx12/CommandList.h"
 #include "graphics/dx12/Texture.h"
 
-// logger includes
+// logger
 #include "logger/Logger.h"
 
-// gameplay includes
+// gameplay
 #include "gameplay/systems/SpriteSystem.h"
 #include "gameplay/systems/TransformSystem.h"
 #include "gameplay/systems/PlayerSystem.h"

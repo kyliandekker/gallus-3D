@@ -1,11 +1,13 @@
 #include "animation/AnimationKeyFrameTagComponent.h"
 
+// graphics
 #include "graphics/dx12/Texture.h"
 #include "graphics/dx12/CommandQueue.h"
 
-#include "resources/SrcData.h"
-
 #include "graphics/imgui/font_icon.h"
+
+// resources
+#include "resources/SrcData.h"
 
 namespace gallus
 {

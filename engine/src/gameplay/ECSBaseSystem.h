@@ -2,19 +2,20 @@
 
 #include "core/System.h"
 
-// std::is_base_of
+// external
 #include <type_traits> 
 #include <map>
 #include <string>
 #include <vector>
 
-// core includes
+// core
 #include "core/Engine.h"
 #include "core/FlagEnum.h"
 
+// resources
 #include "resources/SrcData.h"
 
-// gameplay includes
+// gameplay
 #include "gameplay/EntityID.h"
 #include "gameplay/systems/components/Component.h"
 #include "gameplay/systems/UpdateTime.h"

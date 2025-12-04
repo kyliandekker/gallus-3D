@@ -5,12 +5,16 @@
 
 #include "graphics/imgui/modals/BaseModal.h"
 
+// external
 #include <string>
 #include <vector>
 #include <functional>
 #include <memory>
 
+// graphics
 #include "graphics/imgui/views/DataTypes/StringTextInput.h"
+
+// resources
 #include "resources/AssetType.h"
 
 namespace gallus
@@ -58,7 +62,7 @@ namespace gallus
 				/// <param name="a_FileTypes">The file types that should be shown in the modal.</param>
 				void SetData(const std::function<void(int, gallus::resources::FileResource&)>& a_Callback, const std::vector<gallus::resources::AssetType>& a_aFileTypes);
 			private:
-				std::shared_ptr<graphics::dx12::Texture> m_pPreviewTexture = nullptr;
+				std::weak_ptr<graphics::dx12::Texture> m_pPreviewTexture = {};
 
 				std::function<void(int, gallus::resources::FileResource&)> m_Callback = nullptr; /// The callback that gets called when choosing an option.
 

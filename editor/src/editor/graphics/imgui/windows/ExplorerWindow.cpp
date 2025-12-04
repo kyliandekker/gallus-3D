@@ -3,28 +3,30 @@
 
 #include "ExplorerWindow.h"
 
+// external
 #include <imgui/imgui_helpers.h>
 
-// utils includes
-#include "utils/string_extensions.h"
-#include "utils/file_abstractions.h"
-
-// graphics includes
+// graphics
 #include "graphics/dx12/CommandQueue.h"
 #include "graphics/dx12/CommandList.h"
 #include "graphics/dx12/Texture.h"
+
 #include "graphics/imgui/ImGuiWindow.h"
 #include "graphics/imgui/font_icon.h"
 
-// editor includes
-#include "editor/core/EditorEngine.h"
-#include "editor/graphics/imgui/selectables/FileEditorSelectable.h"
+// utils
+#include "utils/string_extensions.h"
+#include "utils/file_abstractions.h"
 
 // resources
 #include "resources/FileResource.h"
 
-// game includes
+// gameplay
 #include "gameplay/Game.h"
+
+// editor
+#include "editor/core/EditorEngine.h"
+#include "editor/graphics/imgui/selectables/FileEditorSelectable.h"
 
 namespace gallus
 {

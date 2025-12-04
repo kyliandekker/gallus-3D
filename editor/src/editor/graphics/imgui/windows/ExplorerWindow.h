@@ -5,20 +5,21 @@
 
 #include "graphics/imgui/windows/BaseWindow.h"
 
+// external
 #include <vector>
 #include <string>
 #include <memory>
 
-// core includes
+// core
 #include "core/Observable.h"
 
-// utils includes
-#include "utils/file_abstractions.h"
-
-// graphics includes
+// graphics
 #include "graphics/imgui/views/DataTypes/StringTextInput.h"
 
-// graphics includes
+// utils
+#include "utils/file_abstractions.h"
+
+// editor
 #include "editor/graphics/imgui/selectables/FileEditorSelectable.h"
 
 namespace gallus

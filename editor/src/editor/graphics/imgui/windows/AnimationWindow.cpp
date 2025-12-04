@@ -3,25 +3,27 @@
 
 #include "AnimationWindow.h"
 
+// external
 #include <imgui/imgui_helpers.h>
 #include <imgui/imgui_toggle.h>
 #include <imgui/imgui_internal.h>
 
-// utils includes
-#include "utils/string_extensions.h"
-
-// graphics includes
+// graphics
 #include "graphics/imgui/font_icon.h"
 #include "graphics/imgui/ImGuiWindow.h"
 
-// editor includes
-#include "editor/core/EditorEngine.h"
-
-// game includes
-#include "gameplay/Game.h"
-
+// animation
 #include "animation/AnimationKeyFrameSpriteComponent.h"
 #include "animation/AnimationKeyFrameEventComponent.h"
+
+// utils
+#include "utils/string_extensions.h"
+
+// gameplay
+#include "gameplay/Game.h"
+
+// editor
+#include "editor/core/EditorEngine.h"
 
 namespace gallus
 {

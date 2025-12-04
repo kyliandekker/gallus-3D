@@ -2,11 +2,16 @@
 
 #include "gameplay/systems/components/Component.h"
 
-#include "editor/EditorExpose.h"
-
+// external
 #include <map>
 
+// gameplay
 #include "gameplay/Prefab.h"
+
+#ifdef _EDITOR
+// editor
+#include "editor/EditorExpose.h"
+#endif
 
 namespace gallus
 {
@@ -50,24 +55,6 @@ namespace gallus
 			{
 				m_fSpeed = a_fSpeed;
 			}
-
-			/// <summary>
-			/// Retrieves the bullet prefab.
-			/// </summary>
-			/// <returns>Prefab containing the bullet.</returns>
-			gameplay::Prefab* GetBulletPrefab()
-			{
-				return m_pBulletPrefab;
-			}
-
-			/// <summary>
-			/// Retrieves the bullet prefab.
-			/// </summary>
-			/// <returns>Prefab containing the bullet.</returns>
-			const gameplay::Prefab* GetBulletPrefab() const
-			{
-				return m_pBulletPrefab;
-			}
 		protected:
 			/// <summary>
 			/// Updates the components.
@@ -76,7 +63,7 @@ namespace gallus
 			void UpdateRealtime(float a_fDeltaTime, UpdateTime a_UpdateTime);
 
 			float m_fSpeed = 200;
-			gameplay::Prefab* m_pBulletPrefab = nullptr;
+			std::weak_ptr<gameplay::Prefab> m_pBulletPrefab = {};
 
 #ifdef _EDITOR
 			BEGIN_EXPOSE_FIELDS_PARENT(PlayerComponent, Component)

@@ -1,5 +1,4 @@
-﻿// header
-#include "ResourceAtlas.h"
+﻿#include "ResourceAtlas.h"
 
 // external
 #include <algorithm>
@@ -8,7 +7,7 @@
 #include "core/Data.h"
 #include "core/ArgProcessor.h"
 
-// graphics includes
+// graphics
 #include "graphics/dx12/Texture.h"
 #include "graphics/dx12/Shader.h"
 #include "graphics/dx12/DX12ShaderBind.h"
@@ -16,6 +15,7 @@
 #include "graphics/dx12/CommandList.h"
 #include "graphics/dx12/CommandQueue.h"
 
+// animation
 #include "animation/AnimationTrack.h"
 
 // logger
@@ -126,7 +126,7 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		std::shared_ptr<graphics::dx12::Texture> ResourceAtlas::LoadTexture(const std::string& a_sName, std::shared_ptr<graphics::dx12::CommandQueue> a_pCommandQueue)
+		std::weak_ptr<graphics::dx12::Texture> ResourceAtlas::LoadTexture(const std::string& a_sName, std::shared_ptr<graphics::dx12::CommandQueue> a_pCommandQueue)
 		{
 			std::shared_ptr<graphics::dx12::Texture> texture = GetResource(m_aTextures, a_sName, fs::path());
 			if (!texture->IsValid())
@@ -136,7 +136,7 @@ namespace gallus
 				if (!GetResource(a_sName, fileResource))
 				{
 					LOG(LogSeverity::LOGSEVERITY_ERROR, "Could not find resource: \"%s\".", a_sName.c_str());
-					return nullptr;
+					return texture;
 				}
 
 				fs::path texturePath = fileResource->GetPath().lexically_normal();
@@ -149,7 +149,7 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		std::shared_ptr<graphics::dx12::Texture> ResourceAtlas::LoadTextureByDescription(const std::string& a_sName, D3D12_RESOURCE_DESC& a_Description)
+		std::weak_ptr<graphics::dx12::Texture> ResourceAtlas::LoadTextureByDescription(const std::string& a_sName, D3D12_RESOURCE_DESC& a_Description)
 		{
 			std::shared_ptr<graphics::dx12::Texture> texture = GetResource(m_aTextures, a_sName, fs::path());
 			if (!texture->IsValid())
@@ -160,7 +160,7 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		std::shared_ptr<graphics::dx12::Texture> ResourceAtlas::LoadTextureEmpty(const std::string& a_sName)
+		std::weak_ptr<graphics::dx12::Texture> ResourceAtlas::LoadTextureEmpty(const std::string& a_sName)
 		{
 			std::shared_ptr<graphics::dx12::Texture> texture = GetResource(m_aTextures, a_sName, fs::path());
 			return texture;
@@ -183,7 +183,7 @@ namespace gallus
 				if (!GetResource(a_sName, fileResource))
 				{
 					LOG(LogSeverity::LOGSEVERITY_ERROR, "Could not find resource: \"%s\".", a_sName.c_str());
-					return nullptr;
+					return shader;
 				}
 
 				fs::path pixelShaderPath = fileResource->GetPath().lexically_normal();
@@ -206,7 +206,7 @@ namespace gallus
 				if (!GetResource(a_sName, fileResource))
 				{
 					LOG(LogSeverity::LOGSEVERITY_ERROR, "Could not find resource: \"%s\".", a_sName.c_str());
-					return nullptr;
+					return shader;
 				}
 
 				fs::path vertexShaderPath = fileResource->GetPath().lexically_normal();
@@ -231,7 +231,7 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		std::shared_ptr<graphics::dx12::DX12ShaderBind> ResourceAtlas::LoadShaderBind(const std::string& a_sName, const graphics::dx12::PixelShader* a_PixelShader, const graphics::dx12::VertexShader* a_VertexShader)
+		std::weak_ptr<graphics::dx12::DX12ShaderBind> ResourceAtlas::LoadShaderBind(const std::string& a_sName, std::shared_ptr<graphics::dx12::PixelShader> a_PixelShader, std::shared_ptr<graphics::dx12::VertexShader> a_VertexShader)
 		{
 			for (std::shared_ptr<graphics::dx12::DX12ShaderBind>& shaderBind : m_aShaderBinds)
 			{
@@ -269,7 +269,7 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		std::shared_ptr<graphics::dx12::Mesh> ResourceAtlas::LoadMesh(const std::string& a_sName)
+		std::weak_ptr<graphics::dx12::Mesh> ResourceAtlas::LoadMesh(const std::string& a_sName)
 		{
 			std::shared_ptr<graphics::dx12::Mesh> mesh = GetResource(m_aMeshes, a_sName, fs::path());
 			if (!mesh->IsValid())
@@ -280,7 +280,7 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		std::shared_ptr<gameplay::Prefab> ResourceAtlas::LoadPrefab(const std::string& a_sName)
+		std::weak_ptr<gameplay::Prefab> ResourceAtlas::LoadPrefab(const std::string& a_sName)
 		{
 			std::shared_ptr<gameplay::Prefab> prefab = GetResource(m_aPrefabs, a_sName, fs::path());
 			if (!prefab->IsValid())
@@ -290,7 +290,7 @@ namespace gallus
 				if (!GetResource(a_sName, fileResource))
 				{
 					LOG(LogSeverity::LOGSEVERITY_ERROR, "Could not find resource: \"%s\".", a_sName.c_str());
-					return nullptr;
+					return prefab;
 				}
 
 				fs::path vertexShaderPath = fileResource->GetPath().lexically_normal();
@@ -303,7 +303,7 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		std::shared_ptr<animation::AnimationTrack> ResourceAtlas::LoadAnimationTrack(const std::string& a_sName)
+		std::weak_ptr<animation::AnimationTrack> ResourceAtlas::LoadAnimationTrack(const std::string& a_sName)
 		{
 			std::shared_ptr<animation::AnimationTrack> animation = GetResource(m_aAnimationTracks, a_sName, fs::path());
 			if (!animation->IsValid())
@@ -313,7 +313,7 @@ namespace gallus
 				if (!GetResource(a_sName, fileResource))
 				{
 					LOG(LogSeverity::LOGSEVERITY_ERROR, "Could not find resource: \"%s\".", a_sName.c_str());
-					return nullptr;
+					return animation;
 				}
 
 				fs::path vertexShaderPath = fileResource->GetPath().lexically_normal();
@@ -332,37 +332,37 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		std::shared_ptr<graphics::dx12::PixelShader> ResourceAtlas::GetDefaultPixelShader()
+		std::weak_ptr<graphics::dx12::PixelShader> ResourceAtlas::GetDefaultPixelShader()
 		{
 			return m_aPixelShaders[MISSING];
 		}
 
 		//---------------------------------------------------------------------
-		std::shared_ptr<graphics::dx12::VertexShader> ResourceAtlas::GetDefaultVertexShader()
+		std::weak_ptr<graphics::dx12::VertexShader> ResourceAtlas::GetDefaultVertexShader()
 		{
 			return m_aVertexShaders[MISSING];
 		}
 
 		//---------------------------------------------------------------------
-		std::shared_ptr<graphics::dx12::DX12ShaderBind> ResourceAtlas::GetDefaultShaderBind()
+		std::weak_ptr<graphics::dx12::DX12ShaderBind> ResourceAtlas::GetDefaultShaderBind()
 		{
 			return m_aShaderBinds[MISSING];
 		}
 
 		//---------------------------------------------------------------------
-		std::shared_ptr<graphics::dx12::DX12ShaderBind> ResourceAtlas::GetRenderTexShaderBind()
+		std::weak_ptr<graphics::dx12::DX12ShaderBind> ResourceAtlas::GetRenderTexShaderBind()
 		{
 			return m_aShaderBinds[RENDER_TEX];
 		}
 
 		//---------------------------------------------------------------------
-		std::shared_ptr<graphics::dx12::Texture> ResourceAtlas::GetDefaultTexture()
+		std::weak_ptr<graphics::dx12::Texture> ResourceAtlas::GetDefaultTexture()
 		{
 			return m_aTextures[MISSING + 1];
 		}
 
 		//---------------------------------------------------------------------
-		std::shared_ptr<graphics::dx12::Mesh> ResourceAtlas::GetDefaultMesh()
+		std::weak_ptr<graphics::dx12::Mesh> ResourceAtlas::GetDefaultMesh()
 		{
 			return m_aMeshes[MISSING];
 		}

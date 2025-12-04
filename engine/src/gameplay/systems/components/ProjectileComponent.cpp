@@ -1,11 +1,15 @@
-#include "gameplay/systems/components/ProjectileComponent.h"
+#include "ProjectileComponent.h"
 
+// external
 #include <rapidjson/utils.h>
 
+// core
 #include "core/Engine.h"
 
+// resources
 #include "resources/SrcData.h"
 
+// gameplay
 #include "gameplay/systems/CollisionSystem.h"
 #include "gameplay/systems/HealthSystem.h"
 #include "gameplay/systems/TransformSystem.h"
@@ -28,11 +32,11 @@ namespace gallus
 
 			a_Document.AddMember(JSON_PROJECTILE_COMPONENT_DAMAGE_VAR, m_fDamage, a_Allocator);
 
-			if (m_ExplosionPrefab)
+			if (auto explosionPrefab = m_ExplosionPrefab.lock())
 			{
 				a_Document.AddMember(
 					JSON_PROJECTILE_COMPONENT_EXPLOSION_VAR,
-					rapidjson::Value(m_ExplosionPrefab->GetPath().filename().generic_string().c_str(), a_Allocator),
+					rapidjson::Value(explosionPrefab->GetPath().filename().generic_string().c_str(), a_Allocator),
 					a_Allocator
 				);
 			}
@@ -46,7 +50,7 @@ namespace gallus
 			std::string explosionPrefabName = a_SrcData.GetString(JSON_PROJECTILE_COMPONENT_EXPLOSION_VAR);
 			if (!explosionPrefabName.empty())
 			{
-				m_ExplosionPrefab = core::ENGINE->GetResourceAtlas().LoadPrefab(explosionPrefabName).get();
+				m_ExplosionPrefab = core::ENGINE->GetResourceAtlas().LoadPrefab(explosionPrefabName);
 			}
 		}
 
@@ -69,9 +73,9 @@ namespace gallus
 						healthComponent.SetHealth(healthComponent.GetHealth() - m_fDamage);
 					}
 
-					if (m_ExplosionPrefab)
+					if (auto explosionPrefab = m_ExplosionPrefab.lock())
 					{
-						gameplay::EntityID id = m_ExplosionPrefab->Instantiate();
+						gameplay::EntityID id = explosionPrefab->Instantiate();
 
 						TransformSystem& transformSys = core::ENGINE->GetECS().GetSystem<TransformSystem>();
 						const DirectX::XMFLOAT2& pos = transformSys.GetComponent(m_EntityID).Transform().GetPosition();

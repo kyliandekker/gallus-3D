@@ -1,11 +1,12 @@
-﻿#include "gameplay/systems/components/SpriteComponent.h"
+﻿#include "SpriteComponent.h"
 
+// external
 #include <rapidjson/utils.h>
 
-// core includes
+// core
 #include "core/Engine.h"
 
-// graphics includes
+// graphics
 #include "graphics/dx12/Texture.h"
 #include "graphics/dx12/Mesh.h"
 #include "graphics/dx12/DX12ShaderBind.h"
@@ -14,9 +15,10 @@
 #include "graphics/dx12/CommandList.h"
 #include "graphics/dx12/CommandQueue.h"
 
+// resources
 #include "resources/SrcData.h"
 
-// gameplay includes
+// gameplay
 #include "gameplay/systems/TransformSystem.h"
 
 #define JSON_SPRITE_COMPONENT_TEX_VAR "texture"
@@ -44,26 +46,26 @@ namespace gallus
 		{
 			Component::Init(a_EntityID);
 
-			m_pShaderBind = core::ENGINE->GetResourceAtlas().GetDefaultShaderBind().get();
-			m_pTexture = core::ENGINE->GetResourceAtlas().GetDefaultTexture().get();
-			m_pMesh = core::ENGINE->GetResourceAtlas().GetDefaultMesh().get();
+			m_pShaderBind = core::ENGINE->GetResourceAtlas().GetDefaultShaderBind();
+			m_pTexture = core::ENGINE->GetResourceAtlas().GetDefaultTexture();
+			m_pMesh = core::ENGINE->GetResourceAtlas().GetDefaultMesh();
 			m_vColor = { 1, 1, 1, 1 };
 		}
 
 		//---------------------------------------------------------------------
-		void SpriteComponent::SetMesh(graphics::dx12::Mesh* a_pMesh)
+		void SpriteComponent::SetMesh(std::weak_ptr<graphics::dx12::Mesh> a_pMesh)
 		{
 			m_pMesh = a_pMesh;
 		}
 
 		//---------------------------------------------------------------------
-		void SpriteComponent::SetShader(graphics::dx12::DX12ShaderBind* a_pShaderBind)
+		void SpriteComponent::SetShader(std::weak_ptr<graphics::dx12::DX12ShaderBind> a_pShaderBind)
 		{
 			m_pShaderBind = a_pShaderBind;
 		}
 
 		//---------------------------------------------------------------------
-		void SpriteComponent::SetTexture(graphics::dx12::Texture* a_pTexture)
+		void SpriteComponent::SetTexture(std::weak_ptr<graphics::dx12::Texture> a_pTexture)
 		{
 			m_pTexture = a_pTexture;
 		}
@@ -150,6 +152,7 @@ namespace gallus
 			}
 			DirectX::XMMATRIX mvpMatrix = transform.GetWorldMatrixWithPivot() * viewMatrix * projectionMatrix;
 
+			// TODO: Culling
 			//if (!CheckVisibility(transform, a_Camera))
 			//{
 			//	return;
@@ -168,24 +171,28 @@ namespace gallus
 			float colorData[4] = { m_vColor.x, m_vColor.y, m_vColor.z, m_vColor.w };
 			a_pCommandList->GetCommandList()->SetGraphicsRoot32BitConstants(graphics::dx12::RootParameters::SPRITE_COLOR, 4, colorData, 0);
 
-			if (m_pTexture && m_pTexture->CanBeDrawn())
+			if (auto tex = m_pTexture.lock())
 			{
-				m_pTexture->Bind(a_pCommandList, m_iSpriteIndex);
+				if (tex->CanBeDrawn())
+				{
+					tex->Bind(a_pCommandList, m_iSpriteIndex);
+				}
 			}
 
-			if (m_pShaderBind && m_pShaderBind->IsValid())
+			if (auto shaderBind = m_pShaderBind.lock())
 			{
-				m_pShaderBind->Bind(a_pCommandList);
+				if (shaderBind->IsValid())
+				{
+					shaderBind->Bind(a_pCommandList);
+				}
 			}
 
-			if (m_pMesh && m_pMesh->IsValid())
+			if (auto mesh = m_pMesh.lock())
 			{
-				m_pMesh->Render(a_pCommandList, mvpMatrix);
-			}
-
-			if (m_pTexture && m_pTexture->IsValid())
-			{
-				m_pTexture->Unbind(a_pCommandList);
+				if (mesh->IsValid())
+				{
+					mesh->Render(a_pCommandList, mvpMatrix);
+				}
 			}
 		}
 
@@ -199,13 +206,16 @@ namespace gallus
 			}
 
 			{
-				a_Document.AddMember(JSON_SPRITE_COMPONENT_TEX_VAR, rapidjson::Value().SetObject(), a_Allocator);
-				std::string tex = m_pTexture->GetName();
-				a_Document[JSON_SPRITE_COMPONENT_TEX_VAR].AddMember(
-					JSON_SPRITE_COMPONENT_TEX_NAME_VAR,
-					rapidjson::Value(tex.c_str(), a_Allocator),
-					a_Allocator
-				);
+				if (auto tex = m_pTexture.lock())
+				{
+					a_Document.AddMember(JSON_SPRITE_COMPONENT_TEX_VAR, rapidjson::Value().SetObject(), a_Allocator);
+					std::string texName = tex->GetName();
+					a_Document[JSON_SPRITE_COMPONENT_TEX_VAR].AddMember(
+						JSON_SPRITE_COMPONENT_TEX_NAME_VAR,
+						rapidjson::Value(texName.c_str(), a_Allocator),
+						a_Allocator
+					);
+				}
 				a_Document[JSON_SPRITE_COMPONENT_TEX_VAR].AddMember(
 					JSON_SPRITE_COMPONENT_TEX_SPRITE_INDEX_VAR,
 					m_iSpriteIndex,
@@ -215,26 +225,38 @@ namespace gallus
 
 			a_Document.AddMember(JSON_SPRITE_COMPONENT_SHADER_VAR, rapidjson::Value().SetObject(), a_Allocator);
 
-			std::string pixelShader = m_pShaderBind->GetPixelShader()->GetName();
-			a_Document[JSON_SPRITE_COMPONENT_SHADER_VAR].AddMember(
-				JSON_SPRITE_COMPONENT_SHADER_PIXEL_VAR,
-				rapidjson::Value(pixelShader.c_str(), a_Allocator),
-				a_Allocator
-			);
+			if (auto shaderBind = m_pShaderBind.lock())
+			{
+				if (auto pixelShader = shaderBind->GetPixelShader().lock())
+				{
+					std::string pixelShaderName = pixelShader->GetName();
+					a_Document[JSON_SPRITE_COMPONENT_SHADER_VAR].AddMember(
+						JSON_SPRITE_COMPONENT_SHADER_PIXEL_VAR,
+						rapidjson::Value(pixelShaderName.c_str(), a_Allocator),
+						a_Allocator
+					);
+				}
+				
+				if (auto vertexShader = shaderBind->GetVertexShader().lock())
+				{
+					std::string vertexShaderName = vertexShader->GetName();
+					a_Document[JSON_SPRITE_COMPONENT_SHADER_VAR].AddMember(
+						JSON_SPRITE_COMPONENT_SHADER_VERTEX_VAR,
+						rapidjson::Value(vertexShaderName.c_str(), a_Allocator),
+						a_Allocator
+					);
+				}
+			}
 
-			std::string vertexShader = m_pShaderBind->GetVertexShader()->GetName();
-			a_Document[JSON_SPRITE_COMPONENT_SHADER_VAR].AddMember(
-				JSON_SPRITE_COMPONENT_SHADER_VERTEX_VAR,
-				rapidjson::Value(vertexShader.c_str(), a_Allocator),
-				a_Allocator
-			);
-
-			std::string mesh = m_pMesh->GetName();
-			a_Document.AddMember(
-				JSON_SPRITE_COMPONENT_MESH_VAR,
-				rapidjson::Value(mesh.c_str(), a_Allocator),
-				a_Allocator
-			);
+			if (auto mesh = m_pMesh.lock())
+			{
+				std::string meshName = mesh->GetName();
+				a_Document.AddMember(
+					JSON_SPRITE_COMPONENT_MESH_VAR,
+					rapidjson::Value(meshName.c_str(), a_Allocator),
+					a_Allocator
+				);
+			}
 
 			{
 				rapidjson::Document colorDoc;
@@ -266,19 +288,19 @@ namespace gallus
 			std::shared_ptr<graphics::dx12::CommandQueue> cCommandQueue = core::ENGINE->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
 			if (!mesh.empty())
 			{
-				SetMesh(core::ENGINE->GetResourceAtlas().LoadMesh(mesh).get());
+				SetMesh(core::ENGINE->GetResourceAtlas().LoadMesh(mesh));
 			}
 			if (!tex.empty())
 			{
-				SetTexture(core::ENGINE->GetResourceAtlas().LoadTexture(tex, cCommandQueue).get());
+				SetTexture(core::ENGINE->GetResourceAtlas().LoadTexture(tex, cCommandQueue));
 			}
 			if (!vertexShader.empty() && !pixelShader.empty())
 			{
 				SetShader(core::ENGINE->GetResourceAtlas().LoadShaderBind(
 					pixelShader,
-					core::ENGINE->GetResourceAtlas().LoadPixelShader(pixelShader).get(),
-					core::ENGINE->GetResourceAtlas().LoadVertexShader(vertexShader).get()
-				).get());
+					core::ENGINE->GetResourceAtlas().LoadPixelShader(pixelShader),
+					core::ENGINE->GetResourceAtlas().LoadVertexShader(vertexShader)
+				));
 			}
 			cCommandQueue->Flush();
 		}
@@ -290,9 +312,9 @@ namespace gallus
 		void SpriteComponent::SetSpriteIndex(int8_t a_iSpriteIndex)
 		{
 			size_t numSpriteRects = 0;
-			if (m_pTexture)
+			if (auto tex = m_pTexture.lock())
 			{
-				numSpriteRects = m_pTexture->GetSpriteRectsSize() - 1;
+				numSpriteRects = tex->GetSpriteRectsSize() - 1;
 			}
 			if (a_iSpriteIndex < 0)
 			{

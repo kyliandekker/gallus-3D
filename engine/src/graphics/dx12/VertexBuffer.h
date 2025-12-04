@@ -2,6 +2,7 @@
 
 #include "graphics/dx12/Buffer.h"
 
+// external
 #include <string>
 
 namespace gallus
@@ -49,7 +50,6 @@ namespace gallus
 				size_t m_iVertexStride = 0;
 
 				D3D12_VERTEX_BUFFER_VIEW m_VertexBufferView;
-
 #ifdef _EDITOR
 				BEGIN_EXPOSE_FIELDS_PARENT(VertexBuffer, Buffer)
 				END_EXPOSE_FIELDS(VertexBuffer)

@@ -2,11 +2,14 @@
 
 #include "resources/EngineResource.h"
 
+// external
 #include <map>
 #include <set>
 
+// animation
 #include "animation/AnimationKeyFrame.h"
 
+// utils
 #include "utils/FILEPCH.h"
 
 namespace gallus

@@ -1,6 +1,5 @@
 #pragma once
 
-// base class
 #include "gameplay/Scene.h"
 
 // gameplay
@@ -50,7 +49,7 @@ namespace gallus
 			/// <summary>
 			/// Returns a copy of the current prefab data.
 			/// </summary>
-			/// <returns>A <see cref="core::Data"/> object representing the prefab’s data.</returns>
+			/// <returns>A <see cref="core::Data"/> object representing the prefabï¿½s data.</returns>
 			virtual const core::Data GetSceneData() const override;
 #endif
 

@@ -2,7 +2,7 @@
 
 #include "gameplay/ECSBaseSystem.h"
 
-// gameplay includes
+// gameplay
 #include "gameplay/systems/components/HealthComponent.h"
 
 namespace gallus

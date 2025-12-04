@@ -1,14 +1,17 @@
 #include "animation/AnimationKeyFrameEventComponent.h"
 
+// graphics
 #include "graphics/dx12/Texture.h"
 #include "graphics/dx12/CommandQueue.h"
 
-#include "resources/SrcData.h"
+#include "graphics/imgui/font_icon.h"
 
+// animation
 #include "animation/AnimationKeyFrame.h"
 #include "animation/AnimationTrack.h"
 
-#include "graphics/imgui/font_icon.h"
+// resources
+#include "resources/SrcData.h"
 
 namespace gallus
 {

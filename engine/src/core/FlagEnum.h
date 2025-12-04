@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+// external
 #include <type_traits>
 
 namespace gallus

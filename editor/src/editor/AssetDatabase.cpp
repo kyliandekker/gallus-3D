@@ -1,4 +1,3 @@
-// header
 #include "AssetDatabase.h"
 
 // core

@@ -1,11 +1,13 @@
 #include "graphics/win32/Window.h"
 
+// external
 #include <iostream>
-
-// logger includes
-#include "logger/Logger.h"
-
+#ifndef IMGUI_DISABLE
 #include <imgui/imgui.h>
+#endif
+
+// logger
+#include "logger/Logger.h"
 
 namespace gallus
 {

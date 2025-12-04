@@ -1,11 +1,15 @@
 #include "Editor.h"
 
+// external
 #include <iostream>
 
+// graphics
 #include "graphics/dx12/DX12System2D.h"
 
+// logger
 #include "logger/Logger.h"
 
+// editor
 #include "editor/graphics/imgui/EditorSelectable.h"
 
 namespace gallus

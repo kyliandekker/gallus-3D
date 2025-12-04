@@ -1,0 +1,12 @@
+Key frame should deserialize inside class instead of animation track
+Animation track should be shared with others ✓
+Key frame components are fucking hardcoded now
+Top bar for new scene, etc ✓
+Tooltip hovers ✓
+Debug shapes
+Input fix ✓
+Weak ptrs for everything instead of raw ptrs ✓
+Scene sys needs refactor because it is awful and illogical ✓
+Whole engine resource needs refactor because it is a mess ✓ 
+Path loading only needs to be editor based ✓
+Sprite modal is awful

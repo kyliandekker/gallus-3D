@@ -5,9 +5,16 @@
 
 #include "graphics/imgui/windows/BaseWindow.h"
 
+// graphics
 #include "graphics/imgui/views/DataTypes/StringTextInput.h"
-#include "resources/AssetType.h"
+
+// animation
 #include "animation/AnimationTrack.h"
+
+// resources
+#include "resources/AssetType.h"
+
+// editor
 #include "editor/graphics/imgui/selectables/AnimationKeyFrameEditorSelectable.h"
 
 namespace gallus

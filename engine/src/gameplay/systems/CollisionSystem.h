@@ -2,13 +2,15 @@
 
 #include "gameplay/ECSBaseSystem.h"
 
+// external
 #include <vector>
 #include <map>
 #include <set>
 
+// core
 #include "core/Event.h"
 
-// gameplay includes
+// gameplay
 #include "gameplay/systems/components/ColliderComponent.h"
 
 namespace gallus

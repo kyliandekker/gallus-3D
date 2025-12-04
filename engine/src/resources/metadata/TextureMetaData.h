@@ -2,8 +2,10 @@
 
 #include "MetaData.h"
 
+// external
 #include <vector>
 
+// graphics
 #include "graphics/dx12/Texture.h"
 
 namespace gallus

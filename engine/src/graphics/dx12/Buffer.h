@@ -3,6 +3,7 @@
 #include "graphics/dx12/DX12PCH.h"
 #include "graphics/dx12/DX12Resource.h"
 
+// external
 #include <string>
 
 namespace gallus

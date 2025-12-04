@@ -2,10 +2,13 @@
 
 #ifdef _EDITOR
 
+// external
 #include <string>
 #include <vector>
 #include <functional>
 #include <cstddef>
+
+// resources
 #include "resources/AssetType.h"
 
 namespace gallus
@@ -45,6 +48,7 @@ namespace gallus
 		std::function<std::string(int)> enumToStringFunc; // returns string name for index
 		std::string description;
 		bool disabled = false;
+		bool internal = false;
 
 		size_t relatedIndexFieldOffset = 0;
 	};

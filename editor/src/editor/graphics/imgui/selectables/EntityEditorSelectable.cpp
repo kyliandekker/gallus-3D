@@ -3,22 +3,22 @@
 
 #include "EntityEditorSelectable.h"
 
+// external
 #include <imgui/imgui_helpers.h>
 
-// utils includes
-#include "utils/string_extensions.h"
-
-// graphics includes
+// graphics
 #include "graphics/imgui/font_icon.h"
 
-// editor includes
-#include "editor/core/EditorEngine.h"
+// utils
+#include "utils/string_extensions.h"
 
-// gameplay includes
+// gameplay
 #include "gameplay/Game.h"
-
 #include "gameplay/ECSBaseSystem.h"
-#include <editor/graphics/imgui/RenderEditorExposable.h>
+
+// editor
+#include "editor/core/EditorEngine.h"
+#include "editor/graphics/imgui/RenderEditorExposable.h"
 
 namespace gallus
 {

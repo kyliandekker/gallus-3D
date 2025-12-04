@@ -2,10 +2,13 @@
 
 #include "gameplay/systems/components/Component.h"
 
-#include "editor/EditorExpose.h"
-
-// graphics includes
+// graphics
 #include "graphics/dx12/DX12Transform.h"
+
+#ifdef _EDITOR
+// editor
+#include "editor/EditorExpose.h"
+#endif
 
 namespace gallus
 {

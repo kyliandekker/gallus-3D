@@ -1,21 +1,29 @@
 #include "AnimationTrack.h"
 
+// external
 #include <rapidjson/document.h>
 #include <rapidjson/utils.h>
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/prettywriter.h>
 #include <algorithm>
 
-#include "utils/file_abstractions.h"
-#include "logger/Logger.h"
-#include "core/DataStream.h"
-#include "resources/SrcData.h"
-
-#include "AnimationKeyFrameSpriteComponent.h"
-#include "AnimationKeyFrameEventComponent.h"
-#include "AnimationKeyFrameSoundComponent.h"
-
+// core
 #include "core/Engine.h"
+#include "core/DataStream.h"
+
+// animation
+#include "animation/AnimationKeyFrameSpriteComponent.h"
+#include "animation/AnimationKeyFrameEventComponent.h"
+#include "animation/AnimationKeyFrameSoundComponent.h"
+
+// logger
+#include "logger/Logger.h"
+
+// utils
+#include "utils/file_abstractions.h"
+
+// resources
+#include "resources/SrcData.h"
 
 #define ANIMATION_TRACK_FRAME_COUNT_VAR "frameCount"
 #define ANIMATION_TRACK_LOOP_VAR "loop"

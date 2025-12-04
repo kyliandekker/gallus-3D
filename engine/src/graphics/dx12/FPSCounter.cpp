@@ -1,11 +1,13 @@
 #include "FPSCounter.h"
+
+// external
 #include <thread>
 
 namespace gallus
 {
 	namespace graphics
 	{
-	void FPSCounter::Update()
+		void FPSCounter::Update()
         {
 			clock::time_point current = clock::now();
 			std::chrono::duration<double> elapsed = current - m_tPrevious;

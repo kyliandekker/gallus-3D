@@ -2,8 +2,13 @@
 
 #include "graphics/imgui/views/ImGuiUIView.h"
 
+// external
+#include <memory>
+
+// graphics
 #include "graphics/imgui/views/DataTypes/StringDropdown.h"
 
+// audio
 #include "audio/ChunkCollection.h"
 
 namespace gallus
@@ -104,7 +109,7 @@ namespace gallus
 
 				void Render(FileEditorSelectable& a_FileEditorSelectable) override;
 			protected:
-				graphics::dx12::Texture* m_pTexture = nullptr;
+				std::weak_ptr<graphics::dx12::Texture> m_pTexture = {};
 				StringDropdown<graphics::dx12::TextureType> m_TextureTypeDropdown; /// Drop down UI element for selecting asset types.
 			};
 

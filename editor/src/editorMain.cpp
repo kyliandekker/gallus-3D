@@ -3,23 +3,20 @@
 #include <filesystem>
 #include <ShellScalingApi.h>
 
-// core includes
+// core
 #include "resource.h"
 #include "core/ArgProcessor.h"
 
-// logger includes
+// logger
 #include "logger/Logger.h"
 
-// utils includes
+// utils
 #include "utils/file_abstractions.h"
 
-// graphics includes
-#include "graphics/imgui/windows/MainWindowDock.h"
-
-// gameplay includes
+// gameplay
 #include "gameplay/Game.h"
 
-// editor includes
+// editor
 #include "editor/core/EditorEngine.h"
 #include "editor/graphics/imgui/EditorWindowsConfig.h"
 

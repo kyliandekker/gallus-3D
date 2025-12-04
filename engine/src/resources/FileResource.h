@@ -1,6 +1,6 @@
 #pragma once
 
-//#ifdef _EDITOR
+#ifdef _LOAD_BY_PATH
 
 // external
 #include <vector>
@@ -8,12 +8,12 @@
 #include <rapidjson/document.h>
 #include <unordered_map>
 
+// utils
+#include "utils/FILEPCH.h"
+
 // resources
 #include "resources/AssetType.h"
 #include "resources/metadata/MetaData.h"
-
-// utils includes
-#include "utils/FILEPCH.h"
 
 namespace gallus
 {
@@ -175,4 +175,4 @@ namespace gallus
 	}
 }
 
-//#endif // _EDITOR
+#endif // _LOAD_BY_PATH

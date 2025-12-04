@@ -1,6 +1,5 @@
 #pragma once
 
-// base class
 #include "resources/EngineResource.h"
 
 // external

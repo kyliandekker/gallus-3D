@@ -2,11 +2,16 @@
 
 #include "gameplay/systems/components/Component.h"
 
-#include "editor/EditorExpose.h"
-
-#include "gameplay/Prefab.h"
-
+// external
 #include <DirectXMath.h>
+
+#ifdef _EDITOR
+// editor
+#include "editor/EditorExpose.h"
+#endif
+
+// gameplay
+#include "gameplay/Prefab.h"
 
 namespace gallus
 {
@@ -65,7 +70,7 @@ namespace gallus
 			DirectX::XMFLOAT2 m_vVelocity = {};
 			float m_fDamage;
 			
-			gameplay::Prefab* m_ExplosionPrefab = nullptr;
+			std::weak_ptr<gameplay::Prefab> m_ExplosionPrefab = {};
 
 #ifdef _EDITOR
 			BEGIN_EXPOSE_FIELDS_PARENT(ProjectileComponent, Component)

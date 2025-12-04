@@ -1,20 +1,23 @@
-#include <cstring>
+#include "WaveReader.h"
 
+// external
+#include <cstring>
 #include <functional>
 
-// core includes
+// core
 #include "core/DataStream.h"
 
-#include "utils/file_abstractions.h"
+// audio
+#include "audio/WaveChunks.h"
+#include "audio/ChunkCollection.h"
+#include "audio/ChunkFilter.h"
+#include "audio/WAVE_READER_RESULT.h"
 
-// logger includes
+// logger
 #include "logger/Logger.h"
 
-#include "WaveReader.h"
-#include "WaveChunks.h"
-#include "ChunkCollection.h"
-#include "ChunkFilter.h"
-#include "WAVE_READER_RESULT.h"
+// utils
+#include "utils/file_abstractions.h"
 
 namespace gallus
 {

@@ -1,9 +1,10 @@
 #include "DataStream.h"
 
+// external
 #include <vcruntime_string.h>
 
-// core includes
-#include "Memory.h"
+// core
+#include "core/Memory.h"
 
 namespace gallus
 {

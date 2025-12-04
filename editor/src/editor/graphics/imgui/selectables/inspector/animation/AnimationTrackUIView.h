@@ -2,12 +2,12 @@
 
 #include "graphics/imgui/views/ImGuiUIView.h"
 
+// external
+#include <vector>
+
+// animation
 #include "animation/AnimationTrack.h"
 #include "animation/AnimationKeyFrame.h"
-
-//#include "editor/graphics/imgui/views/AnimationKeyFrameUIView.h"
-
-#include <vector>
 
 constexpr float ANIMATION_FRAME_PIXEL_WIDTH_DEFAULT = 25.0f;
 inline float ANIMATION_FRAME_PIXEL_WIDTH = 25.0f;

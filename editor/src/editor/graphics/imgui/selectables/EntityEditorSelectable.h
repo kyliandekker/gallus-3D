@@ -5,10 +5,11 @@
 
 #include "graphics/imgui/views/ImGuiUIView.h"
 
+// external
 #include <string>
 #include <map>
 
-// editor includes
+// editor
 #include "editor/graphics/imgui/EditorSelectable.h"
 
 namespace gallus

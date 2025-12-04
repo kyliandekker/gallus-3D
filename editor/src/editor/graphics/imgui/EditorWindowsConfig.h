@@ -2,6 +2,7 @@
 
 #include "graphics/imgui/ImGuiWindowsConfig.h"
 
+// editor
 #include "editor/graphics/imgui/windows/EditorWindowDock.h"
 #include "editor/graphics/imgui/windows/ResourcesWindow.h"
 #include "editor/graphics/imgui/windows/ConsoleWindow.h"

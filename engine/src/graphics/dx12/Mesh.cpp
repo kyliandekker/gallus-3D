@@ -1,24 +1,25 @@
 #include "graphics/dx12/Mesh.h"
 
+// external
 #include <stb_image.h>
 #include <filesystem>
 #include <format>
 
-// core includes
+// core
 #include "core/Engine.h"
 #include "core/DataStream.h"
 
-// logger includes
-#include "logger/Logger.h"
-
-// utils includes
-#include "utils/file_abstractions.h"
-
-// graphics includes
+// graphics
 #include "graphics/dx12/Texture.h"
 #include "graphics/dx12/Shader.h"
 #include "graphics/dx12/CommandList.h"
 #include "graphics/dx12/CommandQueue.h"
+
+// logger
+#include "logger/Logger.h"
+
+// utils
+#include "utils/file_abstractions.h"
 
 namespace gallus
 {

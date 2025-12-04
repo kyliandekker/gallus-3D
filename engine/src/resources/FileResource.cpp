@@ -1,4 +1,4 @@
-//#ifdef _EDITOR
+#ifdef _LOAD_BY_PATH
 
 // header
 #include "FileResource.h"
@@ -220,4 +220,4 @@ namespace gallus
 	}
 }
 
-//#endif // _EDITOR
+#endif // _LOAD_BY_PATH

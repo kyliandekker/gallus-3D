@@ -1,9 +1,12 @@
 ﻿#pragma once
 
+// external
 #include <string>
 
 #ifdef _EDITOR
 #include <imgui/imgui.h>
+
+// graphics
 #include "graphics/imgui/font_icon.h"
 #include "graphics/imgui/ImGuiWindow.h"
 #endif

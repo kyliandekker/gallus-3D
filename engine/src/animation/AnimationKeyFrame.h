@@ -1,13 +1,16 @@
 ﻿#pragma once
 
+// external
 #include <vector>
 #ifdef _EDITOR
 #include <rapidjson/document.h>
 #endif
 
-#include "gameplay/EntityID.h"
-
+// animation
 #include "animation/AnimationKeyFrameComponentBase.h"
+
+// gameplay
+#include "gameplay/EntityID.h"
 
 namespace gallus
 {

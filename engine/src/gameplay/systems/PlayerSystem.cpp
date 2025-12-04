@@ -1,10 +1,10 @@
-#include "gameplay/systems/PlayerSystem.h"
+#include "PlayerSystem.h"
 
-// logger includes
-#include "logger/Logger.h"
-
-// graphics includes
+// graphics
 #include "graphics/imgui/font_icon.h"
+
+// logger
+#include "logger/Logger.h"
 
 namespace gallus
 {

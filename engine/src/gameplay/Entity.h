@@ -1,8 +1,9 @@
 #pragma once
 
+// external
 #include <string>
 
-// gameplay includes
+// gameplay
 #include "gameplay/EntityID.h"
 
 namespace gallus
@@ -34,7 +35,7 @@ namespace gallus
 			{}
 
 			/// <summary>
-			/// Gets a reference to the entity’s unique identifier.
+			/// Gets a reference to the entityï¿½s unique identifier.
 			/// </summary>
 			/// <returns>Reference to the entity ID.</returns>
 			EntityID& GetEntityID()
@@ -43,7 +44,7 @@ namespace gallus
 			}
 
 			/// <summary>
-			/// Gets a constant reference to the entity’s unique identifier.
+			/// Gets a constant reference to the entityï¿½s unique identifier.
 			/// </summary>
 			/// <returns>Constant reference to the entity ID.</returns>
 			const EntityID& GetEntityID() const

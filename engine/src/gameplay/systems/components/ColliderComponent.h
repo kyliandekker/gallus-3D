@@ -2,11 +2,15 @@
 
 #include "gameplay/systems/components/Component.h"
 
-#include "editor/EditorExpose.h"
-
+// external
 #include <DirectXMath.h>
 #include <array>
 #include <set>
+
+#ifdef _EDITOR
+// editor
+#include "editor/EditorExpose.h"
+#endif
 
 namespace gallus
 {

@@ -1,17 +1,16 @@
 #pragma once
 
-// base class
 #include "core/System.h"
 
 // external
 #include <vector>
 #include <memory>
 
-// resources
-#include "resources/FileResource.h"
-
 // utils
 #include "utils/FILEPCH.h"
+
+// resources
+#include "resources/FileResource.h"
 
 struct D3D12_RESOURCE_DESC;
 
@@ -71,17 +70,17 @@ namespace gallus
 			/// <summary>
 			/// Loads a texture by name from the resource folder.
 			/// </summary>
-			std::shared_ptr<graphics::dx12::Texture> LoadTexture(const std::string& a_sName, std::shared_ptr<graphics::dx12::CommandQueue> a_pCommandQueue = nullptr);
+			std::weak_ptr<graphics::dx12::Texture> LoadTexture(const std::string& a_sName, std::shared_ptr<graphics::dx12::CommandQueue> a_pCommandQueue = nullptr);
 
 			/// <summary>
 			/// Loads a texture using a provided Direct3D resource description.
 			/// </summary>
-			std::shared_ptr<graphics::dx12::Texture> LoadTextureByDescription(const std::string& a_sName, D3D12_RESOURCE_DESC& a_Description);
+			std::weak_ptr<graphics::dx12::Texture> LoadTextureByDescription(const std::string& a_sName, D3D12_RESOURCE_DESC& a_Description);
 
 			/// <summary>
 			/// Creates an empty texture resource with the given name.
 			/// </summary>
-			std::shared_ptr<graphics::dx12::Texture> LoadTextureEmpty(const std::string& a_sName);
+			std::weak_ptr<graphics::dx12::Texture> LoadTextureEmpty(const std::string& a_sName);
 
 			/// <summary>
 			/// Checks whether a texture with the given name is already loaded.
@@ -111,7 +110,7 @@ namespace gallus
 			/// <summary>
 			/// Loads a shader bind.
 			/// </summary>
-			std::shared_ptr<graphics::dx12::DX12ShaderBind> LoadShaderBind(const std::string& a_sName, const graphics::dx12::PixelShader* a_PixelShader, const graphics::dx12::VertexShader* a_VertexShader);
+			std::weak_ptr<graphics::dx12::DX12ShaderBind> LoadShaderBind(const std::string& a_sName, std::shared_ptr<graphics::dx12::PixelShader> a_PixelShader, std::shared_ptr<graphics::dx12::VertexShader> a_VertexShader);
 
 			/// <summary>
 			/// Loads a scene.
@@ -121,17 +120,17 @@ namespace gallus
 			/// <summary>
 			/// Loads a mesh by name from the resource folder.
 			/// </summary>
-			std::shared_ptr<graphics::dx12::Mesh> LoadMesh(const std::string& a_sName);
+			std::weak_ptr<graphics::dx12::Mesh> LoadMesh(const std::string& a_sName);
 
 			/// <summary>
 			/// Loads a prefab.
 			/// </summary>
-			std::shared_ptr<gameplay::Prefab> LoadPrefab(const std::string& a_sName);
+			std::weak_ptr<gameplay::Prefab> LoadPrefab(const std::string& a_sName);
 
 			/// <summary>
 			/// Loads an animation.
 			/// </summary>
-			std::shared_ptr<animation::AnimationTrack> LoadAnimationTrack(const std::string& a_sName);
+			std::weak_ptr<animation::AnimationTrack> LoadAnimationTrack(const std::string& a_sName);
 
 			/// <summary>
 			/// Checks whether a mesh with the given name is already loaded.
@@ -141,32 +140,32 @@ namespace gallus
 			/// <summary>
 			/// Retrieves the default pixel shader (used as fallback).
 			/// </summary>
-			std::shared_ptr<graphics::dx12::PixelShader> GetDefaultPixelShader();
+			std::weak_ptr<graphics::dx12::PixelShader> GetDefaultPixelShader();
 
 			/// <summary>
 			/// Retrieves the default vertex shader (used as fallback).
 			/// </summary>
-			std::shared_ptr<graphics::dx12::VertexShader> GetDefaultVertexShader();
+			std::weak_ptr<graphics::dx12::VertexShader> GetDefaultVertexShader();
 
 			/// <summary>
 			/// Retrieves the default shader bind (used as fallback).
 			/// </summary>
-			std::shared_ptr<graphics::dx12::DX12ShaderBind> GetDefaultShaderBind();
+			std::weak_ptr<graphics::dx12::DX12ShaderBind> GetDefaultShaderBind();
 
 			/// <summary>
 			/// Retrieves the default shader bind (used as fallback).
 			/// </summary>
-			std::shared_ptr<graphics::dx12::DX12ShaderBind> GetRenderTexShaderBind();
+			std::weak_ptr<graphics::dx12::DX12ShaderBind> GetRenderTexShaderBind();
 
 			/// <summary>
 			/// Retrieves the default texture (used as fallback).
 			/// </summary>
-			std::shared_ptr<graphics::dx12::Texture> GetDefaultTexture();
+			std::weak_ptr<graphics::dx12::Texture> GetDefaultTexture();
 
 			/// <summary>
 			/// Retrieves the default mesh (used as fallback).
 			/// </summary>
-			std::shared_ptr<graphics::dx12::Mesh> GetDefaultMesh();
+			std::weak_ptr<graphics::dx12::Mesh> GetDefaultMesh();
 
 			/// <summary>
 			/// Gets the list of loaded textures.

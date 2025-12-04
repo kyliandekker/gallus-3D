@@ -1,11 +1,12 @@
 #pragma once
 
+// external
 #include <rapidjson/document.h>
 
-// utils includes
+// utils
 #include "utils/file_abstractions.h"
 
-// resources includes
+// resources
 #include "resources/AssetType.h"
 
 namespace gallus

@@ -1,5 +1,6 @@
-#include "graphics/dx12/IndexBuffer.h"
+#include "IndexBuffer.h"
 
+// external
 #include <cassert>
 
 namespace gallus

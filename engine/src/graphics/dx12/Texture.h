@@ -3,13 +3,14 @@
 #include "graphics/dx12/DX12PCH.h"
 #include "graphics/dx12/DX12Resource.h"
 
+// external
 #include <wrl.h>
 #include <string>
 #include <memory>
 #include <cstdint>
 #include <glm/vec2.hpp>
 
-// utils includes
+// utils
 #include "utils/file_abstractions.h"
 
 namespace gallus
@@ -162,12 +163,6 @@ namespace gallus
 				/// <param name="a_pCommandList">The command list that will be used.</param>
 				/// <param name="a_iSpriteIndex">The sprite index that is used in the sprite sheet (optional).</param>
 				void Bind(std::shared_ptr<CommandList> a_pCommandList, int8_t a_iSpriteIndex);
-
-				/// <summary>
-				/// Unbinds the texture from the pipeline.
-				/// </summary>
-				/// <param name="a_pCommandList">The command list that will be used.</param>
-				void Unbind(std::shared_ptr<CommandList> a_pCommandList);
 
 				/// <summary>
 				/// Retrieves the GPU handle of the SRV.

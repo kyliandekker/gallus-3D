@@ -3,6 +3,7 @@
 #include "graphics/dx12/DX12PCH.h"
 #include "resources/EngineResource.h"
 
+// external
 #include <wrl.h>
 #include <memory>
 
@@ -30,7 +31,7 @@ namespace gallus
 				/// <summary>
 				/// Constructs a shader resource.
 				/// </summary>
-				bool LoadByName(const std::string& a_sName, const PixelShader* a_pPixelShader, const VertexShader* a_pVertexShader);
+				bool LoadByName(const std::string& a_sName, std::shared_ptr<PixelShader> a_pPixelShader, std::shared_ptr<VertexShader> a_pVertexShader);
 
 				/// <summary>
 				/// Creates the pipe line state.
@@ -64,31 +65,31 @@ namespace gallus
 				/// <summary>
 				/// Checks the resource has a given pixel shader.
 				/// </summary>
-				/// <param name="a_PixelShader">The pixel shader to check.</param>
+				/// <param name="a_pPixelShader">The pixel shader to check.</param>
 				/// <returns>True if the resource has a pixel shader, false otherwise.</returns>
-				bool HasPixelShader(const PixelShader* a_PixelShader);
+				bool HasPixelShader(std::weak_ptr<PixelShader> a_pPixelShader);
 
 				/// <summary>
 				/// Checks the resource has a given vertex shader.
 				/// </summary>
-				/// <param name="a_PixelShader">The vertex shader to check.</param>
+				/// <param name="a_pVertexShader">The vertex shader to check.</param>
 				/// <returns>True if the resource has a vertex shader, false otherwise.</returns>
-				bool HasVertexShader(const VertexShader* a_VertexShader);
+				bool HasVertexShader(std::weak_ptr<VertexShader> a_pVertexShader);
 
 				/// <summary>
 				/// Returns the pixel shader used in the shader bind.
 				/// </summary>
 				/// <returns>Pointer to the pixel shader (can be nullptr).</returns>
-				const PixelShader* GetPixelShader();
+				const std::weak_ptr<PixelShader> GetPixelShader();
 
 				/// <summary>
 				/// Returns the vertex shader used in the shader bind.
 				/// </summary>
 				/// <returns>Pointer to the vertex shader (can be nullptr).</returns>
-				const VertexShader* GetVertexShader();
+				const std::weak_ptr<VertexShader> GetVertexShader();
 			private:
-				const PixelShader* m_pPixelShader = nullptr;
-				const VertexShader* m_pVertexShader = nullptr;
+				std::shared_ptr<PixelShader> m_pPixelShader = {};
+				std::shared_ptr<VertexShader> m_pVertexShader = {};
 
 				Microsoft::WRL::ComPtr<ID3D12PipelineState> m_pPipelineState = nullptr;
 

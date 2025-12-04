@@ -1,4 +1,3 @@
-// header
 #include "string_extensions.h"
 
 // external

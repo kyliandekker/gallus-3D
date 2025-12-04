@@ -2,7 +2,6 @@
 
 #ifdef _EDITOR
 
-// base class
 #include "core/System.h"
 
 // external

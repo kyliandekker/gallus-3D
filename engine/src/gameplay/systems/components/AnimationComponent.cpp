@@ -1,9 +1,15 @@
-#include "gameplay/systems/components/AnimationComponent.h"
+#include "AnimationComponent.h"
 
+// external
 #include <rapidjson/utils.h>
 
+// core
 #include "core/Engine.h"
 
+// animation
+#include "animation/AnimationTrack.h"
+
+// resources
 #include "resources/SrcData.h"
 
 #define JSON_ANIMATION_COMPONENT_START_ANIMATION_VAR "startingAnimation"
@@ -55,22 +61,26 @@ namespace gallus
 		//---------------------------------------------------------------------
 		void AnimationComponent::UpdateRealtime(float a_fDeltaTime, UpdateTime a_UpdateTime)
 		{
-			if (!m_AnimationTrack)
+			auto animationTrack = m_AnimationTrack.lock();
+			if (!animationTrack)
 			{
 				return;
 			}
-			m_AnimationTrack->Update(m_EntityID, a_fDeltaTime);
+			animationTrack->Update(m_EntityID, a_fDeltaTime);
 		}
 
 		//---------------------------------------------------------------------
 		void AnimationComponent::LoadAnimation(const std::string& a_sAnimName)
 		{
-			if (m_AnimationTrack && m_AnimationTrack->GetName() == a_sAnimName)
+			if (auto animationTrack = m_AnimationTrack.lock())
 			{
-				return;
+				if (animationTrack->GetName() == a_sAnimName)
+				{
+					return;
+				}
 			}
 
-			m_AnimationTrack = core::ENGINE->GetResourceAtlas().LoadAnimationTrack(a_sAnimName).get();
+			m_AnimationTrack = core::ENGINE->GetResourceAtlas().LoadAnimationTrack(a_sAnimName);
 			m_iNextKeyFrameIndex = 0;
 			m_fAccumulatedTime = 0.0f;
 		}
@@ -78,7 +88,8 @@ namespace gallus
 		//---------------------------------------------------------------------
 		void AnimationComponent::UpdateRealtimeInner(float a_fDeltaTime, UpdateTime a_UpdateTime)
 		{
-			if (!m_AnimationTrack)
+			auto animationTrack = m_AnimationTrack.lock();
+			if (!animationTrack)
 			{
 				return;
 			}
@@ -91,9 +102,9 @@ namespace gallus
 			m_fAccumulatedTime += a_fDeltaTime;
 
 			// Loop over keyframes that are due
-			while (m_iNextKeyFrameIndex < m_AnimationTrack->GetKeyFrames().size())
+			while (m_iNextKeyFrameIndex < animationTrack->GetKeyFrames().size())
 			{
-				animation::AnimationKeyFrame* keyFrame = m_AnimationTrack->GetKeyFrames()[m_iNextKeyFrameIndex];
+				animation::AnimationKeyFrame* keyFrame = animationTrack->GetKeyFrames()[m_iNextKeyFrameIndex];
 				int keyFrameNumber = keyFrame->GetFrame(); // actual frame number
 				float keyFrameTime = keyFrameNumber * FRAME_TIME;
 
@@ -109,11 +120,11 @@ namespace gallus
 			}
 
 			// Reset if animation is done
-			if (!m_AnimationTrack->GetKeyFrames().empty() && m_iNextKeyFrameIndex >= m_AnimationTrack->GetKeyFrames().size())
+			if (!animationTrack->GetKeyFrames().empty() && m_iNextKeyFrameIndex >= animationTrack->GetKeyFrames().size())
 			{
 				m_fAccumulatedTime = 0.0f;
 				m_iNextKeyFrameIndex = 0;
-				if (!m_AnimationTrack->IsLooping())
+				if (!animationTrack->IsLooping())
 				{
 					m_bIsPlaying = false;
 				}

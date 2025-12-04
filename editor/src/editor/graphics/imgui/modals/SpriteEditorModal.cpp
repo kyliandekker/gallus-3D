@@ -3,28 +3,32 @@
 
 #include "SpriteEditorModal.h"
 
+// external
 #include <imgui/imgui.h>
 #include <imgui/imgui_helpers.h>
 #include <imgui/imgui_internal.h>
 #include <algorithm>
 
-// core includes
+// core
 #include "editor/core/EditorEngine.h"
 
-// utils includes
-#include "utils/string_extensions.h"
-
-// graphics includes
-#include "graphics/imgui/font_icon.h"
-#include "graphics/imgui/ImGuiWindow.h"
+// graphics
 #include "graphics/dx12/CommandQueue.h"
 #include "graphics/dx12/CommandList.h"
 #include "graphics/dx12/Texture.h"
 
-// graphics includes
+#include "graphics/imgui/font_icon.h"
+#include "graphics/imgui/ImGuiWindow.h"
+
+// utils
+#include "utils/string_extensions.h"
+
+// resources
 #include "resources/FileResource.h"
-#include "editor/graphics/imgui/selectables/FileEditorSelectable.h"
 #include "resources/metadata/TextureMetaData.h"
+
+// editor
+#include "editor/graphics/imgui/selectables/FileEditorSelectable.h"
 
 namespace gallus
 {
@@ -41,7 +45,10 @@ namespace gallus
 			{
 				auto cCommandQueue = core::EDITOR_ENGINE->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
 				m_pPreviewTexture = core::EDITOR_ENGINE->GetResourceAtlas().LoadTexture(a_sName, cCommandQueue);
-				m_pPreviewTexture->SetResourceCategory(gallus::resources::EngineResourceCategory::Editor);
+				if (auto tex = m_pPreviewTexture.lock())
+				{
+					tex->SetResourceCategory(gallus::resources::EngineResourceCategory::Editor);
+				}
 			}
 
 			//---------------------------------------------------------------------
@@ -52,18 +59,24 @@ namespace gallus
 					return;
 				}
 
-				if (!m_pPreviewTexture || !m_pPreviewTexture->IsValid())
+				auto tex = m_pPreviewTexture.lock();
+				if (!tex)
 				{
 					return;
 				}
 
-				RenderToolbar();
+				if (!tex->IsValid())
+				{
+					return;
+				}
+
+				RenderToolbar(tex);
 
 				ImGui::Separator();
 
 				ImVec2 textureSize(
-					static_cast<float>(m_pPreviewTexture->GetSize().x),
-					static_cast<float>(m_pPreviewTexture->GetSize().y)
+					static_cast<float>(tex->GetSize().x),
+					static_cast<float>(tex->GetSize().y)
 				);
 
 				ImVec2 windowSize = ImGui::GetContentRegionAvail();
@@ -76,14 +89,14 @@ namespace gallus
 				ImVec2 mouseScreen = ImGui::GetIO().MousePos;
 				ImVec2 mouseLocal = mouseScreen - childPos;
 
-				HandleGlobalControls(windowSize);
+				HandleGlobalControls(windowSize, tex);
 
 				// --- Draw texture ---
 				ImVec2 imagePos = m_vPanOffset;
 				ImVec2 imageSize(textureSize.x * m_fZoom, textureSize.y * m_fZoom);
 
 				ImGui::SetCursorPos(imagePos);
-				ImGui::Image((ImTextureID) m_pPreviewTexture->GetGPUHandle().ptr, imageSize);
+				ImGui::Image((ImTextureID) tex->GetGPUHandle().ptr, imageSize);
 
 				ImVec2 imgMin = ImGui::GetItemRectMin(); // screen coords
 				ImVec2 imgMax = ImGui::GetItemRectMax();
@@ -91,26 +104,26 @@ namespace gallus
 
 				dl->AddRect(imgMin, imgMax, IM_COL32(255, 255, 255, 255), 0, 0, 2.0f);
 
-				bool handledRect = InteractWithRect(imgMin, imgMax);
+				bool handledRect = InteractWithRect(imgMin, imgMax, tex);
 				for (size_t i = 0; i < m_pTextureMetaData->GetSprites().size(); i++)
 				{
 					RenderRect((int8_t) i, imgMin, imgMax);
 					if (!handledRect)
 					{
-						HandleRectSelection((int8_t) i, imgMin, imgMax);
+						HandleRectSelection((int8_t) i, imgMin, imgMax, tex);
 					}
 				}
-				DrawRectInteraction(imgMin, imgMax);
+				DrawRectInteraction(imgMin, imgMax, tex);
 
 				ImGui::EndChild();
 			}
 
 			//---------------------------------------------------------------------
-			void SpriteEditorModal::RenderToolbar()
+			void SpriteEditorModal::RenderToolbar(std::shared_ptr<graphics::dx12::Texture> a_pTexture)
 			{
-				RenderFloatingToolbar();
+				RenderFloatingToolbar(a_pTexture);
 
-				glm::ivec2 textureSize = m_pPreviewTexture->GetSize();
+				glm::ivec2 textureSize = a_pTexture->GetSize();
 
 				if (ImGui::BeginChild("SpriteToolbar", ImVec2(0, m_Window.GetHeaderSize().y * 2.75f)))
 				{
@@ -121,7 +134,10 @@ namespace gallus
 
 						if (core::EDITOR_ENGINE->GetResourceAtlas().HasTexture(m_pFileResource->GetPath().filename().generic_string()))
 						{
-							core::EDITOR_ENGINE->GetResourceAtlas().LoadTexture(m_pFileResource->GetPath().filename().generic_string())->LoadMetaData();
+							if (auto tex = core::EDITOR_ENGINE->GetResourceAtlas().LoadTexture(m_pFileResource->GetPath().filename().generic_string()).lock())
+							{
+								tex->LoadMetaData();
+							}
 						}
 					}
 					ImGui::SameLine();
@@ -172,15 +188,15 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			void SpriteEditorModal::HandleGlobalControls(const ImVec2& a_vWindowSize)
+			void SpriteEditorModal::HandleGlobalControls(const ImVec2& a_vWindowSize, std::shared_ptr<graphics::dx12::Texture> a_pTexture)
 			{
 				ImVec2 childPos = ImGui::GetCursorScreenPos();
 				ImVec2 mouseScreen = ImGui::GetIO().MousePos;
 				ImVec2 mouseLocal = mouseScreen - childPos;
 
 				ImVec2 textureSize(
-					static_cast<float>(m_pPreviewTexture->GetSize().x),
-					static_cast<float>(m_pPreviewTexture->GetSize().y)
+					static_cast<float>(a_pTexture->GetSize().x),
+					static_cast<float>(a_pTexture->GetSize().y)
 				);
 
 				// --- ZOOM ---
@@ -244,7 +260,7 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			void SpriteEditorModal::HandleRectSelection(int8_t a_iIndex, const ImVec2& a_vImgMin, const ImVec2& a_vImgMax)
+			void SpriteEditorModal::HandleRectSelection(int8_t a_iIndex, const ImVec2& a_vImgMin, const ImVec2& a_vImgMax, std::shared_ptr<graphics::dx12::Texture> a_pTexture)
 			{
 				if (a_iIndex == -1 || a_iIndex >= m_pTextureMetaData->GetSprites().size())
 				{
@@ -252,8 +268,8 @@ namespace gallus
 				}
 
 				ImVec2 textureSize(
-					static_cast<float>(m_pPreviewTexture->GetSize().x),
-					static_cast<float>(m_pPreviewTexture->GetSize().y)
+					static_cast<float>(a_pTexture->GetSize().x),
+					static_cast<float>(a_pTexture->GetSize().y)
 				);
 
 				graphics::dx12::SpriteRect& r = m_pTextureMetaData->GetSprites()[a_iIndex];
@@ -299,7 +315,7 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			bool SpriteEditorModal::InteractWithRect(const ImVec2& a_vImgMin, const ImVec2& a_vImgMax)
+			bool SpriteEditorModal::InteractWithRect(const ImVec2& a_vImgMin, const ImVec2& a_vImgMax, std::shared_ptr<graphics::dx12::Texture> a_pTexture)
 			{
 				if (m_iCurrentSprite == -1 || m_iCurrentSprite >= m_pTextureMetaData->GetSprites().size())
 				{
@@ -307,8 +323,8 @@ namespace gallus
 				}
 
 				ImVec2 textureSize(
-					static_cast<float>(m_pPreviewTexture->GetSize().x),
-					static_cast<float>(m_pPreviewTexture->GetSize().y)
+					static_cast<float>(a_pTexture->GetSize().x),
+					static_cast<float>(a_pTexture->GetSize().y)
 				);
 
 				graphics::dx12::SpriteRect& r = m_pTextureMetaData->GetSprites()[m_iCurrentSprite];
@@ -439,7 +455,7 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			void SpriteEditorModal::DrawRectInteraction(const ImVec2& a_vImgMin, const ImVec2& a_vImgMax)
+			void SpriteEditorModal::DrawRectInteraction(const ImVec2& a_vImgMin, const ImVec2& a_vImgMax, std::shared_ptr<graphics::dx12::Texture> a_pTexture)
 			{
 				if (m_iCurrentSprite == -1 || m_iCurrentSprite >= m_pTextureMetaData->GetSprites().size())
 				{
@@ -447,8 +463,8 @@ namespace gallus
 				}
 
 				ImVec2 textureSize(
-					static_cast<float>(m_pPreviewTexture->GetSize().x),
-					static_cast<float>(m_pPreviewTexture->GetSize().y)
+					static_cast<float>(a_pTexture->GetSize().x),
+					static_cast<float>(a_pTexture->GetSize().y)
 				);
 
 				graphics::dx12::SpriteRect& r = m_pTextureMetaData->GetSprites()[m_iCurrentSprite];
@@ -496,7 +512,7 @@ namespace gallus
 
 			//---------------------------------------------------------------------
 			ImVec2 m_vFloatingPanelPos = ImVec2(50, 50);
-			void SpriteEditorModal::RenderFloatingToolbar()
+			void SpriteEditorModal::RenderFloatingToolbar(std::shared_ptr<graphics::dx12::Texture> a_pTexture)
 			{
 				if (m_iCurrentSprite == -1 || m_iCurrentSprite >= m_pTextureMetaData->GetSprites().size())
 				{
@@ -504,7 +520,7 @@ namespace gallus
 				}
 
 				graphics::dx12::SpriteRect& spriteUV = m_pTextureMetaData->GetSprites()[m_iCurrentSprite];
-				glm::ivec2 textureSize = m_pPreviewTexture->GetSize();
+				glm::ivec2 textureSize = a_pTexture->GetSize();
 
 				ImGui::SetNextWindowPos(m_vFloatingPanelPos, ImGuiCond_FirstUseEver);
 				ImGui::SetNextWindowBgAlpha(0.9f);

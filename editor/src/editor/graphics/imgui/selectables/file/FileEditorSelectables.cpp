@@ -1,26 +1,31 @@
 ﻿#include "editor/graphics/imgui/selectables/file/FileEditorSelectables.h"
 
+// external
 #include <imgui/imgui.h>
 #include <imgui/imgui_helpers.h>
 
+// graphics
+#include "graphics/dx12/Texture.h"
+
 #include "graphics/imgui/ImGuiWindow.h"
 
-#include "editor/graphics/imgui/EditorWindowsConfig.h"
-#include "resources/FileResource.h"
-
-#include "editor/core/EditorEngine.h"
-
-#include "gameplay/Game.h"
-
-// audio includes
+// audio
 #include "audio/WaveReader.h"
 #include "audio/ChunkCollection.h"
 #include "audio/WaveChunks.h"
 #include "audio/ChunkFilter.h"
 #include "audio/AudioUtils.h"
 
-#include "graphics/dx12/Texture.h"
+// resources
 #include "resources/metadata/TextureMetaData.h"
+#include "resources/FileResource.h"
+
+// gameplay
+#include "gameplay/Game.h"
+
+// editor
+#include "editor/graphics/imgui/EditorWindowsConfig.h"
+#include "editor/core/EditorEngine.h"
 
 namespace gallus
 {
@@ -129,8 +134,11 @@ namespace gallus
 				);
 
 				auto cCommandQueue = core::EDITOR_ENGINE->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
-				m_pTexture = core::EDITOR_ENGINE->GetResourceAtlas().LoadTexture(a_FileEditorSelectable.GetFileResource().GetPath().filename().generic_string(), cCommandQueue).get();
-				m_pTexture->SetResourceCategory(gallus::resources::EngineResourceCategory::Editor);
+				m_pTexture = core::EDITOR_ENGINE->GetResourceAtlas().LoadTexture(a_FileEditorSelectable.GetFileResource().GetPath().filename().generic_string(), cCommandQueue);
+				if (auto tex = m_pTexture.lock())
+				{
+					tex->SetResourceCategory(gallus::resources::EngineResourceCategory::Editor);
+				}
 			}
 
 			int GetFormatChannelCount(DXGI_FORMAT format)
@@ -199,38 +207,38 @@ namespace gallus
 				ImGui::StartInspectorKeyVal(ImGui::IMGUI_FORMAT_ID("", TABLE_ID, "SPRITE_EXPLORER_ITEM_TABLE_INSPECTOR"), m_Window.GetFramePadding());
 
 				resources::TextureMetaData* metaData = a_FileEditorSelectable.GetFileResource().GetMetaData<resources::TextureMetaData>();
-				if (m_pTexture)
+				if (auto tex = m_pTexture.lock())
 				{
 					ImGui::KeyValue([this]
-						{
-							ImGui::AlignTextToFramePadding();
-							ImGui::DisplayHeader(m_Window.GetBoldFont(), "Width: ");
-						},
-						[this]
-						{
-							ImGui::Text(std::to_string(m_pTexture->GetResourceDesc().Width).c_str());
-							return false;
-						});
+					{
+						ImGui::AlignTextToFramePadding();
+						ImGui::DisplayHeader(m_Window.GetBoldFont(), "Width: ");
+					},
+						[this, tex]
+					{
+						ImGui::Text(std::to_string(tex->GetResourceDesc().Width).c_str());
+						return false;
+					});
 					ImGui::KeyValue([this]
-						{
-							ImGui::AlignTextToFramePadding();
-							ImGui::DisplayHeader(m_Window.GetBoldFont(), "Height: ");
-						},
-						[this]
-						{
-							ImGui::Text(std::to_string(m_pTexture->GetResourceDesc().Height).c_str());
-							return false;
-						});
+					{
+						ImGui::AlignTextToFramePadding();
+						ImGui::DisplayHeader(m_Window.GetBoldFont(), "Height: ");
+					},
+						[this, tex]
+					{
+						ImGui::Text(std::to_string(tex->GetResourceDesc().Height).c_str());
+						return false;
+					});
 					ImGui::KeyValue([this]
-						{
-							ImGui::AlignTextToFramePadding();
-							ImGui::DisplayHeader(m_Window.GetBoldFont(), "Channels: ");
-						},
-						[this]
-						{
-							ImGui::Text(std::to_string(GetFormatChannelCount(m_pTexture->GetResourceDesc().Format)).c_str());
-							return false;
-						});
+					{
+						ImGui::AlignTextToFramePadding();
+						ImGui::DisplayHeader(m_Window.GetBoldFont(), "Channels: ");
+					},
+						[this, tex]
+					{
+						ImGui::Text(std::to_string(GetFormatChannelCount(tex->GetResourceDesc().Format)).c_str());
+						return false;
+					});
 				}
 				ImGui::KeyValue([this]
 					{
@@ -294,8 +302,9 @@ namespace gallus
 							a_FileEditorSelectable.GetFileResource().GetMetaData()->SetAssetType(m_AssetTypeDropdown.GetValue());
 							a_FileEditorSelectable.SetIcon();
 							a_FileEditorSelectable.GetFileResource().GetMetaData()->Save(a_FileEditorSelectable.GetFileResource().GetPath());
-							return false;
+							return true;
 						}
+						return false;
 					});
 
 				audio::FMT_Chunk fmt_chunk;

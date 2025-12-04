@@ -5,12 +5,16 @@
 
 #include "graphics/imgui/windows/BaseWindow.h"
 
+// external
 #include <vector>
 #include <mutex>
 #include <map>
 
-#include "logger/Logger.h"
+// graphics
 #include "graphics/imgui/views/DataTypes/StringTextInput.h"
+
+// logger
+#include "logger/Logger.h"
 
 namespace gallus
 {

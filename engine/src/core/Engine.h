@@ -2,21 +2,23 @@
 
 #include "System.h"
 
+// external
 #include <wtypes.h>
 
-// core includes
-#include "resources/ResourceAtlas.h"
-
-// utils includes
-#include "utils/file_abstractions.h"
-
-// graphics includes
+// graphics
 #include "graphics/dx12/DX12System2D.h"
 #include "graphics/win32/Window.h"
 
+// input
 #include "input/InputSystem.h"
 
-// gameplay includes
+// utils
+#include "utils/file_abstractions.h"
+
+// resources
+#include "resources/ResourceAtlas.h"
+
+// gameplay
 #include "gameplay/EntityComponentSystem.h"
 
 namespace gallus

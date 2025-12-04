@@ -4,10 +4,11 @@
 
 #include "graphics/imgui/views/ImGuiUIView.h"
 
+// external
 #include <string>
 #include <imgui/imgui.h>
 
-// core includes
+// core
 #include "core/Data.h"
 
 namespace gallus

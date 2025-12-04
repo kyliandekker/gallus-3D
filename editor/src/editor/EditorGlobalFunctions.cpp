@@ -1,5 +1,6 @@
 #include "EditorGlobalFunctions.h"
 
+// editor
 #include "editor/core/EditorEngine.h"
 
 namespace gallus

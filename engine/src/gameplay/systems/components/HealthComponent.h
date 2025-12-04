@@ -2,7 +2,10 @@
 
 #include "gameplay/systems/components/Component.h"
 
+// editor
+#ifdef _EDITOR
 #include "editor/EditorExpose.h"
+#endif
 
 namespace gallus
 {

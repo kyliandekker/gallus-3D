@@ -3,13 +3,18 @@
 
 #include "FileEditorSelectable.h"
 
+// external
 #include <imgui/imgui_helpers.h>
 
-#include "resources/FileResource.h"
+// graphics
 #include "graphics/imgui/ImGuiWindow.h"
 #include "graphics/imgui/font_icon.h"
+
+// resources
+#include "resources/FileResource.h"
 #include "resources/AssetType.h"
 
+// external
 #include "editor/core/EditorEngine.h"
 #include "editor/graphics/imgui/selectables/file/FileEditorSelectables.h"
 

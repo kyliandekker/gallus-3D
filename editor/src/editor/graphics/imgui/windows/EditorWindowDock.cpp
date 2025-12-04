@@ -1,17 +1,22 @@
 #include "EditorWindowDock.h"
 
+// external
 #include <imgui/imgui_helpers.h>
 #include <imgui/imgui_internal.h>
 
+// graphics
 #include "graphics/imgui/ImGuiWindow.h"
 #include "graphics/imgui/font_icon.h"
 
+// gameplay
+#include "gameplay/Game.h"
+
+// editor
 #include "editor/core/EditorEngine.h"
 #include "editor/graphics/imgui/selectables/EntityEditorSelectable.h"
 #include "editor/graphics/imgui/selectables/FileEditorSelectable.h"
 
 #include "editor/EditorGlobalFunctions.h"
-#include "gameplay/Game.h"
 
 namespace gallus
 {
@@ -75,9 +80,9 @@ namespace gallus
 					ImGui::EndMenu();
 				}
 				// TODO: Edit Icon.
-				if (ImGui::BeginMenu(ImGui::IMGUI_FORMAT_ID(font::ICON_CUBE + std::string(" Edit"), MENU_ID, "CREATE_EDITOR").c_str()))
+				if (ImGui::BeginMenu(ImGui::IMGUI_FORMAT_ID(font::ICON_EDIT + std::string(" Edit"), MENU_ID, "CREATE_EDITOR").c_str()))
 				{
-					if (ImGui::MenuItem(ImGui::IMGUI_FORMAT_ID(font::ICON_CUBE + std::string(" Create Entity"), MENU_ITEM_ID, "CREATE_ENTITY_EDITOR").c_str(), "CTRL+SHIFT+N"))
+					if (ImGui::MenuItem(ImGui::IMGUI_FORMAT_ID(font::ICON_MODEL + std::string(" Create Entity"), MENU_ITEM_ID, "CREATE_ENTITY_EDITOR").c_str(), "CTRL+SHIFT+N"))
 					{
 						core::EDITOR_ENGINE->GetECS().CreateEntity(core::EDITOR_ENGINE->GetECS().GetUniqueName("New GameObject"));
 						core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);

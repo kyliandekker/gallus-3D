@@ -1,13 +1,9 @@
 #include "DX12System2D.h"
 
-// core includes
+// core
 #include "core/Engine.h"
 
-// logger includes
-#include "logger/Logger.h"
-
-// graphics includes
-#include "graphics/win32/Window.h"
+// graphics
 #include "graphics/dx12/CommandQueue.h"
 #include "graphics/dx12/CommandList.h"
 #include "graphics/dx12/Shader.h"
@@ -15,7 +11,12 @@
 #include "graphics/dx12/Texture.h"
 #include "graphics/dx12/Mesh.h"
 
-// gameplay includes
+#include "graphics/win32/Window.h"
+
+// logger
+#include "logger/Logger.h"
+
+// gameplay
 #include "gameplay/systems/SpriteSystem.h"
 
 namespace gallus
@@ -175,46 +176,63 @@ namespace gallus
 				m_ImGuiWindow.Initialize();
 #endif // IMGUI_DISABLE
 
-				std::shared_ptr<Texture> texture = core::ENGINE->GetResourceAtlas().LoadTexture("tex_missing.png", cCommandQueue); // Default texture.
-				texture->SetResourceCategory(resources::EngineResourceCategory::Missing);
-				texture->SetIsDestroyable(false);
+				std::weak_ptr<Texture> texturePtr = core::ENGINE->GetResourceAtlas().LoadTexture("tex_missing.png", cCommandQueue); // Default texture.
+				if (auto tex = texturePtr.lock())
+				{
+					tex->SetResourceCategory(resources::EngineResourceCategory::Missing);
+					tex->SetIsDestroyable(false);
+				}
 
-				std::shared_ptr<PixelShader> pixelShader = core::ENGINE->GetResourceAtlas().LoadPixelShader("pixelShader.hlsl"); // Default shader.
-				std::shared_ptr<VertexShader> vertexShader = core::ENGINE->GetResourceAtlas().LoadVertexShader("vertexShader.hlsl"); // Default shader.
-				pixelShader->SetResourceCategory(resources::EngineResourceCategory::Missing);
-				pixelShader->SetIsDestroyable(false);
-				vertexShader->SetResourceCategory(resources::EngineResourceCategory::Missing);
-				vertexShader->SetIsDestroyable(false);
+				std::shared_ptr<PixelShader> pixelShaderPtr = core::ENGINE->GetResourceAtlas().LoadPixelShader("pixelShader.hlsl"); // Default shader.
+				std::shared_ptr<VertexShader> vertexShaderPtr = core::ENGINE->GetResourceAtlas().LoadVertexShader("vertexShader.hlsl"); // Default shader.
 
-				std::shared_ptr<DX12ShaderBind> shaderBind = core::ENGINE->GetResourceAtlas().LoadShaderBind("defaultShaderBind", pixelShader.get(), vertexShader.get()); // Default shader.
-				shaderBind->SetResourceCategory(resources::EngineResourceCategory::Missing);
-				shaderBind->SetIsDestroyable(false);
+				pixelShaderPtr->SetResourceCategory(resources::EngineResourceCategory::Missing);
+				pixelShaderPtr->SetIsDestroyable(false);
 
-				std::shared_ptr<PixelShader> renderTexPixelShader = core::ENGINE->GetResourceAtlas().LoadPixelShader("renderTexPixelShader.hlsl"); // Default render tex shader.
-				std::shared_ptr<VertexShader> renderTexVertexShader = core::ENGINE->GetResourceAtlas().LoadVertexShader("renderTexVertexShader.hlsl"); // Default render tex shader.
-				renderTexPixelShader->SetResourceCategory(resources::EngineResourceCategory::Missing);
-				renderTexPixelShader->SetIsDestroyable(false);
-				renderTexVertexShader->SetResourceCategory(resources::EngineResourceCategory::Missing);
-				renderTexVertexShader->SetIsDestroyable(false);
+				vertexShaderPtr->SetResourceCategory(resources::EngineResourceCategory::Missing);
+				vertexShaderPtr->SetIsDestroyable(false);
 
-				std::shared_ptr<DX12ShaderBind> renderTexShaderBind = core::ENGINE->GetResourceAtlas().LoadShaderBind("renderTexShaderBind", renderTexPixelShader.get(), renderTexVertexShader.get()); // Render Tex shader.
-				renderTexShaderBind->SetResourceCategory(resources::EngineResourceCategory::Missing);
-				renderTexShaderBind->SetIsDestroyable(false);
+				std::weak_ptr<DX12ShaderBind> shaderBindPtr = core::ENGINE->GetResourceAtlas().LoadShaderBind("defaultShaderBind", pixelShaderPtr, vertexShaderPtr); // Default shader.
+				if (auto shaderBind = shaderBindPtr.lock())
+				{
+					shaderBind->SetResourceCategory(resources::EngineResourceCategory::Missing);
+					shaderBind->SetIsDestroyable(false);
+				}
 
-				std::shared_ptr<Mesh> mesh = core::ENGINE->GetResourceAtlas().LoadMesh("square"); // Default mesh.
-				MeshPartData& squarePrimitive = s_PRIMITIVES[(int)PRIMITIVES::SQUARE];
-				mesh->SetMeshData(squarePrimitive, cCommandQueue);
-				mesh->SetResourceCategory(resources::EngineResourceCategory::Missing);
-				mesh->SetIsDestroyable(false);
+				std::shared_ptr<PixelShader> renderTexPixelShaderPtr = core::ENGINE->GetResourceAtlas().LoadPixelShader("renderTexPixelShader.hlsl"); // Default render tex shader.
+				std::shared_ptr<VertexShader> renderTexVertexShaderPtr = core::ENGINE->GetResourceAtlas().LoadVertexShader("renderTexVertexShader.hlsl"); // Default render tex shader.
+				renderTexPixelShaderPtr->SetResourceCategory(resources::EngineResourceCategory::Missing);
+				renderTexPixelShaderPtr->SetIsDestroyable(false);
+				renderTexVertexShaderPtr->SetResourceCategory(resources::EngineResourceCategory::Missing);
+				renderTexVertexShaderPtr->SetIsDestroyable(false);
+
+				std::weak_ptr<DX12ShaderBind> renderTexShaderBindPtr = core::ENGINE->GetResourceAtlas().LoadShaderBind("renderTexShaderBind", renderTexPixelShaderPtr, renderTexVertexShaderPtr); // Render Tex shader.
+				if (auto renderTexShaderBind = renderTexShaderBindPtr.lock())
+				{
+					renderTexShaderBind->SetResourceCategory(resources::EngineResourceCategory::Missing);
+					renderTexShaderBind->SetIsDestroyable(false);
+				}
+
+				std::weak_ptr<Mesh> meshPtr = core::ENGINE->GetResourceAtlas().LoadMesh("square"); // Default mesh.
+				if (auto mesh = meshPtr.lock())
+				{
+					MeshPartData& squarePrimitive = s_PRIMITIVES[(int) PRIMITIVES::SQUARE];
+					mesh->SetMeshData(squarePrimitive, cCommandQueue);
+					mesh->SetResourceCategory(resources::EngineResourceCategory::Missing);
+					mesh->SetIsDestroyable(false);
+				}
 
 				cCommandQueue->Flush();
 
 				UpdateRenderTargetViews();
 
 				// Create RTV for custom render target texture
-				if (m_pRenderTexture->GetResource())
+				if (auto renderTex = m_pRenderTexture.lock())
 				{
-					m_pDevice->CreateRenderTargetView(m_pRenderTexture->GetResource().Get(), nullptr, m_RTV.GetCPUHandle(g_iBufferCount));
+					if (renderTex->GetResource())
+					{
+						m_pDevice->CreateRenderTargetView(renderTex->GetResource().Get(), nullptr, m_RTV.GetCPUHandle(g_iBufferCount));
+					}
 				}
 
 				Resize({}, m_vSize);
@@ -507,7 +525,7 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			std::shared_ptr<Texture> DX12System2D::GetRenderTexture()
+			std::weak_ptr<Texture> DX12System2D::GetRenderTexture()
 			{
 				return m_pRenderTexture;
 			}
@@ -684,11 +702,17 @@ namespace gallus
 			//---------------------------------------------------------------------
 			D3D12_CPU_DESCRIPTOR_HANDLE DX12System2D::GetCurrentRenderTargetView(bool a_bUseRenderTexture)
 			{
-				if (a_bUseRenderTexture && m_pRenderTexture->IsValid())
+				if (a_bUseRenderTexture)
 				{
-					size_t backBufferStart = g_iBufferCount;
+					if (auto renderTex = m_pRenderTexture.lock())
+					{
+						if (renderTex->IsValid())
+						{
+							size_t backBufferStart = g_iBufferCount;
 
-					return m_RTV.GetCPUHandle(backBufferStart);
+							return m_RTV.GetCPUHandle(backBufferStart);
+						}
+					}
 				}
 
 				return m_RTV.GetCPUHandle(m_iCurrentBackBufferIndex);
@@ -723,19 +747,23 @@ namespace gallus
 				D3D12_CPU_DESCRIPTOR_HANDLE backRtv;  // For back buffer
 
 				// 1. Render 2D scene into RenderTexture
-				if (m_pRenderTexture->CanBeDrawn())
+				auto renderTex = m_pRenderTexture.lock();
+				if (renderTex)
 				{
-					// Transition RenderTexture -> RTV
-					m_pRenderTexture->Transition(commandList, D3D12_RESOURCE_STATE_RENDER_TARGET);
+					if (renderTex->CanBeDrawn())
+					{
+						// Transition RenderTexture -> RTV
+						renderTex->Transition(commandList, D3D12_RESOURCE_STATE_RENDER_TARGET);
 
-					// Render onto the render tex rtv (true arg does this).
-					D3D12_CPU_DESCRIPTOR_HANDLE rtRtv = GetCurrentRenderTargetView(true);
-					commandList->GetCommandList()->ClearRenderTargetView(rtRtv, clearColor, 0, nullptr);
-					commandList->GetCommandList()->OMSetRenderTargets(1, &rtRtv, FALSE, nullptr);
+						// Render onto the render tex rtv (true arg does this).
+						D3D12_CPU_DESCRIPTOR_HANDLE rtRtv = GetCurrentRenderTargetView(true);
+						commandList->GetCommandList()->ClearRenderTargetView(rtRtv, clearColor, 0, nullptr);
+						commandList->GetCommandList()->OMSetRenderTargets(1, &rtRtv, FALSE, nullptr);
 
-					Render2D(commandQueue, commandList, rtRtv);
+						Render2D(commandQueue, commandList, rtRtv);
 
-					m_pRenderTexture->Transition(commandList, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+						renderTex->Transition(commandList, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+					}
 				}
 
 				backBuffer->Transition(commandList, D3D12_RESOURCE_STATE_RENDER_TARGET);
@@ -745,24 +773,30 @@ namespace gallus
 				commandList->GetCommandList()->ClearRenderTargetView(backRtv, clearColor, 0, nullptr);
 				commandList->GetCommandList()->OMSetRenderTargets(1, &backRtv, FALSE, nullptr);
 #ifndef _EDITOR
-				// 1. Render RenderTexture onto quad.
-				if (m_pRenderTexture->CanBeDrawn())
+				// 2. Render RenderTexture onto quad.
+				if (renderTex && renderTex->CanBeDrawn())
 				{
-					// Bind pipeline + root signature
-					commandList->GetCommandList()->SetPipelineState(
-						core::ENGINE->GetResourceAtlas().GetRenderTexShaderBind()->GetPipelineState());
-					commandList->GetCommandList()->SetGraphicsRootSignature(
-						core::ENGINE->GetDX12().GetRootSignature().Get());
+					if (renderTex->CanBeDrawn())
+					{
+						// Bind pipeline + root signature
+						if (auto shaderBind = core::ENGINE->GetResourceAtlas().GetRenderTexShaderBind().lock())
+						{
+							commandList->GetCommandList()->SetPipelineState(
+								shaderBind->GetPipelineState());
+						}
+						commandList->GetCommandList()->SetGraphicsRootSignature(
+							core::ENGINE->GetDX12().GetRootSignature().Get());
 
-					m_pRenderTexture->Bind(commandList, 2);
+						renderTex->Bind(commandList, 2);
 
-					commandList->GetCommandList()->RSSetViewports(1, &m_Viewport);
-					commandList->GetCommandList()->RSSetScissorRects(1, &m_ScissorRect);
+						commandList->GetCommandList()->RSSetViewports(1, &m_Viewport);
+						commandList->GetCommandList()->RSSetScissorRects(1, &m_ScissorRect);
 
-					// Draw fullscreen quad (shader-generated)
-					commandList->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-					commandList->GetCommandList()->IASetVertexBuffers(0, 0, nullptr);
-					commandList->GetCommandList()->DrawInstanced(3, 1, 0, 0);
+						// Draw fullscreen quad (shader-generated)
+						commandList->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+						commandList->GetCommandList()->IASetVertexBuffers(0, 0, nullptr);
+						commandList->GetCommandList()->DrawInstanced(3, 1, 0, 0);
+					}
 				}
 #endif // _EDITOR
 
@@ -896,9 +930,12 @@ namespace gallus
 			//---------------------------------------------------------------------
 			void DX12System2D::CreateRenderTexture(const glm::ivec2& a_vSize)
 			{
-				if (m_pRenderTexture && m_pRenderTexture->GetResource())
+				if (auto renderTex = m_pRenderTexture.lock())
 				{
-					m_pRenderTexture->Destroy();
+					if (renderTex && renderTex->GetResource())
+					{
+						renderTex->Destroy();
+					}
 				}
 
 				D3D12_RESOURCE_DESC texDesc = {};
@@ -913,8 +950,11 @@ namespace gallus
 				texDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
 
 				m_pRenderTexture = core::ENGINE->GetResourceAtlas().LoadTextureByDescription("RenderTexture", texDesc);
-				m_pRenderTexture->SetResourceCategory(resources::EngineResourceCategory::System);
-				m_pRenderTexture->SetIsDestroyable(false);
+				if (auto renderTex = m_pRenderTexture.lock())
+				{
+					renderTex->SetResourceCategory(resources::EngineResourceCategory::System);
+					renderTex->SetIsDestroyable(false);
+				}
 			}
 		}
 	}

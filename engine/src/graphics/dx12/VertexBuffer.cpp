@@ -1,4 +1,4 @@
-#include "graphics/dx12/VertexBuffer.h"
+#include "VertexBuffer.h"
 
 namespace gallus
 {

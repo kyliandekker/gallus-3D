@@ -1,14 +1,14 @@
 ﻿#include "DX12ShaderBind.h"
 
-// core includes
+// core
 #include "core/Engine.h"
 
-// logger includes
-#include "logger/Logger.h"
-
-// graphics includes
+// graphics
 #include "graphics/dx12/CommandList.h"
 #include "graphics/dx12/Shader.h"
+
+// logger
+#include "logger/Logger.h"
 
 namespace gallus
 {
@@ -17,7 +17,7 @@ namespace gallus
 		namespace dx12
 		{
 			//---------------------------------------------------------------------
-			bool DX12ShaderBind::LoadByName(const std::string& a_sName, const PixelShader* a_pPixelShader, const VertexShader* a_pVertexShader) 
+			bool DX12ShaderBind::LoadByName(const std::string& a_sName, std::shared_ptr<PixelShader> a_pPixelShader, std::shared_ptr<VertexShader> a_pVertexShader)
 			{
 				if (!EngineResource::LoadByName(a_sName))
 				{
@@ -102,25 +102,33 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			bool DX12ShaderBind::HasPixelShader(const PixelShader* a_PixelShader)
+			bool DX12ShaderBind::HasPixelShader(std::weak_ptr<PixelShader> a_pPixelShader)
 			{
-				return m_pPixelShader == a_PixelShader;
+				if (auto pixelShader = a_pPixelShader.lock())
+				{
+					return m_pPixelShader == pixelShader;
+				}
+				return m_pPixelShader != nullptr;
 			}
 
 			//---------------------------------------------------------------------
-			bool DX12ShaderBind::HasVertexShader(const VertexShader* a_VertexShader)
+			bool DX12ShaderBind::HasVertexShader(std::weak_ptr<VertexShader> a_pVertexShader)
 			{
-				return m_pVertexShader == a_VertexShader;
+				if (auto vertexShader = a_pVertexShader.lock())
+				{
+					return m_pVertexShader == vertexShader;
+				}
+				return m_pVertexShader != nullptr;
 			}
 
 			//---------------------------------------------------------------------
-			const PixelShader* DX12ShaderBind::GetPixelShader()
+			const std::weak_ptr<PixelShader> DX12ShaderBind::GetPixelShader()
 			{
 				return m_pPixelShader;
 			}
 
 			//---------------------------------------------------------------------
-			const VertexShader* DX12ShaderBind::GetVertexShader()
+			const std::weak_ptr<VertexShader> DX12ShaderBind::GetVertexShader()
 			{
 				return m_pVertexShader;
 			}

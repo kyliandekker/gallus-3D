@@ -1,4 +1,3 @@
-// header
 #include "file_abstractions.h"
 
 // external
@@ -58,7 +57,7 @@ namespace gallus
 					std::wstring wide(pszPath);
 					fs::path resultPath(wide);
 
-					// If user didn’t specify extension, apply default one from filter
+					// If user didnï¿½t specify extension, apply default one from filter
 					if (resultPath.extension().empty() && !a_aFilters.empty())
 					{
 						UINT fileTypeIndex = 0;

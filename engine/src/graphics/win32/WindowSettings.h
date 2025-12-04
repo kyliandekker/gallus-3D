@@ -2,6 +2,7 @@
 
 #include "core/Settings.h"
 
+// external
 #include <glm/vec2.hpp>
 
 namespace gallus

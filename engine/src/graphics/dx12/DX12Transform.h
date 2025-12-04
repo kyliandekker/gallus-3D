@@ -1,11 +1,12 @@
 #pragma once
 
+// external
+#include <DirectXMath.h>
+#include <array>
+
 #ifdef _EDITOR
 #include "editor/EditorExpose.h"
 #endif
-
-#include <DirectXMath.h>
-#include <array>
 
 namespace gallus
 {

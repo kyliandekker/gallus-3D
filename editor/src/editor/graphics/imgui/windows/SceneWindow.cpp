@@ -3,21 +3,23 @@
 
 #include "SceneWindow.h"
 
+// external
 #include <imgui/imgui_helpers.h>
 #include <imgui/imgui_internal.h>
 #include <imgui/ImGuizmo.h>
 
-// graphics includes
-#include "graphics/imgui/font_icon.h"
-#include "graphics/imgui/ImGuiWindow.h"
+// graphics
 #include "graphics/dx12/Texture.h"
 
-// editor includes
+#include "graphics/imgui/font_icon.h"
+#include "graphics/imgui/ImGuiWindow.h"
+
+// gameplay
+#include "gameplay/Game.h"
+
+// editor
 #include "editor/core/EditorEngine.h"
 #include "editor/graphics/imgui/selectables/EntityEditorSelectable.h"
-
-// gameplay includes
-#include "gameplay/Game.h"
 
 namespace gallus
 {
@@ -79,6 +81,18 @@ namespace gallus
 				}
 
 				bool isStarted = gameplay::GAME.IsStarted();
+				if (ImGui::IsKeyDown(ImGuiKey_Escape))
+				{
+					core::EDITOR_ENGINE->GetEditor().SetSelectable(nullptr);
+					if (isStarted)
+					{
+						const fs::path scenePath = core::EDITOR_ENGINE->GetEditor().GetScene().GetPath();
+						gameplay::GAME.GetScene().LoadByPath(scenePath);
+						gameplay::GAME.GetScene().LoadData();
+					}
+					gameplay::GAME.SetIsStarted(false);
+				}
+
 				if (ImGui::CheckboxButton(
 					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_PLAY), BUTTON_ID, "PLAY_SCENE").c_str(), &isStarted, m_Window.GetHeaderSize()))
 				{
@@ -145,16 +159,17 @@ namespace gallus
 
 				DrawViewportPanel();
 
-				std::shared_ptr<gallus::graphics::dx12::Texture> renderTexture = core::EDITOR_ENGINE->GetDX12().GetRenderTexture();
-				if (!renderTexture || !renderTexture->IsValid())
+				std::weak_ptr<gallus::graphics::dx12::Texture> renderTexture = core::EDITOR_ENGINE->GetDX12().GetRenderTexture();
+				auto tex = renderTexture.lock();
+				if (!tex || !tex->IsValid())
 				{
 					return;
 				}
 
 				ImVec2 windowSize = ImGui::GetContentRegionAvail();
 				ImVec2 textureSize = ImVec2(
-					static_cast<float>(renderTexture->GetSize().x),
-					static_cast<float>(renderTexture->GetSize().y)
+					static_cast<float>(tex->GetSize().x),
+					static_cast<float>(tex->GetSize().y)
 				);
 
 				// Static variables for m_fZoom and pan
@@ -201,7 +216,7 @@ namespace gallus
 				ImVec2 imageSize = ImVec2(textureSize.x * m_fZoom, textureSize.y * m_fZoom);
 				ImGui::SetCursorPos(imagePos);
 				ImGui::Image(
-					(ImTextureID) renderTexture->GetGPUHandle().ptr,
+					(ImTextureID) tex->GetGPUHandle().ptr,
 					imageSize
 				);
 
@@ -623,8 +638,9 @@ namespace gallus
 				ImGui::PopStyleVar();
 				ImGui::PopStyleVar();
 
-				std::shared_ptr<gallus::graphics::dx12::Texture> renderTexture = core::EDITOR_ENGINE->GetDX12().GetRenderTexture();
-				if (!renderTexture || !renderTexture->IsValid())
+				std::weak_ptr<gallus::graphics::dx12::Texture> renderTexture = core::EDITOR_ENGINE->GetDX12().GetRenderTexture();
+				auto tex = renderTexture.lock();
+				if (!tex || !tex->IsValid())
 				{
 					return;
 				}
@@ -636,9 +652,9 @@ namespace gallus
 				avail.y -= padding.y * 2.0f;
 
 				// Fit inside available space (keep aspect ratio)
-				float scale = std::min(avail.x / renderTexture->GetSize().x, avail.y / renderTexture->GetSize().y);
-				float drawW = renderTexture->GetSize().x * scale;
-				float drawH = renderTexture->GetSize().y * scale;
+				float scale = std::min(avail.x / tex->GetSize().x, avail.y / tex->GetSize().y);
+				float drawW = tex->GetSize().x * scale;
+				float drawH = tex->GetSize().y * scale;
 
 				// Center horizontally
 				float cursorX = ImGui::GetCursorPosX() + (avail.x - drawW) * 0.5f;
@@ -652,7 +668,7 @@ namespace gallus
 
 				ImGui::SetCursorScreenPos(image_pos);
 				ImGui::Image(
-					(ImTextureID) renderTexture->GetGPUHandle().ptr,
+					(ImTextureID) tex->GetGPUHandle().ptr,
 					ImVec2(drawW, drawH)
 				);
 

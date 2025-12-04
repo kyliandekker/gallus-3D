@@ -1,7 +1,6 @@
 #ifndef IMGUI_DISABLE
 #ifdef _EDITOR
 
-// header
 #include "StatsWindow.h"
 
 // external
@@ -14,11 +13,11 @@
 // utils
 #include "utils/string_extensions.h"
 
+// gameplay
+#include "gameplay/Game.h"
+
 // editor
 #include "editor/core/EditorEngine.h"
-
-// game includes
-#include "gameplay/Game.h"
 
 namespace gallus
 {
@@ -32,7 +31,7 @@ namespace gallus
 			//---------------------------------------------------------------------
 			// StatsWindow
 			//---------------------------------------------------------------------
-			StatsWindow::StatsWindow(ImGuiWindow& a_Window) : BaseWindow(a_Window, ImGuiWindowFlags_NoCollapse, std::string(font::ICON_SETTINGS) + " Stats", "STATS")
+			StatsWindow::StatsWindow(ImGuiWindow& a_Window) : BaseWindow(a_Window, ImGuiWindowFlags_NoCollapse, std::string(font::ICON_STATS) + " Stats", "STATS")
 			{
 			}
 

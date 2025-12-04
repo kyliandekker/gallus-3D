@@ -5,12 +5,16 @@
 
 #include "graphics/imgui/modals/BaseModal.h"
 
+// external
 #include <string>
 #include <vector>
 #include <functional>
 #include <memory>
 
+// graphics
 #include "graphics/imgui/views/DataTypes/StringTextInput.h"
+
+// resources
 #include "resources/AssetType.h"
 
 namespace gallus
@@ -58,16 +62,15 @@ namespace gallus
 				/// </summary>
 				/// <param name="a_FileResource">The sprite file.</param>
 				void SetData(resources::FileResource& a_FileResource);
-				void RenderSpriteInfoPopup();
-				void RenderFloatingToolbar();
+				void RenderFloatingToolbar(std::shared_ptr<graphics::dx12::Texture> a_pTexture);
 			private:
-				void RenderToolbar();
-				void HandleGlobalControls(const ImVec2& a_vWindowSize);
+				void RenderToolbar(std::shared_ptr<graphics::dx12::Texture> a_pTexture);
+				void HandleGlobalControls(const ImVec2& a_vWindowSize, std::shared_ptr<graphics::dx12::Texture> a_pTexture);
 				void RenderRect(int8_t a_iIndex, const ImVec2& a_vImgMin, const ImVec2& a_vImgMax);
-				void HandleRectSelection(int8_t a_iIndex, const ImVec2& a_vImgMin, const ImVec2& a_vImgMax);
+				void HandleRectSelection(int8_t a_iIndex, const ImVec2& a_vImgMin, const ImVec2& a_vImgMax, std::shared_ptr<graphics::dx12::Texture> a_pTexture);
 				void GetSpriteMinMax(int8_t a_iIndex, ImVec2& a_vMin, ImVec2& a_vMax, const ImVec2& a_vImgMin, const ImVec2& a_vImgMax);
-				bool InteractWithRect(const ImVec2& a_vImgMin, const ImVec2& a_vImgMax);
-				void DrawRectInteraction(const ImVec2& a_vImgMin, const ImVec2& a_vImgMax);
+				bool InteractWithRect(const ImVec2& a_vImgMin, const ImVec2& a_vImgMax, std::shared_ptr<graphics::dx12::Texture> a_pTexture);
+				void DrawRectInteraction(const ImVec2& a_vImgMin, const ImVec2& a_vImgMax, std::shared_ptr<graphics::dx12::Texture> a_pTexture);
 
 				int8_t m_iCurrentSprite = -1;
 
@@ -77,7 +80,7 @@ namespace gallus
 				bool m_bResizing = false;
 				int8_t m_iDragIndex = -1;
 
-				std::shared_ptr<graphics::dx12::Texture> m_pPreviewTexture = nullptr;
+				std::weak_ptr<graphics::dx12::Texture> m_pPreviewTexture = {};
 
 				resources::TextureMetaData* m_pTextureMetaData = nullptr;
 				resources::FileResource* m_pFileResource = nullptr;

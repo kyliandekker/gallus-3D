@@ -1,5 +1,6 @@
 #pragma once
 
+// external
 #ifdef _EDITOR
 #include <string>
 #endif

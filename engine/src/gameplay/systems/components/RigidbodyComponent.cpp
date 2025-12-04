@@ -1,13 +1,16 @@
-#include "gameplay/systems/components/RigidbodyComponent.h"
+#include "RigidbodyComponent.h"
 
+// external
 #include <rapidjson/utils.h>
 
+// core
 #include "core/Engine.h"
 
+// resources
 #include "resources/SrcData.h"
 
+// gameplay
 #include "gameplay/systems/CollisionSystem.h"
-
 #include "gameplay/systems/TransformSystem.h"
 
 #define JSON_RIGIDBODY_COMPONENT_USE_GRAVITY_VAR "useGravity"

@@ -1,19 +1,23 @@
-﻿#include "gameplay/systems/components/PlayerComponent.h"
+﻿#include "PlayerComponent.h"
 
+// external
 #include <rapidjson/utils.h>
 
-// engine includes
+// core
 #include "core/Engine.h"
 
+// input
+#include "input/InputSystem.h"
+
+// resources
 #include "resources/SrcData.h"
 
-// gameplay includes
+// gameplay
 #include "gameplay/Entity.h"
 #include "gameplay/systems/TransformSystem.h"
 #include "gameplay/systems/CollisionSystem.h"
 #include "gameplay/systems/ProjectileSystem.h"
 #include "gameplay/systems/AnimationSystem.h"
-#include "input/InputSystem.h"
 
 #define JSON_PLAYER_COMPONENT_MOVEMENT_SPEED_VAR "movementSpeed"
 #define JSON_PLAYER_COMPONENT_PREFAB_NAME "bulletPrefab"
@@ -35,11 +39,11 @@ namespace gallus
 
 			a_Document.AddMember(JSON_PLAYER_COMPONENT_MOVEMENT_SPEED_VAR, m_fSpeed, a_Allocator);
 
-			if (m_pBulletPrefab)
+			if (auto bulletPrefab = m_pBulletPrefab.lock())
 			{
 				a_Document.AddMember(
 					JSON_PLAYER_COMPONENT_PREFAB_NAME,
-					rapidjson::Value(m_pBulletPrefab->GetPath().filename().generic_string().c_str(), a_Allocator),
+					rapidjson::Value(bulletPrefab->GetPath().filename().generic_string().c_str(), a_Allocator),
 					a_Allocator
 				);
 			}
@@ -53,7 +57,7 @@ namespace gallus
 			std::string bulletPrefabName = a_SrcData.GetString(JSON_PLAYER_COMPONENT_PREFAB_NAME);
 			if (!bulletPrefabName.empty())
 			{
-				m_pBulletPrefab = core::ENGINE->GetResourceAtlas().LoadPrefab(bulletPrefabName).get();
+				m_pBulletPrefab = core::ENGINE->GetResourceAtlas().LoadPrefab(bulletPrefabName);
 			}
 		}
 
@@ -77,9 +81,9 @@ namespace gallus
 
 			if (left || right || up || down)
 			{
-				if (m_pBulletPrefab)
+				if (auto bulletPrefab = m_pBulletPrefab.lock())
 				{
-					gameplay::EntityID id = m_pBulletPrefab->Instantiate();
+					gameplay::EntityID id = bulletPrefab->Instantiate();
 
 					ProjectileSystem& projectileSystem = core::ENGINE->GetECS().GetSystem<ProjectileSystem>();
 

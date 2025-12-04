@@ -1,6 +1,7 @@
 ﻿#include "ChunkFilter.h"
 
-#include "./Defines.h"
+// audio
+#include "audio/Defines.h"
 
 namespace gallus
 {

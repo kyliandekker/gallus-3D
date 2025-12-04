@@ -1,7 +1,10 @@
-#include "graphics/dx12/Shader.h"
+#include "Shader.h"
 
-// logger includes
+// logger
 #include "logger/Logger.h"
+
+// utils
+#include "utils/file_abstractions.h"
 
 namespace gallus
 {

@@ -2,6 +2,9 @@
 
 #include "AnimationKeyFrameComponentBase.h"
 
+// external
+#include <memory>
+
 namespace gallus
 {
 	namespace graphics
@@ -50,7 +53,7 @@ namespace gallus
 			/// Retrieves the texture.
 			/// </summary>
 			/// <returns>A pointer to the texture.</returns>
-			graphics::dx12::Texture* GetTexture()
+			std::weak_ptr<graphics::dx12::Texture> GetTexture()
 			{
 				return m_pTexture;
 			}
@@ -66,7 +69,7 @@ namespace gallus
 			/// Sets the texture used in this key frame.
 			/// </summary>
 			/// <param name="a_pTexture">The texture.</param>
-			void SetTexture(graphics::dx12::Texture* a_pTexture)
+			void SetTexture(std::weak_ptr<graphics::dx12::Texture> a_pTexture)
 			{
 				m_pTexture = a_pTexture;
 			}
@@ -92,7 +95,7 @@ namespace gallus
 			/// <param name="a_SrcData">The source data.</param>
 			void Deserialize(const resources::SrcData& a_SrcData) override;
 		private:
-			graphics::dx12::Texture* m_pTexture = nullptr;
+			std::weak_ptr<graphics::dx12::Texture> m_pTexture = {};
 			int m_iSpriteIndex = 0;
 
 #ifdef _EDITOR

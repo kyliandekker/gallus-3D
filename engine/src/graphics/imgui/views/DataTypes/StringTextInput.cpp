@@ -2,11 +2,12 @@
 
 #include "StringTextInput.h"
 
+// external
 #include <imgui/imgui_internal.h>
 #include <imgui/imgui.h>
 #include <imgui/imgui_helpers.h>
 
-// graphics includes
+// graphics
 #include "graphics/imgui/ImGuiWindow.h"
 #include "graphics/imgui/font_icon.h"
 

@@ -9,10 +9,11 @@
 // core
 #include "core/DataStream.h"
 
-#include "resources/SrcData.h"
-
 // logger
 #include "logger/Logger.h"
+
+// resources
+#include "resources/SrcData.h"
 
 // gameplay
 #include "gameplay/ECSBaseSystem.h"

@@ -3,21 +3,22 @@
 
 #include "ConsoleWindow.h"
 
+// external
 #include <imgui/imgui_helpers.h>
 #include <imgui/imgui_internal.h>
 
-// utils includes
-#include "utils/string_extensions.h"
-
-// graphics includes
+// graphics
 #include "graphics/imgui/font_icon.h"
 #include "graphics/imgui/ImGuiWindow.h"
 
-// editor includes
-#include "editor/core/EditorEngine.h"
+// utils
+#include "utils/string_extensions.h"
 
-// game includes
+// gameplay
 #include "gameplay/Game.h"
+
+// editor
+#include "editor/core/EditorEngine.h"
 
 namespace gallus
 {

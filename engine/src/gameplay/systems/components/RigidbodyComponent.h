@@ -1,10 +1,14 @@
 #pragma once
 
+#include "gameplay/systems/components/Component.h"
+
+// external
 #include <DirectXMath.h>
 
+#ifdef _EDITOR
+// editor
 #include "editor/EditorExpose.h"
-
-#include "gameplay/systems/components/Component.h"
+#endif
 
 namespace gallus
 {

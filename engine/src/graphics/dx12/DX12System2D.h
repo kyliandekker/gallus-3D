@@ -3,22 +3,24 @@
 #include "DX12PCH.h"
 #include "core/System.h"
 
+// external
 #include <glm/vec2.hpp>
 #include <memory>
 #include <mutex>
 
-// core includes
-#include "core/Event.h"
-
-// graphics includes
+// graphics
 #include "graphics/dx12/HeapAllocation.h"
 #include "graphics/dx12/Camera.h"
+#include "graphics/dx12/FPSCounter.h"
+
 #ifndef IMGUI_DISABLE
 #include "graphics/imgui/ImGuiWindow.h"
 #endif // IMGUI_DISABLE
-#include "graphics/dx12/FPSCounter.h"
 
-// gameplay includes
+// core
+#include "core/Event.h"
+
+// gameplay
 #include "gameplay/systems/components/SpriteComponent.h"
 
 #undef min
@@ -318,7 +320,7 @@ namespace gallus
 				/// Retrieves the render texture.
 				/// </summary>
 				/// <returns>Pointer to the render texture.</returns>
-				std::shared_ptr<Texture> GetRenderTexture();
+				std::weak_ptr<Texture> GetRenderTexture();
 
 				SimpleEvent<DX12System2D&> m_eOnInitialize;
 				SimpleEvent<std::shared_ptr<dx12::CommandList>> m_eOnRender;
@@ -390,7 +392,7 @@ namespace gallus
 #ifndef IMGUI_DISABLE
 				imgui::ImGuiWindow m_ImGuiWindow;
 #endif // IMGUI_DISABLE
-				std::shared_ptr<Texture> m_pRenderTexture = nullptr;
+				std::weak_ptr<Texture> m_pRenderTexture = {};
 
 				FPSCounter m_FpsCounter;
 

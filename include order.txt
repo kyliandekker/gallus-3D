@@ -1,8 +1,12 @@
-1. include header file
+1. include inherited/header file, header include in source should always be relative
 2. lib includes
-2. core
-3. logger
-4. utils
-5. graphics
-6. gameplay
-7. editor
+3. core
+4. graphics, dx12 -> win32 -> imgui
+5. audio
+6. animation
+7. input
+8. logger
+9. utils
+10. resources
+11. gameplay
+12. editor

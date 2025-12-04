@@ -3,24 +3,25 @@
 
 #include "HierarchyWindow.h"
 
+// external
 #include <imgui/imgui_helpers.h>
 #include <imgui/imgui_internal.h>
 
-// utils includes
+// utils
 #include "utils/string_extensions.h"
 #include "utils/file_abstractions.h"
 
-// graphics includes
+// graphics
 #include "graphics/imgui/font_icon.h"
 #include "graphics/imgui/ImGuiWindow.h"
 
-// editor includes
-#include "editor/core/EditorEngine.h"
-#include "editor/EditorGlobalFunctions.h"
-
-// game includes
+// gameplay
 #include "gameplay/Game.h"
 #include "gameplay/systems/TransformSystem.h"
+
+// editor
+#include "editor/core/EditorEngine.h"
+#include "editor/EditorGlobalFunctions.h"
 
 namespace gallus
 {
@@ -156,7 +157,7 @@ namespace gallus
 
 				bool spawnEntity = false;
 				if (ImGui::IconButton(
-					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_CUBE), BUTTON_ID, "SPAWN_ENTITY_HIERARCHY").c_str(), m_Window.GetHeaderSize(), m_Window.GetIconFont()))
+					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_MODEL), BUTTON_ID, "SPAWN_ENTITY_HIERARCHY").c_str(), m_Window.GetHeaderSize(), m_Window.GetIconFont()))
 				{
 					spawnEntity = true;
 				}

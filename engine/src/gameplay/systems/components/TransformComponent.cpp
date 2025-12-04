@@ -1,10 +1,13 @@
-﻿#include "gameplay/systems/components/TransformComponent.h"
+﻿#include "TransformComponent.h"
 
+// external
 #include <rapidjson/utils.h>
 #include <DirectXMath.h>
 
+// resources
 #include "resources/SrcData.h"
 
+// gameplay
 #include "gameplay/systems/TransformSystem.h"
 #include "gameplay/EntityID.h"
 

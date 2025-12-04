@@ -2,10 +2,12 @@
 
 #include "gameplay/systems/components/Component.h"
 
-#include "animation/AnimationTrack.h"
-
 namespace gallus
 {
+	namespace animation
+	{
+		class AnimationTrack;
+	}
 	namespace gameplay
 	{
 		//---------------------------------------------------------------------
@@ -38,6 +40,7 @@ namespace gallus
 			/// Updates the components.
 			/// </summary>
 			/// <param name="a_fDeltaTime">Delta time.</param>
+			/// <param name="a_UpdateTime">Which order this update is called in.</param>
 			void UpdateRealtime(float a_fDeltaTime, UpdateTime a_UpdateTime) override;
 
 			void LoadAnimation(const std::string& a_sAnimName);
@@ -46,6 +49,7 @@ namespace gallus
 			/// Updates the components.
 			/// </summary>
 			/// <param name="a_fDeltaTime">Delta time.</param>
+			/// <param name="a_UpdateTime">Which order this update is called in.</param>
 			void UpdateRealtimeInner(float a_fDeltaTime, UpdateTime a_UpdateTime) override;
 
 			/// <summary>
@@ -65,18 +69,25 @@ namespace gallus
 			}
 
 #ifdef _EDITOR
+			/// <summary>
+			/// Sets the starting animation.
+			/// </summary>
+			/// <param name="a_sStartingAnimation">The starting animation represented as a string.</param>
 			void SetStartingAnimation(const std::string a_sStartingAnimation)
 			{
 				m_sStartingAnimation = a_sStartingAnimation;
 			}
 #endif
-
+			/// <summary>
+			/// Retrieves the starting animation.
+			/// </summary>
+			/// <returns>A string representing the starting animation.</returns>
 			const std::string& GetStartingAnimation() const
 			{
 				return m_sStartingAnimation;
 			}
 		private:
-			animation::AnimationTrack* m_AnimationTrack = nullptr;
+			std::weak_ptr<animation::AnimationTrack> m_AnimationTrack = {};
 			
 			std::string m_sStartingAnimation;
 

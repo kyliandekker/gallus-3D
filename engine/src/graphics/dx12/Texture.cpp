@@ -1,19 +1,21 @@
-﻿#include "graphics/dx12/Texture.h"
+﻿#include "Texture.h"
 
+// external
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
-// core includes
+// core
 #include "core/Engine.h"
 #include "core/Data.h"
 
-// logger includes
+// logger
 #include "logger/Logger.h"
 
-// graphics includes
+// graphics
 #include "graphics/dx12/CommandList.h"
 #include "graphics/dx12/CommandQueue.h"
 
+// resources
 #include "resources/metadata/TextureMetaData.h"
 
 namespace gallus
@@ -278,10 +280,6 @@ namespace gallus
 					a_pCommandList->GetCommandList()->SetGraphicsRoot32BitConstants(RootParameters::SPRITE_UV, 4, uvData, 0);
 				}
 			}
-
-			//---------------------------------------------------------------------
-			void Texture::Unbind(std::shared_ptr<CommandList> a_pCommandList)
-			{}
 
 			//---------------------------------------------------------------------
 			CD3DX12_GPU_DESCRIPTOR_HANDLE Texture::GetGPUHandle()

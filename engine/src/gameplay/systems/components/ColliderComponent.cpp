@@ -1,11 +1,15 @@
 ﻿#include "gameplay/systems/components/ColliderComponent.h"
 
+// external
 #include <rapidjson/utils.h>
 
-#include "resources/SrcData.h"
-
+// core
 #include "core/Engine.h"
 
+// resources
+#include "resources/SrcData.h"
+
+// gameplay
 #include "gameplay/Entity.h"
 #include "gameplay/systems/TransformSystem.h"
 #include "gameplay/systems/CollisionSystem.h"

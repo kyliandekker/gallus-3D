@@ -1,6 +1,9 @@
 #include "Component.h"
 
+// core
 #include "core/Engine.h"
+
+// gameplay
 #include "gameplay/Entity.h"
 
 namespace gallus

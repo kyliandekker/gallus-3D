@@ -3,23 +3,25 @@
 
 #include "FilePickerModal.h"
 
+// external
 #include <imgui/imgui.h>
 #include <imgui/imgui_helpers.h>
 
-// core includes
+// core
 #include "editor/core/EditorEngine.h"
 
-// utils includes
+// utils
 #include "utils/string_extensions.h"
 
-// graphics includes
-#include "graphics/imgui/font_icon.h"
-#include "graphics/imgui/ImGuiWindow.h"
+// graphics
 #include "graphics/dx12/CommandQueue.h"
 #include "graphics/dx12/CommandList.h"
 #include "graphics/dx12/Texture.h"
 
-// graphics includes
+#include "graphics/imgui/font_icon.h"
+#include "graphics/imgui/ImGuiWindow.h"
+
+// graphics
 #include "resources/FileResource.h"
 #include "editor/graphics/imgui/selectables/FileEditorSelectable.h"
 
@@ -42,7 +44,10 @@ namespace gallus
 			{
 				auto cCommandQueue = core::EDITOR_ENGINE->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
 				m_pPreviewTexture = core::EDITOR_ENGINE->GetResourceAtlas().LoadTexture(a_sName, cCommandQueue);
-				m_pPreviewTexture->SetResourceCategory(gallus::resources::EngineResourceCategory::Editor);
+				if (auto tex = m_pPreviewTexture.lock())
+				{
+					tex->SetResourceCategory(gallus::resources::EngineResourceCategory::Editor);
+				}
 			}
 
 			//---------------------------------------------------------------------
@@ -75,7 +80,8 @@ namespace gallus
 				ImVec2 initialPos = ImGui::GetCursorPos();
 				ImGui::SetCursorPos(ImVec2(initialPos.x + m_Window.GetFramePadding().x, initialPos.y + m_Window.GetFramePadding().y));
 
-				float childSize = (m_pPreviewTexture && m_pPreviewTexture->CanBeDrawn()) ? (ImGui::GetContentRegionAvail().x / 2) : 0;
+				auto tex = m_pPreviewTexture.lock();
+				float childSize = (tex && tex->CanBeDrawn()) ? (ImGui::GetContentRegionAvail().x / 2) : 0;
 
 				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, m_Window.GetWindowPadding());
 				ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(m_Window.GetFramePadding().x * 2, m_Window.GetFramePadding().y * 2));
@@ -117,7 +123,7 @@ namespace gallus
 				}
 				ImGui::EndChild();
 
-				if (childSize > 0)
+				if (tex && childSize > 0)
 				{
 					ImGui::SameLine();
 					if (ImGui::BeginChild(
@@ -129,10 +135,10 @@ namespace gallus
 						ImGuiChildFlags_Borders
 						))
 					{
-						if (m_pPreviewTexture && m_pPreviewTexture->CanBeDrawn())
+						if (tex->CanBeDrawn())
 						{
-							const float spriteW = m_pPreviewTexture->GetResourceDesc().Width;
-							const float spriteH = m_pPreviewTexture->GetResourceDesc().Height;
+							const float spriteW = tex->GetResourceDesc().Width;
+							const float spriteH = tex->GetResourceDesc().Height;
 
 							ImVec2 avail = ImGui::GetContentRegionAvail();
 							ImVec2 padding = ImVec2();
@@ -152,7 +158,7 @@ namespace gallus
 							ImGui::SetCursorPosX(cursorX);
 
 							ImVec2 image_pos = ImGui::GetCursorScreenPos();
-							ImGui::Image((ImTextureID) m_pPreviewTexture->GetGPUHandle().ptr, ImVec2(drawW, drawH));
+							ImGui::Image((ImTextureID) tex->GetGPUHandle().ptr, ImVec2(drawW, drawH));
 
 							// Draw border
 							ImDrawList* draw_list = ImGui::GetWindowDrawList();

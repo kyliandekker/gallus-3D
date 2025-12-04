@@ -1,13 +1,16 @@
 #pragma once
 
+// external
 #ifdef _EDITOR
 #include <rapidjson/document.h>
 #endif
 #include <string>
 
+// gameplay
 #include "gameplay/EntityID.h"
 #include "gameplay/systems/UpdateTime.h"
 
+// editor
 #ifdef _EDITOR
 #include "editor/EditorExpose.h"
 #endif

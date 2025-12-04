@@ -8,22 +8,23 @@
 #include <imgui/imgui_helpers.h>
 
 // graphics
-#include "graphics/imgui/font_icon.h"
-#include "graphics/imgui/ImGuiWindow.h"
 #include "graphics/dx12/Texture.h"
 #include "graphics/dx12/Mesh.h"
 #include "graphics/dx12/Shader.h"
 #include "graphics/dx12/DX12ShaderBind.h"
 
+#include "graphics/imgui/font_icon.h"
+#include "graphics/imgui/ImGuiWindow.h"
+
 // utils
 #include "utils/string_extensions.h"
 
+// gameplay
+#include "gameplay/Game.h"
+
 // editor
 #include "editor/core/EditorEngine.h"
-
-// game includes
-#include "gameplay/Game.h"
-#include <editor/graphics/imgui/RenderEditorExposable.h>
+#include "editor/graphics/imgui/RenderEditorExposable.h"
 
 namespace gallus
 {
@@ -34,7 +35,7 @@ namespace gallus
 			//---------------------------------------------------------------------
 			// ResourcesWindow
 			//---------------------------------------------------------------------
-			ResourcesWindow::ResourcesWindow(ImGuiWindow& a_Window) : BaseWindow(a_Window, ImGuiWindowFlags_NoCollapse, std::string(font::ICON_SETTINGS) + " Resources", "RESOURCES")
+			ResourcesWindow::ResourcesWindow(ImGuiWindow& a_Window) : BaseWindow(a_Window, ImGuiWindowFlags_NoCollapse, std::string(font::ICON_RESOURCES) + " Resources", "RESOURCES")
 			{
 			}
 

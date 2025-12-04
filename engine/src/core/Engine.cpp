@@ -1,10 +1,12 @@
 #include "Engine.h"
 
+// external
 #include <glm/vec2.hpp>
 
-#include "ArgProcessor.h"
+// core
+#include "core/ArgProcessor.h"
 
-// logger includes
+// logger
 #include "logger/Logger.h"
 
 namespace gallus

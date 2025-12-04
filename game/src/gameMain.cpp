@@ -3,20 +3,20 @@
 #include <filesystem>
 #include <ShellScalingApi.h>
 
-// core includes
+// core
 #include "resource.h"
 #include "core/ArgProcessor.h"
 
-// logger includes
+// logger
 #include "logger/Logger.h"
 
-// utils includes
+// utils
 #include "utils/file_abstractions.h"
 
-// gameplay includes
+// gameplay
 #include "gameplay/Game.h"
 
-// editor includes
+// editor
 #include "core/Engine.h"
 
 int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR lpCmdLine, _In_ int nShowCmd)

@@ -3,18 +3,19 @@
 
 #include "InspectorWindow.h"
 
+// external
 #include <imgui/imgui_helpers.h>
 #include <imgui/imgui_internal.h>
 
-// graphics includes
+// graphics
 #include "graphics/imgui/ImGuiWindow.h"
 #include "graphics/imgui/font_icon.h"
 
-// editor includes
-#include "editor/core/EditorEngine.h"
-
-// gameplay includes
+// gameplay
 #include "gameplay/Game.h"
+
+// editor
+#include "editor/core/EditorEngine.h"
 
 namespace gallus
 {

@@ -1,23 +1,27 @@
 #include "RenderEditorExposable.h"
 
+// external
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
 #include <imgui/imgui_toggle.h>
 #include <imgui/imgui_helpers.h>
 #include <limits>
 
+// utils
 #include "utils/string_extensions.h"
 
-#include "editor/core/EditorEngine.h"
-#include "editor/EditorExpose.h"
-
-#include "EditorWindowsConfig.h"
-
+// graphics
+#include "graphics/dx12/DX12Transform.h"
 #include "graphics/dx12/Texture.h"
 #include "graphics/dx12/Shader.h"
-#include "gameplay/Prefab.h"
 
-#include "graphics/dx12/DX12Transform.h"
+// editor
+#include "editor/core/EditorEngine.h"
+#include "editor/EditorExpose.h"
+#include "editor/graphics/imgui/EditorWindowsConfig.h"
+
+// gameplay
+#include "gameplay/Prefab.h"
 
 namespace gallus
 {
@@ -87,7 +91,7 @@ namespace gallus
 				return false;
 			}
 
-			bool ShowObject(IExposableToEditor* obj)
+			bool ShowObject(IExposableToEditor* obj, bool a_bInternal)
 			{
 				if (!obj)
 				{
@@ -98,75 +102,101 @@ namespace gallus
 				bool changed = false;
 				for (const EditorFieldInfo& subField : obj->GetEditorFields())
 				{
-					changed = ShowEditorFieldFromObject(obj, subField);
+					changed = ShowEditorFieldFromObject(obj, subField, a_bInternal);
 				}
 				return changed;
 			}
 
-			bool ShowAssetPicker(const std::string& a_sId, gallus::resources::EngineResource* a_pValue, gallus::resources::EngineResource** a_pValuePtr, const EditorFieldInfo& a_Field)
+			bool ShowAssetPicker(
+				const std::string& a_sId,
+				gallus::resources::EngineResource* a_pLocked,
+				std::weak_ptr<gallus::resources::EngineResource>* a_pWeak,
+				const EditorFieldInfo& a_Field)
 			{
 				bool changed = false;
 
-				const std::string name = (a_pValue != nullptr) ? a_pValue->GetName() : "<null>";
+				const std::string name = (a_pLocked != nullptr) ? a_pLocked->GetName() : "<null>";
 
 				char buf[256];
 				strncpy_s(buf, sizeof(buf), name.c_str(), sizeof(buf) - 1);
 				buf[sizeof(buf) - 1] = '\0';
 
-				ImVec2 buttonSize = ImVec2(core::EDITOR_ENGINE->GetDX12().GetImGuiWindow().GetFontSize() * 2, core::EDITOR_ENGINE->GetDX12().GetImGuiWindow().GetFontSize() * 2);
+				ImVec2 buttonSize = ImVec2(
+					core::EDITOR_ENGINE->GetDX12().GetImGuiWindow().GetFontSize() * 2,
+					core::EDITOR_ENGINE->GetDX12().GetImGuiWindow().GetFontSize() * 2);
 
-				ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(core::EDITOR_ENGINE->GetDX12().GetImGuiWindow().GetFontSize() / 2, core::EDITOR_ENGINE->GetDX12().GetImGuiWindow().GetFontSize() / 2));
+				ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,
+					ImVec2(
+						core::EDITOR_ENGINE->GetDX12().GetImGuiWindow().GetFontSize() / 2,
+						core::EDITOR_ENGINE->GetDX12().GetImGuiWindow().GetFontSize() / 2));
+
 				ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
 				ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x - buttonSize.x);
 				ImGui::InputText(a_sId.c_str(), buf, sizeof(buf), ImGuiInputTextFlags_ReadOnly);
 				ImGui::PopItemFlag();
+
 				ImGui::SameLine();
-				if (ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_FILE, a_sId + BUTTON_ID, "").c_str(), buttonSize))
+
+				if (ImGui::Button(
+					ImGui::IMGUI_FORMAT_ID(font::ICON_FILE, a_sId + BUTTON_ID, "").c_str(),
+					buttonSize))
 				{
-					FilePickerModal& filePickerModal = core::EDITOR_ENGINE->GetDX12().GetImGuiWindow().GetWindowsConfig<EditorWindowsConfig>().GetFilePickerModal();
+					changed = true;
+
+					FilePickerModal& filePickerModal =
+						core::EDITOR_ENGINE->GetDX12().GetImGuiWindow()
+						.GetWindowsConfig<EditorWindowsConfig>().GetFilePickerModal();
+
 					filePickerModal.SetData(
-						[&changed, a_pValuePtr, a_pValue](int success, gallus::resources::FileResource& resource)
-					{
-						if (success == 1)
+						// FIX: capture changedPtr instead of reference to local variable
+						[a_pLocked, a_pWeak](int success, gallus::resources::FileResource& resource)
 						{
-							if (!a_pValue)
+							if (success == 1)
 							{
-								return;
-							}
+								if (a_pLocked == nullptr)
+								{
+									return;
+								}
 
-							if (a_pValue->GetResourceType() == resources::AssetType::Sprite)
-							{
-								auto cCommandQueue = core::EDITOR_ENGINE->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
+								switch (a_pLocked->GetResourceType())
+								{
+									case resources::AssetType::Sprite:
+									{
+										auto cCommandQueue =
+											core::EDITOR_ENGINE->GetDX12()
+											.GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
 
-								*a_pValuePtr = core::EDITOR_ENGINE->GetResourceAtlas()
-									.LoadTexture(resource.GetPath().filename().generic_string(), cCommandQueue)
-									.get();
+										*a_pWeak = core::EDITOR_ENGINE->GetResourceAtlas()
+											.LoadTexture(resource.GetPath().filename().generic_string(), cCommandQueue);
+
+										break;
+									}
+									case resources::AssetType::PixelShader:
+									{
+										*a_pWeak = core::EDITOR_ENGINE->GetResourceAtlas()
+											.LoadPixelShader(resource.GetPath().filename().generic_string());
+										break;
+									}
+									case resources::AssetType::VertexShader:
+									{
+										*a_pWeak = core::EDITOR_ENGINE->GetResourceAtlas()
+											.LoadVertexShader(resource.GetPath().filename().generic_string());
+										break;
+									}
+									case resources::AssetType::Prefab:
+									{
+										*a_pWeak = core::EDITOR_ENGINE->GetResourceAtlas()
+											.LoadPrefab(resource.GetPath().filename().generic_string());
+										break;
+									}
+								}
 							}
-							else if (a_pValue->GetResourceType() == resources::AssetType::PixelShader)
-							{
-								*a_pValuePtr = core::EDITOR_ENGINE->GetResourceAtlas()
-									.LoadPixelShader(resource.GetPath().filename().generic_string())
-									.get();
-							}
-							else if (a_pValue->GetResourceType() == resources::AssetType::VertexShader)
-							{
-								*a_pValuePtr = core::EDITOR_ENGINE->GetResourceAtlas()
-									.LoadVertexShader(resource.GetPath().filename().generic_string())
-									.get();
-							}
-							else if (a_pValue->GetResourceType() == resources::AssetType::Prefab)
-							{
-								*a_pValuePtr = core::EDITOR_ENGINE->GetResourceAtlas()
-									.LoadPrefab(resource.GetPath().filename().generic_string())
-									.get();
-							}
-							
-							changed = true;
-						}
-					},
+						},
 						std::vector<gallus::resources::AssetType>{ a_Field.m_Options.assetType });
+
 					filePickerModal.Show();
 				}
+
 				ImGui::ShowTooltip(a_Field.m_Options.description);
 				ImGui::PopStyleVar();
 
@@ -255,8 +285,13 @@ namespace gallus
 				return false; // read-only
 			}
 
-			bool ShowEditorFieldFromObject(IExposableToEditor* a_pObject, const EditorFieldInfo& a_Field)
+			bool ShowEditorFieldFromObject(IExposableToEditor* a_pObject, const EditorFieldInfo& a_Field, bool a_bInternal)
 			{
+				if (a_Field.m_Options.internal != a_bInternal)
+				{
+					return false;
+				}
+
 				void* ptr = reinterpret_cast<char*>(a_pObject) + a_Field.m_iOffset;
 
 				std::function<bool()> func = [] { return false; };
@@ -382,13 +417,23 @@ namespace gallus
 					}
 					case EditorFieldWidgetType::AssetPickerPtr:
 					{
-						gallus::resources::EngineResource** pValuePtr = reinterpret_cast<gallus::resources::EngineResource**>(ptr);
-						
-						func = [&a_Field, &fieldId, pValuePtr, ptr]
+						std::weak_ptr<gallus::resources::EngineResource>* pWeak =
+							reinterpret_cast<std::weak_ptr<gallus::resources::EngineResource>*>(ptr);
+
+						func = [&a_Field, &fieldId, pWeak]()
 						{
-							gallus::resources::EngineResource* value = (pValuePtr && *pValuePtr) ? *pValuePtr : nullptr;
-							return ShowAssetPicker(fieldId, value, pValuePtr, a_Field);
+							std::shared_ptr<gallus::resources::EngineResource> locked;
+							if (pWeak)
+							{
+								locked = pWeak->lock();
+							}
+
+							gallus::resources::EngineResource* pLocked =
+								(locked.get()) ? locked.get() : nullptr;
+
+							return ShowAssetPicker(fieldId, pLocked, pWeak, a_Field);
 						};
+
 						break;
 					}
 					case EditorFieldWidgetType::Object:
@@ -396,7 +441,7 @@ namespace gallus
 						showTable = false;
 						IExposableToEditor* editorObject = dynamic_cast<IExposableToEditor*>(reinterpret_cast<IExposableToEditor*>(ptr));
 
-						return ShowObject(editorObject);
+						return ShowObject(editorObject, a_bInternal);
 						break;
 					}
 					case EditorFieldWidgetType::ObjectPtr:
@@ -406,7 +451,7 @@ namespace gallus
 						IExposableToEditor** ppEditorObject = reinterpret_cast<IExposableToEditor**>(ptr);
 						IExposableToEditor* pEditorObject = (ppEditorObject ? *ppEditorObject : nullptr);
 
-						return ShowObject(pEditorObject);
+						return ShowObject(pEditorObject, a_bInternal);
 						break;
 					}
 					case EditorFieldWidgetType::EnumDropdown:
@@ -491,7 +536,7 @@ namespace gallus
 				{
 					for (const EditorFieldInfo& field : fields)
 					{
-						if (ShowEditorFieldFromObject(a_pObject, field))
+						if (ShowEditorFieldFromObject(a_pObject, field, field.m_Options.internal))
 						{
 							changed = true;
 						}

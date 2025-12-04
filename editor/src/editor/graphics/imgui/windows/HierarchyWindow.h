@@ -5,15 +5,16 @@
 
 #include "graphics/imgui/windows/BaseWindow.h"
 
+// external
 #include <vector>
 
-// graphics includes
+// graphics
 #include "graphics/imgui/views/DataTypes/StringTextInput.h"
 
-// gameplay includes
+// gameplay
 #include "gameplay/EntityID.h"
 
-// editor includes
+// editor
 #include "editor/graphics/imgui/selectables/EntityEditorSelectable.h"
 
 namespace gallus

@@ -2,14 +2,15 @@
 
 #include "core/System.h"
 
+// external
 #include <vector>
 #include <string>
 #include <mutex>
 
-// core includes
+// core
 #include "core/Event.h"
 
-// gameplay includes
+// gameplay
 #include "gameplay/Entity.h"
 
 namespace gallus

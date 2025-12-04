@@ -3,14 +3,15 @@
 
 #pragma once
 
+// external
 #include <imgui/imgui.h>
 #include <string>
 #include <vector>
 
-// utils includes
+// utils
 #include "utils/file_abstractions.h"
 
-// editor includes
+// editor
 #include "editor/graphics/imgui/EditorSelectable.h"
 
 namespace gallus

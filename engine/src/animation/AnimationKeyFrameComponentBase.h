@@ -1,10 +1,12 @@
 #pragma once
 
+// external
 #include <string>
-
 #ifdef _EDITOR
-#include "editor/EditorExpose.h"
 #include <rapidjson/document.h>
+
+// editor
+#include "editor/EditorExpose.h"
 #endif
 
 namespace gallus

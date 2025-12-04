@@ -2,15 +2,16 @@
 
 #include "core/System.h"
 
+// external
 #include <glm/vec2.hpp>
 #include <wtypes.h>
 #include <string>
 #include <queue>
 
-// core includes
+// core
 #include "core/Event.h"
 
-// gameplay includes
+// gameplay
 #include "graphics/win32/WindowSettings.h"
 
 #if defined(CreateWindow)

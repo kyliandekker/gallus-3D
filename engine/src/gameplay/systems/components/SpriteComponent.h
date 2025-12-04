@@ -2,14 +2,20 @@
 
 #include "gameplay/systems/components/Component.h"
 
-#include "editor/EditorExpose.h"
-
-#include "resources/AssetType.h"
-
-#include "graphics/dx12/DX12PCH.h"
-
+// external
 #include <memory>
 #include <glm/vec4.hpp>
+
+// graphics
+#include "graphics/dx12/DX12PCH.h"
+
+// resources
+#include "resources/AssetType.h"
+
+#ifdef _EDITOR
+// editor
+#include "editor/EditorExpose.h"
+#endif
 
 namespace gallus
 {
@@ -45,45 +51,45 @@ namespace gallus
 			/// Sets the mesh used by the mesh component.
 			/// </summary>
 			/// <param name="a_Mesh">Reference to the mesh that the mesh component will use.</param>
-			void SetMesh(graphics::dx12::Mesh* a_pMesh);
+			void SetMesh(std::weak_ptr<graphics::dx12::Mesh> a_pMesh);
 
 			/// <summary>
 			/// Sets the shader used by the mesh component.
 			/// </summary>
 			/// <param name="a_Shader">Reference to the shader bind that the mesh component will use.</param>
-			void SetShader(graphics::dx12::DX12ShaderBind* a_pShaderBind);
+			void SetShader(std::weak_ptr < graphics::dx12::DX12ShaderBind> a_pShaderBind);
 
 			/// <summary>
 			/// Sets the texture used by the mesh component.
 			/// </summary>
 			/// <param name="a_Texture">Reference to the texture that the mesh component will use.</param>
-			void SetTexture(graphics::dx12::Texture* a_pTexture);
+			void SetTexture(std::weak_ptr < graphics::dx12::Texture> a_pTexture);
 
 			/// <summary>
 			/// Retrieves the mesh used by the mesh component.
 			/// </summary>
 			/// <returns>Pointer to the mesh if the mesh exists, otherwise nullptr.</returns>
-			graphics::dx12::Mesh* GetMesh() const
+			std::shared_ptr<graphics::dx12::Mesh> GetMesh() const
 			{
-				return m_pMesh;
+				return m_pMesh.lock();
 			}
 
 			/// <summary>
 			/// Retrieves the shader used by the mesh component.
 			/// </summary>
 			/// <returns>Pointer to the mesh if the mesh exists, otherwise nullptr.</returns>
-			graphics::dx12::DX12ShaderBind* GetShader()
+			std::shared_ptr<graphics::dx12::DX12ShaderBind> GetShader()
 			{
-				return m_pShaderBind;
+				return m_pShaderBind.lock();
 			}
 
 			/// <summary>
 			/// Retrieves the texture used by the mesh component.
 			/// </summary>
 			/// <returns>Pointer to the mesh if the mesh exists, otherwise nullptr.</returns>
-			graphics::dx12::Texture* GetTexture()
+			std::shared_ptr<graphics::dx12::Texture > GetTexture()
 			{
-				return m_pTexture;
+				return m_pTexture.lock();
 			}
 
 			/// <summary>
@@ -142,12 +148,11 @@ namespace gallus
 			/// <param name="a_SrcData">The source data.</param>
 			void Deserialize(const resources::SrcData& a_SrcData) override;
 		private:
-			graphics::dx12::Mesh* m_pMesh = nullptr;
-			graphics::dx12::DX12ShaderBind* m_pShaderBind = nullptr;
-			graphics::dx12::Texture* m_pTexture = nullptr;
+			std::weak_ptr<graphics::dx12::Mesh> m_pMesh = {};
+			std::weak_ptr<graphics::dx12::DX12ShaderBind> m_pShaderBind = {};
+			std::weak_ptr<graphics::dx12::Texture> m_pTexture = {};
 			int8_t m_iSpriteIndex = 0;
 			DirectX::XMFLOAT4 m_vColor = { 1, 1, 1, 1 };
-
 #ifdef _EDITOR
 			BEGIN_EXPOSE_FIELDS_PARENT(SpriteComponent, Component)
 				EXPOSE_FIELD(SpriteComponent, m_pShaderBind, "Shader Bind", (FieldOptions{ .type = EditorFieldWidgetType::ObjectPtr }))
