@@ -274,7 +274,19 @@ namespace gallus
 			std::shared_ptr<graphics::dx12::Mesh> mesh = GetResource(m_aMeshes, a_sName, fs::path());
 			if (!mesh->IsValid())
 			{
-				mesh->LoadByName(a_sName);
+				//#ifdef _EDITOR
+				resources::FileResource* fileResource = nullptr;
+				if (!GetResource(a_sName, fileResource))
+				{
+					LOG(LogSeverity::LOGSEVERITY_ERROR, "Could not find resource: \"%s\".", a_sName.c_str());
+					return mesh;
+				}
+
+				fs::path vertexShaderPath = fileResource->GetPath().lexically_normal();
+				mesh->LoadByPath(vertexShaderPath);
+				//#else
+				// 
+				//#endif // _EDITOR
 			}
 			return mesh;
 		}

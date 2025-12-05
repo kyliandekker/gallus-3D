@@ -25,6 +25,7 @@ namespace gallus
 		Toggle,
 		InputText,
 		Vector2Field,
+		Vector3Field,
 		AssetPickerPtr,
 		Object,
 		ObjectPtr,

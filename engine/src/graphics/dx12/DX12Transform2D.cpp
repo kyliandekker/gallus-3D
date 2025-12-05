@@ -1,4 +1,4 @@
-﻿#include "DX12Transform.h"
+﻿#include "DX12Transform2D.h"
 
 // external
 #include <iostream>
@@ -10,9 +10,9 @@ namespace gallus
 		namespace dx12
 		{
 			//---------------------------------------------------------------------
-			// DX12Transform
+			// DX12Transform2D
 			//---------------------------------------------------------------------
-			DX12Transform::DX12Transform() : 
+			DX12Transform2D::DX12Transform2D() : 
 				m_vPosition{ 0.0f, 0.0f },
 				m_vScale{ 1.0f, 1.0f },
 				m_vPivot{ -0.5f, -0.5f },
@@ -20,25 +20,25 @@ namespace gallus
 			{}
 
 			//---------------------------------------------------------------------
-			void DX12Transform::SetPosition(const DirectX::XMFLOAT2& a_vPosition)
+			void DX12Transform2D::SetPosition(const DirectX::XMFLOAT2& a_vPosition)
 			{
 				m_vPosition = a_vPosition;
 			}
 
 			//---------------------------------------------------------------------
-			void DX12Transform::SetRotation(float a_fRotationDegrees)
+			void DX12Transform2D::SetRotation(float a_fRotationDegrees)
 			{
 				m_fRotationDegrees = a_fRotationDegrees;
 			}
 
 			//---------------------------------------------------------------------
-			void DX12Transform::SetScale(const DirectX::XMFLOAT2& a_Scale)
+			void DX12Transform2D::SetScale(const DirectX::XMFLOAT2& a_Scale)
 			{
 				m_vScale = a_Scale;
 			}
 
 			//---------------------------------------------------------------------
-			void DX12Transform::SetPivot(const DirectX::XMFLOAT2& a_vPivot)
+			void DX12Transform2D::SetPivot(const DirectX::XMFLOAT2& a_vPivot)
 			{
 				m_vPivot = a_vPivot;
 				if (m_vPivot.x < -0.5f)
@@ -60,31 +60,31 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			const DirectX::XMFLOAT2& DX12Transform::GetPosition() const
+			const DirectX::XMFLOAT2& DX12Transform2D::GetPosition() const
 			{
 				return m_vPosition;
 			}
 
 			//---------------------------------------------------------------------
-			float DX12Transform::GetRotation() const
+			float DX12Transform2D::GetRotation() const
 			{
 				return m_fRotationDegrees;
 			}
 
 			//---------------------------------------------------------------------
-			const DirectX::XMFLOAT2& DX12Transform::GetScale() const
+			const DirectX::XMFLOAT2& DX12Transform2D::GetScale() const
 			{
 				return m_vScale;
 			}
 
 			//---------------------------------------------------------------------
-			const DirectX::XMFLOAT2& DX12Transform::GetPivot() const
+			const DirectX::XMFLOAT2& DX12Transform2D::GetPivot() const
 			{
 				return m_vPivot;
 			}
 
 			//---------------------------------------------------------------------
-			const DirectX::XMMATRIX DX12Transform::GetWorldMatrix() const
+			const DirectX::XMMATRIX DX12Transform2D::GetWorldMatrix() const
 			{
 				DirectX::XMMATRIX scaleMatrix = DirectX::XMMatrixScaling(m_vScale.x, m_vScale.y, 1.0f);
 				float radians = DirectX::XMConvertToRadians(m_fRotationDegrees);
@@ -95,7 +95,7 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			const DirectX::XMMATRIX DX12Transform::GetWorldMatrixWithPivot() const
+			const DirectX::XMMATRIX DX12Transform2D::GetWorldMatrixWithPivot() const
 			{
 				DirectX::XMMATRIX scaleMatrix = DirectX::XMMatrixScaling(m_vScale.x, m_vScale.y, 1.0f);
 				float radians = DirectX::XMConvertToRadians(m_fRotationDegrees);
@@ -110,7 +110,7 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			void DX12Transform::SetWorldMatrix(const DirectX::XMMATRIX& a_WorldMatrix)
+			void DX12Transform2D::SetWorldMatrix(const DirectX::XMMATRIX& a_WorldMatrix)
 			{
 				m_vPosition.x = DirectX::XMVectorGetX(a_WorldMatrix.r[3]);
 				m_vPosition.y = DirectX::XMVectorGetY(a_WorldMatrix.r[3]);
@@ -134,7 +134,7 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			std::array<DirectX::XMFLOAT2, 4> DX12Transform::GetWorldCorners() const
+			std::array<DirectX::XMFLOAT2, 4> DX12Transform2D::GetWorldCorners() const
 			{
 				std::array<DirectX::XMFLOAT2, 4> corners = {
 					DirectX::XMFLOAT2(-0.5f, -0.5f),

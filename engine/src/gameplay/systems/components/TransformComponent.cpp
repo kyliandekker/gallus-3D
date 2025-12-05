@@ -25,7 +25,7 @@ namespace gallus
 		//---------------------------------------------------------------------
 		// TransformComponent
 		//---------------------------------------------------------------------
-		graphics::dx12::DX12Transform& TransformComponent::Transform()
+		graphics::dx12::DX12Transform2D& TransformComponent::Transform()
 		{
 			return m_Transform;
 		}

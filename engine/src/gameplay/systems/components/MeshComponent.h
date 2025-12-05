@@ -37,9 +37,9 @@ namespace gallus
 		struct EntityID;
 
 		//---------------------------------------------------------------------
-		// SpriteComponent
+		// MeshComponent
 		//---------------------------------------------------------------------
-		class SpriteComponent : public Component
+		class MeshComponent : public Component
 		{
 		public:
 			/// <summary>
@@ -93,33 +93,33 @@ namespace gallus
 			}
 
 			/// <summary>
-			/// Retrieves the sprite index.
+			/// Retrieves the texture index.
 			/// </summary>
-			/// <returns>The sprite index.</returns>
-			int8_t GetSpriteIndex()
+			/// <returns>The texture index.</returns>
+			int8_t GetTextureIndex()
 			{
-				return m_iSpriteIndex;
+				return m_iTextureIndex;
 			}
 
 			/// <summary>
-			/// Sets the sprite index.
+			/// Sets the texture index.
 			/// </summary>
-			/// <param name="a_iSpriteIndex">The index the sprite should have.</param>
-			void SetSpriteIndex(int8_t a_iSpriteIndex);
+			/// <param name="a_iTextureIndex">The index the texture should have.</param>
+			void SetTextureIndex(int8_t a_iTextureIndex);
 
 			/// <summary>
-			/// Retrieves the sprite color.
+			/// Retrieves the Mesh color.
 			/// </summary>
-			/// <returns>The sprite color.</returns>
+			/// <returns>The Mesh color.</returns>
 			const DirectX::XMFLOAT4& GetColor()
 			{
 				return m_vColor;
 			}
 
 			/// <summary>
-			/// Sets the sprite color.
+			/// Sets the Mesh color.
 			/// </summary>
-			/// <param name="a_vColor">The color the sprite should have.</param>
+			/// <param name="a_vColor">The color the Mesh should have.</param>
 			void SetColor(const DirectX::XMFLOAT4& a_vColor)
 			{
 				m_vColor = a_vColor;
@@ -151,21 +151,22 @@ namespace gallus
 			std::weak_ptr<graphics::dx12::Mesh> m_pMesh = {};
 			std::weak_ptr<graphics::dx12::DX12ShaderBind> m_pShaderBind = {};
 			std::weak_ptr<graphics::dx12::Texture> m_pTexture = {};
-			int8_t m_iSpriteIndex = 0;
+			int8_t m_iTextureIndex = 0;
 			DirectX::XMFLOAT4 m_vColor = { 1, 1, 1, 1 };
 #ifdef _EDITOR
-			BEGIN_EXPOSE_FIELDS_PARENT(SpriteComponent, Component)
-				EXPOSE_FIELD(SpriteComponent, m_pShaderBind, "Shader Bind", (FieldOptions{ .type = EditorFieldWidgetType::ObjectPtr }))
-				EXPOSE_FIELD(SpriteComponent, m_pTexture, "Texture", (FieldOptions{ .type = EditorFieldWidgetType::AssetPickerPtr, .assetType = resources::AssetType::Sprite, .description = "Pointer to the texture asset used by this sprite. Can be nullptr if no texture is assigned. Determines the visual appearance of the sprite." }))
-				EXPOSE_FIELD(SpriteComponent, m_iSpriteIndex, "Sprite Index", (FieldOptions{ .type = EditorFieldWidgetType::DragInt8, .description = "Index of the sprite within a texture atlas. Used when the texture contains multiple sprites to select which one is displayed." }))
-				EXPOSE_FIELD(SpriteComponent, m_pTexture, "Texture Preview", (FieldOptions{
-				.type = EditorFieldWidgetType::TexturePreview,
-				.relatedIndexFieldOffset = offsetof(SpriteComponent, m_iSpriteIndex)
-					}))
-			END_EXPOSE_FIELDS(SpriteComponent)
-			BEGIN_EXPOSE_GIZMOS(SpriteComponent)
-			END_EXPOSE_GIZMOS(SpriteComponent)
-			END_EXPOSE_TO_EDITOR(SpriteComponent)
+			BEGIN_EXPOSE_FIELDS_PARENT(MeshComponent, Component)
+				EXPOSE_FIELD(MeshComponent, m_pShaderBind, "Shader Bind", (FieldOptions{ .type = EditorFieldWidgetType::ObjectPtr }))
+				EXPOSE_FIELD(MeshComponent, m_pMesh, "Mesh", (FieldOptions{ .type = EditorFieldWidgetType::AssetPickerPtr, .assetType = resources::AssetType::Mesh, .description = "Pointer to the texture asset used by this Mesh. Can be nullptr if no texture is assigned. Determines the visual appearance of the Mesh." }))
+				EXPOSE_FIELD(MeshComponent, m_pTexture, "Texture", (FieldOptions{ .type = EditorFieldWidgetType::AssetPickerPtr, .assetType = resources::AssetType::Sprite, .description = "Pointer to the mesh asset used by this Mesh. Can be nullptr if no texture is assigned. Determines the visual appearance of the Mesh." }))
+				EXPOSE_FIELD(MeshComponent, m_iTextureIndex, "Texture Index", (FieldOptions{ .type = EditorFieldWidgetType::DragInt8, .description = "Index of the Mesh within a texture atlas. Used when the texture contains multiple rects to select which one is displayed." }))
+				EXPOSE_FIELD(MeshComponent, m_pTexture, "Texture Preview", (FieldOptions{
+					.type = EditorFieldWidgetType::TexturePreview,
+					.relatedIndexFieldOffset = offsetof(MeshComponent, m_iTextureIndex)
+				}))
+			END_EXPOSE_FIELDS(MeshComponent)
+			BEGIN_EXPOSE_GIZMOS(MeshComponent)
+			END_EXPOSE_GIZMOS(MeshComponent)
+			END_EXPOSE_TO_EDITOR(MeshComponent)
 #endif
 		};
 	}

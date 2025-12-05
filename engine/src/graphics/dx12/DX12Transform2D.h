@@ -15,15 +15,15 @@ namespace gallus
 		namespace dx12
 		{
 			//---------------------------------------------------------------------
-			// DX12Transform
+			// DX12Transform2D
 			//---------------------------------------------------------------------
-			class DX12Transform
+			class DX12Transform2D
 #ifdef _EDITOR
 				: public IExposableToEditor
 #endif
 			{
 			public:
-				DX12Transform();
+				DX12Transform2D();
 
 				/// <summary>
 				/// Sets the position of the transform.
@@ -103,15 +103,15 @@ namespace gallus
 				float m_fRotationDegrees = 0.0f; // rotation around Z axis
 
 #ifdef _EDITOR
-			BEGIN_EXPOSE_FIELDS(DX12Transform)
-				EXPOSE_FIELD(DX12Transform, m_vPosition, "Position", (FieldOptions{ .type = EditorFieldWidgetType::Vector2Field, .description = "The position of the object in 2D space. Defines where the object is located on the screen." }))
-				EXPOSE_FIELD(DX12Transform, m_vScale, "Scale", (FieldOptions{ .type = EditorFieldWidgetType::Vector2Field, .description = "The size multiplier of the object. A value of 1 means default size, values greater than 1 enlarge the object, and values below 1 shrink it." }))
-				EXPOSE_FIELD(DX12Transform, m_vPivot, "Pivot", (FieldOptions{ .type = EditorFieldWidgetType::Vector2Field, .min = "-0.5", .max = "0.5", .description = "The pivot point for transformations relative to the object�s center. Coordinates represent the normalized offset used for scaling and rotation." }))
-				EXPOSE_FIELD(DX12Transform, m_fRotationDegrees, "Rotation", (FieldOptions{ .type = EditorFieldWidgetType::DragFloat, .description = "Rotation around the Z-axis in degrees. Controls how much the object is rotated clockwise or counterclockwise." }))
-			END_EXPOSE_FIELDS(DX12Transform)
-			BEGIN_EXPOSE_GIZMOS(DX12Transform)
-			END_EXPOSE_GIZMOS(DX12Transform)
-			END_EXPOSE_TO_EDITOR(DX12Transform)
+			BEGIN_EXPOSE_FIELDS(DX12Transform2D)
+				EXPOSE_FIELD(DX12Transform2D, m_vPosition, "Position", (FieldOptions{ .type = EditorFieldWidgetType::Vector2Field, .description = "The position of the object in 2D space. Defines where the object is located on the screen." }))
+				EXPOSE_FIELD(DX12Transform2D, m_vScale, "Scale", (FieldOptions{ .type = EditorFieldWidgetType::Vector2Field, .description = "The size multiplier of the object. A value of 1 means default size, values greater than 1 enlarge the object, and values below 1 shrink it." }))
+				EXPOSE_FIELD(DX12Transform2D, m_vPivot, "Pivot", (FieldOptions{ .type = EditorFieldWidgetType::Vector2Field, .min = "-0.5", .max = "0.5", .description = "The pivot point for transformations relative to the object�s center. Coordinates represent the normalized offset used for scaling and rotation." }))
+				EXPOSE_FIELD(DX12Transform2D, m_fRotationDegrees, "Rotation", (FieldOptions{ .type = EditorFieldWidgetType::DragFloat, .description = "Rotation around the Z-axis in degrees. Controls how much the object is rotated clockwise or counterclockwise." }))
+			END_EXPOSE_FIELDS(DX12Transform2D)
+			BEGIN_EXPOSE_GIZMOS(DX12Transform2D)
+			END_EXPOSE_GIZMOS(DX12Transform2D)
+			END_EXPOSE_TO_EDITOR(DX12Transform2D)
 #endif
 			};
 		}

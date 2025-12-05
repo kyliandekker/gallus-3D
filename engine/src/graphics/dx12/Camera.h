@@ -6,7 +6,7 @@
 #include <DirectXMath.h>
 
 // graphics
-#include "graphics/dx12/DX12Transform.h"
+#include "graphics/dx12/DX12Transform2D.h"
 
 namespace gallus
 {
@@ -55,13 +55,13 @@ namespace gallus
 				/// Gets a reference to the camera's transform, allowing modification of position and orientation.
 				/// </summary>
 				/// <returns>Reference to the transform component.</returns>
-				DX12Transform& Transform();
+				DX12Transform2D& Transform();
 
 				/// <summary>
 				/// Gets a constant reference to the camera's transform.
 				/// </summary>
 				/// <returns>Constant reference to the transform component.</returns>
-				const DX12Transform& Transform() const;
+				const DX12Transform2D& Transform() const;
 
 				/// <summary>
 				/// Computes and returns the view matrix from the camera's transform.
@@ -90,7 +90,7 @@ namespace gallus
 				}
 			private:
 				DirectX::XMINT2 m_vSize;
-				DX12Transform m_Transform;
+				DX12Transform2D m_Transform;
 				DirectX::XMMATRIX m_ProjectionMatrix;
 			};
 		}

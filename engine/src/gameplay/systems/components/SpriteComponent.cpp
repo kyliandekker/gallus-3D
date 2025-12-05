@@ -11,7 +11,7 @@
 #include "graphics/dx12/Mesh.h"
 #include "graphics/dx12/DX12ShaderBind.h"
 #include "graphics/dx12/Shader.h"
-#include "graphics/dx12/DX12Transform.h"
+#include "graphics/dx12/DX12Transform2D.h"
 #include "graphics/dx12/CommandList.h"
 #include "graphics/dx12/CommandQueue.h"
 
@@ -71,7 +71,7 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		bool CheckVisibility(const gallus::graphics::dx12::DX12Transform& a_Transform, const graphics::dx12::Camera& a_Camera)
+		bool CheckVisibility(const gallus::graphics::dx12::DX12Transform2D& a_Transform, const graphics::dx12::Camera& a_Camera)
 		{
 			const DirectX::XMFLOAT2& pos = a_Transform.GetPosition();
 			const DirectX::XMFLOAT2& scale = a_Transform.GetScale();
@@ -144,7 +144,7 @@ namespace gallus
 			const DirectX::XMMATRIX viewMatrix = a_Camera.GetViewMatrix();
 			const DirectX::XMMATRIX& projectionMatrix = a_Camera.GetProjectionMatrix();
 
-			graphics::dx12::DX12Transform transform;
+			graphics::dx12::DX12Transform2D transform;
 			TransformSystem& transformSys = core::ENGINE->GetECS().GetSystem<TransformSystem>();
 			if (transformSys.HasComponent(a_EntityID))
 			{

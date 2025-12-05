@@ -12,6 +12,7 @@
 #include "logger/Logger.h"
 
 // gameplay
+#include "gameplay/systems/MeshSystem.h"
 #include "gameplay/systems/SpriteSystem.h"
 #include "gameplay/systems/TransformSystem.h"
 #include "gameplay/systems/PlayerSystem.h"
@@ -34,6 +35,7 @@ namespace gallus
 
 			m_Scene.SetResourceCategory(resources::EngineResourceCategory::Game);
 
+			core::ENGINE->GetECS().CreateSystem<MeshSystem>().Initialize();
 			core::ENGINE->GetECS().CreateSystem<SpriteSystem>().Initialize();
 			core::ENGINE->GetECS().CreateSystem<TransformSystem>().Initialize();
 			core::ENGINE->GetECS().CreateSystem<PlayerSystem>().Initialize();

@@ -38,13 +38,13 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			DX12Transform& Camera::Transform()
+			DX12Transform2D& Camera::Transform()
 			{
 				return m_Transform;
 			}
 
 			//---------------------------------------------------------------------
-			const DX12Transform& Camera::Transform() const
+			const DX12Transform2D& Camera::Transform() const
 			{
 				return m_Transform;
 			}
