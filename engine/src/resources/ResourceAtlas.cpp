@@ -269,6 +269,17 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
+		std::weak_ptr<graphics::dx12::Mesh> ResourceAtlas::LoadMeshEmpty(const std::string& a_sName)
+		{
+			std::shared_ptr<graphics::dx12::Mesh> mesh = GetResource(m_aMeshes, a_sName, fs::path());
+			if (!mesh->IsValid())
+			{
+				mesh->LoadByNameEmpty(a_sName);
+			}
+			return mesh;
+		}
+
+		//---------------------------------------------------------------------
 		std::weak_ptr<graphics::dx12::Mesh> ResourceAtlas::LoadMesh(const std::string& a_sName)
 		{
 			std::shared_ptr<graphics::dx12::Mesh> mesh = GetResource(m_aMeshes, a_sName, fs::path());
@@ -282,8 +293,8 @@ namespace gallus
 					return mesh;
 				}
 
-				fs::path vertexShaderPath = fileResource->GetPath().lexically_normal();
-				mesh->LoadByPath(vertexShaderPath);
+				fs::path meshPath = fileResource->GetPath().lexically_normal();
+				mesh->LoadByPath(meshPath);
 				//#else
 				// 
 				//#endif // _EDITOR

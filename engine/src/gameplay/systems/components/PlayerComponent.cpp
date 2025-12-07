@@ -79,48 +79,9 @@ namespace gallus
 			bool s = inputSys.IsKey('S');
 			bool d = inputSys.IsKey('D');
 
-			if (left || right || up || down)
-			{
-				if (auto bulletPrefab = m_pBulletPrefab.lock())
-				{
-					gameplay::EntityID id = bulletPrefab->Instantiate();
-
-					ProjectileSystem& projectileSystem = core::ENGINE->GetECS().GetSystem<ProjectileSystem>();
-
-					CollisionSystem& collisionSys = core::ENGINE->GetECS().GetSystem<CollisionSystem>();
-					collisionSys.GetComponent(id).IgnoreEntity(id);
-					collisionSys.GetComponent(id).IgnoreEntity(m_EntityID);
-
-					TransformSystem& transformSys = core::ENGINE->GetECS().GetSystem<TransformSystem>();
-					const DirectX::XMFLOAT2& pos = transformSys.GetComponent(m_EntityID).Transform().GetPosition();
-					TransformComponent& transformComp = transformSys.GetComponent(id);
-					transformComp.Transform().SetPosition(pos);
-
-					if (left)
-					{
-						transformComp.Transform().SetRotation(-180);
-						projectileSystem.GetComponent(id).SetMovementSpeed({ -bulletSpeed, 0 });
-					}
-					else if (right)
-					{
-						projectileSystem.GetComponent(id).SetMovementSpeed({ bulletSpeed, 0 });
-					}
-					else if (up)
-					{
-						transformComp.Transform().SetRotation(-90);
-						projectileSystem.GetComponent(id).SetMovementSpeed({ 0, -bulletSpeed });
-					}
-					else if (down)
-					{
-						transformComp.Transform().SetRotation(90);
-						projectileSystem.GetComponent(id).SetMovementSpeed({ 0, bulletSpeed });
-					}
-				}
-			}
-
 			float deltaSpeed = m_fSpeed * a_fDeltaTime;
 
-			DirectX::XMFLOAT2 movement = { 0.0f, 0.0f };
+			DirectX::XMFLOAT3 movement = { 0.0f, 0.0f, 0.0f };
 
 			if (w)
 			{
@@ -137,54 +98,6 @@ namespace gallus
 			if (d)
 			{
 				movement.x += 1.0f;
-			}
-
-			if (w && d)
-			{
-				animationComp.LoadAnimation("player_walk_up_right.anim");
-				animationComp.Start();
-			}
-			else if (w && a)
-			{
-				animationComp.LoadAnimation("player_walk_up_left.anim");
-				animationComp.Start();
-			}
-			else if (s && a)
-			{
-				animationComp.LoadAnimation("player_walk_down_left.anim");
-				animationComp.Start();
-			}
-			else if (s && d)
-			{
-				animationComp.LoadAnimation("player_walk_down_right.anim");
-				animationComp.Start();
-			}
-			else if (w)
-			{
-				animationComp.LoadAnimation("player_walk_up.anim");
-				animationComp.Start();
-			}
-			else if (a)
-			{
-				animationComp.LoadAnimation("player_walk_left.anim");
-				animationComp.Start();
-			}
-			else if (s)
-			{
-				animationComp.LoadAnimation("player_walk_down.anim");
-				animationComp.Start();
-			}
-			else if (d)
-			{
-				animationComp.LoadAnimation("player_walk_right.anim");
-				animationComp.Start();
-			}
-			
-			if (movement.x == 0.0f && movement.y == 0.0f)
-			{
-				animationComp.LoadAnimation("player_walk_default.anim");
-				animationComp.Start();
-				return; 
 			}
 
 			float length = sqrtf(movement.x * movement.x + movement.y * movement.y);

@@ -22,14 +22,6 @@ namespace gallus
 			//---------------------------------------------------------------------
 			void Camera::SetProjection(float a_fWidth, float a_fHeight, float a_fNearPlane, float a_fFarPlane)
 			{
-				//m_ProjectionMatrix = DirectX::XMMatrixOrthographicOffCenterLH(
-				//	-a_fWidth * 0.5f, 
-				//	a_fWidth * 0.5f,
-				//	a_fHeight * 0.5f,
-				//	-a_fHeight * 0.5f,
-				//	a_fNearPlane, 
-				//	a_fFarPlane
-				//);
 				m_ProjectionMatrix = DirectX::XMMatrixOrthographicOffCenterLH(
 					0.0f, a_fWidth,
 					a_fHeight, 0.0f,
@@ -52,13 +44,13 @@ namespace gallus
 			//---------------------------------------------------------------------
 			DirectX::XMMATRIX Camera::GetViewMatrix() const
 			{
-				const DirectX::XMFLOAT2& pos = m_Transform.GetPosition();
+				const DirectX::XMFLOAT3& pos = m_Transform.GetPosition();
 				const float rotZ = DirectX::XMConvertToRadians(m_Transform.GetRotation());
-				const DirectX::XMFLOAT2& scale = m_Transform.GetScale();
+				const DirectX::XMFLOAT3& scale = m_Transform.GetScale();
 
-				const DirectX::XMMATRIX translation = DirectX::XMMatrixTranslation(pos.x, pos.y, 0.0f);
+				const DirectX::XMMATRIX translation = DirectX::XMMatrixTranslation(pos.x, pos.y, pos.z);
 				const DirectX::XMMATRIX rotation = DirectX::XMMatrixRotationZ(rotZ);
-				const DirectX::XMMATRIX scaling = DirectX::XMMatrixScaling(scale.x, scale.y, 1.0f);
+				const DirectX::XMMATRIX scaling = DirectX::XMMatrixScaling(scale.x, scale.y, scale.z);
 
 				const DirectX::XMMATRIX world = scaling * rotation * translation;
 

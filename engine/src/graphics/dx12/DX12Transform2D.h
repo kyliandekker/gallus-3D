@@ -28,8 +28,8 @@ namespace gallus
 				/// <summary>
 				/// Sets the position of the transform.
 				/// </summary>
-				/// <param name="a_vPosition">A XMFLOAT2 containing the position.</param>
-				void SetPosition(const DirectX::XMFLOAT2& a_vPosition);
+				/// <param name="a_vPosition">A XMFLOAT3 containing the position.</param>
+				void SetPosition(const DirectX::XMFLOAT3& a_vPosition);
 
 				/// <summary>
 				/// Sets the rotation of the transform.
@@ -40,20 +40,20 @@ namespace gallus
 				/// <summary>
 				/// Sets the scale of the transform.
 				/// </summary>
-				/// <param name="a_vScale">A XMFLOAT2 containing the scale.</param>
-				void SetScale(const DirectX::XMFLOAT2& a_vScale);
+				/// <param name="a_vScale">A XMFLOAT3 containing the scale.</param>
+				void SetScale(const DirectX::XMFLOAT3& a_vScale);
 
 				/// <summary>
 				/// Sets the pivot of the transform.
 				/// </summary>
-				/// <param name="a_vPivot">A XMFLOAT2 containing the pivot.</param>
-				void SetPivot(const DirectX::XMFLOAT2& a_vPivot);
+				/// <param name="a_vPivot">A XMFLOAT3 containing the pivot.</param>
+				void SetPivot(const DirectX::XMFLOAT3& a_vPivot);
 
 				/// <summary>
 				/// Retrieves the position of the transform.
 				/// </summary>
-				/// <returns>A XMFLOAT2 containing the position.</returns>
-				const DirectX::XMFLOAT2& GetPosition() const;
+				/// <returns>A XMFLOAT3 containing the position.</returns>
+				const DirectX::XMFLOAT3& GetPosition() const;
 
 				/// <summary>
 				/// Retrieves the rotation of the transform.
@@ -64,14 +64,14 @@ namespace gallus
 				/// <summary>
 				/// Retrieves the scale of the transform.
 				/// </summary>
-				/// <returns>A XMFLOAT2 containing the scale.</returns>
-				const DirectX::XMFLOAT2& GetScale() const;
+				/// <returns>A XMFLOAT3 containing the scale.</returns>
+				const DirectX::XMFLOAT3& GetScale() const;
 
 				/// <summary>
 				/// Retrieves the pivot of the transform.
 				/// </summary>
-				/// <returns>A XMFLOAT2 containing the pivot.</returns>
-				const DirectX::XMFLOAT2& GetPivot() const;
+				/// <returns>A XMFLOAT3 containing the pivot.</returns>
+				const DirectX::XMFLOAT3& GetPivot() const;
 
 				/// <summary>
 				/// Retrieves the world matrix.
@@ -95,11 +95,11 @@ namespace gallus
 				/// Retrieves the world corners for collision purposes.
 				/// </summary>
 				/// <returns>An array containing 4 corners in screen space.</returns>
-				std::array<DirectX::XMFLOAT2, 4> GetWorldCorners() const;
+				std::array<DirectX::XMFLOAT3, 4> GetWorldCorners() const;
 			private:
-				DirectX::XMFLOAT2 m_vPosition = { 0, 0 };
-				DirectX::XMFLOAT2 m_vScale = { 1, 1 };
-				DirectX::XMFLOAT2 m_vPivot = { -0.5f, -0.5f };
+				DirectX::XMFLOAT3 m_vPosition = { 0, 0, 0 };
+				DirectX::XMFLOAT3 m_vScale = { 1, 1, 1 };
+				DirectX::XMFLOAT3 m_vPivot = { -0.5f, -0.5f, -0.5f };
 				float m_fRotationDegrees = 0.0f; // rotation around Z axis
 
 #ifdef _EDITOR

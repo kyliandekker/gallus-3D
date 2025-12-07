@@ -273,7 +273,7 @@ namespace gallus
 				ImVec2 rectMax = ImVec2(rectMin.x + a_vSize.x * a_fZoom, rectMin.y + a_vSize.y * a_fZoom);
 
 				graphics::dx12::Camera& cam = core::ENGINE->GetDX12().GetActiveCamera();
-				const DirectX::XMFLOAT2& cameraPos = cam.Transform().GetPosition();
+				const DirectX::XMFLOAT3& cameraPos = cam.Transform().GetPosition();
 
 				// Draw vertical grid lines
 				float leftWorld = cameraPos.x + 0.5f;
@@ -496,7 +496,7 @@ namespace gallus
 				ImGuiIO& io = ImGui::GetIO();
 				graphics::dx12::Camera& camera = core::EDITOR_ENGINE->GetEditor().GetEditorCamera();
 
-				DirectX::XMFLOAT2 position = camera.Transform().GetPosition();
+				DirectX::XMFLOAT3 position = camera.Transform().GetPosition();
 
 				ImVec2 imageMin = { a_vSceneStartPos.x + m_vPanOffset.x, a_vSceneStartPos.y + m_vPanOffset.y };
 				ImVec2 imageMax = imageMin + ImVec2(a_vSize.x * m_fZoom, a_vSize.y * m_fZoom);

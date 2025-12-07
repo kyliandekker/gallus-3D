@@ -61,10 +61,6 @@ namespace gallus
 			/// <returns>A XMFLOAT2 containing the size.</returns>
 			const DirectX::XMFLOAT2& GetSize() const;
 
-			std::array<DirectX::XMFLOAT2, 4> GetColliderWorldCorners(const DirectX::XMFLOAT2& a_vPos, const DirectX::XMFLOAT2& a_vScale, const DirectX::XMFLOAT2& a_vPivot, float a_fRotation);
-
-			bool IntersectsOBB(const std::array<DirectX::XMFLOAT2, 4>& aA, const std::array<DirectX::XMFLOAT2, 4>& aB);
-
 			void IgnoreEntity(const gameplay::EntityID& a_EntityID);
 		protected:
 			/// <summary>

@@ -45,7 +45,7 @@ namespace gallus
 			/// Retrieves the translation.
 			/// </summary>
 			/// <returns>Reference to the translation vector.</returns>
-			const DirectX::XMFLOAT2& GetTranslation() const
+			const DirectX::XMFLOAT3& GetTranslation() const
 			{
 				return m_vTranslation;
 			}
@@ -54,7 +54,7 @@ namespace gallus
 			/// Translates the component.
 			/// </summary>
 			/// <param name="a_vTranslation">The movement.</param>
-			void SetTranslation(const DirectX::XMFLOAT2& a_vTranslation)
+			void SetTranslation(const DirectX::XMFLOAT3& a_vTranslation)
 			{
 				m_vTranslation = a_vTranslation;
 			}
@@ -63,7 +63,7 @@ namespace gallus
 			/// Translates the component.
 			/// </summary>
 			/// <param name="a_vTranslation">The movement.</param>
-			void Translate(const DirectX::XMFLOAT2& a_vTranslation);
+			void Translate(const DirectX::XMFLOAT3& a_vTranslation);
 		private:
 			/// <summary>
 			/// Updates the components.
@@ -72,7 +72,7 @@ namespace gallus
 			void UpdateRealtime(float a_fDeltaTime, UpdateTime a_UpdateTime);
 
 			graphics::dx12::DX12Transform2D m_Transform;
-			DirectX::XMFLOAT2 m_vTranslation = {};
+			DirectX::XMFLOAT3 m_vTranslation = {};
 #ifdef _EDITOR
 			BEGIN_EXPOSE_FIELDS_PARENT(TransformComponent, Component)
 				EXPOSE_FIELD(TransformComponent, m_Transform, "Transform", (FieldOptions{ .type = EditorFieldWidgetType::Object }))

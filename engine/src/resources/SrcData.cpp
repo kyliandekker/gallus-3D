@@ -58,7 +58,7 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		DirectX::XMFLOAT2 SrcData::GetVector(const std::string& a_sKey) const
+		DirectX::XMFLOAT2 SrcData::GetVector2(const std::string& a_sKey) const
 		{
 			float x = 0, y = 0;
 			if (!m_Document.IsNull() && m_Document.HasMember(a_sKey.c_str()) && m_Document[a_sKey.c_str()].IsObject())
@@ -67,6 +67,19 @@ namespace gallus
 				rapidjson::GetFloat(m_Document[a_sKey.c_str()], "y", y);
 			}
 			return { x,y };
+		}
+
+		//---------------------------------------------------------------------
+		DirectX::XMFLOAT3 SrcData::GetVector3(const std::string& a_sKey) const
+		{
+			float x = 0, y = 0, z = 0;
+			if (!m_Document.IsNull() && m_Document.HasMember(a_sKey.c_str()) && m_Document[a_sKey.c_str()].IsObject())
+			{
+				rapidjson::GetFloat(m_Document[a_sKey.c_str()], "x", x);
+				rapidjson::GetFloat(m_Document[a_sKey.c_str()], "y", y);
+				rapidjson::GetFloat(m_Document[a_sKey.c_str()], "z", z);
+			}
+			return { x, y, z };
 		}
 
 		//---------------------------------------------------------------------

@@ -269,7 +269,11 @@ namespace gallus
 							if (transformSys.HasComponent(view->GetEntityID()))
 							{
 								gameplay::TransformComponent& transformComponent = transformSys.GetComponent(view->GetEntityID());
-								DirectX::XMFLOAT2 pos = { transformComponent.Transform().GetPosition().x - (graphics::dx12::RENDER_TEX_SIZE.x / 2), transformComponent.Transform().GetPosition().y - (graphics::dx12::RENDER_TEX_SIZE.y / 2) };
+								DirectX::XMFLOAT3 pos = { 
+									transformComponent.Transform().GetPosition().x - (graphics::dx12::RENDER_TEX_SIZE.x / 2), 
+									transformComponent.Transform().GetPosition().y - (graphics::dx12::RENDER_TEX_SIZE.y / 2),
+									transformComponent.Transform().GetPosition().z
+								};
 								core::EDITOR_ENGINE->GetEditor().GetEditorCamera().Transform().SetPosition(pos);
 							}
 						}

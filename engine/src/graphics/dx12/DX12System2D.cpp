@@ -213,7 +213,7 @@ namespace gallus
 					renderTexShaderBind->SetIsDestroyable(false);
 				}
 
-				std::weak_ptr<Mesh> meshPtr = core::ENGINE->GetResourceAtlas().LoadMesh("square"); // Default mesh.
+				std::weak_ptr<Mesh> meshPtr = core::ENGINE->GetResourceAtlas().LoadMeshEmpty("square"); // Default mesh.
 				if (auto mesh = meshPtr.lock())
 				{
 					MeshPartData& squarePrimitive = s_PRIMITIVES[(int) PRIMITIVES::SQUARE];
@@ -238,7 +238,7 @@ namespace gallus
 				Resize({}, m_vSize);
 
 				m_Camera.Init(RENDER_TEX_SIZE.x, RENDER_TEX_SIZE.y);
-				m_Camera.Transform().SetPosition({ 0.0f, 0.0f });
+				m_Camera.Transform().SetPosition({ 0.0f, 0.0f, 0.0f });
 				
 #ifndef IMGUI_DISABLE
 				m_ImGuiWindow.OnRenderTargetCreated(dCommandList);

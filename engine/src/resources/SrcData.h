@@ -24,7 +24,8 @@ namespace gallus
 			}
 			std::string GetString(const std::string& a_sKey) const;
 			bool GetBool(const std::string& a_sKey) const;
-			DirectX::XMFLOAT2 GetVector(const std::string& a_sKey) const;
+			DirectX::XMFLOAT2 GetVector2(const std::string& a_sKey) const;
+			DirectX::XMFLOAT3 GetVector3(const std::string& a_sKey) const;
 			SrcData GetSrc(const std::string& a_sKey) const;
 		private:
 			rapidjson::Document m_Document;

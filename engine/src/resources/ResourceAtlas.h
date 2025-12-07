@@ -118,6 +118,11 @@ namespace gallus
 			bool LoadScene(const std::string& a_sName, gameplay::Scene& a_Scene);
 
 			/// <summary>
+			/// Loads an empty mesh.
+			/// </summary>
+			std::weak_ptr<graphics::dx12::Mesh> LoadMeshEmpty(const std::string& a_sName);
+
+			/// <summary>
 			/// Loads a mesh by name from the resource folder.
 			/// </summary>
 			std::weak_ptr<graphics::dx12::Mesh> LoadMesh(const std::string& a_sName);

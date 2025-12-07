@@ -60,6 +60,16 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
+			bool Mesh::LoadByNameEmpty(const std::string& a_sName)
+			{
+				m_sName = a_sName;
+
+				m_AssetType = resources::AssetType::Mesh;
+
+				return true;
+			}
+
+			//---------------------------------------------------------------------
 			void Mesh::SetMeshData(const MeshPartData& a_aData, const std::shared_ptr<CommandQueue> a_pCommandQueue)
 			{
 				if (!m_bIsDestroyable)

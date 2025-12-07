@@ -82,21 +82,25 @@ namespace gallus
 
 			m_vAcceleration.x = m_vForce.x / m_fMass;
 			m_vAcceleration.y = m_vForce.y / m_fMass;
+			m_vAcceleration.z = m_vForce.z / m_fMass;
 
 			m_vVelocity.x += m_vAcceleration.x * a_fDeltaTime;
 			m_vVelocity.y += m_vAcceleration.y * a_fDeltaTime;
+			m_vVelocity.z += m_vAcceleration.z * a_fDeltaTime;
 
 			m_vVelocity.x *= m_fLinearDamping;
 			m_vVelocity.y *= m_fLinearDamping;
+			m_vVelocity.z *= m_fLinearDamping;
 
-			DirectX::XMFLOAT2 vDelta = {
+			DirectX::XMFLOAT3 vDelta = {
 				m_vVelocity.x * a_fDeltaTime,
-				m_vVelocity.y * a_fDeltaTime
+				m_vVelocity.y * a_fDeltaTime,
+				m_vVelocity.z * a_fDeltaTime
 			};
 
 			transformComp.Translate(vDelta);
 
-			m_vForce = { 0.0f, 0.0f };
+			m_vForce = { 0.0f, 0.0f, 0.0f };
 		}
 	}
 }

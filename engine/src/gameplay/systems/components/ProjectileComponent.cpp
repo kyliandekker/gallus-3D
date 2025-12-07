@@ -78,7 +78,7 @@ namespace gallus
 						gameplay::EntityID id = explosionPrefab->Instantiate();
 
 						TransformSystem& transformSys = core::ENGINE->GetECS().GetSystem<TransformSystem>();
-						const DirectX::XMFLOAT2& pos = transformSys.GetComponent(m_EntityID).Transform().GetPosition();
+						const DirectX::XMFLOAT3& pos = transformSys.GetComponent(m_EntityID).Transform().GetPosition();
 						TransformComponent& transformComp = transformSys.GetComponent(id);
 						transformComp.Transform().SetPosition(pos);
 

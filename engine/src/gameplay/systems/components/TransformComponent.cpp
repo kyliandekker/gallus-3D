@@ -17,6 +17,7 @@
 #define JSON_TRANSFORM_COMPONENT_PIVOT_VAR "pivot"
 #define JSON_TRANSFORM_COMPONENT_X_VAR "x"
 #define JSON_TRANSFORM_COMPONENT_Y_VAR "y"
+#define JSON_TRANSFORM_COMPONENT_Z_VAR "z"
 
 namespace gallus
 {
@@ -43,6 +44,7 @@ namespace gallus
 
 			a_Document[JSON_TRANSFORM_COMPONENT_POSITION_VAR].AddMember(JSON_TRANSFORM_COMPONENT_X_VAR, m_Transform.GetPosition().x, a_Allocator);
 			a_Document[JSON_TRANSFORM_COMPONENT_POSITION_VAR].AddMember(JSON_TRANSFORM_COMPONENT_Y_VAR, m_Transform.GetPosition().y, a_Allocator);
+			a_Document[JSON_TRANSFORM_COMPONENT_POSITION_VAR].AddMember(JSON_TRANSFORM_COMPONENT_Z_VAR, m_Transform.GetPosition().z, a_Allocator);
 
 			a_Document.AddMember(JSON_TRANSFORM_COMPONENT_ROTATION_VAR, m_Transform.GetRotation(), a_Allocator);
 
@@ -50,29 +52,32 @@ namespace gallus
 
 			a_Document[JSON_TRANSFORM_COMPONENT_SCALE_VAR].AddMember(JSON_TRANSFORM_COMPONENT_X_VAR, m_Transform.GetScale().x, a_Allocator);
 			a_Document[JSON_TRANSFORM_COMPONENT_SCALE_VAR].AddMember(JSON_TRANSFORM_COMPONENT_Y_VAR, m_Transform.GetScale().y, a_Allocator);
+			a_Document[JSON_TRANSFORM_COMPONENT_SCALE_VAR].AddMember(JSON_TRANSFORM_COMPONENT_Z_VAR, m_Transform.GetScale().z, a_Allocator);
 
 			a_Document.AddMember(JSON_TRANSFORM_COMPONENT_PIVOT_VAR, rapidjson::Value().SetObject(), a_Allocator);
 
 			a_Document[JSON_TRANSFORM_COMPONENT_PIVOT_VAR].AddMember(JSON_TRANSFORM_COMPONENT_X_VAR, m_Transform.GetPivot().x, a_Allocator);
 			a_Document[JSON_TRANSFORM_COMPONENT_PIVOT_VAR].AddMember(JSON_TRANSFORM_COMPONENT_Y_VAR, m_Transform.GetPivot().y, a_Allocator);
+			a_Document[JSON_TRANSFORM_COMPONENT_PIVOT_VAR].AddMember(JSON_TRANSFORM_COMPONENT_Z_VAR, m_Transform.GetPivot().z, a_Allocator);
 		}
 #endif
 
 		//---------------------------------------------------------------------
 		void TransformComponent::Deserialize(const resources::SrcData& a_SrcData)
 		{
-			m_Transform.SetPosition(a_SrcData.GetVector(JSON_TRANSFORM_COMPONENT_POSITION_VAR));
-			m_Transform.SetScale(a_SrcData.GetVector(JSON_TRANSFORM_COMPONENT_SCALE_VAR));
-			m_Transform.SetPivot(a_SrcData.GetVector(JSON_TRANSFORM_COMPONENT_PIVOT_VAR));
+			m_Transform.SetPosition(a_SrcData.GetVector3(JSON_TRANSFORM_COMPONENT_POSITION_VAR));
+			m_Transform.SetScale(a_SrcData.GetVector3(JSON_TRANSFORM_COMPONENT_SCALE_VAR));
+			m_Transform.SetPivot(a_SrcData.GetVector3(JSON_TRANSFORM_COMPONENT_PIVOT_VAR));
 			m_Transform.SetRotation(a_SrcData.GetFloat(JSON_TRANSFORM_COMPONENT_ROTATION_VAR));
 		}
 
 		//---------------------------------------------------------------------
-		void TransformComponent::Translate(const DirectX::XMFLOAT2& a_vTranslation)
+		void TransformComponent::Translate(const DirectX::XMFLOAT3& a_vTranslation)
 		{
 			m_vTranslation = {
 				m_vTranslation.x + a_vTranslation.x,
-				m_vTranslation.y + a_vTranslation.y
+				m_vTranslation.y + a_vTranslation.y,
+				m_vTranslation.z + a_vTranslation.z
 			};
 		}
 
@@ -87,9 +92,10 @@ namespace gallus
 			TransformSystem& transformSys = core::ENGINE->GetECS().GetSystem<TransformSystem>();
 
 			TransformComponent& transformComp = transformSys.GetComponent(m_EntityID);
-			DirectX::XMFLOAT2 newPos = {
+			DirectX::XMFLOAT3 newPos = {
 				transformComp.Transform().GetPosition().x + m_vTranslation.x,
 				transformComp.Transform().GetPosition().y + m_vTranslation.y,
+				transformComp.Transform().GetPosition().z + m_vTranslation.z
 			};
 			transformComp.Transform().SetPosition(newPos);
 

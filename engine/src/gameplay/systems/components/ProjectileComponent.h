@@ -42,7 +42,7 @@ namespace gallus
 			/// Sets the velocity of the projectile.
 			/// </summary>
 			/// <param name="a_vVelocity">Sets the velocity of the projectile.</param>
-			void SetMovementSpeed(const DirectX::XMFLOAT2& a_vVelocity)
+			void SetMovementSpeed(const DirectX::XMFLOAT3& a_vVelocity)
 			{
 				m_vVelocity = a_vVelocity;
 			}
@@ -67,7 +67,7 @@ namespace gallus
 			/// <param name="a_fDeltaTime">Delta time.</param>
 			void UpdateRealtime(float a_fDeltaTime, UpdateTime a_UpdateTime) override;
 
-			DirectX::XMFLOAT2 m_vVelocity = {};
+			DirectX::XMFLOAT3 m_vVelocity = {};
 			float m_fDamage;
 			
 			std::weak_ptr<gameplay::Prefab> m_ExplosionPrefab = {};

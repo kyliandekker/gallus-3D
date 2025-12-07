@@ -115,9 +115,15 @@ namespace gallus
 				/// Loads a mesh by its name, typically from a file or resource database, and initializes GPU buffers.
 				/// </summary>
 				/// <param name="a_sName">The name of the mesh to load.</param>
-				/// <param name="a_pCommandList">The command list used for uploading resources to the GPU.</param>
 				/// <returns>True if loading was successful, false otherwise.</returns>
 				bool LoadByName(const std::string& a_sName);
+
+				/// <summary>
+				/// Loads an empty mesh.
+				/// </summary>
+				/// <param name="a_sName">The name of the mesh to load.</param>
+				/// <returns>True if loading was successful, false otherwise.</returns>
+				bool LoadByNameEmpty(const std::string& a_sName);
 
 				/// <summary>
 				/// Sets the mesh data.

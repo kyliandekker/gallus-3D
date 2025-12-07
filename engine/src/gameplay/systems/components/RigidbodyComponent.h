@@ -103,9 +103,9 @@ namespace gallus
 
 			bool m_bUseGravity = false;
 
-			DirectX::XMFLOAT2 m_vVelocity = { 0.0f, 0.0f };
-			DirectX::XMFLOAT2 m_vAcceleration = { 0.0f, 0.0f };
-			DirectX::XMFLOAT2 m_vForce = { 0.0f, 0.0f };
+			DirectX::XMFLOAT3 m_vVelocity = { 0.0f, 0.0f, 0.0f };
+			DirectX::XMFLOAT3 m_vAcceleration = { 0.0f, 0.0f, 0.0f };
+			DirectX::XMFLOAT3 m_vForce = { 0.0f, 0.0f, 0.0f };
 
 			float m_fMass = 1.0f;
 			float m_fLinearDamping = 0.98f;
