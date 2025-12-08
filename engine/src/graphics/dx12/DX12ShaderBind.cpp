@@ -35,7 +35,7 @@ namespace gallus
 			bool DX12ShaderBind::CreatePipelineState()
 			{
 				CD3DX12_RASTERIZER_DESC rasterDesc(D3D12_DEFAULT);
-				rasterDesc.CullMode = D3D12_CULL_MODE_NONE;
+				rasterDesc.CullMode = D3D12_CULL_MODE_FRONT;
 
 				// Build the raw blend desc
 				D3D12_BLEND_DESC blendDesc = {};
@@ -77,7 +77,7 @@ namespace gallus
 				pipelineStateStream.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 				pipelineStateStream.PS = CD3DX12_SHADER_BYTECODE(m_pPixelShader->GetShaderBlob().Get());
 				pipelineStateStream.VS = CD3DX12_SHADER_BYTECODE(m_pVertexShader->GetShaderBlob().Get());
-				pipelineStateStream.DSVFormat = DXGI_FORMAT_UNKNOWN;
+				pipelineStateStream.DSVFormat = DXGI_FORMAT_D32_FLOAT;
 				pipelineStateStream.RTVFormats = rtvFormats;
 				pipelineStateStream.RasterizerState = rasterDesc;
 				pipelineStateStream.BlendState = CD3DX12_BLEND_DESC(blendDesc);

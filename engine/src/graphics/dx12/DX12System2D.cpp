@@ -482,6 +482,17 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
+			void DX12System2D::CreateDSV()
+			{
+				// Create the descriptor heap for the depth-stencil view.
+				D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc = {};
+				dsvHeapDesc.NumDescriptors = 1;
+				dsvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
+				dsvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+				m_DSV = HeapAllocation(dsvHeapDesc);
+			}
+
+			//---------------------------------------------------------------------
 			void DX12System2D::Finalize()
 			{
 				std::lock_guard<std::mutex> lock(m_RenderMutex);
@@ -544,6 +555,7 @@ namespace gallus
 			{
 				CreateRTV();
 				CreateSRV();
+				CreateDSV();
 
 				return true;
 			}
@@ -684,7 +696,43 @@ namespace gallus
 				m_Viewport = CD3DX12_VIEWPORT(0.0f, 0.0f, m_vSize.x, m_vSize.y);
 				m_ScissorRect = CD3DX12_RECT(0, 0, m_vSize.x, m_vSize.y);
 
+				ResizeDepthBuffer(m_vSize);
+
 				m_vSize = glm::vec2(a_vSize.x, a_vSize.y);
+			}
+
+			//---------------------------------------------------------------------
+			void DX12System2D::ResizeDepthBuffer(const glm::ivec2& a_vSize)
+			{
+				{
+					m_DSV.Deallocate(0);
+
+					// Resize screen dependent resources.
+					// Create a depth buffer.
+					D3D12_CLEAR_VALUE optimizedClearValue = {};
+					optimizedClearValue.Format = DXGI_FORMAT_D32_FLOAT;
+					optimizedClearValue.DepthStencil = { 1.0f, 0 };
+
+					CD3DX12_HEAP_PROPERTIES heapType = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
+					CD3DX12_RESOURCE_DESC tex = CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_D32_FLOAT, a_vSize.x, a_vSize.y,
+						1, 0, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL);
+
+					if (!m_DepthBuffer.CreateResource(tex, "Depth Buffer", CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_RESOURCE_STATE_DEPTH_WRITE, &optimizedClearValue))
+					{
+						LOG(LOGSEVERITY_ERROR, LOG_CATEGORY_DX12, "Failed creating committed resource.");
+						return;
+					}
+
+					// Update the depth-stencil view.
+					D3D12_DEPTH_STENCIL_VIEW_DESC dsv = {};
+					dsv.Format = DXGI_FORMAT_D32_FLOAT;
+					dsv.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+					dsv.Texture2D.MipSlice = 0;
+					dsv.Flags = D3D12_DSV_FLAG_NONE;
+
+					m_pDevice->CreateDepthStencilView(m_DepthBuffer.GetResource().Get(), &dsv,
+						m_DSV.GetCPUHandle(m_DSV.Allocate()));
+				}
 			}
 
 			//---------------------------------------------------------------------

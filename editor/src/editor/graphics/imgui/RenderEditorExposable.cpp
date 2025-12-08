@@ -91,6 +91,35 @@ namespace gallus
 				return false;
 			}
 
+			bool ShowVector3(const std::string& a_sId, DirectX::XMFLOAT3& a_vVector, const EditorFieldInfo& a_Field)
+			{
+				float val[3] = {
+					a_vVector.x,
+					a_vVector.y,
+					a_vVector.z,
+				};
+				float min = std::numeric_limits<float>::min();
+				float max = std::numeric_limits<float>::max();
+				if (!a_Field.m_Options.min.empty())
+				{
+					min = std::stof(a_Field.m_Options.min);
+				}
+				if (!a_Field.m_Options.max.empty())
+				{
+					max = std::stof(a_Field.m_Options.max);
+				}
+				float availW = ImGui::GetContentRegionAvail().x;
+				ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+				if (ImGui::VectorEdit3(a_sId.c_str(), val, 0.1f, min, max))
+				{
+					a_vVector.x = val[0];
+					a_vVector.y = val[1];
+					a_vVector.z = val[2];
+					return true;
+				}
+				return false;
+			}
+
 			bool ShowObject(IExposableToEditor* obj, bool a_bInternal)
 			{
 				if (!obj)
@@ -410,6 +439,17 @@ namespace gallus
 						func = [&a_Field, &fieldId, value]
 						{
 							bool val = ShowVector2(fieldId, *value, a_Field);
+							ImGui::ShowTooltip(a_Field.m_Options.description);
+							return val;
+						};
+						break;
+					}
+					case EditorFieldWidgetType::Vector3Field:
+					{
+						DirectX::XMFLOAT3* value = reinterpret_cast<DirectX::XMFLOAT3*>(ptr);
+						func = [&a_Field, &fieldId, value]
+						{
+							bool val = ShowVector3(fieldId, *value, a_Field);
 							ImGui::ShowTooltip(a_Field.m_Options.description);
 							return val;
 						};

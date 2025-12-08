@@ -159,6 +159,11 @@ namespace gallus
 				void CreateSRV();
 
 				/// <summary>
+				/// Creates the DSV.
+				/// </summary>
+				void CreateDSV();
+
+				/// <summary>
 				/// Destroys the system, releasing resources and performing necessary cleanup.
 				/// </summary>
 				/// <returns>True if the destruction was successful, otherwise false.</returns>
@@ -179,6 +184,12 @@ namespace gallus
 				/// <param name="a_vPos">The position of the window.</param>
 				/// <param name="a_vSize">The size of the window.</param>
 				void Resize(const glm::ivec2& a_vPos, const glm::ivec2& a_vSize);
+
+				/// <summary>
+				/// Resizes the depth buffer.
+				/// </summary>
+				/// <param name="a_Size">The new size of the depth buffer.</param>
+				void ResizeDepthBuffer(const glm::ivec2& a_vSize);
 
 				/// <summary>
 				/// Retrieves the current back buffer.
@@ -246,6 +257,15 @@ namespace gallus
 				HeapAllocation& GetSRV()
 				{
 					return m_SRV;
+				};
+
+				/// <summary>
+				/// Retrieves the DSV heap.
+				/// </summary>
+				/// <returns>Reference to the DSV heap allocation.</returns>
+				HeapAllocation& GetDSV()
+				{
+					return m_DSV;
 				};
 
 				/// <summary>
@@ -372,10 +392,11 @@ namespace gallus
 				win32::Window* m_pWindow = nullptr;
 
 				uint64_t m_aFenceValues[g_iBufferCount] = {};
-
+				DX12Resource m_DepthBuffer;
 				HeapAllocation
 					m_SRV,
-					m_RTV;
+					m_RTV,
+					m_DSV;
 
 				Microsoft::WRL::ComPtr<ID3D12RootSignature> m_pRootSignature = nullptr;
 
