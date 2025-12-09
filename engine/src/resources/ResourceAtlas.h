@@ -125,7 +125,7 @@ namespace gallus
 			/// <summary>
 			/// Loads a mesh by name from the resource folder.
 			/// </summary>
-			std::weak_ptr<graphics::dx12::Mesh> LoadMesh(const std::string& a_sName);
+			std::weak_ptr<graphics::dx12::Mesh> LoadMesh(const std::string& a_sName, std::shared_ptr<graphics::dx12::CommandQueue> a_pCommandQueue);
 
 			/// <summary>
 			/// Loads a prefab.

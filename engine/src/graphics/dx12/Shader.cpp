@@ -56,6 +56,7 @@ namespace gallus
 				return false;
 			}
 
+#ifdef _LOAD_BY_PATH
 			//---------------------------------------------------------------------
 			bool Shader::LoadByPath(const fs::path& a_ShaderPath)
 			{
@@ -64,6 +65,7 @@ namespace gallus
 
 				return true;
 			}
+#endif
 
 			//---------------------------------------------------------------------
 			bool PixelShader::LoadByName(const std::string& a_sPixelShader)
@@ -106,6 +108,7 @@ namespace gallus
 				return false;
 			}
 
+#ifdef _LOAD_BY_PATH
 			//---------------------------------------------------------------------
 			bool VertexShader::LoadByPath(const fs::path& a_VertexShaderPath)
 			{
@@ -119,6 +122,7 @@ namespace gallus
 				}
 				return false;
 			}
+#endif
 		}
 	}
 }

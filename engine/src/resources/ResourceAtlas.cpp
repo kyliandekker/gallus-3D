@@ -280,7 +280,7 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		std::weak_ptr<graphics::dx12::Mesh> ResourceAtlas::LoadMesh(const std::string& a_sName)
+		std::weak_ptr<graphics::dx12::Mesh> ResourceAtlas::LoadMesh(const std::string& a_sName, std::shared_ptr<graphics::dx12::CommandQueue> a_pCommandQueue)
 		{
 			std::shared_ptr<graphics::dx12::Mesh> mesh = GetResource(m_aMeshes, a_sName, fs::path());
 			if (!mesh->IsValid())
@@ -294,7 +294,7 @@ namespace gallus
 				}
 
 				fs::path meshPath = fileResource->GetPath().lexically_normal();
-				mesh->LoadByPath(meshPath);
+				mesh->LoadByPath(meshPath, a_pCommandQueue);
 				//#else
 				// 
 				//#endif // _EDITOR

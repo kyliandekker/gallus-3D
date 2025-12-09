@@ -14,6 +14,7 @@
 #include "graphics/dx12/DX12Transform2D.h"
 #include "graphics/dx12/Texture.h"
 #include "graphics/dx12/Shader.h"
+#include "graphics/dx12/Mesh.h"
 
 // editor
 #include "editor/core/EditorEngine.h"
@@ -178,16 +179,16 @@ namespace gallus
 
 					filePickerModal.SetData(
 						// FIX: capture changedPtr instead of reference to local variable
-						[a_pLocked, a_pWeak](int success, gallus::resources::FileResource& resource)
+						[a_pLocked, a_pWeak, &a_Field](int success, gallus::resources::FileResource& resource)
 						{
 							if (success == 1)
 							{
-								if (a_pLocked == nullptr)
-								{
-									return;
-								}
+								//if (a_pLocked == nullptr)
+								//{
+								//	return;
+								//}
 
-								switch (a_pLocked->GetResourceType())
+								switch (a_Field.m_Options.assetType)
 								{
 									case resources::AssetType::Sprite:
 									{
@@ -197,6 +198,17 @@ namespace gallus
 
 										*a_pWeak = core::EDITOR_ENGINE->GetResourceAtlas()
 											.LoadTexture(resource.GetPath().filename().generic_string(), cCommandQueue);
+
+										break;
+									}
+									case resources::AssetType::Mesh:
+									{
+										auto cCommandQueue =
+											core::EDITOR_ENGINE->GetDX12()
+											.GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
+
+										*a_pWeak = core::EDITOR_ENGINE->GetResourceAtlas()
+											.LoadMesh(resource.GetPath().filename().generic_string(), cCommandQueue);
 
 										break;
 									}

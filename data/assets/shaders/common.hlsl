@@ -19,7 +19,7 @@ cbuffer Color : register(b2)
 
 struct VSInput
 {
-    float2 pos : POSITION;
+    float3 pos : POSITION;
     float2 uv  : TEXCOORD0;
 };
 

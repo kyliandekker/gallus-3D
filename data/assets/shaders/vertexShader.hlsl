@@ -4,7 +4,7 @@ PSInput main(VSInput input)
 {
     PSInput output;
 
-    float4 worldPos = float4(input.pos, 0.0f, 1.0f);
+    float4 worldPos = float4(input.pos, 1.0f);
 
     output.pos = mul(WorldViewProj, worldPos);
 

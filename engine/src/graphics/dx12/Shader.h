@@ -99,12 +99,14 @@ namespace gallus
 				/// <returns>True if loading and compilation were successful, false otherwise.</returns>
 				bool LoadByName(const std::string& a_sPixelShader) override;
 
+#ifdef _LOAD_BY_PATH
 				/// <summary>
 				/// Loads and compiles shaders directly from file paths.
 				/// </summary>
 				/// <param name="a_PixelShaderPath">The file path to the pixel shader source.</param>
 				/// <returns>True if loading and compilation were successful, false otherwise.</returns>
 				bool LoadByPath(const fs::path& a_PixelShaderPath) override;
+#endif
 			protected:
 #ifdef _EDITOR
 				BEGIN_EXPOSE_FIELDS_PARENT(PixelShader, Shader)
@@ -130,12 +132,14 @@ namespace gallus
 				/// <returns>True if loading and compilation were successful, false otherwise.</returns>
 				bool LoadByName(const std::string& a_sVertexShader) override;
 
+#ifdef _LOAD_BY_PATH
 				/// <summary>
 				/// Loads and compiles shaders directly from file paths.
 				/// </summary>
 				/// <param name="a_VertexShaderPath">The file path to the vertex shader source.</param>
 				/// <returns>True if loading and compilation were successful, false otherwise.</returns>
 				bool LoadByPath(const fs::path& a_VertexShaderPath) override;
+#endif
 			protected:
 #ifdef _EDITOR
 				BEGIN_EXPOSE_FIELDS_PARENT(VertexShader, Shader)

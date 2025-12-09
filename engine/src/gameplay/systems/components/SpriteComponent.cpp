@@ -214,7 +214,7 @@ namespace gallus
 			std::shared_ptr<graphics::dx12::CommandQueue> cCommandQueue = core::ENGINE->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
 			if (!mesh.empty())
 			{
-				SetMesh(core::ENGINE->GetResourceAtlas().LoadMesh(mesh));
+				SetMesh(core::ENGINE->GetResourceAtlas().LoadMesh(mesh, cCommandQueue));
 			}
 			if (!tex.empty())
 			{
