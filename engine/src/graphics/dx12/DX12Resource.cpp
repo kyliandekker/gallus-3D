@@ -169,6 +169,43 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
+			bool DX12Resource::CreateResource(const D3D12_RESOURCE_DESC& a_ResourceDesc, const std::string& a_sName, const D3D12_HEAP_PROPERTIES& a_Heap, const D3D12_RESOURCE_STATES a_ResourceState, const D3D12_CLEAR_VALUE* a_pOptimizedClearValue)
+			{
+				if (m_pResource)
+				{
+					// Resources that cannot be destroyed cannot be overridden.
+					if (!m_bIsDestroyable)
+					{
+						return false;
+					}
+					m_pResource.Reset();
+				}
+
+				Microsoft::WRL::ComPtr<ID3D12Device2>& device = core::ENGINE->GetDX12().GetDevice();
+
+				m_sName = a_sName;
+				if (device->CreateCommittedResource(
+					&a_Heap,
+					D3D12_HEAP_FLAG_NONE,
+					&a_ResourceDesc,
+					a_ResourceState,
+					a_pOptimizedClearValue,
+					IID_PPV_ARGS(&m_pResource)
+					))
+				{
+					LOGF(LOGSEVERITY_ERROR, LOG_CATEGORY_DX12, "Failed creating committed resource: \"%s\".", a_sName.c_str());
+					return false;
+				}
+
+				m_wsName = std::wstring(m_sName.begin(), m_sName.end());
+				m_pResource->SetName(m_wsName.c_str());
+
+				CheckFeatureSupport();
+
+				return true;
+			}
+
+			//---------------------------------------------------------------------
 			void DX12Resource::SetResource(Microsoft::WRL::ComPtr<ID3D12Resource> a_pResource)
 			{
 				// TODO: Fix. This is not safe.

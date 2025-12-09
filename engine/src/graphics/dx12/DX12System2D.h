@@ -12,6 +12,7 @@
 #include "graphics/dx12/HeapAllocation.h"
 #include "graphics/dx12/Camera.h"
 #include "graphics/dx12/FPSCounter.h"
+#include "graphics/dx12/DX12Resource.h"
 
 #ifndef IMGUI_DISABLE
 #include "graphics/imgui/ImGuiWindow.h"

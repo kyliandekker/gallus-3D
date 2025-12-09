@@ -239,6 +239,8 @@ namespace gallus
 
 				m_Camera.Init(RENDER_TEX_SIZE.x, RENDER_TEX_SIZE.y);
 				m_Camera.Transform().SetPosition({ 0.0f, 0.0f, 0.0f });
+
+				ResizeDepthBuffer({ RENDER_TEX_SIZE.x, RENDER_TEX_SIZE.y });
 				
 #ifndef IMGUI_DISABLE
 				m_ImGuiWindow.OnRenderTargetCreated(dCommandList);
@@ -794,6 +796,8 @@ namespace gallus
 				// Keep RTV handles outside of scopes
 				D3D12_CPU_DESCRIPTOR_HANDLE backRtv;  // For back buffer
 
+				auto dsv = m_DSV.GetCPUDescriptorHandleForHeapStart();
+
 				// 1. Render 2D scene into RenderTexture
 				auto renderTex = m_pRenderTexture.lock();
 				if (renderTex)
@@ -806,7 +810,7 @@ namespace gallus
 						// Render onto the render tex rtv (true arg does this).
 						D3D12_CPU_DESCRIPTOR_HANDLE rtRtv = GetCurrentRenderTargetView(true);
 						commandList->GetCommandList()->ClearRenderTargetView(rtRtv, clearColor, 0, nullptr);
-						commandList->GetCommandList()->OMSetRenderTargets(1, &rtRtv, FALSE, nullptr);
+						commandList->GetCommandList()->OMSetRenderTargets(1, &rtRtv, FALSE, &dsv);
 
 						Render2D(commandQueue, commandList, rtRtv);
 
@@ -819,7 +823,7 @@ namespace gallus
 				// back buffer rtv.
 				backRtv = GetCurrentRenderTargetView(false);
 				commandList->GetCommandList()->ClearRenderTargetView(backRtv, clearColor, 0, nullptr);
-				commandList->GetCommandList()->OMSetRenderTargets(1, &backRtv, FALSE, nullptr);
+				commandList->GetCommandList()->OMSetRenderTargets(1, &backRtv, FALSE, &dsv);
 #ifndef _EDITOR
 				// 2. Render RenderTexture onto quad.
 				if (renderTex && renderTex->CanBeDrawn())
@@ -883,8 +887,6 @@ namespace gallus
 #ifndef IMGUI_DISABLE
 			void DX12System2D::RenderUI(std::shared_ptr<CommandQueue> a_pCommandQueue, std::shared_ptr<CommandList> a_pCommandList, D3D12_CPU_DESCRIPTOR_HANDLE a_RTVHandle)
 			{
-				a_pCommandList->GetCommandList()->OMSetRenderTargets(1, &a_RTVHandle, FALSE, nullptr);
-
 				m_ImGuiWindow.Render(a_pCommandList);
 			}
 #endif // IMGUI_DISABLE
@@ -897,7 +899,6 @@ namespace gallus
 					return;
 				}
 
-				a_pCommandList->GetCommandList()->OMSetRenderTargets(1, &a_RTVHandle, FALSE, nullptr);
 				a_pCommandList->GetCommandList()->SetGraphicsRootSignature(m_pRootSignature.Get());
 
 				D3D12_VIEWPORT rtViewport{};
