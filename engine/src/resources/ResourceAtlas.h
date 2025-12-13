@@ -9,6 +9,8 @@
 // utils
 #include "utils/FILEPCH.h"
 
+#include "graphics/dx12/DX12PCH.h"
+
 // resources
 #include "resources/FileResource.h"
 
@@ -110,7 +112,12 @@ namespace gallus
 			/// <summary>
 			/// Loads a shader bind.
 			/// </summary>
-			std::weak_ptr<graphics::dx12::DX12ShaderBind> LoadShaderBind(const std::string& a_sName, std::shared_ptr<graphics::dx12::PixelShader> a_PixelShader, std::shared_ptr<graphics::dx12::VertexShader> a_VertexShader);
+			std::weak_ptr<graphics::dx12::DX12ShaderBind> LoadShaderBind(const std::string& a_sName, std::shared_ptr<graphics::dx12::PixelShader> a_PixelShader, std::shared_ptr<graphics::dx12::VertexShader> a_VertexShader, CD3DX12_PIPELINE_STATE_STREAM_DEPTH_STENCIL_FORMAT a_DSVFormat = DXGI_FORMAT_D32_FLOAT);
+
+			/// <summary>
+			/// Loads a shader bind.
+			/// </summary>
+			std::weak_ptr<graphics::dx12::DX12ShaderBind> LoadShaderBind(const std::string& a_sName);
 
 			/// <summary>
 			/// Loads a scene.
@@ -125,7 +132,7 @@ namespace gallus
 			/// <summary>
 			/// Loads a mesh by name from the resource folder.
 			/// </summary>
-			std::weak_ptr<graphics::dx12::Mesh> LoadMesh(const std::string& a_sName);
+			std::weak_ptr<graphics::dx12::Mesh> LoadMesh(const std::string& a_sName, std::shared_ptr<graphics::dx12::CommandQueue> a_pCommandQueue);
 
 			/// <summary>
 			/// Loads a prefab.

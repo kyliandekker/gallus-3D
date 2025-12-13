@@ -12,6 +12,7 @@
 #include "graphics/dx12/HeapAllocation.h"
 #include "graphics/dx12/Camera.h"
 #include "graphics/dx12/FPSCounter.h"
+#include "graphics/dx12/DX12Resource.h"
 
 #ifndef IMGUI_DISABLE
 #include "graphics/imgui/ImGuiWindow.h"
@@ -49,8 +50,10 @@ namespace gallus
 
 			// Create the vertex input layout
 			const D3D12_INPUT_ELEMENT_DESC g_aInputLayout[] = {
-				{ "POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+				{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
 				{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+				{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+				{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
 			};
 
 			// Root parameters for the game.
@@ -188,8 +191,7 @@ namespace gallus
 				/// <summary>
 				/// Resizes the depth buffer.
 				/// </summary>
-				/// <param name="a_Size">The new size of the depth buffer.</param>
-				void ResizeDepthBuffer(const glm::ivec2& a_vSize);
+				void ResizeDepthBuffer();
 
 				/// <summary>
 				/// Retrieves the current back buffer.
@@ -407,8 +409,12 @@ namespace gallus
 
 				bool m_bIsTearingSupported = false;
 
-				D3D12_VIEWPORT m_Viewport;
-				D3D12_RECT m_ScissorRect;
+				D3D12_VIEWPORT m_RenderTexViewport;
+				D3D12_RECT m_RenderTexScissorRect;
+
+				D3D12_VIEWPORT m_WindowViewport;
+				D3D12_RECT m_WindowScissorRect;
+
 				glm::ivec2 m_vSize = { 1920, 1080 };
 #ifndef IMGUI_DISABLE
 				imgui::ImGuiWindow m_ImGuiWindow;

@@ -231,7 +231,7 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		std::weak_ptr<graphics::dx12::DX12ShaderBind> ResourceAtlas::LoadShaderBind(const std::string& a_sName, std::shared_ptr<graphics::dx12::PixelShader> a_PixelShader, std::shared_ptr<graphics::dx12::VertexShader> a_VertexShader)
+		std::weak_ptr<graphics::dx12::DX12ShaderBind> ResourceAtlas::LoadShaderBind(const std::string& a_sName, std::shared_ptr<graphics::dx12::PixelShader> a_PixelShader, std::shared_ptr<graphics::dx12::VertexShader> a_VertexShader, CD3DX12_PIPELINE_STATE_STREAM_DEPTH_STENCIL_FORMAT a_DSVFormat)
 		{
 			for (std::shared_ptr<graphics::dx12::DX12ShaderBind>& shaderBind : m_aShaderBinds)
 			{
@@ -242,9 +242,17 @@ namespace gallus
 			}
 
 			std::shared_ptr<graphics::dx12::DX12ShaderBind> shaderBind = std::make_shared<graphics::dx12::DX12ShaderBind>();
-			shaderBind->LoadByName(a_sName, a_PixelShader, a_VertexShader);
+			shaderBind->LoadByName(a_sName, a_PixelShader, a_VertexShader, a_DSVFormat);
 			shaderBind->CreatePipelineState();
 			m_aShaderBinds.push_back(shaderBind);
+
+			return shaderBind;
+		}
+
+		//---------------------------------------------------------------------
+		std::weak_ptr<graphics::dx12::DX12ShaderBind> ResourceAtlas::LoadShaderBind(const std::string& a_sName)
+		{
+			std::shared_ptr<graphics::dx12::DX12ShaderBind> shaderBind = GetResource(m_aShaderBinds, a_sName, fs::path());
 
 			return shaderBind;
 		}
@@ -280,7 +288,7 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		std::weak_ptr<graphics::dx12::Mesh> ResourceAtlas::LoadMesh(const std::string& a_sName)
+		std::weak_ptr<graphics::dx12::Mesh> ResourceAtlas::LoadMesh(const std::string& a_sName, std::shared_ptr<graphics::dx12::CommandQueue> a_pCommandQueue)
 		{
 			std::shared_ptr<graphics::dx12::Mesh> mesh = GetResource(m_aMeshes, a_sName, fs::path());
 			if (!mesh->IsValid())
@@ -294,7 +302,7 @@ namespace gallus
 				}
 
 				fs::path meshPath = fileResource->GetPath().lexically_normal();
-				mesh->LoadByPath(meshPath);
+				mesh->LoadByPath(meshPath, a_pCommandQueue);
 				//#else
 				// 
 				//#endif // _EDITOR

@@ -31,7 +31,7 @@ namespace gallus
 				/// <summary>
 				/// Constructs a shader resource.
 				/// </summary>
-				bool LoadByName(const std::string& a_sName, std::shared_ptr<PixelShader> a_pPixelShader, std::shared_ptr<VertexShader> a_pVertexShader);
+				bool LoadByName(const std::string& a_sName, std::shared_ptr<PixelShader> a_pPixelShader, std::shared_ptr<VertexShader> a_pVertexShader, CD3DX12_PIPELINE_STATE_STREAM_DEPTH_STENCIL_FORMAT a_DSVFormat = DXGI_FORMAT_D32_FLOAT);
 
 				/// <summary>
 				/// Creates the pipe line state.
@@ -90,6 +90,8 @@ namespace gallus
 			private:
 				std::shared_ptr<PixelShader> m_pPixelShader = {};
 				std::shared_ptr<VertexShader> m_pVertexShader = {};
+				
+				CD3DX12_PIPELINE_STATE_STREAM_DEPTH_STENCIL_FORMAT m_DSVFormat = DXGI_FORMAT_UNKNOWN;
 
 				Microsoft::WRL::ComPtr<ID3D12PipelineState> m_pPipelineState = nullptr;
 

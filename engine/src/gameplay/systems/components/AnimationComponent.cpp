@@ -61,12 +61,10 @@ namespace gallus
 		//---------------------------------------------------------------------
 		void AnimationComponent::UpdateRealtime(float a_fDeltaTime, UpdateTime a_UpdateTime)
 		{
-			auto animationTrack = m_AnimationTrack.lock();
-			if (!animationTrack)
+			if (auto animationTrack = m_AnimationTrack.lock())
 			{
-				return;
+				animationTrack->Update(m_EntityID, a_fDeltaTime);
 			}
-			animationTrack->Update(m_EntityID, a_fDeltaTime);
 		}
 
 		//---------------------------------------------------------------------

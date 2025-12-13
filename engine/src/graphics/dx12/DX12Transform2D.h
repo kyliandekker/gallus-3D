@@ -8,6 +8,15 @@
 #include "editor/EditorExpose.h"
 #endif
 
+constexpr DirectX::XMVECTOR UP = { 0, 1, 0 }; /// Up vector.
+constexpr DirectX::XMVECTOR FORWARD = { 0, 0, 1 }; /// Forward vector.
+inline const DirectX::XMMATRIX IDENTITY = { /// Identity matrix.
+	1.f, 0.f, 0.f, 0.f,
+	0.f, 1.f, 0.f, 0.f,
+	0.f, 0.f, 1.f, 0.f,
+	0.f, 0.f, 0.f, 1.f
+};
+
 namespace gallus
 {
 	namespace graphics
@@ -23,6 +32,9 @@ namespace gallus
 #endif
 			{
 			public:
+				static DirectX::XMFLOAT3 QuaternionToEuler(const DirectX::XMVECTOR& quat);
+				static DirectX::XMVECTOR AddRotation(DirectX::XMVECTOR& a_vQuat, const DirectX::XMFLOAT3& a_vAddition);
+
 				DX12Transform2D();
 
 				/// <summary>
@@ -34,8 +46,8 @@ namespace gallus
 				/// <summary>
 				/// Sets the rotation of the transform.
 				/// </summary>
-				/// <param name="a_fRotationDegrees">A float containing the rotation in degrees.</param>
-				void SetRotation(float a_fRotationDegrees); // Rotation in degrees
+				/// <param name="a_vRotation">A vector containing the rotation in degrees.</param>
+				void SetRotation(const DirectX::XMVECTOR& a_vRotation); // Rotation in degrees
 
 				/// <summary>
 				/// Sets the scale of the transform.
@@ -58,8 +70,14 @@ namespace gallus
 				/// <summary>
 				/// Retrieves the rotation of the transform.
 				/// </summary>
-				/// <returns>A float containing the rotation in degrees.</returns>
-				float GetRotation() const;
+				/// <returns>A vector containing the rotation.</returns>
+				const DirectX::XMVECTOR& GetRotationQ() const;
+
+				/// <summary>
+				/// Retrieves the rotation of the transform.
+				/// </summary>
+				/// <returns>A vector containing the rotation in degrees.</returns>
+				DirectX::XMFLOAT3 GetRotationV() const;
 
 				/// <summary>
 				/// Retrieves the scale of the transform.
@@ -90,24 +108,18 @@ namespace gallus
 				/// </summary>
 				/// <param name="worldMatrix">A XMMATRIX containing the world matrix for the transform.</param>
 				void SetWorldMatrix(const DirectX::XMMATRIX& a_WorldMatrix);
-
-				/// <summary>
-				/// Retrieves the world corners for collision purposes.
-				/// </summary>
-				/// <returns>An array containing 4 corners in screen space.</returns>
-				std::array<DirectX::XMFLOAT3, 4> GetWorldCorners() const;
 			private:
 				DirectX::XMFLOAT3 m_vPosition = { 0, 0, 0 };
 				DirectX::XMFLOAT3 m_vScale = { 1, 1, 1 };
 				DirectX::XMFLOAT3 m_vPivot = { -0.5f, -0.5f, -0.5f };
-				float m_fRotationDegrees = 0.0f; // rotation around Z axis
+				DirectX::XMVECTOR m_vRotation = { DirectX::XMQuaternionIdentity() };
 
 #ifdef _EDITOR
 			BEGIN_EXPOSE_FIELDS(DX12Transform2D)
 				EXPOSE_FIELD(DX12Transform2D, m_vPosition, "Position", (FieldOptions{ .type = EditorFieldWidgetType::Vector3Field, .description = "The position of the object in 2D space. Defines where the object is located on the screen." }))
 				EXPOSE_FIELD(DX12Transform2D, m_vScale, "Scale", (FieldOptions{ .type = EditorFieldWidgetType::Vector3Field, .description = "The size multiplier of the object. A value of 1 means default size, values greater than 1 enlarge the object, and values below 1 shrink it." }))
 				EXPOSE_FIELD(DX12Transform2D, m_vPivot, "Pivot", (FieldOptions{ .type = EditorFieldWidgetType::Vector3Field, .min = "-0.5", .max = "0.5", .description = "The pivot point for transformations relative to the object�s center. Coordinates represent the normalized offset used for scaling and rotation." }))
-				EXPOSE_FIELD(DX12Transform2D, m_fRotationDegrees, "Rotation", (FieldOptions{ .type = EditorFieldWidgetType::DragFloat, .description = "Rotation around the Z-axis in degrees. Controls how much the object is rotated clockwise or counterclockwise." }))
+				EXPOSE_FIELD(DX12Transform2D, m_vRotation, "Rotation", (FieldOptions{ .type = EditorFieldWidgetType::Quaternion, .description = "Rotation in degrees. Controls how much the object is rotated clockwise or counterclockwise." }))
 			END_EXPOSE_FIELDS(DX12Transform2D)
 			BEGIN_EXPOSE_GIZMOS(DX12Transform2D)
 			END_EXPOSE_GIZMOS(DX12Transform2D)

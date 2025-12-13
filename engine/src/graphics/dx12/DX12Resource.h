@@ -109,6 +109,16 @@ namespace gallus
 				bool CheckFormatSupport(D3D12_FORMAT_SUPPORT2 a_FormatSupport) const;
 
 				/// <summary>
+				/// Constructs a dx12 resource with a given name.
+				/// </summary>
+				/// <param name="a_ResourceDesc">Resource description.</param>
+				/// <param name="a_sName">Name of the resource.</param>
+				/// <param name="a_Heap">Heap property options.</param>
+				/// <param name="a_ResourceState">Resource state it will transition into.</param>
+				/// <param name="a_pOptimizedClearValue">Clear value of the resource.</param>
+				bool CreateResource(const D3D12_RESOURCE_DESC& a_ResourceDesc, const std::string& a_sName, const D3D12_HEAP_PROPERTIES& a_Heap, const D3D12_RESOURCE_STATES a_ResourceState, const D3D12_CLEAR_VALUE* a_pOptimizedClearValue);
+
+				/// <summary>
 				/// Sets a DX12 resource.
 				/// </summary>
 				/// <param name="a_pResource">Resource that will be wrapped.</param>

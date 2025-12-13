@@ -2,6 +2,8 @@
 
 #include "gameplay/systems/components/Component.h"
 
+#include <memory>
+
 namespace gallus
 {
 	namespace animation

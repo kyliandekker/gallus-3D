@@ -16,6 +16,7 @@
 
 // editor
 #include "editor/graphics/imgui/selectables/EntityEditorSelectable.h"
+#include "editor/graphics/imgui/selectables/CameraEditorSelectable.h"
 
 namespace gallus
 {
@@ -89,6 +90,7 @@ namespace gallus
 				gameplay::EntityID m_PreviousEntityID;
 				std::vector<EntityEditorSelectable> m_aEntities; /// List of entities shown in the hierarchy window.
 				std::vector<EntityEditorSelectable*> m_aFilteredEntities; /// List of entities shown in the hierarchy window.
+				CameraEditorSelectable m_CameraView;
 				std::vector<std::string> m_aEntityIcons; /// List of entities shown in the hierarchy window.
 
 				SearchBarInput m_SearchBar; /// Search bar to filter specific messages in the hierarchy window.

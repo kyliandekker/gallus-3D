@@ -32,7 +32,7 @@ namespace gallus
 			//---------------------------------------------------------------------
 			// HierarchyWindow
 			//---------------------------------------------------------------------
-			HierarchyWindow::HierarchyWindow(ImGuiWindow& a_Window) : BaseWindow(a_Window, ImGuiWindowFlags_NoCollapse, std::string(font::ICON_LIST) + " Hierarchy", "Hierarchy"), m_SearchBar(a_Window)
+			HierarchyWindow::HierarchyWindow(ImGuiWindow& a_Window) : BaseWindow(a_Window, ImGuiWindowFlags_NoCollapse, std::string(font::ICON_LIST) + " Hierarchy", "Hierarchy"), m_SearchBar(a_Window), m_CameraView(a_Window)
 			{
 				m_SearchBar.Initialize("");
 			}
@@ -242,6 +242,20 @@ namespace gallus
 					))
 				{
 					ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+
+					{
+						bool
+							clicked = false,
+							doubleClicked = false;
+
+						m_CameraView.RenderEntity(clicked, doubleClicked, core::EDITOR_ENGINE->GetEditor().GetSelectable().get() == &m_CameraView);
+
+						if (clicked)
+						{
+							core::EDITOR_ENGINE->GetEditor().SetSelectable(&m_CameraView);
+						}
+					}
+
 					for (EntityEditorSelectable* view : m_aFilteredEntities)
 					{
 						if (!view)

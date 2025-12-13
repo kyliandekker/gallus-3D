@@ -18,6 +18,7 @@
 
 // gameplay
 #include "gameplay/systems/SpriteSystem.h"
+#include "gameplay/systems/MeshSystem.h"
 
 namespace gallus
 {
@@ -183,17 +184,33 @@ namespace gallus
 					tex->SetIsDestroyable(false);
 				}
 
-				std::shared_ptr<PixelShader> pixelShaderPtr = core::ENGINE->GetResourceAtlas().LoadPixelShader("pixelShader.hlsl"); // Default shader.
-				std::shared_ptr<VertexShader> vertexShaderPtr = core::ENGINE->GetResourceAtlas().LoadVertexShader("vertexShader.hlsl"); // Default shader.
+				std::shared_ptr<PixelShader> pixelShader2DPtr = core::ENGINE->GetResourceAtlas().LoadPixelShader("pixelShader.hlsl"); // Default shader.
+				std::shared_ptr<VertexShader> vertexShader2DPtr = core::ENGINE->GetResourceAtlas().LoadVertexShader("vertexShader.hlsl"); // Default shader.
 
-				pixelShaderPtr->SetResourceCategory(resources::EngineResourceCategory::Missing);
-				pixelShaderPtr->SetIsDestroyable(false);
+				pixelShader2DPtr->SetResourceCategory(resources::EngineResourceCategory::Missing);
+				pixelShader2DPtr->SetIsDestroyable(false);
 
-				vertexShaderPtr->SetResourceCategory(resources::EngineResourceCategory::Missing);
-				vertexShaderPtr->SetIsDestroyable(false);
+				vertexShader2DPtr->SetResourceCategory(resources::EngineResourceCategory::Missing);
+				vertexShader2DPtr->SetIsDestroyable(false);
 
-				std::weak_ptr<DX12ShaderBind> shaderBindPtr = core::ENGINE->GetResourceAtlas().LoadShaderBind("defaultShaderBind", pixelShaderPtr, vertexShaderPtr); // Default shader.
-				if (auto shaderBind = shaderBindPtr.lock())
+				std::weak_ptr<DX12ShaderBind> shaderBind2DPtr = core::ENGINE->GetResourceAtlas().LoadShaderBind("defaultShaderBind", pixelShader2DPtr, vertexShader2DPtr); // Default shader.
+				if (auto shaderBind = shaderBind2DPtr.lock())
+				{
+					shaderBind->SetResourceCategory(resources::EngineResourceCategory::Missing);
+					shaderBind->SetIsDestroyable(false);
+				}
+
+				std::shared_ptr<PixelShader> pixelShader3DPtr = core::ENGINE->GetResourceAtlas().LoadPixelShader("pixelShader3D.hlsl"); // Default shader.
+				std::shared_ptr<VertexShader> vertexShader3DPtr = core::ENGINE->GetResourceAtlas().LoadVertexShader("vertexShader3D.hlsl"); // Default shader.
+
+				pixelShader3DPtr->SetResourceCategory(resources::EngineResourceCategory::Missing);
+				pixelShader3DPtr->SetIsDestroyable(false);
+
+				vertexShader3DPtr->SetResourceCategory(resources::EngineResourceCategory::Missing);
+				vertexShader3DPtr->SetIsDestroyable(false);
+
+				std::weak_ptr<DX12ShaderBind> shaderBind3DPtr = core::ENGINE->GetResourceAtlas().LoadShaderBind("defaultShaderBind3D", pixelShader3DPtr, vertexShader3DPtr, DXGI_FORMAT_D32_FLOAT); // Default shader.
+				if (auto shaderBind = shaderBind3DPtr.lock())
 				{
 					shaderBind->SetResourceCategory(resources::EngineResourceCategory::Missing);
 					shaderBind->SetIsDestroyable(false);
@@ -206,7 +223,7 @@ namespace gallus
 				renderTexVertexShaderPtr->SetResourceCategory(resources::EngineResourceCategory::Missing);
 				renderTexVertexShaderPtr->SetIsDestroyable(false);
 
-				std::weak_ptr<DX12ShaderBind> renderTexShaderBindPtr = core::ENGINE->GetResourceAtlas().LoadShaderBind("renderTexShaderBind", renderTexPixelShaderPtr, renderTexVertexShaderPtr); // Render Tex shader.
+				std::weak_ptr<DX12ShaderBind> renderTexShaderBindPtr = core::ENGINE->GetResourceAtlas().LoadShaderBind("renderTexShaderBind", renderTexPixelShaderPtr, renderTexVertexShaderPtr, DXGI_FORMAT_UNKNOWN); // Render Tex shader.
 				if (auto renderTexShaderBind = renderTexShaderBindPtr.lock())
 				{
 					renderTexShaderBind->SetResourceCategory(resources::EngineResourceCategory::Missing);
@@ -238,7 +255,12 @@ namespace gallus
 				Resize({}, m_vSize);
 
 				m_Camera.Init(RENDER_TEX_SIZE.x, RENDER_TEX_SIZE.y);
-				m_Camera.Transform().SetPosition({ 0.0f, 0.0f, 0.0f });
+				m_Camera.Transform().SetPosition({ 0.0f, 1.0f, -2.0f });
+				
+				m_RenderTexViewport = CD3DX12_VIEWPORT(0.0f, 0.0f, RENDER_TEX_SIZE.x, RENDER_TEX_SIZE.y);
+				m_RenderTexScissorRect = CD3DX12_RECT(0, 0, RENDER_TEX_SIZE.x, RENDER_TEX_SIZE.y);
+
+				ResizeDepthBuffer();
 				
 #ifndef IMGUI_DISABLE
 				m_ImGuiWindow.OnRenderTargetCreated(dCommandList);
@@ -693,16 +715,14 @@ namespace gallus
 #ifndef IMGUI_DISABLE
 				m_ImGuiWindow.Resize(a_vPos, a_vSize);
 #endif
-				m_Viewport = CD3DX12_VIEWPORT(0.0f, 0.0f, m_vSize.x, m_vSize.y);
-				m_ScissorRect = CD3DX12_RECT(0, 0, m_vSize.x, m_vSize.y);
-
-				ResizeDepthBuffer(m_vSize);
+				m_WindowViewport = CD3DX12_VIEWPORT(0.0f, 0.0f, m_vSize.x, m_vSize.y);
+				m_WindowScissorRect = CD3DX12_RECT(0, 0, m_vSize.x, m_vSize.y);
 
 				m_vSize = glm::vec2(a_vSize.x, a_vSize.y);
 			}
 
 			//---------------------------------------------------------------------
-			void DX12System2D::ResizeDepthBuffer(const glm::ivec2& a_vSize)
+			void DX12System2D::ResizeDepthBuffer()
 			{
 				{
 					m_DSV.Deallocate(0);
@@ -714,7 +734,7 @@ namespace gallus
 					optimizedClearValue.DepthStencil = { 1.0f, 0 };
 
 					CD3DX12_HEAP_PROPERTIES heapType = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
-					CD3DX12_RESOURCE_DESC tex = CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_D32_FLOAT, a_vSize.x, a_vSize.y,
+					CD3DX12_RESOURCE_DESC tex = CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_D32_FLOAT, RENDER_TEX_SIZE.x, RENDER_TEX_SIZE.y,
 						1, 0, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL);
 
 					if (!m_DepthBuffer.CreateResource(tex, "Depth Buffer", CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_RESOURCE_STATE_DEPTH_WRITE, &optimizedClearValue))
@@ -789,10 +809,9 @@ namespace gallus
 
 				auto backBuffer = GetCurrentBackBuffer();
 				UINT backIndex = GetCurrentBackBufferIndex();
-				const FLOAT clearColor[] = { 0, 0, 0, 1 };
+				const FLOAT clearColor[] = { 0, 0, 0, 0 };
 
-				// Keep RTV handles outside of scopes
-				D3D12_CPU_DESCRIPTOR_HANDLE backRtv;  // For back buffer
+				auto dsv = m_DSV.GetCPUDescriptorHandleForHeapStart();
 
 				// 1. Render 2D scene into RenderTexture
 				auto renderTex = m_pRenderTexture.lock();
@@ -806,7 +825,15 @@ namespace gallus
 						// Render onto the render tex rtv (true arg does this).
 						D3D12_CPU_DESCRIPTOR_HANDLE rtRtv = GetCurrentRenderTargetView(true);
 						commandList->GetCommandList()->ClearRenderTargetView(rtRtv, clearColor, 0, nullptr);
-						commandList->GetCommandList()->OMSetRenderTargets(1, &rtRtv, FALSE, nullptr);
+						commandList->GetCommandList()->ClearDepthStencilView(
+							dsv,
+							D3D12_CLEAR_FLAG_DEPTH,
+							1.0f,
+							0,
+							0,
+							nullptr
+						);
+						commandList->GetCommandList()->OMSetRenderTargets(1, &rtRtv, FALSE, &dsv);
 
 						Render2D(commandQueue, commandList, rtRtv);
 
@@ -817,11 +844,12 @@ namespace gallus
 				backBuffer->Transition(commandList, D3D12_RESOURCE_STATE_RENDER_TARGET);
 
 				// back buffer rtv.
-				backRtv = GetCurrentRenderTargetView(false);
+				D3D12_CPU_DESCRIPTOR_HANDLE backRtv = GetCurrentRenderTargetView(false);
 				commandList->GetCommandList()->ClearRenderTargetView(backRtv, clearColor, 0, nullptr);
 				commandList->GetCommandList()->OMSetRenderTargets(1, &backRtv, FALSE, nullptr);
+
+				// 2. Render the render texture to full screen.
 #ifndef _EDITOR
-				// 2. Render RenderTexture onto quad.
 				if (renderTex && renderTex->CanBeDrawn())
 				{
 					if (renderTex->CanBeDrawn())
@@ -837,20 +865,20 @@ namespace gallus
 
 						renderTex->Bind(commandList, 2);
 
-						commandList->GetCommandList()->RSSetViewports(1, &m_Viewport);
-						commandList->GetCommandList()->RSSetScissorRects(1, &m_ScissorRect);
-
 						// Draw fullscreen quad (shader-generated)
 						commandList->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 						commandList->GetCommandList()->IASetVertexBuffers(0, 0, nullptr);
 						commandList->GetCommandList()->DrawInstanced(3, 1, 0, 0);
 					}
 				}
-#endif // _EDITOR
+#else // _EDITOR
+				// 2. OR render the editor UI.
+				commandList->GetCommandList()->OMSetRenderTargets(1, &backRtv, FALSE, nullptr);
 
-#ifdef _EDITOR
 				RenderUI(commandQueue, commandList, backRtv);
 #endif // _EDITOR
+				commandList->GetCommandList()->RSSetViewports(1, &m_WindowViewport);
+				commandList->GetCommandList()->RSSetScissorRects(1, &m_WindowScissorRect);
 
 				Present(commandQueue, commandList);
 			}
@@ -883,8 +911,6 @@ namespace gallus
 #ifndef IMGUI_DISABLE
 			void DX12System2D::RenderUI(std::shared_ptr<CommandQueue> a_pCommandQueue, std::shared_ptr<CommandList> a_pCommandList, D3D12_CPU_DESCRIPTOR_HANDLE a_RTVHandle)
 			{
-				a_pCommandList->GetCommandList()->OMSetRenderTargets(1, &a_RTVHandle, FALSE, nullptr);
-
 				m_ImGuiWindow.Render(a_pCommandList);
 			}
 #endif // IMGUI_DISABLE
@@ -897,27 +923,20 @@ namespace gallus
 					return;
 				}
 
-				a_pCommandList->GetCommandList()->OMSetRenderTargets(1, &a_RTVHandle, FALSE, nullptr);
 				a_pCommandList->GetCommandList()->SetGraphicsRootSignature(m_pRootSignature.Get());
-
-				D3D12_VIEWPORT rtViewport{};
-				rtViewport.TopLeftX = 0.0f;
-				rtViewport.TopLeftY = 0.0f;
-				rtViewport.Width = static_cast<float>(RENDER_TEX_SIZE.x);
-				rtViewport.Height = static_cast<float>(RENDER_TEX_SIZE.y);
-				rtViewport.MinDepth = 0.0f;
-				rtViewport.MaxDepth = 1.0f;
-
-				CD3DX12_RECT rtScissor(0, 0, RENDER_TEX_SIZE.x, RENDER_TEX_SIZE.y);
-
-				a_pCommandList->GetCommandList()->RSSetViewports(1, &rtViewport);
-				a_pCommandList->GetCommandList()->RSSetScissorRects(1, &rtScissor);
+				
+				a_pCommandList->GetCommandList()->RSSetViewports(1, &m_RenderTexViewport);
+				a_pCommandList->GetCommandList()->RSSetScissorRects(1, &m_RenderTexScissorRect);
 
 				ID3D12DescriptorHeap* descriptorHeaps[] = { m_SRV.GetHeap().Get() };
 				a_pCommandList->GetCommandList()->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
 				std::lock_guard<std::recursive_mutex> lock(core::ENGINE->GetECS().m_EntityMutex);
 				for (auto& pair : core::ENGINE->GetECS().GetSystem<gameplay::SpriteSystem>().GetComponents())
+				{
+					pair.second.Render(a_pCommandList, pair.first, *m_pActiveCamera);
+				}
+				for (auto& pair : core::ENGINE->GetECS().GetSystem<gameplay::MeshSystem>().GetComponents())
 				{
 					pair.second.Render(a_pCommandList, pair.first, *m_pActiveCamera);
 				}

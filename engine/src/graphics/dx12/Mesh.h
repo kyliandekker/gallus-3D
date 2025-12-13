@@ -19,6 +19,10 @@
 
 namespace gallus
 {
+	namespace core
+	{
+		class Data;
+	}
 	namespace graphics
 	{
 		namespace dx12
@@ -31,8 +35,10 @@ namespace gallus
 			/// </summary>
 			struct VertexPosUV
 			{
-				DirectX::XMFLOAT2 Position;
+				DirectX::XMFLOAT3 Position;
 				DirectX::XMFLOAT2 UV;
+				DirectX::XMFLOAT3 Normal;
+				DirectX::XMFLOAT3 Color = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
 			};
 
 			//---------------------------------------------------------------------
@@ -45,6 +51,8 @@ namespace gallus
 			class MeshPartData
 			{
 			public:
+				MeshPartData() = default;
+
 				MeshPartData(
 					std::vector<VertexPosUV> a_aVertices,
 					std::vector<uint16_t> a_aIndices) :
@@ -68,14 +76,37 @@ namespace gallus
 			inline std::vector<MeshPartData> s_PRIMITIVES = {
 				MeshPartData(
 					{
-						{ DirectX::XMFLOAT2(-0.5f, -0.5f), DirectX::XMFLOAT2(0.0f, 0.0f) },
-						{ DirectX::XMFLOAT2(0.5f, -0.5f), DirectX::XMFLOAT2(1.0f, 0.0f) },
-						{ DirectX::XMFLOAT2(-0.5f, 0.5f), DirectX::XMFLOAT2(0.0f, 1.0f) },
-						{ DirectX::XMFLOAT2(0.5f, 0.5f), DirectX::XMFLOAT2(1.0f, 1.0f) }
+						{ DirectX::XMFLOAT3(-0.5f, -0.5f, 0.0f), DirectX::XMFLOAT2(0.0f, 0.0f), DirectX::XMFLOAT3(0.0f, 0.0f, 1.0f) },
+						{ DirectX::XMFLOAT3(0.5f, -0.5f, 0.0f), DirectX::XMFLOAT2(1.0f, 0.0f), DirectX::XMFLOAT3(0.0f, 0.0f, 1.0f) },
+						{ DirectX::XMFLOAT3(-0.5f, 0.5f, 0.0f), DirectX::XMFLOAT2(0.0f, 1.0f), DirectX::XMFLOAT3(0.0f, 0.0f, 1.0f) },
+						{ DirectX::XMFLOAT3(0.5f, 0.5f, 0.0f), DirectX::XMFLOAT2(1.0f, 1.0f), DirectX::XMFLOAT3(0.0f, 0.0f, 1.0f) }
 					},
+					{ 0, 1, 2, 2, 1, 3 }
+				),
+				MeshPartData(
 					{
-						0, 1, 2,
-						2, 1, 3
+						{ DirectX::XMFLOAT3(-0.5f, -0.5f, 0.5f), DirectX::XMFLOAT2(0, 0), DirectX::XMFLOAT3(0, 0, 1) },
+						{ DirectX::XMFLOAT3(0.5f, -0.5f, 0.5f), DirectX::XMFLOAT2(1, 0), DirectX::XMFLOAT3(0, 0, 1) },
+						{ DirectX::XMFLOAT3(0.5f, 0.5f, 0.5f), DirectX::XMFLOAT2(1, 1), DirectX::XMFLOAT3(0, 0, 1) },
+						{ DirectX::XMFLOAT3(-0.5f, 0.5f, 0.5f), DirectX::XMFLOAT2(0, 1), DirectX::XMFLOAT3(0, 0, 1) },
+
+						{ DirectX::XMFLOAT3(-0.5f, -0.5f, -0.5f), DirectX::XMFLOAT2(1, 0), DirectX::XMFLOAT3(0, 0, -1) },
+						{ DirectX::XMFLOAT3(0.5f, -0.5f, -0.5f), DirectX::XMFLOAT2(0, 0), DirectX::XMFLOAT3(0, 0, -1) },
+						{ DirectX::XMFLOAT3(0.5f, 0.5f, -0.5f), DirectX::XMFLOAT2(0, 1), DirectX::XMFLOAT3(0, 0, -1) },
+						{ DirectX::XMFLOAT3(-0.5f, 0.5f, -0.5f), DirectX::XMFLOAT2(1, 1), DirectX::XMFLOAT3(0, 0, -1) },
+					},
+					{ 
+						0, 1, 2, 2, 3, 0,
+						// Back face
+						4, 5, 6, 6, 7, 4,
+						// Left face
+						4, 0, 3, 3, 7, 4,
+						// Right face
+						1, 5, 6, 6, 2, 1,
+						// Top face
+						3, 2, 6, 6, 7, 3,
+						// Bottom face
+						4, 5, 1, 1, 0, 4
 					}
 				)
 			};
@@ -116,7 +147,17 @@ namespace gallus
 				/// </summary>
 				/// <param name="a_sName">The name of the mesh to load.</param>
 				/// <returns>True if loading was successful, false otherwise.</returns>
-				bool LoadByName(const std::string& a_sName);
+				bool LoadByName(const std::string& a_sName, std::shared_ptr<CommandQueue> a_pCommandQueue);
+
+#ifdef _LOAD_BY_PATH
+				/// <summary>
+				/// Loads meshes directly from file paths.
+				/// </summary>
+				/// <param name="a_MeshPath">The file path to the mesh resource.</param>
+				/// <returns>True if loading was successful, false otherwise.</returns>
+				bool LoadByPath(const fs::path& a_MeshPath, std::shared_ptr<CommandQueue> a_pCommandQueue);
+#endif
+				bool GetMeshDataFromModel(const core::Data& a_Data);
 
 				/// <summary>
 				/// Loads an empty mesh.
@@ -131,6 +172,12 @@ namespace gallus
 				/// <param name="a_aData">The mesh part data.</param>
 				/// <param name="a_pCommandQueue">The command queue used for uploading.</param>
 				void SetMeshData(const MeshPartData& a_aData, const std::shared_ptr<CommandQueue> a_pCommandQueue);
+
+				/// <summary>
+				/// Uploads the mesh data.
+				/// </summary>
+				/// <param name="a_pCommandQueue">The command queue used for uploading.</param>
+				void UploadMeshData(const std::shared_ptr<CommandQueue> a_pCommandQueue);
 			private:
 				std::vector<MeshPartData> m_aMeshData;
 

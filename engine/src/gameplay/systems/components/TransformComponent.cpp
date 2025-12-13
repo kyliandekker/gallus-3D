@@ -45,8 +45,13 @@ namespace gallus
 			a_Document[JSON_TRANSFORM_COMPONENT_POSITION_VAR].AddMember(JSON_TRANSFORM_COMPONENT_X_VAR, m_Transform.GetPosition().x, a_Allocator);
 			a_Document[JSON_TRANSFORM_COMPONENT_POSITION_VAR].AddMember(JSON_TRANSFORM_COMPONENT_Y_VAR, m_Transform.GetPosition().y, a_Allocator);
 			a_Document[JSON_TRANSFORM_COMPONENT_POSITION_VAR].AddMember(JSON_TRANSFORM_COMPONENT_Z_VAR, m_Transform.GetPosition().z, a_Allocator);
+			
+			a_Document.AddMember(JSON_TRANSFORM_COMPONENT_ROTATION_VAR, rapidjson::Value().SetObject(), a_Allocator);
 
-			a_Document.AddMember(JSON_TRANSFORM_COMPONENT_ROTATION_VAR, m_Transform.GetRotation(), a_Allocator);
+			DirectX::XMFLOAT3 rot = m_Transform.GetRotationV();
+			a_Document[JSON_TRANSFORM_COMPONENT_ROTATION_VAR].AddMember(JSON_TRANSFORM_COMPONENT_X_VAR, rot.x, a_Allocator);
+			a_Document[JSON_TRANSFORM_COMPONENT_ROTATION_VAR].AddMember(JSON_TRANSFORM_COMPONENT_Y_VAR, rot.y, a_Allocator);
+			a_Document[JSON_TRANSFORM_COMPONENT_ROTATION_VAR].AddMember(JSON_TRANSFORM_COMPONENT_Z_VAR, rot.z, a_Allocator);
 
 			a_Document.AddMember(JSON_TRANSFORM_COMPONENT_SCALE_VAR, rapidjson::Value().SetObject(), a_Allocator);
 
@@ -68,7 +73,9 @@ namespace gallus
 			m_Transform.SetPosition(a_SrcData.GetVector3(JSON_TRANSFORM_COMPONENT_POSITION_VAR));
 			m_Transform.SetScale(a_SrcData.GetVector3(JSON_TRANSFORM_COMPONENT_SCALE_VAR));
 			m_Transform.SetPivot(a_SrcData.GetVector3(JSON_TRANSFORM_COMPONENT_PIVOT_VAR));
-			m_Transform.SetRotation(a_SrcData.GetFloat(JSON_TRANSFORM_COMPONENT_ROTATION_VAR));
+			//m_Transform.SetRotation(a_SrcData.GetFloat(JSON_TRANSFORM_COMPONENT_ROTATION_VAR));
+
+			// TODO: Rotation
 		}
 
 		//---------------------------------------------------------------------

@@ -14,6 +14,8 @@
 #include "graphics/dx12/DX12Transform2D.h"
 #include "graphics/dx12/Texture.h"
 #include "graphics/dx12/Shader.h"
+#include "graphics/dx12/Mesh.h"
+#include "graphics/dx12/Mesh.h"
 
 // editor
 #include "editor/core/EditorEngine.h"
@@ -31,8 +33,8 @@ namespace gallus
 		{
 			bool ShowDragFloat(const std::string& a_sId, float* a_pValue, const EditorFieldInfo& a_Field)
 			{
-				float min = std::numeric_limits<float>::min();
-				float max = std::numeric_limits<float>::max();
+				float min = -FLT_MAX;
+				float max = FLT_MAX;
 				if (!a_Field.m_Options.min.empty())
 				{
 					min = std::stof(a_Field.m_Options.min);
@@ -70,8 +72,8 @@ namespace gallus
 					a_vVector.x,
 					a_vVector.y,
 				};
-				float min = std::numeric_limits<float>::min();
-				float max = std::numeric_limits<float>::max();
+				float min = -FLT_MAX;
+				float max = FLT_MAX;
 				if (!a_Field.m_Options.min.empty())
 				{
 					min = std::stof(a_Field.m_Options.min);
@@ -98,8 +100,8 @@ namespace gallus
 					a_vVector.y,
 					a_vVector.z,
 				};
-				float min = std::numeric_limits<float>::min();
-				float max = std::numeric_limits<float>::max();
+				float min = -FLT_MAX;
+				float max = FLT_MAX;
 				if (!a_Field.m_Options.min.empty())
 				{
 					min = std::stof(a_Field.m_Options.min);
@@ -120,6 +122,43 @@ namespace gallus
 				return false;
 			}
 
+			bool ShowQuaternion(const std::string& a_sId, DirectX::XMVECTOR& a_vVector, const EditorFieldInfo& a_Field)
+			{
+				DirectX::XMFLOAT3 preRotationDegrees = graphics::dx12::DX12Transform2D::QuaternionToEuler(a_vVector);
+
+				float val[3] = {
+					preRotationDegrees.x,
+					preRotationDegrees.y,
+					preRotationDegrees.z,
+				};
+
+				float min = -FLT_MAX;
+				float max = FLT_MAX;
+				if (!a_Field.m_Options.min.empty())
+				{
+					min = std::stof(a_Field.m_Options.min);
+				}
+				if (!a_Field.m_Options.max.empty())
+				{
+					max = std::stof(a_Field.m_Options.max);
+				}
+				float availW = ImGui::GetContentRegionAvail().x;
+				ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+				if (ImGui::VectorEdit3(a_sId.c_str(), val, 0.1f, min, max))
+				{
+					DirectX::XMFLOAT3 newRotationDegrees = {
+						val[0] - preRotationDegrees.x,
+						val[1] - preRotationDegrees.y,
+						val[2] - preRotationDegrees.z
+					};
+
+					a_vVector = graphics::dx12::DX12Transform2D::AddRotation(a_vVector, newRotationDegrees);
+
+					return true;
+				}
+				return false;
+			}
+
 			bool ShowObject(IExposableToEditor* obj, bool a_bInternal)
 			{
 				if (!obj)
@@ -131,7 +170,10 @@ namespace gallus
 				bool changed = false;
 				for (const EditorFieldInfo& subField : obj->GetEditorFields())
 				{
-					changed = ShowEditorFieldFromObject(obj, subField, a_bInternal);
+					if (ShowEditorFieldFromObject(obj, subField, a_bInternal))
+					{
+						changed = true;
+					}
 				}
 				return changed;
 			}
@@ -178,16 +220,16 @@ namespace gallus
 
 					filePickerModal.SetData(
 						// FIX: capture changedPtr instead of reference to local variable
-						[a_pLocked, a_pWeak](int success, gallus::resources::FileResource& resource)
+						[a_pLocked, a_pWeak, &a_Field](int success, gallus::resources::FileResource& resource)
 						{
 							if (success == 1)
 							{
-								if (a_pLocked == nullptr)
-								{
-									return;
-								}
+								//if (a_pLocked == nullptr)
+								//{
+								//	return;
+								//}
 
-								switch (a_pLocked->GetResourceType())
+								switch (a_Field.m_Options.assetType)
 								{
 									case resources::AssetType::Sprite:
 									{
@@ -197,6 +239,17 @@ namespace gallus
 
 										*a_pWeak = core::EDITOR_ENGINE->GetResourceAtlas()
 											.LoadTexture(resource.GetPath().filename().generic_string(), cCommandQueue);
+
+										break;
+									}
+									case resources::AssetType::Mesh:
+									{
+										auto cCommandQueue =
+											core::EDITOR_ENGINE->GetDX12()
+											.GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
+
+										*a_pWeak = core::EDITOR_ENGINE->GetResourceAtlas()
+											.LoadMesh(resource.GetPath().filename().generic_string(), cCommandQueue);
 
 										break;
 									}
@@ -455,6 +508,18 @@ namespace gallus
 						};
 						break;
 					}
+					case EditorFieldWidgetType::Quaternion:
+					{
+						DirectX::XMVECTOR* value = reinterpret_cast<DirectX::XMVECTOR*>(ptr);
+
+						func = [&a_Field, &fieldId, value]
+						{
+							bool val = ShowQuaternion(fieldId, *value, a_Field);
+							ImGui::ShowTooltip(a_Field.m_Options.description);
+							return val;
+						};
+						break;
+					}
 					case EditorFieldWidgetType::AssetPickerPtr:
 					{
 						std::weak_ptr<gallus::resources::EngineResource>* pWeak =
@@ -614,7 +679,7 @@ namespace gallus
 				}
 				if (ImGui::IsKeyPressed(ImGuiKey_R))
 				{
-					core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetLastSceneOperation((int) ImGuizmo::ROTATE_Z);
+					core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetLastSceneOperation((int) ImGuizmo::ROTATE);
 					core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
 				}
 				if (ImGui::IsKeyPressed(ImGuiKey_S))

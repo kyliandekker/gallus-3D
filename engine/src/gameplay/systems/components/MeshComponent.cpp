@@ -46,7 +46,7 @@ namespace gallus
 		{
 			Component::Init(a_EntityID);
 
-			m_pShaderBind = core::ENGINE->GetResourceAtlas().GetDefaultShaderBind();
+			m_pShaderBind = core::ENGINE->GetResourceAtlas().LoadShaderBind("defaultShaderBind3D");
 			m_pTexture = core::ENGINE->GetResourceAtlas().GetDefaultTexture();
 			m_pMesh = {};
 			m_vColor = { 1, 1, 1, 1 };
@@ -83,12 +83,6 @@ namespace gallus
 				transform = transformSys.GetComponent(a_EntityID).Transform();
 			}
 			DirectX::XMMATRIX mvpMatrix = transform.GetWorldMatrixWithPivot() * viewMatrix * projectionMatrix;
-
-			// TODO: Culling
-			//if (!CheckVisibility(transform, a_Camera))
-			//{
-			//	return;
-			//}
 
 			if (!core::ENGINE->GetECS().GetEntity(a_EntityID))
 			{
@@ -220,7 +214,7 @@ namespace gallus
 			std::shared_ptr<graphics::dx12::CommandQueue> cCommandQueue = core::ENGINE->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
 			if (!mesh.empty())
 			{
-				SetMesh(core::ENGINE->GetResourceAtlas().LoadMesh(mesh));
+				SetMesh(core::ENGINE->GetResourceAtlas().LoadMesh(mesh, cCommandQueue));
 			}
 			if (!tex.empty())
 			{

@@ -26,6 +26,7 @@ namespace gallus
 		InputText,
 		Vector2Field,
 		Vector3Field,
+		Quaternion,
 		AssetPickerPtr,
 		Object,
 		ObjectPtr,

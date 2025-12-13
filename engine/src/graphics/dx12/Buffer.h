@@ -23,6 +23,14 @@ namespace gallus
 				/// Used to initialize structured or raw buffers on creation.
 				/// </summary>
 				/// <param name="a_sName">The debug name of the buffer resource.</param>
+				/// <returns></returns>
+				bool LoadByName(const std::string& a_sName);
+
+				/// <summary>
+				/// Constructs a buffer resource with a resource description and element details.
+				/// Used to initialize structured or raw buffers on creation.
+				/// </summary>
+				/// <param name="a_sName">The debug name of the buffer resource.</param>
 				/// <param name="a_ResDesc">The Direct3D resource description (e.g., buffer layout, flags).</param>
 				/// <param name="a_iNumElements">The number of elements in the buffer.</param>
 				/// <param name="a_iElementSize">The size in bytes of a single element.</param>

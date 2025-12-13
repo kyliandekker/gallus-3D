@@ -214,16 +214,39 @@ namespace gallus
 				ImVec2 imageScreenPos = ImGui::GetCursorScreenPos();
 				ImVec2 imagePos = m_vPanOffset;
 				ImVec2 imageSize = ImVec2(textureSize.x * m_fZoom, textureSize.y * m_fZoom);
-				ImGui::SetCursorPos(imagePos);
-				ImGui::Image(
-					(ImTextureID) tex->GetGPUHandle().ptr,
-					imageSize
+				ImGui::GetWindowDrawList()->AddRectFilled(
+					childPos + imagePos,
+					childPos + imagePos + imageSize,
+					IM_COL32(0, 0, 0, 255),
+					0.0f, // rounding
+					0
 				);
 
 				if (core::EDITOR_ENGINE->GetEditor().GetCameraMode() == editor::CameraMode::CAMERA_MODE_SCENE)
 				{
 					HandleCameraInput(core::EDITOR_ENGINE->GetDX12().GetFPS().GetDeltaTime(), imageScreenPos, textureSize);
 
+					DrawGizmos(imageScreenPos, textureSize, m_vPanOffset, m_fZoom);
+
+					//Draw2DGrid(a_vSceneStartPos, a_vSize, m_vPanOffset, m_fZoom);
+					{
+						// Get the camera projection and view matrices
+						DirectX::XMMATRIX camProj = core::EDITOR_ENGINE->GetEditor().GetEditorCamera().GetProjectionMatrix();
+						DirectX::XMMATRIX camView = core::EDITOR_ENGINE->GetEditor().GetEditorCamera().GetViewMatrix();
+
+						// Draw the grid with the adjusted projection matrix
+						ImGuizmo::DrawGrid(reinterpret_cast<float*>(&camView), reinterpret_cast<float*>(&camProj), reinterpret_cast<const float*>(&IDENTITY), 100.f);
+					}
+				}
+
+				ImGui::SetCursorPos(imagePos);
+				ImGui::Image(
+					(ImTextureID)tex->GetGPUHandle().ptr,
+					imageSize
+				);
+
+				if (core::EDITOR_ENGINE->GetEditor().GetCameraMode() == editor::CameraMode::CAMERA_MODE_SCENE)
+				{
 					DrawComponentGizmos(imageScreenPos, textureSize);
 				}
 
@@ -323,9 +346,6 @@ namespace gallus
 			//---------------------------------------------------------------------
 			void SceneWindow::DrawComponentGizmos(const ImVec2& a_vSceneStartPos, const ImVec2& a_vSize)
 			{
-				DrawGizmos(a_vSceneStartPos, a_vSize, m_vPanOffset, m_fZoom);
-				Draw2DGrid(a_vSceneStartPos, a_vSize, m_vPanOffset, m_fZoom);
-
 				if (!core::EDITOR_ENGINE->GetEditor().GetSelectable().get())
 				{
 					return;
@@ -400,7 +420,7 @@ namespace gallus
 							core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
 						}
 
-						bool isRotate = core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetLastSceneOperation() == ImGuizmo::ROTATE_Z;
+						bool isRotate = core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetLastSceneOperation() == ImGuizmo::ROTATE;
 						if (ImGui::IconCheckboxButton(
 							ImGui::IMGUI_FORMAT_ID(font::ICON_ROTATE, BUTTON_ID, "ROTATE").c_str(),
 							&isRotate,
@@ -408,7 +428,7 @@ namespace gallus
 							m_Window.GetIconFont(),
 							isRotate ? ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent) : ImGui::GetStyleColorVec4(ImGuiCol_Text)))
 						{
-							core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetLastSceneOperation((int) ImGuizmo::ROTATE_Z);
+							core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetLastSceneOperation((int) ImGuizmo::ROTATE);
 							core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
 						}
 
@@ -491,75 +511,144 @@ namespace gallus
 				BaseWindow::Update();
 			}
 
-			void SceneWindow::HandleCameraInput(double a_fDeltaTime, const ImVec2& a_vSceneStartPos, const ImVec2& a_vSize)
-			{
-				ImGuiIO& io = ImGui::GetIO();
-				graphics::dx12::Camera& camera = core::EDITOR_ENGINE->GetEditor().GetEditorCamera();
+void SceneWindow::HandleCameraInput(double a_fDeltaTime, const ImVec2& a_vSceneStartPos, const ImVec2& a_vSize)
+{
+    ImGuiIO& io = ImGui::GetIO();
+    graphics::dx12::Camera& camera = core::EDITOR_ENGINE->GetEditor().GetEditorCamera();
 
-				DirectX::XMFLOAT3 position = camera.Transform().GetPosition();
+    DirectX::XMFLOAT3 position = camera.Transform().GetPosition();
 
-				ImVec2 imageMin = { a_vSceneStartPos.x + m_vPanOffset.x, a_vSceneStartPos.y + m_vPanOffset.y };
-				ImVec2 imageMax = imageMin + ImVec2(a_vSize.x * m_fZoom, a_vSize.y * m_fZoom);
+    ImVec2 imageMin = { a_vSceneStartPos.x + m_vPanOffset.x, a_vSceneStartPos.y + m_vPanOffset.y };
+    ImVec2 imageMax = imageMin + ImVec2(a_vSize.x * m_fZoom, a_vSize.y * m_fZoom);
 
-				ImVec2 mouse = io.MousePos;
+    ImVec2 mouse = io.MousePos;
 
-				// Persistent state for mouse look
-				static bool moving = false;
-				static POINT lastCursorPos;
+    static bool moving = false;
+    static POINT lastCursorPos;
 
-				if (ImGui::IsWindowHovered() &&
-					mouse.x >= imageMin.x && mouse.y >= imageMin.y &&
-					mouse.x <= imageMax.x && mouse.y <= imageMax.y)
-				{
-					HWND hwnd = core::EDITOR_ENGINE->GetWindow().GetHWnd();
+    if (ImGui::IsWindowHovered() &&
+        mouse.x >= imageMin.x && mouse.y >= imageMin.y &&
+        mouse.x <= imageMax.x && mouse.y <= imageMax.y)
+    {
+        HWND hwnd = core::EDITOR_ENGINE->GetWindow().GetHWnd();
 
-					// Right-click drag -> rotate
-					if (ImGui::IsMouseDown(ImGuiMouseButton_Right))
-					{
-						if (!moving)
-						{
-							moving = true;
-							ImGui::SetMouseCursor(ImGuiMouseCursor_None);
+        if (ImGui::IsMouseDown(ImGuiMouseButton_Right))
+        {
+            if (!moving)
+            {
+                moving = true;
+                ImGui::SetMouseCursor(ImGuiMouseCursor_None);
 
-							// Cache current cursor
-							GetCursorPos(&lastCursorPos);
-						}
+                GetCursorPos(&lastCursorPos);
+            }
 
-						POINT currentPos;
-						GetCursorPos(&currentPos);
+            POINT currentPos;
+            GetCursorPos(&currentPos);
 
-						float deltaX = static_cast<float>(currentPos.x - lastCursorPos.x);
-						float deltaY = static_cast<float>(currentPos.y - lastCursorPos.y);
+            float deltaX = static_cast<float>(currentPos.x - lastCursorPos.x);
+            float deltaY = static_cast<float>(currentPos.y - lastCursorPos.y);
 
-						float moveSpeed = 20 * a_fDeltaTime;
+            SetCursorPos(lastCursorPos.x, lastCursorPos.y);
 
-						position.x -= deltaX * moveSpeed;
-						position.y -= deltaY * moveSpeed;
+            DirectX::XMFLOAT3 deltaEuler;
+            deltaEuler.x = deltaY * 0.1f;
+            deltaEuler.y = deltaX * 0.1f;
+            deltaEuler.z = 0.0f;
 
-						// Reset cursor so deltas stay per-frame
-						SetCursorPos(lastCursorPos.x, lastCursorPos.y);
-					}
-					else
-					{
-						if (moving)
-						{
-							moving = false;
-							ImGui::SetMouseCursor(ImGuiMouseCursor_Arrow);
-						}
-					}
-				}
-				else
-				{
-					if (moving)
-					{
-						moving = false;
-						ImGui::SetMouseCursor(ImGuiMouseCursor_Arrow);
-					}
-				}
+            DirectX::XMFLOAT3 currentEuler = camera.Transform().GetRotationV();
 
-				// Always apply position after rotation
-				camera.Transform().SetPosition(position);
-			}
+            float newPitch = currentEuler.x + deltaEuler.x;
+            if (newPitch < -89.0f)
+            {
+                deltaEuler.x = -89.0f - currentEuler.x;
+            }
+            else if (newPitch > 89.0f)
+            {
+                deltaEuler.x = 89.0f - currentEuler.x;
+            }
+
+            DirectX::XMVECTOR q = camera.Transform().GetRotationQ();
+            DirectX::XMVECTOR newQ = camera.Transform().AddRotation(q, deltaEuler);
+            camera.Transform().SetRotation(newQ);
+        }
+        else
+        {
+            if (moving)
+            {
+                moving = false;
+                ImGui::SetMouseCursor(ImGuiMouseCursor_Arrow);
+            }
+        }
+
+        if (moving)
+        {
+            using namespace DirectX;
+
+            DirectX::XMFLOAT3 euler = camera.Transform().GetRotationV();
+
+            XMVECTOR forward = XMVector3Transform(
+                FORWARD,
+                XMMatrixRotationRollPitchYaw(
+                    XMConvertToRadians(euler.x),
+                    XMConvertToRadians(euler.y),
+                    XMConvertToRadians(euler.z)
+                )
+            );
+
+            XMVECTOR up = UP;
+            XMVECTOR right = XMVector3Cross(forward, up);
+
+            float baseMoveSpeed = 0.5f;
+            if (ImGui::IsKeyDown(ImGuiKey_LeftShift))
+            {
+                baseMoveSpeed = 2.0f;
+            }
+
+            float moveSpeed = baseMoveSpeed * static_cast<float>(a_fDeltaTime);
+
+            if (ImGui::IsKeyDown(ImGuiKey_W))
+            {
+                XMStoreFloat3(&position, XMLoadFloat3(&position) + forward * moveSpeed);
+            }
+
+            if (ImGui::IsKeyDown(ImGuiKey_S))
+            {
+                XMStoreFloat3(&position, XMLoadFloat3(&position) - forward * moveSpeed);
+            }
+
+            if (ImGui::IsKeyDown(ImGuiKey_A))
+            {
+                XMStoreFloat3(&position, XMLoadFloat3(&position) + right * moveSpeed);
+            }
+
+            if (ImGui::IsKeyDown(ImGuiKey_D))
+            {
+                XMStoreFloat3(&position, XMLoadFloat3(&position) - right * moveSpeed);
+            }
+
+            if (ImGui::IsKeyDown(ImGuiKey_Q))
+            {
+                XMStoreFloat3(&position, XMLoadFloat3(&position) - up * moveSpeed);
+            }
+
+            if (ImGui::IsKeyDown(ImGuiKey_E))
+            {
+                XMStoreFloat3(&position, XMLoadFloat3(&position) + up * moveSpeed);
+            }
+        }
+    }
+    else
+    {
+        if (moving)
+        {
+            moving = false;
+            ImGui::SetMouseCursor(ImGuiMouseCursor_Arrow);
+        }
+    }
+
+    camera.Transform().SetPosition(position);
+}
+
 
 			//---------------------------------------------------------------------
 			void FullSceneWindow::Render()

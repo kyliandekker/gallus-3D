@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "DX12PCH.h"
 
@@ -7,6 +7,10 @@
 
 // graphics
 #include "graphics/dx12/DX12Transform2D.h"
+
+#ifdef _EDITOR
+#include "editor/EditorExpose.h"
+#endif
 
 namespace gallus
 {
@@ -23,10 +27,19 @@ namespace gallus
 			};
 #endif // _EDITOR
 
+			enum CameraType
+			{
+				CameraType_Game,
+				CameraType_UI
+			};
+
 			//---------------------------------------------------------------------
 			// Camera
 			//---------------------------------------------------------------------
 			class Camera
+#ifdef _EDITOR
+				: public IExposableToEditor
+#endif
 			{
 			public:
 				/// <summary>
@@ -89,9 +102,20 @@ namespace gallus
 					return "Transform";
 				}
 			private:
+				float m_fFov = 60;
 				DirectX::XMINT2 m_vSize;
 				DX12Transform2D m_Transform;
 				DirectX::XMMATRIX m_ProjectionMatrix;
+				
+#ifdef _EDITOR
+			BEGIN_EXPOSE_FIELDS(Camera)
+				EXPOSE_FIELD(Camera, m_Transform, "Transform", (FieldOptions{ .type = EditorFieldWidgetType::Object }))
+				EXPOSE_FIELD(Camera, m_fFov, "Field of View", (FieldOptions{ .type = EditorFieldWidgetType::DragFloat }))
+			END_EXPOSE_FIELDS(Camera)
+			BEGIN_EXPOSE_GIZMOS(Camera)
+			END_EXPOSE_GIZMOS(Camera)
+			END_EXPOSE_TO_EDITOR(Camera)
+#endif
 			};
 		}
 	}
