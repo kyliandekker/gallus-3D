@@ -15,7 +15,6 @@
 #include "graphics/dx12/Texture.h"
 #include "graphics/dx12/Shader.h"
 #include "graphics/dx12/Mesh.h"
-#include "graphics/dx12/Mesh.h"
 
 // editor
 #include "editor/core/EditorEngine.h"

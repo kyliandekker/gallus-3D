@@ -848,7 +848,6 @@ namespace gallus
 				commandList->GetCommandList()->ClearRenderTargetView(backRtv, clearColor, 0, nullptr);
 				commandList->GetCommandList()->OMSetRenderTargets(1, &backRtv, FALSE, nullptr);
 
-				// 2. Render the render texture to full screen.
 #ifndef _EDITOR
 				if (renderTex && renderTex->CanBeDrawn())
 				{
