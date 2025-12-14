@@ -12,7 +12,7 @@
 #include "core/Engine.h"
 
 // graphics
-#include "graphics/dx12/DX12System2D.h"
+#include "graphics/dx12/DX12System.h"
 #include "graphics/dx12/CommandQueue.h"
 #include "graphics/dx12/CommandList.h"
 
@@ -104,7 +104,7 @@ namespace gallus
 			//---------------------------------------------------------------------
 			bool ImGuiWindow::CreateContextDX12()
 			{
-				dx12::DX12System2D& dx12window = core::ENGINE->GetDX12();
+				dx12::DX12System& dx12window = core::ENGINE->GetDX12();
 				m_iSrvIndex = dx12window.GetSRV().Allocate();
 
 				if (!ImGui_ImplDX12_Init(dx12window.GetDevice().Get(), dx12::g_iBufferCount,

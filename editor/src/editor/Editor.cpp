@@ -4,7 +4,7 @@
 #include <iostream>
 
 // graphics
-#include "graphics/dx12/DX12System2D.h"
+#include "graphics/dx12/DX12System.h"
 
 // logger
 #include "logger/Logger.h"

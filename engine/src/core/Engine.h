@@ -6,7 +6,7 @@
 #include <wtypes.h>
 
 // graphics
-#include "graphics/dx12/DX12System2D.h"
+#include "graphics/dx12/DX12System.h"
 #include "graphics/win32/Window.h"
 
 // input
@@ -69,7 +69,7 @@ namespace gallus
 			/// Retrieves the dx12 system.
 			/// </summary>
 			/// <returns>Reference to the dx12 system.</returns>
-			graphics::dx12::DX12System2D& GetDX12();
+			graphics::dx12::DX12System& GetDX12();
 
 			/// <summary>
 			/// Retrieves the input system.
@@ -109,7 +109,7 @@ namespace gallus
 		private:
 			resources::ResourceAtlas m_ResourceAtlas;
 			graphics::win32::Window m_Window;
-			graphics::dx12::DX12System2D m_DX12;
+			graphics::dx12::DX12System m_DX12;
 			input::InputSystem m_InputSystem;
 			gameplay::EntityComponentSystem m_ECS;
 

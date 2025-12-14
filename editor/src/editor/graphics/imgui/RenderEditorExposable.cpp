@@ -11,7 +11,7 @@
 #include "utils/string_extensions.h"
 
 // graphics
-#include "graphics/dx12/DX12Transform2D.h"
+#include "graphics/dx12/DX12Transform.h"
 #include "graphics/dx12/Texture.h"
 #include "graphics/dx12/Shader.h"
 #include "graphics/dx12/Mesh.h"
@@ -123,7 +123,7 @@ namespace gallus
 
 			bool ShowQuaternion(const std::string& a_sId, DirectX::XMVECTOR& a_vVector, const EditorFieldInfo& a_Field)
 			{
-				DirectX::XMFLOAT3 preRotationDegrees = graphics::dx12::DX12Transform2D::QuaternionToEuler(a_vVector);
+				DirectX::XMFLOAT3 preRotationDegrees = graphics::dx12::DX12Transform::QuaternionToEuler(a_vVector);
 
 				float val[3] = {
 					preRotationDegrees.x,
@@ -151,7 +151,7 @@ namespace gallus
 						val[2] - preRotationDegrees.z
 					};
 
-					a_vVector = graphics::dx12::DX12Transform2D::AddRotation(a_vVector, newRotationDegrees);
+					a_vVector = graphics::dx12::DX12Transform::AddRotation(a_vVector, newRotationDegrees);
 
 					return true;
 				}
@@ -647,7 +647,7 @@ namespace gallus
 				return changed;
 			}
 
-			bool ShowTransformGizmo(const ImVec2& a_vScenePos, const ImVec2& a_vSize, const ImVec2& a_vPanOffset, float a_fZoom, graphics::dx12::DX12Transform2D& a_Transform)
+			bool ShowTransformGizmo(const ImVec2& a_vScenePos, const ImVec2& a_vSize, const ImVec2& a_vPanOffset, float a_fZoom, graphics::dx12::DX12Transform& a_Transform)
 			{
 				DirectX::XMMATRIX pivotOffset = DirectX::XMMatrixTranslation(a_Transform.GetPivot().x, a_Transform.GetPivot().y, 0.0f);
 				DirectX::XMMATRIX objectMat = a_Transform.GetWorldMatrix();
@@ -721,7 +721,7 @@ namespace gallus
 					{
 						case EditorGizmoType::Transform:
 						{
-							graphics::dx12::DX12Transform2D* value = reinterpret_cast<graphics::dx12::DX12Transform2D*>(ptr);
+							graphics::dx12::DX12Transform* value = reinterpret_cast<graphics::dx12::DX12Transform*>(ptr);
 							if (ShowTransformGizmo(a_vScenePos, a_vSize, a_vPanOffset, a_fZoom, *value))
 							{
 								changed = true;

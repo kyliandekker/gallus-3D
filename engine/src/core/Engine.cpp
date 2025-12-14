@@ -98,7 +98,7 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		graphics::dx12::DX12System2D& Engine::GetDX12()
+		graphics::dx12::DX12System& Engine::GetDX12()
 		{
 			return m_DX12;
 		}

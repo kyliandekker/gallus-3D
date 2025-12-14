@@ -26,7 +26,7 @@ namespace gallus
 		{
 			class CommandList;
 
-			class DX12Transform2D;
+			class DX12Transform;
 			class Texture;
 			class DX12ShaderBind;
 			class Mesh;

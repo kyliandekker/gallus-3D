@@ -1,4 +1,4 @@
-#include "DX12System2D.h"
+#include "DX12System.h"
 
 // core
 #include "core/Engine.h"
@@ -27,9 +27,9 @@ namespace gallus
 		namespace dx12
 		{
 			//---------------------------------------------------------------------
-			// DX12System2D
+			// DX12System
 			//---------------------------------------------------------------------
-			bool DX12System2D::Initialize(bool a_bWait, HWND a_hWnd, const glm::ivec2& a_vSize, win32::Window* a_pWindow)
+			bool DX12System::Initialize(bool a_bWait, HWND a_hWnd, const glm::ivec2& a_vSize, win32::Window* a_pWindow)
 			{
 				m_vSize = a_vSize;
 				m_hWnd = a_hWnd;
@@ -40,14 +40,14 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			bool DX12System2D::Destroy()
+			bool DX12System::Destroy()
 			{
 				LOG(LOGSEVERITY_INFO, LOG_CATEGORY_DX12, "Destroying dx12 system.");
 				return ThreadedSystem::Destroy();
 			}
 
 			//---------------------------------------------------------------------
-			bool DX12System2D::InitThreadWorker()
+			bool DX12System::InitThreadWorker()
 			{
 #if _DEBUG
 				// Always enable the debug layer before doing anything DX12 related
@@ -269,7 +269,7 @@ namespace gallus
 				dCommandQueue->WaitForFenceValue(fenceValue);
 
 				m_FpsCounter.Initialize();
-				m_FpsCounter.m_eOnNewFrame += std::bind(&DX12System2D::NewFrame, this, std::placeholders::_1);
+				m_FpsCounter.m_eOnNewFrame += std::bind(&DX12System::NewFrame, this, std::placeholders::_1);
 				m_FpsCounter.SetTargetFPS(60);
 
 				LOG(LOGSEVERITY_SUCCESS, LOG_CATEGORY_DX12, "Initialized dx12 system.");
@@ -278,7 +278,7 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			bool DX12System2D::GetAdapter(bool a_bUseWarp)
+			bool DX12System::GetAdapter(bool a_bUseWarp)
 			{
 				Microsoft::WRL::ComPtr<IDXGIFactory4> dxgiFactory;
 				UINT createFactoryFlags = 0;
@@ -340,7 +340,7 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			bool DX12System2D::CreateDevice()
+			bool DX12System::CreateDevice()
 			{
 				if (FAILED(D3D12CreateDevice(m_pAdapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&m_pDevice))))
 				{
@@ -394,7 +394,7 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			bool DX12System2D::CheckTearingSupport()
+			bool DX12System::CheckTearingSupport()
 			{
 				BOOL allowTearing = FALSE;
 
@@ -417,7 +417,7 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			bool DX12System2D::CreateSwapChain()
+			bool DX12System::CreateSwapChain()
 			{
 				Microsoft::WRL::ComPtr<IDXGIFactory4> dxgiFactory4;
 				UINT createFactoryFlags = 0;
@@ -482,7 +482,7 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			void DX12System2D::CreateRTV()
+			void DX12System::CreateRTV()
 			{
 				size_t numBuffers = g_iBufferCount + 1;
 
@@ -494,7 +494,7 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			void DX12System2D::CreateSRV()
+			void DX12System::CreateSRV()
 			{
 				D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
 				srvHeapDesc.NumDescriptors = 100;  // Adjust based on how many textures you need
@@ -504,7 +504,7 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			void DX12System2D::CreateDSV()
+			void DX12System::CreateDSV()
 			{
 				// Create the descriptor heap for the depth-stencil view.
 				D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc = {};
@@ -515,7 +515,7 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			void DX12System2D::Finalize()
+			void DX12System::Finalize()
 			{
 				std::lock_guard<std::mutex> lock(m_RenderMutex);
 #ifndef IMGUI_DISABLE
@@ -528,14 +528,14 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			void DX12System2D::Flush()
+			void DX12System::Flush()
 			{
 				m_pDirectCommandQueue->Flush();
 				m_pCopyCommandQueue->Flush();
 			}
 
 			//---------------------------------------------------------------------
-			void DX12System2D::UpdateRenderTargetViews()
+			void DX12System::UpdateRenderTargetViews()
 			{
 				for (int i = 0; i < g_iBufferCount; ++i)
 				{
@@ -558,13 +558,13 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			std::weak_ptr<Texture> DX12System2D::GetRenderTexture()
+			std::weak_ptr<Texture> DX12System::GetRenderTexture()
 			{
 				return m_pRenderTexture;
 			}
 
 			//---------------------------------------------------------------------
-			bool DX12System2D::CreateCommandQueues()
+			bool DX12System::CreateCommandQueues()
 			{
 				m_pDirectCommandQueue = std::make_shared<CommandQueue>(D3D12_COMMAND_LIST_TYPE_DIRECT);
 				m_pCopyCommandQueue = std::make_shared<CommandQueue>(D3D12_COMMAND_LIST_TYPE_COPY);
@@ -573,7 +573,7 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			bool DX12System2D::CreateViews()
+			bool DX12System::CreateViews()
 			{
 				CreateRTV();
 				CreateSRV();
@@ -583,7 +583,7 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			bool DX12System2D::CreateRootSignature()
+			bool DX12System::CreateRootSignature()
 			{
 				// Define descriptor ranges
 				CD3DX12_DESCRIPTOR_RANGE1 descriptorRanges[1]{};
@@ -671,11 +671,11 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			void DX12System2D::AfterResize(const glm::ivec2& a_vSize)
+			void DX12System::AfterResize(const glm::ivec2& a_vSize)
 			{}
 
 			//---------------------------------------------------------------------
-			void DX12System2D::Resize(const glm::ivec2& a_vPos, const glm::ivec2& a_vSize)
+			void DX12System::Resize(const glm::ivec2& a_vPos, const glm::ivec2& a_vSize)
 			{
 				if (a_vSize.x == 0 || a_vSize.y == 0)
 				{
@@ -722,7 +722,7 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			void DX12System2D::ResizeDepthBuffer()
+			void DX12System::ResizeDepthBuffer()
 			{
 				{
 					m_DSV.Deallocate(0);
@@ -756,19 +756,19 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			const std::shared_ptr<DX12Resource>& DX12System2D::GetCurrentBackBuffer() const
+			const std::shared_ptr<DX12Resource>& DX12System::GetCurrentBackBuffer() const
 			{
 				return m_BackBuffers[m_iCurrentBackBufferIndex];
 			}
 
 			//---------------------------------------------------------------------
-			UINT DX12System2D::GetCurrentBackBufferIndex() const
+			UINT DX12System::GetCurrentBackBufferIndex() const
 			{
 				return m_iCurrentBackBufferIndex;
 			}
 
 			//---------------------------------------------------------------------
-			D3D12_CPU_DESCRIPTOR_HANDLE DX12System2D::GetCurrentRenderTargetView(bool a_bUseRenderTexture)
+			D3D12_CPU_DESCRIPTOR_HANDLE DX12System::GetCurrentRenderTargetView(bool a_bUseRenderTexture)
 			{
 				if (a_bUseRenderTexture)
 				{
@@ -787,7 +787,7 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			void DX12System2D::Loop()
+			void DX12System::Loop()
 			{
 				if (!m_bInitialized.load())
 				{
@@ -798,7 +798,7 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			void DX12System2D::NewFrame(float a_fDeltaTime)
+			void DX12System::NewFrame(float a_fDeltaTime)
 			{
 				m_eOnNewFrame(m_FpsCounter.GetFPS());
 
@@ -881,7 +881,7 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			void DX12System2D::ProcessWindowEvents()
+			void DX12System::ProcessWindowEvents()
 			{
 				std::lock_guard<std::mutex> lock(m_RenderMutex);
 
@@ -906,14 +906,14 @@ namespace gallus
 
 			//---------------------------------------------------------------------
 #ifndef IMGUI_DISABLE
-			void DX12System2D::RenderUI(std::shared_ptr<CommandQueue> a_pCommandQueue, std::shared_ptr<CommandList> a_pCommandList, D3D12_CPU_DESCRIPTOR_HANDLE a_RTVHandle)
+			void DX12System::RenderUI(std::shared_ptr<CommandQueue> a_pCommandQueue, std::shared_ptr<CommandList> a_pCommandList, D3D12_CPU_DESCRIPTOR_HANDLE a_RTVHandle)
 			{
 				m_ImGuiWindow.Render(a_pCommandList);
 			}
 #endif // IMGUI_DISABLE
 
 			//---------------------------------------------------------------------
-			void DX12System2D::Render2D(std::shared_ptr<CommandQueue> a_pCommandQueue, std::shared_ptr<CommandList> a_pCommandList, D3D12_CPU_DESCRIPTOR_HANDLE a_RTVHandle)
+			void DX12System::Render2D(std::shared_ptr<CommandQueue> a_pCommandQueue, std::shared_ptr<CommandList> a_pCommandList, D3D12_CPU_DESCRIPTOR_HANDLE a_RTVHandle)
 			{
 				if (!m_pActiveCamera)
 				{
@@ -942,7 +942,7 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			void DX12System2D::Present(std::shared_ptr<CommandQueue> a_pCommandQueue, std::shared_ptr<CommandList> a_pCommandList)
+			void DX12System::Present(std::shared_ptr<CommandQueue> a_pCommandQueue, std::shared_ptr<CommandList> a_pCommandList)
 			{
 				const UINT currentBackBufferIndex = GetCurrentBackBufferIndex();
 				const std::shared_ptr<DX12Resource>& backBuffer = GetCurrentBackBuffer();
@@ -967,7 +967,7 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			std::shared_ptr<CommandQueue> DX12System2D::GetCommandQueue(D3D12_COMMAND_LIST_TYPE a_Type)
+			std::shared_ptr<CommandQueue> DX12System::GetCommandQueue(D3D12_COMMAND_LIST_TYPE a_Type)
 			{
 				std::shared_ptr<CommandQueue> commandQueue = nullptr;
 				switch (a_Type)
@@ -992,7 +992,7 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			void DX12System2D::CreateRenderTexture(const glm::ivec2& a_vSize)
+			void DX12System::CreateRenderTexture(const glm::ivec2& a_vSize)
 			{
 				if (auto renderTex = m_pRenderTexture.lock())
 				{

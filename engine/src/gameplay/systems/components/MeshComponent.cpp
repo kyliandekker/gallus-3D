@@ -11,7 +11,7 @@
 #include "graphics/dx12/Mesh.h"
 #include "graphics/dx12/DX12ShaderBind.h"
 #include "graphics/dx12/Shader.h"
-#include "graphics/dx12/DX12Transform2D.h"
+#include "graphics/dx12/DX12Transform.h"
 #include "graphics/dx12/CommandList.h"
 #include "graphics/dx12/CommandQueue.h"
 
@@ -80,7 +80,7 @@ namespace gallus
 				return;
 			}
 
-			graphics::dx12::DX12Transform2D transform;
+			graphics::dx12::DX12Transform transform;
 			TransformSystem& transformSys = core::ENGINE->GetECS().GetSystem<TransformSystem>();
 			if (transformSys.HasComponent(a_EntityID))
 			{

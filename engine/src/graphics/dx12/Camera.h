@@ -6,7 +6,7 @@
 #include <DirectXMath.h>
 
 // graphics
-#include "graphics/dx12/DX12Transform2D.h"
+#include "graphics/dx12/DX12Transform.h"
 
 #ifdef _EDITOR
 #include "editor/EditorExpose.h"
@@ -58,13 +58,13 @@ namespace gallus
 				/// Gets a reference to the camera's transform, allowing modification of position and orientation.
 				/// </summary>
 				/// <returns>Reference to the transform component.</returns>
-				DX12Transform2D& Transform();
+				DX12Transform& Transform();
 
 				/// <summary>
 				/// Gets a constant reference to the camera's transform.
 				/// </summary>
 				/// <returns>Constant reference to the transform component.</returns>
-				const DX12Transform2D& Transform() const;
+				const DX12Transform& Transform() const;
 
 				/// <summary>
 				/// Computes and returns the view matrix from the camera's transform.
@@ -94,7 +94,7 @@ namespace gallus
 			private:
 				float m_fFov = 60;
 				DirectX::XMINT2 m_vSize;
-				DX12Transform2D m_Transform;
+				DX12Transform m_Transform;
 				DirectX::XMMATRIX m_ProjectionMatrix3D;
 				DirectX::XMMATRIX m_ProjectionMatrix2D;
 #ifdef _EDITOR

@@ -10,7 +10,7 @@
 #include <memory>
 
 // graphics
-#include "graphics/dx12/DX12Transform2D.h"
+#include "graphics/dx12/DX12Transform.h"
 #include "graphics/dx12/IndexBuffer.h"
 #include "graphics/dx12/VertexBuffer.h"
 

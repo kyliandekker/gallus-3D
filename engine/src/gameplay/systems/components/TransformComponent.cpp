@@ -29,7 +29,7 @@ namespace gallus
 		//---------------------------------------------------------------------
 		// TransformComponent
 		//---------------------------------------------------------------------
-		graphics::dx12::DX12Transform2D& TransformComponent::Transform()
+		graphics::dx12::DX12Transform& TransformComponent::Transform()
 		{
 			return m_Transform;
 		}
@@ -79,35 +79,35 @@ namespace gallus
 		//---------------------------------------------------------------------
 		void TransformComponent::Deserialize(const resources::SrcData& a_SrcData)
 		{
-			DirectX::XMFLOAT3 pos;
+			DirectX::XMFLOAT3 pos = VEC_ZERO;
 			if (!a_SrcData.GetVector3(JSON_TRANSFORM_COMPONENT_POSITION_VAR, pos))
 			{
 				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Transform component did not have key %s present in its meta data.", JSON_TRANSFORM_COMPONENT_POSITION_VAR);
 			}
 			m_Transform.SetPosition(pos);
 
-			DirectX::XMFLOAT3 scale;
+			DirectX::XMFLOAT3 scale = VEC_IDENTITY;
 			if (!a_SrcData.GetVector3(JSON_TRANSFORM_COMPONENT_SCALE_VAR, scale))
 			{
 				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Transform component did not have key %s present in its meta data.", JSON_TRANSFORM_COMPONENT_SCALE_VAR);
 			}
 			m_Transform.SetScale(scale);
 
-			DirectX::XMFLOAT3 pivot;
+			DirectX::XMFLOAT3 pivot = VEC_PIVOT_CENTER;
 			if (!a_SrcData.GetVector3(JSON_TRANSFORM_COMPONENT_PIVOT_VAR, pivot))
 			{
 				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Transform component did not have key %s present in its meta data.", JSON_TRANSFORM_COMPONENT_PIVOT_VAR);
 			}
 			m_Transform.SetPivot(pivot);
 
-			DirectX::XMFLOAT3 rotation;
+			DirectX::XMFLOAT3 rotation = VEC_ZERO;
 			if (!a_SrcData.GetVector3(JSON_TRANSFORM_COMPONENT_ROTATION_VAR, rotation))
 			{
 				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Transform component did not have key %s present in its meta data.", JSON_TRANSFORM_COMPONENT_ROTATION_VAR);
 			}
-			m_Transform.SetRotation(graphics::dx12::DX12Transform2D::EulerToQuaternion(rotation));
+			m_Transform.SetRotation(graphics::dx12::DX12Transform::EulerToQuaternion(rotation));
 
-			graphics::dx12::CameraType cameraType;
+			graphics::dx12::CameraType cameraType = graphics::dx12::CameraType::CameraType_World;
 			if (!a_SrcData.GetEnum(JSON_TRANSFORM_COMPONENT_CAMERA_MODE_VAR, cameraType))
 			{
 				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Transform component did not have key %s present in its meta data.", JSON_TRANSFORM_COMPONENT_CAMERA_MODE_VAR);

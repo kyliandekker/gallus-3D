@@ -74,12 +74,12 @@ namespace gallus
 			};
 
 			//---------------------------------------------------------------------
-			// DX12System2D
+			// DX12System
 			//---------------------------------------------------------------------
 			/// <summary>
 			/// Represents a DirectX 12 rendering window, managing device resources, rendering, and synchronization. Only basic 2D rendering.
 			/// </summary>
-			class DX12System2D : public core::ThreadedSystem
+			class DX12System : public core::ThreadedSystem
 			{
 			public:
 				/// <summary>
@@ -361,7 +361,7 @@ namespace gallus
 				/// <returns>Pointer to the render texture.</returns>
 				std::weak_ptr<Texture> GetRenderTexture();
 
-				SimpleEvent<DX12System2D&> m_eOnInitialize;
+				SimpleEvent<DX12System&> m_eOnInitialize;
 				SimpleEvent<std::shared_ptr<dx12::CommandList>> m_eOnRender;
 				SimpleEvent<const glm::ivec2&, const glm::ivec2&> m_eOnResize;
 				Event<float> m_eOnNewFrame;

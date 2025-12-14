@@ -49,7 +49,7 @@ namespace gallus
 				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Rigidbody component did not have key %s present in its meta data.", JSON_RIGIDBODY_COMPONENT_USE_GRAVITY_VAR);
 			}
 
-			float mass;
+			float mass = 1.0f;
 			if (!a_SrcData.GetFloat(JSON_RIGIDBODY_COMPONENT_MASS_VAR, mass))
 			{
 				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Rigidbody component did not have key %s present in its meta data.", JSON_RIGIDBODY_COMPONENT_MASS_VAR);
@@ -57,7 +57,7 @@ namespace gallus
 
 			SetMass(mass);
 
-			float linearDamping;
+			float linearDamping  = 0.98f;
 			if (!a_SrcData.GetFloat(JSON_RIGIDBODY_COMPONENT_LINEAR_DAMPING_VAR, linearDamping))
 			{
 				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Rigidbody component did not have key %s present in its meta data.", JSON_RIGIDBODY_COMPONENT_LINEAR_DAMPING_VAR);

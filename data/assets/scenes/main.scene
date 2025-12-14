@@ -10,7 +10,7 @@
                         "spriteIndex": 4
                     },
                     "shader": {
-                        "pixel": "pixelShader3D.hlsl",
+                        "pixel": "pixelShader.hlsl",
                         "vertex": "vertexShader.hlsl"
                     },
                     "mesh": "square",
@@ -75,7 +75,7 @@
                         "spriteIndex": 1
                     },
                     "shader": {
-                        "pixel": "pixelShader3D.hlsl",
+                        "pixel": "pixelShader.hlsl",
                         "vertex": "vertexShader.hlsl"
                     },
                     "mesh": "square",
@@ -143,7 +143,7 @@
                         "spriteIndex": 0
                     },
                     "shader": {
-                        "pixel": "pixelShader3D.hlsl",
+                        "pixel": "pixelShader.hlsl",
                         "vertex": "vertexShader.hlsl"
                     },
                     "mesh": "square",
@@ -199,7 +199,7 @@
                         "spriteIndex": 0
                     },
                     "shader": {
-                        "pixel": "pixelShader3D.hlsl",
+                        "pixel": "pixelShader.hlsl",
                         "vertex": "vertexShader.hlsl"
                     },
                     "mesh": "square",
@@ -256,7 +256,7 @@
                     },
                     "shader": {
                         "pixel": "pixelShader3D.hlsl",
-                        "vertex": "vertexShader.hlsl"
+                        "vertex": "vertexShader3D.hlsl"
                     },
                     "mesh": "mod_chicken.glb",
                     "color": {

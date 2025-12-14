@@ -8,7 +8,7 @@
                 "spriteIndex": 0
             },
             "shader": {
-                "pixel": "pixelShader3D.hlsl",
+                "pixel": "pixelShader.hlsl",
                 "vertex": "vertexShader.hlsl"
             },
             "mesh": "square",

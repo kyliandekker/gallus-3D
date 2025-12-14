@@ -18,7 +18,7 @@ namespace gallus
 	{
 		namespace dx12
 		{
-			class DX12System2D;
+			class DX12System;
 			class CommandList;
 			class Texture;
 		}
@@ -226,7 +226,7 @@ namespace gallus
 
 				ImGuiWindowsConfig* m_pWindowsConfig = nullptr;
 
-				friend dx12::DX12System2D;
+				friend dx12::DX12System;
 			};
 		}
 	}

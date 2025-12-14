@@ -1,4 +1,4 @@
-﻿#include "DX12Transform2D.h"
+﻿#include "DX12Transform.h"
 
 // external
 #include <iostream>
@@ -10,35 +10,35 @@ namespace gallus
 		namespace dx12
 		{
 			//---------------------------------------------------------------------
-			// DX12Transform2D
+			// DX12Transform
 			//---------------------------------------------------------------------
-			DX12Transform2D::DX12Transform2D() : 
-				m_vPosition{ 0.0f, 0.0f, 0.0f },
-				m_vScale{ 1.0f, 1.0f, 1.0f },
-				m_vPivot{ -0.5f, -0.5f, -0.5f },
-				m_vRotation(0, 0, 0)
+			DX12Transform::DX12Transform() : 
+				m_vPosition(VEC_ZERO),
+				m_vScale(VEC_IDENTITY),
+				m_vPivot(VEC_PIVOT_CENTER),
+				m_vRotation(DirectX::XMQuaternionIdentity())
 			{}
 
 			//---------------------------------------------------------------------
-			void DX12Transform2D::SetPosition(const DirectX::XMFLOAT3& a_vPosition)
+			void DX12Transform::SetPosition(const DirectX::XMFLOAT3& a_vPosition)
 			{
 				m_vPosition = a_vPosition;
 			}
 
 			//---------------------------------------------------------------------
-			void DX12Transform2D::SetRotation(const DirectX::XMVECTOR& a_vRotation)
+			void DX12Transform::SetRotation(const DirectX::XMVECTOR& a_vRotation)
 			{
 				m_vRotation = a_vRotation;
 			}
 
 			//---------------------------------------------------------------------
-			void DX12Transform2D::SetScale(const DirectX::XMFLOAT3& a_Scale)
+			void DX12Transform::SetScale(const DirectX::XMFLOAT3& a_Scale)
 			{
 				m_vScale = a_Scale;
 			}
 
 			//---------------------------------------------------------------------
-			void DX12Transform2D::SetPivot(const DirectX::XMFLOAT3& a_vPivot)
+			void DX12Transform::SetPivot(const DirectX::XMFLOAT3& a_vPivot)
 			{
 				m_vPivot = a_vPivot;
 				if (m_vPivot.x < -0.5f)
@@ -68,13 +68,13 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			const DirectX::XMFLOAT3& DX12Transform2D::GetPosition() const
+			const DirectX::XMFLOAT3& DX12Transform::GetPosition() const
 			{
 				return m_vPosition;
 			}
 
 			//---------------------------------------------------------------------
-			DirectX::XMFLOAT3 DX12Transform2D::QuaternionToEuler(const DirectX::XMVECTOR& quat)
+			DirectX::XMFLOAT3 DX12Transform::QuaternionToEuler(const DirectX::XMVECTOR& quat)
 			{
 				// Normalize the quaternion to avoid errors due to floating-point imprecision
 				DirectX::XMVECTOR q = quat;
@@ -114,7 +114,7 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			DirectX::XMVECTOR DX12Transform2D::EulerToQuaternion(const DirectX::XMFLOAT3& a_vEuler)
+			DirectX::XMVECTOR DX12Transform::EulerToQuaternion(const DirectX::XMFLOAT3& a_vEuler)
 			{
 				// Convert degrees to radians
 				float pitch = DirectX::XMConvertToRadians(a_vEuler.x);
@@ -135,7 +135,7 @@ namespace gallus
 			}
 			
 			//---------------------------------------------------------------------
-			DirectX::XMVECTOR DX12Transform2D::AddRotation(
+			DirectX::XMVECTOR DX12Transform::AddRotation(
 				DirectX::XMVECTOR& a_vQuat,
 				const DirectX::XMFLOAT3& a_vAddition)
 			{
@@ -159,31 +159,31 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			const DirectX::XMVECTOR& DX12Transform2D::GetRotationQ() const
+			const DirectX::XMVECTOR& DX12Transform::GetRotationQ() const
 			{
 				return m_vRotation;
 			}
 			
 			//---------------------------------------------------------------------
-			DirectX::XMFLOAT3 DX12Transform2D::GetRotationV() const
+			DirectX::XMFLOAT3 DX12Transform::GetRotationV() const
 			{
 				return QuaternionToEuler(m_vRotation);
 			}
 
 			//---------------------------------------------------------------------
-			const DirectX::XMFLOAT3& DX12Transform2D::GetScale() const
+			const DirectX::XMFLOAT3& DX12Transform::GetScale() const
 			{
 				return m_vScale;
 			}
 
 			//---------------------------------------------------------------------
-			const DirectX::XMFLOAT3& DX12Transform2D::GetPivot() const
+			const DirectX::XMFLOAT3& DX12Transform::GetPivot() const
 			{
 				return m_vPivot;
 			}
 
 			//---------------------------------------------------------------------
-			const DirectX::XMMATRIX DX12Transform2D::GetWorldMatrix() const
+			const DirectX::XMMATRIX DX12Transform::GetWorldMatrix() const
 			{
 				// Use quaternion for rotation
 				DirectX::XMMATRIX translationMatrix = DirectX::XMMatrixTranslationFromVector(DirectX::XMLoadFloat3(&m_vPosition));
@@ -194,7 +194,7 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			const DirectX::XMMATRIX DX12Transform2D::GetWorldMatrixWithPivot() const
+			const DirectX::XMMATRIX DX12Transform::GetWorldMatrixWithPivot() const
 			{
 				// Use quaternion for rotation
 				DirectX::XMMATRIX translationMatrix = DirectX::XMMatrixTranslationFromVector(DirectX::XMLoadFloat3(&m_vPosition));
@@ -208,7 +208,7 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			void DX12Transform2D::SetWorldMatrix(const DirectX::XMMATRIX& a_WorldMatrix)
+			void DX12Transform::SetWorldMatrix(const DirectX::XMMATRIX& a_WorldMatrix)
 			{
 				DirectX::XMVECTOR scale, rotation, translation;
 				if (DirectX::XMMatrixDecompose(&scale, &rotation, &translation, a_WorldMatrix))

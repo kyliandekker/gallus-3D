@@ -19,7 +19,7 @@ namespace gallus
 	{
 		namespace dx12
 		{
-			class DX12System2D;
+			class DX12System;
 			class CommandQueue;
 
 			enum class TextureType
