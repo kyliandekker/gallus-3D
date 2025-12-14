@@ -33,7 +33,8 @@ namespace gallus
 			Prefab,
 			ShaderBind,
 			Mesh,
-			AnimationGraph
+			AnimationGraph,
+			Material,
 		};
 
 		/// <summary>
@@ -101,6 +102,10 @@ namespace gallus
 				{
 					return "Animation Graph";
 				}
+				case AssetType::Material:
+				{
+					return "Material";
+				}
 				default:
 				{
 					return "";
@@ -163,9 +168,6 @@ namespace gallus
 			switch (a_AssetType)
 			{
 				case resources::AssetType::Scene:
-				{
-					return ShiftWithinFamily(base, 0, 6);
-				}
 				case resources::AssetType::Prefab:
 				{
 					return ShiftWithinFamily(base, 0, 6);
@@ -175,33 +177,18 @@ namespace gallus
 					return ShiftWithinFamily(base, 1, 6);
 				}
 				case resources::AssetType::Sound:
-				{
-					return ShiftWithinFamily(base, 2, 6);
-				}
 				case resources::AssetType::Song:
-				{
-					return ShiftWithinFamily(base, 2, 6);
-				}
 				case resources::AssetType::VO:
 				{
 					return ShiftWithinFamily(base, 2, 6);
 				}
 				case resources::AssetType::Animation:
-				{
-					return ShiftWithinFamily(base, 3, 6);
-				}
 				case resources::AssetType::AnimationGraph:
 				{
 					return ShiftWithinFamily(base, 3, 6);
 				}
 				case resources::AssetType::PixelShader:
-				{
-					return ShiftWithinFamily(base, 4, 6);
-				}
 				case resources::AssetType::VertexShader:
-				{
-					return ShiftWithinFamily(base, 4, 6);
-				}
 				case resources::AssetType::ShaderBind:
 				{
 					return ShiftWithinFamily(base, 4, 6);
@@ -209,6 +196,10 @@ namespace gallus
 				case resources::AssetType::Mesh:
 				{
 					return ShiftWithinFamily(base, 5, 6);
+				}
+				case resources::AssetType::Material:
+				{
+					return ShiftWithinFamily(base, 6, 6);
 				}
 				default:
 				{
@@ -277,6 +268,10 @@ namespace gallus
 					case resources::AssetType::AnimationGraph:
 					{
 						return font::ICON_FILE_ANIMATION;
+					}
+					case resources::AssetType::Material:
+					{
+						return font::ICON_FILE_MATERIAL;
 					}
 					default:
 					{

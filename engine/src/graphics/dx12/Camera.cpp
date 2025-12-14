@@ -68,7 +68,11 @@ namespace gallus
 				{
 					const DirectX::XMFLOAT3& pos = m_Transform.GetPosition();
 					const float rotZ = DirectX::XMConvertToRadians(m_Transform.GetRotationV().y);
-					const DirectX::XMFLOAT3& scale = m_Transform.GetScale();
+					const DirectX::XMFLOAT3& scale = {
+						m_Transform.GetScale().x,
+						m_Transform.GetScale().y,
+						0
+					};
 
 					const DirectX::XMMATRIX translation = DirectX::XMMatrixTranslation(pos.x, pos.y, 0.0f);
 					const DirectX::XMMATRIX rotation = DirectX::XMMatrixRotationZ(rotZ);

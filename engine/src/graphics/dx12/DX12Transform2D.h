@@ -4,6 +4,8 @@
 #include <DirectXMath.h>
 #include <array>
 
+#include <string>
+
 #ifdef _EDITOR
 #include "editor/EditorExpose.h"
 #endif

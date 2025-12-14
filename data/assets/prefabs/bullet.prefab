@@ -8,7 +8,7 @@
                 "spriteIndex": 0
             },
             "shader": {
-                "pixel": "pixelShader.hlsl",
+                "pixel": "pixelShader3D.hlsl",
                 "vertex": "vertexShader.hlsl"
             },
             "mesh": "square",
@@ -22,17 +22,25 @@
         "transform": {
             "position": {
                 "x": 0.0,
-                "y": 0.0
+                "y": 0.0,
+                "z": 0.0
             },
-            "rotation": 0.0,
+            "rotation": {
+                "x": 1.4051179687282149e-15,
+                "y": 1.8130364765056584e-7,
+                "z": 2.220234733840698e-7
+            },
             "scale": {
                 "x": 70.0,
-                "y": 40.0
+                "y": 40.0,
+                "z": 0.0
             },
             "pivot": {
-                "x": 0.0,
-                "y": 0.0
-            }
+                "x": -0.5,
+                "y": -0.5,
+                "z": -0.5
+            },
+            "cameraMode": 1
         },
         "collision": {
             "offset": {
@@ -46,7 +54,7 @@
         },
         "projectile": {
             "damage": 50.0,
-			"explosion": "explosion.prefab"
+            "explosion": "explosion.prefab"
         }
     }
 }

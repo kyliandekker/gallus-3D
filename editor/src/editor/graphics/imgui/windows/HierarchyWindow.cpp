@@ -23,6 +23,8 @@
 #include "editor/core/EditorEngine.h"
 #include "editor/EditorGlobalFunctions.h"
 
+#include "resources/FileResource.h"
+
 namespace gallus
 {
 	namespace graphics
@@ -241,6 +243,97 @@ namespace gallus
 					ImGuiChildFlags_Borders
 					))
 				{
+					ImVec2 childSize = ImGui::GetContentRegionAvail();
+					ImGui::InvisibleButton("HIERARCHY_DROP_TARGET", childSize);
+					if (ImGui::BeginDragDropTarget())
+					{
+						if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("EXPLORER_ITEM"))
+						{
+							IM_ASSERT(payload->DataSize == sizeof(resources::FileResource*));
+							resources::FileResource* dropped = *(resources::FileResource**)payload->Data;
+							if (dropped)
+							{
+								if (dropped->GetMetaData()->GetAssetType() == resources::AssetType::Prefab)
+								{
+									if (auto prefab = core::EDITOR_ENGINE->GetResourceAtlas().LoadPrefab(dropped->GetPath().filename().generic_string()).lock())
+									{
+										prefab->Instantiate();
+									}
+								}
+								else
+								{
+									gameplay::EntityID entityID = core::EDITOR_ENGINE->GetECS().CreateEntity(dropped->GetPath().filename().generic_string());
+
+									switch (dropped->GetMetaData()->GetAssetType())
+									{
+										case resources::AssetType::None:
+										{
+											break;
+										}
+										case resources::AssetType::Folder:
+										{
+											break;
+										}
+										case resources::AssetType::Scene:
+										{
+											break;
+										}
+										case resources::AssetType::Sprite:
+										{
+											break;
+										}
+										case resources::AssetType::Sound:
+										{
+											break;
+										}
+										case resources::AssetType::Song:
+										{
+											break;
+										}
+										case resources::AssetType::VO:
+										{
+											break;
+										}
+										case resources::AssetType::Animation:
+										{
+											break;
+										}
+										case resources::AssetType::PixelShader:
+										{
+											break;
+										}
+										case resources::AssetType::VertexShader:
+										{
+											break;
+										}
+										case resources::AssetType::Prefab:
+										{
+											break;
+										}
+										case resources::AssetType::ShaderBind:
+										{
+											break;
+										}
+										case resources::AssetType::Mesh:
+										{
+											break;
+										}
+										case resources::AssetType::AnimationGraph:
+										{
+											break;
+										}
+										case resources::AssetType::Material:
+										{
+											break;
+										}
+									}
+								}
+							}
+						}
+						ImGui::EndDragDropTarget();
+					}
+					ImGui::SetCursorPos(ImVec2(0, 0));
+
 					ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
 
 					{

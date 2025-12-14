@@ -22,17 +22,25 @@
         "transform": {
             "position": {
                 "x": 0.0,
-                "y": 0.0
+                "y": 0.0,
+                "z": 0.0
             },
-            "rotation": 0.0,
+            "rotation": {
+                "x": 7.025589843641074e-16,
+                "y": 1.8130364765056584e-7,
+                "z": 2.220234733840698e-7
+            },
             "scale": {
                 "x": 150.0,
-                "y": 150.0
+                "y": 150.0,
+                "z": 0.0
             },
             "pivot": {
-                "x": 0.0,
-                "y": 0.0
-            }
+                "x": -0.5,
+                "y": -0.5,
+                "z": -0.5
+            },
+            "cameraMode": 1
         },
         "animation": {
             "startingAnimation": "explosion.anim"

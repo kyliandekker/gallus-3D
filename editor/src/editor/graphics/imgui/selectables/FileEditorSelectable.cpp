@@ -236,6 +236,13 @@ namespace gallus
 				}
 				a_bDoubleClicked = ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0);
 				a_bRightClicked = ImGui::IsItemHovered() && ImGui::IsMouseClicked(1);
+				if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
+				{
+					resources::FileResource* pFile = &m_FileResource;
+					ImGui::SetDragDropPayload("EXPLORER_ITEM", &pFile, sizeof(FileResource*));
+					ImGui::Text(m_sDisplayName.c_str());
+					ImGui::EndDragDropSource();
+				}
 
 				ImVec2 buttonEnd = ImVec2(buttonStart.x + buttonSize.x, buttonStart.y + buttonSize.y);
 				if (ImGui::IsItemHovered())
