@@ -23,6 +23,28 @@ namespace gallus
 	{
 		namespace dx12
 		{
+			enum CameraType
+			{
+				CameraType_World,
+				CameraType_Screen
+			};
+
+			inline std::string CameraTypeToString(CameraType a_CameraType)
+			{
+				switch (a_CameraType)
+				{
+				case CameraType_World:
+				{
+					return "World";
+				}
+				case CameraType_Screen:
+				{
+					return "Screen";
+				}
+				}
+				return "";
+			}
+
 			//---------------------------------------------------------------------
 			// DX12Transform2D
 			//---------------------------------------------------------------------
@@ -33,6 +55,7 @@ namespace gallus
 			{
 			public:
 				static DirectX::XMFLOAT3 QuaternionToEuler(const DirectX::XMVECTOR& quat);
+				static DirectX::XMVECTOR EulerToQuaternion(const DirectX::XMFLOAT3& a_vEuler);
 				static DirectX::XMVECTOR AddRotation(DirectX::XMVECTOR& a_vQuat, const DirectX::XMFLOAT3& a_vAddition);
 
 				DX12Transform2D();
@@ -108,18 +131,35 @@ namespace gallus
 				/// </summary>
 				/// <param name="worldMatrix">A XMMATRIX containing the world matrix for the transform.</param>
 				void SetWorldMatrix(const DirectX::XMMATRIX& a_WorldMatrix);
+
+				graphics::dx12::CameraType GetCameraType() const
+				{
+					return m_CameraType;
+				}
+
+				void SetCameraMode(graphics::dx12::CameraType a_CameraType)
+				{
+					m_CameraType = a_CameraType;
+				}
 			private:
 				DirectX::XMFLOAT3 m_vPosition = { 0, 0, 0 };
 				DirectX::XMFLOAT3 m_vScale = { 1, 1, 1 };
-				DirectX::XMFLOAT3 m_vPivot = { -0.5f, -0.5f, -0.5f };
 				DirectX::XMVECTOR m_vRotation = { DirectX::XMQuaternionIdentity() };
+				DirectX::XMFLOAT3 m_vPivot = { -0.5f, -0.5f, -0.5f };
+				graphics::dx12::CameraType m_CameraType;
 
 #ifdef _EDITOR
 			BEGIN_EXPOSE_FIELDS(DX12Transform2D)
 				EXPOSE_FIELD(DX12Transform2D, m_vPosition, "Position", (FieldOptions{ .type = EditorFieldWidgetType::Vector3Field, .description = "The position of the object in 2D space. Defines where the object is located on the screen." }))
 				EXPOSE_FIELD(DX12Transform2D, m_vScale, "Scale", (FieldOptions{ .type = EditorFieldWidgetType::Vector3Field, .description = "The size multiplier of the object. A value of 1 means default size, values greater than 1 enlarge the object, and values below 1 shrink it." }))
-				EXPOSE_FIELD(DX12Transform2D, m_vPivot, "Pivot", (FieldOptions{ .type = EditorFieldWidgetType::Vector3Field, .min = "-0.5", .max = "0.5", .description = "The pivot point for transformations relative to the object�s center. Coordinates represent the normalized offset used for scaling and rotation." }))
 				EXPOSE_FIELD(DX12Transform2D, m_vRotation, "Rotation", (FieldOptions{ .type = EditorFieldWidgetType::Quaternion, .description = "Rotation in degrees. Controls how much the object is rotated clockwise or counterclockwise." }))
+				EXPOSE_FIELD(DX12Transform2D, m_vPivot, "Pivot", (FieldOptions{ .type = EditorFieldWidgetType::Vector3Field, .min = "-0.5", .max = "0.5", .description = "The pivot point for transformations relative to the object�s center. Coordinates represent the normalized offset used for scaling and rotation." }))
+				EXPOSE_FIELD(DX12Transform2D, m_CameraType, "Camera Type",
+					(FieldOptions{
+						.type = EditorFieldWidgetType::EnumDropdown,
+						.enumToStringFunc = MakeEnumToStringFunc<graphics::dx12::CameraType>(graphics::dx12::CameraTypeToString),
+						.description = "Whether the camera is rendering 3D or 2D."
+					}))
 			END_EXPOSE_FIELDS(DX12Transform2D)
 			BEGIN_EXPOSE_GIZMOS(DX12Transform2D)
 			END_EXPOSE_GIZMOS(DX12Transform2D)

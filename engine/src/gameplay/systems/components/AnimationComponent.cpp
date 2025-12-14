@@ -12,6 +12,8 @@
 // resources
 #include "resources/SrcData.h"
 
+#include "logger/Logger.h"
+
 #define JSON_ANIMATION_COMPONENT_START_ANIMATION_VAR "startingAnimation"
 
 namespace gallus
@@ -55,7 +57,10 @@ namespace gallus
 		//---------------------------------------------------------------------
 		void AnimationComponent::Deserialize(const resources::SrcData& a_SrcData)
 		{
-			m_sStartingAnimation = a_SrcData.GetString(JSON_ANIMATION_COMPONENT_START_ANIMATION_VAR);
+			if (!a_SrcData.GetString(JSON_ANIMATION_COMPONENT_START_ANIMATION_VAR, m_sStartingAnimation))
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Animation component did not have key %s present in its meta data.", JSON_ANIMATION_COMPONENT_START_ANIMATION_VAR);
+			}
 		}
 
 		//---------------------------------------------------------------------

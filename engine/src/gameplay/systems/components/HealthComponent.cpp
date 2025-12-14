@@ -9,6 +9,8 @@
 // resources
 #include "resources/SrcData.h"
 
+#include "logger/Logger.h"
+
 #define JSON_HEALTH_COMPONENT_HEALTH_VAR "health"
 #define JSON_HEALTH_COMPONENT_MAX_HEALTH_VAR "maxHealth"
 
@@ -26,6 +28,7 @@ namespace gallus
 				return;
 			}
 			m_fHealth = m_fMaxHealth;
+
 			Component::InitRealtime();
 		}
 
@@ -46,8 +49,14 @@ namespace gallus
 		//---------------------------------------------------------------------
 		void HealthComponent::Deserialize(const resources::SrcData& a_SrcData)
 		{
-			m_fHealth = a_SrcData.GetFloat(JSON_HEALTH_COMPONENT_HEALTH_VAR);
-			m_fMaxHealth = a_SrcData.GetFloat(JSON_HEALTH_COMPONENT_MAX_HEALTH_VAR);
+			if (!a_SrcData.GetFloat(JSON_HEALTH_COMPONENT_HEALTH_VAR, m_fHealth))
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Health component did not have key %s present in its meta data.", JSON_HEALTH_COMPONENT_HEALTH_VAR);
+			}
+			if (!a_SrcData.GetFloat(JSON_HEALTH_COMPONENT_MAX_HEALTH_VAR, m_fMaxHealth))
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Health component did not have key %s present in its meta data.", JSON_HEALTH_COMPONENT_MAX_HEALTH_VAR);
+			}
 		}
 
 		//---------------------------------------------------------------------

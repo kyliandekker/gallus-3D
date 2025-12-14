@@ -37,7 +37,7 @@ namespace gallus
 		}
 		namespace dx12
 		{
-/// Whether DX12 makes a full log of creating devices, resources, etc (spam).
+			/// Whether DX12 makes a full log of creating devices, resources, etc (spam).
 #define LOG_DX12 1
 
 			inline const uint8_t g_iBufferCount = 3; /// Number of swap chain buffers.
@@ -64,6 +64,13 @@ namespace gallus
 				SPRITE_COLOR = 2,    // b1: Sprite rect UVs (float2 uv0, float2 uv1)
 				TEX_SRV = 3,            // Texture2D texture0 : register(t0);
 				NumRootParameters = 4
+			};
+
+			enum CameraIsolationMode
+			{
+				CameraIsolationMode_2D3D,
+				CameraIsolationMode_3D,
+				CameraIsolationMode_2D,
 			};
 
 			//---------------------------------------------------------------------
@@ -338,6 +345,16 @@ namespace gallus
 					m_pActiveCamera = &a_Camera;
 				}
 
+				void SetCameraIsolationMode(CameraIsolationMode a_CameraIsolationMode)
+				{
+					m_CameraIsolationMode = a_CameraIsolationMode;
+				}
+
+				CameraIsolationMode GetCameraIsolationMode() const
+				{
+					return m_CameraIsolationMode;
+				}
+
 				/// <summary>
 				/// Retrieves the render texture.
 				/// </summary>
@@ -424,8 +441,8 @@ namespace gallus
 				FPSCounter m_FpsCounter;
 
 				Camera m_Camera3D;
-				Camera m_Camera2D;
 				Camera* m_pActiveCamera = &m_Camera3D;
+				CameraIsolationMode m_CameraIsolationMode;
 			};
 		}
 	}

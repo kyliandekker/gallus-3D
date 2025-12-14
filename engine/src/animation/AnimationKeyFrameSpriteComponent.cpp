@@ -12,6 +12,8 @@
 // gameplay
 #include "gameplay/systems/SpriteSystem.h"
 
+#include "logger/Logger.h"
+
 namespace gallus
 {
 	namespace animation
@@ -79,8 +81,16 @@ namespace gallus
 		//---------------------------------------------------------------------
 		void AnimationKeyFrameSpriteComponent::Deserialize(const resources::SrcData& a_SrcData)
 		{
-			std::string tex = a_SrcData.GetString("texture");
-			m_iSpriteIndex = a_SrcData.GetInt("spriteIndex");
+			std::string tex = "";
+			if (!a_SrcData.GetString("texture", tex))
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Animation sprite component did not have key %s present in its meta data.", "texture");
+			}
+
+			if (!a_SrcData.GetInt("spriteIndex", m_iSpriteIndex))
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Animation sprite component did not have key %s present in its meta data.", "spriteIndex");
+			}
 
 			std::shared_ptr<graphics::dx12::CommandQueue> cCommandQueue = core::ENGINE->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
 			if (!tex.empty())

@@ -13,6 +13,8 @@
 #include "gameplay/systems/CollisionSystem.h"
 #include "gameplay/systems/TransformSystem.h"
 
+#include "logger/Logger.h"
+
 #define JSON_RIGIDBODY_COMPONENT_USE_GRAVITY_VAR "useGravity"
 #define JSON_RIGIDBODY_COMPONENT_MASS_VAR "mass"
 #define JSON_RIGIDBODY_COMPONENT_LINEAR_DAMPING_VAR "linearDamping"
@@ -42,10 +44,26 @@ namespace gallus
 		//---------------------------------------------------------------------
 		void RigidbodyComponent::Deserialize(const resources::SrcData& a_SrcData)
 		{
-			m_bUseGravity = a_SrcData.GetBool(JSON_RIGIDBODY_COMPONENT_USE_GRAVITY_VAR);
+			if (!a_SrcData.GetBool(JSON_RIGIDBODY_COMPONENT_USE_GRAVITY_VAR, m_bUseGravity))
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Rigidbody component did not have key %s present in its meta data.", JSON_RIGIDBODY_COMPONENT_USE_GRAVITY_VAR);
+			}
 
-			SetMass(a_SrcData.GetFloat(JSON_RIGIDBODY_COMPONENT_MASS_VAR));
-			SetLinearDamping(a_SrcData.GetFloat(JSON_RIGIDBODY_COMPONENT_LINEAR_DAMPING_VAR));
+			float mass;
+			if (!a_SrcData.GetFloat(JSON_RIGIDBODY_COMPONENT_MASS_VAR, mass))
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Rigidbody component did not have key %s present in its meta data.", JSON_RIGIDBODY_COMPONENT_MASS_VAR);
+			}
+
+			SetMass(mass);
+
+			float linearDamping;
+			if (!a_SrcData.GetFloat(JSON_RIGIDBODY_COMPONENT_LINEAR_DAMPING_VAR, linearDamping))
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Rigidbody component did not have key %s present in its meta data.", JSON_RIGIDBODY_COMPONENT_LINEAR_DAMPING_VAR);
+			}
+
+			SetLinearDamping(linearDamping);
 		}
 
 		constexpr float GRAVITY = 1000.0f;

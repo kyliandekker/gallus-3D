@@ -11,6 +11,8 @@
 #include "gameplay/systems/TransformSystem.h"
 #include "gameplay/EntityID.h"
 
+#include "logger/Logger.h"
+
 #define JSON_TRANSFORM_COMPONENT_POSITION_VAR "position"
 #define JSON_TRANSFORM_COMPONENT_ROTATION_VAR "rotation"
 #define JSON_TRANSFORM_COMPONENT_SCALE_VAR "scale"
@@ -18,6 +20,7 @@
 #define JSON_TRANSFORM_COMPONENT_X_VAR "x"
 #define JSON_TRANSFORM_COMPONENT_Y_VAR "y"
 #define JSON_TRANSFORM_COMPONENT_Z_VAR "z"
+#define JSON_TRANSFORM_COMPONENT_CAMERA_MODE_VAR "cameraMode"
 
 namespace gallus
 {
@@ -64,18 +67,52 @@ namespace gallus
 			a_Document[JSON_TRANSFORM_COMPONENT_PIVOT_VAR].AddMember(JSON_TRANSFORM_COMPONENT_X_VAR, m_Transform.GetPivot().x, a_Allocator);
 			a_Document[JSON_TRANSFORM_COMPONENT_PIVOT_VAR].AddMember(JSON_TRANSFORM_COMPONENT_Y_VAR, m_Transform.GetPivot().y, a_Allocator);
 			a_Document[JSON_TRANSFORM_COMPONENT_PIVOT_VAR].AddMember(JSON_TRANSFORM_COMPONENT_Z_VAR, m_Transform.GetPivot().z, a_Allocator);
+
+			a_Document.AddMember(
+				JSON_TRANSFORM_COMPONENT_CAMERA_MODE_VAR,
+				(int)m_Transform.GetCameraType(),
+				a_Allocator
+			);
 		}
 #endif
 
 		//---------------------------------------------------------------------
 		void TransformComponent::Deserialize(const resources::SrcData& a_SrcData)
 		{
-			m_Transform.SetPosition(a_SrcData.GetVector3(JSON_TRANSFORM_COMPONENT_POSITION_VAR));
-			m_Transform.SetScale(a_SrcData.GetVector3(JSON_TRANSFORM_COMPONENT_SCALE_VAR));
-			m_Transform.SetPivot(a_SrcData.GetVector3(JSON_TRANSFORM_COMPONENT_PIVOT_VAR));
-			//m_Transform.SetRotation(a_SrcData.GetFloat(JSON_TRANSFORM_COMPONENT_ROTATION_VAR));
+			DirectX::XMFLOAT3 pos;
+			if (!a_SrcData.GetVector3(JSON_TRANSFORM_COMPONENT_POSITION_VAR, pos))
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Transform component did not have key %s present in its meta data.", JSON_TRANSFORM_COMPONENT_POSITION_VAR);
+			}
+			m_Transform.SetPosition(pos);
 
-			// TODO: Rotation
+			DirectX::XMFLOAT3 scale;
+			if (!a_SrcData.GetVector3(JSON_TRANSFORM_COMPONENT_SCALE_VAR, scale))
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Transform component did not have key %s present in its meta data.", JSON_TRANSFORM_COMPONENT_SCALE_VAR);
+			}
+			m_Transform.SetScale(scale);
+
+			DirectX::XMFLOAT3 pivot;
+			if (!a_SrcData.GetVector3(JSON_TRANSFORM_COMPONENT_PIVOT_VAR, pivot))
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Transform component did not have key %s present in its meta data.", JSON_TRANSFORM_COMPONENT_PIVOT_VAR);
+			}
+			m_Transform.SetPivot(pivot);
+
+			DirectX::XMFLOAT3 rotation;
+			if (!a_SrcData.GetVector3(JSON_TRANSFORM_COMPONENT_ROTATION_VAR, rotation))
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Transform component did not have key %s present in its meta data.", JSON_TRANSFORM_COMPONENT_ROTATION_VAR);
+			}
+			m_Transform.SetRotation(graphics::dx12::DX12Transform2D::EulerToQuaternion(rotation));
+
+			graphics::dx12::CameraType cameraType;
+			if (!a_SrcData.GetEnum(JSON_TRANSFORM_COMPONENT_CAMERA_MODE_VAR, cameraType))
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Transform component did not have key %s present in its meta data.", JSON_TRANSFORM_COMPONENT_CAMERA_MODE_VAR);
+			}
+			m_Transform.SetCameraMode(cameraType);
 		}
 
 		//---------------------------------------------------------------------

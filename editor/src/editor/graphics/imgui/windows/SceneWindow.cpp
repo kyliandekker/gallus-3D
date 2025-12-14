@@ -151,6 +151,16 @@ namespace gallus
 					core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetFullScreenPlayMode(inFullScreen);
 					core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
 				}
+				ImGui::SameLine();
+
+				int camIsolationMode = core::EDITOR_ENGINE->GetDX12().GetCameraIsolationMode();
+				std::string camIsolationModeIcon = camIsolationMode == 0 ? font::ICON_2D3D : (camIsolationMode == 1 ? font::ICON_3D : font::ICON_2D);
+				if (ImGui::Button(
+					ImGui::IMGUI_FORMAT_ID(camIsolationModeIcon, BUTTON_ID, "CAMERA_ISOLATION_MODE_SCENE").c_str(), m_Window.GetHeaderSize()))
+				{
+					camIsolationMode = ++camIsolationMode % 3;
+					core::EDITOR_ENGINE->GetDX12().SetCameraIsolationMode((graphics::dx12::CameraIsolationMode)camIsolationMode);
+				}
 
 				ImGui::EndToolbar(ImVec2(0, 0));
 
@@ -228,15 +238,7 @@ namespace gallus
 
 					DrawGizmos(imageScreenPos, textureSize, m_vPanOffset, m_fZoom);
 
-					//Draw2DGrid(a_vSceneStartPos, a_vSize, m_vPanOffset, m_fZoom);
-					{
-						// Get the camera projection and view matrices
-						DirectX::XMMATRIX camProj = core::EDITOR_ENGINE->GetEditor().GetEditorCamera().GetProjectionMatrix(graphics::dx12::CameraType_World);
-						DirectX::XMMATRIX camView = core::EDITOR_ENGINE->GetEditor().GetEditorCamera().GetViewMatrix(graphics::dx12::CameraType_World);
-
-						// Draw the grid with the adjusted projection matrix
-						ImGuizmo::DrawGrid(reinterpret_cast<float*>(&camView), reinterpret_cast<float*>(&camProj), reinterpret_cast<const float*>(&IDENTITY), 100.f);
-					}
+					Draw2DGrid(imageScreenPos, textureSize, m_vPanOffset, m_fZoom);
 				}
 
 				ImGui::SetCursorPos(imagePos);
@@ -283,64 +285,82 @@ namespace gallus
 					return;
 				}
 
-				ImDrawList* drawList = ImGui::GetWindowDrawList();
 
-				const float baseSpacing = 100.0f;
-				const int majorEvery = 10;
-				const ImU32 minorColor = IM_COL32(255, 255, 255, 25);
-				const ImU32 majorColor = IM_COL32(255, 255, 255, 55);
-				const ImU32 axisXColor = IM_COL32(255, 80, 80, 200);
-				const ImU32 axisYColor = IM_COL32(80, 160, 255, 200);
-
-				ImVec2 rectMin = ImVec2(a_vScenePos.x + a_vPanOffset.x, a_vScenePos.y + a_vPanOffset.y);
-				ImVec2 rectMax = ImVec2(rectMin.x + a_vSize.x * a_fZoom, rectMin.y + a_vSize.y * a_fZoom);
-
-				graphics::dx12::Camera& cam = core::ENGINE->GetDX12().GetActiveCamera();
-				const DirectX::XMFLOAT3& cameraPos = cam.Transform().GetPosition();
-
-				// Draw vertical grid lines
-				float leftWorld = cameraPos.x + 0.5f;
-				float rightWorld = cameraPos.x + a_vSize.x / a_fZoom;
-				float firstX = floorf(leftWorld / baseSpacing) * baseSpacing;
-
-				for (float x = firstX;; x += baseSpacing)
+				int camIsolationMode = core::EDITOR_ENGINE->GetDX12().GetCameraIsolationMode();
+				if (camIsolationMode == graphics::dx12::CameraIsolationMode_2D)
 				{
-					float screenX = rectMin.x + (x - cameraPos.x) * a_fZoom;
-					if (screenX > rectMax.x + 0.5f) break; // stop when past rect
-					if (screenX >= rectMin.x - 0.5f)      // only draw inside rect
+					ImDrawList* drawList = ImGui::GetWindowDrawList();
+
+					const float baseSpacing = 100.0f;
+					const int majorEvery = 10;
+					const ImU32 minorColor = IM_COL32(255, 255, 255, 25);
+					const ImU32 majorColor = IM_COL32(255, 255, 255, 55);
+					const ImU32 axisXColor = IM_COL32(255, 80, 80, 200);
+					const ImU32 axisYColor = IM_COL32(80, 160, 255, 200);
+
+					ImVec2 rectMin = ImVec2(a_vScenePos.x + a_vPanOffset.x, a_vScenePos.y + a_vPanOffset.y);
+					ImVec2 rectMax = ImVec2(rectMin.x + a_vSize.x * a_fZoom, rectMin.y + a_vSize.y * a_fZoom);
+
+					graphics::dx12::Camera& cam = core::ENGINE->GetDX12().GetActiveCamera();
+					const DirectX::XMFLOAT3& cameraPos = cam.Transform().GetPosition();
+
+					// Draw vertical grid lines
+					float leftWorld = cameraPos.x + 0.5f;
+					float rightWorld = cameraPos.x + a_vSize.x / a_fZoom;
+					float firstX = floorf(leftWorld / baseSpacing) * baseSpacing;
+
+					for (float x = firstX;; x += baseSpacing)
 					{
-						bool major = (static_cast<int>(x / baseSpacing) % majorEvery == 0);
-						ImU32 color = major ? majorColor : minorColor;
-						drawList->AddLine(ImVec2(screenX, rectMin.y), ImVec2(screenX, rectMax.y), color);
+						float screenX = rectMin.x + (x - cameraPos.x) * a_fZoom;
+						if (screenX > rectMax.x + 0.5f) break; // stop when past rect
+						if (screenX >= rectMin.x - 0.5f)      // only draw inside rect
+						{
+							bool major = (static_cast<int>(x / baseSpacing) % majorEvery == 0);
+							ImU32 color = major ? majorColor : minorColor;
+							drawList->AddLine(ImVec2(screenX, rectMin.y), ImVec2(screenX, rectMax.y), color);
+						}
+					}
+
+					// Draw horizontal grid lines
+					float topWorld = cameraPos.y;
+					float bottomWorld = cameraPos.y + a_vSize.y / a_fZoom;
+					float firstY = floorf(topWorld / baseSpacing) * baseSpacing;
+
+					for (float y = firstY;; y += baseSpacing)
+					{
+						float screenY = rectMin.y + (y - cameraPos.y) * a_fZoom;
+						if (screenY > rectMax.y + 0.5f) break;
+						if (screenY >= rectMin.y - 0.5f)
+						{
+							bool major = (static_cast<int>(y / baseSpacing) % majorEvery == 0);
+							ImU32 color = major ? majorColor : minorColor;
+							drawList->AddLine(ImVec2(rectMin.x, screenY), ImVec2(rectMax.x, screenY), color);
+						}
+					}
+
+					// Draw axes
+					float originX = rectMin.x + (0.0f - cameraPos.x) * a_fZoom;
+					float originY = rectMin.y + (0.0f - cameraPos.y) * a_fZoom;
+
+					if (originX >= rectMin.x && originX <= rectMax.x)
+					{
+						drawList->AddLine(ImVec2(originX, rectMin.y), ImVec2(originX, rectMax.y), axisYColor, 1.5f);
+					}
+
+					if (originY >= rectMin.y && originY <= rectMax.y)
+					{
+						drawList->AddLine(ImVec2(rectMin.x, originY), ImVec2(rectMax.x, originY), axisXColor, 1.5f);
 					}
 				}
-
-				// Draw horizontal grid lines
-				float topWorld = cameraPos.y;
-				float bottomWorld = cameraPos.y + a_vSize.y / a_fZoom;
-				float firstY = floorf(topWorld / baseSpacing) * baseSpacing;
-
-				for (float y = firstY;; y += baseSpacing)
+				else if (camIsolationMode == graphics::dx12::CameraIsolationMode_3D)
 				{
-					float screenY = rectMin.y + (y - cameraPos.y) * a_fZoom;
-					if (screenY > rectMax.y + 0.5f) break;
-					if (screenY >= rectMin.y - 0.5f)
-					{
-						bool major = (static_cast<int>(y / baseSpacing) % majorEvery == 0);
-						ImU32 color = major ? majorColor : minorColor;
-						drawList->AddLine(ImVec2(rectMin.x, screenY), ImVec2(rectMax.x, screenY), color);
-					}
+					// Get the camera projection and view matrices
+					DirectX::XMMATRIX camProj = core::EDITOR_ENGINE->GetEditor().GetEditorCamera().GetProjectionMatrix(graphics::dx12::CameraType_World);
+					DirectX::XMMATRIX camView = core::EDITOR_ENGINE->GetEditor().GetEditorCamera().GetViewMatrix(graphics::dx12::CameraType_World);
+
+					// Draw the grid with the adjusted projection matrix
+					ImGuizmo::DrawGrid(reinterpret_cast<float*>(&camView), reinterpret_cast<float*>(&camProj), reinterpret_cast<const float*>(&IDENTITY), 100.f);
 				}
-
-				// Draw axes
-				float originX = rectMin.x + (0.0f - cameraPos.x) * a_fZoom;
-				float originY = rectMin.y + (0.0f - cameraPos.y) * a_fZoom;
-
-				if (originX >= rectMin.x && originX <= rectMax.x)
-					drawList->AddLine(ImVec2(originX, rectMin.y), ImVec2(originX, rectMax.y), axisYColor, 1.5f);
-
-				if (originY >= rectMin.y && originY <= rectMax.y)
-					drawList->AddLine(ImVec2(rectMin.x, originY), ImVec2(rectMax.x, originY), axisXColor, 1.5f);
 			}
 
 			//---------------------------------------------------------------------
@@ -362,7 +382,15 @@ namespace gallus
 			{
 				ImGuizmo::BeginFrame();
 
-				ImGuizmo::SetOrthographic(false);
+				int camIsolationMode = core::EDITOR_ENGINE->GetDX12().GetCameraIsolationMode();
+				if (camIsolationMode == graphics::dx12::CameraIsolationMode_2D)
+				{
+					ImGuizmo::SetOrthographic(true);
+				}
+				else
+				{
+					ImGuizmo::SetOrthographic(false);
+				}
 				ImGuizmo::SetDrawlist(ImGui::GetCurrentWindow()->DrawList);
 
 				ImGuizmo::SetRect(a_vScenePos.x + a_vPanOffset.x, a_vScenePos.y + a_vPanOffset.y, a_vSize.x * a_fZoom, a_vSize.y * a_fZoom);
@@ -511,143 +539,9 @@ namespace gallus
 				BaseWindow::Update();
 			}
 
-void SceneWindow::HandleCameraInput(double a_fDeltaTime, const ImVec2& a_vSceneStartPos, const ImVec2& a_vSize)
-{
-    ImGuiIO& io = ImGui::GetIO();
-    graphics::dx12::Camera& camera = core::EDITOR_ENGINE->GetEditor().GetEditorCamera();
-
-    DirectX::XMFLOAT3 position = camera.Transform().GetPosition();
-
-    ImVec2 imageMin = { a_vSceneStartPos.x + m_vPanOffset.x, a_vSceneStartPos.y + m_vPanOffset.y };
-    ImVec2 imageMax = imageMin + ImVec2(a_vSize.x * m_fZoom, a_vSize.y * m_fZoom);
-
-    ImVec2 mouse = io.MousePos;
-
-    static bool moving = false;
-    static POINT lastCursorPos;
-
-    if (ImGui::IsWindowHovered() &&
-        mouse.x >= imageMin.x && mouse.y >= imageMin.y &&
-        mouse.x <= imageMax.x && mouse.y <= imageMax.y)
-    {
-        HWND hwnd = core::EDITOR_ENGINE->GetWindow().GetHWnd();
-
-        if (ImGui::IsMouseDown(ImGuiMouseButton_Right))
-        {
-            if (!moving)
-            {
-                moving = true;
-                ImGui::SetMouseCursor(ImGuiMouseCursor_None);
-
-                GetCursorPos(&lastCursorPos);
-            }
-
-            POINT currentPos;
-            GetCursorPos(&currentPos);
-
-            float deltaX = static_cast<float>(currentPos.x - lastCursorPos.x);
-            float deltaY = static_cast<float>(currentPos.y - lastCursorPos.y);
-
-            SetCursorPos(lastCursorPos.x, lastCursorPos.y);
-
-            DirectX::XMFLOAT3 deltaEuler;
-            deltaEuler.x = deltaY * 0.1f;
-            deltaEuler.y = deltaX * 0.1f;
-            deltaEuler.z = 0.0f;
-
-            DirectX::XMFLOAT3 currentEuler = camera.Transform().GetRotationV();
-
-            float newPitch = currentEuler.x + deltaEuler.x;
-            if (newPitch < -89.0f)
-            {
-                deltaEuler.x = -89.0f - currentEuler.x;
-            }
-            else if (newPitch > 89.0f)
-            {
-                deltaEuler.x = 89.0f - currentEuler.x;
-            }
-
-            DirectX::XMVECTOR q = camera.Transform().GetRotationQ();
-            DirectX::XMVECTOR newQ = camera.Transform().AddRotation(q, deltaEuler);
-            camera.Transform().SetRotation(newQ);
-        }
-        else
-        {
-            if (moving)
-            {
-                moving = false;
-                ImGui::SetMouseCursor(ImGuiMouseCursor_Arrow);
-            }
-        }
-
-        if (moving)
-        {
-            using namespace DirectX;
-
-            DirectX::XMFLOAT3 euler = camera.Transform().GetRotationV();
-
-            XMVECTOR forward = XMVector3Transform(
-                FORWARD,
-                XMMatrixRotationRollPitchYaw(
-                    XMConvertToRadians(euler.x),
-                    XMConvertToRadians(euler.y),
-                    XMConvertToRadians(euler.z)
-                )
-            );
-
-            XMVECTOR up = UP;
-            XMVECTOR right = XMVector3Cross(forward, up);
-
-            float baseMoveSpeed = 0.5f;
-            if (ImGui::IsKeyDown(ImGuiKey_LeftShift))
-            {
-                baseMoveSpeed = 2.0f;
-            }
-
-            float moveSpeed = baseMoveSpeed * static_cast<float>(a_fDeltaTime);
-
-            if (ImGui::IsKeyDown(ImGuiKey_W))
-            {
-                XMStoreFloat3(&position, XMLoadFloat3(&position) + forward * moveSpeed);
-            }
-
-            if (ImGui::IsKeyDown(ImGuiKey_S))
-            {
-                XMStoreFloat3(&position, XMLoadFloat3(&position) - forward * moveSpeed);
-            }
-
-            if (ImGui::IsKeyDown(ImGuiKey_A))
-            {
-                XMStoreFloat3(&position, XMLoadFloat3(&position) + right * moveSpeed);
-            }
-
-            if (ImGui::IsKeyDown(ImGuiKey_D))
-            {
-                XMStoreFloat3(&position, XMLoadFloat3(&position) - right * moveSpeed);
-            }
-
-            if (ImGui::IsKeyDown(ImGuiKey_Q))
-            {
-                XMStoreFloat3(&position, XMLoadFloat3(&position) - up * moveSpeed);
-            }
-
-            if (ImGui::IsKeyDown(ImGuiKey_E))
-            {
-                XMStoreFloat3(&position, XMLoadFloat3(&position) + up * moveSpeed);
-            }
-        }
-    }
-    else
-    {
-        if (moving)
-        {
-            moving = false;
-            ImGui::SetMouseCursor(ImGuiMouseCursor_Arrow);
-        }
-    }
-
-    camera.Transform().SetPosition(position);
-}
+			void SceneWindow::HandleCameraInput(double a_fDeltaTime, const ImVec2& a_vSceneStartPos, const ImVec2& a_vSize)
+			{
+			}
 
 
 			//---------------------------------------------------------------------

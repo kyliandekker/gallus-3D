@@ -141,7 +141,7 @@ namespace gallus
 				ImGui::SameLine();
 				bool scrollToBottom = editorSettings.GetScrollToBottom();
 				if (ImGui::CheckboxButton(
-					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_SCROLL_TO_BOTTOM) + " Scroll to bottom", BUTTON_ID, "SCROLL_TO_BOTTOM_CONSOLE").c_str(), &scrollToBottom, ImVec2(190, toolbarSize.y)))
+					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_SCROLL_TO_BOTTOM) + " Scroll to bottom", BUTTON_ID, "SCROLL_TO_BOTTOM_CONSOLE").c_str(), &scrollToBottom, ImVec2(10 * m_Window.GetFontSize(), toolbarSize.y)))
 				{
 					editorSettings.SetScrollToBottom(scrollToBottom);
 					editorSettings.Save();

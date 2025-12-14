@@ -56,7 +56,7 @@ namespace gallus
 
 				CD3DX12_DEPTH_STENCIL_DESC depthDesc(D3D12_DEFAULT);
 				depthDesc.DepthEnable = TRUE;
-				depthDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+				depthDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
 				depthDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 				depthDesc.StencilEnable = FALSE;
 

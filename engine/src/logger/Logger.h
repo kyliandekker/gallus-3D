@@ -35,6 +35,7 @@ namespace gallus
 #define LOG_CATEGORY_AUDIO "AUDIO"
 #define LOG_CATEGORY_TEST "TEST"
 #define LOG_CATEGORY_ANIMATION "ANIMATION"
+#define LOG_CATEGORY_RESOURCES "RESOURCES"
 
 	typedef enum LogSeverity
 	{

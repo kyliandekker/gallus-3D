@@ -13,6 +13,8 @@
 // resources
 #include "resources/SrcData.h"
 
+#include "logger/Logger.h"
+
 namespace gallus
 {
 	namespace animation
@@ -39,7 +41,10 @@ namespace gallus
 		//---------------------------------------------------------------------
 		void AnimationKeyFrameEventComponent::Deserialize(const resources::SrcData& a_SrcData)
 		{
-			m_Event = a_SrcData.GetEnum<AnimationEvent>("event");
+			if (!a_SrcData.GetEnum<AnimationEvent>("event", m_Event))
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Animation event component did not have key %s present in its meta data.", "event");
+			}
 		}
 
 		//---------------------------------------------------------------------

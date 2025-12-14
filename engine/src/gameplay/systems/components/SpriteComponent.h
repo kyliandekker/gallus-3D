@@ -133,10 +133,6 @@ namespace gallus
 			/// <param name="a_EntityID">The entity ID to get the data from.</param>
 			/// <param name="a_Camera">The camera.</param>
 			void Render(std::shared_ptr<graphics::dx12::CommandList> a_pCommandList, const EntityID& a_EntityID, const graphics::dx12::Camera& a_Camera);
-
-			graphics::dx12::CameraType GetCameraType() const;
-
-			void SetCameraMode(graphics::dx12::CameraType a_CameraType);
 #ifdef _EDITOR
 			/// <summary>
 			/// Serialized the component to a json document.
@@ -145,7 +141,6 @@ namespace gallus
 			/// <param name="a_Allocator">The allocator used by the json document.</param>
 			void Serialize(rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator) const override;
 #endif
-
 			/// <summary>
 			/// Creates an instance based on source data.
 			/// </summary>
@@ -157,7 +152,6 @@ namespace gallus
 			std::weak_ptr<graphics::dx12::Texture> m_pTexture = {};
 			int8_t m_iSpriteIndex = 0;
 			DirectX::XMFLOAT4 m_vColor = { 1, 1, 1, 1 };
-			graphics::dx12::CameraType m_CameraType;
 #ifdef _EDITOR
 			BEGIN_EXPOSE_FIELDS_PARENT(SpriteComponent, Component)
 				EXPOSE_FIELD(SpriteComponent, m_pShaderBind, "Shader Bind", (FieldOptions{ .type = EditorFieldWidgetType::ObjectPtr }))
@@ -167,12 +161,6 @@ namespace gallus
 				.type = EditorFieldWidgetType::TexturePreview,
 				.relatedIndexFieldOffset = offsetof(SpriteComponent, m_iSpriteIndex)
 					}))
-				EXPOSE_FIELD(SpriteComponent, m_CameraType, "Camera Type",
-					(FieldOptions{
-						.type = EditorFieldWidgetType::EnumDropdown,
-						.enumToStringFunc = MakeEnumToStringFunc<graphics::dx12::CameraType>(graphics::dx12::CameraTypeToString),
-						.description = "Whether the camera is rendering 3D or 2D."
-						}))
 			END_EXPOSE_FIELDS(SpriteComponent)
 			BEGIN_EXPOSE_GIZMOS(SpriteComponent)
 			END_EXPOSE_GIZMOS(SpriteComponent)

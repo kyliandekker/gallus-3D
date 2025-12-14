@@ -14,6 +14,8 @@
 #include "gameplay/systems/HealthSystem.h"
 #include "gameplay/systems/TransformSystem.h"
 
+#include "logger/Logger.h"
+
 #define JSON_PROJECTILE_COMPONENT_DAMAGE_VAR "damage"
 #define JSON_PROJECTILE_COMPONENT_EXPLOSION_VAR "explosion"
 
@@ -46,8 +48,17 @@ namespace gallus
 		//---------------------------------------------------------------------
 		void ProjectileComponent::Deserialize(const resources::SrcData& a_SrcData)
 		{
-			m_fDamage = a_SrcData.GetFloat(JSON_PROJECTILE_COMPONENT_DAMAGE_VAR);
-			std::string explosionPrefabName = a_SrcData.GetString(JSON_PROJECTILE_COMPONENT_EXPLOSION_VAR);
+			if (a_SrcData.GetFloat(JSON_PROJECTILE_COMPONENT_DAMAGE_VAR, m_fDamage))
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Projectile component did not have key %s present in its meta data.", JSON_PROJECTILE_COMPONENT_DAMAGE_VAR);
+			}
+
+			std::string explosionPrefabName = "";
+			if (a_SrcData.GetString(JSON_PROJECTILE_COMPONENT_EXPLOSION_VAR, explosionPrefabName))
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Projectile component did not have key %s present in its meta data.", JSON_PROJECTILE_COMPONENT_EXPLOSION_VAR);
+			}
+
 			if (!explosionPrefabName.empty())
 			{
 				m_ExplosionPrefab = core::ENGINE->GetResourceAtlas().LoadPrefab(explosionPrefabName);

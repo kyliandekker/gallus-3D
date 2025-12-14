@@ -14,6 +14,8 @@
 #include "gameplay/systems/TransformSystem.h"
 #include "gameplay/systems/CollisionSystem.h"
 
+#include "logger/Logger.h"
+
 #define JSON_COLLIDER_COMPONENT_OFFSET_VAR "offset"
 #define JSON_COLLIDER_COMPONENT_SIZE_VAR "size"
 #define JSON_COLLIDER_COMPONENT_X_VAR "x"
@@ -49,8 +51,14 @@ namespace gallus
 		//---------------------------------------------------------------------
 		void ColliderComponent::Deserialize(const resources::SrcData& a_SrcData)
 		{
-			m_vOffset = a_SrcData.GetVector2(JSON_COLLIDER_COMPONENT_OFFSET_VAR);
-			m_vSize = a_SrcData.GetVector2(JSON_COLLIDER_COMPONENT_SIZE_VAR);
+			if (!a_SrcData.GetVector2(JSON_COLLIDER_COMPONENT_OFFSET_VAR, m_vOffset))
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Collider component did not have key %s present in its meta data.", JSON_COLLIDER_COMPONENT_OFFSET_VAR);
+			}
+			if (!a_SrcData.GetVector2(JSON_COLLIDER_COMPONENT_SIZE_VAR, m_vSize))
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Collider component did not have key %s present in its meta data.", JSON_COLLIDER_COMPONENT_SIZE_VAR);
+			}
 		}
 
 		//---------------------------------------------------------------------

@@ -9,6 +9,8 @@
 // resources
 #include "resources/SrcData.h"
 
+#include "logger/Logger.h"
+
 namespace gallus
 {
 	namespace animation
@@ -32,7 +34,10 @@ namespace gallus
 		//---------------------------------------------------------------------
 		void AnimationKeyFrameTagComponent::Deserialize(const resources::SrcData& a_SrcData)
 		{
-			m_sTag = a_SrcData.GetString("tag");
+			if (!a_SrcData.GetString("tag", m_sTag))
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "animation tag component did not have key %s present in its meta data.", "tag");
+			}
 		}
 
 		//---------------------------------------------------------------------

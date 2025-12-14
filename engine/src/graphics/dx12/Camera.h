@@ -27,28 +27,6 @@ namespace gallus
 			};
 #endif // _EDITOR
 
-			enum CameraType
-			{
-				CameraType_World,
-				CameraType_Screen
-			};
-
-			inline std::string CameraTypeToString(CameraType a_CameraType)
-			{
-				switch (a_CameraType)
-				{
-					case CameraType_World:
-					{
-						return "World";
-					}
-					case CameraType_Screen:
-					{
-						return "Screen";
-					}
-				}
-				return "";
-			}
-
 			//---------------------------------------------------------------------
 			// Camera
 			//---------------------------------------------------------------------

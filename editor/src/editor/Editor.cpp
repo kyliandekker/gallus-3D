@@ -33,7 +33,6 @@ namespace gallus
 			m_EditorCamera.Transform().SetPosition({ 0.0f, 1.0f, -2.0f });
 
 			LOG(LOGSEVERITY_INFO, LOG_CATEGORY_EDITOR, "Initializing editor.");
-			LOG(LOGSEVERITY_WARNING, LOG_CATEGORY_EDITOR, "This is a test.");
 
 			return ThreadedSystem::Initialize(a_bWait);
 		}

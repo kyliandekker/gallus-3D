@@ -114,6 +114,7 @@ namespace gallus
 						if (changed)
 						{
 							a_FileEditorSelectable.GetFileResource().GetMetaData()->SetAssetType(m_AssetTypeDropdown.GetValue());
+							a_FileEditorSelectable.GetFileResource().GetMetaData()->Save(a_FileEditorSelectable.GetFileResource().GetPath());
 						}
 						return changed;
 					});

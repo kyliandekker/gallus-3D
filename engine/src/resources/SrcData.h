@@ -15,18 +15,21 @@ namespace gallus
 			SrcData() = default;
 			SrcData(const rapidjson::Value& a_Value);
 
-			int GetInt(const std::string& a_sKey) const;
-			float GetFloat(const std::string& a_sKey) const;
+			bool GetInt(const std::string& a_sKey, int& a_iInt) const;
+			bool GetFloat(const std::string& a_sKey, float& a_fFloat) const;
 			template <typename T>
-			T GetEnum(const std::string& a_sKey) const
+			bool GetEnum(const std::string& a_sKey, T& a_Enum) const
 			{
-				return static_cast<T>(GetInt(a_sKey));
+				int enumVal = 0;
+				bool success = GetInt(a_sKey, enumVal);
+				a_Enum = static_cast<T>(enumVal);
+				return success;
 			}
-			std::string GetString(const std::string& a_sKey) const;
-			bool GetBool(const std::string& a_sKey) const;
-			DirectX::XMFLOAT2 GetVector2(const std::string& a_sKey) const;
-			DirectX::XMFLOAT3 GetVector3(const std::string& a_sKey) const;
-			SrcData GetSrc(const std::string& a_sKey) const;
+			bool GetString(const std::string& a_sKey, std::string& a_sString) const;
+			bool GetBool(const std::string& a_sKey, bool& a_bBool) const;
+			bool GetVector2(const std::string& a_sKey, DirectX::XMFLOAT2& a_vVector) const;
+			bool GetVector3(const std::string& a_sKey, DirectX::XMFLOAT3& a_vVector) const;
+			bool GetSrc(const std::string& a_sKey, SrcData& a_SrcData) const;
 		private:
 			rapidjson::Document m_Document;
 		};

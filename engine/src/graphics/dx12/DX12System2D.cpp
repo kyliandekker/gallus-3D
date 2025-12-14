@@ -257,9 +257,6 @@ namespace gallus
 				m_Camera3D.Init(RENDER_TEX_SIZE.x, RENDER_TEX_SIZE.y);
 				m_Camera3D.Transform().SetPosition({ 0.0f, 1.0f, -2.0f });
 
-				m_Camera2D.Init(RENDER_TEX_SIZE.x, RENDER_TEX_SIZE.y);
-				m_Camera2D.Transform().SetPosition({ 0.0f, 0.0f, 0.0f });
-				
 				m_RenderTexViewport = CD3DX12_VIEWPORT(0.0f, 0.0f, RENDER_TEX_SIZE.x, RENDER_TEX_SIZE.y);
 				m_RenderTexScissorRect = CD3DX12_RECT(0, 0, RENDER_TEX_SIZE.x, RENDER_TEX_SIZE.y);
 

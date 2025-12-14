@@ -409,7 +409,6 @@ namespace gallus
 						};
 						break;
 					}
-
 					case EditorFieldWidgetType::DragInt16:
 					{
 						func = [ptr, &a_Field, &fieldId]
@@ -427,7 +426,6 @@ namespace gallus
 						};
 						break;
 					}
-
 					case EditorFieldWidgetType::DragInt32:
 					{
 						func = [ptr, &a_Field, &fieldId]
@@ -445,7 +443,6 @@ namespace gallus
 						};
 						break;
 					}
-
 					case EditorFieldWidgetType::DragInt64:
 					{
 						func = [ptr, &a_Field, &fieldId]
@@ -658,9 +655,8 @@ namespace gallus
 
 				graphics::dx12::Camera& cam = core::ENGINE->GetDX12().GetActiveCamera();
 
-				// Get transformation matrices
-				DirectX::XMMATRIX viewMat = cam.GetViewMatrix(graphics::dx12::CameraType_World);
-				const DirectX::XMMATRIX& projMat = cam.GetProjectionMatrix(graphics::dx12::CameraType_World);
+				DirectX::XMMATRIX viewMat = cam.GetViewMatrix(a_Transform.GetCameraType());
+				const DirectX::XMMATRIX& projMat = cam.GetProjectionMatrix(a_Transform.GetCameraType());
 
 				// Convert DirectX matrices to float[16] format for ImGuizmo
 				float objectFloat[16];
@@ -689,12 +685,11 @@ namespace gallus
 				bool useSnap = ImGui::IsKeyDown(ImGuiKey_LeftShift);
 				float snap = useSnap ? 1.0f : 0.0f;
 
-				// Render the gizmo (check if manipulation occurred)
 				if (ImGuizmo::Manipulate(
 					viewFloat,
 					projFloat,
 					(ImGuizmo::OPERATION) core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetLastSceneOperation(),
-					ImGuizmo::LOCAL,
+					ImGuizmo::WORLD,
 					objectFloat, 0, &snap))
 				{
 					DirectX::XMMATRIX result = DirectX::XMLoadFloat4x4(reinterpret_cast<DirectX::XMFLOAT4X4*>(objectFloat));

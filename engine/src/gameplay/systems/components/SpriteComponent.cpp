@@ -21,6 +21,8 @@
 // gameplay
 #include "gameplay/systems/TransformSystem.h"
 
+#include "logger/Logger.h"
+
 #define JSON_SPRITE_COMPONENT_TEX_VAR "texture"
 #define JSON_SPRITE_COMPONENT_TEX_NAME_VAR "name"
 #define JSON_SPRITE_COMPONENT_TEX_SPRITE_INDEX_VAR "spriteIndex"
@@ -34,7 +36,6 @@
 #define JSON_SPRITE_COMPONENT_COLOR_G_VAR "g"
 #define JSON_SPRITE_COMPONENT_COLOR_B_VAR "b"
 #define JSON_SPRITE_COMPONENT_COLOR_A_VAR "a"
-#define JSON_SPRITE_COMPONENT_CAMERA_TYPE_VAR "cameraType"
 
 namespace gallus
 {
@@ -79,15 +80,31 @@ namespace gallus
 				return;
 			}
 
-			const DirectX::XMMATRIX viewMatrix = a_Camera.GetViewMatrix(m_CameraType);
-			const DirectX::XMMATRIX& projectionMatrix = a_Camera.GetProjectionMatrix(m_CameraType);
-
 			graphics::dx12::DX12Transform2D transform;
 			TransformSystem& transformSys = core::ENGINE->GetECS().GetSystem<TransformSystem>();
 			if (transformSys.HasComponent(a_EntityID))
 			{
 				transform = transformSys.GetComponent(a_EntityID).Transform();
 			}
+
+			if (transform.GetCameraType() == graphics::dx12::CameraType_Screen)
+			{
+				if (core::ENGINE->GetDX12().GetCameraIsolationMode() != graphics::dx12::CameraIsolationMode::CameraIsolationMode_2D && core::ENGINE->GetDX12().GetCameraIsolationMode() != graphics::dx12::CameraIsolationMode::CameraIsolationMode_2D3D)
+				{
+					return;
+				}
+			}
+			else if (transform.GetCameraType() == graphics::dx12::CameraType_World)
+			{
+				if (core::ENGINE->GetDX12().GetCameraIsolationMode() != graphics::dx12::CameraIsolationMode::CameraIsolationMode_3D && core::ENGINE->GetDX12().GetCameraIsolationMode() != graphics::dx12::CameraIsolationMode::CameraIsolationMode_2D3D)
+				{
+					return;
+				}
+			}
+
+			const DirectX::XMMATRIX viewMatrix = a_Camera.GetViewMatrix(transform.GetCameraType());
+			const DirectX::XMMATRIX& projectionMatrix = a_Camera.GetProjectionMatrix(transform.GetCameraType());
+
 			DirectX::XMMATRIX mvpMatrix = transform.GetWorldMatrixWithPivot() * viewMatrix * projectionMatrix;
 
 			if (!core::ENGINE->GetECS().GetEntity(a_EntityID))
@@ -126,18 +143,6 @@ namespace gallus
 					mesh->Render(a_pCommandList, mvpMatrix);
 				}
 			}
-		}
-
-		//---------------------------------------------------------------------
-		graphics::dx12::CameraType SpriteComponent::GetCameraType() const
-		{
-			return m_CameraType;
-		}
-
-		//---------------------------------------------------------------------
-		void SpriteComponent::SetCameraMode(graphics::dx12::CameraType a_CameraType)
-		{
-			m_CameraType = a_CameraType;
 		}
 
 		//---------------------------------------------------------------------
@@ -217,25 +222,54 @@ namespace gallus
 					a_Allocator
 				);
 			}
-
-			a_Document.AddMember(
-				JSON_SPRITE_COMPONENT_CAMERA_TYPE_VAR,
-				(int) m_CameraType,
-				a_Allocator
-			);
 		}
 #endif
 
 		//---------------------------------------------------------------------
 		void SpriteComponent::Deserialize(const resources::SrcData& a_SrcData)
 		{
-			std::string tex = a_SrcData.GetSrc(JSON_SPRITE_COMPONENT_TEX_VAR).GetString(JSON_SPRITE_COMPONENT_TEX_NAME_VAR);
-			SetSpriteIndex(a_SrcData.GetSrc(JSON_SPRITE_COMPONENT_TEX_VAR).GetInt(JSON_SPRITE_COMPONENT_TEX_SPRITE_INDEX_VAR));
-			std::string pixelShader = a_SrcData.GetSrc(JSON_SPRITE_COMPONENT_SHADER_VAR).GetString(JSON_SPRITE_COMPONENT_SHADER_PIXEL_VAR);
-			std::string vertexShader = a_SrcData.GetSrc(JSON_SPRITE_COMPONENT_SHADER_VAR).GetString(JSON_SPRITE_COMPONENT_SHADER_VERTEX_VAR);
-			std::string mesh = a_SrcData.GetString(JSON_SPRITE_COMPONENT_MESH_VAR);
+			resources::SrcData texComp;
+			if (!a_SrcData.GetSrc(JSON_SPRITE_COMPONENT_TEX_VAR, texComp))
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Sprite component did not have key %s present in its meta data.", JSON_SPRITE_COMPONENT_TEX_VAR);
+			}
 
-			m_CameraType = a_SrcData.GetEnum<graphics::dx12::CameraType>(JSON_SPRITE_COMPONENT_CAMERA_TYPE_VAR);
+			std::string tex = "";
+			if (!texComp.GetString(JSON_SPRITE_COMPONENT_TEX_NAME_VAR, tex))
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Sprite component did not have key %s present in its meta data.", JSON_SPRITE_COMPONENT_TEX_NAME_VAR);
+			}
+
+			int textureIndex = 0;
+			if (!texComp.GetInt(JSON_SPRITE_COMPONENT_TEX_SPRITE_INDEX_VAR, textureIndex))
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Sprite component did not have key %s present in its meta data.", JSON_SPRITE_COMPONENT_TEX_SPRITE_INDEX_VAR);
+			}
+			SetSpriteIndex(textureIndex);
+
+			resources::SrcData shaderVar;
+			if (!a_SrcData.GetSrc(JSON_SPRITE_COMPONENT_SHADER_VAR, shaderVar))
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Sprite component did not have key %s present in its meta data.", JSON_SPRITE_COMPONENT_SHADER_VAR);
+			}
+
+			std::string pixelShader = "";
+			if (!shaderVar.GetString(JSON_SPRITE_COMPONENT_SHADER_PIXEL_VAR, pixelShader))
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Sprite component did not have key %s present in its meta data.", JSON_SPRITE_COMPONENT_SHADER_PIXEL_VAR);
+			}
+
+			std::string vertexShader = "";
+			if (!shaderVar.GetString(JSON_SPRITE_COMPONENT_SHADER_VERTEX_VAR, vertexShader))
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Sprite component did not have key %s present in its meta data.", JSON_SPRITE_COMPONENT_SHADER_VERTEX_VAR);
+			}
+
+			std::string mesh = "";
+			if (!a_SrcData.GetString(JSON_SPRITE_COMPONENT_MESH_VAR, mesh))
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Sprite component did not have key %s present in its meta data.", JSON_SPRITE_COMPONENT_MESH_VAR);
+			}
 
 			std::shared_ptr<graphics::dx12::CommandQueue> cCommandQueue = core::ENGINE->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
 			if (!mesh.empty())

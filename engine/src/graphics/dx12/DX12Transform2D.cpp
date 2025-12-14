@@ -112,21 +112,47 @@ namespace gallus
 
 				return euler;
 			}
+
+			//---------------------------------------------------------------------
+			DirectX::XMVECTOR DX12Transform2D::EulerToQuaternion(const DirectX::XMFLOAT3& a_vEuler)
+			{
+				// Convert degrees to radians
+				float pitch = DirectX::XMConvertToRadians(a_vEuler.x);
+				float yaw = DirectX::XMConvertToRadians(a_vEuler.y);
+				float roll = DirectX::XMConvertToRadians(a_vEuler.z);
+
+				// Create quaternion from Euler angles
+				DirectX::XMVECTOR quat = DirectX::XMQuaternionRotationRollPitchYaw(
+					pitch,
+					yaw,
+					roll
+				);
+
+				// Normalize to ensure numerical stability
+				quat = DirectX::XMQuaternionNormalize(quat);
+
+				return quat;
+			}
 			
 			//---------------------------------------------------------------------
-			DirectX::XMVECTOR DX12Transform2D::AddRotation(DirectX::XMVECTOR& a_vQuat, const DirectX::XMFLOAT3& a_vAddition)
+			DirectX::XMVECTOR DX12Transform2D::AddRotation(
+				DirectX::XMVECTOR& a_vQuat,
+				const DirectX::XMFLOAT3& a_vAddition)
 			{
 				float pitch = DirectX::XMConvertToRadians(a_vAddition.x);
 				float yaw = DirectX::XMConvertToRadians(a_vAddition.y);
 				float roll = DirectX::XMConvertToRadians(a_vAddition.z);
 
-				// Build quaternion directly from Euler angles
-				DirectX::XMVECTOR deltaQuat = DirectX::XMQuaternionRotationRollPitchYaw(pitch, yaw, roll);
+				DirectX::XMVECTOR deltaQuat =
+					DirectX::XMQuaternionRotationRollPitchYaw(
+						pitch,
+						yaw,
+						roll
+					);
 
-				// Accumulate: local rotation (delta * current) or global (current * delta)
-				a_vQuat = DirectX::XMQuaternionMultiply(deltaQuat, a_vQuat);
+				// World-space accumulation (Euler-style behavior)
+				a_vQuat = DirectX::XMQuaternionMultiply(a_vQuat, deltaQuat);
 
-				// Normalize to avoid drift
 				a_vQuat = DirectX::XMQuaternionNormalize(a_vQuat);
 
 				return a_vQuat;
