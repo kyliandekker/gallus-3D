@@ -106,7 +106,7 @@ namespace gallus
 				/// <returns>Reference to the camera.</returns>
 				Camera& GetCamera()
 				{
-					return m_Camera;
+					return m_Camera3D;
 				}
 			protected:
 				/// <summary>
@@ -423,8 +423,9 @@ namespace gallus
 
 				FPSCounter m_FpsCounter;
 
-				Camera m_Camera;
-				Camera* m_pActiveCamera = &m_Camera;
+				Camera m_Camera3D;
+				Camera m_Camera2D;
+				Camera* m_pActiveCamera = &m_Camera3D;
 			};
 		}
 	}

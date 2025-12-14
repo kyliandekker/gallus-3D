@@ -29,9 +29,25 @@ namespace gallus
 
 			enum CameraType
 			{
-				CameraType_Game,
-				CameraType_UI
+				CameraType_World,
+				CameraType_Screen
 			};
+
+			inline std::string CameraTypeToString(CameraType a_CameraType)
+			{
+				switch (a_CameraType)
+				{
+					case CameraType_World:
+					{
+						return "World";
+					}
+					case CameraType_Screen:
+					{
+						return "Screen";
+					}
+				}
+				return "";
+			}
 
 			//---------------------------------------------------------------------
 			// Camera
@@ -58,11 +74,7 @@ namespace gallus
 				/// <summary>
 				/// Sets the projection matrix of the camera using perspective parameters.
 				/// </summary>
-				/// <param name="a_fWidth">The width of the rendering viewport.</param>
-				/// <param name="a_fHeight">The height of the rendering viewport.</param>
-				/// <param name="a_fNearPlane">The near clipping plane distance.</param>
-				/// <param name="a_fFarPlane">The far clipping plane distance.</param>
-				void SetProjection(float a_fWidth, float a_fHeight, float a_fNearPlane, float a_fFarPlane);
+				void SetProjection();
 
 				/// <summary>
 				/// Gets a reference to the camera's transform, allowing modification of position and orientation.
@@ -80,13 +92,13 @@ namespace gallus
 				/// Computes and returns the view matrix from the camera's transform.
 				/// </summary>
 				/// <returns>The view matrix used for rendering from the camera's perspective.</returns>
-				DirectX::XMMATRIX GetViewMatrix() const;
+				DirectX::XMMATRIX GetViewMatrix(CameraType a_CameraType) const;
 
 				/// <summary>
 				/// Returns the current projection matrix of the camera.
 				/// </summary>
 				/// <returns>The projection matrix used for rendering.</returns>
-				const DirectX::XMMATRIX& GetProjectionMatrix() const;
+				const DirectX::XMMATRIX& GetProjectionMatrix(CameraType a_CameraType) const;
 
 				/// <summary>
 				/// Returns the size of the camera.
@@ -105,8 +117,8 @@ namespace gallus
 				float m_fFov = 60;
 				DirectX::XMINT2 m_vSize;
 				DX12Transform2D m_Transform;
-				DirectX::XMMATRIX m_ProjectionMatrix;
-				
+				DirectX::XMMATRIX m_ProjectionMatrix3D;
+				DirectX::XMMATRIX m_ProjectionMatrix2D;
 #ifdef _EDITOR
 			BEGIN_EXPOSE_FIELDS(Camera)
 				EXPOSE_FIELD(Camera, m_Transform, "Transform", (FieldOptions{ .type = EditorFieldWidgetType::Object }))

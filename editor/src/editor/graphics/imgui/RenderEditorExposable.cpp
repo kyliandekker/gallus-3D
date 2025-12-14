@@ -566,7 +566,6 @@ namespace gallus
 							int temp = *enumValue;
 
 							bool changed = ShowEnumDropdown(fieldId, &temp, a_Field);
-							ImGui::ShowTooltip(a_Field.m_Options.description);
 							if (changed)
 							{
 								*enumValue = temp;
@@ -660,8 +659,8 @@ namespace gallus
 				graphics::dx12::Camera& cam = core::ENGINE->GetDX12().GetActiveCamera();
 
 				// Get transformation matrices
-				DirectX::XMMATRIX viewMat = cam.GetViewMatrix();
-				const DirectX::XMMATRIX& projMat = cam.GetProjectionMatrix();
+				DirectX::XMMATRIX viewMat = cam.GetViewMatrix(graphics::dx12::CameraType_World);
+				const DirectX::XMMATRIX& projMat = cam.GetProjectionMatrix(graphics::dx12::CameraType_World);
 
 				// Convert DirectX matrices to float[16] format for ImGuizmo
 				float objectFloat[16];

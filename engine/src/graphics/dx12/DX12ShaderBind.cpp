@@ -54,6 +54,12 @@ namespace gallus
 				rtBlendDesc.BlendOpAlpha = D3D12_BLEND_OP_ADD;
 				rtBlendDesc.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
 
+				CD3DX12_DEPTH_STENCIL_DESC depthDesc(D3D12_DEFAULT);
+				depthDesc.DepthEnable = TRUE;
+				depthDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+				depthDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+				depthDesc.StencilEnable = FALSE;
+
 				blendDesc.RenderTarget[0] = rtBlendDesc;
 
 				D3D12_RT_FORMAT_ARRAY rtvFormats = {};
@@ -73,6 +79,7 @@ namespace gallus
 						CD3DX12_PIPELINE_STATE_STREAM_RENDER_TARGET_FORMATS RTVFormats;
 						CD3DX12_PIPELINE_STATE_STREAM_RASTERIZER RasterizerState;
 						CD3DX12_PIPELINE_STATE_STREAM_BLEND_DESC BlendState;
+						CD3DX12_PIPELINE_STATE_STREAM_DEPTH_STENCIL DepthStencilState;
 					} pipelineStateStream;
 
 					pipelineStateStream.pRootSignature =
@@ -89,6 +96,8 @@ namespace gallus
 					pipelineStateStream.RTVFormats = rtvFormats;
 					pipelineStateStream.RasterizerState = rasterDesc;
 					pipelineStateStream.BlendState = CD3DX12_BLEND_DESC(blendDesc);
+					pipelineStateStream.DepthStencilState =
+						CD3DX12_PIPELINE_STATE_STREAM_DEPTH_STENCIL(depthDesc);
 
 					D3D12_PIPELINE_STATE_STREAM_DESC desc = {};
 					desc.SizeInBytes = sizeof(pipelineStateStream);

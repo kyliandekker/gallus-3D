@@ -1,6 +1,7 @@
 // external
 #include <string>
 #include <vector>
+#include <memory>
 
 #pragma once
 
@@ -143,15 +144,10 @@ namespace gallus
 			/// <param name="a_sArgs">The string containing all arguments from cmd.</param>
 			void ProcessArguments(const std::string& a_sArgs);
 
-			/// <summary>
-			/// Adds an argument with a default value.
-			/// </summary>
-			/// <param name="a_sName">The name of the argument.</param>
-			/// <param name="a_Value">The value of the argument.</param>
 			template<typename T>
 			void AddArgument(const std::string& a_sName, const T& a_Value)
 			{
-				m_aArgs.push_back(new Arg<T>(a_sName, a_Value));
+				m_aArgs.push_back(std::make_unique<Arg<T>>(a_sName, a_Value));
 			}
 
 			/// <summary>
@@ -162,11 +158,11 @@ namespace gallus
 			template<typename T>
 			const T GetArgument(const std::string& a_sName)
 			{
-				for (const BaseArg* arg : m_aArgs)
+				for (const std::unique_ptr<BaseArg>& arg : m_aArgs)
 				{
 					if (arg->GetName() == a_sName)
 					{
-						const Arg<T>* cArg = dynamic_cast<const Arg<T>*>(arg);
+						const Arg<T>* cArg = dynamic_cast<const Arg<T>*>(arg.get());
 						if (cArg != nullptr)
 						{
 							return cArg->GetValue();
@@ -177,7 +173,7 @@ namespace gallus
 				return T();
 			}
 		private:
-			std::vector<BaseArg*> m_aArgs;
+			std::vector<std::unique_ptr<BaseArg>> m_aArgs;
 		};
 		inline extern ArgProcessor ARGS = {};
 	}

@@ -254,8 +254,11 @@ namespace gallus
 
 				Resize({}, m_vSize);
 
-				m_Camera.Init(RENDER_TEX_SIZE.x, RENDER_TEX_SIZE.y);
-				m_Camera.Transform().SetPosition({ 0.0f, 1.0f, -2.0f });
+				m_Camera3D.Init(RENDER_TEX_SIZE.x, RENDER_TEX_SIZE.y);
+				m_Camera3D.Transform().SetPosition({ 0.0f, 1.0f, -2.0f });
+
+				m_Camera2D.Init(RENDER_TEX_SIZE.x, RENDER_TEX_SIZE.y);
+				m_Camera2D.Transform().SetPosition({ 0.0f, 0.0f, 0.0f });
 				
 				m_RenderTexViewport = CD3DX12_VIEWPORT(0.0f, 0.0f, RENDER_TEX_SIZE.x, RENDER_TEX_SIZE.y);
 				m_RenderTexScissorRect = CD3DX12_RECT(0, 0, RENDER_TEX_SIZE.x, RENDER_TEX_SIZE.y);
@@ -848,6 +851,8 @@ namespace gallus
 				commandList->GetCommandList()->ClearRenderTargetView(backRtv, clearColor, 0, nullptr);
 				commandList->GetCommandList()->OMSetRenderTargets(1, &backRtv, FALSE, nullptr);
 
+				commandList->GetCommandList()->RSSetViewports(1, &m_WindowViewport);
+				commandList->GetCommandList()->RSSetScissorRects(1, &m_WindowScissorRect);
 #ifndef _EDITOR
 				if (renderTex && renderTex->CanBeDrawn())
 				{
@@ -859,10 +864,8 @@ namespace gallus
 							commandList->GetCommandList()->SetPipelineState(
 								shaderBind->GetPipelineState());
 						}
-						commandList->GetCommandList()->SetGraphicsRootSignature(
-							core::ENGINE->GetDX12().GetRootSignature().Get());
 
-						renderTex->Bind(commandList, 2);
+						renderTex->Bind(commandList);
 
 						// Draw fullscreen quad (shader-generated)
 						commandList->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
@@ -872,13 +875,11 @@ namespace gallus
 				}
 #else // _EDITOR
 				// 2. OR render the editor UI.
-				commandList->GetCommandList()->OMSetRenderTargets(1, &backRtv, FALSE, nullptr);
-
 				RenderUI(commandQueue, commandList, backRtv);
 #endif // _EDITOR
-				commandList->GetCommandList()->RSSetViewports(1, &m_WindowViewport);
-				commandList->GetCommandList()->RSSetScissorRects(1, &m_WindowScissorRect);
 
+				commandList->GetCommandList()->SetGraphicsRootSignature(
+					core::ENGINE->GetDX12().GetRootSignature().Get());
 				Present(commandQueue, commandList);
 			}
 
@@ -931,11 +932,11 @@ namespace gallus
 				a_pCommandList->GetCommandList()->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
 				std::lock_guard<std::recursive_mutex> lock(core::ENGINE->GetECS().m_EntityMutex);
-				for (auto& pair : core::ENGINE->GetECS().GetSystem<gameplay::SpriteSystem>().GetComponents())
+				for (auto& pair : core::ENGINE->GetECS().GetSystem<gameplay::MeshSystem>().GetComponents())
 				{
 					pair.second.Render(a_pCommandList, pair.first, *m_pActiveCamera);
 				}
-				for (auto& pair : core::ENGINE->GetECS().GetSystem<gameplay::MeshSystem>().GetComponents())
+				for (auto& pair : core::ENGINE->GetECS().GetSystem<gameplay::SpriteSystem>().GetComponents())
 				{
 					pair.second.Render(a_pCommandList, pair.first, *m_pActiveCamera);
 				}

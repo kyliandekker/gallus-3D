@@ -231,8 +231,8 @@ namespace gallus
 					//Draw2DGrid(a_vSceneStartPos, a_vSize, m_vPanOffset, m_fZoom);
 					{
 						// Get the camera projection and view matrices
-						DirectX::XMMATRIX camProj = core::EDITOR_ENGINE->GetEditor().GetEditorCamera().GetProjectionMatrix();
-						DirectX::XMMATRIX camView = core::EDITOR_ENGINE->GetEditor().GetEditorCamera().GetViewMatrix();
+						DirectX::XMMATRIX camProj = core::EDITOR_ENGINE->GetEditor().GetEditorCamera().GetProjectionMatrix(graphics::dx12::CameraType_World);
+						DirectX::XMMATRIX camView = core::EDITOR_ENGINE->GetEditor().GetEditorCamera().GetViewMatrix(graphics::dx12::CameraType_World);
 
 						// Draw the grid with the adjusted projection matrix
 						ImGuizmo::DrawGrid(reinterpret_cast<float*>(&camView), reinterpret_cast<float*>(&camProj), reinterpret_cast<const float*>(&IDENTITY), 100.f);
@@ -755,6 +755,13 @@ void SceneWindow::HandleCameraInput(double a_fDeltaTime, const ImVec2& a_vSceneS
 				// Draw the texture
 				ImVec2 image_pos = ImGui::GetCursorScreenPos();
 
+				ImGui::GetWindowDrawList()->AddRectFilled(
+					image_pos,
+					image_pos + ImVec2(drawW, drawH),
+					IM_COL32(0, 0, 0, 255),
+					0.0f, // rounding
+					0
+				);
 				ImGui::SetCursorScreenPos(image_pos);
 				ImGui::Image(
 					(ImTextureID) tex->GetGPUHandle().ptr,

@@ -11,7 +11,7 @@
                     },
                     "shader": {
                         "pixel": "pixelShader3D.hlsl",
-                        "vertex": "vertexShader3D.hlsl"
+                        "vertex": "vertexShader.hlsl"
                     },
                     "mesh": "square",
                     "color": {
@@ -19,7 +19,8 @@
                         "g": 1.0,
                         "b": 1.0,
                         "a": 1.0
-                    }
+                    },
+                    "cameraType": 1
                 },
                 "transform": {
                     "position": {
@@ -75,7 +76,7 @@
                     },
                     "shader": {
                         "pixel": "pixelShader3D.hlsl",
-                        "vertex": "vertexShader3D.hlsl"
+                        "vertex": "vertexShader.hlsl"
                     },
                     "mesh": "square",
                     "color": {
@@ -83,7 +84,8 @@
                         "g": 1.0,
                         "b": 1.0,
                         "a": 1.0
-                    }
+                    },
+                    "cameraType": 1
                 },
                 "transform": {
                     "position": {
@@ -146,7 +148,7 @@
                     },
                     "shader": {
                         "pixel": "pixelShader3D.hlsl",
-                        "vertex": "vertexShader3D.hlsl"
+                        "vertex": "vertexShader.hlsl"
                     },
                     "mesh": "square",
                     "color": {
@@ -154,7 +156,8 @@
                         "g": 1.0,
                         "b": 1.0,
                         "a": 1.0
-                    }
+                    },
+                    "cameraType": 1
                 },
                 "transform": {
                     "position": {
@@ -201,7 +204,7 @@
                     },
                     "shader": {
                         "pixel": "pixelShader3D.hlsl",
-                        "vertex": "vertexShader3D.hlsl"
+                        "vertex": "vertexShader.hlsl"
                     },
                     "mesh": "square",
                     "color": {
@@ -209,7 +212,8 @@
                         "g": 1.0,
                         "b": 1.0,
                         "a": 1.0
-                    }
+                    },
+                    "cameraType": 1
                 },
                 "transform": {
                     "position": {
@@ -256,7 +260,7 @@
                     },
                     "shader": {
                         "pixel": "pixelShader3D.hlsl",
-                        "vertex": "vertexShader3D.hlsl"
+                        "vertex": "vertexShader.hlsl"
                     },
                     "mesh": "mod_chicken.glb",
                     "color": {
@@ -268,19 +272,19 @@
                 },
                 "transform": {
                     "position": {
-                        "x": -0.015615460462868214,
-                        "y": 0.5369007587432861,
+                        "x": -0.17505323886871339,
+                        "y": 0.6284748315811157,
                         "z": 0.18066687881946565
                     },
                     "rotation": {
                         "x": 0.0,
-                        "y": -25.799806594848634,
+                        "y": 0.0,
                         "z": 0.0
                     },
                     "scale": {
-                        "x": 1.0,
-                        "y": 1.0,
-                        "z": 1.0
+                        "x": 1.7400000095367432,
+                        "y": 1.7400000095367432,
+                        "z": 1.7400000095367432
                     },
                     "pivot": {
                         "x": 0.0,

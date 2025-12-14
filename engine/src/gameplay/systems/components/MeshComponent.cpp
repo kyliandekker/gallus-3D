@@ -73,8 +73,13 @@ namespace gallus
 		//---------------------------------------------------------------------
 		void MeshComponent::Render(std::shared_ptr<graphics::dx12::CommandList> a_pCommandList, const EntityID& a_EntityID, const graphics::dx12::Camera& a_Camera)
 		{
-			const DirectX::XMMATRIX viewMatrix = a_Camera.GetViewMatrix();
-			const DirectX::XMMATRIX& projectionMatrix = a_Camera.GetProjectionMatrix();
+			if (!core::ENGINE->GetECS().GetEntity(m_EntityID)->IsActive())
+			{
+				return;
+			}
+
+			const DirectX::XMMATRIX viewMatrix = a_Camera.GetViewMatrix(graphics::dx12::CameraType_World);
+			const DirectX::XMMATRIX& projectionMatrix = a_Camera.GetProjectionMatrix(graphics::dx12::CameraType_World);
 
 			graphics::dx12::DX12Transform2D transform;
 			TransformSystem& transformSys = core::ENGINE->GetECS().GetSystem<TransformSystem>();

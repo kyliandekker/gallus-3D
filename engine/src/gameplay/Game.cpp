@@ -91,15 +91,15 @@ namespace gallus
 
 			if (updateRealtime)
 			{
-				const gameplay::Entity* player = core::ENGINE->GetECS().GetEntityByName("Player");
+				//const gameplay::Entity* player = core::ENGINE->GetECS().GetEntityByName("Player");
 
-				if (player)
-				{
-					gameplay::TransformSystem& transformSys = core::ENGINE->GetECS().GetSystem<gameplay::TransformSystem>();
-					gameplay::TransformComponent& transformComponent = transformSys.GetComponent(player->GetEntityID());
-					DirectX::XMFLOAT3 pos = { transformComponent.Transform().GetPosition().x - (graphics::dx12::RENDER_TEX_SIZE.x / 2), transformComponent.Transform().GetPosition().y - (graphics::dx12::RENDER_TEX_SIZE.y / 2), transformComponent.Transform().GetPosition().z };
-					core::ENGINE->GetDX12().GetActiveCamera().Transform().SetPosition(pos);
-				}
+				//if (player)
+				//{
+				//	gameplay::TransformSystem& transformSys = core::ENGINE->GetECS().GetSystem<gameplay::TransformSystem>();
+				//	gameplay::TransformComponent& transformComponent = transformSys.GetComponent(player->GetEntityID());
+				//	DirectX::XMFLOAT3 pos = { transformComponent.Transform().GetPosition().x - (graphics::dx12::RENDER_TEX_SIZE.x / 2), transformComponent.Transform().GetPosition().y - (graphics::dx12::RENDER_TEX_SIZE.y / 2), transformComponent.Transform().GetPosition().z };
+				//	core::ENGINE->GetDX12().GetActiveCamera().Transform().SetPosition(pos);
+				//}
 			}
 		}
 

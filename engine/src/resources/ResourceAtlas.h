@@ -45,7 +45,7 @@ namespace gallus
 	{
 		constexpr uint32_t MAX_RESOURCES = 64;
 		constexpr uint32_t MISSING = 0;
-		constexpr uint32_t RENDER_TEX = 1;
+		constexpr uint32_t RENDER_TEX = 2;
 
 		//---------------------------------------------------------------------
 		// ResourceAtlas

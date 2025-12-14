@@ -162,7 +162,7 @@ namespace gallus
 				/// </summary>
 				/// <param name="a_pCommandList">The command list that will be used.</param>
 				/// <param name="a_iSpriteIndex">The sprite index that is used in the sprite sheet (optional).</param>
-				void Bind(std::shared_ptr<CommandList> a_pCommandList, int8_t a_iSpriteIndex);
+				void Bind(std::shared_ptr<CommandList> a_pCommandList, int8_t a_iSpriteIndex = 0);
 
 				/// <summary>
 				/// Retrieves the GPU handle of the SRV.
