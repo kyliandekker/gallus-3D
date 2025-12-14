@@ -150,12 +150,15 @@ namespace gallus
 				ImGui::SetCursorPos(centerPos);
 				ImGui::Text(entity->GetName().c_str());
 
-				ImGui::SetCursorScreenPos(ImVec2(screenCursorPos.x, screenCursorPos.y + childSize.y));
+				ImGui::SetCursorScreenPos(ImVec2(screenCursorPos.x, screenCursorPos.y));
+				ImGui::InvisibleButton(ImGui::IMGUI_FORMAT_ID("", BUTTON_ID, string_extensions::StringToUpper(entity->GetName()) + "_HIERARCHY").c_str(), childSize);
 
 				if (wasInactive)
 				{
 					ImGui::PopStyleVar();
 				}
+
+				ImGui::SetCursorScreenPos(ImVec2(screenCursorPos.x, screenCursorPos.y + childSize.y));
 			}
 
 			bool EntityEditorSelectable::RenderGizmos(const ImVec2& a_vScenePos, const ImVec2& a_vSize, const ImVec2& a_vPanOffset, float a_fZoom)

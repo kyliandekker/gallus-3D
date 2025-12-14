@@ -20,6 +20,10 @@
 
 namespace gallus
 {
+	namespace resources
+	{
+		enum class AssetType;
+	}
 	namespace graphics
 	{
 		namespace imgui
@@ -69,6 +73,8 @@ namespace gallus
 				/// </summary>
 				void Render() override;
 			private:
+				void DragAction(const gameplay::EntityID& a_EntityID, resources::AssetType a_AssetType, const std::string& a_sFileName);
+
 				/// <summary>
 				/// Updates all the entities shown in the hierarchy window.
 				/// </summary>

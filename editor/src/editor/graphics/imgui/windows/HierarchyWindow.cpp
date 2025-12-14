@@ -18,6 +18,8 @@
 // gameplay
 #include "gameplay/Game.h"
 #include "gameplay/systems/TransformSystem.h"
+#include "gameplay/systems/SpriteSystem.h"
+#include "gameplay/systems/MeshSystem.h"
 
 // editor
 #include "editor/core/EditorEngine.h"
@@ -263,70 +265,7 @@ namespace gallus
 								else
 								{
 									gameplay::EntityID entityID = core::EDITOR_ENGINE->GetECS().CreateEntity(dropped->GetPath().filename().generic_string());
-
-									switch (dropped->GetMetaData()->GetAssetType())
-									{
-										case resources::AssetType::None:
-										{
-											break;
-										}
-										case resources::AssetType::Folder:
-										{
-											break;
-										}
-										case resources::AssetType::Scene:
-										{
-											break;
-										}
-										case resources::AssetType::Sprite:
-										{
-											break;
-										}
-										case resources::AssetType::Sound:
-										{
-											break;
-										}
-										case resources::AssetType::Song:
-										{
-											break;
-										}
-										case resources::AssetType::VO:
-										{
-											break;
-										}
-										case resources::AssetType::Animation:
-										{
-											break;
-										}
-										case resources::AssetType::PixelShader:
-										{
-											break;
-										}
-										case resources::AssetType::VertexShader:
-										{
-											break;
-										}
-										case resources::AssetType::Prefab:
-										{
-											break;
-										}
-										case resources::AssetType::ShaderBind:
-										{
-											break;
-										}
-										case resources::AssetType::Mesh:
-										{
-											break;
-										}
-										case resources::AssetType::AnimationGraph:
-										{
-											break;
-										}
-										case resources::AssetType::Material:
-										{
-											break;
-										}
-									}
+									DragAction(entityID, dropped->GetMetaData()->GetAssetType(), dropped->GetPath().filename().generic_string());
 								}
 							}
 						}
@@ -365,6 +304,19 @@ namespace gallus
 							doubleClicked,
 							core::EDITOR_ENGINE->GetEditor().GetSelectable().get() == view
 						);
+						if (ImGui::BeginDragDropTarget())
+						{
+							if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("EXPLORER_ITEM"))
+							{
+								IM_ASSERT(payload->DataSize == sizeof(resources::FileResource*));
+								resources::FileResource* dropped = *(resources::FileResource**)payload->Data;
+								if (dropped)
+								{
+									DragAction(view->GetEntityID(), dropped->GetMetaData()->GetAssetType(), dropped->GetPath().filename().generic_string());
+								}
+							}
+							ImGui::EndDragDropTarget();
+						}
 
 						if (clicked)
 						{
@@ -399,6 +351,91 @@ namespace gallus
 
 					core::EDITOR_ENGINE->GetECS().CreateEntity(core::EDITOR_ENGINE->GetECS().GetUniqueName("New GameObject"));
 					core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
+				}
+			}
+
+			//---------------------------------------------------------------------
+			void HierarchyWindow::DragAction(const gameplay::EntityID& a_EntityID, resources::AssetType a_AssetType, const std::string& a_sFileName)
+			{
+				switch (a_AssetType)
+				{
+					case resources::AssetType::None:
+					{
+						break;
+					}
+					case resources::AssetType::Folder:
+					{
+						break;
+					}
+					case resources::AssetType::Scene:
+					{
+						break;
+					}
+					case resources::AssetType::Sprite:
+					{
+						std::shared_ptr<graphics::dx12::CommandQueue> cCommandQueue = core::ENGINE->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
+						if (core::EDITOR_ENGINE->GetECS().GetSystem<gameplay::MeshSystem>().HasComponent(a_EntityID))
+						{
+							core::EDITOR_ENGINE->GetECS().GetSystem<gameplay::MeshSystem>().CreateComponent(a_EntityID).SetMesh(
+								core::EDITOR_ENGINE->GetResourceAtlas().LoadMesh(a_sFileName, cCommandQueue)
+							);
+						}
+						else
+						{
+							core::EDITOR_ENGINE->GetECS().GetSystem<gameplay::SpriteSystem>().CreateComponent(a_EntityID).SetTexture(
+								core::EDITOR_ENGINE->GetResourceAtlas().LoadTexture(a_sFileName, cCommandQueue)
+							);
+						}
+						break;
+					}
+					case resources::AssetType::Sound:
+					{
+						break;
+					}
+					case resources::AssetType::Song:
+					{
+						break;
+					}
+					case resources::AssetType::VO:
+					{
+						break;
+					}
+					case resources::AssetType::Animation:
+					{
+						break;
+					}
+					case resources::AssetType::PixelShader:
+					{
+						break;
+					}
+					case resources::AssetType::VertexShader:
+					{
+						break;
+					}
+					//case resources::AssetType::Prefab:
+					//{
+					//	break;
+					//}
+					case resources::AssetType::ShaderBind:
+					{
+						break;
+					}
+					case resources::AssetType::Mesh:
+					{
+						std::shared_ptr<graphics::dx12::CommandQueue> cCommandQueue = core::ENGINE->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
+						core::EDITOR_ENGINE->GetECS().GetSystem<gameplay::MeshSystem>().CreateComponent(a_EntityID).SetMesh(
+							core::EDITOR_ENGINE->GetResourceAtlas().LoadMesh(a_sFileName, cCommandQueue)
+						);
+						break;
+					}
+					case resources::AssetType::AnimationGraph:
+					{
+						break;
+					}
+					case resources::AssetType::Material:
+					{
+						break;
+					}
 				}
 			}
 
