@@ -865,7 +865,7 @@ namespace gallus
 						renderTex->Bind(commandList);
 
 						// Draw fullscreen quad (shader-generated)
-						commandList->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+						commandList->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 						commandList->GetCommandList()->IASetVertexBuffers(0, 0, nullptr);
 						commandList->GetCommandList()->DrawInstanced(3, 1, 0, 0);
 					}

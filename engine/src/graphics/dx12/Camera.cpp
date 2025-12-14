@@ -26,12 +26,15 @@ namespace gallus
 			void Camera::SetProjection()
 			{
 				m_ProjectionMatrix2D = DirectX::XMMatrixOrthographicOffCenterLH(
-					0.0f, m_vSize.x,
-					m_vSize.y, 0.0f,
+					0.0f, static_cast<float>(m_vSize.x),
+					static_cast<float>(m_vSize.y), 0.0f,
 					-1.0f, 1.0f
 				);
 				m_ProjectionMatrix3D = DirectX::XMMatrixPerspectiveFovLH(
-					DirectX::XMConvertToRadians(m_fFov), m_vSize.x / m_vSize.y, 0.1f, 1000.0f
+					DirectX::XMConvertToRadians(m_fFov),
+					static_cast<float>(m_vSize.x) / static_cast<float>(m_vSize.y),
+					0.1f,
+					1000.0f
 				);
 			}
 
