@@ -1,11 +1,6 @@
 // header
 #include "Scene.h"
 
-// external
-#include <rapidjson/utils.h>
-#include <rapidjson/stringbuffer.h>
-#include <rapidjson/prettywriter.h>
-
 // core
 #include "core/Engine.h"
 #include "core/DataStream.h"
@@ -83,57 +78,88 @@ namespace gallus
 			m_bIsDirty = false;
 #endif // _EDITOR
 
-			rapidjson::Document document;
-			document.Parse(m_Data.dataAs<const char>(), m_Data.size());
-
-			if (document.HasParseError())
+			resources::SrcData src(m_Data);
+			if (!src.IsValid())
+			{
+				LOG(LOGSEVERITY_ERROR, LOG_CATEGORY_GAME, "Something went wrong when trying to load scene data.");
+				return false;
+			}
+			
+			if (!src.GetSrcArray(JSON_SCENE_ENTITIES_VAR, src))
+			{
+				LOG(LOGSEVERITY_ERROR, LOG_CATEGORY_GAME, "Something went wrong when trying to load scene data.");
+				return false;
+			}
+			
+			if (!src.IsValid())
 			{
 				LOG(LOGSEVERITY_ERROR, LOG_CATEGORY_GAME, "Something went wrong when trying to load scene data.");
 				return false;
 			}
 
-			// Load entities and systems.
-			if (document.HasMember(JSON_SCENE_ENTITIES_VAR) && document[JSON_SCENE_ENTITIES_VAR].IsArray())
+			size_t arraySize = 0;
+			if (!src.GetArraySize(arraySize))
 			{
-				for (auto& entityDoc : document[JSON_SCENE_ENTITIES_VAR].GetArray())
+				LOG(LOGSEVERITY_ERROR, LOG_CATEGORY_GAME, "Something went wrong when trying to load scene data.");
+				return false;
+			}
+
+			for (size_t i = 0; i < arraySize; i++)
+			{
+				resources::SrcData entitySrc;
+				if (!src.GetSrcArrayElement(i, entitySrc))
 				{
-					if (!entityDoc.IsObject())
-					{
-						continue;
-					}
+					LOGF(LOGSEVERITY_ERROR, LOG_CATEGORY_GAME, "Something went wrong when trying to load entity index %i in scene data.", i);
+					continue;
+				}
 
-					std::string name = core::ENGINE->GetECS().GetUniqueName("New GameObject");
-					if (entityDoc.HasMember(JSON_SCENE_ENTITIES_VAR_NAME) && entityDoc[JSON_SCENE_ENTITIES_VAR_NAME].IsString())
-					{
-						name = entityDoc[JSON_SCENE_ENTITIES_VAR_NAME].GetString();
-					}
+				if (!entitySrc.IsValid())
+				{
+					LOGF(LOGSEVERITY_ERROR, LOG_CATEGORY_GAME, "Something went wrong when trying to load entity index %i in scene data.", i);
+					continue;
+				}
 
-					gameplay::EntityID id = core::ENGINE->GetECS().CreateEntity(core::ENGINE->GetECS().GetUniqueName(name));
-					gameplay::Entity* entity = core::ENGINE->GetECS().GetEntity(id);
-					if (!entity)
-					{
-						continue;
-					}
+				std::string name = core::ENGINE->GetECS().GetUniqueName("New GameObject");
+				if (!entitySrc.GetString(JSON_SCENE_ENTITIES_VAR_NAME, name))
+				{
+					LOGF(LOGSEVERITY_WARNING, LOG_CATEGORY_GAME, "Could not read name of entity index %i in scene data. Defaulting to using name \"\".", i, name.c_str());
+				}
 
-					bool isActive = true;
-					if (entityDoc.HasMember(JSON_SCENE_ENTITIES_VAR_ACTIVE) && entityDoc[JSON_SCENE_ENTITIES_VAR_ACTIVE].IsBool())
-					{
-						isActive = entityDoc[JSON_SCENE_ENTITIES_VAR_ACTIVE].GetBool();
-					}
-					entity->SetIsActive(isActive);
+				gameplay::EntityID id = core::ENGINE->GetECS().CreateEntity(core::ENGINE->GetECS().GetUniqueName(name));
+				if (!id.IsValid())
+				{
+					LOGF(LOGSEVERITY_WARNING, LOG_CATEGORY_GAME, "Could not spawn entity index %i.", i);
+					continue;
+				}
 
-					auto componentsDoc = entityDoc[JSON_SCENE_ENTITIES_VAR_COMPONENTS].GetObject();
-					for (gameplay::AbstractECSSystem* system : core::ENGINE->GetECS().GetSystems())
+				gameplay::Entity* entity = core::ENGINE->GetECS().GetEntity(id);
+
+				bool isActive = true;
+				if (!entitySrc.GetBool(JSON_SCENE_ENTITIES_VAR_ACTIVE, isActive))
+				{
+					LOGF(LOGSEVERITY_WARNING, LOG_CATEGORY_GAME, "Could not read active state of entity index %i in scene data. Defaulting to true.", i);
+				}
+				entity->SetIsActive(isActive);
+
+				resources::SrcData componentsSrc;
+				if (!entitySrc.GetSrcObject(JSON_SCENE_ENTITIES_VAR_COMPONENTS, componentsSrc))
+				{
+					LOGF(LOGSEVERITY_WARNING, LOG_CATEGORY_GAME, "Entity index %i did not have any components in scene data.", i);
+					continue;
+				}
+
+				// Create all components.
+				for (gameplay::AbstractECSSystem* system : core::ENGINE->GetECS().GetSystems())
+				{
+					if (componentsSrc.HasSrcObject(system->GetPropertyName()))
 					{
-						if (componentsDoc.HasMember(system->GetPropertyName().c_str()))
+						resources::SrcData componentSrc;
+						if (!componentsSrc.GetSrcObject(system->GetPropertyName(), componentSrc))
 						{
-							const rapidjson::Value& srcData = componentsDoc[system->GetPropertyName().c_str()];
-							const gameplay::Component* component = system->CreateBaseComponent(id, srcData);
-							if (!component)
-							{
-								continue;
-							}
+							continue;
 						}
+
+						const gameplay::Component* component = system->CreateBaseComponent(id, componentSrc);
 					}
 				}
 			}
@@ -142,6 +168,13 @@ namespace gallus
 		}
 
 #ifdef _EDITOR
+		//---------------------------------------------------------------------
+		bool Scene::Save(const fs::path& a_Path)
+		{
+			m_Path = a_Path;
+			return Save();
+		}
+
 		//---------------------------------------------------------------------
 		bool Scene::Save()
 		{
@@ -175,43 +208,43 @@ namespace gallus
 #ifdef _EDITOR
 		const core::Data Scene::GetSceneData() const
 		{
-			rapidjson::Document a_Document;
-			a_Document.SetObject();
-			rapidjson::Document::AllocatorType& allocator = a_Document.GetAllocator();
+			resources::SrcData srcData = resources::SrcData();
+			srcData.SetObject();
 
-			a_Document.AddMember(JSON_SCENE_ENTITIES_VAR, rapidjson::Value().SetArray(), allocator);
+			resources::SrcData entitiesSrc = resources::SrcData();
+			entitiesSrc.SetArray();
+
 			for (gameplay::Entity& entity : core::ENGINE->GetECS().GetEntities())
 			{
-				rapidjson::Document entityDoc;
-				entityDoc.SetObject();
+				resources::SrcData entitySrc = resources::SrcData();
+				entitySrc.SetObject();
 
-				rapidjson::SetOrAddMember(entityDoc, JSON_SCENE_ENTITIES_VAR_NAME, entity.GetName().c_str(), allocator);
-				entityDoc.AddMember(JSON_SCENE_ENTITIES_VAR_ACTIVE, entity.IsActive(), allocator);
+				entitySrc.SetString(JSON_SCENE_ENTITIES_VAR_NAME, entity.GetName());
+				entitySrc.SetBool(JSON_SCENE_ENTITIES_VAR_ACTIVE, entity.IsActive());
 
-				rapidjson::Document componentsDoc;
-				componentsDoc.SetObject();
+				resources::SrcData componentsSrc = resources::SrcData();
+				componentsSrc.SetObject();
 
 				for (gameplay::AbstractECSSystem* system : core::ENGINE->GetECS().GetSystemsContainingEntity(entity))
 				{
-					rapidjson::Value key(system->GetPropertyName().c_str(), allocator);
-
-					rapidjson::Document componentDoc;
-					componentDoc.SetObject();
+					resources::SrcData componentSrc = resources::SrcData();
+					componentSrc.SetObject();
 
 					const gameplay::Component* component = system->GetBaseComponent(entity.GetEntityID());
-					componentsDoc.AddMember(key, rapidjson::Value().SetObject(), allocator);
-					component->Serialize(componentsDoc[system->GetPropertyName().c_str()], allocator);
-				}
+					component->Serialize(componentSrc);
 
-				entityDoc.AddMember(JSON_SCENE_ENTITIES_VAR_COMPONENTS, componentsDoc, allocator);
-				a_Document[JSON_SCENE_ENTITIES_VAR].PushBack(entityDoc, allocator);
+					componentsSrc.SetSrcObject(system->GetPropertyName(), componentSrc);
+				}
+				entitySrc.SetSrcObject(JSON_SCENE_ENTITIES_VAR_COMPONENTS, componentsSrc);
+
+				entitiesSrc.PushArraySrcObject(entitySrc);
 			}
 
-			rapidjson::StringBuffer buffer;
-			rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
-			a_Document.Accept(writer);
+			srcData.SetSrcObject(JSON_SCENE_ENTITIES_VAR, entitiesSrc);
 
-			return core::DataStream(buffer.GetString(), buffer.GetSize());
+			core::Data data;
+			srcData.GetData(data);
+			return data;
 		}
 #endif // _EDITOR
 	}

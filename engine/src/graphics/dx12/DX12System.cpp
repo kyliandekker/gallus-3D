@@ -603,6 +603,9 @@ namespace gallus
 				// b2: Sprite Color
 				rootParameters[SPRITE_COLOR].InitAsConstants(4, 2);
 
+				// b3: Material
+				rootParameters[RootParameters::MATERIAL].InitAsConstantBufferView(3);
+
 				// Texture SRV at register t0 (binds a texture)
 				rootParameters[RootParameters::TEX_SRV].InitAsDescriptorTable(1, &descriptorRanges[0], D3D12_SHADER_VISIBILITY_PIXEL);
 

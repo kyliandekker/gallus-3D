@@ -1,9 +1,6 @@
 #pragma once
 
 // external
-#ifdef _EDITOR
-#include <rapidjson/document.h>
-#endif
 #include <string>
 
 // gameplay
@@ -57,9 +54,8 @@ namespace gallus
 			/// <summary>
 			/// Serialized the component to a json document.
 			/// </summary>
-			/// <param name="a_Document">The json document that the data will be put into.</param>
-			/// <param name="a_Allocator">The allocator used by the json document.</param>
-			virtual void Serialize(rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator) const = 0;
+			/// <param name="a_SrcData">The json document that the data will be put into.</param>
+			virtual void Serialize(resources::SrcData& a_SrcData) const = 0;
 #endif
 			/// <summary>
 			/// Creates an instance based on source data.

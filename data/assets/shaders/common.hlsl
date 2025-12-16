@@ -17,6 +17,13 @@ cbuffer Color : register(b2)
     float4 Color; // RGBA color multiplier
 };
 
+cbuffer Material : register(b3)
+{
+    float3 DiffuseColor;
+    float Metallic;
+    float Smoothness;
+};
+
 struct VSInput
 {
     float3 pos : POSITION;

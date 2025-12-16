@@ -43,7 +43,6 @@ namespace gallus
 
 					fs::path scenePath = a_FileEditorSelectable.GetFileResource().GetPath();
 					gameplay::GAME.GetScene().LoadByPath(scenePath);
-					gameplay::GAME.GetScene().LoadData();
 
 					core::EDITOR_ENGINE->GetEditor().SetEditorMethod(editor::EditorMethod::EDITOR_METHOD_SCENE);
 

@@ -1,8 +1,5 @@
 #include "MeshComponent.h"
 
-// external
-#include <rapidjson/utils.h>
-
 // core
 #include "core/Engine.h"
 
@@ -32,10 +29,6 @@
 #define JSON_MESH_COMPONENT_SHADER_VERTEX_VAR "vertex"
 #define JSON_MESH_COMPONENT_MATERIAL_VAR "material"
 #define JSON_MESH_COMPONENT_COLOR_VAR "color"
-#define JSON_MESH_COMPONENT_COLOR_R_VAR "r"
-#define JSON_MESH_COMPONENT_COLOR_G_VAR "g"
-#define JSON_MESH_COMPONENT_COLOR_B_VAR "b"
-#define JSON_MESH_COMPONENT_COLOR_A_VAR "a"
 
 namespace gallus
 {
@@ -147,81 +140,48 @@ namespace gallus
 
 		//---------------------------------------------------------------------
 #ifdef _EDITOR
-		void MeshComponent::Serialize(rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator) const
+		void MeshComponent::Serialize(resources::SrcData& a_SrcData) const
 		{
-			if (!a_Document.IsObject())
 			{
-				return;
-			}
-
-			{
+				resources::SrcData textureSrc;
+				textureSrc.SetObject();
 				if (auto tex = m_pTexture.lock())
 				{
-					a_Document.AddMember(JSON_MESH_COMPONENT_TEX_VAR, rapidjson::Value().SetObject(), a_Allocator);
 					std::string texName = tex->GetName();
-					a_Document[JSON_MESH_COMPONENT_TEX_VAR].AddMember(
-						JSON_MESH_COMPONENT_TEX_NAME_VAR,
-						rapidjson::Value(texName.c_str(), a_Allocator),
-						a_Allocator
-					);
+					textureSrc.SetString(JSON_MESH_COMPONENT_TEX_NAME_VAR, texName);
 				}
-				a_Document[JSON_MESH_COMPONENT_TEX_VAR].AddMember(
-					JSON_MESH_COMPONENT_TEX_TEXTURE_INDEX_VAR,
-					m_iTextureIndex,
-					a_Allocator
-				);
+				textureSrc.SetInt(JSON_MESH_COMPONENT_TEX_TEXTURE_INDEX_VAR, m_iTextureIndex);
+
+				a_SrcData.SetSrcObject(JSON_MESH_COMPONENT_TEX_VAR, textureSrc);
 			}
 
-			a_Document.AddMember(JSON_MESH_COMPONENT_SHADER_VAR, rapidjson::Value().SetObject(), a_Allocator);
-
-			if (auto shaderBind = m_pShaderBind.lock())
 			{
-				if (auto pixelShader = shaderBind->GetPixelShader().lock())
+				resources::SrcData shaderSrc;
+				shaderSrc.SetObject();
+				if (auto shaderBind = m_pShaderBind.lock())
 				{
-					std::string pixelShaderName = pixelShader->GetName();
-					a_Document[JSON_MESH_COMPONENT_SHADER_VAR].AddMember(
-						JSON_MESH_COMPONENT_SHADER_PIXEL_VAR,
-						rapidjson::Value(pixelShaderName.c_str(), a_Allocator),
-						a_Allocator
-					);
-				}
+					if (auto pixelShader = shaderBind->GetPixelShader().lock())
+					{
+						std::string pixelShaderName = pixelShader->GetName();
+						shaderSrc.SetString(JSON_MESH_COMPONENT_SHADER_PIXEL_VAR, pixelShaderName);
+					}
 
-				if (auto vertexShader = shaderBind->GetVertexShader().lock())
-				{
-					std::string vertexShaderName = vertexShader->GetName();
-					a_Document[JSON_MESH_COMPONENT_SHADER_VAR].AddMember(
-						JSON_MESH_COMPONENT_SHADER_VERTEX_VAR,
-						rapidjson::Value(vertexShaderName.c_str(), a_Allocator),
-						a_Allocator
-					);
+					if (auto vertexShader = shaderBind->GetVertexShader().lock())
+					{
+						std::string vertexShaderName = vertexShader->GetName();
+						shaderSrc.SetString(JSON_MESH_COMPONENT_SHADER_VERTEX_VAR, vertexShaderName);
+					}
 				}
+				a_SrcData.SetSrcObject(JSON_MESH_COMPONENT_SHADER_VAR, shaderSrc);
 			}
 
 			if (auto mesh = m_pMesh.lock())
 			{
 				std::string meshName = mesh->GetName();
-				a_Document.AddMember(
-					JSON_MESH_COMPONENT_MESH_VAR,
-					rapidjson::Value(meshName.c_str(), a_Allocator),
-					a_Allocator
-				);
+				a_SrcData.SetString(JSON_MESH_COMPONENT_MESH_VAR, meshName);
 			}
 
-			{
-				rapidjson::Document colorDoc;
-				colorDoc.SetObject();
-
-				colorDoc.AddMember(JSON_MESH_COMPONENT_COLOR_R_VAR, m_vColor.x, a_Allocator);
-				colorDoc.AddMember(JSON_MESH_COMPONENT_COLOR_G_VAR, m_vColor.y, a_Allocator);
-				colorDoc.AddMember(JSON_MESH_COMPONENT_COLOR_B_VAR, m_vColor.z, a_Allocator);
-				colorDoc.AddMember(JSON_MESH_COMPONENT_COLOR_A_VAR, m_vColor.w, a_Allocator);
-
-				a_Document.AddMember(
-					JSON_MESH_COMPONENT_COLOR_VAR,
-					colorDoc,
-					a_Allocator
-				);
-			}
+			a_SrcData.SetColor(JSON_MESH_COMPONENT_COLOR_VAR, m_vColor);
 		}
 #endif
 
@@ -229,7 +189,7 @@ namespace gallus
 		void MeshComponent::Deserialize(const resources::SrcData& a_SrcData)
 		{
 			resources::SrcData texComp;
-			if (!a_SrcData.GetSrc(JSON_MESH_COMPONENT_TEX_VAR, texComp))
+			if (!a_SrcData.GetSrcObject(JSON_MESH_COMPONENT_TEX_VAR, texComp))
 			{
 				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Mesh component did not have key %s present in its meta data.", JSON_MESH_COMPONENT_TEX_VAR);
 			}
@@ -248,7 +208,7 @@ namespace gallus
 			SetTextureIndex(textureIndex);
 
 			resources::SrcData shaderVar;
-			if (!a_SrcData.GetSrc(JSON_MESH_COMPONENT_SHADER_VAR, shaderVar))
+			if (!a_SrcData.GetSrcObject(JSON_MESH_COMPONENT_SHADER_VAR, shaderVar))
 			{
 				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Mesh component did not have key %s present in its meta data.", JSON_MESH_COMPONENT_SHADER_VAR);
 			}

@@ -2,7 +2,7 @@
     "entities": [
         {
             "name": "Other Character",
-            "isActive": true,
+            "isActive": 1,
             "components": {
                 "sprite": {
                     "texture": {
@@ -23,30 +23,30 @@
                 },
                 "transform": {
                     "position": {
-                        "x": 496.2489013671875,
-                        "y": 459.91851806640627,
+                        "x": 201.89999389648438,
+                        "y": -400.0,
                         "z": 0.0
+                    },
+                    "scale": {
+                        "x": 100.0,
+                        "y": 100.0,
+                        "z": 1.0
                     },
                     "rotation": {
                         "x": 0.0,
                         "y": 0.0,
                         "z": 0.0
                     },
-                    "scale": {
-                        "x": 100.0,
-                        "y": 100.0,
-                        "z": 0.0
-                    },
                     "pivot": {
                         "x": 0.0,
                         "y": 0.0,
-                        "z": 0.0
+                        "z": -0.5
                     },
                     "cameraMode": 1
                 },
                 "health": {
-                    "health": 100.0,
-                    "maxHealth": 100.0
+                    "health": 100,
+                    "maxHealth": 100
                 },
                 "collision": {
                     "offset": {
@@ -59,15 +59,15 @@
                     }
                 },
                 "rigidbody": {
-                    "useGravity": true,
-                    "mass": 1.0,
-                    "linearDamping": 1.0
+                    "useGravity": 0,
+                    "mass": 1,
+                    "linearDamping": 0
                 }
             }
         },
         {
             "name": "Player",
-            "isActive": true,
+            "isActive": 1,
             "components": {
                 "sprite": {
                     "texture": {
@@ -88,30 +88,30 @@
                 },
                 "transform": {
                     "position": {
-                        "x": 0.0,
-                        "y": 0.0,
+                        "x": 892.9450073242188,
+                        "y": 411.4779968261719,
                         "z": 0.0
-                    },
-                    "rotation": {
-                        "x": 2.606410163340861e-21,
-                        "y": -9.950846570350169e-12,
-                        "z": -1.6674883696055077e-9
                     },
                     "scale": {
                         "x": 99.99999237060547,
                         "y": 99.99999237060547,
+                        "z": 1.0
+                    },
+                    "rotation": {
+                        "x": 0.0,
+                        "y": 0.0,
                         "z": 0.0
                     },
                     "pivot": {
-                        "x": -0.5,
-                        "y": -0.5,
+                        "x": 0.0,
+                        "y": 0.0,
                         "z": -0.5
                     },
                     "cameraMode": 1
                 },
                 "health": {
-                    "health": 100.0,
-                    "maxHealth": 324.0
+                    "health": 100,
+                    "maxHealth": 100
                 },
                 "collision": {
                     "offset": {
@@ -127,15 +127,15 @@
                     "startingAnimation": ""
                 },
                 "rigidbody": {
-                    "useGravity": false,
-                    "mass": 1.0,
-                    "linearDamping": 1.0
+                    "useGravity": 0,
+                    "mass": 1,
+                    "linearDamping": 0
                 }
             }
         },
         {
             "name": "Ground",
-            "isActive": true,
+            "isActive": 1,
             "components": {
                 "sprite": {
                     "texture": {
@@ -160,20 +160,20 @@
                         "y": 200.0,
                         "z": 0.0
                     },
+                    "scale": {
+                        "x": 4000.0,
+                        "y": 100.0,
+                        "z": 1.0
+                    },
                     "rotation": {
                         "x": 0.0,
                         "y": 0.0,
                         "z": 0.0
                     },
-                    "scale": {
-                        "x": 4000.0,
-                        "y": 100.0,
-                        "z": 0.0
-                    },
                     "pivot": {
                         "x": -0.5,
                         "y": -0.5,
-                        "z": 0.0
+                        "z": -0.5
                     },
                     "cameraMode": 1
                 },
@@ -191,7 +191,7 @@
         },
         {
             "name": "Ground 2",
-            "isActive": true,
+            "isActive": 1,
             "components": {
                 "sprite": {
                     "texture": {
@@ -216,20 +216,20 @@
                         "y": 746.18798828125,
                         "z": 0.0
                     },
+                    "scale": {
+                        "x": 516.8297729492188,
+                        "y": 99.99999237060547,
+                        "z": 1.0
+                    },
                     "rotation": {
                         "x": 0.0,
                         "y": 0.0,
                         "z": 0.0
                     },
-                    "scale": {
-                        "x": 516.8297729492188,
-                        "y": 99.99999237060547,
-                        "z": 0.0
-                    },
                     "pivot": {
                         "x": -0.5,
                         "y": -0.5,
-                        "z": 0.0
+                        "z": -0.5
                     },
                     "cameraMode": 1
                 },
@@ -246,8 +246,8 @@
             }
         },
         {
-            "name": "New GameObject",
-            "isActive": true,
+            "name": "mod_chicken.glb",
+            "isActive": 1,
             "components": {
                 "mesh": {
                     "texture": {
@@ -268,24 +268,24 @@
                 },
                 "transform": {
                     "position": {
-                        "x": 0.024016380310058595,
-                        "y": 0.32579487562179568,
-                        "z": 0.18066687881946565
-                    },
-                    "rotation": {
-                        "x": 0.0,
-                        "y": 31.742298126220704,
-                        "z": 0.0
-                    },
-                    "scale": {
-                        "x": 1.7400014400482178,
-                        "y": 1.7400000095367432,
-                        "z": 1.7400014400482178
-                    },
-                    "pivot": {
                         "x": 0.0,
                         "y": 0.0,
                         "z": 0.0
+                    },
+                    "scale": {
+                        "x": 1.899999976158142,
+                        "y": 1.7999999523162842,
+                        "z": 1.899999976158142
+                    },
+                    "rotation": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "pivot": {
+                        "x": -0.5,
+                        "y": -0.5,
+                        "z": -0.5
                     },
                     "cameraMode": 0
                 }

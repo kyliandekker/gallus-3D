@@ -74,45 +74,46 @@ namespace gallus
 #ifdef _EDITOR
 		const core::Data Prefab::GetSceneData() const
 		{
-			rapidjson::Document a_Document;
-			a_Document.SetObject();
-			rapidjson::Document::AllocatorType& allocator = a_Document.GetAllocator();
+			return core::Data();
+			//rapidjson::Document a_Document;
+			//a_Document.SetObject();
+			//rapidjson::Document::AllocatorType& allocator = a_Document.GetAllocator();
 
-			auto& entities = core::ENGINE->GetECS().GetEntities();
-			if (!entities.empty())
-			{
-				auto& entity = entities[0];
+			//auto& entities = core::ENGINE->GetECS().GetEntities();
+			//if (!entities.empty())
+			//{
+			//	auto& entity = entities[0];
 
-				rapidjson::Document entityDoc;
-				entityDoc.SetObject();
+			//	rapidjson::Document entityDoc;
+			//	entityDoc.SetObject();
 
-				rapidjson::SetOrAddMember(entityDoc, JSON_SCENE_ENTITIES_VAR_NAME, entity.GetName().c_str(), allocator);
-				entityDoc.AddMember(JSON_SCENE_ENTITIES_VAR_ACTIVE, entity.IsActive(), allocator);
+			//	rapidjson::SetOrAddMember(entityDoc, JSON_SCENE_ENTITIES_VAR_NAME, entity.GetName().c_str(), allocator);
+			//	entityDoc.AddMember(JSON_SCENE_ENTITIES_VAR_ACTIVE, entity.IsActive(), allocator);
 
-				rapidjson::Document componentsDoc;
-				componentsDoc.SetObject();
+			//	rapidjson::Document componentsDoc;
+			//	componentsDoc.SetObject();
 
-				for (gameplay::AbstractECSSystem* system : core::ENGINE->GetECS().GetSystemsContainingEntity(entity))
-				{
-					rapidjson::Value key(system->GetPropertyName().c_str(), allocator);
+			//	for (gameplay::AbstractECSSystem* system : core::ENGINE->GetECS().GetSystemsContainingEntity(entity))
+			//	{
+			//		rapidjson::Value key(system->GetPropertyName().c_str(), allocator);
 
-					rapidjson::Document componentDoc;
-					componentDoc.SetObject();
+			//		rapidjson::Document componentDoc;
+			//		componentDoc.SetObject();
 
-					const gameplay::Component* component = system->GetBaseComponent(entity.GetEntityID());
-					componentsDoc.AddMember(key, rapidjson::Value().SetObject(), allocator);
-					component->Serialize(componentsDoc[system->GetPropertyName().c_str()], allocator);
-				}
+			//		const gameplay::Component* component = system->GetBaseComponent(entity.GetEntityID());
+			//		componentsDoc.AddMember(key, rapidjson::Value().SetObject(), allocator);
+			//		component->Serialize(componentsDoc[system->GetPropertyName().c_str()], allocator);
+			//	}
 
-				entityDoc.AddMember(JSON_SCENE_ENTITIES_VAR_COMPONENTS, componentsDoc, allocator);
-				a_Document.CopyFrom(entityDoc, a_Document.GetAllocator());
-			}
+			//	entityDoc.AddMember(JSON_SCENE_ENTITIES_VAR_COMPONENTS, componentsDoc, allocator);
+			//	a_Document.CopyFrom(entityDoc, a_Document.GetAllocator());
+			//}
 
-			rapidjson::StringBuffer buffer;
-			rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
-			a_Document.Accept(writer);
+			//rapidjson::StringBuffer buffer;
+			//rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
+			//a_Document.Accept(writer);
 
-			return core::DataStream(buffer.GetString(), buffer.GetSize());
+			//return core::DataStream(buffer.GetString(), buffer.GetSize());
 		}
 #endif
 

@@ -67,6 +67,12 @@ namespace gallus
 			/// Saves the current scene data to disk or a serialized format.
 			/// </summary>
 			/// <returns>True if saving was successful, false otherwise.</returns>
+			bool Save(const fs::path& a_Path);
+
+			/// <summary>
+			/// Saves the current scene data to disk or a serialized format.
+			/// </summary>
+			/// <returns>True if saving was successful, false otherwise.</returns>
 			bool Save();
 #endif
 			/// <summary>

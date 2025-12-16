@@ -15,6 +15,7 @@
 // gameplay
 #include "gameplay/Game.h"
 #include "gameplay/ECSBaseSystem.h"
+#include "gameplay/systems/SpriteSystem.h"
 
 // editor
 #include "editor/core/EditorEngine.h"
@@ -217,6 +218,7 @@ namespace gallus
 
 				ImGui::SetCursorPosY(0);
 				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+
 				for (auto* sys : core::EDITOR_ENGINE->GetECS().GetSystems())
 				{
 					ImGui::SetCursorPosX(0);

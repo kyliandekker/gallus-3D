@@ -1,7 +1,6 @@
 ﻿#include "TransformComponent.h"
 
 // external
-#include <rapidjson/utils.h>
 #include <DirectXMath.h>
 
 // resources
@@ -17,9 +16,6 @@
 #define JSON_TRANSFORM_COMPONENT_ROTATION_VAR "rotation"
 #define JSON_TRANSFORM_COMPONENT_SCALE_VAR "scale"
 #define JSON_TRANSFORM_COMPONENT_PIVOT_VAR "pivot"
-#define JSON_TRANSFORM_COMPONENT_X_VAR "x"
-#define JSON_TRANSFORM_COMPONENT_Y_VAR "y"
-#define JSON_TRANSFORM_COMPONENT_Z_VAR "z"
 #define JSON_TRANSFORM_COMPONENT_CAMERA_MODE_VAR "cameraMode"
 
 namespace gallus
@@ -36,43 +32,14 @@ namespace gallus
 
 		//---------------------------------------------------------------------
 #ifdef _EDITOR
-		void TransformComponent::Serialize(rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator) const
+		void TransformComponent::Serialize(resources::SrcData& a_SrcData) const
 		{
-			if (!a_Document.IsObject())
-			{
-				return;
-			}
-
-			a_Document.AddMember(JSON_TRANSFORM_COMPONENT_POSITION_VAR, rapidjson::Value().SetObject(), a_Allocator);
-
-			a_Document[JSON_TRANSFORM_COMPONENT_POSITION_VAR].AddMember(JSON_TRANSFORM_COMPONENT_X_VAR, m_Transform.GetPosition().x, a_Allocator);
-			a_Document[JSON_TRANSFORM_COMPONENT_POSITION_VAR].AddMember(JSON_TRANSFORM_COMPONENT_Y_VAR, m_Transform.GetPosition().y, a_Allocator);
-			a_Document[JSON_TRANSFORM_COMPONENT_POSITION_VAR].AddMember(JSON_TRANSFORM_COMPONENT_Z_VAR, m_Transform.GetPosition().z, a_Allocator);
-			
-			a_Document.AddMember(JSON_TRANSFORM_COMPONENT_ROTATION_VAR, rapidjson::Value().SetObject(), a_Allocator);
-
+			a_SrcData.SetVector3(JSON_TRANSFORM_COMPONENT_POSITION_VAR, m_Transform.GetPosition());
+			a_SrcData.SetVector3(JSON_TRANSFORM_COMPONENT_SCALE_VAR, m_Transform.GetScale());
 			DirectX::XMFLOAT3 rot = m_Transform.GetRotationV();
-			a_Document[JSON_TRANSFORM_COMPONENT_ROTATION_VAR].AddMember(JSON_TRANSFORM_COMPONENT_X_VAR, rot.x, a_Allocator);
-			a_Document[JSON_TRANSFORM_COMPONENT_ROTATION_VAR].AddMember(JSON_TRANSFORM_COMPONENT_Y_VAR, rot.y, a_Allocator);
-			a_Document[JSON_TRANSFORM_COMPONENT_ROTATION_VAR].AddMember(JSON_TRANSFORM_COMPONENT_Z_VAR, rot.z, a_Allocator);
-
-			a_Document.AddMember(JSON_TRANSFORM_COMPONENT_SCALE_VAR, rapidjson::Value().SetObject(), a_Allocator);
-
-			a_Document[JSON_TRANSFORM_COMPONENT_SCALE_VAR].AddMember(JSON_TRANSFORM_COMPONENT_X_VAR, m_Transform.GetScale().x, a_Allocator);
-			a_Document[JSON_TRANSFORM_COMPONENT_SCALE_VAR].AddMember(JSON_TRANSFORM_COMPONENT_Y_VAR, m_Transform.GetScale().y, a_Allocator);
-			a_Document[JSON_TRANSFORM_COMPONENT_SCALE_VAR].AddMember(JSON_TRANSFORM_COMPONENT_Z_VAR, m_Transform.GetScale().z, a_Allocator);
-
-			a_Document.AddMember(JSON_TRANSFORM_COMPONENT_PIVOT_VAR, rapidjson::Value().SetObject(), a_Allocator);
-
-			a_Document[JSON_TRANSFORM_COMPONENT_PIVOT_VAR].AddMember(JSON_TRANSFORM_COMPONENT_X_VAR, m_Transform.GetPivot().x, a_Allocator);
-			a_Document[JSON_TRANSFORM_COMPONENT_PIVOT_VAR].AddMember(JSON_TRANSFORM_COMPONENT_Y_VAR, m_Transform.GetPivot().y, a_Allocator);
-			a_Document[JSON_TRANSFORM_COMPONENT_PIVOT_VAR].AddMember(JSON_TRANSFORM_COMPONENT_Z_VAR, m_Transform.GetPivot().z, a_Allocator);
-
-			a_Document.AddMember(
-				JSON_TRANSFORM_COMPONENT_CAMERA_MODE_VAR,
-				(int)m_Transform.GetCameraType(),
-				a_Allocator
-			);
+			a_SrcData.SetVector3(JSON_TRANSFORM_COMPONENT_ROTATION_VAR, rot);
+			a_SrcData.SetVector3(JSON_TRANSFORM_COMPONENT_PIVOT_VAR, m_Transform.GetPivot());
+			a_SrcData.SetEnum(JSON_TRANSFORM_COMPONENT_CAMERA_MODE_VAR, m_Transform.GetCameraType());
 		}
 #endif
 

@@ -121,6 +121,27 @@ namespace rapidjson
 		}
 	}
 
+	inline void SetOrAddMember(
+		rapidjson::Document& obj,
+		const char* name,
+		const rapidjson::Value& value)
+	{
+		rapidjson::Document::AllocatorType& allocator = obj.GetAllocator();
+
+		rapidjson::Value copy;
+		copy.CopyFrom(value, allocator); // deep copy into obj's allocator
+
+		if (obj.HasMember(name))
+		{
+			obj[name] = std::move(copy);
+		}
+		else
+		{
+			rapidjson::Value key(name, allocator);
+			obj.AddMember(key, std::move(copy), allocator);
+		}
+	}
+
 	// For arrays specifically (still rapidjson::Value&, but for clarity)
 	inline void SetOrAddArrayMember(
 		rapidjson::Value& obj,

@@ -61,9 +61,10 @@ namespace gallus
 			{
 				CBV = 0,                // ConstantBuffer<ModelViewProjection> ModelViewProjectionCB : register(b0);
 				SPRITE_UV = 1,    // b1: Sprite rect UVs (float2 uv0, float2 uv1)
-				SPRITE_COLOR = 2,    // b1: Sprite rect UVs (float2 uv0, float2 uv1)
-				TEX_SRV = 3,            // Texture2D texture0 : register(t0);
-				NumRootParameters = 4
+				SPRITE_COLOR = 2,    // b2: Sprite rect UVs (float2 uv0, float2 uv1)
+				MATERIAL = 3,    // b3: Material for meshes
+				TEX_SRV = 4,            // Texture2D texture0 : register(t0);
+				NumRootParameters = 5
 			};
 
 			enum CameraIsolationMode

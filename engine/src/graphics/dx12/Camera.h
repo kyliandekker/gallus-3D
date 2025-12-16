@@ -91,7 +91,7 @@ namespace gallus
 				{
 					return "Transform";
 				}
-			private:
+			protected:
 				float m_fFov = 60;
 				DirectX::XMINT2 m_vSize;
 				DX12Transform m_Transform;
@@ -99,7 +99,9 @@ namespace gallus
 				DirectX::XMMATRIX m_ProjectionMatrix2D;
 #ifdef _EDITOR
 			BEGIN_EXPOSE_FIELDS(Camera)
-				EXPOSE_FIELD(Camera, m_Transform, "Transform", (FieldOptions{ .type = EditorFieldWidgetType::Object }))
+				EXPOSE_FIELD(Camera, m_Transform.m_vPosition, "Position", (FieldOptions{ .type = EditorFieldWidgetType::Vector3Field, .description = "The position of the object in 2D space. Defines where the object is located on the screen." }))
+				EXPOSE_FIELD(Camera, m_Transform.m_vRotation, "Rotation", (FieldOptions{ .type = EditorFieldWidgetType::Quaternion, .description = "Rotation in degrees. Controls how much the object is rotated clockwise or counterclockwise." }))
+				EXPOSE_FIELD(Camera, m_Transform.m_vPivot, "Pivot", (FieldOptions{ .type = EditorFieldWidgetType::Vector3Field, .min = "-0.5", .max = "0.5", .description = "The pivot point for transformations relative to the object's center. Coordinates represent the normalized offset used for scaling and rotation." }))
 				EXPOSE_FIELD(Camera, m_fFov, "Field of View", (FieldOptions{ .type = EditorFieldWidgetType::DragFloat }))
 			END_EXPOSE_FIELDS(Camera)
 			BEGIN_EXPOSE_GIZMOS(Camera)

@@ -1,8 +1,5 @@
 #include "AnimationComponent.h"
 
-// external
-#include <rapidjson/utils.h>
-
 // core
 #include "core/Engine.h"
 
@@ -39,18 +36,9 @@ namespace gallus
 
 		//---------------------------------------------------------------------
 #ifdef _EDITOR
-		void AnimationComponent::Serialize(rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator) const
+		void AnimationComponent::Serialize(resources::SrcData& a_SrcData) const
 		{
-			if (!a_Document.IsObject())
-			{
-				return;
-			}
-
-			a_Document.AddMember(
-				JSON_ANIMATION_COMPONENT_START_ANIMATION_VAR,
-				rapidjson::Value(m_sStartingAnimation.c_str(), a_Allocator),
-				a_Allocator
-			);
+			a_SrcData.SetString(JSON_ANIMATION_COMPONENT_START_ANIMATION_VAR, m_sStartingAnimation);
 		}
 #endif
 

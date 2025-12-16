@@ -25,22 +25,13 @@ namespace gallus
 	{
 		//---------------------------------------------------------------------
 #ifdef _EDITOR
-		void ProjectileComponent::Serialize(rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator) const
+		void ProjectileComponent::Serialize(resources::SrcData& a_SrcData) const
 		{
-			if (!a_Document.IsObject())
-			{
-				return;
-			}
-
-			a_Document.AddMember(JSON_PROJECTILE_COMPONENT_DAMAGE_VAR, m_fDamage, a_Allocator);
-
+			a_SrcData.SetFloat(JSON_PROJECTILE_COMPONENT_DAMAGE_VAR, m_fDamage);
+			
 			if (auto explosionPrefab = m_ExplosionPrefab.lock())
 			{
-				a_Document.AddMember(
-					JSON_PROJECTILE_COMPONENT_EXPLOSION_VAR,
-					rapidjson::Value(explosionPrefab->GetPath().filename().generic_string().c_str(), a_Allocator),
-					a_Allocator
-				);
+				a_SrcData.SetString(JSON_PROJECTILE_COMPONENT_EXPLOSION_VAR, explosionPrefab->GetPath().filename().generic_string());
 			}
 		}
 #endif

@@ -1,8 +1,5 @@
 #include "RigidbodyComponent.h"
 
-// external
-#include <rapidjson/utils.h>
-
 // core
 #include "core/Engine.h"
 
@@ -27,17 +24,11 @@ namespace gallus
 		// RigidbodyComponent
 		//---------------------------------------------------------------------
 #ifdef _EDITOR
-		void RigidbodyComponent::Serialize(rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator) const
+		void RigidbodyComponent::Serialize(resources::SrcData& a_SrcData) const
 		{
-			if (!a_Document.IsObject())
-			{
-				return;
-			}
-
-			a_Document.AddMember(JSON_RIGIDBODY_COMPONENT_USE_GRAVITY_VAR, m_bUseGravity, a_Allocator);
-
-			a_Document.AddMember(JSON_RIGIDBODY_COMPONENT_MASS_VAR, m_fMass, a_Allocator);
-			a_Document.AddMember(JSON_RIGIDBODY_COMPONENT_LINEAR_DAMPING_VAR, m_fLinearDamping, a_Allocator);
+			a_SrcData.SetBool(JSON_RIGIDBODY_COMPONENT_USE_GRAVITY_VAR, m_bUseGravity);
+			a_SrcData.SetFloat(JSON_RIGIDBODY_COMPONENT_MASS_VAR, m_fMass);
+			a_SrcData.SetFloat(JSON_RIGIDBODY_COMPONENT_LINEAR_DAMPING_VAR, m_fLinearDamping);
 		}
 #endif
 
