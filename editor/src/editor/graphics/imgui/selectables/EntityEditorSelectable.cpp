@@ -290,6 +290,8 @@ namespace gallus
 						if (ImGui::MenuItem(ImGui::IMGUI_FORMAT_ID(system->GetSystemName(), MENU_ITEM_ID, "ADD_COMPONENT_MENU_INSPECTOR_" + system->GetPropertyName()).c_str()))
 						{
 							system->CreateBaseComponent(m_EntityID);
+
+							core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
 						}
 					}
 

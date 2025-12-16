@@ -78,27 +78,27 @@ namespace gallus
 			m_bIsDirty = false;
 #endif // _EDITOR
 
-			resources::SrcData src(m_Data);
-			if (!src.IsValid())
+			resources::SrcData srcData(m_Data);
+			if (!srcData.IsValid())
 			{
 				LOG(LOGSEVERITY_ERROR, LOG_CATEGORY_GAME, "Something went wrong when trying to load scene data.");
 				return false;
 			}
 			
-			if (!src.GetSrcArray(JSON_SCENE_ENTITIES_VAR, src))
+			if (!srcData.GetSrcArray(JSON_SCENE_ENTITIES_VAR, srcData))
 			{
 				LOG(LOGSEVERITY_ERROR, LOG_CATEGORY_GAME, "Something went wrong when trying to load scene data.");
 				return false;
 			}
 			
-			if (!src.IsValid())
+			if (!srcData.IsValid())
 			{
 				LOG(LOGSEVERITY_ERROR, LOG_CATEGORY_GAME, "Something went wrong when trying to load scene data.");
 				return false;
 			}
 
 			size_t arraySize = 0;
-			if (!src.GetArraySize(arraySize))
+			if (!srcData.GetArraySize(arraySize))
 			{
 				LOG(LOGSEVERITY_ERROR, LOG_CATEGORY_GAME, "Something went wrong when trying to load scene data.");
 				return false;
@@ -107,7 +107,7 @@ namespace gallus
 			for (size_t i = 0; i < arraySize; i++)
 			{
 				resources::SrcData entitySrc;
-				if (!src.GetSrcArrayElement(i, entitySrc))
+				if (!srcData.GetSrcArrayElement(i, entitySrc))
 				{
 					LOGF(LOGSEVERITY_ERROR, LOG_CATEGORY_GAME, "Something went wrong when trying to load entity index %i in scene data.", i);
 					continue;

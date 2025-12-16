@@ -45,17 +45,25 @@ namespace gallus
 						fs::path scenePath;
 						if (file::PickFile(scenePath, {
 							{ L"Scene Files (*.scene)", L"*.scene" },
+							{ L"Prefab Files (*.prefab)", L"*.prefab" },
 							}, core::EDITOR_ENGINE->GetResourceAtlas().GetResourceFolder().GetPath()))
 						{
 							core::Data data;
 							if (file::LoadFile(scenePath, data))
 							{
-								gameplay::GAME.GetScene().LoadByPath(scenePath);
-								gameplay::GAME.GetScene().LoadData();
+								if (scenePath.extension() == ".scene")
+								{
+									core::EDITOR_ENGINE->GetEditor().SetEditorMethod(editor::EditorMethod::EDITOR_METHOD_SCENE);
+
+									gameplay::GAME.GetScene().LoadByPath(scenePath);
+								}
+								else if (scenePath.extension() == ".prefab")
+								{
+									core::EDITOR_ENGINE->GetEditor().SetEditorMethod(editor::EditorMethod::EDITOR_METHOD_PREFAB);
+								}
+
 								core::EDITOR_ENGINE->GetEditor().GetScene().LoadByPath(scenePath);
 								core::EDITOR_ENGINE->GetEditor().GetScene().LoadData();
-
-								core::EDITOR_ENGINE->GetEditor().SetEditorMethod(editor::EditorMethod::EDITOR_METHOD_SCENE);
 							}
 						}
 					}

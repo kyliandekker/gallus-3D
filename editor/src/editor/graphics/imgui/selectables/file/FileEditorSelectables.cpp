@@ -42,10 +42,10 @@ namespace gallus
 					a_FileEditorSelectable.GetFileResource().GetFileData(data);
 
 					fs::path scenePath = a_FileEditorSelectable.GetFileResource().GetPath();
-					gameplay::GAME.GetScene().LoadByPath(scenePath);
 
 					core::EDITOR_ENGINE->GetEditor().SetEditorMethod(editor::EditorMethod::EDITOR_METHOD_SCENE);
-
+					
+					gameplay::GAME.GetScene().LoadByPath(scenePath);
 					core::EDITOR_ENGINE->GetEditor().GetScene().LoadByPath(scenePath);
 					core::EDITOR_ENGINE->GetEditor().GetScene().LoadData();
 				}
@@ -76,9 +76,10 @@ namespace gallus
 
 					gameplay::GAME.GetScene().Destroy();
 
+					fs::path prefabPath = a_FileEditorSelectable.GetFileResource().GetPath();
+
 					core::EDITOR_ENGINE->GetEditor().SetEditorMethod(editor::EditorMethod::EDITOR_METHOD_PREFAB);
 
-					fs::path prefabPath = a_FileEditorSelectable.GetFileResource().GetPath();
 					core::EDITOR_ENGINE->GetEditor().GetScene().LoadByPath(prefabPath);
 					core::EDITOR_ENGINE->GetEditor().GetScene().LoadData();
 				}

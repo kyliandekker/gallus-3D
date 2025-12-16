@@ -17,6 +17,15 @@ namespace gallus
 					{ L"Prefab Files (*.prefab)", L"*.prefab" },
 					}, core::EDITOR_ENGINE->GetResourceAtlas().GetResourceFolder().GetPath()))
 				{
+					if (scenePath.extension() == ".scene")
+					{
+						core::EDITOR_ENGINE->GetEditor().SetEditorMethod(editor::EditorMethod::EDITOR_METHOD_SCENE);
+					}
+					else if (scenePath.extension() == ".prefab")
+					{
+						core::EDITOR_ENGINE->GetEditor().SetEditorMethod(editor::EditorMethod::EDITOR_METHOD_PREFAB);
+					}
+
 					core::EDITOR_ENGINE->GetEditor().GetScene().Save(scenePath);
 				}
 			}
