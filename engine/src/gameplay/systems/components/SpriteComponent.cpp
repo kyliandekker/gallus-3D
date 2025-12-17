@@ -6,9 +6,9 @@
 // graphics
 #include "graphics/dx12/Texture.h"
 #include "graphics/dx12/Mesh.h"
-#include "graphics/dx12/DX12ShaderBind.h"
+#include "graphics/dx12/ShaderBind.h"
 #include "graphics/dx12/Shader.h"
-#include "graphics/dx12/DX12Transform.h"
+#include "graphics/dx12/Transform.h"
 #include "graphics/dx12/CommandList.h"
 #include "graphics/dx12/CommandQueue.h"
 
@@ -37,13 +37,13 @@ namespace gallus
 		//---------------------------------------------------------------------
 		// SpriteComponent
 		//---------------------------------------------------------------------
-		void SpriteComponent::Init(const gameplay::EntityID& a_EntityID)
+		void SpriteComponent::SetDefaults(const gameplay::EntityID& a_EntityID)
 		{
-			Component::Init(a_EntityID);
+			Component::SetDefaults(a_EntityID);
 
 			m_pShaderBind = core::ENGINE->GetResourceAtlas().GetDefaultShaderBind();
-			m_pTexture = core::ENGINE->GetResourceAtlas().GetDefaultTexture();
-			m_pMesh = core::ENGINE->GetResourceAtlas().GetDefaultMesh();
+			m_pSprite = core::ENGINE->GetResourceAtlas().GetDefaultTexture();
+			m_pMesh = core::ENGINE->GetResourceAtlas().LoadMesh("square");
 			m_vColor = { 1, 1, 1, 1 };
 		}
 
@@ -54,7 +54,7 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		void SpriteComponent::SetShader(std::weak_ptr<graphics::dx12::DX12ShaderBind> a_pShaderBind)
+		void SpriteComponent::SetShader(std::weak_ptr<graphics::dx12::ShaderBind> a_pShaderBind)
 		{
 			m_pShaderBind = a_pShaderBind;
 		}
@@ -62,7 +62,7 @@ namespace gallus
 		//---------------------------------------------------------------------
 		void SpriteComponent::SetTexture(std::weak_ptr<graphics::dx12::Texture> a_pTexture)
 		{
-			m_pTexture = a_pTexture;
+			m_pSprite = a_pTexture;
 		}
 
 		//---------------------------------------------------------------------
@@ -73,11 +73,11 @@ namespace gallus
 				return;
 			}
 
-			graphics::dx12::DX12Transform transform;
+			graphics::dx12::Transform transform;
 			TransformSystem& transformSys = core::ENGINE->GetECS().GetSystem<TransformSystem>();
 			if (transformSys.HasComponent(a_EntityID))
 			{
-				transform = transformSys.GetComponent(a_EntityID).Transform();
+				transform = transformSys.GetComponent(a_EntityID).GetTransform();
 			}
 
 			if (transform.GetCameraType() == graphics::dx12::CameraType_Screen)
@@ -113,7 +113,7 @@ namespace gallus
 			float colorData[4] = { m_vColor.x, m_vColor.y, m_vColor.z, m_vColor.w };
 			a_pCommandList->GetCommandList()->SetGraphicsRoot32BitConstants(graphics::dx12::RootParameters::SPRITE_COLOR, 4, colorData, 0);
 
-			if (auto tex = m_pTexture.lock())
+			if (auto tex = m_pSprite.lock())
 			{
 				if (tex->CanBeDrawn())
 				{
@@ -138,119 +138,6 @@ namespace gallus
 			}
 		}
 
-		//---------------------------------------------------------------------
-#ifdef _EDITOR
-		void SpriteComponent::Serialize(resources::SrcData& a_SrcData) const
-		{
-			{
-				resources::SrcData textureSrc;
-				textureSrc.SetObject();
-				if (auto tex = m_pTexture.lock())
-				{
-					std::string texName = tex->GetName();
-					textureSrc.SetString(JSON_SPRITE_COMPONENT_TEX_NAME_VAR, texName);
-				}
-				textureSrc.SetInt(JSON_SPRITE_COMPONENT_TEX_SPRITE_INDEX_VAR, m_iSpriteIndex);
-
-				a_SrcData.SetSrcObject(JSON_SPRITE_COMPONENT_TEX_VAR, textureSrc);
-			}
-
-			{
-				resources::SrcData shaderSrc;
-				shaderSrc.SetObject();
-				if (auto shaderBind = m_pShaderBind.lock())
-				{
-					if (auto pixelShader = shaderBind->GetPixelShader().lock())
-					{
-						std::string pixelShaderName = pixelShader->GetName();
-						shaderSrc.SetString(JSON_SPRITE_COMPONENT_SHADER_PIXEL_VAR, pixelShaderName);
-					}
-
-					if (auto vertexShader = shaderBind->GetVertexShader().lock())
-					{
-						std::string vertexShaderName = vertexShader->GetName();
-						shaderSrc.SetString(JSON_SPRITE_COMPONENT_SHADER_VERTEX_VAR, vertexShaderName);
-					}
-				}
-				a_SrcData.SetSrcObject(JSON_SPRITE_COMPONENT_SHADER_VAR, shaderSrc);
-			}
-
-			if (auto mesh = m_pMesh.lock())
-			{
-				std::string meshName = mesh->GetName();
-				a_SrcData.SetString(JSON_SPRITE_COMPONENT_MESH_VAR, meshName);
-			}
-
-			a_SrcData.SetColor(JSON_SPRITE_COMPONENT_COLOR_VAR, m_vColor);
-		}
-#endif
-
-		//---------------------------------------------------------------------
-		void SpriteComponent::Deserialize(const resources::SrcData& a_SrcData)
-		{
-			resources::SrcData texComp;
-			if (!a_SrcData.GetSrcObject(JSON_SPRITE_COMPONENT_TEX_VAR, texComp))
-			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Sprite component did not have key %s present in its meta data.", JSON_SPRITE_COMPONENT_TEX_VAR);
-			}
-
-			std::string tex = "";
-			if (!texComp.GetString(JSON_SPRITE_COMPONENT_TEX_NAME_VAR, tex))
-			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Sprite component did not have key %s present in its meta data.", JSON_SPRITE_COMPONENT_TEX_NAME_VAR);
-			}
-
-			int textureIndex = 0;
-			if (!texComp.GetInt(JSON_SPRITE_COMPONENT_TEX_SPRITE_INDEX_VAR, textureIndex))
-			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Sprite component did not have key %s present in its meta data.", JSON_SPRITE_COMPONENT_TEX_SPRITE_INDEX_VAR);
-			}
-			SetSpriteIndex(textureIndex);
-
-			resources::SrcData shaderVar;
-			if (!a_SrcData.GetSrcObject(JSON_SPRITE_COMPONENT_SHADER_VAR, shaderVar))
-			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Sprite component did not have key %s present in its meta data.", JSON_SPRITE_COMPONENT_SHADER_VAR);
-			}
-
-			std::string pixelShader = "";
-			if (!shaderVar.GetString(JSON_SPRITE_COMPONENT_SHADER_PIXEL_VAR, pixelShader))
-			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Sprite component did not have key %s present in its meta data.", JSON_SPRITE_COMPONENT_SHADER_PIXEL_VAR);
-			}
-
-			std::string vertexShader = "";
-			if (!shaderVar.GetString(JSON_SPRITE_COMPONENT_SHADER_VERTEX_VAR, vertexShader))
-			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Sprite component did not have key %s present in its meta data.", JSON_SPRITE_COMPONENT_SHADER_VERTEX_VAR);
-			}
-
-			std::string mesh = "";
-			if (!a_SrcData.GetString(JSON_SPRITE_COMPONENT_MESH_VAR, mesh))
-			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Sprite component did not have key %s present in its meta data.", JSON_SPRITE_COMPONENT_MESH_VAR);
-			}
-
-			std::shared_ptr<graphics::dx12::CommandQueue> cCommandQueue = core::ENGINE->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
-			if (!mesh.empty())
-			{
-				SetMesh(core::ENGINE->GetResourceAtlas().LoadMesh(mesh, cCommandQueue));
-			}
-			if (!tex.empty())
-			{
-				SetTexture(core::ENGINE->GetResourceAtlas().LoadTexture(tex, cCommandQueue));
-			}
-			if (!vertexShader.empty() && !pixelShader.empty())
-			{
-				SetShader(core::ENGINE->GetResourceAtlas().LoadShaderBind(
-					pixelShader,
-					core::ENGINE->GetResourceAtlas().LoadPixelShader(pixelShader),
-					core::ENGINE->GetResourceAtlas().LoadVertexShader(vertexShader)
-				));
-			}
-			cCommandQueue->Flush();
-		}
-
 		/// <summary>
 		/// Sets the sprite index.
 		/// </summary>
@@ -258,7 +145,7 @@ namespace gallus
 		void SpriteComponent::SetSpriteIndex(int8_t a_iSpriteIndex)
 		{
 			size_t numSpriteRects = 0;
-			if (auto tex = m_pTexture.lock())
+			if (auto tex = m_pSprite.lock())
 			{
 				numSpriteRects = tex->GetSpriteRectsSize() - 1;
 			}

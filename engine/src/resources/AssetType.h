@@ -33,7 +33,6 @@ namespace gallus
 			Prefab,
 			ShaderBind,
 			Mesh,
-			AnimationGraph,
 			Material,
 		};
 
@@ -97,10 +96,6 @@ namespace gallus
 				case AssetType::Mesh:
 				{
 					return "Mesh";
-				}
-				case AssetType::AnimationGraph:
-				{
-					return "Animation Graph";
 				}
 				case AssetType::Material:
 				{
@@ -183,7 +178,6 @@ namespace gallus
 					return ShiftWithinFamily(base, 2, 6);
 				}
 				case resources::AssetType::Animation:
-				case resources::AssetType::AnimationGraph:
 				{
 					return ShiftWithinFamily(base, 3, 6);
 				}
@@ -264,10 +258,6 @@ namespace gallus
 					case resources::AssetType::Mesh:
 					{
 						return font::ICON_FILE_MODEL;
-					}
-					case resources::AssetType::AnimationGraph:
-					{
-						return font::ICON_FILE_ANIMATION;
 					}
 					case resources::AssetType::Material:
 					{

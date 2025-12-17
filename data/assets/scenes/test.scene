@@ -1,0 +1,43 @@
+{
+    "entities": [
+        {
+            "name": "Other Character",
+            "isActive": true,
+            "components": {
+                "transform": {
+                    "dX12Transform": {
+                        "position": {
+                            "x": 100.0,
+                            "y": 0.75,
+                            "z": 5.0
+                        },
+                        "scale": {
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
+                        },
+                        "rotation": {
+                            "x": 0.0,
+                            "y": 0.0,
+                            "z": 0.0
+                        },
+                        "pivot": {
+                            "x": -0.5,
+                            "y": -0.5,
+                            "z": -0.5
+                        },
+                        "cameraType": 1
+                    }
+                },
+                "health": {
+                    "health": 100.0,
+                    "maxHealth": 100.0
+                },
+                "healthExperimental": {
+                    "health": 100.0,
+                    "maxHealth": 100.0
+                }
+            }
+        }
+    ]
+}

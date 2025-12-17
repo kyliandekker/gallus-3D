@@ -3,7 +3,7 @@
 #include "gameplay/systems/components/Component.h"
 
 // graphics
-#include "graphics/dx12/DX12Transform.h"
+#include "graphics/dx12/Transform.h"
 
 #ifdef _EDITOR
 // editor
@@ -24,22 +24,7 @@ namespace gallus
 			/// Retrieves the transform.
 			/// </summary>
 			/// <returns>Reference to the transform used in the transform component.</returns>
-			graphics::dx12::DX12Transform& Transform();
-
-#ifdef _EDITOR
-			/// <summary>
-			/// Serialized the component to a json document.
-			/// </summary>
-			/// <param name="a_Document">The json document that the data will be put into.</param>
-			/// <param name="a_Allocator">The allocator used by the json document.</param>
-			void Serialize(resources::SrcData& a_SrcData) const override;
-#endif
-
-			/// <summary>
-			/// Creates an instance based on source data.
-			/// </summary>
-			/// <param name="a_SrcData">The source data.</param>
-			void Deserialize(const resources::SrcData& a_SrcData) override;
+			graphics::dx12::Transform& GetTransform();
 
 			/// <summary>
 			/// Retrieves the translation.
@@ -71,7 +56,7 @@ namespace gallus
 			/// <param name="a_fDeltaTime">Delta time.</param>
 			void UpdateRealtime(float a_fDeltaTime, UpdateTime a_UpdateTime);
 
-			graphics::dx12::DX12Transform m_Transform;
+			graphics::dx12::Transform m_Transform;
 			DirectX::XMFLOAT3 m_vTranslation = {};
 #ifdef _EDITOR
 			BEGIN_EXPOSE_FIELDS_PARENT(TransformComponent, Component)

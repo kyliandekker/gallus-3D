@@ -1,4 +1,4 @@
-﻿#include "DX12ShaderBind.h"
+﻿#include "ShaderBind.h"
 
 // core
 #include "core/Engine.h"
@@ -17,7 +17,7 @@ namespace gallus
 		namespace dx12
 		{
 			//---------------------------------------------------------------------
-			bool DX12ShaderBind::LoadByName(const std::string& a_sName, std::shared_ptr<PixelShader> a_pPixelShader, std::shared_ptr<VertexShader> a_pVertexShader, CD3DX12_PIPELINE_STATE_STREAM_DEPTH_STENCIL_FORMAT a_DSVFormat)
+			bool ShaderBind::LoadByName(const std::string& a_sName, std::shared_ptr<PixelShader> a_pPixelShader, std::shared_ptr<VertexShader> a_pVertexShader, CD3DX12_PIPELINE_STATE_STREAM_DEPTH_STENCIL_FORMAT a_DSVFormat)
 			{
 				if (!EngineResource::LoadByName(a_sName))
 				{
@@ -33,7 +33,7 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			bool DX12ShaderBind::CreatePipelineState()
+			bool ShaderBind::CreatePipelineState()
 			{
 				CD3DX12_RASTERIZER_DESC rasterDesc(D3D12_DEFAULT);
 				rasterDesc.CullMode = D3D12_CULL_MODE_BACK;
@@ -156,14 +156,14 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			void DX12ShaderBind::Bind(std::shared_ptr<CommandList> a_pCommandList)
+			void ShaderBind::Bind(std::shared_ptr<CommandList> a_pCommandList)
 			{
 				a_pCommandList->GetCommandList()->SetPipelineState(m_pPipelineState.Get());
 				a_pCommandList->GetCommandList()->SetGraphicsRootSignature(core::ENGINE->GetDX12().GetRootSignature().Get()); // Set the existing root signature
 			}
 
 			//---------------------------------------------------------------------
-			bool DX12ShaderBind::HasPixelShader(std::weak_ptr<PixelShader> a_pPixelShader)
+			bool ShaderBind::HasPixelShader(std::weak_ptr<PixelShader> a_pPixelShader)
 			{
 				if (auto pixelShader = a_pPixelShader.lock())
 				{
@@ -173,7 +173,7 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			bool DX12ShaderBind::HasVertexShader(std::weak_ptr<VertexShader> a_pVertexShader)
+			bool ShaderBind::HasVertexShader(std::weak_ptr<VertexShader> a_pVertexShader)
 			{
 				if (auto vertexShader = a_pVertexShader.lock())
 				{
@@ -183,13 +183,13 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			const std::weak_ptr<PixelShader> DX12ShaderBind::GetPixelShader()
+			const std::weak_ptr<PixelShader> ShaderBind::GetPixelShader()
 			{
 				return m_pPixelShader;
 			}
 
 			//---------------------------------------------------------------------
-			const std::weak_ptr<VertexShader> DX12ShaderBind::GetVertexShader()
+			const std::weak_ptr<VertexShader> ShaderBind::GetVertexShader()
 			{
 				return m_pVertexShader;
 			}

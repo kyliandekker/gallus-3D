@@ -24,39 +24,6 @@ namespace gallus
 	namespace gameplay
 	{
 		//---------------------------------------------------------------------
-#ifdef _EDITOR
-		void ProjectileComponent::Serialize(resources::SrcData& a_SrcData) const
-		{
-			a_SrcData.SetFloat(JSON_PROJECTILE_COMPONENT_DAMAGE_VAR, m_fDamage);
-			
-			if (auto explosionPrefab = m_ExplosionPrefab.lock())
-			{
-				a_SrcData.SetString(JSON_PROJECTILE_COMPONENT_EXPLOSION_VAR, explosionPrefab->GetPath().filename().generic_string());
-			}
-		}
-#endif
-
-		//---------------------------------------------------------------------
-		void ProjectileComponent::Deserialize(const resources::SrcData& a_SrcData)
-		{
-			if (a_SrcData.GetFloat(JSON_PROJECTILE_COMPONENT_DAMAGE_VAR, m_fDamage))
-			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Projectile component did not have key %s present in its meta data.", JSON_PROJECTILE_COMPONENT_DAMAGE_VAR);
-			}
-
-			std::string explosionPrefabName = "";
-			if (a_SrcData.GetString(JSON_PROJECTILE_COMPONENT_EXPLOSION_VAR, explosionPrefabName))
-			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Projectile component did not have key %s present in its meta data.", JSON_PROJECTILE_COMPONENT_EXPLOSION_VAR);
-			}
-
-			if (!explosionPrefabName.empty())
-			{
-				m_ExplosionPrefab = core::ENGINE->GetResourceAtlas().LoadPrefab(explosionPrefabName);
-			}
-		}
-
-		//---------------------------------------------------------------------
 		void ProjectileComponent::UpdateRealtime(float a_fDeltaTime, UpdateTime a_UpdateTime)
 		{
 			CollisionSystem& collisionSystem = core::ENGINE->GetECS().GetSystem<CollisionSystem>();
@@ -80,9 +47,9 @@ namespace gallus
 						gameplay::EntityID id = explosionPrefab->Instantiate();
 
 						TransformSystem& transformSys = core::ENGINE->GetECS().GetSystem<TransformSystem>();
-						const DirectX::XMFLOAT3& pos = transformSys.GetComponent(m_EntityID).Transform().GetPosition();
+						const DirectX::XMFLOAT3& pos = transformSys.GetComponent(m_EntityID).GetTransform().GetPosition();
 						TransformComponent& transformComp = transformSys.GetComponent(id);
-						transformComp.Transform().SetPosition(pos);
+						transformComp.GetTransform().SetPosition(pos);
 
 						// Destroy projectile on first impact.
 						core::ENGINE->GetECS().GetEntity(m_EntityID)->Destroy();

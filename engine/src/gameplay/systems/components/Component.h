@@ -37,7 +37,7 @@ namespace gallus
 			/// <summary>
 			/// Initializes the component.
 			/// </summary>
-			virtual void Init(const gameplay::EntityID& a_EntityID)
+			virtual void SetDefaults(const gameplay::EntityID& a_EntityID)
 			{
 				m_EntityID = a_EntityID;
 			}
@@ -55,13 +55,13 @@ namespace gallus
 			/// Serialized the component to a json document.
 			/// </summary>
 			/// <param name="a_SrcData">The json document that the data will be put into.</param>
-			virtual void Serialize(resources::SrcData& a_SrcData) const = 0;
+			virtual void Serialize(resources::SrcData& a_SrcData) const;
 #endif
 			/// <summary>
 			/// Creates an instance based on source data.
 			/// </summary>
 			/// <param name="a_SrcData">The source data.</param>
-			virtual void Deserialize(const resources::SrcData& a_SrcData) = 0;
+			virtual void Deserialize(const resources::SrcData& a_SrcData);
 
 			/// <summary>
 			/// Checks whether the component is destroyed.

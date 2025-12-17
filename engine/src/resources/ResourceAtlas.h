@@ -25,7 +25,7 @@ namespace gallus
 			class Texture;
 			class PixelShader;
 			class VertexShader;
-			class DX12ShaderBind;
+			class ShaderBind;
 			class Mesh;
 
 			class CommandQueue;
@@ -112,12 +112,12 @@ namespace gallus
 			/// <summary>
 			/// Loads a shader bind.
 			/// </summary>
-			std::weak_ptr<graphics::dx12::DX12ShaderBind> LoadShaderBind(const std::string& a_sName, std::shared_ptr<graphics::dx12::PixelShader> a_PixelShader, std::shared_ptr<graphics::dx12::VertexShader> a_VertexShader, CD3DX12_PIPELINE_STATE_STREAM_DEPTH_STENCIL_FORMAT a_DSVFormat = DXGI_FORMAT_D32_FLOAT);
+			std::weak_ptr<graphics::dx12::ShaderBind> LoadShaderBind(const std::string& a_sName, std::shared_ptr<graphics::dx12::PixelShader> a_PixelShader, std::shared_ptr<graphics::dx12::VertexShader> a_VertexShader, CD3DX12_PIPELINE_STATE_STREAM_DEPTH_STENCIL_FORMAT a_DSVFormat = DXGI_FORMAT_D32_FLOAT);
 
 			/// <summary>
 			/// Loads a shader bind.
 			/// </summary>
-			std::weak_ptr<graphics::dx12::DX12ShaderBind> LoadShaderBind(const std::string& a_sName);
+			std::weak_ptr<graphics::dx12::ShaderBind> LoadShaderBind(const std::string& a_sName);
 
 			/// <summary>
 			/// Loads a scene.
@@ -132,7 +132,7 @@ namespace gallus
 			/// <summary>
 			/// Loads a mesh by name from the resource folder.
 			/// </summary>
-			std::weak_ptr<graphics::dx12::Mesh> LoadMesh(const std::string& a_sName, std::shared_ptr<graphics::dx12::CommandQueue> a_pCommandQueue);
+			std::weak_ptr<graphics::dx12::Mesh> LoadMesh(const std::string& a_sName, std::shared_ptr<graphics::dx12::CommandQueue> a_pCommandQueue = nullptr);
 
 			/// <summary>
 			/// Loads a prefab.
@@ -162,12 +162,12 @@ namespace gallus
 			/// <summary>
 			/// Retrieves the default shader bind (used as fallback).
 			/// </summary>
-			std::weak_ptr<graphics::dx12::DX12ShaderBind> GetDefaultShaderBind();
+			std::weak_ptr<graphics::dx12::ShaderBind> GetDefaultShaderBind();
 
 			/// <summary>
 			/// Retrieves the default shader bind (used as fallback).
 			/// </summary>
-			std::weak_ptr<graphics::dx12::DX12ShaderBind> GetRenderTexShaderBind();
+			std::weak_ptr<graphics::dx12::ShaderBind> GetRenderTexShaderBind();
 
 			/// <summary>
 			/// Retrieves the default texture (used as fallback).
@@ -197,7 +197,7 @@ namespace gallus
 			/// <summary>
 			/// Gets the list of shader binds.
 			/// </summary>
-			const std::vector<std::shared_ptr<graphics::dx12::DX12ShaderBind>>& GetShaderBinds() const;
+			const std::vector<std::shared_ptr<graphics::dx12::ShaderBind>>& GetShaderBinds() const;
 
 			/// <summary>
 			/// Gets the list of loaded meshes.
@@ -270,7 +270,7 @@ namespace gallus
 			std::vector<std::shared_ptr<graphics::dx12::Texture>> m_aTextures;
 			std::vector<std::shared_ptr<graphics::dx12::PixelShader>> m_aPixelShaders;
 			std::vector<std::shared_ptr<graphics::dx12::VertexShader>> m_aVertexShaders;
-			std::vector<std::shared_ptr<graphics::dx12::DX12ShaderBind>> m_aShaderBinds;
+			std::vector<std::shared_ptr<graphics::dx12::ShaderBind>> m_aShaderBinds;
 			std::vector<std::shared_ptr<graphics::dx12::Mesh>> m_aMeshes;
 			std::vector<std::shared_ptr<gameplay::Prefab>> m_aPrefabs;
 			std::vector<std::shared_ptr<animation::AnimationTrack>> m_aAnimationTracks;

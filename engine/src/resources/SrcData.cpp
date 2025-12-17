@@ -11,6 +11,8 @@
 // logger
 #include "logger/Logger.h"
 
+#include "core/DataStream.h"
+
 namespace gallus
 {
 	namespace resources
@@ -231,6 +233,11 @@ namespace gallus
 		//---------------------------------------------------------------------
 		bool SrcData::GetSrcObject(const std::string& a_sKey, SrcData& a_SrcData) const
 		{
+			core::DataStream data;
+			GetData(data);
+
+			file::SaveFile(fs::path("C:/ekkes/test.txt"), data);
+
 			if (m_Document.HasParseError() || m_Document.IsNull())
 			{
 				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Document is empty.");
@@ -351,13 +358,13 @@ namespace gallus
 		//---------------------------------------------------------------------
 		void SrcData::SetBool(const std::string& a_sKey, bool a_iBool)
 		{
-			rapidjson::SetOrAddMember(m_Document, a_sKey.c_str(), a_iBool, m_Document.GetAllocator());
+			rapidjson::SetOrAddMemberBool(m_Document, a_sKey.c_str(), a_iBool, m_Document.GetAllocator());
 		}
 
 		//---------------------------------------------------------------------
 		void SrcData::SetFloat(const std::string& a_sKey, float a_iFloat)
 		{
-			rapidjson::SetOrAddMember(m_Document, a_sKey.c_str(), a_iFloat, m_Document.GetAllocator());
+			rapidjson::SetOrAddMemberFloat(m_Document, a_sKey.c_str(), a_iFloat, m_Document.GetAllocator());
 		}
 
 		//---------------------------------------------------------------------

@@ -22,21 +22,6 @@ namespace gallus
 			/// </summary>
 			void InitRealtime() override;
 
-#ifdef _EDITOR
-			/// <summary>
-			/// Serialized the component to a json document.
-			/// </summary>
-			/// <param name="a_Document">The json document that the data will be put into.</param>
-			/// <param name="a_Allocator">The allocator used by the json document.</param>
-			void Serialize(resources::SrcData& a_SrcData) const override;
-#endif
-
-			/// <summary>
-			/// Creates an instance based on source data.
-			/// </summary>
-			/// <param name="a_SrcData">The source data.</param>
-			void Deserialize(const resources::SrcData& a_SrcData) override;
-
 			/// <summary>
 			/// Retrieves the health.
 			/// </summary>

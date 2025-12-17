@@ -31,10 +31,6 @@ namespace gallus
 			//---------------------------------------------------------------------
 			// Mesh
 			//---------------------------------------------------------------------
-			Mesh::Mesh() : EngineResource()
-			{}
-
-			//---------------------------------------------------------------------
 			void Mesh::Render(std::shared_ptr<CommandList> a_pCommandList, const DirectX::XMMATRIX& a_MVP)
 			{
 				for (MeshPartData& meshData : m_aMeshData)
@@ -84,6 +80,8 @@ namespace gallus
 
 				bool success = GetMeshDataFromModel(data);
 				UploadMeshData(a_pCommandQueue);
+
+				m_AssetType = resources::AssetType::Mesh;
 
 				return success;
 			}

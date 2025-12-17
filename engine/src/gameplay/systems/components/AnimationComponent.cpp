@@ -35,23 +35,6 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-#ifdef _EDITOR
-		void AnimationComponent::Serialize(resources::SrcData& a_SrcData) const
-		{
-			a_SrcData.SetString(JSON_ANIMATION_COMPONENT_START_ANIMATION_VAR, m_sStartingAnimation);
-		}
-#endif
-
-		//---------------------------------------------------------------------
-		void AnimationComponent::Deserialize(const resources::SrcData& a_SrcData)
-		{
-			if (!a_SrcData.GetString(JSON_ANIMATION_COMPONENT_START_ANIMATION_VAR, m_sStartingAnimation))
-			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Animation component did not have key %s present in its meta data.", JSON_ANIMATION_COMPONENT_START_ANIMATION_VAR);
-			}
-		}
-
-		//---------------------------------------------------------------------
 		void AnimationComponent::UpdateRealtime(float a_fDeltaTime, UpdateTime a_UpdateTime)
 		{
 			if (auto animationTrack = m_AnimationTrack.lock())

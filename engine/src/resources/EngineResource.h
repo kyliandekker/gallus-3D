@@ -138,13 +138,13 @@ namespace gallus
 			/// Returns the resource type of the engine resource.
 			/// </summary>
 			/// <returns>Type of resource.</returns>
-			resources::AssetType GetResourceType() const;
+			resources::AssetType GetAssetType() const;
 
 			/// <summary>
 			/// Sets the asset type of the engine resource.
 			/// </summary>
 			/// <param name="a_ResourceType">The type of asset.</param>
-			void SetResourceType(resources::AssetType a_AssetType);
+			void SetAssetType(resources::AssetType a_AssetType);
 
 			/// <summary>
 			/// Returns the name of the resource.

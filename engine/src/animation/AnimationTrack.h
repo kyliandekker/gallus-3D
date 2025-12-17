@@ -32,6 +32,7 @@ namespace gallus
 			/// <param name="a_KeyFrame">The key frame this component is attached to.</param>
 			AnimationTrack() : EngineResource()
 			{
+				m_AssetType = resources::AssetType::Animation;
 				m_aKeyFrames.reserve(100);
 			}
 

@@ -90,7 +90,10 @@ namespace gallus
 				/// <summary>
 				/// Constructs an empty pixel shader resource.
 				/// </summary>
-				PixelShader() = default;
+				PixelShader() : Shader()
+				{
+					m_AssetType = resources::AssetType::PixelShader;
+				}
 
 				/// <summary>
 				/// Loads and compiles shaders using logical resource names, resolving them through the engine�s resource system.
@@ -123,7 +126,10 @@ namespace gallus
 				/// <summary>
 				/// Constructs an empty pixel shader resource.
 				/// </summary>
-				VertexShader() = default;
+				VertexShader() : Shader()
+				{
+					m_AssetType = resources::AssetType::VertexShader;
+				}
 
 				/// <summary>
 				/// Loads and compiles shaders using logical resource names, resolving them through the engine�s resource system.

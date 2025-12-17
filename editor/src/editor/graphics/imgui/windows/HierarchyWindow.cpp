@@ -329,11 +329,11 @@ namespace gallus
 							{
 								gameplay::TransformComponent& transformComponent = transformSys.GetComponent(view->GetEntityID());
 								DirectX::XMFLOAT3 pos = { 
-									transformComponent.Transform().GetPosition().x - (graphics::dx12::RENDER_TEX_SIZE.x / 2), 
-									transformComponent.Transform().GetPosition().y - (graphics::dx12::RENDER_TEX_SIZE.y / 2),
-									transformComponent.Transform().GetPosition().z
+									transformComponent.GetTransform().GetPosition().x - (graphics::dx12::RENDER_TEX_SIZE.x / 2), 
+									transformComponent.GetTransform().GetPosition().y - (graphics::dx12::RENDER_TEX_SIZE.y / 2),
+									transformComponent.GetTransform().GetPosition().z
 								};
-								core::EDITOR_ENGINE->GetEditor().GetEditorCamera().Transform().SetPosition(pos);
+								core::EDITOR_ENGINE->GetEditor().GetEditorCamera().GetTransform().SetPosition(pos);
 							}
 						}
 					}
@@ -426,10 +426,6 @@ namespace gallus
 						core::EDITOR_ENGINE->GetECS().GetSystem<gameplay::MeshSystem>().CreateComponent(a_EntityID).SetMesh(
 							core::EDITOR_ENGINE->GetResourceAtlas().LoadMesh(a_sFileName, cCommandQueue)
 						);
-						break;
-					}
-					case resources::AssetType::AnimationGraph:
-					{
 						break;
 					}
 					case resources::AssetType::Material:

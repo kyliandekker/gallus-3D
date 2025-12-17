@@ -7,7 +7,7 @@
 #include "graphics/dx12/CommandQueue.h"
 #include "graphics/dx12/CommandList.h"
 #include "graphics/dx12/Shader.h"
-#include "graphics/dx12/DX12ShaderBind.h"
+#include "graphics/dx12/ShaderBind.h"
 #include "graphics/dx12/Texture.h"
 #include "graphics/dx12/Mesh.h"
 
@@ -193,7 +193,7 @@ namespace gallus
 				vertexShader2DPtr->SetResourceCategory(resources::EngineResourceCategory::Missing);
 				vertexShader2DPtr->SetIsDestroyable(false);
 
-				std::weak_ptr<DX12ShaderBind> shaderBind2DPtr = core::ENGINE->GetResourceAtlas().LoadShaderBind("defaultShaderBind", pixelShader2DPtr, vertexShader2DPtr); // Default shader.
+				std::weak_ptr<ShaderBind> shaderBind2DPtr = core::ENGINE->GetResourceAtlas().LoadShaderBind("defaultShaderBind", pixelShader2DPtr, vertexShader2DPtr); // Default shader.
 				if (auto shaderBind = shaderBind2DPtr.lock())
 				{
 					shaderBind->SetResourceCategory(resources::EngineResourceCategory::Missing);
@@ -209,7 +209,7 @@ namespace gallus
 				vertexShader3DPtr->SetResourceCategory(resources::EngineResourceCategory::Missing);
 				vertexShader3DPtr->SetIsDestroyable(false);
 
-				std::weak_ptr<DX12ShaderBind> shaderBind3DPtr = core::ENGINE->GetResourceAtlas().LoadShaderBind("defaultShaderBind3D", pixelShader3DPtr, vertexShader3DPtr, DXGI_FORMAT_D32_FLOAT); // Default shader.
+				std::weak_ptr<ShaderBind> shaderBind3DPtr = core::ENGINE->GetResourceAtlas().LoadShaderBind("defaultShaderBind3D", pixelShader3DPtr, vertexShader3DPtr, DXGI_FORMAT_D32_FLOAT); // Default shader.
 				if (auto shaderBind = shaderBind3DPtr.lock())
 				{
 					shaderBind->SetResourceCategory(resources::EngineResourceCategory::Missing);
@@ -223,15 +223,22 @@ namespace gallus
 				renderTexVertexShaderPtr->SetResourceCategory(resources::EngineResourceCategory::Missing);
 				renderTexVertexShaderPtr->SetIsDestroyable(false);
 
-				std::weak_ptr<DX12ShaderBind> renderTexShaderBindPtr = core::ENGINE->GetResourceAtlas().LoadShaderBind("renderTexShaderBind", renderTexPixelShaderPtr, renderTexVertexShaderPtr, DXGI_FORMAT_UNKNOWN); // Render Tex shader.
+				std::weak_ptr<ShaderBind> renderTexShaderBindPtr = core::ENGINE->GetResourceAtlas().LoadShaderBind("renderTexShaderBind", renderTexPixelShaderPtr, renderTexVertexShaderPtr, DXGI_FORMAT_UNKNOWN); // Render Tex shader.
 				if (auto renderTexShaderBind = renderTexShaderBindPtr.lock())
 				{
 					renderTexShaderBind->SetResourceCategory(resources::EngineResourceCategory::Missing);
 					renderTexShaderBind->SetIsDestroyable(false);
 				}
 
-				std::weak_ptr<Mesh> meshPtr = core::ENGINE->GetResourceAtlas().LoadMeshEmpty("square"); // Default mesh.
+				std::weak_ptr<Mesh> meshPtr = core::ENGINE->GetResourceAtlas().LoadMesh("mod_missing.glb", cCommandQueue); // Default mesh.
 				if (auto mesh = meshPtr.lock())
+				{
+					mesh->SetResourceCategory(resources::EngineResourceCategory::Missing);
+					mesh->SetIsDestroyable(false);
+				}
+
+				std::weak_ptr<Mesh> squareMeshPtr = core::ENGINE->GetResourceAtlas().LoadMeshEmpty("square"); // Square mesh.
+				if (auto mesh = squareMeshPtr.lock())
 				{
 					MeshPartData& squarePrimitive = s_PRIMITIVES[(int) PRIMITIVES::SQUARE];
 					mesh->SetMeshData(squarePrimitive, cCommandQueue);
@@ -255,7 +262,7 @@ namespace gallus
 				Resize({}, m_vSize);
 
 				m_Camera3D.Init(RENDER_TEX_SIZE.x, RENDER_TEX_SIZE.y);
-				m_Camera3D.Transform().SetPosition({ 0.0f, 1.0f, -2.0f });
+				m_Camera3D.GetTransform().SetPosition({ 0.0f, 1.0f, -2.0f });
 
 				m_RenderTexViewport = CD3DX12_VIEWPORT(0.0f, 0.0f, RENDER_TEX_SIZE.x, RENDER_TEX_SIZE.y);
 				m_RenderTexScissorRect = CD3DX12_RECT(0, 0, RENDER_TEX_SIZE.x, RENDER_TEX_SIZE.y);

@@ -30,7 +30,10 @@ namespace gallus
 				/// <summary>
 				/// Constructs an empty Material resource.
 				/// </summary>
-				Material() = default;
+				Material() : DX12Resource()
+				{
+					m_AssetType = resources::AssetType::Material;
+				}
 
 				/// <summary>
 				/// Loads and compiles Materials using logical resource names, resolving them through the engine�s resource system.

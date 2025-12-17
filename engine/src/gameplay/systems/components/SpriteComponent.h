@@ -26,9 +26,9 @@ namespace gallus
 		{
 			class CommandList;
 
-			class DX12Transform;
+			class Transform;
 			class Texture;
-			class DX12ShaderBind;
+			class ShaderBind;
 			class Mesh;
 			class Camera;
 		}
@@ -46,7 +46,7 @@ namespace gallus
 			/// <summary>
 			/// Initializes the component.
 			/// </summary>
-			void Init(const gameplay::EntityID& a_EntityID) override;
+			void SetDefaults(const gameplay::EntityID& a_EntityID) override;
 
 			/// <summary>
 			/// Sets the mesh used by the mesh component.
@@ -58,7 +58,7 @@ namespace gallus
 			/// Sets the shader used by the mesh component.
 			/// </summary>
 			/// <param name="a_Shader">Reference to the shader bind that the mesh component will use.</param>
-			void SetShader(std::weak_ptr < graphics::dx12::DX12ShaderBind> a_pShaderBind);
+			void SetShader(std::weak_ptr < graphics::dx12::ShaderBind> a_pShaderBind);
 
 			/// <summary>
 			/// Sets the texture used by the mesh component.
@@ -79,7 +79,7 @@ namespace gallus
 			/// Retrieves the shader used by the mesh component.
 			/// </summary>
 			/// <returns>Pointer to the mesh if the mesh exists, otherwise nullptr.</returns>
-			std::shared_ptr<graphics::dx12::DX12ShaderBind> GetShader()
+			std::shared_ptr<graphics::dx12::ShaderBind> GetShader()
 			{
 				return m_pShaderBind.lock();
 			}
@@ -90,7 +90,7 @@ namespace gallus
 			/// <returns>Pointer to the mesh if the mesh exists, otherwise nullptr.</returns>
 			std::shared_ptr<graphics::dx12::Texture > GetTexture()
 			{
-				return m_pTexture.lock();
+				return m_pSprite.lock();
 			}
 
 			/// <summary>
@@ -133,31 +133,18 @@ namespace gallus
 			/// <param name="a_EntityID">The entity ID to get the data from.</param>
 			/// <param name="a_Camera">The camera.</param>
 			void Render(std::shared_ptr<graphics::dx12::CommandList> a_pCommandList, const EntityID& a_EntityID, const graphics::dx12::Camera& a_Camera);
-#ifdef _EDITOR
-			/// <summary>
-			/// Serialized the component to a json document.
-			/// </summary>
-			/// <param name="a_Document">The json document that the data will be put into.</param>
-			/// <param name="a_Allocator">The allocator used by the json document.</param>
-			void Serialize(resources::SrcData& a_SrcData) const override;
-#endif
-			/// <summary>
-			/// Creates an instance based on source data.
-			/// </summary>
-			/// <param name="a_SrcData">The source data.</param>
-			void Deserialize(const resources::SrcData& a_SrcData) override;
 		private:
 			std::weak_ptr<graphics::dx12::Mesh> m_pMesh = {};
-			std::weak_ptr<graphics::dx12::DX12ShaderBind> m_pShaderBind = {};
-			std::weak_ptr<graphics::dx12::Texture> m_pTexture = {};
+			std::weak_ptr<graphics::dx12::ShaderBind> m_pShaderBind = {};
+			std::weak_ptr<graphics::dx12::Texture> m_pSprite = {};
 			int8_t m_iSpriteIndex = 0;
 			DirectX::XMFLOAT4 m_vColor = { 1, 1, 1, 1 };
 #ifdef _EDITOR
 			BEGIN_EXPOSE_FIELDS_PARENT(SpriteComponent, Component)
 				EXPOSE_FIELD(SpriteComponent, m_pShaderBind, "Shader Bind", (FieldOptions{ .type = EditorFieldWidgetType::ObjectPtr }))
-				EXPOSE_FIELD(SpriteComponent, m_pTexture, "Texture", (FieldOptions{ .type = EditorFieldWidgetType::AssetPickerPtr, .assetType = resources::AssetType::Sprite, .description = "Pointer to the texture asset used by this sprite. Can be nullptr if no texture is assigned. Determines the visual appearance of the sprite." }))
+				EXPOSE_FIELD(SpriteComponent, m_pSprite, "Sprite", (FieldOptions{ .type = EditorFieldWidgetType::AssetPickerPtr, .assetType = resources::AssetType::Sprite, .description = "Pointer to the texture asset used by this sprite. Can be nullptr if no texture is assigned. Determines the visual appearance of the sprite." }))
 				EXPOSE_FIELD(SpriteComponent, m_iSpriteIndex, "Sprite Index", (FieldOptions{ .type = EditorFieldWidgetType::DragInt8, .description = "Index of the sprite within a texture atlas. Used when the texture contains multiple sprites to select which one is displayed." }))
-				EXPOSE_FIELD(SpriteComponent, m_pTexture, "Texture Preview", (FieldOptions{
+				EXPOSE_FIELD(SpriteComponent, m_pSprite, "Sprite Preview", (FieldOptions{
 				.type = EditorFieldWidgetType::TexturePreview,
 				.relatedIndexFieldOffset = offsetof(SpriteComponent, m_iSpriteIndex)
 					}))

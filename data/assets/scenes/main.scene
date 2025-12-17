@@ -2,51 +2,44 @@
     "entities": [
         {
             "name": "Other Character",
-            "isActive": 1,
+            "isActive": true,
             "components": {
                 "sprite": {
-                    "texture": {
-                        "name": "tex_goomba_sprites.png",
-                        "spriteIndex": 4
+                    "shaderBind": {
+                        "pixelShader": "pixelShader.hlsl",
+                        "vertexShader": "vertexShader.hlsl"
                     },
-                    "shader": {
-                        "pixel": "pixelShader.hlsl",
-                        "vertex": "vertexShader.hlsl"
-                    },
-                    "mesh": "square",
-                    "color": {
-                        "r": 1.0,
-                        "g": 1.0,
-                        "b": 1.0,
-                        "a": 1.0
-                    }
+                    "sprite": "tex_explosion.png",
+                    "spriteIndex": 0
                 },
                 "transform": {
-                    "position": {
-                        "x": 201.89999389648438,
-                        "y": -400.0,
-                        "z": 0.0
-                    },
-                    "scale": {
-                        "x": 100.0,
-                        "y": 100.0,
-                        "z": 1.0
-                    },
-                    "rotation": {
-                        "x": 0.0,
-                        "y": 0.0,
-                        "z": 0.0
-                    },
-                    "pivot": {
-                        "x": 0.0,
-                        "y": 0.0,
-                        "z": -0.5
-                    },
-                    "cameraMode": 1
+                    "transform": {
+                        "position": {
+                            "x": 201.89999389648438,
+                            "y": -400.0,
+                            "z": 0.0
+                        },
+                        "scale": {
+                            "x": 100.0,
+                            "y": 100.0,
+                            "z": 1.0
+                        },
+                        "rotation": {
+                            "x": 0.0,
+                            "y": 0.0,
+                            "z": 0.0
+                        },
+                        "pivot": {
+                            "x": 0.0,
+                            "y": 0.0,
+                            "z": -0.5
+                        },
+                        "cameraType": 1
+                    }
                 },
                 "health": {
-                    "health": 100,
-                    "maxHealth": 100
+                    "health": 100.0,
+                    "maxHealth": 100.0
                 },
                 "collision": {
                     "offset": {
@@ -59,59 +52,52 @@
                     }
                 },
                 "rigidbody": {
-                    "useGravity": 0,
-                    "mass": 1,
-                    "linearDamping": 0
+                    "useGravity": false,
+                    "mass": 1.0,
+                    "linearDamping": 0.9800000190734863
                 }
             }
         },
         {
             "name": "Player",
-            "isActive": 1,
+            "isActive": true,
             "components": {
                 "sprite": {
-                    "texture": {
-                        "name": "tex_walk.png",
-                        "spriteIndex": 1
+                    "shaderBind": {
+                        "pixelShader": "pixelShader.hlsl",
+                        "vertexShader": "vertexShader.hlsl"
                     },
-                    "shader": {
-                        "pixel": "pixelShader.hlsl",
-                        "vertex": "vertexShader.hlsl"
-                    },
-                    "mesh": "square",
-                    "color": {
-                        "r": 1.0,
-                        "g": 1.0,
-                        "b": 1.0,
-                        "a": 1.0
-                    }
+                    "sprite": "tex_walk.png",
+                    "spriteIndex": 0
                 },
                 "transform": {
-                    "position": {
-                        "x": 892.9450073242188,
-                        "y": 411.4779968261719,
-                        "z": 0.0
-                    },
-                    "scale": {
-                        "x": 99.99999237060547,
-                        "y": 99.99999237060547,
-                        "z": 1.0
-                    },
-                    "rotation": {
-                        "x": 0.0,
-                        "y": 0.0,
-                        "z": 0.0
-                    },
-                    "pivot": {
-                        "x": 0.0,
-                        "y": 0.0,
-                        "z": -0.5
-                    },
-                    "cameraMode": 1
+                    "transform": {
+                        "position": {
+                            "x": 864.730224609375,
+                            "y": 410.4308776855469,
+                            "z": 0.0
+                        },
+                        "scale": {
+                            "x": 99.99999237060547,
+                            "y": 99.99999237060547,
+                            "z": 1.0
+                        },
+                        "rotation": {
+                            "x": 0.0,
+                            "y": 0.0,
+                            "z": 0.0
+                        },
+                        "pivot": {
+                            "x": 0.0,
+                            "y": 0.0,
+                            "z": -0.5
+                        },
+                        "cameraType": 1
+                    }
                 },
                 "health": {
-                    "health": 100,
-                    "maxHealth": 100
+                    "health": 100.0,
+                    "maxHealth": 100.0
                 },
                 "collision": {
                     "offset": {
@@ -123,59 +109,50 @@
                         "y": 1.0
                     }
                 },
-                "animation": {
-                    "startingAnimation": ""
-                },
+                "animation": {},
                 "rigidbody": {
-                    "useGravity": 0,
-                    "mass": 1,
-                    "linearDamping": 0
+                    "useGravity": false,
+                    "mass": 1.0,
+                    "linearDamping": 0.9800000190734863
                 }
             }
         },
         {
             "name": "Ground",
-            "isActive": 1,
+            "isActive": true,
             "components": {
                 "sprite": {
-                    "texture": {
-                        "name": "tex_missing.png",
-                        "spriteIndex": 0
+                    "shaderBind": {
+                        "pixelShader": "pixelShader.hlsl",
+                        "vertexShader": "vertexShader.hlsl"
                     },
-                    "shader": {
-                        "pixel": "pixelShader.hlsl",
-                        "vertex": "vertexShader.hlsl"
-                    },
-                    "mesh": "square",
-                    "color": {
-                        "r": 1.0,
-                        "g": 1.0,
-                        "b": 1.0,
-                        "a": 1.0
-                    }
+                    "sprite": "tex_missing.png",
+                    "spriteIndex": 0
                 },
                 "transform": {
-                    "position": {
-                        "x": 0.0,
-                        "y": 200.0,
-                        "z": 0.0
-                    },
-                    "scale": {
-                        "x": 4000.0,
-                        "y": 100.0,
-                        "z": 1.0
-                    },
-                    "rotation": {
-                        "x": 0.0,
-                        "y": 0.0,
-                        "z": 0.0
-                    },
-                    "pivot": {
-                        "x": -0.5,
-                        "y": -0.5,
-                        "z": -0.5
-                    },
-                    "cameraMode": 1
+                    "transform": {
+                        "position": {
+                            "x": 0.0,
+                            "y": 200.0,
+                            "z": 0.0
+                        },
+                        "scale": {
+                            "x": 4000.0,
+                            "y": 100.0,
+                            "z": 1.0
+                        },
+                        "rotation": {
+                            "x": 0.0,
+                            "y": 0.0,
+                            "z": 0.0
+                        },
+                        "pivot": {
+                            "x": -0.5,
+                            "y": -0.5,
+                            "z": -0.5
+                        },
+                        "cameraType": 1
+                    }
                 },
                 "collision": {
                     "offset": {
@@ -191,47 +168,40 @@
         },
         {
             "name": "Ground 2",
-            "isActive": 1,
+            "isActive": true,
             "components": {
                 "sprite": {
-                    "texture": {
-                        "name": "tex_missing.png",
-                        "spriteIndex": 0
+                    "shaderBind": {
+                        "pixelShader": "pixelShader.hlsl",
+                        "vertexShader": "vertexShader.hlsl"
                     },
-                    "shader": {
-                        "pixel": "pixelShader.hlsl",
-                        "vertex": "vertexShader.hlsl"
-                    },
-                    "mesh": "square",
-                    "color": {
-                        "r": 1.0,
-                        "g": 1.0,
-                        "b": 1.0,
-                        "a": 1.0
-                    }
+                    "sprite": "tex_missing.png",
+                    "spriteIndex": 0
                 },
                 "transform": {
-                    "position": {
-                        "x": 744.7197875976563,
-                        "y": 746.18798828125,
-                        "z": 0.0
-                    },
-                    "scale": {
-                        "x": 516.8297729492188,
-                        "y": 99.99999237060547,
-                        "z": 1.0
-                    },
-                    "rotation": {
-                        "x": 0.0,
-                        "y": 0.0,
-                        "z": 0.0
-                    },
-                    "pivot": {
-                        "x": -0.5,
-                        "y": -0.5,
-                        "z": -0.5
-                    },
-                    "cameraMode": 1
+                    "transform": {
+                        "position": {
+                            "x": 744.7197875976563,
+                            "y": 746.18798828125,
+                            "z": 0.0
+                        },
+                        "scale": {
+                            "x": 516.8297729492188,
+                            "y": 99.99999237060547,
+                            "z": 1.0
+                        },
+                        "rotation": {
+                            "x": 0.0,
+                            "y": 0.0,
+                            "z": 0.0
+                        },
+                        "pivot": {
+                            "x": -0.5,
+                            "y": -0.5,
+                            "z": -0.5
+                        },
+                        "cameraType": 1
+                    }
                 },
                 "collision": {
                     "offset": {
@@ -247,47 +217,41 @@
         },
         {
             "name": "mod_chicken.glb",
-            "isActive": 1,
+            "isActive": true,
             "components": {
                 "mesh": {
-                    "texture": {
-                        "name": "tex_missing.png",
-                        "textureIndex": 0
-                    },
-                    "shader": {
-                        "pixel": "pixelShader3D.hlsl",
-                        "vertex": "vertexShader3D.hlsl"
+                    "shaderBind": {
+                        "pixelShader": "pixelShader3D.hlsl",
+                        "vertexShader": "vertexShader3D.hlsl"
                     },
                     "mesh": "mod_chicken.glb",
-                    "color": {
-                        "r": 1.0,
-                        "g": 1.0,
-                        "b": 1.0,
-                        "a": 1.0
-                    }
+                    "texture": "tex_missing.png",
+                    "textureIndex": 0
                 },
                 "transform": {
-                    "position": {
-                        "x": 0.0,
-                        "y": 0.0,
-                        "z": 0.0
-                    },
-                    "scale": {
-                        "x": 1.899999976158142,
-                        "y": 1.7999999523162842,
-                        "z": 1.899999976158142
-                    },
-                    "rotation": {
-                        "x": 0.0,
-                        "y": 0.0,
-                        "z": 0.0
-                    },
-                    "pivot": {
-                        "x": -0.5,
-                        "y": -0.5,
-                        "z": -0.5
-                    },
-                    "cameraMode": 0
+                    "transform": {
+                        "position": {
+                            "x": 0.0,
+                            "y": 0.0,
+                            "z": 0.0
+                        },
+                        "scale": {
+                            "x": 1.899999976158142,
+                            "y": 1.7999999523162842,
+                            "z": 1.899999976158142
+                        },
+                        "rotation": {
+                            "x": 0.0,
+                            "y": 0.0,
+                            "z": 0.0
+                        },
+                        "pivot": {
+                            "x": -0.5,
+                            "y": -0.5,
+                            "z": -0.5
+                        },
+                        "cameraType": 0
+                    }
                 }
             }
         }

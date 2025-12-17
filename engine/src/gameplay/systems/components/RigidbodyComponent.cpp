@@ -23,40 +23,6 @@ namespace gallus
 		//---------------------------------------------------------------------
 		// RigidbodyComponent
 		//---------------------------------------------------------------------
-#ifdef _EDITOR
-		void RigidbodyComponent::Serialize(resources::SrcData& a_SrcData) const
-		{
-			a_SrcData.SetBool(JSON_RIGIDBODY_COMPONENT_USE_GRAVITY_VAR, m_bUseGravity);
-			a_SrcData.SetFloat(JSON_RIGIDBODY_COMPONENT_MASS_VAR, m_fMass);
-			a_SrcData.SetFloat(JSON_RIGIDBODY_COMPONENT_LINEAR_DAMPING_VAR, m_fLinearDamping);
-		}
-#endif
-
-		//---------------------------------------------------------------------
-		void RigidbodyComponent::Deserialize(const resources::SrcData& a_SrcData)
-		{
-			if (!a_SrcData.GetBool(JSON_RIGIDBODY_COMPONENT_USE_GRAVITY_VAR, m_bUseGravity))
-			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Rigidbody component did not have key %s present in its meta data.", JSON_RIGIDBODY_COMPONENT_USE_GRAVITY_VAR);
-			}
-
-			float mass = 1.0f;
-			if (!a_SrcData.GetFloat(JSON_RIGIDBODY_COMPONENT_MASS_VAR, mass))
-			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Rigidbody component did not have key %s present in its meta data.", JSON_RIGIDBODY_COMPONENT_MASS_VAR);
-			}
-
-			SetMass(mass);
-
-			float linearDamping  = 0.98f;
-			if (!a_SrcData.GetFloat(JSON_RIGIDBODY_COMPONENT_LINEAR_DAMPING_VAR, linearDamping))
-			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Rigidbody component did not have key %s present in its meta data.", JSON_RIGIDBODY_COMPONENT_LINEAR_DAMPING_VAR);
-			}
-
-			SetLinearDamping(linearDamping);
-		}
-
 		constexpr float GRAVITY = 1000.0f;
 		//---------------------------------------------------------------------
 		void RigidbodyComponent::UpdateRealtime(float a_fDeltaTime, UpdateTime a_UpdateTime)

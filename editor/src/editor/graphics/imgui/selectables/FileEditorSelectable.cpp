@@ -109,11 +109,6 @@ namespace gallus
 						m_pFileEditorSelectable = nullptr;
 						break;
 					}
-					case resources::AssetType::AnimationGraph:
-					{
-						m_pFileEditorSelectable = nullptr;
-						break;
-					}
 				}
 			}
 

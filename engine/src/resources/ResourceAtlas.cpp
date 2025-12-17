@@ -10,7 +10,7 @@
 // graphics
 #include "graphics/dx12/Texture.h"
 #include "graphics/dx12/Shader.h"
-#include "graphics/dx12/DX12ShaderBind.h"
+#include "graphics/dx12/ShaderBind.h"
 #include "graphics/dx12/Mesh.h"
 #include "graphics/dx12/CommandList.h"
 #include "graphics/dx12/CommandQueue.h"
@@ -231,9 +231,9 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		std::weak_ptr<graphics::dx12::DX12ShaderBind> ResourceAtlas::LoadShaderBind(const std::string& a_sName, std::shared_ptr<graphics::dx12::PixelShader> a_PixelShader, std::shared_ptr<graphics::dx12::VertexShader> a_VertexShader, CD3DX12_PIPELINE_STATE_STREAM_DEPTH_STENCIL_FORMAT a_DSVFormat)
+		std::weak_ptr<graphics::dx12::ShaderBind> ResourceAtlas::LoadShaderBind(const std::string& a_sName, std::shared_ptr<graphics::dx12::PixelShader> a_PixelShader, std::shared_ptr<graphics::dx12::VertexShader> a_VertexShader, CD3DX12_PIPELINE_STATE_STREAM_DEPTH_STENCIL_FORMAT a_DSVFormat)
 		{
-			for (std::shared_ptr<graphics::dx12::DX12ShaderBind>& shaderBind : m_aShaderBinds)
+			for (std::shared_ptr<graphics::dx12::ShaderBind>& shaderBind : m_aShaderBinds)
 			{
 				if (shaderBind->HasPixelShader(a_PixelShader) && shaderBind->HasVertexShader(a_VertexShader))
 				{
@@ -241,7 +241,7 @@ namespace gallus
 				}
 			}
 
-			std::shared_ptr<graphics::dx12::DX12ShaderBind> shaderBind = std::make_shared<graphics::dx12::DX12ShaderBind>();
+			std::shared_ptr<graphics::dx12::ShaderBind> shaderBind = std::make_shared<graphics::dx12::ShaderBind>();
 			shaderBind->LoadByName(a_sName, a_PixelShader, a_VertexShader, a_DSVFormat);
 			shaderBind->CreatePipelineState();
 			m_aShaderBinds.push_back(shaderBind);
@@ -250,9 +250,9 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		std::weak_ptr<graphics::dx12::DX12ShaderBind> ResourceAtlas::LoadShaderBind(const std::string& a_sName)
+		std::weak_ptr<graphics::dx12::ShaderBind> ResourceAtlas::LoadShaderBind(const std::string& a_sName)
 		{
-			std::shared_ptr<graphics::dx12::DX12ShaderBind> shaderBind = GetResource(m_aShaderBinds, a_sName, fs::path());
+			std::shared_ptr<graphics::dx12::ShaderBind> shaderBind = GetResource(m_aShaderBinds, a_sName, fs::path());
 
 			return shaderBind;
 		}
@@ -375,13 +375,13 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		std::weak_ptr<graphics::dx12::DX12ShaderBind> ResourceAtlas::GetDefaultShaderBind()
+		std::weak_ptr<graphics::dx12::ShaderBind> ResourceAtlas::GetDefaultShaderBind()
 		{
 			return m_aShaderBinds[MISSING];
 		}
 
 		//---------------------------------------------------------------------
-		std::weak_ptr<graphics::dx12::DX12ShaderBind> ResourceAtlas::GetRenderTexShaderBind()
+		std::weak_ptr<graphics::dx12::ShaderBind> ResourceAtlas::GetRenderTexShaderBind()
 		{
 			return m_aShaderBinds[RENDER_TEX];
 		}
@@ -417,7 +417,7 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		const std::vector<std::shared_ptr<graphics::dx12::DX12ShaderBind>>& ResourceAtlas::GetShaderBinds() const
+		const std::vector<std::shared_ptr<graphics::dx12::ShaderBind>>& ResourceAtlas::GetShaderBinds() const
 		{
 			return m_aShaderBinds;
 		}

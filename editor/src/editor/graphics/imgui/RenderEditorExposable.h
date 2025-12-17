@@ -8,6 +8,10 @@ namespace gallus
 	class EditorFieldInfo;
 	class IExposableToEditor;
 
+	namespace resources
+	{
+		class ScrData;
+	}
 	namespace graphics
 	{
 		namespace imgui

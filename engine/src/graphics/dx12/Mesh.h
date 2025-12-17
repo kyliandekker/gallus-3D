@@ -10,7 +10,7 @@
 #include <memory>
 
 // graphics
-#include "graphics/dx12/DX12Transform.h"
+#include "graphics/dx12/Transform.h"
 #include "graphics/dx12/IndexBuffer.h"
 #include "graphics/dx12/VertexBuffer.h"
 
@@ -127,7 +127,10 @@ namespace gallus
 				/// <summary>
 				/// Constructs an empty mesh.
 				/// </summary>
-				Mesh();
+				Mesh() : EngineResource()
+				{
+					m_AssetType = resources::AssetType::Mesh;
+				}
 
 				/// <summary>
 				/// Renders the mesh using the specified command list, applying a transform and camera matrices.

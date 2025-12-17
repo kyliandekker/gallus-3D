@@ -104,6 +104,34 @@ namespace rapidjson
 		}
 	}
 
+	// Overload for int
+	inline void SetOrAddMemberFloat(Value& obj, const char* name, float value, Document::AllocatorType& allocator)
+	{
+		if (obj.HasMember(name))
+		{
+			obj[name].SetInt(value);
+		}
+		else
+		{
+			Value key(name, allocator);
+			obj.AddMember(key, value, allocator);
+		}
+	}
+
+	// Overload for bool
+	inline void SetOrAddMemberBool(Value& obj, const char* name, bool value, Document::AllocatorType& allocator)
+	{
+		if (obj.HasMember(name))
+		{
+			obj[name].SetInt(value);
+		}
+		else
+		{
+			Value key(name, allocator);
+			obj.AddMember(key, value, allocator);
+		}
+	}
+
 	inline void SetOrAddMember(
 		rapidjson::Value& obj,
 		const char* name,

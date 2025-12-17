@@ -79,15 +79,15 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		resources::AssetType EngineResource::GetResourceType() const
+		resources::AssetType EngineResource::GetAssetType() const
 		{
 			return m_AssetType;
 		}
 
 		//---------------------------------------------------------------------
-		void EngineResource::SetResourceType(resources::AssetType a_ResourceType)
+		void EngineResource::SetAssetType(resources::AssetType a_AssetType)
 		{
-			m_AssetType = a_ResourceType;
+			m_AssetType = a_AssetType;
 		}
 
 		//---------------------------------------------------------------------

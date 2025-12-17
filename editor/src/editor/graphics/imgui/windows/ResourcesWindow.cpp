@@ -11,7 +11,7 @@
 #include "graphics/dx12/Texture.h"
 #include "graphics/dx12/Mesh.h"
 #include "graphics/dx12/Shader.h"
-#include "graphics/dx12/DX12ShaderBind.h"
+#include "graphics/dx12/ShaderBind.h"
 
 #include "graphics/imgui/font_icon.h"
 #include "graphics/imgui/ImGuiWindow.h"
@@ -67,7 +67,7 @@ namespace gallus
 				ImGui::PopFont();
 				ImGui::TableNextColumn();
 
-				ImGui::Text(resources::AssetTypeToString(a_pResource->GetResourceType()).c_str());
+				ImGui::Text(resources::AssetTypeToString(a_pResource->GetAssetType()).c_str());
 				ImGui::TableNextColumn();
 			}
 
@@ -188,7 +188,7 @@ namespace gallus
 					if (m_bShaderBindsFoldedOut)
 					{
 						auto& shaderBinds = core::EDITOR_ENGINE->GetResourceAtlas().GetShaderBinds();
-						for (std::shared_ptr<graphics::dx12::DX12ShaderBind> shader : shaderBinds)
+						for (std::shared_ptr<graphics::dx12::ShaderBind> shader : shaderBinds)
 						{
 							ImGui::Indent();
 							if (ImGui::CollapsingHeader(ImGui::IMGUI_FORMAT_ID(shader.get()->GetName(), FOLDOUT_ID, "SHADER_BIND_" + shader.get()->GetName()).c_str()))

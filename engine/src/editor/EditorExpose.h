@@ -23,7 +23,6 @@ namespace gallus
 		DragInt64,
 		Checkbox,
 		Toggle,
-		InputText,
 		Vector2Field,
 		Vector3Field,
 		Quaternion,
@@ -89,6 +88,13 @@ namespace gallus
 		virtual const char* GetTypeName() const = 0;
 		virtual ~IExposableToEditor() = default;
 	};
+
+	namespace resources
+	{
+		class SrcData;
+	}
+	void DeserializeEditorExposable(IExposableToEditor* a_pObject, const resources::SrcData& a_SrcData);
+	void SerializeEditorExposable(const IExposableToEditor* a_pObject, resources::SrcData& a_SrcData);
 
 	// No parent
 #define BEGIN_EXPOSE_FIELDS(CLASSNAME) \

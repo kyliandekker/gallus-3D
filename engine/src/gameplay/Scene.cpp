@@ -159,7 +159,7 @@ namespace gallus
 							continue;
 						}
 
-						const gameplay::Component* component = system->CreateBaseComponent(id, componentSrc);
+						system->CreateBaseComponent(id, componentSrc);
 					}
 				}
 			}
@@ -229,7 +229,7 @@ namespace gallus
 				{
 					resources::SrcData componentSrc = resources::SrcData();
 					componentSrc.SetObject();
-
+					
 					const gameplay::Component* component = system->GetBaseComponent(entity.GetEntityID());
 					component->Serialize(componentSrc);
 

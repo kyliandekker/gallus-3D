@@ -23,28 +23,6 @@ namespace gallus
 		//---------------------------------------------------------------------
 		// ColliderComponent
 		//---------------------------------------------------------------------
-#ifdef _EDITOR
-		void ColliderComponent::Serialize(resources::SrcData& a_SrcData) const
-		{
-			a_SrcData.SetVector2(JSON_COLLIDER_COMPONENT_OFFSET_VAR, m_vOffset);
-			a_SrcData.SetVector2(JSON_COLLIDER_COMPONENT_SIZE_VAR, m_vSize);
-		}
-#endif
-
-		//---------------------------------------------------------------------
-		void ColliderComponent::Deserialize(const resources::SrcData& a_SrcData)
-		{
-			if (!a_SrcData.GetVector2(JSON_COLLIDER_COMPONENT_OFFSET_VAR, m_vOffset))
-			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Collider component did not have key %s present in its meta data.", JSON_COLLIDER_COMPONENT_OFFSET_VAR);
-			}
-			if (!a_SrcData.GetVector2(JSON_COLLIDER_COMPONENT_SIZE_VAR, m_vSize))
-			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Collider component did not have key %s present in its meta data.", JSON_COLLIDER_COMPONENT_SIZE_VAR);
-			}
-		}
-
-		//---------------------------------------------------------------------
 		void ColliderComponent::SetOffset(const DirectX::XMFLOAT2& a_vOffset)
 		{
 			m_vOffset = a_vOffset;
@@ -83,10 +61,10 @@ namespace gallus
 
 			//	TransformComponent& transformComp = transformSys.GetComponent(m_EntityID);
 
-			//	DirectX::XMFLOAT2 position = transformComp.Transform().GetPosition();
-			//	DirectX::XMFLOAT2 scale = transformComp.Transform().GetScale();
-			//	DirectX::XMFLOAT2 pivot = transformComp.Transform().GetPivot();
-			//	float rotation = transformComp.Transform().GetRotation();
+			//	DirectX::XMFLOAT2 position = transformComp.GetTransform().GetPosition();
+			//	DirectX::XMFLOAT2 scale = transformComp.GetTransform().GetScale();
+			//	DirectX::XMFLOAT2 pivot = transformComp.GetTransform().GetPivot();
+			//	float rotation = transformComp.GetTransform().GetRotation();
 
 			//	DirectX::XMFLOAT2 move = transformComp.GetTranslation();
 
@@ -229,10 +207,10 @@ namespace gallus
 			//		ColliderComponent& otherCollider = colliderPair.second;
 			//		TransformComponent& otherTransform = transformSys.GetComponent(colliderPair.first);
 
-			//		DirectX::XMFLOAT2 otherPosition = otherTransform.Transform().GetPosition();
-			//		DirectX::XMFLOAT2 otherScale = otherTransform.Transform().GetScale();
-			//		DirectX::XMFLOAT2 otherPivot = otherTransform.Transform().GetPivot();
-			//		float otherRotation = otherTransform.Transform().GetRotation();
+			//		DirectX::XMFLOAT2 otherPosition = otherTransform.GetTransform().GetPosition();
+			//		DirectX::XMFLOAT2 otherScale = otherTransform.GetTransform().GetScale();
+			//		DirectX::XMFLOAT2 otherPivot = otherTransform.GetTransform().GetPivot();
+			//		float otherRotation = otherTransform.GetTransform().GetRotation();
 
 			//		auto otherCorners = otherCollider.GetColliderWorldCorners(otherPosition, otherScale, otherPivot, otherRotation);
 
