@@ -53,7 +53,7 @@ namespace gallus
 			core::ENGINE->GetResourceAtlas().LoadScene("main.scene", m_Scene);
 			m_Scene.LoadData();
 			m_bStarted = true;
-#endif
+#endif // _EDITOR
 
 			LOG(LOGSEVERITY_INFO, LOG_CATEGORY_GAME, "Initialized game.");
 

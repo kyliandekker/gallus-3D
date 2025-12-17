@@ -724,7 +724,7 @@ namespace gallus
 				m_eOnResize(a_vPos, a_vSize);
 #ifndef IMGUI_DISABLE
 				m_ImGuiWindow.Resize(a_vPos, a_vSize);
-#endif
+#endif // IMGUI_DISABLE
 				m_WindowViewport = CD3DX12_VIEWPORT(0.0f, 0.0f, m_vSize.x, m_vSize.y);
 				m_WindowScissorRect = CD3DX12_RECT(0, 0, m_vSize.x, m_vSize.y);
 

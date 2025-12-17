@@ -67,6 +67,8 @@ namespace gallus
 					return;
 				}
 
+				core::EDITOR_ENGINE->GetEditor().CopyGameFoV();
+
 				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
 				ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0);
 
@@ -94,7 +96,7 @@ namespace gallus
 				}
 
 				if (ImGui::CheckboxButton(
-					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_PLAY), BUTTON_ID, "PLAY_SCENE").c_str(), &isStarted, m_Window.GetHeaderSize()))
+					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_PLAY), BUTTON_ID, "PLAY_SCENE").c_str(),  & isStarted, "Starts or stops the game simulation using the currently loaded scene. When stopping, the scene is reloaded to its original editor state.", m_Window.GetHeaderSize()))
 				{
 					core::EDITOR_ENGINE->GetEditor().SetSelectable(nullptr);
 					if (isStarted)
@@ -115,7 +117,7 @@ namespace gallus
 
 				bool isPaused = gameplay::GAME.IsPaused();
 				if (ImGui::CheckboxButton(
-					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_PAUSE), BUTTON_ID, "PAUSE_SCENE").c_str(), &isPaused, m_Window.GetHeaderSize()))
+					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_PAUSE), BUTTON_ID, "PAUSE_SCENE").c_str(), &isPaused, "Pauses or resumes the game simulation while preserving the current runtime state.", m_Window.GetHeaderSize()))
 				{
 					gameplay::GAME.SetIsPaused(isPaused);
 				}
@@ -129,7 +131,7 @@ namespace gallus
 
 				bool showGrid = core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetShowGrid();
 				if (ImGui::CheckboxButton(
-					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_SCENE), BUTTON_ID, "SHOW_GRID_SCENE").c_str(), &showGrid, m_Window.GetHeaderSize()))
+					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_SCENE), BUTTON_ID, "SHOW_GRID_SCENE").c_str(), &showGrid, "Toggles visibility of the scene grid to assist with spatial alignment and positioning.", m_Window.GetHeaderSize()))
 				{
 					core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetShowGrid(showGrid);
 					core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
@@ -138,7 +140,7 @@ namespace gallus
 
 				bool inGameMode = core::EDITOR_ENGINE->GetEditor().GetCameraMode() == editor::CameraMode::CAMERA_MODE_GAME;
 				if (ImGui::CheckboxButton(
-					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_CAMERA), BUTTON_ID, "CAMERA_MODE_GAME_SCENE").c_str(), &inGameMode, m_Window.GetHeaderSize()))
+					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_CAMERA), BUTTON_ID, "CAMERA_MODE_GAME_SCENE").c_str(), &inGameMode, "Switches between the editor scene camera and the in-game camera view.", m_Window.GetHeaderSize()))
 				{
 					core::EDITOR_ENGINE->GetEditor().SetCameraMode(inGameMode ? editor::CameraMode::CAMERA_MODE_GAME : editor::CameraMode::CAMERA_MODE_SCENE);
 				}
@@ -146,7 +148,7 @@ namespace gallus
 
 				bool inFullScreen = core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetFullScreenPlayMode();
 				if (ImGui::CheckboxButton(
-					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_GAMEMODE), BUTTON_ID, "FULL_SCREEN_PLAY_MODE_SCENE").c_str(), &inFullScreen, m_Window.GetHeaderSize()))
+					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_GAMEMODE), BUTTON_ID, "FULL_SCREEN_PLAY_MODE_SCENE").c_str(), &inFullScreen, "Toggles fullscreen play mode, rendering the game view without editor UI overlays.", m_Window.GetHeaderSize()))
 				{
 					core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetFullScreenPlayMode(inFullScreen);
 					core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
@@ -155,8 +157,8 @@ namespace gallus
 
 				int camIsolationMode = core::EDITOR_ENGINE->GetDX12().GetCameraIsolationMode();
 				std::string camIsolationModeIcon = camIsolationMode == 0 ? font::ICON_2D3D : (camIsolationMode == 1 ? font::ICON_3D : font::ICON_2D);
-				if (ImGui::Button(
-					ImGui::IMGUI_FORMAT_ID(camIsolationModeIcon, BUTTON_ID, "CAMERA_ISOLATION_MODE_SCENE").c_str(), m_Window.GetHeaderSize()))
+				if (ImGui::TextButton(
+					ImGui::IMGUI_FORMAT_ID(camIsolationModeIcon, BUTTON_ID, "CAMERA_ISOLATION_MODE_SCENE").c_str(), "Cycles camera rendering between combined 2D and 3D, 3D-only, and 2D-only modes.", m_Window.GetHeaderSize()))
 				{
 					camIsolationMode = ++camIsolationMode % 3;
 					core::EDITOR_ENGINE->GetDX12().SetCameraIsolationMode((graphics::dx12::CameraIsolationMode)camIsolationMode);
@@ -439,9 +441,8 @@ namespace gallus
 						bool isTranslate = core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetLastSceneOperation() == ImGuizmo::TRANSLATE;
 						if (ImGui::IconCheckboxButton(
 							ImGui::IMGUI_FORMAT_ID(font::ICON_TRANSLATE, BUTTON_ID, "TRANSLATE").c_str(),
-							&isTranslate,
+							&isTranslate, "Enables position manipulation of the selected object using translation gizmos.",
 							m_Window.GetHeaderSize(),
-							m_Window.GetIconFont(),
 							isTranslate ? ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent) : ImGui::GetStyleColorVec4(ImGuiCol_Text)))
 						{
 							core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetLastSceneOperation((int) ImGuizmo::TRANSLATE);
@@ -451,9 +452,8 @@ namespace gallus
 						bool isRotate = core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetLastSceneOperation() == ImGuizmo::ROTATE;
 						if (ImGui::IconCheckboxButton(
 							ImGui::IMGUI_FORMAT_ID(font::ICON_ROTATE, BUTTON_ID, "ROTATE").c_str(),
-							&isRotate,
+							&isRotate, "Enables rotation manipulation of the selected object using rotation gizmos.",
 							m_Window.GetHeaderSize(),
-							m_Window.GetIconFont(),
 							isRotate ? ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent) : ImGui::GetStyleColorVec4(ImGuiCol_Text)))
 						{
 							core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetLastSceneOperation((int) ImGuizmo::ROTATE);
@@ -463,9 +463,8 @@ namespace gallus
 						bool isScale = core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetLastSceneOperation() == ImGuizmo::SCALE;
 						if (ImGui::IconCheckboxButton(
 							ImGui::IMGUI_FORMAT_ID(font::ICON_SCALE, BUTTON_ID, "SCALE").c_str(),
-							&isScale,
+							&isScale, "Enables scale manipulation of the selected object using scaling gizmos.",
 							m_Window.GetHeaderSize(),
-							m_Window.GetIconFont(),
 							isScale ? ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent) : ImGui::GetStyleColorVec4(ImGuiCol_Text)))
 						{
 							core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetLastSceneOperation((int) ImGuizmo::SCALE);
@@ -575,7 +574,7 @@ namespace gallus
 				}
 
 				if (ImGui::CheckboxButton(
-					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_PLAY), BUTTON_ID, "PLAY_FULL_SCENE").c_str(), &isStarted, m_Window.GetHeaderSize()))
+					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_PLAY), BUTTON_ID, "PLAY_FULL_SCENE").c_str(), &isStarted, "Starts or stops the game simulation using the currently loaded scene. When stopping, the scene is reloaded to its original editor state.", m_Window.GetHeaderSize()))
 				{
 					core::EDITOR_ENGINE->GetEditor().SetSelectable(nullptr);
 					if (isStarted)
@@ -595,7 +594,7 @@ namespace gallus
 				ImGui::SameLine();
 				bool isPaused = gameplay::GAME.IsPaused();
 				if (ImGui::CheckboxButton(
-					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_PAUSE), BUTTON_ID, "PAUSE_FULL_SCENE").c_str(), &isPaused, m_Window.GetHeaderSize()))
+					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_PAUSE), BUTTON_ID, "PAUSE_FULL_SCENE").c_str(), &isPaused, "Pauses or resumes the game simulation while preserving the current runtime state.", m_Window.GetHeaderSize()))
 				{
 					gameplay::GAME.SetIsPaused(isPaused);
 				}
@@ -609,7 +608,7 @@ namespace gallus
 				ImGui::SameLine();
 				bool inFullScreen = core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetFullScreenPlayMode();
 				if (ImGui::CheckboxButton(
-					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_GAMEMODE), BUTTON_ID, "FULL_SCREEN_PLAY_MODE_FULL_SCENE").c_str(), &inFullScreen, m_Window.GetHeaderSize()))
+					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_GAMEMODE), BUTTON_ID, "FULL_SCREEN_PLAY_MODE_FULL_SCENE").c_str(), &inFullScreen, "Toggles fullscreen play mode, rendering the game view without editor UI overlays.", m_Window.GetHeaderSize()))
 				{
 					core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetFullScreenPlayMode(inFullScreen);
 					core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();

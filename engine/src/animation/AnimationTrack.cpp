@@ -241,6 +241,6 @@ namespace gallus
                 }
             );
         }
-#endif
+#endif // _EDITOR
 	}
 }

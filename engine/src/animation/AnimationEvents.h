@@ -3,7 +3,7 @@
 // external
 #ifdef _EDITOR
 #include <string>
-#endif
+#endif // _EDITOR
 
 namespace gallus
 {
@@ -39,6 +39,6 @@ namespace gallus
 				}
 			}
 		}
-#endif
+#endif // _EDITOR
 	}
 }

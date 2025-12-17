@@ -16,10 +16,12 @@ namespace gallus
 {
 	namespace gameplay
 	{
+#ifdef _EDITOR
 		void Component::Serialize(resources::SrcData& a_SrcData) const
 		{
 			SerializeEditorExposable(this, a_SrcData);
 		}
+#endif // _EDITOR
 
 		void Component::Deserialize(const resources::SrcData& a_SrcData)
 		{

@@ -54,7 +54,7 @@ namespace gallus
 
 				core::EDITOR_ENGINE->GetEditor().GetSelectable().OnChanged() += std::bind(&HierarchyWindow::OnSelectableChanged, this, std::placeholders::_1, std::placeholders::_2);
 				
-				core::EDITOR_ENGINE->GetEditor().GetScene().IsDirty().OnChanged() += std::bind(&HierarchyWindow::OnSceneDirty, this, std::placeholders::_1, std::placeholders::_2);
+				core::EDITOR_ENGINE->GetEditor().IsAnyDirty().OnChanged() += std::bind(&HierarchyWindow::OnSceneDirty, this, std::placeholders::_1, std::placeholders::_2);
 
 				return BaseWindow::Initialize();
 			}
@@ -161,7 +161,7 @@ namespace gallus
 
 				bool spawnEntity = false;
 				if (ImGui::IconButton(
-					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_MODEL), BUTTON_ID, "SPAWN_ENTITY_HIERARCHY").c_str(), m_Window.GetHeaderSize(), m_Window.GetIconFont()))
+					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_MODEL), BUTTON_ID, "SPAWN_ENTITY_HIERARCHY").c_str(), "Spawns an entity in the currently opened scene.", m_Window.GetHeaderSize()))
 				{
 					spawnEntity = true;
 				}
@@ -175,7 +175,7 @@ namespace gallus
 					{
 						if (isDelete)
 						{
-							ent->OnDelete();
+							editor::G_DeleteEntity(ent->GetEntityID());
 						}
 						else if (isDuplicate)
 						{
@@ -198,9 +198,9 @@ namespace gallus
 				}
 
 				if (ImGui::IconButton(
-					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_SAVE), BUTTON_ID, "SAVE_HIERARCHY").c_str(), m_Window.GetHeaderSize(), m_Window.GetIconFont(), ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent)))
+					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_SAVE), BUTTON_ID, "SAVE_HIERARCHY").c_str(), "Saves the currently opened scene data to its scene file.", m_Window.GetHeaderSize(), ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent)))
 				{
-					editor::SaveScene();
+					editor::G_SaveScene();
 				}
 
 				ImVec2 endPos = ImGui::GetCursorPos();
@@ -213,7 +213,7 @@ namespace gallus
 
 				if (ImGui::IsKeyDown(ImGuiMod_Ctrl) && ImGui::IsKeyPressed(ImGuiKey_S) && wasDirty)
 				{
-					editor::SaveScene();
+					editor::G_SaveScene();
 				}
 
 				ImGui::PopStyleVar();
@@ -259,12 +259,12 @@ namespace gallus
 								{
 									if (auto prefab = core::EDITOR_ENGINE->GetResourceAtlas().LoadPrefab(dropped->GetPath().filename().generic_string()).lock())
 									{
-										prefab->Instantiate();
+										editor::G_InstantiatePrefab(*prefab);
 									}
 								}
 								else
 								{
-									gameplay::EntityID entityID = core::EDITOR_ENGINE->GetECS().CreateEntity(dropped->GetPath().filename().generic_string());
+									gameplay::EntityID entityID = editor::G_CreateEntity(dropped->GetPath().filename().generic_string());
 									DragAction(entityID, dropped->GetMetaData()->GetAssetType(), dropped->GetPath().filename().generic_string());
 								}
 							}
@@ -348,9 +348,8 @@ namespace gallus
 					{
 						core::EDITOR_ENGINE->GetEditor().SetSelectable(nullptr);
 					}
-
-					core::EDITOR_ENGINE->GetECS().CreateEntity(core::EDITOR_ENGINE->GetECS().GetUniqueName("New GameObject"));
-					core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
+					
+					editor::G_CreateEntity();
 				}
 			}
 
@@ -374,15 +373,31 @@ namespace gallus
 					case resources::AssetType::Sprite:
 					{
 						std::shared_ptr<graphics::dx12::CommandQueue> cCommandQueue = core::ENGINE->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
-						if (core::EDITOR_ENGINE->GetECS().GetSystem<gameplay::MeshSystem>().HasComponent(a_EntityID))
+						
+						gameplay::MeshSystem& meshSystem = core::EDITOR_ENGINE->GetECS().GetSystem<gameplay::MeshSystem>();
+						if (meshSystem.HasComponent(a_EntityID))
 						{
-							core::EDITOR_ENGINE->GetECS().GetSystem<gameplay::MeshSystem>().CreateComponent(a_EntityID).SetMesh(
-								core::EDITOR_ENGINE->GetResourceAtlas().LoadMesh(a_sFileName, cCommandQueue)
+							gameplay::MeshComponent* component = editor::G_CreateComponentOfType<gameplay::MeshComponent>(&meshSystem, a_EntityID);
+							if (!component)
+							{
+								return;
+							}
+							
+							component->SetTexture(
+								core::EDITOR_ENGINE->GetResourceAtlas().LoadTexture(a_sFileName, cCommandQueue)
 							);
 						}
 						else
 						{
-							core::EDITOR_ENGINE->GetECS().GetSystem<gameplay::SpriteSystem>().CreateComponent(a_EntityID).SetTexture(
+							gameplay::SpriteSystem& spriteSystem = core::EDITOR_ENGINE->GetECS().GetSystem<gameplay::SpriteSystem>();
+							
+							gameplay::SpriteComponent* component = editor::G_CreateComponentOfType<gameplay::SpriteComponent>(&spriteSystem, a_EntityID);
+							if (!component)
+							{
+								return;
+							}
+
+							component->SetTexture(
 								core::EDITOR_ENGINE->GetResourceAtlas().LoadTexture(a_sFileName, cCommandQueue)
 							);
 						}
@@ -423,7 +438,16 @@ namespace gallus
 					case resources::AssetType::Mesh:
 					{
 						std::shared_ptr<graphics::dx12::CommandQueue> cCommandQueue = core::ENGINE->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
-						core::EDITOR_ENGINE->GetECS().GetSystem<gameplay::MeshSystem>().CreateComponent(a_EntityID).SetMesh(
+						
+						gameplay::MeshSystem& meshSystem = core::EDITOR_ENGINE->GetECS().GetSystem<gameplay::MeshSystem>();
+
+						gameplay::MeshComponent* component = editor::G_CreateComponentOfType<gameplay::MeshComponent>(&meshSystem, a_EntityID);
+						if (!component)
+						{
+							return;
+						}
+						
+						component->SetMesh(
 							core::EDITOR_ENGINE->GetResourceAtlas().LoadMesh(a_sFileName, cCommandQueue)
 						);
 						break;
@@ -476,7 +500,11 @@ namespace gallus
 			void HierarchyWindow::OnSceneDirty(const bool oldVal, const bool newVal)
 			{
 				std::string name = (newVal ? "*" : "") + core::EDITOR_ENGINE->GetEditor().GetScene().GetPath().filename().generic_string();
-				std::string title = " - (" + name + ")";
+				std::string title = "";
+				if (!name.empty())
+				{
+					title = " - (" + name + ")";
+				}
 
 				core::EDITOR_ENGINE->GetWindow().AddTitle(title);
 			}

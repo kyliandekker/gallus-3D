@@ -66,7 +66,7 @@ namespace gallus
 			{
 				m_sTag = a_sTag;
 			}
-#endif
+#endif // _EDITOR
 			/// <summary>
 			/// Retrieves the property name of the key frame component.
 			/// </summary>
@@ -84,13 +84,11 @@ namespace gallus
 		private:
 			std::string m_sTag;
 
-#ifdef _EDITOR
 			BEGIN_EXPOSE_FIELDS_PARENT(AnimationKeyFrameTagComponent, AnimationKeyFrameComponentBase)
 			END_EXPOSE_FIELDS(AnimationKeyFrameTagComponent)
 			BEGIN_EXPOSE_GIZMOS(AnimationKeyFrameTagComponent)
 			END_EXPOSE_GIZMOS(AnimationKeyFrameTagComponent)
 			END_EXPOSE_TO_EDITOR(AnimationKeyFrameTagComponent)
-#endif
 		};
 	}
 }

@@ -20,6 +20,7 @@
 // editor
 #include "editor/core/EditorEngine.h"
 #include "editor/graphics/imgui/RenderEditorExposable.h"
+#include "editor/EditorGlobalFunctions.h"
 
 namespace gallus
 {
@@ -105,12 +106,9 @@ namespace gallus
 				bool temp = entity->IsActive();
 				if (ImGui::Checkbox(ImGui::IMGUI_FORMAT_ID("", CHECKBOX_ID, string_extensions::StringToUpper(entity->GetName()) + "_HIERARCHY").c_str(), &temp))
 				{
-					entity->SetIsActive(temp);
-					core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
+					editor::G_SetEntityActive(m_EntityID, temp);
 				}
 				ImGui::PopStyleVar();
-
-				ImGui::PushFont(m_Window.GetIconFont());
 
 				// Dynamically calculate the size of the icon
 				ImVec2 iconSize = ImVec2(m_Window.GetFontSize(), m_Window.GetFontSize()); // Replace this with your icon size calculation.
@@ -138,8 +136,6 @@ namespace gallus
 				// Set cursor to the calculated position and render the icon
 				ImGui::SetCursorPos(centerPos);
 				ImGui::Text(m_sIcon.c_str());
-
-				ImGui::PopFont();
 
 				ImVec2 textSize = ImGui::CalcTextSize(entity->GetName().c_str());
 
@@ -185,18 +181,13 @@ namespace gallus
 			//---------------------------------------------------------------------
 			void EntityEditorSelectable::OnRename(const std::string& a_sName)
 			{
-				if (m_pEntity)
-				{
-					m_pEntity->SetName(a_sName);
-					core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
-				}
+				editor::G_RenameEntity(m_EntityID, a_sName);
 			}
 
 			//---------------------------------------------------------------------
 			void EntityEditorSelectable::OnDelete()
 			{
-				core::EDITOR_ENGINE->GetECS().DeleteEntity(m_EntityID);
-				core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
+				editor::G_DeleteEntity(m_EntityID);
 			}
 
 			//---------------------------------------------------------------------
@@ -242,9 +233,9 @@ namespace gallus
 						ImGui::FoldOutButton(
 							std::string((m_aExpanded[id] ? font::ICON_FOLDED_OUT : font::ICON_FOLDED_IN) + sys->GetSystemName() + id).c_str(), &m_aExpanded[id], ImVec2(width, size.y));
 						ImGui::SameLine();
-						if (ImGui::IconButton(ImGui::IMGUI_FORMAT_ID(font::ICON_DELETE, BUTTON_ID, id + "_DELETE_INSPECTOR").c_str(), size, m_Window.GetIconFont()))
+						if (ImGui::IconButton(ImGui::IMGUI_FORMAT_ID(font::ICON_DELETE, BUTTON_ID, id + "_DELETE_INSPECTOR").c_str(), "Deletes the specific component from the selected entity.", size))
 						{
-							sys->DeleteComponent(m_EntityID);
+							editor::G_DeleteComponent(sys, m_EntityID);
 						}
 
 						ImGui::PopStyleVar();
@@ -280,18 +271,16 @@ namespace gallus
 				ImGui::SetNextWindowSize(ImVec2(width, 0));
 				if (ImGui::BeginPopup(ImGui::IMGUI_FORMAT_ID("", POPUP_WINDOW_ID, "ADD_COMPONENT_MENU_INSPECTOR").c_str()))
 				{
-					for (gameplay::AbstractECSSystem* system : core::EDITOR_ENGINE->GetECS().GetSystems())
+					for (gameplay::AbstractECSSystem* sys : core::EDITOR_ENGINE->GetECS().GetSystems())
 					{
-						if (system->HasComponent(m_EntityID))
+						if (sys->HasComponent(m_EntityID))
 						{
 							continue;
 						}
 
-						if (ImGui::MenuItem(ImGui::IMGUI_FORMAT_ID(system->GetSystemName(), MENU_ITEM_ID, "ADD_COMPONENT_MENU_INSPECTOR_" + system->GetPropertyName()).c_str()))
+						if (ImGui::MenuItem(ImGui::IMGUI_FORMAT_ID(sys->GetSystemName(), MENU_ITEM_ID, "ADD_COMPONENT_MENU_INSPECTOR_" + sys->GetPropertyName()).c_str()))
 						{
-							system->CreateBaseComponent(m_EntityID);
-
-							core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
+							editor::G_CreateComponent(sys, m_EntityID);
 						}
 					}
 

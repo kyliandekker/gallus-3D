@@ -164,6 +164,13 @@ namespace gallus
 			{
 				m_CameraMode = a_CameraMode;
 			}
+
+			const core::Observable<bool>& IsAnyDirty() const
+			{
+				return m_bIsAnyDirty;
+			}
+
+			void CopyGameFoV();
 		protected:
 			// TODO: Use m_bLoadAssets or something in AssetDatabase to wake up thread and let it sleep otherwise.
 			bool Sleep() const override
@@ -171,6 +178,10 @@ namespace gallus
 				return true;
 			}
 		private:
+			core::Observable<bool> m_bIsAnyDirty;
+
+			void SceneOrPrefabDirtyChanged(bool a_bPrev, bool a_bNew);
+			
 			/// <summary>
 			/// Called once on the thread to perform initialization steps.
 			/// </summary>

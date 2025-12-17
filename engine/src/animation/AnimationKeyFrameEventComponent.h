@@ -50,7 +50,7 @@ namespace gallus
 			/// <param name="a_Document">The json document that the data will be put into.</param>
 			/// <param name="a_Allocator">The allocator used by the json document.</param>
 			void Serialize(rapidjson::Value& a_Value, rapidjson::Document::AllocatorType& a_Allocator) const override;
-#endif
+#endif // _EDITOR
 			/// <summary>
 			/// Retrieves the property name of the key frame component.
 			/// </summary>
@@ -83,18 +83,16 @@ namespace gallus
 			{
 				m_Event = a_Event;
 			}
-#endif
+#endif // _EDITOR
 		private:
 			AnimationEvent m_Event;
 
-#ifdef _EDITOR
 			BEGIN_EXPOSE_FIELDS_PARENT(AnimationKeyFrameEventComponent, AnimationKeyFrameComponentBase)
 				//EXPOSE_ENUM_FIELD_AUTO(AnimationKeyFrameEventComponent, m_Event, "Event Type", AnimationEvent)
 			END_EXPOSE_FIELDS(AnimationKeyFrameEventComponent)
 			BEGIN_EXPOSE_GIZMOS(AnimationKeyFrameEventComponent)
 			END_EXPOSE_GIZMOS(AnimationKeyFrameEventComponent)
 			END_EXPOSE_TO_EDITOR(AnimationKeyFrameEventComponent)
-#endif
 		};
 	}
 }

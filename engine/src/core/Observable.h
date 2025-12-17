@@ -102,6 +102,16 @@ namespace gallus
 				return OnChange;
 			}
 
+			/// <summary>
+			/// Gets the event object that is triggered when the value changes.
+			/// The event provides the old and new values as arguments.
+			/// </summary>
+			/// <returns>A reference to the <see cref="Event"/>.</returns>
+			Event<const T, const T>& OnChanged()
+			{
+				return OnChange;
+			}
+
 		private:
 			T m_Value{};
 			mutable Event<const T, const T> OnChange;

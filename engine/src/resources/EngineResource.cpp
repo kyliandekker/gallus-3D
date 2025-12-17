@@ -16,7 +16,7 @@ namespace gallus
 
 #ifdef _LOAD_BY_PATH
 			m_Path = "";
-#endif
+#endif // _LOAD_BY_PATH
 			m_sName = "";
 			m_ResourceCategory = EngineResourceCategory::Unknown;
 			m_AssetType = resources::AssetType::None;
@@ -25,7 +25,8 @@ namespace gallus
 			m_bIsUnique = false;
 #ifdef _EDITOR
 			m_bIsDirty = false;
-#endif
+			m_bIsDirty.OnChanged().invoke(false, false);
+#endif // _EDITOR
 
 			return true;
 		}
@@ -102,7 +103,7 @@ namespace gallus
 		{
 			return m_Path;
 		}
-#endif
+#endif // _LOAD_BY_PATH
 
 		//---------------------------------------------------------------------
 		bool EngineResource::LoadByName(const std::string& a_sName)
@@ -114,8 +115,12 @@ namespace gallus
 
 #ifdef _LOAD_BY_PATH
 			m_Path = "";
-#endif
+#endif // _LOAD_BY_PATH
 			m_sName = a_sName;
+#ifdef _EDITOR
+			m_bIsDirty = false;
+			m_bIsDirty.OnChanged().invoke(false, false);
+#endif // _EDITOR
 
 			return true;
 		}
@@ -131,9 +136,13 @@ namespace gallus
 
 			m_Path = a_Path;
 			m_sName = a_Path.filename().generic_string();
+#ifdef _EDITOR
+			m_bIsDirty = false;
+			m_bIsDirty.OnChanged().invoke(false, false);
+#endif // _EDITOR
 
 			return true;
 		}
-#endif
+#endif // _LOAD_BY_PATH
 	}
 }

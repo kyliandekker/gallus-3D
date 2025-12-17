@@ -79,7 +79,7 @@ namespace gallus
 			/// </summary>
 			/// <param name="a_iSpriteIndex">The index of the sprite rect.</param>
 			void SetSpriteIndex(int a_iSpriteIndex);
-#endif
+#endif // _EDITOR
 			/// <summary>
 			/// Retrieves the property name of the key frame component.
 			/// </summary>
@@ -98,7 +98,6 @@ namespace gallus
 			std::weak_ptr<graphics::dx12::Texture> m_pTexture = {};
 			int m_iSpriteIndex = 0;
 
-#ifdef _EDITOR
 			BEGIN_EXPOSE_FIELDS_PARENT(AnimationKeyFrameSpriteComponent, AnimationKeyFrameComponentBase)
 				EXPOSE_FIELD(AnimationKeyFrameSpriteComponent, m_pTexture, "Texture", (FieldOptions{ .type = EditorFieldWidgetType::AssetPickerPtr, .assetType = resources::AssetType::Sprite }))
 				EXPOSE_FIELD(AnimationKeyFrameSpriteComponent, m_iSpriteIndex, "Sprite Index", (FieldOptions{ .type = EditorFieldWidgetType::DragInt8 }))
@@ -110,7 +109,6 @@ namespace gallus
 			BEGIN_EXPOSE_GIZMOS(AnimationKeyFrameSpriteComponent)
 			END_EXPOSE_GIZMOS(AnimationKeyFrameSpriteComponent)
 			END_EXPOSE_TO_EDITOR(AnimationKeyFrameSpriteComponent)
-#endif
 		};
 	}
 }

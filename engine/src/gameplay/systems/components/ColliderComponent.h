@@ -10,7 +10,7 @@
 #ifdef _EDITOR
 // editor
 #include "editor/EditorExpose.h"
-#endif
+#endif // _EDITOR
 
 namespace gallus
 {
@@ -59,7 +59,6 @@ namespace gallus
 
 			std::set<gameplay::EntityID> m_aEntitiesToIgnore;
 
-#ifdef _EDITOR
 			BEGIN_EXPOSE_FIELDS_PARENT(ColliderComponent, Component)
 				EXPOSE_FIELD(ColliderComponent, m_vOffset, "Offset", (FieldOptions{ .type = EditorFieldWidgetType::Vector2Field, .description = "The local offset of the collider relative to the object�s pivot or position. Adjusts where the collider is positioned without moving the object itself." }))
 				EXPOSE_FIELD(ColliderComponent, m_vSize, "Size", (FieldOptions{ .type = EditorFieldWidgetType::Vector2Field, .description = "The size of the collider in local space. Determines the width and height of the collision area." }))
@@ -67,7 +66,6 @@ namespace gallus
 			BEGIN_EXPOSE_GIZMOS(ColliderComponent)
 			END_EXPOSE_GIZMOS(ColliderComponent)
 			END_EXPOSE_TO_EDITOR(ColliderComponent)
-#endif											   	
 		};
 	}
 }

@@ -69,7 +69,7 @@ namespace gallus
 
 				bool roundUpFPS = core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetFPSPrecision();
 				if (ImGui::CheckboxButton(
-					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_SETTINGS) + " Round Up Values", BUTTON_ID, "ROUND_UP_FPS_STATS").c_str(), &roundUpFPS, ImVec2(10.5f * m_Window.GetFontSize(), m_Window.GetHeaderSize().y)))
+					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_SETTINGS) + " Round Up Values", BUTTON_ID, "ROUND_UP_FPS_STATS").c_str(), &roundUpFPS, "Rounds up FPS values to zero decimals.", ImVec2(10.5f * m_Window.GetFontSize(), m_Window.GetHeaderSize().y)))
 				{
 					core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetFPSPrecision(roundUpFPS);
 					core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();

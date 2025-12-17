@@ -43,6 +43,7 @@ namespace gallus
 			{
 				return false;
 			}
+
 			m_AssetType = resources::AssetType::Scene;
 
 			return true;
@@ -55,6 +56,7 @@ namespace gallus
 			{
 				return false;
 			}
+
 			m_AssetType = resources::AssetType::Scene;
 			
 			return file::LoadFile(m_Path, m_Data);
@@ -74,31 +76,41 @@ namespace gallus
 				return false;
 			}
 
-#ifdef _EDITOR
-			m_bIsDirty = false;
-#endif // _EDITOR
-
 			resources::SrcData srcData(m_Data);
 			if (!srcData.IsValid())
 			{
 				LOG(LOGSEVERITY_ERROR, LOG_CATEGORY_GAME, "Something went wrong when trying to load scene data.");
 				return false;
 			}
+
+			resources::SrcData cameraSrcData;
+			cameraSrcData.SetObject();
+
+			if (!srcData.GetSrcObject(JSON_SCENE_CAMERA_VAR, cameraSrcData))
+			{
+				LOGF(LOGSEVERITY_WARNING, LOG_CATEGORY_GAME, "Could not read camera settings in scene data.");
+				core::ENGINE->GetDX12().GetCamera().Init(graphics::dx12::RENDER_TEX_SIZE.x, graphics::dx12::RENDER_TEX_SIZE.y);
+			}
+			else
+			{
+				core::ENGINE->GetDX12().GetCamera().Deserialize(cameraSrcData);
+			}
 			
-			if (!srcData.GetSrcArray(JSON_SCENE_ENTITIES_VAR, srcData))
+			resources::SrcData entitiesSrc;
+			if (!srcData.GetSrcArray(JSON_SCENE_ENTITIES_VAR, entitiesSrc))
 			{
 				LOG(LOGSEVERITY_ERROR, LOG_CATEGORY_GAME, "Something went wrong when trying to load scene data.");
 				return false;
 			}
 			
-			if (!srcData.IsValid())
+			if (!entitiesSrc.IsValid())
 			{
 				LOG(LOGSEVERITY_ERROR, LOG_CATEGORY_GAME, "Something went wrong when trying to load scene data.");
 				return false;
 			}
 
 			size_t arraySize = 0;
-			if (!srcData.GetArraySize(arraySize))
+			if (!entitiesSrc.GetArraySize(arraySize))
 			{
 				LOG(LOGSEVERITY_ERROR, LOG_CATEGORY_GAME, "Something went wrong when trying to load scene data.");
 				return false;
@@ -107,7 +119,7 @@ namespace gallus
 			for (size_t i = 0; i < arraySize; i++)
 			{
 				resources::SrcData entitySrc;
-				if (!srcData.GetSrcArrayElement(i, entitySrc))
+				if (!entitiesSrc.GetSrcArrayElement(i, entitySrc))
 				{
 					LOGF(LOGSEVERITY_ERROR, LOG_CATEGORY_GAME, "Something went wrong when trying to load entity index %i in scene data.", i);
 					continue;
@@ -210,6 +222,12 @@ namespace gallus
 		{
 			resources::SrcData srcData = resources::SrcData();
 			srcData.SetObject();
+
+			resources::SrcData cameraSrcData;
+			cameraSrcData.SetObject();
+
+			SerializeEditorExposable(&core::ENGINE->GetDX12().GetCamera(), cameraSrcData);
+			srcData.SetSrcObject(JSON_SCENE_CAMERA_VAR, cameraSrcData);
 
 			resources::SrcData entitiesSrc = resources::SrcData();
 			entitiesSrc.SetArray();

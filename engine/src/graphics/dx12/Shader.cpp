@@ -65,7 +65,7 @@ namespace gallus
 
 				return true;
 			}
-#endif
+#endif // _LOAD_BY_PATH
 
 			//---------------------------------------------------------------------
 			bool PixelShader::LoadByName(const std::string& a_sPixelShader)
@@ -122,7 +122,7 @@ namespace gallus
 				}
 				return false;
 			}
-#endif
+#endif // _LOAD_BY_PATH
 		}
 	}
 }

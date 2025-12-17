@@ -26,6 +26,7 @@
 // editor
 #include "editor/graphics/imgui/EditorWindowsConfig.h"
 #include "editor/core/EditorEngine.h"
+#include "editor/EditorGlobalFunctions.h"
 
 namespace gallus
 {
@@ -36,25 +37,22 @@ namespace gallus
 			void SceneFileEditorSelectables::Render(FileEditorSelectable& a_FileEditorSelectable)
 			{
 				float width = ImGui::GetContentRegionAvail().x;
-				if (ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_FILE_SCENE + std::string(" Open Scene"), BUTTON_ID, "OPEN_SCENE_FILE_INSPECTOR").c_str(), ImVec2(width, 0)))
+				if (ImGui::TextButton(ImGui::IMGUI_FORMAT_ID(font::ICON_FILE_SCENE + std::string(" Open Scene"), BUTTON_ID, "OPEN_SCENE_FILE_INSPECTOR").c_str(), "Opens the selected scene file in the editor, replacing the current scene.", ImVec2(width, 0)))
 				{
 					core::Data data;
 					a_FileEditorSelectable.GetFileResource().GetFileData(data);
+					
+					gameplay::GAME.GetScene().Destroy();
 
 					fs::path scenePath = a_FileEditorSelectable.GetFileResource().GetPath();
-
-					core::EDITOR_ENGINE->GetEditor().SetEditorMethod(editor::EditorMethod::EDITOR_METHOD_SCENE);
-					
-					gameplay::GAME.GetScene().LoadByPath(scenePath);
-					core::EDITOR_ENGINE->GetEditor().GetScene().LoadByPath(scenePath);
-					core::EDITOR_ENGINE->GetEditor().GetScene().LoadData();
+					editor::G_SetScene(scenePath, editor::EditorMethod::EDITOR_METHOD_SCENE);
 				}
 			}
 
 			void AnimationFileEditorSelectables::Render(FileEditorSelectable& a_FileEditorSelectable)
 			{
 				float width = ImGui::GetContentRegionAvail().x;
-				if (ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_FILE_MODEL + std::string(" Open Animation"), BUTTON_ID, "OPEN_ANIMATION_FILE_INSPECTOR").c_str(), ImVec2(width, 0)))
+				if (ImGui::TextButton(ImGui::IMGUI_FORMAT_ID(font::ICON_FILE_MODEL + std::string(" Open Animation"), BUTTON_ID, "OPEN_ANIMATION_FILE_INSPECTOR").c_str(), "Opens the selected animation file in the Animation Window for editing.", ImVec2(width, 0)))
 				{
 					AnimationWindow& animationWindow = m_Window.GetWindowsConfig<EditorWindowsConfig>().GetAnimationWindow();
 
@@ -69,7 +67,7 @@ namespace gallus
 			void PrefabFileEditorSelectables::Render(FileEditorSelectable& a_FileEditorSelectable)
 			{
 				float width = ImGui::GetContentRegionAvail().x;
-				if (ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_FILE_MODEL + std::string(" Open Prefab"), BUTTON_ID, "OPEN_PREFAB_FILE_INSPECTOR").c_str(), ImVec2(width, 0)))
+				if (ImGui::TextButton(ImGui::IMGUI_FORMAT_ID(font::ICON_FILE_MODEL + std::string(" Open Prefab"), BUTTON_ID, "OPEN_PREFAB_FILE_INSPECTOR").c_str(), "Opens the selected prefab file in the editor, replacing the current scene.", ImVec2(width, 0)))
 				{
 					core::Data data;
 					a_FileEditorSelectable.GetFileResource().GetFileData(data);
@@ -77,11 +75,7 @@ namespace gallus
 					gameplay::GAME.GetScene().Destroy();
 
 					fs::path prefabPath = a_FileEditorSelectable.GetFileResource().GetPath();
-
-					core::EDITOR_ENGINE->GetEditor().SetEditorMethod(editor::EditorMethod::EDITOR_METHOD_PREFAB);
-
-					core::EDITOR_ENGINE->GetEditor().GetScene().LoadByPath(prefabPath);
-					core::EDITOR_ENGINE->GetEditor().GetScene().LoadData();
+					editor::G_SetScene(prefabPath, editor::EditorMethod::EDITOR_METHOD_PREFAB);
 				}
 			}
 
@@ -260,7 +254,7 @@ namespace gallus
 				ImGui::EndInspectorKeyVal(m_Window.GetFramePadding());
 
 				float width = ImGui::GetContentRegionAvail().x;
-				if (metaData->GetTextureType() == graphics::dx12::TextureType::SpriteSheet && ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_IMAGE + std::string(" Open Sprite Editor"), BUTTON_ID, "OPEN_SPRITE_EDITOR_INSPECTOR").c_str(), ImVec2(width, 0)))
+				if (metaData->GetTextureType() == graphics::dx12::TextureType::SpriteSheet && ImGui::TextButton(ImGui::IMGUI_FORMAT_ID(font::ICON_IMAGE + std::string(" Open Sprite Editor"), BUTTON_ID, "OPEN_SPRITE_EDITOR_INSPECTOR").c_str(), "Opens the sprite editor for the selected sprite sheet.", ImVec2(width, 0)))
 				{
 					SpriteEditorModal& spriteEditorModal = m_Window.GetWindowsConfig<EditorWindowsConfig>().GetSpriteEditorModal();
 

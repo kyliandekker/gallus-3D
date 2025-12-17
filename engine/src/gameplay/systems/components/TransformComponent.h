@@ -8,7 +8,7 @@
 #ifdef _EDITOR
 // editor
 #include "editor/EditorExpose.h"
-#endif
+#endif // _EDITOR
 
 namespace gallus
 {
@@ -58,7 +58,7 @@ namespace gallus
 
 			graphics::dx12::Transform m_Transform;
 			DirectX::XMFLOAT3 m_vTranslation = {};
-#ifdef _EDITOR
+
 			BEGIN_EXPOSE_FIELDS_PARENT(TransformComponent, Component)
 				EXPOSE_FIELD(TransformComponent, m_Transform, "Transform", (FieldOptions{ .type = EditorFieldWidgetType::Object }))
 			END_EXPOSE_FIELDS(TransformComponent)
@@ -66,7 +66,6 @@ namespace gallus
 				EXPOSE_GIZMO(TransformComponent, m_Transform, (GizmoOptions{ EditorGizmoType::Transform }))
 			END_EXPOSE_GIZMOS(TransformComponent)
 			END_EXPOSE_TO_EDITOR(TransformComponent)
-#endif
 		};
 	}
 }

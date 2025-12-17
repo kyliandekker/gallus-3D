@@ -53,10 +53,6 @@ namespace gallus
 				return false;
 			}
 
-#if LOG_SETTINGS == 1
-			LOGF(LOGSEVERITY_SUCCESS, LOG_CATEGORY_CORE, "Loaded settings: \"%s\".", path.filename().generic_string().c_str());
-#endif
-
 			return true;
 		}
 
@@ -83,10 +79,6 @@ namespace gallus
 				LOGF(LOGSEVERITY_ERROR, LOG_CATEGORY_CORE, "Something went wrong when trying to save the settings: \"%s\".", path.filename().generic_string().c_str());
 				return false;
 			}
-
-#if LOG_SETTINGS == 1
-			LOGF(LOGSEVERITY_SUCCESS, LOG_CATEGORY_CORE, "Saved settings: \"%s\".", path.generic_string().c_str());
-#endif
 
 			return true;
 		}

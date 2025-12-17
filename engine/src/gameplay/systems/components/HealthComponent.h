@@ -5,7 +5,7 @@
 // editor
 #ifdef _EDITOR
 #include "editor/EditorExpose.h"
-#endif
+#endif // _EDITOR
 
 namespace gallus
 {
@@ -67,7 +67,6 @@ namespace gallus
 			float m_fHealth = 100;
 			float m_fMaxHealth = 100;
 
-#ifdef _EDITOR
 			BEGIN_EXPOSE_FIELDS_PARENT(HealthComponent, Component)
 				EXPOSE_FIELD(HealthComponent, m_fHealth, "Health", (FieldOptions{ .type = EditorFieldWidgetType::DragFloat, .min = "0", .max = "1000", .description = "The current health of the entity. Represents how much damage it can take before being destroyed or dying." }))
 				EXPOSE_FIELD(HealthComponent, m_fMaxHealth, "Max Health", (FieldOptions{ .type = EditorFieldWidgetType::DragFloat, .min = "0", .max = "1000", .description = "The maximum health the entity can have." }))
@@ -75,7 +74,6 @@ namespace gallus
 			BEGIN_EXPOSE_GIZMOS(HealthComponent)
 			END_EXPOSE_GIZMOS(HealthComponent)
 			END_EXPOSE_TO_EDITOR(HealthComponent)
-#endif
 		};
 	}
 }

@@ -87,7 +87,7 @@ namespace gallus
 			/// Sorts the animation track's key frames based on their frame position.
 			/// </summary>
 			void Sort();
-#endif
+#endif // _EDITOR
 			/// <summary>
 			/// Returns whether the resource is a valid resource.
 			/// </summary>
@@ -123,7 +123,7 @@ namespace gallus
 			{
 				m_iFrameCount = a_iFrameCount;
 			}
-#endif
+#endif // _EDITOR
 			/// <summary>
 			/// Retrieves the amount of frames in the animation track.
 			/// </summary>
@@ -146,13 +146,11 @@ namespace gallus
 			int m_iFrameCount = 0;
 			bool m_bIsLooping = false;
 
-#ifdef _EDITOR
 			BEGIN_EXPOSE_FIELDS_PARENT(AnimationTrack, resources::EngineResource)
 			END_EXPOSE_FIELDS(AnimationTrack)
 			BEGIN_EXPOSE_GIZMOS(AnimationTrack)
 			END_EXPOSE_GIZMOS(AnimationTrack)
 			END_EXPOSE_TO_EDITOR(AnimationTrack)
-#endif
 		};
 	}
 }

@@ -49,7 +49,7 @@ namespace gallus
 			}
 			m_iSpriteIndex = a_iSpriteIndex;
 		}
-#endif
+#endif // _EDITOR
 
 		//---------------------------------------------------------------------
 		std::string AnimationKeyFrameSpriteComponent::GetName() const

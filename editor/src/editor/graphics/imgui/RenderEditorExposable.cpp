@@ -584,6 +584,21 @@ namespace gallus
 						};
 						break;
 					}
+					case EditorFieldWidgetType::Button:
+					{
+						func = [ptr, &a_Field, a_pObject]()
+						{
+							if (ImGui::TextButton(a_Field.m_sUIName, a_Field.m_Options.description))
+							{
+								if (a_Field.m_Options.buttonFunc)
+								{
+									a_Field.m_Options.buttonFunc(a_pObject);
+								}
+							}
+							return false;
+						};
+						break;
+					}
 					default:
 					{
 						break;
@@ -636,6 +651,10 @@ namespace gallus
 						if (ShowEditorFieldFromObject(a_pObject, field, field.m_Options.internal))
 						{
 							changed = true;
+							if (field.m_Options.onChangeFunc)
+							{
+								field.m_Options.onChangeFunc(a_pObject);
+							}
 						}
 					}
 					ImGui::EndInspectorKeyVal(ImVec2());

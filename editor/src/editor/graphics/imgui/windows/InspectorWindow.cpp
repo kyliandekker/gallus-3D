@@ -129,12 +129,10 @@ namespace gallus
 
 				ImGui::BeginToolbar(toolbarSize);
 
-				ImGui::PushFont(m_Window.GetIconFont());
-
 				if (selectable->GetShowShowInExplorer())
 				{
 					if (ImGui::TextButton(
-						ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_FOLDER_SHOW), BUTTON_ID, "SHOW_IN_EXPLORER_INSPECTOR").c_str(), m_Window.GetHeaderSize()))
+						ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_FOLDER_SHOW), BUTTON_ID, "SHOW_IN_EXPLORER_INSPECTOR").c_str(), "Opens the asset database or file explorer at the location of the selected object.", m_Window.GetHeaderSize()))
 					{
 						selectable->OnShowInExplorer();
 					}
@@ -144,7 +142,7 @@ namespace gallus
 				if (selectable->GetShowDelete())
 				{
 					if (ImGui::TextButton(
-						ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_DELETE), BUTTON_ID, "DELETE_INSPECTOR").c_str(), m_Window.GetHeaderSize()))
+						ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_DELETE), BUTTON_ID, "DELETE_INSPECTOR").c_str(), "Deletes the currently selected object from the scene or asset database.", m_Window.GetHeaderSize()))
 					{
 						deleteView = true;
 					}
@@ -152,8 +150,6 @@ namespace gallus
 				}
 
 				ImGui::PopStyleVar();
-
-				ImGui::PopFont();
 
 				ImGui::SetCursorPos(ImVec2(toolbarPos.x, toolbarPos.y + toolbarSize.y));
 

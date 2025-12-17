@@ -45,6 +45,13 @@ namespace gallus
 			m_pTexture = core::ENGINE->GetResourceAtlas().GetDefaultTexture();
 			m_pMesh = core::ENGINE->GetResourceAtlas().GetDefaultMesh();
 			m_vColor = { 1, 1, 1, 1 };
+
+			TransformSystem& transformSys = core::ENGINE->GetECS().GetSystem<TransformSystem>();
+			if (transformSys.HasComponent(a_EntityID))
+			{
+				graphics::dx12::Transform transform = transformSys.GetComponent(a_EntityID).GetTransform();
+				transform.SetPivot({ 0, 0, 0 });
+			}
 		}
 
 		//---------------------------------------------------------------------

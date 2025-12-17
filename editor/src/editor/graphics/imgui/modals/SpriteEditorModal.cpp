@@ -128,7 +128,7 @@ namespace gallus
 				if (ImGui::BeginChild("SpriteToolbar", ImVec2(0, m_Window.GetHeaderSize().y * 2.75f)))
 				{
 					if (ImGui::IconButton(
-						ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_SAVE), BUTTON_ID, "SAVE_SPRITE_EDITOR_MODAL").c_str(), m_Window.GetHeaderSize(), m_Window.GetIconFont(), ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent)))
+						ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_SAVE), BUTTON_ID, "SAVE_SPRITE_EDITOR_MODAL").c_str(), "Saves the current sprite data to its file.", m_Window.GetHeaderSize(), ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent)))
 					{
 						m_pTextureMetaData->Save(m_pFileResource->GetPath());
 

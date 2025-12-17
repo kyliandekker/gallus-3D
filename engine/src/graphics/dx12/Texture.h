@@ -113,7 +113,7 @@ namespace gallus
 				/// <param name="a_pCommandList">The command list used for updating resources.</param>
 				/// <returns></returns>
 				bool LoadByPath(const fs::path& a_Path, std::shared_ptr<CommandQueue> a_pCommandQueue);
-#endif
+#endif // _LOAD_BY_PATH
 
 				/// <summary>
 				/// Destroys the texture and sets it to invalid (it still exists in the texture atlas, however).

@@ -75,7 +75,7 @@ namespace gallus
 				/// <param name="a_pOptimizedClearValue">Clear value of the resource.</param>
 				/// <returns></returns>
 				virtual bool LoadByPath(const fs::path& a_Path, const D3D12_RESOURCE_DESC& a_ResourceDesc, const D3D12_HEAP_PROPERTIES& a_Heap = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), const D3D12_RESOURCE_STATES a_ResourceState = D3D12_RESOURCE_STATE_COMMON, const D3D12_CLEAR_VALUE* a_pOptimizedClearValue = nullptr);
-#endif
+#endif // _LOAD_BY_PATH
 
 				/// <summary>
 				/// Returns whether the resource is a valid resource.
@@ -142,14 +142,12 @@ namespace gallus
 				std::wstring m_wsName = L"";
 				D3D12_RESOURCE_STATES m_CurrentState = D3D12_RESOURCE_STATE_COMMON;
 
-#ifdef _EDITOR
 				BEGIN_EXPOSE_FIELDS_PARENT(DX12Resource, resources::EngineResource)
 					//EXPOSE_ENUM_FIELD_AUTO(DX12Resource, m_CurrentState, "Current State", D3D12_RESOURCE_STATES, FieldOptions{ .disabled = true, .description = "." })
 				END_EXPOSE_FIELDS(DX12Resource)
 				BEGIN_EXPOSE_GIZMOS(DX12Resource)
 				END_EXPOSE_GIZMOS(DX12Resource)
 				END_EXPOSE_TO_EDITOR(DX12Resource)
-#endif
 			};
 		}
 	}

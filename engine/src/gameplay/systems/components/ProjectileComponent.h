@@ -8,7 +8,7 @@
 #ifdef _EDITOR
 // editor
 #include "editor/EditorExpose.h"
-#endif
+#endif // _EDITOR
 
 // gameplay
 #include "gameplay/Prefab.h"
@@ -57,7 +57,6 @@ namespace gallus
 			
 			std::weak_ptr<gameplay::Prefab> m_ExplosionPrefab = {};
 
-#ifdef _EDITOR
 			BEGIN_EXPOSE_FIELDS_PARENT(ProjectileComponent, Component)
 				EXPOSE_FIELD(ProjectileComponent, m_fDamage, "Damage", (FieldOptions{ .type = EditorFieldWidgetType::DragFloat, .description = "The amount of damage this projectile deals when it hits a target." }))
 				EXPOSE_FIELD(ProjectileComponent, m_ExplosionPrefab, "Explosion Prefab", (FieldOptions{ .type = EditorFieldWidgetType::AssetPickerPtr, .assetType = resources::AssetType::Prefab, .description = "Pointer to a prefab that is spawned when the projectile explodes or impacts. Can be nullptr if no explosion effect is used." }))
@@ -65,7 +64,6 @@ namespace gallus
 			BEGIN_EXPOSE_GIZMOS(ProjectileComponent)
 			END_EXPOSE_GIZMOS(ProjectileComponent)
 			END_EXPOSE_TO_EDITOR(ProjectileComponent)
-#endif
 		};
 	}
 }

@@ -2,12 +2,9 @@
 
 // external
 #include <string>
-#ifdef _EDITOR
 #include <rapidjson/document.h>
 
-// editor
 #include "editor/EditorExpose.h"
-#endif
 
 namespace gallus
 {
@@ -24,10 +21,7 @@ namespace gallus
 		class AnimationKeyFrame;
 		class AnimationTrack;
 
-		class AnimationKeyFrameComponentBase
-#ifdef _EDITOR
-			: public IExposableToEditor
-#endif
+		class AnimationKeyFrameComponentBase : public IExposableToEditor
 		{
 		public:
 			/// <summary>
@@ -56,7 +50,7 @@ namespace gallus
 			/// <param name="a_Document">The json document that the data will be put into.</param>
 			/// <param name="a_Allocator">The allocator used by the json document.</param>
 			virtual void Serialize(rapidjson::Value& a_Value, rapidjson::Document::AllocatorType& a_Allocator) const = 0;
-#endif
+#endif // _EDITOR
 			/// <summary>
 			/// Retrieves the property name of the key frame component.
 			/// </summary>
@@ -71,13 +65,11 @@ namespace gallus
 
 			AnimationKeyFrame& m_KeyFrame;
 
-#ifdef _EDITOR
 			BEGIN_EXPOSE_FIELDS(AnimationKeyFrameComponentBase)
 			END_EXPOSE_FIELDS(AnimationKeyFrameComponentBase)
 			BEGIN_EXPOSE_GIZMOS(AnimationKeyFrameComponentBase)
 			END_EXPOSE_GIZMOS(AnimationKeyFrameComponentBase)
 			END_EXPOSE_TO_EDITOR(AnimationKeyFrameComponentBase)
-#endif
 		};
 	}
 }

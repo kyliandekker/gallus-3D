@@ -89,12 +89,12 @@ namespace gallus
 					ImGui::FoldOutButton(
 						std::string((m_aExpanded[id] ? font::ICON_FOLDED_OUT : font::ICON_FOLDED_IN) + std::string(component->GetName()) + id).c_str(), &m_aExpanded[id], ImVec2(width, size.y));
 					ImGui::SameLine();
-					if (ImGui::IconButton(ImGui::IMGUI_FORMAT_ID(font::ICON_DELETE, BUTTON_ID, id + "_DELETE_INSPECTOR").c_str(), size, m_Window.GetIconFont()))
-					{
-						m_KeyFrame.RemoveComponent(component);
+					//if (ImGui::IconButton(ImGui::IMGUI_FORMAT_ID(font::ICON_DELETE, BUTTON_ID, id + "_DELETE_INSPECTOR").c_str(), size, m_Window.GetIconFont()))
+					//{
+					//	m_KeyFrame.RemoveComponent(component);
 
-						m_KeyFrame.GetAnimationTrack()->SetIsDirty(true);
-					}
+					//	m_KeyFrame.GetAnimationTrack()->SetIsDirty(true);
+					//}
 
 					ImGui::PopStyleVar();
 					ImGui::PopStyleVar();

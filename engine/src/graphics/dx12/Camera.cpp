@@ -1,5 +1,9 @@
 #include "Camera.h"
 
+#include "utils/general_utils.h"
+
+#include "editor/EditorExpose.h"
+
 namespace gallus
 {
 	namespace graphics
@@ -12,14 +16,23 @@ namespace gallus
 			Camera::Camera()
 #ifdef _EDITOR
 				: IExposableToEditor()
-#endif
-			{}
-
+#endif // _EDITOR
+			{ }
+			
 			//---------------------------------------------------------------------
 			void Camera::Init(float a_fWidth, float a_fHeight)
 			{
+				m_fFoV = 90;
+				m_Transform = Transform();
+
 				m_vSize = { static_cast<int>(a_fWidth), static_cast<int>(a_fHeight) };
 				SetProjection();
+			}
+			
+			//---------------------------------------------------------------------
+			void Camera::Deserialize(const resources::SrcData& a_SrcData)
+			{
+				DeserializeEditorExposable(this, a_SrcData);
 			}
 
 			//---------------------------------------------------------------------
@@ -31,7 +44,7 @@ namespace gallus
 					-1.0f, 1.0f
 				);
 				m_ProjectionMatrix3D = DirectX::XMMatrixPerspectiveFovLH(
-					DirectX::XMConvertToRadians(m_fFov),
+					DirectX::XMConvertToRadians(m_fFoV),
 					static_cast<float>(m_vSize.x) / static_cast<float>(m_vSize.y),
 					0.1f,
 					1000.0f
@@ -94,6 +107,15 @@ namespace gallus
 				{
 					return m_ProjectionMatrix2D;
 				}
+			}
+			
+			//---------------------------------------------------------------------
+			void Camera::OnFoVChanged()
+			{
+				// Clamp FoV.
+				m_fFoV = utils::clamp(m_fFoV, 30.0f, 120.0f);
+
+				SetProjection();
 			}
 		}
 	}

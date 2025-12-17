@@ -10,6 +10,8 @@
 #include "core/Data.h"
 #include "core/Observable.h"
 
+#define JSON_SCENE_CAMERA_VAR "camera"
+
 #define JSON_SCENE_ENTITIES_VAR "entities"
 #define JSON_SCENE_ENTITIES_VAR_NAME "name"
 #define JSON_SCENE_ENTITIES_VAR_ACTIVE "isActive"
@@ -55,7 +57,7 @@ namespace gallus
 			/// <param name="a_Path">The path to the resource.</param>
 			/// <returns></returns>
 			virtual bool LoadByPath(const fs::path& a_Path) override;
-#endif
+#endif // _LOAD_BY_PATH
 
 			/// <summary>
 			/// Loads the scene data from its associated resource source.
@@ -74,7 +76,7 @@ namespace gallus
 			/// </summary>
 			/// <returns>True if saving was successful, false otherwise.</returns>
 			bool Save();
-#endif
+#endif // _EDITOR
 			/// <summary>
 			/// Returns a constant reference to the internal scene data.
 			/// </summary>
@@ -87,7 +89,7 @@ namespace gallus
 			/// </summary>
 			/// <returns>A <see cref="core::Data"/> object representing the scene�s data.</returns>
 			virtual const core::Data GetSceneData() const;
-#endif
+#endif // _EDITOR
 			/// <summary>
 			/// Checks if the scene is in a valid state.
 			/// </summary>
@@ -98,13 +100,12 @@ namespace gallus
 			}
 		protected:
 			core::Data m_Data;
-#ifdef _EDITOR
+			
 			BEGIN_EXPOSE_FIELDS_PARENT(Scene, resources::EngineResource)
 			END_EXPOSE_FIELDS(Scene)
 			BEGIN_EXPOSE_GIZMOS(Scene)
 			END_EXPOSE_GIZMOS(Scene)
 			END_EXPOSE_TO_EDITOR(Scene)
-#endif
 		};
 	}
 }

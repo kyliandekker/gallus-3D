@@ -12,7 +12,7 @@
 
 namespace ImGui
 {
-	bool CheckboxButton(const char* a_Label, bool* a_pValue, const ImVec2& a_Size, const ImVec4& a_Color)
+	bool CheckboxButton(const std::string& a_Label, bool* a_pValue, const std::string& a_sDescription, const ImVec2& a_Size, const ImVec4& a_Color)
 	{
 		ImVec2 min = ImGui::GetCursorScreenPos();
 		ImVec2 max = ImVec2(min.x + a_Size.x, min.y + a_Size.y);
@@ -30,7 +30,7 @@ namespace ImGui
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0, 0, 0, 0));
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0, 0, 0, 0));
 
-		bool b = TextButton(a_Label, a_Size, a_Color);
+		bool b = TextButton(a_Label, a_sDescription, a_Size, a_Color);
 		if (b)
 		{
 			*a_pValue = !(*a_pValue);
@@ -42,13 +42,14 @@ namespace ImGui
 	}
 
 
-	bool TextButton(const char* a_Label, const ImVec2& a_Size, const ImVec4& a_Color)
+	bool TextButton(const std::string& a_Label, const std::string& a_sDescription, const ImVec2& a_Size, const ImVec4& a_Color)
 	{
 		ImVec2 pos = ImGui::GetCursorScreenPos(); // Get the top-left corner of the button
 
 		ImGui::PushStyleColor(ImGuiCol_Text, a_Color);
-		bool b = ImGui::Button(a_Label, a_Size);
+		bool b = ImGui::Button(a_Label.c_str(), a_Size);
 		ImGui::PopStyleColor();
+		ShowTooltip(a_sDescription);
 
 		ImDrawList* draw_list = ImGui::GetWindowDrawList();
 		ImU32 border_color = ImGui::GetColorU32(ImGuiCol_Border); // Use ImGui border color
@@ -58,19 +59,15 @@ namespace ImGui
 		return b;
 	}
 
-	bool IconButton(const char* a_Label, const ImVec2& a_Size, ImFont* a_Font, const ImVec4& a_Color)
+	bool IconButton(const std::string& a_Label, const std::string& a_sDescription, const ImVec2& a_Size, const ImVec4& a_Color)
 	{
-		ImGui::PushFont(a_Font);
-		bool success = ImGui::TextButton(a_Label, a_Size, a_Color);
-		ImGui::PopFont();
+		bool success = ImGui::TextButton(a_Label, a_sDescription, a_Size, a_Color);
 		return success;
 	}
 
-	bool IconCheckboxButton(const char* a_Label, bool* a_pValue, const ImVec2& a_Size, ImFont* a_Font, const ImVec4& a_Color)
+	bool IconCheckboxButton(const std::string& a_Label, bool* a_pValue, const std::string& a_sDescription, const ImVec2& a_Size, const ImVec4& a_Color)
 	{
-		ImGui::PushFont(a_Font);
-		bool success = ImGui::CheckboxButton(a_Label, a_pValue, a_Size, a_Color);
-		ImGui::PopFont();
+		bool success = ImGui::CheckboxButton(a_Label, a_pValue, a_sDescription, a_Size, a_Color);
 		return success;
 	}
 
@@ -93,20 +90,20 @@ namespace ImGui
 		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + a_Padding.x);
 	}
 
-	void DisplayHeader(ImFont* a_BoldFont, const char* a_Label)
+	void DisplayHeader(ImFont* a_BoldFont, const std::string& a_Label)
 	{
 		ImGui::PushFont(a_BoldFont);
-		ImGui::Text(a_Label);
+		ImGui::Text(a_Label.c_str());
 		ImGui::PopFont();
 	}
 
-	bool InputTextStdString(const char* label, std::string* str, ImGuiInputTextFlags flags)
+	bool InputTextStdString(const std::string& label, std::string* str, ImGuiInputTextFlags flags)
 	{
 		IM_ASSERT((flags & ImGuiInputTextFlags_CallbackResize) == 0);
 		flags |= ImGuiInputTextFlags_CallbackResize;
 
 		ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
-		return ImGui::InputText(label,
+		return ImGui::InputText(label.c_str(),
 			str->data(),
 			str->capacity() + 1,
 			flags,
@@ -240,7 +237,7 @@ namespace ImGui
 		ImGui::PopStyleVar();
 	}
 
-	bool VectorEdit2(const char* label, float col[2], float a_fSpeed, float a_fMin, float a_fMax)
+	bool VectorEdit2(const std::string& label, float col[2], float a_fSpeed, float a_fMin, float a_fMax)
 	{
 		ImGuiWindow* window = GetCurrentWindow();
 		if (window->SkipItems)
@@ -249,12 +246,12 @@ namespace ImGui
 		ImGuiContext& g = *GImGui;
 		const ImGuiStyle& style = g.Style;
 		const float square_sz = GetFrameHeight();
-		const char* label_display_end = FindRenderedTextEnd(label);
+		const std::string& label_display_end = FindRenderedTextEnd(label.c_str());
 		float w_full = CalcItemWidth();
 		g.NextItemData.ClearFlags();
 
 		BeginGroup();
-		PushID(label);
+		PushID(label.c_str());
 		const bool set_current_color_edit_id = (g.ColorEditCurrentID == 0);
 		if (set_current_color_edit_id)
 			g.ColorEditCurrentID = window->IDStack.back();
@@ -307,7 +304,7 @@ namespace ImGui
 			// but we need to use SameLine() to setup baseline correctly. Might want to refactor SameLine() to simplify this.
 			SameLine(0.0f, style.ItemInnerSpacing.x);
 			window->DC.CursorPos.x = pos.x + (w_full + style.ItemInnerSpacing.x);
-			TextEx(label, label_display_end);
+			TextEx(label.c_str(), label_display_end.c_str());
 		}
 
 		PopID();
@@ -316,7 +313,7 @@ namespace ImGui
 		return value_changed_as_float;
 	}
 
-	bool VectorEdit3(const char* label, float col[3], float a_fSpeed, float a_fMin, float a_fMax)
+	bool VectorEdit3(const std::string& label, float col[3], float a_fSpeed, float a_fMin, float a_fMax)
 	{
 		ImGuiWindow* window = GetCurrentWindow();
 		if (window->SkipItems)
@@ -325,12 +322,12 @@ namespace ImGui
 		ImGuiContext& g = *GImGui;
 		const ImGuiStyle& style = g.Style;
 		const float square_sz = GetFrameHeight();
-		const char* label_display_end = FindRenderedTextEnd(label);
+		const std::string& label_display_end = FindRenderedTextEnd(label.c_str());
 		float w_full = CalcItemWidth();
 		g.NextItemData.ClearFlags();
 
 		BeginGroup();
-		PushID(label);
+		PushID(label.c_str());
 		const bool set_current_color_edit_id = (g.ColorEditCurrentID == 0);
 		if (set_current_color_edit_id)
 			g.ColorEditCurrentID = window->IDStack.back();
@@ -383,7 +380,7 @@ namespace ImGui
 			// but we need to use SameLine() to setup baseline correctly. Might want to refactor SameLine() to simplify this.
 			SameLine(0.0f, style.ItemInnerSpacing.x);
 			window->DC.CursorPos.x = pos.x + (w_full + style.ItemInnerSpacing.x);
-			TextEx(label, label_display_end);
+			TextEx(label.c_str(), label_display_end.c_str());
 		}
 
 		PopID();
@@ -392,7 +389,7 @@ namespace ImGui
 		return value_changed_as_float;
 	}
 
-	bool IVectorEdit2(const char* label, int col[2])
+	bool IVectorEdit2(const std::string& label, int col[2])
 	{
 		ImGuiWindow* window = GetCurrentWindow();
 		if (window->SkipItems)
@@ -401,12 +398,12 @@ namespace ImGui
 		ImGuiContext& g = *GImGui;
 		const ImGuiStyle& style = g.Style;
 		const float square_sz = GetFrameHeight();
-		const char* label_display_end = FindRenderedTextEnd(label);
+		const std::string& label_display_end = FindRenderedTextEnd(label.c_str());
 		float w_full = CalcItemWidth();
 		g.NextItemData.ClearFlags();
 
 		BeginGroup();
-		PushID(label);
+		PushID(label.c_str());
 		const bool set_current_color_edit_id = (g.ColorEditCurrentID == 0);
 		if (set_current_color_edit_id)
 			g.ColorEditCurrentID = window->IDStack.back();
@@ -463,7 +460,7 @@ namespace ImGui
 			// but we need to use SameLine() to setup baseline correctly. Might want to refactor SameLine() to simplify this.
 			SameLine(0.0f, style.ItemInnerSpacing.x);
 			window->DC.CursorPos.x = pos.x + (w_full + style.ItemInnerSpacing.x);
-			TextEx(label, label_display_end);
+			TextEx(label.c_str(), label_display_end.c_str());
 		}
 
 		if (value_changed && g.LastItemData.ID != 0) // In case of ID collision, the second EndGroup() won't catch g.ActiveId
@@ -483,9 +480,11 @@ namespace ImGui
 		}
 		if (ImGui::IsItemHovered())
 		{
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(10, 10));
 			ImGui::BeginTooltip();
 			ImGui::Text(a_sText.c_str());
 			ImGui::EndTooltip();
+			ImGui::PopStyleVar();
 		}
 	}
 }

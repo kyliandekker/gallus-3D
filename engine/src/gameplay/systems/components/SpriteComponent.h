@@ -16,7 +16,7 @@
 #ifdef _EDITOR
 // editor
 #include "editor/EditorExpose.h"
-#endif
+#endif // _EDITOR
 
 namespace gallus
 {
@@ -139,7 +139,7 @@ namespace gallus
 			std::weak_ptr<graphics::dx12::Texture> m_pSprite = {};
 			int8_t m_iSpriteIndex = 0;
 			DirectX::XMFLOAT4 m_vColor = { 1, 1, 1, 1 };
-#ifdef _EDITOR
+
 			BEGIN_EXPOSE_FIELDS_PARENT(SpriteComponent, Component)
 				EXPOSE_FIELD(SpriteComponent, m_pShaderBind, "Shader Bind", (FieldOptions{ .type = EditorFieldWidgetType::ObjectPtr }))
 				EXPOSE_FIELD(SpriteComponent, m_pSprite, "Sprite", (FieldOptions{ .type = EditorFieldWidgetType::AssetPickerPtr, .assetType = resources::AssetType::Sprite, .description = "Pointer to the texture asset used by this sprite. Can be nullptr if no texture is assigned. Determines the visual appearance of the sprite." }))
@@ -152,7 +152,6 @@ namespace gallus
 			BEGIN_EXPOSE_GIZMOS(SpriteComponent)
 			END_EXPOSE_GIZMOS(SpriteComponent)
 			END_EXPOSE_TO_EDITOR(SpriteComponent)
-#endif
 		};
 	}
 }

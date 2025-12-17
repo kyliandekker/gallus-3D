@@ -163,7 +163,7 @@ namespace gallus
 				LOGF(LOGSEVERITY_INFO_SUCCESS, LOG_CATEGORY_DX12, "Successfully loaded texture: \"%s\".", a_Path.generic_string().c_str());
 				return true;
 			}
-#endif
+#endif // _LOAD_BY_PATH
 
 			//---------------------------------------------------------------------
 			bool Texture::Destroy()

@@ -159,7 +159,7 @@ namespace gallus
 				/// <param name="a_MeshPath">The file path to the mesh resource.</param>
 				/// <returns>True if loading was successful, false otherwise.</returns>
 				bool LoadByPath(const fs::path& a_MeshPath, std::shared_ptr<CommandQueue> a_pCommandQueue);
-#endif
+#endif // _LOAD_BY_PATH
 				bool GetMeshDataFromModel(const core::Data& a_Data);
 
 				/// <summary>
@@ -184,13 +184,11 @@ namespace gallus
 			private:
 				std::vector<MeshPartData> m_aMeshData;
 
-#ifdef _EDITOR
 				BEGIN_EXPOSE_FIELDS_PARENT(Mesh, resources::EngineResource)
 				END_EXPOSE_FIELDS(Mesh)
 				BEGIN_EXPOSE_GIZMOS(Mesh)
 				END_EXPOSE_GIZMOS(Mesh)
 				END_EXPOSE_TO_EDITOR(Mesh)
-#endif
 			};
 		}
 	}

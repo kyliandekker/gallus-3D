@@ -49,7 +49,7 @@ namespace gallus
 				/// <param name="a_MaterialPath">The file path to the Material source.</param>
 				/// <returns>True if loading and compilation were successful, false otherwise.</returns>
 				bool LoadByPath(const fs::path& a_MaterialPath) override;
-#endif
+#endif // _LOAD_BY_PATH
 
 				void Bind(std::shared_ptr<CommandList> a_CommandList);
 
@@ -63,7 +63,7 @@ namespace gallus
 				}
 protected:
 				MaterialData m_MaterialData;
-#ifdef _EDITOR
+
 				BEGIN_EXPOSE_FIELDS_PARENT(Material, resources::EngineResource)
 				EXPOSE_FIELD(Material, m_MaterialData.DiffuseColor, "Diffuse Color",
 					{ .type = gallus::EditorFieldWidgetType::Vector3Field })
@@ -75,7 +75,6 @@ protected:
 				BEGIN_EXPOSE_GIZMOS(Material)
 				END_EXPOSE_GIZMOS(Material)
 				END_EXPOSE_TO_EDITOR(Material)
-#endif
 			};
 		}
 	}

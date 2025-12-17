@@ -44,7 +44,7 @@ namespace gallus
 					a_Allocator);
 			}
 		}
-#endif
+#endif // _EDITOR
 		//---------------------------------------------------------------------
 		void AnimationKeyFrame::Deserialize(const resources::SrcData& a_SrcData)
 		{

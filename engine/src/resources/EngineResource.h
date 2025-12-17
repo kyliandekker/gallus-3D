@@ -4,7 +4,7 @@
 #include <string>
 #ifdef _LOAD_BY_PATH
 #include "utils/FILEPCH.h"
-#endif
+#endif // _LOAD_BY_PATH
 
 // core
 #include "core/Observable.h"
@@ -13,9 +13,7 @@
 #include "resources/AssetType.h"
 
 // editor
-#ifdef _EDITOR
 #include "editor/EditorExpose.h"
-#endif
 
 namespace gallus
 {
@@ -64,10 +62,7 @@ namespace gallus
 		/// <summary>
 		/// Represents an engine resource with details like category, type and name.
 		/// </summary>
-		class EngineResource
-#ifdef _EDITOR
-			: public IExposableToEditor
-#endif
+		class EngineResource : public IExposableToEditor
 		{
 		public:
 			/// <summary>
@@ -174,7 +169,7 @@ namespace gallus
 			/// <param name="a_Path">The path to the resource.</param>
 			/// <returns></returns>
 			virtual bool LoadByPath(const fs::path& a_Path);
-#endif
+#endif // _LOAD_BY_PATH
 
 #ifdef _EDITOR
 			bool IsDirty() const
@@ -191,7 +186,7 @@ namespace gallus
 			{
 				m_bIsDirty = a_bIsDirty;
 			}
-#endif
+#endif // _EDITOR
 		protected:
 			bool m_bIsDestroyable = true; // Whether it is destroyable once created.
 			bool m_bIsLocked = false; // Whether the resource can be overridden in the atlas.
@@ -199,16 +194,15 @@ namespace gallus
 
 #ifdef _EDITOR
 			core::Observable<bool> m_bIsDirty;
-#endif
+#endif // _EDITOR
 			EngineResourceCategory m_ResourceCategory = EngineResourceCategory::Unknown;
 			resources::AssetType m_AssetType = resources::AssetType::None;
 
 			std::string m_sName;
 #ifdef _LOAD_BY_PATH
 			std::filesystem::path m_Path;
-#endif
+#endif // _LOAD_BY_PATH
 
-#ifdef _EDITOR
 			BEGIN_EXPOSE_FIELDS(EngineResource)
 				EXPOSE_FIELD(EngineResource, m_bIsDestroyable, "Is Destroyable", (FieldOptions{ .type = EditorFieldWidgetType::Checkbox, .description = "Indicates if this resource can be destroyed or deleted.", .disabled = true, .internal = true }))
 				EXPOSE_FIELD(EngineResource, m_bIsLocked, "Is Locked", (FieldOptions{ .type = EditorFieldWidgetType::Checkbox, .description = "Indicates if this resource is locked from modifications.", .disabled = true, .internal = true }))
@@ -233,7 +227,6 @@ namespace gallus
 			BEGIN_EXPOSE_GIZMOS(EngineResource)
 			END_EXPOSE_GIZMOS(EngineResource)
 			END_EXPOSE_TO_EDITOR(EngineResource)
-#endif
 		};
 	}
 }

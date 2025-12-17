@@ -37,7 +37,7 @@ namespace gallus
 			{
 				return false;
 			}
-#endif
+#endif // _LOAD_BY_PATH
 
 			//---------------------------------------------------------------------
 			void Material::Bind(std::shared_ptr<CommandList> a_CommandList)

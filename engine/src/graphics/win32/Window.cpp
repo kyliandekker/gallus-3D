@@ -4,7 +4,7 @@
 #include <iostream>
 #ifndef IMGUI_DISABLE
 #include <imgui/imgui.h>
-#endif
+#endif // IMGUI_DISABLE
 
 // logger
 #include "logger/Logger.h"

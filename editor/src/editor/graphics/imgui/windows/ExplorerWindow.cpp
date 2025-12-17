@@ -185,7 +185,7 @@ namespace gallus
 
 				bool doRescan = false;
 				if (ImGui::IconButton(
-					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_REFRESH), BUTTON_ID, "RESCAN_EXPLORER").c_str(), m_Window.GetHeaderSize(), m_Window.GetIconFont()))
+					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_REFRESH), BUTTON_ID, "RESCAN_EXPLORER").c_str(), "Triggers a full rescan of the asset database, updating all folders and files in the explorer.", m_Window.GetHeaderSize()))
 				{
 					doRescan = true;
 				}
@@ -195,7 +195,7 @@ namespace gallus
 				bool list = m_ExplorerViewMode == ExplorerViewMode::ExplorerViewMode_List;
 				bool grid = m_ExplorerViewMode == ExplorerViewMode::ExplorerViewMode_Grid;
 				if (ImGui::IconCheckboxButton(
-					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_LIST), BUTTON_ID, "LIST_EXPLORER").c_str(), &list, m_Window.GetHeaderSize(), m_Window.GetIconFont(), list ? ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent) : ImGui::GetStyleColorVec4(ImGuiCol_Text)))
+					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_LIST), BUTTON_ID, "LIST_EXPLORER").c_str(), &list, "Switches the explorer display to a vertical list of items, showing file names and metadata in a single column.", m_Window.GetHeaderSize(), list ? ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent) : ImGui::GetStyleColorVec4(ImGuiCol_Text)))
 				{
 					if (list)
 					{
@@ -206,7 +206,7 @@ namespace gallus
 				ImGui::SameLine();
 
 				if (ImGui::IconCheckboxButton(
-					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_GRID), BUTTON_ID, "GRID_EXPLORER").c_str(), &grid, m_Window.GetHeaderSize(), m_Window.GetIconFont(), grid ? ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent) : ImGui::GetStyleColorVec4(ImGuiCol_Text)))
+					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_GRID), BUTTON_ID, "GRID_EXPLORER").c_str(), &grid, "Switches the explorer display to a grid of icons, useful for browsing visually.", m_Window.GetHeaderSize(), grid ? ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent) : ImGui::GetStyleColorVec4(ImGuiCol_Text)))
 				{
 					if (grid)
 					{

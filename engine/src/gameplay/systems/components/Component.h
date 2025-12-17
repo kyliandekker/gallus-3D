@@ -8,9 +8,7 @@
 #include "gameplay/systems/UpdateTime.h"
 
 // editor
-#ifdef _EDITOR
 #include "editor/EditorExpose.h"
-#endif
 
 namespace gallus
 {
@@ -23,10 +21,7 @@ namespace gallus
 		//---------------------------------------------------------------------
 		// Component
 		//---------------------------------------------------------------------
-		class Component
-#ifdef _EDITOR
-			: public IExposableToEditor
-#endif
+		class Component : public IExposableToEditor
 		{
 		public:
 			/// <summary>
@@ -56,7 +51,8 @@ namespace gallus
 			/// </summary>
 			/// <param name="a_SrcData">The json document that the data will be put into.</param>
 			virtual void Serialize(resources::SrcData& a_SrcData) const;
-#endif
+#endif // _EDITOR
+
 			/// <summary>
 			/// Creates an instance based on source data.
 			/// </summary>
@@ -106,13 +102,11 @@ namespace gallus
 			gameplay::EntityID m_EntityID;
 			bool m_bIsDestroyed = false;
 
-#ifdef _EDITOR
 			BEGIN_EXPOSE_FIELDS(Component)
 			END_EXPOSE_FIELDS(Component)
 			BEGIN_EXPOSE_GIZMOS(Component)
 			END_EXPOSE_GIZMOS(Component)
 			END_EXPOSE_TO_EDITOR(Component)
-#endif
 		};
 	}
 }

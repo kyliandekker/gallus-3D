@@ -67,7 +67,7 @@ namespace gallus
 
 			if (!rapidjson::GetInt(m_Document, a_sKey, a_iInt))
 			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key %s is not present or not an integer.", a_sKey.c_str());
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" is not present or not an integer.", a_sKey.c_str());
 				return false;
 			}
 
@@ -85,7 +85,7 @@ namespace gallus
 
 			if (!rapidjson::GetBool(m_Document, a_sKey, a_bBool))
 			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key %s is not present or not a boolean.", a_sKey.c_str());
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" is not present or not a boolean.", a_sKey.c_str());
 				return false;
 			}
 
@@ -103,7 +103,7 @@ namespace gallus
 
 			if (!rapidjson::GetFloat(m_Document, a_sKey, a_fFloat))
 			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key %s is not present or not a float.", a_sKey.c_str());
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" is not present or not a float.", a_sKey.c_str());
 				return false;
 			}
 
@@ -121,7 +121,7 @@ namespace gallus
 
 			if (!rapidjson::GetString(m_Document, a_sKey, a_sString))
 			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key %s is not present or not a string.", a_sKey.c_str());
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" is not present or not a string.", a_sKey.c_str());
 				return false;
 			}
 
@@ -139,18 +139,18 @@ namespace gallus
 
 			if (!m_Document.HasMember(a_sKey.c_str()) || !m_Document[a_sKey.c_str()].IsObject())
 			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key %s is not present or not an object/vector.", a_sKey.c_str());
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" is not present or not an object/vector.", a_sKey.c_str());
 				return false;
 			}
 
 			if (!rapidjson::GetFloat(m_Document[a_sKey.c_str()], SRC_DATA_VECTOR_X, a_vVector.x))
 			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key %s does not have an x axis.", a_sKey.c_str());
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" does not have an x axis.", a_sKey.c_str());
 				return false;
 			}
 			if (!rapidjson::GetFloat(m_Document[a_sKey.c_str()], SRC_DATA_VECTOR_Y, a_vVector.y))
 			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key %s does not have an y axis.", a_sKey.c_str());
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" does not have an y axis.", a_sKey.c_str());
 				return false;
 			}
 
@@ -168,23 +168,23 @@ namespace gallus
 
 			if (!m_Document.HasMember(a_sKey.c_str()) || !m_Document[a_sKey.c_str()].IsObject())
 			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key %s is not present or not an object/vector.", a_sKey.c_str());
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" is not present or not an object/vector.", a_sKey.c_str());
 				return false;
 			}
 
 			if (!rapidjson::GetFloat(m_Document[a_sKey.c_str()], SRC_DATA_VECTOR_X, a_vVector.x))
 			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key %s does not have an x axis.", a_sKey.c_str());
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" does not have an x axis.", a_sKey.c_str());
 				return false;
 			}
 			if (!rapidjson::GetFloat(m_Document[a_sKey.c_str()], SRC_DATA_VECTOR_Y, a_vVector.y))
 			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key %s does not have an y axis.", a_sKey.c_str());
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" does not have an y axis.", a_sKey.c_str());
 				return false;
 			}
 			if (!rapidjson::GetFloat(m_Document[a_sKey.c_str()], SRC_DATA_VECTOR_Z, a_vVector.z))
 			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key %s does not have an z axis.", a_sKey.c_str());
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" does not have an z axis.", a_sKey.c_str());
 				return false;
 			}
 
@@ -202,28 +202,28 @@ namespace gallus
 
 			if (!m_Document.HasMember(a_sKey.c_str()) || !m_Document[a_sKey.c_str()].IsObject())
 			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key %s is not present or not an object/vector.", a_sKey.c_str());
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" is not present or not an object/vector.", a_sKey.c_str());
 				return false;
 			}
 
 			if (!rapidjson::GetFloat(m_Document[a_sKey.c_str()], SRC_DATA_VECTOR_R, a_vVector.x))
 			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key %s does not have an r axis.", a_sKey.c_str());
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" does not have an r axis.", a_sKey.c_str());
 				return false;
 			}
 			if (!rapidjson::GetFloat(m_Document[a_sKey.c_str()], SRC_DATA_VECTOR_G, a_vVector.y))
 			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key %s does not have an g axis.", a_sKey.c_str());
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" does not have an g axis.", a_sKey.c_str());
 				return false;
 			}
 			if (!rapidjson::GetFloat(m_Document[a_sKey.c_str()], SRC_DATA_VECTOR_B, a_vVector.z))
 			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key %s does not have an b axis.", a_sKey.c_str());
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" does not have an b axis.", a_sKey.c_str());
 				return false;
 			}
 			if (!rapidjson::GetFloat(m_Document[a_sKey.c_str()], SRC_DATA_VECTOR_A, a_vVector.w))
 			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key %s does not have an a axis.", a_sKey.c_str());
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" does not have an a axis.", a_sKey.c_str());
 				return false;
 			}
 
@@ -246,7 +246,7 @@ namespace gallus
 
 			if (!m_Document.HasMember(a_sKey.c_str()) || !m_Document[a_sKey.c_str()].IsObject())
 			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key %s is not present or not an object.", a_sKey.c_str());
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" is not present or not an object.", a_sKey.c_str());
 				return false;
 			}
 
@@ -282,7 +282,7 @@ namespace gallus
 
 			if (!m_Document.HasMember(a_sKey.c_str()) || !m_Document[a_sKey.c_str()].IsArray())
 			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key %s is not present or not an array.", a_sKey.c_str());
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" is not present or not an array.", a_sKey.c_str());
 				return false;
 			}
 

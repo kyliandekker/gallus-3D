@@ -44,10 +44,6 @@ namespace gallus
 		//---------------------------------------------------------------------
 		bool Prefab::LoadData()
 		{
-#ifdef _EDITOR
-			m_bIsDirty = false;
-#endif // _EDITOR
-
 			// Clear all entities.
 			core::ENGINE->GetECS().Clear();
 			while (!core::ENGINE->GetECS().GetEntities().empty())
@@ -59,9 +55,6 @@ namespace gallus
 				return false;
 			}
 
-#ifdef _EDITOR
-			m_bIsDirty = true;
-#endif // _EDITOR
 			return true;
 		}
 
@@ -100,10 +93,10 @@ namespace gallus
 			srcData.GetData(data);
 			return data;
 		}
-#endif
+#endif // _EDITOR
 
 		//---------------------------------------------------------------------
-		gameplay::EntityID Prefab::Instantiate()
+		gameplay::EntityID Prefab::Instantiate() const
 		{
 			gameplay::EntityID id;
 			id.SetInvalid();

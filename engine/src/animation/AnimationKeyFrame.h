@@ -4,7 +4,7 @@
 #include <vector>
 #ifdef _EDITOR
 #include <rapidjson/document.h>
-#endif
+#endif// _EDITOR
 
 // animation
 #include "animation/AnimationKeyFrameComponentBase.h"
@@ -60,7 +60,7 @@ namespace gallus
 			{
 				m_iFrame = a_iFrame;
 			}
-#endif
+#endif // _EDITOR
 			bool operator<(const AnimationKeyFrame& a_Other) const
 			{
 				return m_iFrame < a_Other.m_iFrame;
@@ -160,7 +160,7 @@ namespace gallus
 					}
 				}
 			}
-#endif
+#endif // _EDITOR
 			/// <summary>
 			/// Creates an instance based on source data.
 			/// </summary>

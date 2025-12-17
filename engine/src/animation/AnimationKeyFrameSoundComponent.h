@@ -61,7 +61,7 @@ namespace gallus
 			/// <param name="a_Document">The json document that the data will be put into.</param>
 			/// <param name="a_Allocator">The allocator used by the json document.</param>
 			void Serialize(rapidjson::Value& a_Value, rapidjson::Document::AllocatorType& a_Allocator) const override;
-
+#endif // _EDITOR
 		protected:
 			audio::Sound* m_pSound = nullptr;
 			
@@ -71,7 +71,6 @@ namespace gallus
 			BEGIN_EXPOSE_GIZMOS(AnimationKeyFrameSoundComponent)
 			END_EXPOSE_GIZMOS(AnimationKeyFrameSoundComponent)
 			END_EXPOSE_TO_EDITOR(AnimationKeyFrameSoundComponent)
-#endif
 		};
 	}
 }

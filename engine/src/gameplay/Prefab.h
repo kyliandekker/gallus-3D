@@ -37,7 +37,7 @@ namespace gallus
 			/// <param name="a_Path">The path to the resource.</param>
 			/// <returns></returns>
 			virtual bool LoadByPath(const fs::path& a_Path) override;
-#endif
+#endif // _LOAD_BY_PATH
 
 			/// <summary>
 			/// Loads the prefab data from its associated resource source.
@@ -51,13 +51,13 @@ namespace gallus
 			/// </summary>
 			/// <returns>A <see cref="core::Data"/> object representing the prefab�s data.</returns>
 			virtual const core::Data GetSceneData() const override;
-#endif
+#endif // _EDITOR
 
 			/// <summary>
 			/// Creates a copy of the data stored in the prefab and spawns it in runtime.
 			/// </summary>
 			/// <returns>The newly created entity id.</returns>
-			gameplay::EntityID Instantiate();
+			gameplay::EntityID Instantiate() const;
 		};
 	}
 }

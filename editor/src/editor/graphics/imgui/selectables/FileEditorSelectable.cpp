@@ -172,7 +172,6 @@ namespace gallus
 					ImGui::GetWindowDrawList()->AddRectFilled(buttonStart, buttonEnd, ImGui::ColorConvertFloat4ToU32(ImGui::GetStyleColorVec4(ImGuiCol_HeaderActive)));
 				}
 
-				ImGui::PushFont(m_Window.GetIconFont());
 				std::string	folderIcon = m_bIsFoldedOut ? font::ICON_FOLDER_OPEN : font::ICON_FOLDER;
 				ImVec2 iconSize = ImGui::CalcTextSize(folderIcon.c_str());
 
@@ -205,7 +204,6 @@ namespace gallus
 						m_bIsFoldedOut = !m_bIsFoldedOut;
 					}
 				}
-				ImGui::PopFont();
 
 				ImVec2 textSize = ImGui::CalcTextSize(m_sDisplayName.c_str());
 
@@ -249,7 +247,6 @@ namespace gallus
 					ImGui::GetWindowDrawList()->AddRectFilled(buttonStart, buttonEnd, ImGui::ColorConvertFloat4ToU32(ImGui::GetStyleColorVec4(ImGuiCol_HeaderActive)));
 				}
 
-				ImGui::PushFont(m_Window.GetIconFont());
 				ImVec2 iconSize = ImGui::CalcTextSize(m_sIcon.c_str());
 
 				float verticalOffset = (buttonSize.y - iconSize.y) / 2.0f;
@@ -257,8 +254,6 @@ namespace gallus
 				ImVec2 contentStartPos = ImVec2(initialPos.x + m_Window.GetFontSize(), initialPos.y + verticalOffset);
 				ImGui::SetCursorPos(contentStartPos);
 				ImGui::TextColored(AssetTypeToColor(m_FileResource.GetMetaData()->GetAssetType()), m_sIcon.c_str());
-
-				ImGui::PopFont();
 
 				ImVec2 textSize = ImGui::CalcTextSize(m_sDisplayName.c_str());
 

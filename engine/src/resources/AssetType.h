@@ -9,7 +9,7 @@
 // graphics
 #include "graphics/imgui/font_icon.h"
 #include "graphics/imgui/ImGuiWindow.h"
-#endif
+#endif // _EDITOR
 
 namespace gallus
 {
@@ -335,5 +335,5 @@ namespace gallus
 			//}
 		}
 	}
-#endif
+#endif // _EDITOR
 }

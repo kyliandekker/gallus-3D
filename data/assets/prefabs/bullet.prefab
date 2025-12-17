@@ -3,44 +3,37 @@
     "isActive": true,
     "components": {
         "sprite": {
-            "texture": {
-                "name": "tex_bullet.png",
-                "spriteIndex": 0
+            "shaderBind": {
+                "pixelShader": "pixelShader.hlsl",
+                "vertexShader": "vertexShader.hlsl"
             },
-            "shader": {
-                "pixel": "pixelShader.hlsl",
-                "vertex": "vertexShader.hlsl"
-            },
-            "mesh": "square",
-            "color": {
-                "r": 1.0,
-                "g": 1.0,
-                "b": 1.0,
-                "a": 1.0
-            }
+            "sprite": "tex_missing.png",
+            "spriteIndex": 0
         },
         "transform": {
-            "position": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "rotation": {
-                "x": 1.4051179687282149e-15,
-                "y": 1.8130364765056584e-7,
-                "z": 2.220234733840698e-7
-            },
-            "scale": {
-                "x": 70.0,
-                "y": 40.0,
-                "z": 0.0
-            },
-            "pivot": {
-                "x": -0.5,
-                "y": -0.5,
-                "z": -0.5
-            },
-            "cameraMode": 1
+            "transform": {
+                "position": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "rotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "pivot": {
+                    "x": -0.5,
+                    "y": -0.5,
+                    "z": -0.5
+                },
+                "cameraType": 1
+            }
         },
         "collision": {
             "offset": {
@@ -53,8 +46,7 @@
             }
         },
         "projectile": {
-            "damage": 50.0,
-            "explosion": "explosion.prefab"
+            "damage": 50.0
         }
     }
 }

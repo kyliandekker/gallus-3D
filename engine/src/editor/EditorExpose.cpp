@@ -37,7 +37,7 @@ namespace gallus
 			EditorFieldWidgetType type = field.m_Options.type;
 
 			// These fields are unserializable. They are invalid or purely visual.
-			if (type == EditorFieldWidgetType::None || type == EditorFieldWidgetType::TexturePreview)
+			if (type == EditorFieldWidgetType::None || type == EditorFieldWidgetType::TexturePreview || type == EditorFieldWidgetType::Button)
 			{
 				continue;
 			}
@@ -87,7 +87,11 @@ namespace gallus
 				}
 				case EditorFieldWidgetType::EnumDropdown:
 				{
-					a_SrcData.GetInt(propertyName, *(int*)ptr);
+					int enumValue = 0;
+					a_SrcData.GetInt(propertyName, enumValue);
+
+					int32_t* pEnum = reinterpret_cast<int32_t*>(ptr);
+					*pEnum = static_cast<int32_t>(enumValue);
 					break;
 				}
 				case EditorFieldWidgetType::Checkbox:
@@ -264,7 +268,7 @@ namespace gallus
 			}
 
 			// These fields are unserializable. They are invalid or purely visual.
-			if (type == EditorFieldWidgetType::None || type == EditorFieldWidgetType::TexturePreview)
+			if (type == EditorFieldWidgetType::None || type == EditorFieldWidgetType::TexturePreview || type == EditorFieldWidgetType::Button)
 			{
 				continue;
 			}

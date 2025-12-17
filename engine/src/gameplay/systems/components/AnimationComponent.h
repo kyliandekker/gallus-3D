@@ -64,7 +64,7 @@ namespace gallus
 			{
 				m_sStartingAnimation = a_sStartingAnimation;
 			}
-#endif
+#endif // _EDITOR
 			/// <summary>
 			/// Retrieves the starting animation.
 			/// </summary>
@@ -83,13 +83,11 @@ namespace gallus
 			bool m_bIsPlaying = false;
 			float m_fAccumulatedTime = 0.0f;
 
-#ifdef _EDITOR	
 			BEGIN_EXPOSE_FIELDS_PARENT(AnimationComponent, Component)
 			END_EXPOSE_FIELDS(AnimationComponent)
 			BEGIN_EXPOSE_GIZMOS(AnimationComponent)
 			END_EXPOSE_GIZMOS(AnimationComponent)
 			END_EXPOSE_TO_EDITOR(AnimationComponent)
-#endif		  	
 		};
 	}
 }

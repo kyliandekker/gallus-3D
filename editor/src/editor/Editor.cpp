@@ -11,6 +11,7 @@
 
 // editor
 #include "editor/graphics/imgui/EditorSelectable.h"
+#include "editor/core/EditorEngine.h"
 
 namespace gallus
 {
@@ -31,6 +32,9 @@ namespace gallus
 			m_CurrentScene.SetResourceCategory(resources::EngineResourceCategory::Editor);
 			m_EditorCamera.Init(graphics::dx12::RENDER_TEX_SIZE.x, graphics::dx12::RENDER_TEX_SIZE.y);
 			m_EditorCamera.GetTransform().SetPosition({ 0.0f, 1.0f, -2.0f });
+
+			m_CurrentScene.IsDirty().OnChanged() += std::bind(&Editor::SceneOrPrefabDirtyChanged, this, std::placeholders::_1, std::placeholders::_2);
+			m_Prefab.IsDirty().OnChanged() += std::bind(&Editor::SceneOrPrefabDirtyChanged, this, std::placeholders::_1, std::placeholders::_2);
 
 			LOG(LOGSEVERITY_INFO, LOG_CATEGORY_EDITOR, "Initializing editor.");
 
@@ -63,6 +67,25 @@ namespace gallus
 			{
 				m_pSelectable.get()->Select();
 			}
+		}
+		
+		//---------------------------------------------------------------------
+		void Editor::SceneOrPrefabDirtyChanged(bool a_bPrev, bool a_bNew)
+		{
+			m_bIsAnyDirty.OnChanged().invoke(a_bPrev, a_bNew);
+		}
+		
+		//---------------------------------------------------------------------
+		void Editor::CopyGameFoV()
+		{
+			graphics::dx12::Camera& gameCamera = core::EDITOR_ENGINE->GetDX12().GetCamera();
+			if (m_EditorCamera.GetFoV() == gameCamera.GetFoV())
+			{
+				return;
+			}
+
+			m_EditorCamera.SetFoV(gameCamera.GetFoV());
+			m_EditorCamera.SetProjection();
 		}
 
 		//---------------------------------------------------------------------

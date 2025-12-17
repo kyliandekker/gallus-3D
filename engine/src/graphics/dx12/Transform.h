@@ -6,9 +6,7 @@
 
 #include <string>
 
-#ifdef _EDITOR
 #include "editor/EditorExpose.h"
-#endif
 
 constexpr DirectX::XMVECTOR UP = { 0, 1, 0 }; /// Up vector.
 constexpr DirectX::XMFLOAT3 VEC_ZERO = { 0, 0, 0 }; /// Zero vector.
@@ -53,10 +51,7 @@ namespace gallus
 			//---------------------------------------------------------------------
 			// Transform
 			//---------------------------------------------------------------------
-			class Transform
-#ifdef _EDITOR
-				: public IExposableToEditor
-#endif
+			class Transform : public IExposableToEditor
 			{
 			public:
 				static DirectX::XMFLOAT3 QuaternionToEuler(const DirectX::XMVECTOR & quat);
@@ -155,23 +150,21 @@ namespace gallus
 
 				friend class Camera;
 
-#ifdef _EDITOR
-			BEGIN_EXPOSE_FIELDS(Transform)
-				EXPOSE_FIELD(Transform, m_vPosition, "Position", (FieldOptions{.type = EditorFieldWidgetType::Vector3Field, .description = "The position of the object in 2D space. Defines where the object is located on the screen." }))
-				EXPOSE_FIELD(Transform, m_vScale, "Scale", (FieldOptions{.type = EditorFieldWidgetType::Vector3Field, .description = "The size multiplier of the object. A value of 1 means default size, values greater than 1 enlarge the object, and values below 1 shrink it." }))
-				EXPOSE_FIELD(Transform, m_vRotation, "Rotation", (FieldOptions{.type = EditorFieldWidgetType::Quaternion, .description = "Rotation in degrees. Controls how much the object is rotated clockwise or counterclockwise." }))
-				EXPOSE_FIELD(Transform, m_vPivot, "Pivot", (FieldOptions{.type = EditorFieldWidgetType::Vector3Field, .min = "-0.5", .max = "0.5", .description = "The pivot point for transformations relative to the object's center. Coordinates represent the normalized offset used for scaling and rotation." }))
-				EXPOSE_FIELD(Transform, m_CameraType, "Camera Type",
+				BEGIN_EXPOSE_FIELDS(Transform)
+					EXPOSE_FIELD(Transform, m_vPosition, "Position", (FieldOptions{.type = EditorFieldWidgetType::Vector3Field, .description = "The position of the object in 2D space. Defines where the object is located on the screen." }))
+					EXPOSE_FIELD(Transform, m_vScale, "Scale", (FieldOptions{.type = EditorFieldWidgetType::Vector3Field, .description = "The size multiplier of the object. A value of 1 means default size, values greater than 1 enlarge the object, and values below 1 shrink it." }))
+					EXPOSE_FIELD(Transform, m_vRotation, "Rotation", (FieldOptions{.type = EditorFieldWidgetType::Quaternion, .description = "Rotation in degrees. Controls how much the object is rotated clockwise or counterclockwise." }))
+					EXPOSE_FIELD(Transform, m_vPivot, "Pivot", (FieldOptions{.type = EditorFieldWidgetType::Vector3Field, .min = "-0.5", .max = "0.5", .description = "The pivot point for transformations relative to the object's center. Coordinates represent the normalized offset used for scaling and rotation." }))
+					EXPOSE_FIELD(Transform, m_CameraType, "Camera Type",
 					(FieldOptions{
 						.type = EditorFieldWidgetType::EnumDropdown,
 						.enumToStringFunc = MakeEnumToStringFunc<graphics::dx12::CameraType>(graphics::dx12::CameraTypeToString),
 						.description = "Whether the camera is rendering 3D or 2D."
 					}))
-			END_EXPOSE_FIELDS(Transform)
-			BEGIN_EXPOSE_GIZMOS(Transform)
-			END_EXPOSE_GIZMOS(Transform)
-			END_EXPOSE_TO_EDITOR(Transform)
-#endif
+				END_EXPOSE_FIELDS(Transform)
+				BEGIN_EXPOSE_GIZMOS(Transform)
+				END_EXPOSE_GIZMOS(Transform)
+				END_EXPOSE_TO_EDITOR(Transform)
 			};
 		}
 	}

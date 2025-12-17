@@ -130,7 +130,7 @@ namespace gallus
 
 				return true;
 			}
-#endif
+#endif // _LOAD_BY_PATH
 
 			//---------------------------------------------------------------------
 			bool DX12Resource::IsValid() const

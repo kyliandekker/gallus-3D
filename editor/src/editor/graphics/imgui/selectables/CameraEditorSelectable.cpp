@@ -69,8 +69,6 @@ namespace gallus
 				ImGui::SetCursorPos(centerPos);
 				ImGui::PopStyleVar();
 
-				ImGui::PushFont(m_Window.GetIconFont());
-
 				// Dynamically calculate the size of the icon
 				ImVec2 iconSize = ImVec2(m_Window.GetFontSize(), m_Window.GetFontSize()); // Replace this with your icon size calculation.
 
@@ -97,8 +95,6 @@ namespace gallus
 				// Set cursor to the calculated position and render the icon
 				ImGui::SetCursorPos(centerPos);
 				ImGui::Text(m_sIcon.c_str());
-
-				ImGui::PopFont();
 
 				ImVec2 textSize = ImGui::CalcTextSize(GetName().c_str());
 
@@ -158,6 +154,7 @@ namespace gallus
 				{
 					if (RenderObjectFields(&core::EDITOR_ENGINE->GetDX12().GetCamera()))
 					{
+						core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
 					}
 				}
 

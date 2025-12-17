@@ -31,17 +31,17 @@ namespace ImGui
 #define TABLE_ID "TABLE_"
 #define PLOT_ID "PLOT_"
 
-	bool CheckboxButton(const char* a_Label, bool* a_pValue, const ImVec2& a_Size = ImVec2(0, 0), const ImVec4& a_Color = ImVec4(1, 1, 1, 1));
-	bool TextButton(const char* a_Label, const ImVec2& a_Size = ImVec2(0, 0), const ImVec4& a_Color = ImVec4(1, 1, 1, 1));
+	bool CheckboxButton(const std::string& a_Label, bool* a_pValue, const std::string& a_sDescription, const ImVec2& a_Size = ImVec2(0, 0), const ImVec4& a_Color = ImVec4(1, 1, 1, 1));
+	bool TextButton(const std::string& a_Label, const std::string& a_sDescription, const ImVec2& a_Size = ImVec2(0, 0), const ImVec4& a_Color = ImVec4(1, 1, 1, 1));
 
-	bool IconButton(const char* a_Label, const ImVec2& a_Size, ImFont* a_Font, const ImVec4& a_Color = ImGui::GetStyle().Colors[ImGuiCol_Text]);
-	bool IconCheckboxButton(const char* a_Label, bool* a_pValue, const ImVec2& a_Size, ImFont* a_Font, const ImVec4& a_Color = ImGui::GetStyle().Colors[ImGuiCol_Text]);
+	bool IconButton(const std::string& a_Label, const std::string& a_sDescription, const ImVec2& a_Size, const ImVec4& a_Color = ImGui::GetStyle().Colors[ImGuiCol_Text]);
+	bool IconCheckboxButton(const std::string& a_Label, bool* a_pValue, const std::string& a_sDescription, const ImVec2& a_Size, const ImVec4& a_Color = ImGui::GetStyle().Colors[ImGuiCol_Text]);
 
 	void BeginToolbar(const ImVec2& a_Size);
 	void EndToolbar(const ImVec2& a_Padding);
-	void DisplayHeader(ImFont* a_BoldFont, const char* a_Label);
+	void DisplayHeader(ImFont* a_BoldFont, const std::string& a_Label);
 
-	bool InputTextStdString(const char* label, std::string* str, ImGuiInputTextFlags flags = 0);
+	bool InputTextStdString(const std::string& label, std::string* str, ImGuiInputTextFlags flags = 0);
 
 	/// <summary>
 	/// Converts colors ranging 0-255 to 0-1.
@@ -78,11 +78,10 @@ namespace ImGui
 	bool KeyValue(std::function<void()> a_Key, std::function<bool()> a_Val);
 	void EndInspectorKeyVal(const ImVec2& a_vFramePadding);
 
-	bool VectorEdit2(const char* label, float col[2], float a_fSpeed = 1.0f, float a_fMin = -999999999999999, float a_fMax = 9999999999999999);
-	bool VectorEdit3(const char* label, float col[3], float a_fSpeed = 1.0f, float a_fMin = -999999999999999, float a_fMax = 9999999999999999);
-	bool IVectorEdit2(const char* label, int col[2]);
+	bool VectorEdit2(const std::string& label, float col[2], float a_fSpeed = 1.0f, float a_fMin = -999999999999999, float a_fMax = 9999999999999999);
+	bool VectorEdit3(const std::string& label, float col[3], float a_fSpeed = 1.0f, float a_fMin = -999999999999999, float a_fMax = 9999999999999999);
+	bool IVectorEdit2(const std::string& label, int col[2]);
 
-	bool ButtonWToolTip();
 	void ShowTooltip(const std::string& a_sText);
 }
 
