@@ -8,9 +8,6 @@
 
 #include "logger/Logger.h"
 
-#define JSON_HEALTH_COMPONENT_HEALTH_VAR "health"
-#define JSON_HEALTH_COMPONENT_MAX_HEALTH_VAR "maxHealth"
-
 namespace gallus
 {
 	namespace gameplay

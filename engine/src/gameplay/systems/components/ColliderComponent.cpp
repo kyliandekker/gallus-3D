@@ -13,9 +13,6 @@
 
 #include "logger/Logger.h"
 
-#define JSON_COLLIDER_COMPONENT_OFFSET_VAR "offset"
-#define JSON_COLLIDER_COMPONENT_SIZE_VAR "size"
-
 namespace gallus
 {
 	namespace gameplay

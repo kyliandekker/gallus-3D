@@ -41,6 +41,11 @@ namespace gallus
 			{
 				continue;
 			}
+
+			if (field.m_Options.internal)
+			{
+				continue;
+			}
 			
 			std::string propertyName = TypeNameToPropertyName(field.m_sUIName);
 

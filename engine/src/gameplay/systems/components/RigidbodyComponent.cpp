@@ -12,10 +12,6 @@
 
 #include "logger/Logger.h"
 
-#define JSON_RIGIDBODY_COMPONENT_USE_GRAVITY_VAR "useGravity"
-#define JSON_RIGIDBODY_COMPONENT_MASS_VAR "mass"
-#define JSON_RIGIDBODY_COMPONENT_LINEAR_DAMPING_VAR "linearDamping"
-
 namespace gallus
 {
 	namespace gameplay

@@ -134,6 +134,8 @@ namespace gallus
 			/// <param name="a_Camera">The camera.</param>
 			void Render(std::shared_ptr<graphics::dx12::CommandList> a_pCommandList, const EntityID& a_EntityID, const graphics::dx12::Camera& a_Camera);
 		private:
+			bool m_bIsStatic = false;
+
 			std::weak_ptr<graphics::dx12::Mesh> m_pMesh = {};
 			std::weak_ptr<graphics::dx12::ShaderBind> m_pShaderBind = {};
 			std::weak_ptr<graphics::dx12::Texture> m_pSprite = {};
@@ -141,6 +143,7 @@ namespace gallus
 			DirectX::XMFLOAT4 m_vColor = { 1, 1, 1, 1 };
 
 			BEGIN_EXPOSE_FIELDS_PARENT(SpriteComponent, Component)
+				EXPOSE_FIELD(SpriteComponent, m_bIsStatic, "Static", (FieldOptions{ .type = EditorFieldWidgetType::Checkbox, .description = "Determines whether the sprite should stick on the screen or not." }))
 				EXPOSE_FIELD(SpriteComponent, m_pShaderBind, "Shader Bind", (FieldOptions{ .type = EditorFieldWidgetType::ObjectPtr }))
 				EXPOSE_FIELD(SpriteComponent, m_pSprite, "Sprite", (FieldOptions{ .type = EditorFieldWidgetType::AssetPickerPtr, .assetType = resources::AssetType::Sprite, .description = "Pointer to the texture asset used by this sprite. Can be nullptr if no texture is assigned. Determines the visual appearance of the sprite." }))
 				EXPOSE_FIELD(SpriteComponent, m_iSpriteIndex, "Sprite Index", (FieldOptions{ .type = EditorFieldWidgetType::DragInt8, .description = "Index of the sprite within a texture atlas. Used when the texture contains multiple sprites to select which one is displayed." }))

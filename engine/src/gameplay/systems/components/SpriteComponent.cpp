@@ -20,16 +20,6 @@
 
 #include "logger/Logger.h"
 
-#define JSON_SPRITE_COMPONENT_TEX_VAR "texture"
-#define JSON_SPRITE_COMPONENT_TEX_NAME_VAR "name"
-#define JSON_SPRITE_COMPONENT_TEX_SPRITE_INDEX_VAR "spriteIndex"
-#define JSON_SPRITE_COMPONENT_MESH_VAR "mesh"
-#define JSON_SPRITE_COMPONENT_SHADER_VAR "shader"
-#define JSON_SPRITE_COMPONENT_SHADER_PIXEL_VAR "pixel"
-#define JSON_SPRITE_COMPONENT_SHADER_VERTEX_VAR "vertex"
-#define JSON_SPRITE_COMPONENT_MATERIAL_VAR "material"
-#define JSON_SPRITE_COMPONENT_COLOR_VAR "color"
-
 namespace gallus
 {
 	namespace gameplay
@@ -98,7 +88,15 @@ namespace gallus
 			const DirectX::XMMATRIX viewMatrix = a_Camera.GetViewMatrix(transform.GetCameraType());
 			const DirectX::XMMATRIX& projectionMatrix = a_Camera.GetProjectionMatrix(transform.GetCameraType());
 
-			DirectX::XMMATRIX mvpMatrix = transform.GetWorldMatrixWithPivot() * viewMatrix * projectionMatrix;
+			DirectX::XMMATRIX mvpMatrix;
+			if (m_bIsStatic)
+			{
+				mvpMatrix = transform.GetWorldMatrixWithPivot() * projectionMatrix;
+			}
+			else
+			{
+				mvpMatrix = transform.GetWorldMatrixWithPivot() * viewMatrix * projectionMatrix;
+			}
 
 			if (!core::ENGINE->GetECS().GetEntity(a_EntityID))
 			{

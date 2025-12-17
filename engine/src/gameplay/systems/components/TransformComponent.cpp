@@ -12,12 +12,6 @@
 
 #include "logger/Logger.h"
 
-#define JSON_TRANSFORM_COMPONENT_POSITION_VAR "position"
-#define JSON_TRANSFORM_COMPONENT_ROTATION_VAR "rotation"
-#define JSON_TRANSFORM_COMPONENT_SCALE_VAR "scale"
-#define JSON_TRANSFORM_COMPONENT_PIVOT_VAR "pivot"
-#define JSON_TRANSFORM_COMPONENT_CAMERA_MODE_VAR "cameraMode"
-
 namespace gallus
 {
 	namespace gameplay

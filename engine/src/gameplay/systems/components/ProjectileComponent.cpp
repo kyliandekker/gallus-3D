@@ -16,9 +16,6 @@
 
 #include "logger/Logger.h"
 
-#define JSON_PROJECTILE_COMPONENT_DAMAGE_VAR "damage"
-#define JSON_PROJECTILE_COMPONENT_EXPLOSION_VAR "explosion"
-
 namespace gallus
 {
 	namespace gameplay

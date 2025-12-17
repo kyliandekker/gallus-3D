@@ -11,8 +11,6 @@
 
 #include "logger/Logger.h"
 
-#define JSON_ANIMATION_COMPONENT_START_ANIMATION_VAR "startingAnimation"
-
 namespace gallus
 {
 	namespace gameplay

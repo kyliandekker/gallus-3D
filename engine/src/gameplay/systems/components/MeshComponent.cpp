@@ -20,16 +20,6 @@
 
 #include "logger/Logger.h"
 
-#define JSON_MESH_COMPONENT_TEX_VAR "texture"
-#define JSON_MESH_COMPONENT_TEX_NAME_VAR "name"
-#define JSON_MESH_COMPONENT_TEX_TEXTURE_INDEX_VAR "textureIndex"
-#define JSON_MESH_COMPONENT_MESH_VAR "mesh"
-#define JSON_MESH_COMPONENT_SHADER_VAR "shader"
-#define JSON_MESH_COMPONENT_SHADER_PIXEL_VAR "pixel"
-#define JSON_MESH_COMPONENT_SHADER_VERTEX_VAR "vertex"
-#define JSON_MESH_COMPONENT_MATERIAL_VAR "material"
-#define JSON_MESH_COMPONENT_COLOR_VAR "color"
-
 namespace gallus
 {
 	namespace gameplay

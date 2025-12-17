@@ -23,6 +23,7 @@
             "isActive": true,
             "components": {
                 "sprite": {
+                    "static": false,
                     "shaderBind": {
                         "pixelShader": "pixelShader.hlsl",
                         "vertexShader": "vertexShader.hlsl"
@@ -81,12 +82,13 @@
             "isActive": true,
             "components": {
                 "sprite": {
+                    "static": true,
                     "shaderBind": {
                         "pixelShader": "pixelShader.hlsl",
                         "vertexShader": "vertexShader.hlsl"
                     },
                     "sprite": "tex_walk.png",
-                    "spriteIndex": 0
+                    "spriteIndex": 1
                 },
                 "transform": {
                     "transform": {
@@ -140,6 +142,7 @@
             "isActive": true,
             "components": {
                 "sprite": {
+                    "static": false,
                     "shaderBind": {
                         "pixelShader": "pixelShader.hlsl",
                         "vertexShader": "vertexShader.hlsl"
@@ -189,6 +192,7 @@
             "isActive": true,
             "components": {
                 "sprite": {
+                    "static": false,
                     "shaderBind": {
                         "pixelShader": "pixelShader.hlsl",
                         "vertexShader": "vertexShader.hlsl"
