@@ -24,6 +24,7 @@
             "components": {
                 "sprite": {
                     "static": false,
+                    "order": 0,
                     "shaderBind": {
                         "pixelShader": "pixelShader.hlsl",
                         "vertexShader": "vertexShader.hlsl"
@@ -83,6 +84,7 @@
             "components": {
                 "sprite": {
                     "static": true,
+                    "order": 1,
                     "shaderBind": {
                         "pixelShader": "pixelShader.hlsl",
                         "vertexShader": "vertexShader.hlsl"
@@ -93,14 +95,14 @@
                 "transform": {
                     "transform": {
                         "position": {
-                            "x": 925.60498046875,
-                            "y": 428.60504150390627,
+                            "x": 767.9450073242188,
+                            "y": 479.2003173828125,
                             "z": 0.0
                         },
                         "scale": {
-                            "x": 100.0,
-                            "y": 100.0,
-                            "z": 1.0
+                            "x": 696.9674682617188,
+                            "y": 696.9674682617188,
+                            "z": 0.0
                         },
                         "rotation": {
                             "x": 0.0,
@@ -108,8 +110,8 @@
                             "z": 0.0
                         },
                         "pivot": {
-                            "x": 0.0,
-                            "y": 0.0,
+                            "x": -0.5,
+                            "y": -0.5,
                             "z": -0.5
                         },
                         "cameraType": 1
@@ -143,6 +145,7 @@
             "components": {
                 "sprite": {
                     "static": false,
+                    "order": 0,
                     "shaderBind": {
                         "pixelShader": "pixelShader.hlsl",
                         "vertexShader": "vertexShader.hlsl"
@@ -193,6 +196,7 @@
             "components": {
                 "sprite": {
                     "static": false,
+                    "order": 0,
                     "shaderBind": {
                         "pixelShader": "pixelShader.hlsl",
                         "vertexShader": "vertexShader.hlsl"
@@ -253,18 +257,18 @@
                 "transform": {
                     "transform": {
                         "position": {
-                            "x": -0.8600000143051148,
-                            "y": 0.20999999344348908,
-                            "z": 0.0
+                            "x": -0.24861955642700196,
+                            "y": 0.2705696225166321,
+                            "z": -1.1920928244535389e-7
                         },
                         "scale": {
-                            "x": 1.899999976158142,
+                            "x": 1.8999994993209839,
                             "y": 1.7999999523162842,
-                            "z": 1.899999976158142
+                            "z": 1.8999994993209839
                         },
                         "rotation": {
                             "x": 0.0,
-                            "y": 0.0,
+                            "y": -43.68976974487305,
                             "z": 0.0
                         },
                         "pivot": {

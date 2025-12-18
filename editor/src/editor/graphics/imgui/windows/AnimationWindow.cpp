@@ -96,8 +96,7 @@ namespace gallus
 					ImGui::PopStyleVar();
 				}
 
-				bool wasInvalid = m_iSelectedKeyFrame < 0 || m_iSelectedKeyFrame >= m_AnimationTrack.GetKeyFrames().size();
-				if (!wasValid || wasInvalid)
+				if (!wasValid)
 				{
 					ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
 					ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
@@ -111,6 +110,19 @@ namespace gallus
 					m_AnimationTrack.AddKeyFrame(m_iCurrentFrame);
 
 					m_AnimationTrack.SetIsDirty(true);
+				}
+
+				if (!wasValid)
+				{
+					ImGui::PopItemFlag();
+					ImGui::PopStyleVar();
+				}
+
+				bool wasInvalid = m_iSelectedKeyFrame < 0 || m_iSelectedKeyFrame >= m_AnimationTrack.GetKeyFrames().size();
+				if (!wasValid || wasInvalid)
+				{
+					ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+					ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
 				}
 
 				ImGui::SameLine();

@@ -943,9 +943,32 @@ namespace gallus
 				{
 					pair.second.Render(a_pCommandList, pair.first, *m_pActiveCamera);
 				}
-				for (auto& pair : core::ENGINE->GetECS().GetSystem<gameplay::SpriteSystem>().GetComponents())
+				
+				// m_aOrderedSprites stores pointers
+				m_aOrderedSprites.clear();
+
+				// Collect pointers to components
+				for (auto& pair : core::ENGINE->GetECS()
+					.GetSystem<gameplay::SpriteSystem>()
+					.GetComponents())
 				{
-					pair.second.Render(a_pCommandList, pair.first, *m_pActiveCamera);
+					m_aOrderedSprites.push_back(&pair.second); // take address of the ref
+				}
+
+				// Sort back-to-front by order
+				std::sort(
+					m_aOrderedSprites.begin(),
+					m_aOrderedSprites.end(),
+					[](gameplay::SpriteComponent* a, gameplay::SpriteComponent* b)
+					{
+						return a->GetOrder() < b->GetOrder();
+					}
+				);
+
+				// Render in order
+				for (auto* sprite : m_aOrderedSprites)
+				{
+					sprite->Render(a_pCommandList, sprite->GetEntityID(), *m_pActiveCamera);
 				}
 
 				m_eOnRender(a_pCommandList);

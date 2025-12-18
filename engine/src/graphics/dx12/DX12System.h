@@ -29,6 +29,10 @@
 
 namespace gallus
 {
+	namespace gameplay
+	{
+		class SpriteComponent;
+	}
 	namespace graphics
 	{
 		namespace win32
@@ -444,6 +448,8 @@ namespace gallus
 				Camera m_Camera3D;
 				Camera* m_pActiveCamera = &m_Camera3D;
 				CameraIsolationMode m_CameraIsolationMode;
+
+				std::vector<gameplay::SpriteComponent*> m_aOrderedSprites;
 			};
 		}
 	}
