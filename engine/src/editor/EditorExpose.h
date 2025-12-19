@@ -18,35 +18,36 @@ namespace gallus
 
 	enum class EditorFieldWidgetType
 	{
-		None,
-		DragFloat,
-		DragInt8,
-		DragInt16,
-		DragInt32,
-		DragInt64,
-		Checkbox,
-		Toggle,
-		Vector2Field,
-		Vector3Field,
-		Quaternion,
-		AssetPickerPtr,
-		Object,
-		ObjectPtr,
-		EnumDropdown,
-		TexturePreview,
-		Button
+		EditorFieldWidgetType_None,
+		EditorFieldWidgetType_Float,
+		EditorFieldWidgetType_Int8,
+		EditorFieldWidgetType_Int16,
+		EditorFieldWidgetType_Int32,
+		EditorFieldWidgetType_Int64,
+		EditorFieldWidgetType_Enum,
+		EditorFieldWidgetType_Bool,
+		EditorFieldWidgetType_Switch,
+		EditorFieldWidgetType_Vector2,
+		EditorFieldWidgetType_Vector3,
+		EditorFieldWidgetType_Color,
+		EditorFieldWidgetType_Quaternion,
+		EditorFieldWidgetType_EngineResource,
+		EditorFieldWidgetType_Object,
+		EditorFieldWidgetType_ObjectPtr,
+		EditorFieldWidgetType_TexturePreview,
+		EditorFieldWidgetType_Button
 	};
 
 	enum class EditorGizmoType
 	{
-		None,
-		Transform
+		EditorGizmoType_None,
+		EditorGizmoType_Transform
 	};
 
 	// Field options with default values
 	struct FieldOptions
 	{
-		EditorFieldWidgetType type = EditorFieldWidgetType::None;
+		EditorFieldWidgetType type = EditorFieldWidgetType::EditorFieldWidgetType_None;
 		gallus::resources::AssetType assetType;
 		std::string min = "";
 		std::string max = "";
@@ -63,7 +64,7 @@ namespace gallus
 	// Gizmo options with default values
 	struct GizmoOptions
 	{
-		EditorGizmoType type = EditorGizmoType::None;
+		EditorGizmoType type = EditorGizmoType::EditorGizmoType_None;
 	};
 
 	// Editor field with direct memory access

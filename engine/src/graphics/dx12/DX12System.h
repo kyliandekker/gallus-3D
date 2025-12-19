@@ -349,12 +349,20 @@ namespace gallus
 				{
 					m_pActiveCamera = &a_Camera;
 				}
-
+				
+				/// <summary>
+				/// Sets the camera isolation mode, rendering only 2D, 3D or both.
+				/// </summary>
+				/// <param name="a_CameraIsolationMode">The camera isolation mode.</param>
 				void SetCameraIsolationMode(CameraIsolationMode a_CameraIsolationMode)
 				{
 					m_CameraIsolationMode = a_CameraIsolationMode;
 				}
-
+				
+				/// <summary>
+				/// Retrieves the camera isolation mode, rendering only 2D, 3D or both.
+				/// </summary>
+				/// <returns>The camera isolation mode.</returns>
 				CameraIsolationMode GetCameraIsolationMode() const
 				{
 					return m_CameraIsolationMode;

@@ -389,6 +389,12 @@ namespace gallus
 				return m_FileResource.GetPath().filename().generic_string();
 			}
 
+			//---------------------------------------------------------------------
+			void FileEditorSelectable::OnDoubleClicked()
+			{
+				return m_pFileEditorSelectable->OpenFile(*this);
+			}
+
 			void FileEditorSelectable::RenderEditorFields()
 			{
 				if (!m_pFileEditorSelectable)

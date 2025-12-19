@@ -96,8 +96,8 @@ namespace gallus
 				Microsoft::WRL::ComPtr<ID3D12PipelineState> m_pPipelineState = nullptr;
 
 				BEGIN_EXPOSE_FIELDS_PARENT(ShaderBind, resources::EngineResource)
-					EXPOSE_FIELD(ShaderBind, m_pPixelShader, "Pixel Shader", (FieldOptions{ .type = EditorFieldWidgetType::AssetPickerPtr, .assetType = resources::AssetType::PixelShader, .description = "Pointer to the pixel shader asset used for rendering this object. Can be nullptr if no specific pixel shader is assigned." }))
-					EXPOSE_FIELD(ShaderBind, m_pVertexShader, "Vertex Shader", (FieldOptions{ .type = EditorFieldWidgetType::AssetPickerPtr, .assetType = resources::AssetType::VertexShader, .description = "Pointer to the vertex shader asset used for rendering this object. Can be nullptr if no specific vertex shader is assigned." }))
+					EXPOSE_FIELD(ShaderBind, m_pPixelShader, "Pixel Shader", (FieldOptions{ .type = EditorFieldWidgetType::EditorFieldWidgetType_EngineResource, .assetType = resources::AssetType::PixelShader, .description = "Pointer to the pixel shader asset used for rendering this object. Can be nullptr if no specific pixel shader is assigned." }))
+					EXPOSE_FIELD(ShaderBind, m_pVertexShader, "Vertex Shader", (FieldOptions{ .type = EditorFieldWidgetType::EditorFieldWidgetType_EngineResource, .assetType = resources::AssetType::VertexShader, .description = "Pointer to the vertex shader asset used for rendering this object. Can be nullptr if no specific vertex shader is assigned." }))
 				END_EXPOSE_FIELDS(ShaderBind)
 				BEGIN_EXPOSE_GIZMOS(ShaderBind)
 				END_EXPOSE_GIZMOS(ShaderBind)

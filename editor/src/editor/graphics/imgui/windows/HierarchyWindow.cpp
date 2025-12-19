@@ -175,7 +175,7 @@ namespace gallus
 					{
 						if (isDelete)
 						{
-							editor::G_DeleteEntity(ent->GetEntityID());
+							editor::g_DeleteEntity(ent->GetEntityID());
 						}
 						else if (isDuplicate)
 						{
@@ -200,7 +200,7 @@ namespace gallus
 				if (ImGui::IconButton(
 					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_SAVE), BUTTON_ID, "SAVE_HIERARCHY").c_str(), "Saves the currently opened scene data to its scene file.", m_Window.GetHeaderSize(), ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent)))
 				{
-					editor::G_SaveScene();
+					editor::g_SaveScene();
 				}
 
 				ImVec2 endPos = ImGui::GetCursorPos();
@@ -213,7 +213,7 @@ namespace gallus
 
 				if (ImGui::IsKeyDown(ImGuiMod_Ctrl) && ImGui::IsKeyPressed(ImGuiKey_S) && wasDirty)
 				{
-					editor::G_SaveScene();
+					editor::g_SaveScene();
 				}
 
 				ImGui::PopStyleVar();
@@ -259,12 +259,12 @@ namespace gallus
 								{
 									if (auto prefab = core::EDITOR_ENGINE->GetResourceAtlas().LoadPrefab(dropped->GetPath().filename().generic_string()).lock())
 									{
-										editor::G_InstantiatePrefab(*prefab);
+										editor::g_InstantiatePrefab(*prefab);
 									}
 								}
 								else
 								{
-									gameplay::EntityID entityID = editor::G_CreateEntity(dropped->GetPath().filename().generic_string());
+									gameplay::EntityID entityID = editor::g_CreateEntity(dropped->GetPath().filename().generic_string());
 									DragAction(entityID, dropped->GetMetaData()->GetAssetType(), dropped->GetPath().filename().generic_string());
 								}
 							}
@@ -349,7 +349,7 @@ namespace gallus
 						core::EDITOR_ENGINE->GetEditor().SetSelectable(nullptr);
 					}
 					
-					editor::G_CreateEntity();
+					editor::g_CreateEntity();
 				}
 			}
 
@@ -377,7 +377,7 @@ namespace gallus
 						gameplay::MeshSystem& meshSystem = core::EDITOR_ENGINE->GetECS().GetSystem<gameplay::MeshSystem>();
 						if (meshSystem.HasComponent(a_EntityID))
 						{
-							gameplay::MeshComponent* component = editor::G_CreateComponentOfType<gameplay::MeshComponent>(&meshSystem, a_EntityID);
+							gameplay::MeshComponent* component = editor::g_CreateComponentOfType<gameplay::MeshComponent>(&meshSystem, a_EntityID);
 							if (!component)
 							{
 								return;
@@ -391,7 +391,7 @@ namespace gallus
 						{
 							gameplay::SpriteSystem& spriteSystem = core::EDITOR_ENGINE->GetECS().GetSystem<gameplay::SpriteSystem>();
 							
-							gameplay::SpriteComponent* component = editor::G_CreateComponentOfType<gameplay::SpriteComponent>(&spriteSystem, a_EntityID);
+							gameplay::SpriteComponent* component = editor::g_CreateComponentOfType<gameplay::SpriteComponent>(&spriteSystem, a_EntityID);
 							if (!component)
 							{
 								return;
@@ -441,7 +441,7 @@ namespace gallus
 						
 						gameplay::MeshSystem& meshSystem = core::EDITOR_ENGINE->GetECS().GetSystem<gameplay::MeshSystem>();
 
-						gameplay::MeshComponent* component = editor::G_CreateComponentOfType<gameplay::MeshComponent>(&meshSystem, a_EntityID);
+						gameplay::MeshComponent* component = editor::g_CreateComponentOfType<gameplay::MeshComponent>(&meshSystem, a_EntityID);
 						if (!component)
 						{
 							return;

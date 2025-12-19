@@ -50,6 +50,9 @@ namespace gallus
 					return "";
 				}
 
+				virtual void OnDoubleClicked()
+				{}
+
 				virtual std::string GetIcon() const
 				{
 					return "";

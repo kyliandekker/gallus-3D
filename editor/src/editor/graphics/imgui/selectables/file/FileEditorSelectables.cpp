@@ -39,14 +39,19 @@ namespace gallus
 				float width = ImGui::GetContentRegionAvail().x;
 				if (ImGui::TextButton(ImGui::IMGUI_FORMAT_ID(font::ICON_FILE_SCENE + std::string(" Open Scene"), BUTTON_ID, "OPEN_SCENE_FILE_INSPECTOR").c_str(), "Opens the selected scene file in the editor, replacing the current scene.", ImVec2(width, 0)))
 				{
-					core::Data data;
-					a_FileEditorSelectable.GetFileResource().GetFileData(data);
-					
-					gameplay::GAME.GetScene().Destroy();
-
-					fs::path scenePath = a_FileEditorSelectable.GetFileResource().GetPath();
-					editor::G_SetScene(scenePath, editor::EditorMethod::EDITOR_METHOD_SCENE);
+					OpenFile(a_FileEditorSelectable);
 				}
+			}
+
+			void SceneFileEditorSelectables::OpenFile(FileEditorSelectable& a_FileEditorSelectable)
+			{
+				core::Data data;
+				a_FileEditorSelectable.GetFileResource().GetFileData(data);
+				
+				gameplay::GAME.GetScene().Destroy();
+
+				fs::path scenePath = a_FileEditorSelectable.GetFileResource().GetPath();
+				editor::g_SetScene(scenePath, editor::EditorMethod::EDITOR_METHOD_SCENE);
 			}
 
 			void AnimationFileEditorSelectables::Render(FileEditorSelectable& a_FileEditorSelectable)
@@ -75,7 +80,7 @@ namespace gallus
 					gameplay::GAME.GetScene().Destroy();
 
 					fs::path prefabPath = a_FileEditorSelectable.GetFileResource().GetPath();
-					editor::G_SetScene(prefabPath, editor::EditorMethod::EDITOR_METHOD_PREFAB);
+					editor::g_SetScene(prefabPath, editor::EditorMethod::EDITOR_METHOD_PREFAB);
 				}
 			}
 

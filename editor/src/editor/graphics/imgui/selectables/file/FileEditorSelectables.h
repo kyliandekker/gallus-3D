@@ -41,6 +41,9 @@ namespace gallus
 				void Render() override
 				{}
 
+				virtual void OpenFile(FileEditorSelectable& a_FileEditorSelectable)
+				{}
+
 				virtual void Render(FileEditorSelectable& a_FileEditorSelectable)
 				{}
 			};
@@ -56,6 +59,8 @@ namespace gallus
 				{}
 
 				void Render(FileEditorSelectable& a_FileEditorSelectable) override;
+
+				void OpenFile(FileEditorSelectable& a_FileEditorSelectable) override;
 			};
 
 			class AnimationFileEditorSelectables : public FileEditorSelectables

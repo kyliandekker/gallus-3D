@@ -79,10 +79,13 @@ namespace gallus
 				/// </summary>
 				/// <param name="a_Message"></param>
 				void LoggerCallback(const logger::LoggerMessage& a_Message);
+
+				void CountMessages();
 			private:
 				bool m_bNeedsRefresh = true; /// Whether the console needs to refresh the results shown in the console window.
 				std::vector<logger::LoggerMessage> m_aMessages; /// List of messages retrieved from the logger.
 				std::vector<size_t> m_aFilteredMessages; /// List of messages shown in the console window.
+				std::vector<size_t> m_aMessageCount; /// List of messages shown in the console window.
 
 				SearchBarInput m_SearchBar; /// Search bar to filter specific messages in the console window.
 

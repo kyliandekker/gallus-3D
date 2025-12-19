@@ -99,10 +99,10 @@ namespace gallus
 			int m_iSpriteIndex = 0;
 
 			BEGIN_EXPOSE_FIELDS_PARENT(AnimationKeyFrameSpriteComponent, AnimationKeyFrameComponentBase)
-				EXPOSE_FIELD(AnimationKeyFrameSpriteComponent, m_pTexture, "Texture", (FieldOptions{ .type = EditorFieldWidgetType::AssetPickerPtr, .assetType = resources::AssetType::Sprite }))
-				EXPOSE_FIELD(AnimationKeyFrameSpriteComponent, m_iSpriteIndex, "Sprite Index", (FieldOptions{ .type = EditorFieldWidgetType::DragInt8 }))
+				EXPOSE_FIELD(AnimationKeyFrameSpriteComponent, m_pTexture, "Texture", (FieldOptions{ .type = EditorFieldWidgetType::EditorFieldWidgetType_EngineResource, .assetType = resources::AssetType::Sprite }))
+				EXPOSE_FIELD(AnimationKeyFrameSpriteComponent, m_iSpriteIndex, "Sprite Index", (FieldOptions{ .type = EditorFieldWidgetType::EditorFieldWidgetType_Int8 }))
 				EXPOSE_FIELD(AnimationKeyFrameSpriteComponent, m_pTexture, "Texture Preview", (FieldOptions{
-				.type = EditorFieldWidgetType::TexturePreview,
+				.type = EditorFieldWidgetType::EditorFieldWidgetType_TexturePreview,
 				.relatedIndexFieldOffset = offsetof(AnimationKeyFrameSpriteComponent, m_iSpriteIndex)
 					}))
 			END_EXPOSE_FIELDS(AnimationKeyFrameSpriteComponent)

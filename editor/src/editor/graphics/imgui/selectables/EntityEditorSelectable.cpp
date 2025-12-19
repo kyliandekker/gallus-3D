@@ -106,7 +106,7 @@ namespace gallus
 				bool temp = entity->IsActive();
 				if (ImGui::Checkbox(ImGui::IMGUI_FORMAT_ID("", CHECKBOX_ID, string_extensions::StringToUpper(entity->GetName()) + "_HIERARCHY").c_str(), &temp))
 				{
-					editor::G_SetEntityActive(m_EntityID, temp);
+					editor::g_SetEntityActive(m_EntityID, temp);
 				}
 				ImGui::PopStyleVar();
 
@@ -181,13 +181,13 @@ namespace gallus
 			//---------------------------------------------------------------------
 			void EntityEditorSelectable::OnRename(const std::string& a_sName)
 			{
-				editor::G_RenameEntity(m_EntityID, a_sName);
+				editor::g_RenameEntity(m_EntityID, a_sName);
 			}
 
 			//---------------------------------------------------------------------
 			void EntityEditorSelectable::OnDelete()
 			{
-				editor::G_DeleteEntity(m_EntityID);
+				editor::g_DeleteEntity(m_EntityID);
 			}
 
 			//---------------------------------------------------------------------
@@ -235,7 +235,7 @@ namespace gallus
 						ImGui::SameLine();
 						if (ImGui::IconButton(ImGui::IMGUI_FORMAT_ID(font::ICON_DELETE, BUTTON_ID, id + "_DELETE_INSPECTOR").c_str(), "Deletes the specific component from the selected entity.", size))
 						{
-							editor::G_DeleteComponent(sys, m_EntityID);
+							editor::g_DeleteComponent(sys, m_EntityID);
 						}
 
 						ImGui::PopStyleVar();
@@ -280,7 +280,7 @@ namespace gallus
 
 						if (ImGui::MenuItem(ImGui::IMGUI_FORMAT_ID(sys->GetSystemName(), MENU_ITEM_ID, "ADD_COMPONENT_MENU_INSPECTOR_" + sys->GetPropertyName()).c_str()))
 						{
-							editor::G_CreateComponent(sys, m_EntityID);
+							editor::g_CreateComponent(sys, m_EntityID);
 						}
 					}
 

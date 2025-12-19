@@ -326,10 +326,17 @@ namespace gallus
 									}
 								}
 
-								if (double_clicked && view->GetFileResource().GetMetaData()->GetAssetType() == gallus::resources::AssetType::Folder)
+								if (double_clicked)
 								{
-									m_pViewedFolder = view;
-									m_bNeedsRefresh = true;
+									if (view->GetFileResource().GetMetaData()->GetAssetType() == gallus::resources::AssetType::Folder)
+									{
+										m_pViewedFolder = view;
+										m_bNeedsRefresh = true;
+									}
+									else
+									{
+										view->OnDoubleClicked();
+									}
 								}
 
 								if (clicked)

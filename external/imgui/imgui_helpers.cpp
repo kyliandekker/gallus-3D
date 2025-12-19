@@ -65,9 +65,57 @@ namespace ImGui
 		return success;
 	}
 
-	bool IconCheckboxButton(const std::string& a_Label, bool* a_pValue, const std::string& a_sDescription, const ImVec2& a_Size, const ImVec4& a_Color)
+	bool IconCheckboxButton(const std::string& a_Label, bool* a_pValue, const std::string& a_sDescription, const ImVec2& a_Size, const ImVec4& a_vColor)
 	{
-		bool success = ImGui::CheckboxButton(a_Label, a_pValue, a_sDescription, a_Size, a_Color);
+		bool success = ImGui::CheckboxButton(a_Label, a_pValue, a_sDescription, a_Size, a_vColor);
+		return success;
+	}
+
+	bool ConsoleButton(const std::string& a_Label, bool* a_pValue, const std::string& a_sDescription, const ImVec2& a_vSize, int a_iNumber, const ImVec4& a_vColor, const ImVec4& a_vCircleColor)
+	{
+		ImVec2 startPos = ImGui::GetCursorScreenPos();
+		ImVec2 circlePos = startPos + ImVec2(a_vSize.x * 0.75f, a_vSize.y);
+
+		ImGui::SetCursorScreenPos(startPos);
+		bool success = IconCheckboxButton(a_Label, a_pValue, a_sDescription, a_vSize, a_vColor);
+
+		ImDrawList* pDrawList = ImGui::GetForegroundDrawList();
+
+		const float circleRadius = 12.5f;
+
+		ImVec4 textColorV = ImGui::GetStyle().Colors[ImGuiCol_Text];
+		ImVec4 circleColorV = a_vCircleColor;
+
+		if (!(*a_pValue))
+		{
+			textColorV.w = 0.4f;
+			circleColorV.w = 0.4f;
+		}
+
+		ImU32 textColor = ImGui::ColorConvertFloat4ToU32(textColorV);
+		ImU32 circleColor = ImGui::ColorConvertFloat4ToU32(circleColorV);
+
+		pDrawList->AddCircleFilled(circlePos, circleRadius, circleColor);
+
+		char numberBuffer[8] = { 0 };
+
+		if (a_iNumber > 99)
+		{
+			snprintf(numberBuffer, sizeof(numberBuffer), "99");
+		}
+		else
+		{
+			snprintf(numberBuffer, sizeof(numberBuffer), "%d", a_iNumber);
+		}
+
+		ImVec2 textSize = ImGui::CalcTextSize(numberBuffer);
+
+		ImVec2 textPos;
+		textPos.x = circlePos.x - (textSize.x * 0.5f);
+		textPos.y = circlePos.y - (textSize.y * 0.5f);
+
+		pDrawList->AddText(textPos, textColor, numberBuffer);
+
 		return success;
 	}
 

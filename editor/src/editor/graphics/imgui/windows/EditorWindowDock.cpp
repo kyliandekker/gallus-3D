@@ -54,11 +54,11 @@ namespace gallus
 							{
 								if (scenePath.extension() == ".scene")
 								{
-									editor::G_SetScene(scenePath, editor::EditorMethod::EDITOR_METHOD_SCENE);
+									editor::g_SetScene(scenePath, editor::EditorMethod::EDITOR_METHOD_SCENE);
 								}
 								else if (scenePath.extension() == ".prefab")
 								{
-									editor::G_SetScene(scenePath, editor::EditorMethod::EDITOR_METHOD_PREFAB);
+									editor::g_SetScene(scenePath, editor::EditorMethod::EDITOR_METHOD_PREFAB);
 								}
 
 								core::EDITOR_ENGINE->GetEditor().GetScene().LoadByPath(scenePath);
@@ -76,7 +76,7 @@ namespace gallus
 
 					if (ImGui::MenuItem(ImGui::IMGUI_FORMAT_ID(font::ICON_SAVE + std::string(" Save Scene"), MENU_ITEM_ID, "SAVE_SCENE_EDITOR").c_str(), "CTRL+S"))
 					{
-						editor::G_SaveScene();
+						editor::g_SaveScene();
 					}
 
 					if (!wasDirty)
@@ -91,7 +91,7 @@ namespace gallus
 				{
 					if (ImGui::MenuItem(ImGui::IMGUI_FORMAT_ID(font::ICON_MODEL + std::string(" Create Entity"), MENU_ITEM_ID, "CREATE_ENTITY_EDITOR").c_str(), "CTRL+SHIFT+N"))
 					{
-						editor::G_CreateEntity();
+						editor::g_CreateEntity();
 					}
 					ImGui::Separator();
 					if (graphics::imgui::EntityEditorSelectable* ent = dynamic_cast<graphics::imgui::EntityEditorSelectable*>(core::EDITOR_ENGINE->GetEditor().GetSelectable().get()))

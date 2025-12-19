@@ -860,11 +860,11 @@ namespace gallus
 				// back buffer rtv.
 				D3D12_CPU_DESCRIPTOR_HANDLE backRtv = GetCurrentRenderTargetView(false);
 				commandList->GetCommandList()->ClearRenderTargetView(backRtv, clearColor, 0, nullptr);
-				commandList->GetCommandList()->OMSetRenderTargets(1, &backRtv, FALSE, nullptr);
 
 				commandList->GetCommandList()->RSSetViewports(1, &m_WindowViewport);
 				commandList->GetCommandList()->RSSetScissorRects(1, &m_WindowScissorRect);
 #ifndef _EDITOR
+				commandList->GetCommandList()->OMSetRenderTargets(1, &backRtv, FALSE, &dsv);
 				if (renderTex && renderTex->CanBeDrawn())
 				{
 					if (renderTex->CanBeDrawn())
@@ -885,6 +885,7 @@ namespace gallus
 					}
 				}
 #else // _EDITOR
+				commandList->GetCommandList()->OMSetRenderTargets(1, &backRtv, FALSE, nullptr);
 				// 2. OR render the editor UI.
 				RenderUI(commandQueue, commandList, backRtv);
 #endif // _EDITOR

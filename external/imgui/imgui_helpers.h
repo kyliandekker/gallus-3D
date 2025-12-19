@@ -35,7 +35,8 @@ namespace ImGui
 	bool TextButton(const std::string& a_Label, const std::string& a_sDescription, const ImVec2& a_Size = ImVec2(0, 0), const ImVec4& a_Color = ImVec4(1, 1, 1, 1));
 
 	bool IconButton(const std::string& a_Label, const std::string& a_sDescription, const ImVec2& a_Size, const ImVec4& a_Color = ImGui::GetStyle().Colors[ImGuiCol_Text]);
-	bool IconCheckboxButton(const std::string& a_Label, bool* a_pValue, const std::string& a_sDescription, const ImVec2& a_Size, const ImVec4& a_Color = ImGui::GetStyle().Colors[ImGuiCol_Text]);
+	bool IconCheckboxButton(const std::string& a_Label, bool* a_pValue, const std::string& a_sDescription, const ImVec2& a_vSize, const ImVec4& a_Color = ImGui::GetStyle().Colors[ImGuiCol_Text]);
+	bool ConsoleButton(const std::string& a_Label, bool* a_pValue, const std::string& a_sDescription, const ImVec2& a_vSize, int a_iNumber, const ImVec4& a_Color = ImGui::GetStyle().Colors[ImGuiCol_Text], const ImVec4& a_vCircleColor = ImGui::GetStyle().Colors[ImGuiCol_TabActive]);
 
 	void BeginToolbar(const ImVec2& a_Size);
 	void EndToolbar(const ImVec2& a_Padding);

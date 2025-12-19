@@ -95,8 +95,8 @@
                 "transform": {
                     "transform": {
                         "position": {
-                            "x": 767.9450073242188,
-                            "y": 479.2003173828125,
+                            "x": 826.1050415039063,
+                            "y": 341.07025146484377,
                             "z": 0.0
                         },
                         "scale": {
@@ -105,9 +105,9 @@
                             "z": 0.0
                         },
                         "rotation": {
-                            "x": 0.0,
+                            "x": -0.0,
                             "y": 0.0,
-                            "z": 0.0
+                            "z": -0.0
                         },
                         "pivot": {
                             "x": -0.5,
@@ -131,7 +131,9 @@
                         "y": 1.0
                     }
                 },
-                "animation": {},
+                "animation": {
+                    "startingAnimation": "player_walk_default.anim"
+                },
                 "rigidbody": {
                     "useGravity": false,
                     "mass": 1.0,

@@ -32,6 +32,8 @@ namespace gallus
 
 			void LoadAnimation(const std::string& a_sAnimName);
 
+			void LoadAnimation();
+
 			/// <summary>
 			/// Updates the components.
 			/// </summary>
@@ -54,29 +56,10 @@ namespace gallus
 			{
 				m_bIsPlaying = false;
 			}
-
-#ifdef _EDITOR
-			/// <summary>
-			/// Sets the starting animation.
-			/// </summary>
-			/// <param name="a_sStartingAnimation">The starting animation represented as a string.</param>
-			void SetStartingAnimation(const std::string a_sStartingAnimation)
-			{
-				m_sStartingAnimation = a_sStartingAnimation;
-			}
-#endif // _EDITOR
-			/// <summary>
-			/// Retrieves the starting animation.
-			/// </summary>
-			/// <returns>A string representing the starting animation.</returns>
-			const std::string& GetStartingAnimation() const
-			{
-				return m_sStartingAnimation;
-			}
 		private:
-			std::weak_ptr<animation::AnimationTrack> m_AnimationTrack = {};
+			std::weak_ptr<animation::AnimationTrack> m_pAnimationTrack = {};
 			
-			std::string m_sStartingAnimation;
+			std::weak_ptr<animation::AnimationTrack> m_pStartingAnimation;
 
 			int m_iNextKeyFrameIndex = 0;
 			bool m_bIsLooping = false;
@@ -84,6 +67,7 @@ namespace gallus
 			float m_fAccumulatedTime = 0.0f;
 
 			BEGIN_EXPOSE_FIELDS_PARENT(AnimationComponent, Component)
+				EXPOSE_FIELD(AnimationComponent, m_pStartingAnimation, "Starting Animation", (FieldOptions{ .type = EditorFieldWidgetType::EditorFieldWidgetType_EngineResource, .assetType = resources::AssetType::Animation, .description = "If set, the sprite will start with this animation." }))
 			END_EXPOSE_FIELDS(AnimationComponent)
 			BEGIN_EXPOSE_GIZMOS(AnimationComponent)
 			END_EXPOSE_GIZMOS(AnimationComponent)

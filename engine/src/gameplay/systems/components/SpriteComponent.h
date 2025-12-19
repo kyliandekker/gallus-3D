@@ -13,11 +13,6 @@
 // resources
 #include "resources/AssetType.h"
 
-#ifdef _EDITOR
-// editor
-#include "editor/EditorExpose.h"
-#endif // _EDITOR
-
 namespace gallus
 {
 	namespace graphics
@@ -67,65 +62,15 @@ namespace gallus
 			void SetTexture(std::weak_ptr < graphics::dx12::Texture> a_pTexture);
 
 			/// <summary>
-			/// Retrieves the mesh used by the mesh component.
-			/// </summary>
-			/// <returns>Pointer to the mesh if the mesh exists, otherwise nullptr.</returns>
-			std::shared_ptr<graphics::dx12::Mesh> GetMesh() const
-			{
-				return m_pMesh.lock();
-			}
-
-			/// <summary>
-			/// Retrieves the shader used by the mesh component.
-			/// </summary>
-			/// <returns>Pointer to the mesh if the mesh exists, otherwise nullptr.</returns>
-			std::shared_ptr<graphics::dx12::ShaderBind> GetShader()
-			{
-				return m_pShaderBind.lock();
-			}
-
-			/// <summary>
-			/// Retrieves the texture used by the mesh component.
-			/// </summary>
-			/// <returns>Pointer to the mesh if the mesh exists, otherwise nullptr.</returns>
-			std::shared_ptr<graphics::dx12::Texture > GetTexture()
-			{
-				return m_pSprite.lock();
-			}
-
-			/// <summary>
-			/// Retrieves the sprite index.
-			/// </summary>
-			/// <returns>The sprite index.</returns>
-			int8_t GetSpriteIndex()
-			{
-				return m_iSpriteIndex;
-			}
-
-			/// <summary>
 			/// Sets the sprite index.
 			/// </summary>
 			/// <param name="a_iSpriteIndex">The index the sprite should have.</param>
 			void SetSpriteIndex(int8_t a_iSpriteIndex);
-
+			
 			/// <summary>
-			/// Retrieves the sprite color.
+			/// Retrieves the layer order.
 			/// </summary>
-			/// <returns>The sprite color.</returns>
-			const DirectX::XMFLOAT4& GetColor()
-			{
-				return m_vColor;
-			}
-
-			/// <summary>
-			/// Sets the sprite color.
-			/// </summary>
-			/// <param name="a_vColor">The color the sprite should have.</param>
-			void SetColor(const DirectX::XMFLOAT4& a_vColor)
-			{
-				m_vColor = a_vColor;
-			}
-
+			/// <returns>An integer representing the layer order.</returns>
 			int8_t GetOrder() const
 			{
 				return m_iOrder;
@@ -151,13 +96,14 @@ namespace gallus
 			DirectX::XMFLOAT4 m_vColor = { 1, 1, 1, 1 };
 
 			BEGIN_EXPOSE_FIELDS_PARENT(SpriteComponent, Component)
-				EXPOSE_FIELD(SpriteComponent, m_bIsStatic, "Static", (FieldOptions{ .type = EditorFieldWidgetType::Checkbox, .description = "Determines whether the sprite should stick on the screen or not." }))
-				EXPOSE_FIELD(SpriteComponent, m_iOrder, "Order", (FieldOptions{ .type = EditorFieldWidgetType::DragInt8, .onChangeFunc = MakeOnChangeFunc(&SpriteComponent::OnOrderChanged), .description = "Determines what sprites overlap other sprites." }))
-				EXPOSE_FIELD(SpriteComponent, m_pShaderBind, "Shader Bind", (FieldOptions{ .type = EditorFieldWidgetType::ObjectPtr }))
-				EXPOSE_FIELD(SpriteComponent, m_pSprite, "Sprite", (FieldOptions{ .type = EditorFieldWidgetType::AssetPickerPtr, .assetType = resources::AssetType::Sprite, .description = "Pointer to the texture asset used by this sprite. Can be nullptr if no texture is assigned. Determines the visual appearance of the sprite." }))
-				EXPOSE_FIELD(SpriteComponent, m_iSpriteIndex, "Sprite Index", (FieldOptions{ .type = EditorFieldWidgetType::DragInt8, .description = "Index of the sprite within a texture atlas. Used when the texture contains multiple sprites to select which one is displayed." }))
+				EXPOSE_FIELD(SpriteComponent, m_bIsStatic, "Static", (FieldOptions{ .type = EditorFieldWidgetType::EditorFieldWidgetType_Bool, .description = "Determines whether the sprite should stick on the screen or not." }))
+				EXPOSE_FIELD(SpriteComponent, m_iOrder, "Order", (FieldOptions{ .type = EditorFieldWidgetType::EditorFieldWidgetType_Int8, .onChangeFunc = MakeOnChangeFunc(&SpriteComponent::OnOrderChanged), .description = "Determines what sprites overlap other sprites." }))
+				EXPOSE_FIELD(SpriteComponent, m_vColor, "Color", (FieldOptions{ .type = EditorFieldWidgetType::EditorFieldWidgetType_Color, .description = "Determines what color the sprite has." }))
+				EXPOSE_FIELD(SpriteComponent, m_pShaderBind, "Shader Bind", (FieldOptions{ .type = EditorFieldWidgetType::EditorFieldWidgetType_ObjectPtr }))
+				EXPOSE_FIELD(SpriteComponent, m_pSprite, "Sprite", (FieldOptions{ .type = EditorFieldWidgetType::EditorFieldWidgetType_EngineResource, .assetType = resources::AssetType::Sprite, .description = "Pointer to the texture asset used by this sprite. Can be nullptr if no texture is assigned. Determines the visual appearance of the sprite." }))
+				EXPOSE_FIELD(SpriteComponent, m_iSpriteIndex, "Sprite Index", (FieldOptions{ .type = EditorFieldWidgetType::EditorFieldWidgetType_Int8, .description = "Index of the sprite within a texture atlas. Used when the texture contains multiple sprites to select which one is displayed." }))
 				EXPOSE_FIELD(SpriteComponent, m_pSprite, "Sprite Preview", (FieldOptions{
-				.type = EditorFieldWidgetType::TexturePreview,
+				.type = EditorFieldWidgetType::EditorFieldWidgetType_TexturePreview,
 				.relatedIndexFieldOffset = offsetof(SpriteComponent, m_iSpriteIndex)
 					}))
 			END_EXPOSE_FIELDS(SpriteComponent)

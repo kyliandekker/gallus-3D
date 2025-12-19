@@ -5,11 +5,6 @@
 // graphics
 #include "graphics/dx12/Transform.h"
 
-#ifdef _EDITOR
-// editor
-#include "editor/EditorExpose.h"
-#endif // _EDITOR
-
 namespace gallus
 {
 	namespace gameplay
@@ -27,24 +22,6 @@ namespace gallus
 			graphics::dx12::Transform& GetTransform();
 
 			/// <summary>
-			/// Retrieves the translation.
-			/// </summary>
-			/// <returns>Reference to the translation vector.</returns>
-			const DirectX::XMFLOAT3& GetTranslation() const
-			{
-				return m_vTranslation;
-			}
-
-			/// <summary>
-			/// Translates the component.
-			/// </summary>
-			/// <param name="a_vTranslation">The movement.</param>
-			void SetTranslation(const DirectX::XMFLOAT3& a_vTranslation)
-			{
-				m_vTranslation = a_vTranslation;
-			}
-
-			/// <summary>
 			/// Translates the component.
 			/// </summary>
 			/// <param name="a_vTranslation">The movement.</param>
@@ -60,10 +37,10 @@ namespace gallus
 			DirectX::XMFLOAT3 m_vTranslation = {};
 
 			BEGIN_EXPOSE_FIELDS_PARENT(TransformComponent, Component)
-				EXPOSE_FIELD(TransformComponent, m_Transform, "Transform", (FieldOptions{ .type = EditorFieldWidgetType::Object }))
+				EXPOSE_FIELD(TransformComponent, m_Transform, "Transform", (FieldOptions{ .type = EditorFieldWidgetType::EditorFieldWidgetType_Object }))
 			END_EXPOSE_FIELDS(TransformComponent)
 			BEGIN_EXPOSE_GIZMOS(TransformComponent)
-				EXPOSE_GIZMO(TransformComponent, m_Transform, (GizmoOptions{ EditorGizmoType::Transform }))
+				EXPOSE_GIZMO(TransformComponent, m_Transform, (GizmoOptions{ EditorGizmoType::EditorGizmoType_Transform }))
 			END_EXPOSE_GIZMOS(TransformComponent)
 			END_EXPOSE_TO_EDITOR(TransformComponent)
 		};

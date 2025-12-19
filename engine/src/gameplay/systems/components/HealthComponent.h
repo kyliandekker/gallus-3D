@@ -2,11 +2,6 @@
 
 #include "gameplay/systems/components/Component.h"
 
-// editor
-#ifdef _EDITOR
-#include "editor/EditorExpose.h"
-#endif // _EDITOR
-
 namespace gallus
 {
 	namespace gameplay
@@ -23,39 +18,16 @@ namespace gallus
 			void InitRealtime() override;
 
 			/// <summary>
-			/// Retrieves the health.
-			/// </summary>
-			/// <returns>Float representing the health.</returns>
-			float GetHealth() const
-			{
-				return m_fHealth;
-			}
-
-			/// <summary>
 			/// Sets the health.
 			/// </summary>
-			/// <param name="a_fHealth">The health.</param>
-			void SetHealth(float a_fHealth)
+			/// <param name="a_fDamage">The health.</param>
+			void TakeDamage(float a_fDamage)
 			{
-				m_fHealth = a_fHealth;
-			}
-
-			/// <summary>
-			/// Retrieves the max health.
-			/// </summary>
-			/// <returns>Float representing the max health.</returns>
-			float GetMaxHealth() const
-			{
-				return m_fMaxHealth;
-			}
-
-			/// <summary>
-			/// Sets the max health.
-			/// </summary>
-			/// <param name="a_fMaxHealth">The max health.</param>
-			void SetMaxHealth(float a_fMaxHealth)
-			{
-				m_fMaxHealth = a_fMaxHealth;
+				m_fHealth -= a_fDamage;
+				if (m_fHealth < 0)
+				{
+					m_fHealth = 0;
+				}
 			}
 		protected:
 			/// <summary>
@@ -68,8 +40,8 @@ namespace gallus
 			float m_fMaxHealth = 100;
 
 			BEGIN_EXPOSE_FIELDS_PARENT(HealthComponent, Component)
-				EXPOSE_FIELD(HealthComponent, m_fHealth, "Health", (FieldOptions{ .type = EditorFieldWidgetType::DragFloat, .min = "0", .max = "1000", .description = "The current health of the entity. Represents how much damage it can take before being destroyed or dying." }))
-				EXPOSE_FIELD(HealthComponent, m_fMaxHealth, "Max Health", (FieldOptions{ .type = EditorFieldWidgetType::DragFloat, .min = "0", .max = "1000", .description = "The maximum health the entity can have." }))
+				EXPOSE_FIELD(HealthComponent, m_fHealth, "Health", (FieldOptions{ .type = EditorFieldWidgetType::EditorFieldWidgetType_Float, .min = "0", .max = "1000", .description = "The current health of the entity. Represents how much damage it can take before being destroyed or dying." }))
+				EXPOSE_FIELD(HealthComponent, m_fMaxHealth, "Max Health", (FieldOptions{ .type = EditorFieldWidgetType::EditorFieldWidgetType_Float, .min = "0", .max = "1000", .description = "The maximum health the entity can have." }))
 			END_EXPOSE_FIELDS(HealthComponent)
 			BEGIN_EXPOSE_GIZMOS(HealthComponent)
 			END_EXPOSE_GIZMOS(HealthComponent)

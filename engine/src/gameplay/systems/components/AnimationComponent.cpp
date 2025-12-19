@@ -24,9 +24,9 @@ namespace gallus
 			{
 				return;
 			}
-			if (!m_sStartingAnimation.empty())
+			if (m_pStartingAnimation.lock())
 			{
-				LoadAnimation(m_sStartingAnimation);
+				m_pAnimationTrack = m_pStartingAnimation;
 				Start();
 			}
 			Component::InitRealtime();
@@ -35,7 +35,7 @@ namespace gallus
 		//---------------------------------------------------------------------
 		void AnimationComponent::UpdateRealtime(float a_fDeltaTime, UpdateTime a_UpdateTime)
 		{
-			if (auto animationTrack = m_AnimationTrack.lock())
+			if (auto animationTrack = m_pAnimationTrack.lock())
 			{
 				animationTrack->Update(m_EntityID, a_fDeltaTime);
 			}
@@ -44,15 +44,11 @@ namespace gallus
 		//---------------------------------------------------------------------
 		void AnimationComponent::LoadAnimation(const std::string& a_sAnimName)
 		{
-			if (auto animationTrack = m_AnimationTrack.lock())
-			{
-				if (animationTrack->GetName() == a_sAnimName)
-				{
-					return;
-				}
-			}
+		}
 
-			m_AnimationTrack = core::ENGINE->GetResourceAtlas().LoadAnimationTrack(a_sAnimName);
+		//---------------------------------------------------------------------
+		void AnimationComponent::LoadAnimation()
+		{
 			m_iNextKeyFrameIndex = 0;
 			m_fAccumulatedTime = 0.0f;
 		}
@@ -60,7 +56,7 @@ namespace gallus
 		//---------------------------------------------------------------------
 		void AnimationComponent::UpdateRealtimeInner(float a_fDeltaTime, UpdateTime a_UpdateTime)
 		{
-			auto animationTrack = m_AnimationTrack.lock();
+			auto animationTrack = m_pAnimationTrack.lock();
 			if (!animationTrack)
 			{
 				return;

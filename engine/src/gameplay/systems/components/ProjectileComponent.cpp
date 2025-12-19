@@ -36,7 +36,7 @@ namespace gallus
 					if (healthSystem.HasComponent(c.b))
 					{
 						HealthComponent& healthComponent = healthSystem.GetComponent(c.b);
-						healthComponent.SetHealth(healthComponent.GetHealth() - m_fDamage);
+						healthComponent.TakeDamage(m_fDamage);
 					}
 
 					if (auto explosionPrefab = m_ExplosionPrefab.lock())

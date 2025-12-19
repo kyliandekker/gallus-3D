@@ -16,6 +16,8 @@
 #include "graphics/dx12/Shader.h"
 #include "graphics/dx12/Mesh.h"
 
+#include "graphics/imgui/views/DataTypes/ColorView.h"
+
 // resources
 #include "resources/SrcData.h"
 
@@ -267,6 +269,12 @@ namespace gallus
 											.LoadPrefab(resource.GetPath().filename().generic_string());
 										break;
 									}
+									case resources::AssetType::Animation:
+									{
+										*a_pWeak = core::EDITOR_ENGINE->GetResourceAtlas()
+											.LoadAnimationTrack(resource.GetPath().filename().generic_string());
+										break;
+									}
 								}
 							}
 						},
@@ -378,7 +386,7 @@ namespace gallus
 				std::string fieldId = ImGui::IMGUI_FORMAT_ID("", INPUT_ID, string_extensions::StringToUpper(a_Field.m_sUIName) + "_INSPECTOR");
 				switch (a_Field.m_Options.type)
 				{
-					case EditorFieldWidgetType::DragFloat:
+					case EditorFieldWidgetType::EditorFieldWidgetType_Float:
 					{
 						float* value = reinterpret_cast<float*>(ptr);
 						func = [value, &a_Field, &fieldId]
@@ -389,7 +397,7 @@ namespace gallus
 						};
 						break;
 					}
-					case EditorFieldWidgetType::DragInt8:
+					case EditorFieldWidgetType::EditorFieldWidgetType_Int8:
 					{
 						func = [ptr, &a_Field, &fieldId]
 						{
@@ -406,7 +414,7 @@ namespace gallus
 						};
 						break;
 					}
-					case EditorFieldWidgetType::DragInt16:
+					case EditorFieldWidgetType::EditorFieldWidgetType_Int16:
 					{
 						func = [ptr, &a_Field, &fieldId]
 						{
@@ -423,7 +431,7 @@ namespace gallus
 						};
 						break;
 					}
-					case EditorFieldWidgetType::DragInt32:
+					case EditorFieldWidgetType::EditorFieldWidgetType_Int32:
 					{
 						func = [ptr, &a_Field, &fieldId]
 						{
@@ -440,7 +448,7 @@ namespace gallus
 						};
 						break;
 					}
-					case EditorFieldWidgetType::DragInt64:
+					case EditorFieldWidgetType::EditorFieldWidgetType_Int64:
 					{
 						func = [ptr, &a_Field, &fieldId]
 						{
@@ -457,7 +465,7 @@ namespace gallus
 						};
 						break;
 					}
-					case EditorFieldWidgetType::Checkbox:
+					case EditorFieldWidgetType::EditorFieldWidgetType_Bool:
 					{
 						bool* value = reinterpret_cast<bool*>(ptr);
 						func = [&a_Field, &fieldId, value]
@@ -468,7 +476,7 @@ namespace gallus
 						};
 						break;
 					}
-					case EditorFieldWidgetType::Toggle:
+					case EditorFieldWidgetType::EditorFieldWidgetType_Switch:
 					{
 						bool* value = reinterpret_cast<bool*>(ptr);
 						func = [&a_Field, &fieldId, value]
@@ -479,7 +487,7 @@ namespace gallus
 						};
 						break;
 					}
-					case EditorFieldWidgetType::Vector2Field:
+					case EditorFieldWidgetType::EditorFieldWidgetType_Vector2:
 					{
 						DirectX::XMFLOAT2* value = reinterpret_cast<DirectX::XMFLOAT2*>(ptr);
 						func = [&a_Field, &fieldId, value]
@@ -490,7 +498,7 @@ namespace gallus
 						};
 						break;
 					}
-					case EditorFieldWidgetType::Vector3Field:
+					case EditorFieldWidgetType::EditorFieldWidgetType_Vector3:
 					{
 						DirectX::XMFLOAT3* value = reinterpret_cast<DirectX::XMFLOAT3*>(ptr);
 						func = [&a_Field, &fieldId, value]
@@ -501,7 +509,20 @@ namespace gallus
 						};
 						break;
 					}
-					case EditorFieldWidgetType::Quaternion:
+					case EditorFieldWidgetType::EditorFieldWidgetType_Color:
+					{
+						DirectX::XMFLOAT3* value = reinterpret_cast<DirectX::XMFLOAT3*>(ptr);
+						func = [&a_Field, &fieldId, value]
+						{
+							bool val = ImGui::ColorEdit4(fieldId.c_str(),
+								reinterpret_cast<float*>(value)
+							);
+							ImGui::ShowTooltip(a_Field.m_Options.description);
+							return val;
+						};
+						break;
+					}
+					case EditorFieldWidgetType::EditorFieldWidgetType_Quaternion:
 					{
 						DirectX::XMVECTOR* value = reinterpret_cast<DirectX::XMVECTOR*>(ptr);
 
@@ -513,7 +534,7 @@ namespace gallus
 						};
 						break;
 					}
-					case EditorFieldWidgetType::AssetPickerPtr:
+					case EditorFieldWidgetType::EditorFieldWidgetType_EngineResource:
 					{
 						std::weak_ptr<gallus::resources::EngineResource>* pWeak =
 							reinterpret_cast<std::weak_ptr<gallus::resources::EngineResource>*>(ptr);
@@ -534,7 +555,7 @@ namespace gallus
 
 						break;
 					}
-					case EditorFieldWidgetType::Object:
+					case EditorFieldWidgetType::EditorFieldWidgetType_Object:
 					{
 						showTable = false;
 						IExposableToEditor* editorObject = dynamic_cast<IExposableToEditor*>(reinterpret_cast<IExposableToEditor*>(ptr));
@@ -542,7 +563,7 @@ namespace gallus
 						return ShowObject(editorObject, a_bInternal);
 						break;
 					}
-					case EditorFieldWidgetType::ObjectPtr:
+					case EditorFieldWidgetType::EditorFieldWidgetType_ObjectPtr:
 					{
 						showTable = false;
 
@@ -552,7 +573,7 @@ namespace gallus
 						return ShowObject(pEditorObject, a_bInternal);
 						break;
 					}
-					case EditorFieldWidgetType::EnumDropdown:
+					case EditorFieldWidgetType::EditorFieldWidgetType_Enum:
 					{
 						func = [ptr, &a_Field, &fieldId]
 						{
@@ -568,7 +589,7 @@ namespace gallus
 						};
 						break;
 					}
-					case EditorFieldWidgetType::TexturePreview:
+					case EditorFieldWidgetType::EditorFieldWidgetType_TexturePreview:
 					{
 						func = [ptr, &a_Field, a_pObject]()
 						{
@@ -584,7 +605,7 @@ namespace gallus
 						};
 						break;
 					}
-					case EditorFieldWidgetType::Button:
+					case EditorFieldWidgetType::EditorFieldWidgetType_Button:
 					{
 						func = [ptr, &a_Field, a_pObject]()
 						{
@@ -735,7 +756,7 @@ namespace gallus
 
 					switch (gizmo.m_Options.type)
 					{
-						case EditorGizmoType::Transform:
+						case EditorGizmoType::EditorGizmoType_Transform:
 						{
 							graphics::dx12::Transform* value = reinterpret_cast<graphics::dx12::Transform*>(ptr);
 							if (ShowTransformGizmo(a_vScenePos, a_vSize, a_vPanOffset, a_fZoom, *value))

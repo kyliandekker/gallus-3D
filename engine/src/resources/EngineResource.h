@@ -204,12 +204,12 @@ namespace gallus
 #endif // _LOAD_BY_PATH
 
 			BEGIN_EXPOSE_FIELDS(EngineResource)
-				EXPOSE_FIELD(EngineResource, m_bIsDestroyable, "Is Destroyable", (FieldOptions{ .type = EditorFieldWidgetType::Checkbox, .description = "Indicates if this resource can be destroyed or deleted.", .disabled = true, .internal = true }))
-				EXPOSE_FIELD(EngineResource, m_bIsLocked, "Is Locked", (FieldOptions{ .type = EditorFieldWidgetType::Checkbox, .description = "Indicates if this resource is locked from modifications.", .disabled = true, .internal = true }))
-				EXPOSE_FIELD(EngineResource, m_bIsUnique, "Is Unique", (FieldOptions{ .type = EditorFieldWidgetType::Checkbox, .description = "Specifies if this resource is unique and cannot have duplicates.", .disabled = true, .internal = true }))
+				EXPOSE_FIELD(EngineResource, m_bIsDestroyable, "Is Destroyable", (FieldOptions{ .type = EditorFieldWidgetType::EditorFieldWidgetType_Bool, .description = "Indicates if this resource can be destroyed or deleted.", .disabled = true, .internal = true }))
+				EXPOSE_FIELD(EngineResource, m_bIsLocked, "Is Locked", (FieldOptions{ .type = EditorFieldWidgetType::EditorFieldWidgetType_Bool, .description = "Indicates if this resource is locked from modifications.", .disabled = true, .internal = true }))
+				EXPOSE_FIELD(EngineResource, m_bIsUnique, "Is Unique", (FieldOptions{ .type = EditorFieldWidgetType::EditorFieldWidgetType_Bool, .description = "Specifies if this resource is unique and cannot have duplicates.", .disabled = true, .internal = true }))
 				EXPOSE_FIELD(EngineResource, m_ResourceCategory, "Resource Category",
 					(FieldOptions{
-						.type = EditorFieldWidgetType::EnumDropdown,
+						.type = EditorFieldWidgetType::EditorFieldWidgetType_Enum,
 						.enumToStringFunc = MakeEnumToStringFunc<EngineResourceCategory>(EngineResourceCategoryToString),
 						.description = "The category this resource belongs to, used for organizational purposes..",
 						.disabled = true, 
@@ -217,7 +217,7 @@ namespace gallus
 					}))
 				EXPOSE_FIELD(EngineResource, m_AssetType, "Asset Type",
 					(FieldOptions{
-						.type = EditorFieldWidgetType::EnumDropdown,
+						.type = EditorFieldWidgetType::EditorFieldWidgetType_Enum,
 						.enumToStringFunc = MakeEnumToStringFunc<AssetType>(AssetTypeToString),
 						.description = "The specific type of asset this resource represents.",
 						.disabled = true, 

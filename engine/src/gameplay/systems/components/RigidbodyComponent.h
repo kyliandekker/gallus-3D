@@ -5,11 +5,6 @@
 // external
 #include <DirectXMath.h>
 
-#ifdef _EDITOR
-// editor
-#include "editor/EditorExpose.h"
-#endif // _EDITOR
-
 namespace gallus
 {
 	namespace gameplay
@@ -20,24 +15,6 @@ namespace gallus
 		class RigidbodyComponent : public Component
 		{
 		public:
-			/// <summary>
-			/// Retrieves whether the rigidbody should use gravity or not.
-			/// </summary>
-			/// <returns>True if gravity is enabled, false otherwise.</returns>
-			bool UseGravity() const
-			{
-				return m_bUseGravity;
-			}
-
-			/// <summary>
-			/// Sets whether the rigidbody should use gravity or not.
-			/// </summary>
-			/// <param name="a_bUseGravity">True to enable gravity, false otherwise.</param>
-			void SetUseGravity(bool a_bUseGravity)
-			{
-				m_bUseGravity = a_bUseGravity;
-			}
-
 			/// <summary>
 			/// Adds force to the rigidbody.
 			/// </summary>
@@ -57,11 +34,6 @@ namespace gallus
 				m_fMass = a_fMass;
 			}
 
-			float GetMass()
-			{
-				return m_fMass;
-			}
-
 			void SetLinearDamping(float a_fLinearDamping)
 			{
 				if (a_fLinearDamping < 0.0f)
@@ -73,11 +45,6 @@ namespace gallus
 					a_fLinearDamping = 1.0f;
 				}
 				m_fLinearDamping = a_fLinearDamping;
-			}
-
-			float GetLinearDamping()
-			{
-				return m_fLinearDamping;
 			}
 		protected:
 			/// <summary>
@@ -96,9 +63,9 @@ namespace gallus
 			float m_fLinearDamping = 0.98f;
 
 			BEGIN_EXPOSE_FIELDS_PARENT(RigidbodyComponent, Component)
-				EXPOSE_FIELD(RigidbodyComponent, m_bUseGravity, "Use Gravity", (FieldOptions{ .type = EditorFieldWidgetType::Toggle, .description = "Determines whether the object is affected by gravity. When true, the rigidbody will accelerate downward according to the physics system; when false, it will ignore gravity." }))
-				EXPOSE_FIELD(RigidbodyComponent, m_fMass, "Mass", (FieldOptions{ .type = EditorFieldWidgetType::DragFloat, .min = "0.0001", .max = "9999999", .description = "The mass of the rigidbody. Affects how forces influence the object; higher mass makes it harder to accelerate." }))
-				EXPOSE_FIELD(RigidbodyComponent, m_fLinearDamping, "Linear Damping", (FieldOptions{ .type = EditorFieldWidgetType::DragFloat, .min = "0.01", .max = "1.0f", .description = "The linear damping factor applied to the rigidbody�s velocity. Values closer to 1 reduce movement slowly, values closer to 0 slow the object more quickly over time." }))
+				EXPOSE_FIELD(RigidbodyComponent, m_bUseGravity, "Use Gravity", (FieldOptions{ .type = EditorFieldWidgetType::EditorFieldWidgetType_Switch, .description = "Determines whether the object is affected by gravity. When true, the rigidbody will accelerate downward according to the physics system; when false, it will ignore gravity." }))
+				EXPOSE_FIELD(RigidbodyComponent, m_fMass, "Mass", (FieldOptions{ .type = EditorFieldWidgetType::EditorFieldWidgetType_Float, .min = "0.0001", .max = "9999999", .description = "The mass of the rigidbody. Affects how forces influence the object; higher mass makes it harder to accelerate." }))
+				EXPOSE_FIELD(RigidbodyComponent, m_fLinearDamping, "Linear Damping", (FieldOptions{ .type = EditorFieldWidgetType::EditorFieldWidgetType_Float, .min = "0.01", .max = "1.0f", .description = "The linear damping factor applied to the rigidbody�s velocity. Values closer to 1 reduce movement slowly, values closer to 0 slow the object more quickly over time." }))
 			END_EXPOSE_FIELDS(RigidbodyComponent)
 			BEGIN_EXPOSE_GIZMOS(RigidbodyComponent)
 			END_EXPOSE_GIZMOS(RigidbodyComponent)

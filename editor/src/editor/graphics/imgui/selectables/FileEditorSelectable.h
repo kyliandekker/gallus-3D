@@ -138,6 +138,8 @@ namespace gallus
 
 				std::string GetName() const override;
 
+				void OnDoubleClicked() override;
+
 				void RenderEditorFields() override;
 			private:
 				gallus::resources::FileResource& m_FileResource;
