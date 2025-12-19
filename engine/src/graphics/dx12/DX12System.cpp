@@ -274,6 +274,10 @@ namespace gallus
 #endif // IMGUI_DISABLE
 				int fenceValue = dCommandQueue->ExecuteCommandList(dCommandList);
 				dCommandQueue->WaitForFenceValue(fenceValue);
+				
+				core::ENGINE->GetECS().OnEntitiesUpdated() += std::bind(&DX12System::ReorderSpriteComponents, this);
+				core::ENGINE->GetECS().OnEntityComponentsUpdated() += std::bind(&DX12System::ReorderSpriteComponents, this);
+				ReorderSpriteComponents();
 
 				m_FpsCounter.Initialize();
 				m_FpsCounter.m_eOnNewFrame += std::bind(&DX12System::NewFrame, this, std::placeholders::_1);
@@ -943,29 +947,6 @@ namespace gallus
 				{
 					pair.second.Render(a_pCommandList, pair.first, *m_pActiveCamera);
 				}
-				
-				// m_aOrderedSprites stores pointers
-				m_aOrderedSprites.clear();
-
-				// Collect pointers to components
-				for (auto& pair : core::ENGINE->GetECS()
-					.GetSystem<gameplay::SpriteSystem>()
-					.GetComponents())
-				{
-					m_aOrderedSprites.push_back(&pair.second); // take address of the ref
-				}
-
-				// Sort back-to-front by order
-				std::sort(
-					m_aOrderedSprites.begin(),
-					m_aOrderedSprites.end(),
-					[](gameplay::SpriteComponent* a, gameplay::SpriteComponent* b)
-					{
-						return a->GetOrder() < b->GetOrder();
-					}
-				);
-
-				// Render in order
 				for (auto* sprite : m_aOrderedSprites)
 				{
 					sprite->Render(a_pCommandList, sprite->GetEntityID(), *m_pActiveCamera);
@@ -1052,6 +1033,31 @@ namespace gallus
 					renderTex->SetResourceCategory(resources::EngineResourceCategory::System);
 					renderTex->SetIsDestroyable(false);
 				}
+			}
+
+			void DX12System::ReorderSpriteComponents()
+			{
+				// m_aOrderedSprites stores pointers
+				m_aOrderedSprites.clear();
+
+				// Collect pointers to components
+				for (auto& pair : core::ENGINE->GetECS()
+					.GetSystem<gameplay::SpriteSystem>()
+					.GetComponents())
+				{
+					m_aOrderedSprites.push_back(&pair.second); // take address of the ref
+				}
+
+				// Sort back-to-front by order
+				std::sort(
+					m_aOrderedSprites.begin(),
+					m_aOrderedSprites.end(),
+					[](gameplay::SpriteComponent* a, gameplay::SpriteComponent* b)
+					{
+						return a->GetOrder() < b->GetOrder();
+					}
+				);
+
 			}
 		}
 	}

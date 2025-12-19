@@ -166,7 +166,7 @@ namespace gallus
 			/// Retrieves the event that gets called after any entity has been updated.
 			/// </summary>
 			/// <returns>A const reference to the event.</returns>
-			const SimpleEvent<>& OnEntitiesUpdated() const
+			const Event<>& OnEntitiesUpdated() const
 			{
 				return m_eOnEntitiesUpdated;
 			}
@@ -175,13 +175,13 @@ namespace gallus
 			/// Retrieves the event that gets called after any entity component has been updated.
 			/// </summary>
 			/// <returns>A const reference to the event.</returns>
-			const SimpleEvent<>& OnEntityComponentsUpdated() const
+			const Event<>& OnEntityComponentsUpdated() const
 			{
 				return m_eOnEntityComponentsUpdated;
 			}
 		private:
-			SimpleEvent<> m_eOnEntitiesUpdated;
-			SimpleEvent<> m_eOnEntityComponentsUpdated;
+			Event<> m_eOnEntitiesUpdated;
+			Event<> m_eOnEntityComponentsUpdated;
 
 			std::vector<AbstractECSSystem*> m_aSystems;
 			std::vector<Entity> m_aEntities;

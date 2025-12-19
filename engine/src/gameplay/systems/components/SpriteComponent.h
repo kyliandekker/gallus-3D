@@ -139,6 +139,8 @@ namespace gallus
 			/// <param name="a_Camera">The camera.</param>
 			void Render(std::shared_ptr<graphics::dx12::CommandList> a_pCommandList, const EntityID& a_EntityID, const graphics::dx12::Camera& a_Camera);
 		private:
+			void OnOrderChanged();
+
 			bool m_bIsStatic = false;
 			int8_t m_iOrder = false;
 
@@ -150,7 +152,7 @@ namespace gallus
 
 			BEGIN_EXPOSE_FIELDS_PARENT(SpriteComponent, Component)
 				EXPOSE_FIELD(SpriteComponent, m_bIsStatic, "Static", (FieldOptions{ .type = EditorFieldWidgetType::Checkbox, .description = "Determines whether the sprite should stick on the screen or not." }))
-				EXPOSE_FIELD(SpriteComponent, m_iOrder, "Order", (FieldOptions{ .type = EditorFieldWidgetType::DragInt8, .description = "Determines what sprites overlap other sprites." }))
+				EXPOSE_FIELD(SpriteComponent, m_iOrder, "Order", (FieldOptions{ .type = EditorFieldWidgetType::DragInt8, .onChangeFunc = MakeOnChangeFunc(&SpriteComponent::OnOrderChanged), .description = "Determines what sprites overlap other sprites." }))
 				EXPOSE_FIELD(SpriteComponent, m_pShaderBind, "Shader Bind", (FieldOptions{ .type = EditorFieldWidgetType::ObjectPtr }))
 				EXPOSE_FIELD(SpriteComponent, m_pSprite, "Sprite", (FieldOptions{ .type = EditorFieldWidgetType::AssetPickerPtr, .assetType = resources::AssetType::Sprite, .description = "Pointer to the texture asset used by this sprite. Can be nullptr if no texture is assigned. Determines the visual appearance of the sprite." }))
 				EXPOSE_FIELD(SpriteComponent, m_iSpriteIndex, "Sprite Index", (FieldOptions{ .type = EditorFieldWidgetType::DragInt8, .description = "Index of the sprite within a texture atlas. Used when the texture contains multiple sprites to select which one is displayed." }))

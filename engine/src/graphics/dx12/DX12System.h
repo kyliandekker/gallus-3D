@@ -365,6 +365,11 @@ namespace gallus
 				/// </summary>
 				/// <returns>Pointer to the render texture.</returns>
 				std::weak_ptr<Texture> GetRenderTexture();
+				
+				/// <summary>
+				/// Reorders all sprite components based on layer index.
+				/// </summary>
+				void ReorderSpriteComponents();
 
 				SimpleEvent<DX12System&> m_eOnInitialize;
 				SimpleEvent<std::shared_ptr<dx12::CommandList>> m_eOnRender;

@@ -135,11 +135,14 @@ namespace gallus
 				}
 			}
 		}
-
-		/// <summary>
-		/// Sets the sprite index.
-		/// </summary>
-		/// <param name="a_iSpriteIndex">The index the sprite should have.</param>
+		
+		//---------------------------------------------------------------------
+		void SpriteComponent::OnOrderChanged()
+		{
+			core::ENGINE->GetDX12().ReorderSpriteComponents();
+		}
+		
+		//---------------------------------------------------------------------
 		void SpriteComponent::SetSpriteIndex(int8_t a_iSpriteIndex)
 		{
 			size_t numSpriteRects = 0;

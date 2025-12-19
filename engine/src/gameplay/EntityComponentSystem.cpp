@@ -100,8 +100,9 @@ namespace gallus
 
 			const EntityID id(++m_iNextID);
 			m_aEntities.emplace_back(id, a_sName);
-
+			
 			m_eOnEntitiesUpdated();
+			m_eOnEntityComponentsUpdated();
 
 			return id;
 		}
