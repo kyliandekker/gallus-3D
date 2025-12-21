@@ -8,7 +8,7 @@ namespace gallus
 {
 	namespace animation
 	{
-		class AnimationTrack;
+		class Animation;
 	}
 	namespace gameplay
 	{
@@ -57,9 +57,9 @@ namespace gallus
 				m_bIsPlaying = false;
 			}
 		private:
-			std::weak_ptr<animation::AnimationTrack> m_pAnimationTrack = {};
+			std::weak_ptr<animation::Animation> m_pAnimation = {};
 			
-			std::weak_ptr<animation::AnimationTrack> m_pStartingAnimation;
+			std::weak_ptr<animation::Animation> m_pStartingAnimation;
 
 			int m_iNextKeyFrameIndex = 0;
 			bool m_bIsLooping = false;

@@ -9,6 +9,7 @@
 #include "graphics/dx12/ShaderBind.h"
 #include "graphics/dx12/Shader.h"
 #include "graphics/dx12/Transform.h"
+#include "graphics/dx12/Material.h"
 #include "graphics/dx12/CommandList.h"
 #include "graphics/dx12/CommandQueue.h"
 
@@ -106,6 +107,11 @@ namespace gallus
 			if (!core::ENGINE->GetECS().GetEntity(a_EntityID)->IsActive())
 			{
 				return;
+			}
+
+			if (auto material = core::ENGINE->GetResourceAtlas().GetDefaultMaterial().lock())
+			{
+				material->Bind(a_pCommandList);
 			}
 
 			float colorData[4] = { m_vColor.x, m_vColor.y, m_vColor.z, m_vColor.w };

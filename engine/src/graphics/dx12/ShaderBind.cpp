@@ -38,7 +38,6 @@ namespace gallus
 				CD3DX12_RASTERIZER_DESC rasterDesc(D3D12_DEFAULT);
 				rasterDesc.CullMode = D3D12_CULL_MODE_BACK;
 
-				// Blend state (straight alpha)
 				D3D12_BLEND_DESC blendDesc = {};
 				blendDesc.AlphaToCoverageEnable = FALSE;
 				blendDesc.IndependentBlendEnable = FALSE;
@@ -56,14 +55,12 @@ namespace gallus
 
 				blendDesc.RenderTarget[0] = rtBlendDesc;
 
-				// Depth state: test ON, write OFF
 				CD3DX12_DEPTH_STENCIL_DESC depthDesc(D3D12_DEFAULT);
 				depthDesc.DepthEnable = TRUE;
-				depthDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+				depthDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
 				depthDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 				depthDesc.StencilEnable = FALSE;
 
-				// Render target formats
 				D3D12_RT_FORMAT_ARRAY rtvFormats = {};
 				rtvFormats.NumRenderTargets = 1;
 				rtvFormats.RTFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM; // Must match actual RTV

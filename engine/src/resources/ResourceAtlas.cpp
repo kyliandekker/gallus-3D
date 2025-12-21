@@ -12,11 +12,12 @@
 #include "graphics/dx12/Shader.h"
 #include "graphics/dx12/ShaderBind.h"
 #include "graphics/dx12/Mesh.h"
+#include "graphics/dx12/Material.h"
 #include "graphics/dx12/CommandList.h"
 #include "graphics/dx12/CommandQueue.h"
 
 // animation
-#include "animation/AnimationTrack.h"
+#include "animation/Animation.h"
 
 // logger
 #include "logger/Logger.h"
@@ -311,6 +312,40 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
+		std::weak_ptr<graphics::dx12::Material> ResourceAtlas::LoadMaterial(const std::string& a_sName)
+		{
+			std::shared_ptr<graphics::dx12::Material> material = GetResource(m_aMaterials, a_sName, fs::path());
+			if (!material->IsValid())
+			{
+				//#ifdef _EDITOR
+				resources::FileResource* fileResource = nullptr;
+				if (!GetResource(a_sName, fileResource))
+				{
+					LOG(LogSeverity::LOGSEVERITY_ERROR, "Could not find resource: \"%s\".", a_sName.c_str());
+					return material;
+				}
+
+				fs::path meshPath = fileResource->GetPath().lexically_normal();
+				material->LoadByPath(meshPath);
+				//#else
+				// 
+				//#endif // _EDITOR
+			}
+			return material;
+		}
+
+		//---------------------------------------------------------------------
+		std::weak_ptr<graphics::dx12::Material> ResourceAtlas::LoadMaterialEmpty(const std::string& a_sName)
+		{
+			std::shared_ptr<graphics::dx12::Material> material = GetResource(m_aMaterials, a_sName, fs::path());
+			if (!material->IsValid())
+			{
+				material->LoadByNameEmpty(a_sName);
+			}
+			return material;
+		}
+
+		//---------------------------------------------------------------------
 		std::weak_ptr<gameplay::Prefab> ResourceAtlas::LoadPrefab(const std::string& a_sName)
 		{
 			std::shared_ptr<gameplay::Prefab> prefab = GetResource(m_aPrefabs, a_sName, fs::path());
@@ -334,9 +369,9 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		std::weak_ptr<animation::AnimationTrack> ResourceAtlas::LoadAnimationTrack(const std::string& a_sName)
+		std::weak_ptr<animation::Animation> ResourceAtlas::LoadAnimation(const std::string& a_sName)
 		{
-			std::shared_ptr<animation::AnimationTrack> animation = GetResource(m_aAnimationTracks, a_sName, fs::path());
+			std::shared_ptr<animation::Animation> animation = GetResource(m_aAnimations, a_sName, fs::path());
 			if (!animation->IsValid())
 			{
 				//#ifdef _EDITOR
@@ -381,12 +416,6 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		std::weak_ptr<graphics::dx12::ShaderBind> ResourceAtlas::GetRenderTexShaderBind()
-		{
-			return m_aShaderBinds[RENDER_TEX];
-		}
-
-		//---------------------------------------------------------------------
 		std::weak_ptr<graphics::dx12::Texture> ResourceAtlas::GetDefaultTexture()
 		{
 			return m_aTextures[MISSING + 1];
@@ -396,6 +425,12 @@ namespace gallus
 		std::weak_ptr<graphics::dx12::Mesh> ResourceAtlas::GetDefaultMesh()
 		{
 			return m_aMeshes[MISSING];
+		}
+
+		//---------------------------------------------------------------------
+		std::weak_ptr<graphics::dx12::Material> ResourceAtlas::GetDefaultMaterial()
+		{
+			return m_aMaterials[MISSING];
 		}
 
 		//---------------------------------------------------------------------
@@ -428,9 +463,114 @@ namespace gallus
 			return m_aMeshes;
 		}
 
-		const std::vector<std::shared_ptr<animation::AnimationTrack>>& ResourceAtlas::GetAnimationTracks() const
+		//---------------------------------------------------------------------
+		const std::vector<std::shared_ptr<graphics::dx12::Material>>& ResourceAtlas::GetMaterials() const
 		{
-			return m_aAnimationTracks;
+			return m_aMaterials;
+		}
+
+		//---------------------------------------------------------------------
+		const std::vector<std::shared_ptr<animation::Animation>>& ResourceAtlas::GetAnimations() const
+		{
+			return m_aAnimations;
+		}
+
+		//---------------------------------------------------------------------
+		std::vector<std::weak_ptr<resources::EngineResource>> ResourceAtlas::GetResourcesOfType(resources::AssetType a_AssetType, resources::EngineResourceCategory a_Category)
+		{
+			std::vector<std::weak_ptr<resources::EngineResource>> engineResources;
+			switch (a_AssetType)
+			{
+				case resources::AssetType::Animation:
+				{
+					for (auto resource : m_aAnimations)
+					{
+						if (a_Category == resources::EngineResourceCategory::Unknown || resource->GetResourceCategory() == a_Category)
+						{
+							engineResources.push_back(resource);
+						}
+					}
+					break;
+				}
+				case resources::AssetType::Mesh:
+				{
+					for (auto resource : m_aMeshes)
+					{
+						if (a_Category == resources::EngineResourceCategory::Unknown || resource->GetResourceCategory() == a_Category)
+						{
+							engineResources.push_back(resource);
+						}
+					}
+					break;
+				}
+				case resources::AssetType::Material:
+				{
+					for (auto resource : m_aMaterials)
+					{
+						if (a_Category == resources::EngineResourceCategory::Unknown || resource->GetResourceCategory() == a_Category)
+						{
+							engineResources.push_back(resource);
+						}
+					}
+					break;
+				}
+				case resources::AssetType::PixelShader:
+				{
+					for (auto resource : m_aPixelShaders)
+					{
+						if (a_Category == resources::EngineResourceCategory::Unknown || resource->GetResourceCategory() == a_Category)
+						{
+							engineResources.push_back(resource);
+						}
+					}
+					break;
+				}
+				case resources::AssetType::VertexShader:
+				{
+					for (auto resource : m_aVertexShaders)
+					{
+						if (a_Category == resources::EngineResourceCategory::Unknown || resource->GetResourceCategory() == a_Category)
+						{
+							engineResources.push_back(resource);
+						}
+					}
+					break;
+				}
+				case resources::AssetType::ShaderBind:
+				{
+					for (auto resource : m_aShaderBinds)
+					{
+						if (a_Category == resources::EngineResourceCategory::Unknown || resource->GetResourceCategory() == a_Category)
+						{
+							engineResources.push_back(resource);
+						}
+					}
+					break;
+				}
+				case resources::AssetType::Sprite:
+				{
+					for (auto resource : m_aTextures)
+					{
+						if (a_Category == resources::EngineResourceCategory::Unknown || resource->GetResourceCategory() == a_Category)
+						{
+							engineResources.push_back(resource);
+						}
+					}
+					break;
+				}
+				case resources::AssetType::Prefab:
+				{
+					for (auto resource : m_aPrefabs)
+					{
+						if (a_Category == resources::EngineResourceCategory::Unknown || resource->GetResourceCategory() == a_Category)
+						{
+							engineResources.push_back(resource);
+						}
+					}
+					break;
+				}
+			}
+			return engineResources;
 		}
 	}
 }

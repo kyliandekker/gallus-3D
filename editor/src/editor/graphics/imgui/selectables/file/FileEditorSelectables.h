@@ -7,6 +7,7 @@
 
 // graphics
 #include "graphics/imgui/views/DataTypes/StringDropdown.h"
+#include "graphics/dx12/Material.h"
 
 // audio
 #include "audio/ChunkCollection.h"
@@ -133,6 +134,20 @@ namespace gallus
 
 				StringDropdown<resources::AssetType> m_AssetTypeDropdown; /// Drop down UI element for selecting asset types.
 				audio::ChunkCollection m_SongData;
+			};
+
+			class MaterialFileEditorSelectables : public FileEditorSelectables
+			{
+			public:
+				/// <summary>
+				/// Constructs a file editor selectable.
+				/// </summary>
+				/// <param name="a_Window">The ImGui window for rendering the view.</param>
+				MaterialFileEditorSelectables(ImGuiWindow& a_Window, FileEditorSelectable& a_FileEditorSelectable);
+
+				void Render(FileEditorSelectable& a_FileEditorSelectable) override;
+			protected:
+				graphics::dx12::Material m_Material;
 			};
 		}
 	}

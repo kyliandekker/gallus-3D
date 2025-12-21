@@ -27,6 +27,7 @@
 #include "editor/graphics/imgui/EditorWindowsConfig.h"
 #include "editor/core/EditorEngine.h"
 #include "editor/EditorGlobalFunctions.h"
+#include "editor/graphics/imgui/RenderEditorExposable.h"
 
 namespace gallus
 {
@@ -447,6 +448,18 @@ namespace gallus
 				}
 
 				return true;
+			}
+
+			MaterialFileEditorSelectables::MaterialFileEditorSelectables(ImGuiWindow& a_Window, FileEditorSelectable& a_FileEditorSelectable) : FileEditorSelectables(a_Window, a_FileEditorSelectable)
+			{
+				m_Material.LoadByName(a_FileEditorSelectable.GetFileResource().GetPath().filename().generic_string());
+			}
+
+			void MaterialFileEditorSelectables::Render(FileEditorSelectable& a_FileEditorSelectable)
+			{
+				if (RenderObjectFields(&m_Material, false))
+				{
+				}
 			}
 		}
 	}

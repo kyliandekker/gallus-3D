@@ -15,69 +15,9 @@
             "y": -0.5,
             "z": -0.5
         },
-        "fieldofView": 90.0
+        "fieldofView": 55.0
     },
     "entities": [
-        {
-            "name": "Other Character",
-            "isActive": true,
-            "components": {
-                "sprite": {
-                    "static": false,
-                    "order": 0,
-                    "shaderBind": {
-                        "pixelShader": "pixelShader.hlsl",
-                        "vertexShader": "vertexShader.hlsl"
-                    },
-                    "sprite": "tex_explosion.png",
-                    "spriteIndex": 0
-                },
-                "transform": {
-                    "transform": {
-                        "position": {
-                            "x": 201.89999389648438,
-                            "y": -400.0,
-                            "z": 0.0
-                        },
-                        "scale": {
-                            "x": 100.0,
-                            "y": 100.0,
-                            "z": 1.0
-                        },
-                        "rotation": {
-                            "x": 0.0,
-                            "y": 0.0,
-                            "z": 0.0
-                        },
-                        "pivot": {
-                            "x": 0.0,
-                            "y": 0.0,
-                            "z": -0.5
-                        },
-                        "cameraType": 1
-                    }
-                },
-                "health": {
-                    "health": 100.0,
-                    "maxHealth": 100.0
-                },
-                "collision": {
-                    "offset": {
-                        "x": 0.0,
-                        "y": 0.0
-                    },
-                    "size": {
-                        "x": 1.0,
-                        "y": 1.0
-                    }
-                },
-                "rigidbody": {
-                    "useGravity": false,
-                    "mass": 1.0,
-                    "linearDamping": 0.9800000190734863
-                }
-            }
-        },
         {
             "name": "Player",
             "isActive": true,
@@ -95,19 +35,19 @@
                 "transform": {
                     "transform": {
                         "position": {
-                            "x": 826.1050415039063,
-                            "y": 341.07025146484377,
+                            "x": 767.8887329101563,
+                            "y": 245.98379516601563,
                             "z": 0.0
                         },
                         "scale": {
-                            "x": 696.9674682617188,
-                            "y": 696.9674682617188,
+                            "x": 696.9682006835938,
+                            "y": 696.9682006835938,
                             "z": 0.0
                         },
                         "rotation": {
-                            "x": -0.0,
+                            "x": 0.0,
                             "y": 0.0,
-                            "z": -0.0
+                            "z": -0.8597984910011292
                         },
                         "pivot": {
                             "x": -0.5,
@@ -132,114 +72,12 @@
                     }
                 },
                 "animation": {
-                    "startingAnimation": "player_walk_default.anim"
+                    "startingAnimation": "player_walk_down.anim"
                 },
                 "rigidbody": {
                     "useGravity": false,
                     "mass": 1.0,
                     "linearDamping": 0.9800000190734863
-                }
-            }
-        },
-        {
-            "name": "Ground",
-            "isActive": true,
-            "components": {
-                "sprite": {
-                    "static": false,
-                    "order": 0,
-                    "shaderBind": {
-                        "pixelShader": "pixelShader.hlsl",
-                        "vertexShader": "vertexShader.hlsl"
-                    },
-                    "sprite": "tex_missing.png",
-                    "spriteIndex": 0
-                },
-                "transform": {
-                    "transform": {
-                        "position": {
-                            "x": 0.0,
-                            "y": 200.0,
-                            "z": 0.0
-                        },
-                        "scale": {
-                            "x": 4000.0,
-                            "y": 100.0,
-                            "z": 1.0
-                        },
-                        "rotation": {
-                            "x": 0.0,
-                            "y": 0.0,
-                            "z": 0.0
-                        },
-                        "pivot": {
-                            "x": -0.5,
-                            "y": -0.5,
-                            "z": -0.5
-                        },
-                        "cameraType": 1
-                    }
-                },
-                "collision": {
-                    "offset": {
-                        "x": 0.0,
-                        "y": 0.0
-                    },
-                    "size": {
-                        "x": 1.0,
-                        "y": 1.0
-                    }
-                }
-            }
-        },
-        {
-            "name": "Ground 2",
-            "isActive": true,
-            "components": {
-                "sprite": {
-                    "static": false,
-                    "order": 0,
-                    "shaderBind": {
-                        "pixelShader": "pixelShader.hlsl",
-                        "vertexShader": "vertexShader.hlsl"
-                    },
-                    "sprite": "tex_missing.png",
-                    "spriteIndex": 0
-                },
-                "transform": {
-                    "transform": {
-                        "position": {
-                            "x": 744.719970703125,
-                            "y": 746.1900024414063,
-                            "z": 0.0
-                        },
-                        "scale": {
-                            "x": 516.8300170898438,
-                            "y": 100.0,
-                            "z": 1.0
-                        },
-                        "rotation": {
-                            "x": 0.0,
-                            "y": 0.0,
-                            "z": 0.0
-                        },
-                        "pivot": {
-                            "x": -0.5,
-                            "y": -0.5,
-                            "z": -0.5
-                        },
-                        "cameraType": 1
-                    }
-                },
-                "collision": {
-                    "offset": {
-                        "x": 0.0,
-                        "y": 0.0
-                    },
-                    "size": {
-                        "x": 1.0,
-                        "y": 1.0
-                    }
                 }
             }
         },
@@ -264,13 +102,13 @@
                             "z": -1.1920928244535389e-7
                         },
                         "scale": {
-                            "x": 1.8999994993209839,
+                            "x": 1.900001883506775,
                             "y": 1.7999999523162842,
-                            "z": 1.8999994993209839
+                            "z": 1.900001883506775
                         },
                         "rotation": {
                             "x": 0.0,
-                            "y": -43.68976974487305,
+                            "y": 9.01809310913086,
                             "z": 0.0
                         },
                         "pivot": {

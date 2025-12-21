@@ -17,12 +17,15 @@
 #include "graphics/dx12/CommandQueue.h"
 #include "graphics/dx12/CommandList.h"
 #include "graphics/dx12/Texture.h"
+#include "graphics/dx12/Mesh.h"
 
 #include "graphics/imgui/font_icon.h"
 #include "graphics/imgui/ImGuiWindow.h"
 
 // graphics
 #include "resources/FileResource.h"
+
+// editor
 #include "editor/graphics/imgui/selectables/FileEditorSelectable.h"
 
 namespace gallus
@@ -65,6 +68,21 @@ namespace gallus
 						}
 					}
 
+					m_aFilteredEngineResources.clear();
+
+					size_t i = 0;
+					for (auto& resource : m_aEngineResources)
+					{
+						if (auto pResource = resource.GetEngineResource().lock())
+						{
+							if (m_SearchBar.GetString().empty() || string_extensions::StringToLower(pResource->GetPath().filename().generic_string()).find(m_SearchBar.GetString()) != std::string::npos)
+							{
+								m_aFilteredEngineResources.push_back(&resource);
+							}
+						}
+						i++;
+					}
+
 					m_bNeedsRefresh = false;
 				}
 
@@ -94,6 +112,27 @@ namespace gallus
 					ImGuiChildFlags_Borders
 					))
 				{
+					for (EngineResourceEditorSelectable* resource : m_aFilteredEngineResources)
+					{
+						bool
+							clicked = false,
+							right_clicked = false,
+							double_clicked = false;
+
+						resource->RenderList(clicked, right_clicked, double_clicked, resource == m_pSelectedResource, false);
+
+						if (clicked)
+						{
+							m_pSelectedResource = resource;
+						}
+
+						if (double_clicked && m_Callback)
+						{
+							m_Callback(1, resource->GetEngineResource().lock()->GetName());
+							Hide();
+							break;
+						}
+					}
 					for (FileEditorSelectable* view : m_aFilteredFileResources)
 					{
 						bool
@@ -101,11 +140,12 @@ namespace gallus
 							right_clicked = false,
 							double_clicked = false;
 
-						view->RenderList(clicked, right_clicked, double_clicked, view == m_pSelectedFileResource, false);
+						view->RenderList(clicked, right_clicked, double_clicked, view == m_pSelectedResource, false);
 
 						if (clicked)
 						{
-							m_pSelectedFileResource = view;
+							m_pSelectedResource = view;
+							m_iSelectedEngineResource = -1;
 
 							if (view->GetFileResource().GetMetaData()->GetAssetType() == gallus::resources::AssetType::Sprite)
 							{
@@ -115,7 +155,7 @@ namespace gallus
 
 						if (double_clicked && m_Callback)
 						{
-							m_Callback(1, view->GetFileResource());
+							m_Callback(1, view->GetFileResource().GetPath().stem().generic_string());
 							Hide();
 							break;
 						}
@@ -174,18 +214,15 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			void RecursiveFind(gallus::resources::FileResource& a_File, std::vector<gallus::resources::AssetType>& a_aFileTypes, std::vector<FileEditorSelectable>& a_aResources, ImGuiWindow& a_Window)
+			void RecursiveFind(gallus::resources::FileResource& a_File, resources::AssetType a_aFileType, std::vector<FileEditorSelectable>& a_aResources, ImGuiWindow& a_Window)
 			{
 				for (gallus::resources::FileResource& fileResource : a_File.GetChildren())
 				{
-					for (gallus::resources::AssetType assetType : a_aFileTypes)
+					if (fileResource.GetMetaData()->GetAssetType() == a_aFileType)
 					{
-						if (fileResource.GetMetaData()->GetAssetType() == assetType)
-						{
-							a_aResources.emplace_back(a_Window, fileResource);
-						}
-						RecursiveFind(fileResource, a_aFileTypes, a_aResources, a_Window);
+						a_aResources.emplace_back(a_Window, fileResource);
 					}
+					RecursiveFind(fileResource, a_aFileType, a_aResources, a_Window);
 				}
 			}
 
@@ -194,19 +231,29 @@ namespace gallus
 			{
 				m_aResources.clear();
 				m_aResources.reserve(gallus::core::EDITOR_ENGINE->GetResourceAtlas().GetResourceFolder().GetChildren().size());
-				RecursiveFind(gallus::core::EDITOR_ENGINE->GetResourceAtlas().GetResourceFolder(), m_aFileTypes, m_aResources, m_Window);
+				RecursiveFind(gallus::core::EDITOR_ENGINE->GetResourceAtlas().GetResourceFolder(), m_AssetType, m_aResources, m_Window);
 
 				BaseModal::Show();
 			}
 
 			//---------------------------------------------------------------------
-			void FilePickerModal::SetData(const std::function<void(int, gallus::resources::FileResource&)>& a_Callback, const std::vector<gallus::resources::AssetType>& a_aFileTypes)
+			void FilePickerModal::SetData(const std::function<void(int, const std::string&)>& a_Callback, gallus::resources::AssetType a_aFileType)
 			{
-				m_pSelectedFileResource = nullptr;
+				m_pSelectedResource = nullptr;
 				m_Callback = nullptr;
 
 				m_Callback = a_Callback;
-				m_aFileTypes = a_aFileTypes;
+				m_AssetType = a_aFileType;
+
+				m_aFilteredFileResources.clear();
+				m_aResources.clear();
+
+				m_aEngineResources.clear();
+				m_aFilteredEngineResources.clear();
+				for (auto resource : core::EDITOR_ENGINE->GetResourceAtlas().GetResourcesOfType(m_AssetType, resources::EngineResourceCategory::System))
+				{
+					m_aEngineResources.emplace_back(m_Window, resource);
+				}
 
 				m_bNeedsRefresh = true;
 			}

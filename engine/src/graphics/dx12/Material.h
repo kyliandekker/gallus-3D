@@ -11,7 +11,7 @@ namespace gallus
 		{
 			struct MaterialData
 			{
-				DirectX::XMFLOAT3 DiffuseColor = { 0, 0, 0 };	// Base color of the material
+				DirectX::XMFLOAT4 DiffuseColor = { 0, 0, 0, 0 };	// Base color of the material
 				float Metallic = 0.0f;                   // 0 = non-metallic, 1 = metallic
 				float Smoothness = 0.0f;                 // 0 = rough, 1 = smooth
 			};
@@ -35,6 +35,8 @@ namespace gallus
 					m_AssetType = resources::AssetType::Material;
 				}
 
+				Material Instantiate() const;
+
 				/// <summary>
 				/// Loads and compiles Materials using logical resource names, resolving them through the engine�s resource system.
 				/// </summary>
@@ -42,6 +44,12 @@ namespace gallus
 				/// <returns>True if loading and compilation were successful, false otherwise.</returns>
 				bool LoadByName(const std::string& a_sName) override;
 
+				/// <summary>
+				/// Loads and compiles Materials using logical resource names, resolving them through the engine�s resource system.
+				/// </summary>
+				/// <param name="a_sName">The resource name of the Material.</param>
+				/// <returns>True if loading and compilation were successful, false otherwise.</returns>
+				bool LoadByNameEmpty(const std::string& a_sName);
 #ifdef _LOAD_BY_PATH
 				/// <summary>
 				/// Loads and compiles Materials directly from file paths.
@@ -51,6 +59,11 @@ namespace gallus
 				bool LoadByPath(const fs::path& a_MaterialPath) override;
 #endif // _LOAD_BY_PATH
 
+				void SetColor(DirectX::XMFLOAT4 a_vColor)
+				{
+					m_MaterialData.DiffuseColor = a_vColor;
+				}
+
 				void Bind(std::shared_ptr<CommandList> a_CommandList);
 
 				/// <summary>
@@ -59,14 +72,14 @@ namespace gallus
 				/// <returns>True if the resource was valid, false otherwise.</returns>
 				bool IsValid() const override
 				{
-					return false;
+					return m_pResource;
 				}
 protected:
 				MaterialData m_MaterialData;
 
 				BEGIN_EXPOSE_FIELDS_PARENT(Material, resources::EngineResource)
 				EXPOSE_FIELD(Material, m_MaterialData.DiffuseColor, "Diffuse Color",
-					{ .type = gallus::EditorFieldWidgetType::EditorFieldWidgetType_Vector3 })
+					{ .type = gallus::EditorFieldWidgetType::EditorFieldWidgetType_Color })
 				EXPOSE_FIELD(Material, m_MaterialData.Metallic, "Metallic",
 					{ .type = gallus::EditorFieldWidgetType::EditorFieldWidgetType_Float })
 				EXPOSE_FIELD(Material, m_MaterialData.Smoothness, "Smoothness",

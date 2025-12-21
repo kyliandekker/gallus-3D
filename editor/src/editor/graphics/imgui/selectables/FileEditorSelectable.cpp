@@ -14,7 +14,7 @@
 #include "resources/FileResource.h"
 #include "resources/AssetType.h"
 
-// external
+// editor
 #include "editor/core/EditorEngine.h"
 #include "editor/graphics/imgui/selectables/file/FileEditorSelectables.h"
 
@@ -107,6 +107,11 @@ namespace gallus
 					case resources::AssetType::Mesh:
 					{
 						m_pFileEditorSelectable = nullptr;
+						break;
+					}
+					case resources::AssetType::Material:
+					{
+						m_pFileEditorSelectable = new MaterialFileEditorSelectables(m_Window, *this);
 						break;
 					}
 				}

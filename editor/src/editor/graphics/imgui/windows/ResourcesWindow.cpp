@@ -10,6 +10,7 @@
 // graphics
 #include "graphics/dx12/Texture.h"
 #include "graphics/dx12/Mesh.h"
+#include "graphics/dx12/Material.h"
 #include "graphics/dx12/Shader.h"
 #include "graphics/dx12/ShaderBind.h"
 
@@ -132,6 +133,22 @@ namespace gallus
 							{
 								ImGui::Indent();
 								RenderObjectFields(mesh.get());
+								ImGui::Unindent();
+							}
+							ImGui::Unindent();
+						}
+					}
+
+					if (m_bMaterialsFoldedOut)
+					{
+						auto& materials = core::EDITOR_ENGINE->GetResourceAtlas().GetMaterials();
+						for (std::shared_ptr<graphics::dx12::Material> material : materials)
+						{
+							ImGui::Indent();
+							if (ImGui::CollapsingHeader(ImGui::IMGUI_FORMAT_ID(material.get()->GetName(), FOLDOUT_ID, "MESH_" + material.get()->GetName()).c_str()))
+							{
+								ImGui::Indent();
+								RenderObjectFields(material.get());
 								ImGui::Unindent();
 							}
 							ImGui::Unindent();

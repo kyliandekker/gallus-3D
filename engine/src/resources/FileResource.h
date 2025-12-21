@@ -33,6 +33,7 @@ namespace gallus
 			{ ".anim", { AssetType::Animation } },
 			{ ".hlsl", { AssetType::PixelShader, AssetType::VertexShader } },
 			{ ".glb", { AssetType::Mesh } },
+			{ ".mat", { AssetType::Material } },
 		};
 
 		//---------------------------------------------------------------------

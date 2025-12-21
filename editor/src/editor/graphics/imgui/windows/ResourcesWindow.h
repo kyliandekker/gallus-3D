@@ -55,6 +55,7 @@ namespace gallus
 				bool
 					m_bTexturesFoldedOut = false,
 					m_bMeshesFoldedOut = false,
+					m_bMaterialsFoldedOut = false,
 					m_bPixelShadersFoldedOut = false,
 					m_bVertexShadersFoldedOut = false,
 					m_bShaderBindsFoldedOut = false;

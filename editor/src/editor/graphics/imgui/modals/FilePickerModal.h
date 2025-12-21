@@ -17,11 +17,15 @@
 // resources
 #include "resources/AssetType.h"
 
+#include "editor/graphics/imgui/selectables/FileEditorSelectable.h"
+#include "editor/graphics/imgui/selectables/EngineResourceEditorSelectable.h"
+
 namespace gallus
 {
 	namespace resources
 	{
 		class FileResource;
+		class EngineResource;
 	}
 	namespace graphics
 	{
@@ -60,19 +64,21 @@ namespace gallus
 				/// </summary>
 				/// <param name="a_Callback">Callback for modal selection.</param>
 				/// <param name="a_FileTypes">The file types that should be shown in the modal.</param>
-				void SetData(const std::function<void(int, gallus::resources::FileResource&)>& a_Callback, const std::vector<gallus::resources::AssetType>& a_aFileTypes);
+				void SetData(const std::function<void(int, const std::string&)>& a_Callback, gallus::resources::AssetType a_aFileTypes);
 			private:
 				std::weak_ptr<graphics::dx12::Texture> m_pPreviewTexture = {};
 
-				std::function<void(int, gallus::resources::FileResource&)> m_Callback = nullptr; /// The callback that gets called when choosing an option.
+				std::function<void(int, const std::string&)> m_Callback = nullptr; /// The callback that gets called when choosing an option.
 
-				FileEditorSelectable* m_pSelectedFileResource = nullptr; /// The current selected resource in the modal.
-				std::shared_ptr<graphics::dx12::DX12Resource> m_pSelectedResource = nullptr; /// The current selected resource in the modal.
+				EditorSelectable* m_pSelectedResource = nullptr; /// The current selected resource in the modal.
+				int32_t m_iSelectedEngineResource = -1; /// The current selected resource in the modal.
 				bool m_bNeedsRefresh = true; /// Used for refreshing the resources that are shown.
 
-				std::vector<gallus::resources::AssetType> m_aFileTypes; /// The file types that will be used in the filter.
+				resources::AssetType m_AssetType; /// The file type that will be used in the filter.
 				std::vector<FileEditorSelectable> m_aResources; /// List of explorer items shown in the explorer window.
-				std::vector<FileEditorSelectable*> m_aFilteredFileResources; /// List of explorer items shown in the explorer window.
+				std::vector<FileEditorSelectable*> m_aFilteredFileResources; /// List of pointers to explorer items shown in the explorer window.
+				std::vector<EngineResourceEditorSelectable> m_aEngineResources; /// List of engine resources shown in the explorer window.
+				std::vector<EngineResourceEditorSelectable*> m_aFilteredEngineResources; /// List of pointers to engine resources shown in the explorer window.
 
 				SearchBarInput m_SearchBar; /// Search bar to filter specific explorer items in the explorer window.
 			};

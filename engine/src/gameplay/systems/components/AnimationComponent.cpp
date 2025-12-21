@@ -4,7 +4,7 @@
 #include "core/Engine.h"
 
 // animation
-#include "animation/AnimationTrack.h"
+#include "animation/Animation.h"
 
 // resources
 #include "resources/SrcData.h"
@@ -26,7 +26,7 @@ namespace gallus
 			}
 			if (m_pStartingAnimation.lock())
 			{
-				m_pAnimationTrack = m_pStartingAnimation;
+				m_pAnimation = m_pStartingAnimation;
 				Start();
 			}
 			Component::InitRealtime();
@@ -35,7 +35,7 @@ namespace gallus
 		//---------------------------------------------------------------------
 		void AnimationComponent::UpdateRealtime(float a_fDeltaTime, UpdateTime a_UpdateTime)
 		{
-			if (auto animationTrack = m_pAnimationTrack.lock())
+			if (auto animationTrack = m_pAnimation.lock())
 			{
 				animationTrack->Update(m_EntityID, a_fDeltaTime);
 			}
@@ -56,7 +56,7 @@ namespace gallus
 		//---------------------------------------------------------------------
 		void AnimationComponent::UpdateRealtimeInner(float a_fDeltaTime, UpdateTime a_UpdateTime)
 		{
-			auto animationTrack = m_pAnimationTrack.lock();
+			auto animationTrack = m_pAnimation.lock();
 			if (!animationTrack)
 			{
 				return;

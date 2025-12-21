@@ -14,7 +14,7 @@ namespace gallus
 	}
 	namespace animation
 	{
-		class AnimationTrack;
+		class Animation;
 
 		class AnimationKeyFrameSoundComponent : public AnimationKeyFrameComponentBase
 		{

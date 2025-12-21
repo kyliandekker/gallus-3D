@@ -23,20 +23,20 @@ namespace gallus
 	namespace animation
 	{
 		enum class AnimationEvent;
-		class AnimationTrack : public resources::EngineResource
+		class Animation : public resources::EngineResource
 		{
 		public:
 			/// <summary>
 			/// Constructs an animation track.
 			/// </summary>
 			/// <param name="a_KeyFrame">The key frame this component is attached to.</param>
-			AnimationTrack() : EngineResource()
+			Animation() : EngineResource()
 			{
 				m_AssetType = resources::AssetType::Animation;
 				m_aKeyFrames.reserve(100);
 			}
 
-			~AnimationTrack();
+			~Animation();
 
 			/// <summary>
 			/// Loads the animation track by path.
@@ -146,11 +146,11 @@ namespace gallus
 			int m_iFrameCount = 0;
 			bool m_bIsLooping = false;
 
-			BEGIN_EXPOSE_FIELDS_PARENT(AnimationTrack, resources::EngineResource)
-			END_EXPOSE_FIELDS(AnimationTrack)
-			BEGIN_EXPOSE_GIZMOS(AnimationTrack)
-			END_EXPOSE_GIZMOS(AnimationTrack)
-			END_EXPOSE_TO_EDITOR(AnimationTrack)
+			BEGIN_EXPOSE_FIELDS_PARENT(Animation, resources::EngineResource)
+			END_EXPOSE_FIELDS(Animation)
+			BEGIN_EXPOSE_GIZMOS(Animation)
+			END_EXPOSE_GIZMOS(Animation)
+			END_EXPOSE_TO_EDITOR(Animation)
 		};
 	}
 }

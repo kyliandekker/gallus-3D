@@ -161,11 +161,11 @@ namespace gallus
 						}
 						case resources::AssetType::Animation:
 						{
-							std::weak_ptr<animation::AnimationTrack>* pReal =
-								reinterpret_cast<std::weak_ptr<animation::AnimationTrack>*>(ptr);
+							std::weak_ptr<animation::Animation>* pReal =
+								reinterpret_cast<std::weak_ptr<animation::Animation>*>(ptr);
 
 							(*pReal) = core::ENGINE->GetResourceAtlas()
-								.LoadAnimationTrack(assetName);
+								.LoadAnimation(assetName);
 							break;
 						}
 						case resources::AssetType::PixelShader:

@@ -12,14 +12,9 @@ cbuffer SpriteUV : register(b1)
     float4 uv; // xy = uv0, zw = uv1
 };
 
-cbuffer Color : register(b2)
-{
-    float4 Color; // RGBA color multiplier
-};
-
 cbuffer Material : register(b3)
 {
-    float3 DiffuseColor;
+    float4 DiffuseColor;
     float Metallic;
     float Smoothness;
 };

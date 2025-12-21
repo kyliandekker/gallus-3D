@@ -1,4 +1,4 @@
-#include "AnimationTrack.h"
+#include "Animation.h"
 
 // external
 #include <rapidjson/document.h>
@@ -34,7 +34,7 @@ namespace gallus
 	namespace animation
 	{
         //---------------------------------------------------------------------
-        AnimationTrack::~AnimationTrack()
+        Animation::~Animation()
         {
             for (AnimationKeyFrame* keyFrame : m_aKeyFrames)
             {
@@ -44,7 +44,7 @@ namespace gallus
         }
 
         //---------------------------------------------------------------------
-        bool AnimationTrack::LoadByPath(const fs::path& a_Path)
+        bool Animation::LoadByPath(const fs::path& a_Path)
 		{
 			core::Data data;
 			if (!file::LoadFile(a_Path, data))
@@ -123,12 +123,12 @@ namespace gallus
 		}
 
         //---------------------------------------------------------------------
-        void AnimationTrack::Update(gameplay::EntityID& a_EntityID, float a_fDeltaTime)
+        void Animation::Update(gameplay::EntityID& a_EntityID, float a_fDeltaTime)
         {
         }
 
         //---------------------------------------------------------------------
-        void AnimationTrack::ActivateEvent(gameplay::EntityID& a_EntityID, AnimationEvent a_Event)
+        void Animation::ActivateEvent(gameplay::EntityID& a_EntityID, AnimationEvent a_Event)
         {
             switch (a_Event)
             {
@@ -145,7 +145,7 @@ namespace gallus
         }
 
         //---------------------------------------------------------------------
-        std::vector<AnimationKeyFrame*>& AnimationTrack::GetKeyFrames()
+        std::vector<AnimationKeyFrame*>& Animation::GetKeyFrames()
         {
             return m_aKeyFrames;
         }
@@ -153,7 +153,7 @@ namespace gallus
 #ifdef _EDITOR
 
         //---------------------------------------------------------------------
-        bool AnimationTrack::Save(const fs::path& a_Path) const
+        bool Animation::Save(const fs::path& a_Path) const
         {
             rapidjson::Document doc;
             doc.SetObject();
@@ -193,7 +193,7 @@ namespace gallus
         }
 
         //---------------------------------------------------------------------
-        void AnimationTrack::AddKeyFrame(int a_iFrame)
+        void Animation::AddKeyFrame(int a_iFrame)
         {
             for (AnimationKeyFrame* keyFrame : m_aKeyFrames)
             {
@@ -208,14 +208,14 @@ namespace gallus
         }
 
         //---------------------------------------------------------------------
-        void AnimationTrack::RemoveKeyFrame(int a_iIndex)
+        void Animation::RemoveKeyFrame(int a_iIndex)
         {
             m_aKeyFrames.erase(m_aKeyFrames.begin() + a_iIndex);
             Sort();
         }
 
         //---------------------------------------------------------------------
-        void AnimationTrack::RemoveKeyFrame(AnimationKeyFrame& a_KeyFrame)
+        void Animation::RemoveKeyFrame(AnimationKeyFrame& a_KeyFrame)
         {
             size_t i = 0;
             for (AnimationKeyFrame* keyFrame : m_aKeyFrames)
@@ -230,7 +230,7 @@ namespace gallus
         }
 
         //---------------------------------------------------------------------
-        void AnimationTrack::Sort()
+        void Animation::Sort()
         {
             std::sort(
                 m_aKeyFrames.begin(),

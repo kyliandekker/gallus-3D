@@ -18,6 +18,11 @@ struct D3D12_RESOURCE_DESC;
 
 namespace gallus
 {
+	namespace resources
+	{
+		class EngineResource;
+		enum class EngineResourceCategory;
+	}
 	namespace graphics
 	{
 		namespace dx12
@@ -27,6 +32,7 @@ namespace gallus
 			class VertexShader;
 			class ShaderBind;
 			class Mesh;
+			class Material;
 
 			class CommandQueue;
 			class CommandList;
@@ -34,7 +40,7 @@ namespace gallus
 	}
 	namespace animation
 	{
-		class AnimationTrack;
+		class Animation;
 	}
 	namespace gameplay
 	{
@@ -45,7 +51,6 @@ namespace gallus
 	{
 		constexpr uint32_t MAX_RESOURCES = 64;
 		constexpr uint32_t MISSING = 0;
-		constexpr uint32_t RENDER_TEX = 2;
 
 		//---------------------------------------------------------------------
 		// ResourceAtlas
@@ -135,6 +140,16 @@ namespace gallus
 			std::weak_ptr<graphics::dx12::Mesh> LoadMesh(const std::string& a_sName, std::shared_ptr<graphics::dx12::CommandQueue> a_pCommandQueue = nullptr);
 
 			/// <summary>
+			/// Loads a material by name from the resource folder.
+			/// </summary>
+			std::weak_ptr<graphics::dx12::Material> LoadMaterial(const std::string& a_sName);
+
+			/// <summary>
+			/// Creates an empty material resource with the given name.
+			/// </summary>
+			std::weak_ptr<graphics::dx12::Material> LoadMaterialEmpty(const std::string& a_sName);
+
+			/// <summary>
 			/// Loads a prefab.
 			/// </summary>
 			std::weak_ptr<gameplay::Prefab> LoadPrefab(const std::string& a_sName);
@@ -142,7 +157,7 @@ namespace gallus
 			/// <summary>
 			/// Loads an animation.
 			/// </summary>
-			std::weak_ptr<animation::AnimationTrack> LoadAnimationTrack(const std::string& a_sName);
+			std::weak_ptr<animation::Animation> LoadAnimation(const std::string& a_sName);
 
 			/// <summary>
 			/// Checks whether a mesh with the given name is already loaded.
@@ -165,11 +180,6 @@ namespace gallus
 			std::weak_ptr<graphics::dx12::ShaderBind> GetDefaultShaderBind();
 
 			/// <summary>
-			/// Retrieves the default shader bind (used as fallback).
-			/// </summary>
-			std::weak_ptr<graphics::dx12::ShaderBind> GetRenderTexShaderBind();
-
-			/// <summary>
 			/// Retrieves the default texture (used as fallback).
 			/// </summary>
 			std::weak_ptr<graphics::dx12::Texture> GetDefaultTexture();
@@ -178,6 +188,11 @@ namespace gallus
 			/// Retrieves the default mesh (used as fallback).
 			/// </summary>
 			std::weak_ptr<graphics::dx12::Mesh> GetDefaultMesh();
+
+			/// <summary>
+			/// Retrieves the default material (used as fallback).
+			/// </summary>
+			std::weak_ptr<graphics::dx12::Material> GetDefaultMaterial();
 
 			/// <summary>
 			/// Gets the list of loaded textures.
@@ -205,14 +220,21 @@ namespace gallus
 			const std::vector<std::shared_ptr<graphics::dx12::Mesh>>& GetMeshes() const;
 
 			/// <summary>
+			/// Gets the list of loaded meshes.
+			/// </summary>
+			const std::vector<std::shared_ptr<graphics::dx12::Material>>& GetMaterials() const;
+
+			/// <summary>
 			/// Gets the list of loaded animations.
 			/// </summary>
-			const std::vector<std::shared_ptr<animation::AnimationTrack>>& GetAnimationTracks() const;
+			const std::vector<std::shared_ptr<animation::Animation>>& GetAnimations() const;
 
-//#ifdef _EDITOR
-			/// <summary>
-			/// Gets a resource (if it exists) by name and returns the full path and all properties, including metadata.
-			/// </summary>
+			std::vector<std::weak_ptr<resources::EngineResource>> GetResourcesOfType(resources::AssetType a_AssetType, resources::EngineResourceCategory a_Category);
+
+			//#ifdef _EDITOR
+						/// <summary>
+						/// Gets a resource (if it exists) by name and returns the full path and all properties, including metadata.
+						/// </summary>
 			bool GetResource(const std::string& a_sName, resources::FileResource*& a_pResource)
 			{
 				return m_ResourceFolder.Find(a_sName, a_pResource);
@@ -241,7 +263,7 @@ namespace gallus
 			{
 				return m_ResourceFolder;
 			}
-//#endif _EDITOR // _EDITOR
+			//#endif _EDITOR // _EDITOR
 		private:
 			/// <summary>
 			/// Retrieves a resource from the given vector, or loads it if not found.
@@ -273,11 +295,12 @@ namespace gallus
 			std::vector<std::shared_ptr<graphics::dx12::ShaderBind>> m_aShaderBinds;
 			std::vector<std::shared_ptr<graphics::dx12::Mesh>> m_aMeshes;
 			std::vector<std::shared_ptr<gameplay::Prefab>> m_aPrefabs;
-			std::vector<std::shared_ptr<animation::AnimationTrack>> m_aAnimationTracks;
+			std::vector<std::shared_ptr<animation::Animation>> m_aAnimations;
+			std::vector<std::shared_ptr<graphics::dx12::Material>> m_aMaterials;
 
-//#ifdef _EDITOR
+			//#ifdef _EDITOR
 			resources::FileResource m_ResourceFolder;
-//#endif _EDITOR // _EDITOR
+			//#endif _EDITOR // _EDITOR
 		};
 	}
 }

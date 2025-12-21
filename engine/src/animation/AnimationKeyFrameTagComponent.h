@@ -17,7 +17,7 @@ namespace gallus
 	}
 	namespace animation
 	{
-		class AnimationTrack;
+		class Animation;
 
 		class AnimationKeyFrameTagComponent : public AnimationKeyFrameComponentBase
 		{

@@ -9,7 +9,7 @@
 #include "graphics/imgui/views/DataTypes/StringTextInput.h"
 
 // animation
-#include "animation/AnimationTrack.h"
+#include "animation/Animation.h"
 
 // resources
 #include "resources/AssetType.h"
@@ -83,7 +83,7 @@ namespace gallus
 				std::shared_ptr<graphics::dx12::Texture> m_pPreviewTexture = nullptr;
 				gallus::resources::FileResource* m_pFile = nullptr;
 
-				animation::AnimationTrack m_AnimationTrack;
+				animation::Animation m_Animation;
 				std::vector<AnimationKeyFrameEditorSelectable> m_KeyFrameSelectables;
 
 				int m_iCurrentFrame = 0;

@@ -1,6 +1,6 @@
 #include "AnimationKeyFrame.h"
 
-#include "animation/AnimationTrack.h"
+#include "animation/Animation.h"
 
 namespace gallus
 {

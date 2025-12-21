@@ -13,7 +13,7 @@
 
 // gameplay
 #include "animation/AnimationKeyFrame.h"
-#include "animation/AnimationTrack.h"
+#include "animation/Animation.h"
 
 // utils
 #include "utils/string_extensions.h"
@@ -40,7 +40,7 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			AnimationKeyFrameEditorSelectable::AnimationKeyFrameEditorSelectable(ImGuiWindow& a_Window, animation::AnimationKeyFrame& a_KeyFrame, animation::AnimationTrack& a_AnimationTrack) : EditorSelectable(a_Window), m_KeyFrame(a_KeyFrame), m_AnimationTrack(a_AnimationTrack)
+			AnimationKeyFrameEditorSelectable::AnimationKeyFrameEditorSelectable(ImGuiWindow& a_Window, animation::AnimationKeyFrame& a_KeyFrame, animation::Animation& a_Animation) : EditorSelectable(a_Window), m_KeyFrame(a_KeyFrame), m_Animation(a_Animation)
 			{
 				m_bShowDelete = true;
 			}
@@ -60,7 +60,7 @@ namespace gallus
 			//---------------------------------------------------------------------
 			void AnimationKeyFrameEditorSelectable::OnDelete()
 			{
-				m_AnimationTrack.RemoveKeyFrame(m_KeyFrame);
+				m_Animation.RemoveKeyFrame(m_KeyFrame);
 			}
 
 			//---------------------------------------------------------------------
@@ -93,7 +93,7 @@ namespace gallus
 					//{
 					//	m_KeyFrame.RemoveComponent(component);
 
-					//	m_KeyFrame.GetAnimationTrack()->SetIsDirty(true);
+					//	m_KeyFrame.GetAnimation()->SetIsDirty(true);
 					//}
 
 					ImGui::PopStyleVar();
@@ -103,7 +103,7 @@ namespace gallus
 					{
 						if (RenderObjectFields(component))
 						{
-							m_KeyFrame.GetAnimationTrack()->SetIsDirty(true);
+							m_KeyFrame.GetAnimation()->SetIsDirty(true);
 						}
 					}
 				}

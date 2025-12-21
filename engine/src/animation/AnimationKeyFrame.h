@@ -20,7 +20,7 @@ namespace gallus
 	}
 	namespace animation
 	{
-		class AnimationTrack;
+		class Animation;
 
 		class AnimationKeyFrame
 		{
@@ -31,9 +31,9 @@ namespace gallus
 			/// Constructs a key frame at a given frame.
 			/// </summary>
 			/// <param name="a_iFrame">The frame where the key frame sits.</param>
-			AnimationKeyFrame(int a_iFrame, AnimationTrack& a_AnimationTrack) :
+			AnimationKeyFrame(int a_iFrame, Animation& a_Animation) :
 				m_iFrame(a_iFrame),
-				m_pAnimationTrack(&a_AnimationTrack)
+				m_pAnimation(&a_Animation)
 			{ }
 
 			/// <summary>
@@ -123,9 +123,9 @@ namespace gallus
 				return nullptr;
 			};
 
-			AnimationTrack* GetAnimationTrack()
+			Animation* GetAnimation()
 			{
-				return m_pAnimationTrack;
+				return m_pAnimation;
 			}
 #ifdef _EDITOR
 			/// <summary>
@@ -170,7 +170,7 @@ namespace gallus
 			int m_iFrame = 0;
 
 			std::vector<AnimationKeyFrameComponentBase*> m_aAnimationKeyFrameComponents;
-			AnimationTrack* m_pAnimationTrack = nullptr;
+			Animation* m_pAnimation = nullptr;
 		};
 	}
 }

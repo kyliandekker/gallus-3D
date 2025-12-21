@@ -19,7 +19,7 @@ namespace gallus
 	namespace animation
 	{
 		class AnimationKeyFrame;
-		class AnimationTrack;
+		class Animation;
 
 		class AnimationKeyFrameComponentBase : public IExposableToEditor
 		{

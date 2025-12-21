@@ -50,6 +50,7 @@ namespace gallus
 			class CommandQueue;
 			class CommandList;
 			class Texture;
+			class Material;
 			class DX12Resource;
 
 			// Create the vertex input layout
@@ -248,7 +249,7 @@ namespace gallus
 				/// <summary>
 				/// Renders the DX12 stuff to the screen.
 				/// </summary>
-				void Render2D(std::shared_ptr<CommandQueue> a_pCommandQueue, std::shared_ptr<CommandList> a_pCommandList, D3D12_CPU_DESCRIPTOR_HANDLE a_RTVHandle);
+				void RenderObjects(std::shared_ptr<CommandQueue> a_pCommandQueue, std::shared_ptr<CommandList> a_pCommandList, D3D12_CPU_DESCRIPTOR_HANDLE a_RTVHandle);
 
 				/// <summary>
 				/// PResents everything to the DX12 render loop.
@@ -455,6 +456,7 @@ namespace gallus
 				imgui::ImGuiWindow m_ImGuiWindow;
 #endif // IMGUI_DISABLE
 				std::weak_ptr<Texture> m_pRenderTexture = {};
+				std::weak_ptr<Material> m_pMaterial = {};
 
 				FPSCounter m_FpsCounter;
 

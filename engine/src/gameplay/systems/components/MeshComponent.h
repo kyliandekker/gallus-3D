@@ -12,6 +12,8 @@
 // resources
 #include "resources/AssetType.h"
 
+#include "graphics/dx12/Material.h"
+
 namespace gallus
 {
 	namespace graphics
@@ -78,10 +80,12 @@ namespace gallus
 			std::weak_ptr<graphics::dx12::ShaderBind> m_pShaderBind = {};
 			std::weak_ptr<graphics::dx12::Texture> m_pTexture = {};
 			int8_t m_iTextureIndex = 0;
+			std::weak_ptr<graphics::dx12::Material> m_pMaterial = {};
 			DirectX::XMFLOAT4 m_vColor = { 1, 1, 1, 1 };
 
 			BEGIN_EXPOSE_FIELDS_PARENT(MeshComponent, Component)
 				EXPOSE_FIELD(MeshComponent, m_pShaderBind, "Shader Bind", (FieldOptions{ .type = EditorFieldWidgetType::EditorFieldWidgetType_ObjectPtr }))
+				EXPOSE_FIELD(MeshComponent, m_pMaterial, "Material", (FieldOptions{ .type = EditorFieldWidgetType::EditorFieldWidgetType_EngineResource, .assetType = resources::AssetType::Material }))
 				EXPOSE_FIELD(MeshComponent, m_pMesh, "Mesh", (FieldOptions{ .type = EditorFieldWidgetType::EditorFieldWidgetType_EngineResource, .assetType = resources::AssetType::Mesh, .description = "Pointer to the texture asset used by this Mesh. Can be nullptr if no texture is assigned. Determines the visual appearance of the Mesh." }))
 				EXPOSE_FIELD(MeshComponent, m_pTexture, "Texture", (FieldOptions{ .type = EditorFieldWidgetType::EditorFieldWidgetType_EngineResource, .assetType = resources::AssetType::Sprite, .description = "Pointer to the mesh asset used by this Mesh. Can be nullptr if no texture is assigned. Determines the visual appearance of the Mesh." }))
 				EXPOSE_FIELD(MeshComponent, m_iTextureIndex, "Texture Index", (FieldOptions{ .type = EditorFieldWidgetType::EditorFieldWidgetType_Int8, .description = "Index of the Mesh within a texture atlas. Used when the texture contains multiple rects to select which one is displayed." }))

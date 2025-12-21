@@ -246,6 +246,32 @@ namespace gallus
 					mesh->SetIsDestroyable(false);
 				}
 
+				std::weak_ptr<Mesh> cubeMeshPtr = core::ENGINE->GetResourceAtlas().LoadMeshEmpty("cube"); // Cube mesh.
+				if (auto mesh = cubeMeshPtr.lock())
+				{
+					MeshPartData& squarePrimitive = s_PRIMITIVES[(int) PRIMITIVES::CUBE];
+					mesh->SetMeshData(squarePrimitive, cCommandQueue);
+					mesh->SetResourceCategory(resources::EngineResourceCategory::System);
+					mesh->SetIsDestroyable(false);
+				}
+
+				std::weak_ptr<Mesh> cylinderMeshPtr = core::ENGINE->GetResourceAtlas().LoadMeshEmpty("cylinder"); // Cylinder mesh.
+				if (auto mesh = cylinderMeshPtr.lock())
+				{
+					MeshPartData& squarePrimitive = s_PRIMITIVES[(int) PRIMITIVES::CYLINDER];
+					mesh->SetMeshData(squarePrimitive, cCommandQueue);
+					mesh->SetResourceCategory(resources::EngineResourceCategory::System);
+					mesh->SetIsDestroyable(false);
+				}
+
+				m_pMaterial = core::ENGINE->GetResourceAtlas().LoadMaterialEmpty("default"); // Cylinder mesh.
+				if (auto material = m_pMaterial.lock())
+				{
+					material->SetColor({1, 1, 1, 1});
+					material->SetResourceCategory(resources::EngineResourceCategory::System);
+					material->SetIsDestroyable(false);
+				}
+
 				cCommandQueue->Flush();
 
 				UpdateRenderTargetViews();
@@ -849,7 +875,7 @@ namespace gallus
 						);
 						commandList->GetCommandList()->OMSetRenderTargets(1, &rtRtv, FALSE, &dsv);
 
-						Render2D(commandQueue, commandList, rtRtv);
+						RenderObjects(commandQueue, commandList, rtRtv);
 
 						renderTex->Transition(commandList, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 					}
@@ -928,7 +954,7 @@ namespace gallus
 #endif // IMGUI_DISABLE
 
 			//---------------------------------------------------------------------
-			void DX12System::Render2D(std::shared_ptr<CommandQueue> a_pCommandQueue, std::shared_ptr<CommandList> a_pCommandList, D3D12_CPU_DESCRIPTOR_HANDLE a_RTVHandle)
+			void DX12System::RenderObjects(std::shared_ptr<CommandQueue> a_pCommandQueue, std::shared_ptr<CommandList> a_pCommandList, D3D12_CPU_DESCRIPTOR_HANDLE a_RTVHandle)
 			{
 				if (!m_pActiveCamera)
 				{

@@ -15,6 +15,7 @@
 #include "graphics/dx12/Texture.h"
 #include "graphics/dx12/Shader.h"
 #include "graphics/dx12/Mesh.h"
+#include "graphics/dx12/Material.h"
 
 #include "graphics/imgui/views/DataTypes/ColorView.h"
 
@@ -223,7 +224,7 @@ namespace gallus
 						.GetWindowsConfig<EditorWindowsConfig>().GetFilePickerModal();
 
 					filePickerModal.SetData(
-						[a_pWeak, &a_Field](int success, gallus::resources::FileResource& resource)
+						[a_pWeak, &a_Field](int success, const std::string& resourceName)
 						{
 							if (success == 1)
 							{
@@ -236,7 +237,7 @@ namespace gallus
 											.GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
 
 										*a_pWeak = core::EDITOR_ENGINE->GetResourceAtlas()
-											.LoadTexture(resource.GetPath().filename().generic_string(), cCommandQueue);
+											.LoadTexture(resourceName, cCommandQueue);
 
 										break;
 									}
@@ -247,38 +248,45 @@ namespace gallus
 											.GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
 
 										*a_pWeak = core::EDITOR_ENGINE->GetResourceAtlas()
-											.LoadMesh(resource.GetPath().filename().generic_string(), cCommandQueue);
+											.LoadMesh(resourceName, cCommandQueue);
+
+										break;
+									}
+									case resources::AssetType::Material:
+									{
+										*a_pWeak = core::EDITOR_ENGINE->GetResourceAtlas()
+											.LoadMaterial(resourceName);
 
 										break;
 									}
 									case resources::AssetType::PixelShader:
 									{
 										*a_pWeak = core::EDITOR_ENGINE->GetResourceAtlas()
-											.LoadPixelShader(resource.GetPath().filename().generic_string());
+											.LoadPixelShader(resourceName);
 										break;
 									}
 									case resources::AssetType::VertexShader:
 									{
 										*a_pWeak = core::EDITOR_ENGINE->GetResourceAtlas()
-											.LoadVertexShader(resource.GetPath().filename().generic_string());
+											.LoadVertexShader(resourceName);
 										break;
 									}
 									case resources::AssetType::Prefab:
 									{
 										*a_pWeak = core::EDITOR_ENGINE->GetResourceAtlas()
-											.LoadPrefab(resource.GetPath().filename().generic_string());
+											.LoadPrefab(resourceName);
 										break;
 									}
 									case resources::AssetType::Animation:
 									{
 										*a_pWeak = core::EDITOR_ENGINE->GetResourceAtlas()
-											.LoadAnimationTrack(resource.GetPath().filename().generic_string());
+											.LoadAnimation(resourceName);
 										break;
 									}
 								}
 							}
 						},
-						std::vector<gallus::resources::AssetType>{ a_Field.m_Options.assetType });
+						a_Field.m_Options.assetType);
 
 					filePickerModal.Show();
 				}
@@ -657,7 +665,7 @@ namespace gallus
 				return false;
 			}
 
-			bool RenderObjectFields(IExposableToEditor* a_pObject)
+			bool RenderObjectFields(IExposableToEditor* a_pObject, bool a_bInternal)
 			{
 				const auto& fields = a_pObject->GetEditorFields();
 
@@ -669,6 +677,11 @@ namespace gallus
 				{
 					for (const EditorFieldInfo& field : fields)
 					{
+						if (!a_bInternal && field.m_Options.internal)
+						{
+							continue;
+						}
+
 						if (ShowEditorFieldFromObject(a_pObject, field, field.m_Options.internal))
 						{
 							changed = true;

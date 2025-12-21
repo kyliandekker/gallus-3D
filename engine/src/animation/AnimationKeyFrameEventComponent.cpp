@@ -8,7 +8,7 @@
 
 // animation
 #include "animation/AnimationKeyFrame.h"
-#include "animation/AnimationTrack.h"
+#include "animation/Animation.h"
 
 // resources
 #include "resources/SrcData.h"
@@ -22,7 +22,7 @@ namespace gallus
 		//---------------------------------------------------------------------
 		void AnimationKeyFrameEventComponent::Activate(gameplay::EntityID& a_EntityID)
 		{
-			m_KeyFrame.GetAnimationTrack()->ActivateEvent(a_EntityID, m_Event);
+			m_KeyFrame.GetAnimation()->ActivateEvent(a_EntityID, m_Event);
 		}
 
 #ifdef _EDITOR
