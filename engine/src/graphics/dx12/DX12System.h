@@ -51,6 +51,7 @@ namespace gallus
 			class CommandList;
 			class Texture;
 			class Material;
+			class ShaderBind;
 			class DX12Resource;
 
 			// Create the vertex input layout
@@ -456,6 +457,7 @@ namespace gallus
 				imgui::ImGuiWindow m_ImGuiWindow;
 #endif // IMGUI_DISABLE
 				std::weak_ptr<Texture> m_pRenderTexture = {};
+				std::weak_ptr<ShaderBind> m_pRenderTextureShaderBind = {};
 				std::weak_ptr<Material> m_pMaterial = {};
 
 				FPSCounter m_FpsCounter;

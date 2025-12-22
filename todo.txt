@@ -3,7 +3,7 @@ Animation track should be shared with others ✓
 Key frame components are fucking hardcoded now
 Top bar for new scene, etc ✓
 Tooltip hovers ✓
-Debug shapes
+Debug shapes ✓
 Input fix ✓
 Weak ptrs for everything instead of raw ptrs ✓
 Scene sys needs refactor because it is awful and illogical ✓

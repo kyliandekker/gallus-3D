@@ -223,8 +223,8 @@ namespace gallus
 				renderTexVertexShaderPtr->SetResourceCategory(resources::EngineResourceCategory::Missing);
 				renderTexVertexShaderPtr->SetIsDestroyable(false);
 
-				std::weak_ptr<ShaderBind> renderTexShaderBindPtr = core::ENGINE->GetResourceAtlas().LoadShaderBind("renderTexShaderBind", renderTexPixelShaderPtr, renderTexVertexShaderPtr, DXGI_FORMAT_UNKNOWN); // Render Tex shader.
-				if (auto renderTexShaderBind = renderTexShaderBindPtr.lock())
+				m_pRenderTextureShaderBind = core::ENGINE->GetResourceAtlas().LoadShaderBind("renderTexShaderBind", renderTexPixelShaderPtr, renderTexVertexShaderPtr, DXGI_FORMAT_UNKNOWN); // Render Tex shader.
+				if (auto renderTexShaderBind = m_pRenderTextureShaderBind.lock())
 				{
 					renderTexShaderBind->SetResourceCategory(resources::EngineResourceCategory::Missing);
 					renderTexShaderBind->SetIsDestroyable(false);
@@ -890,13 +890,13 @@ namespace gallus
 				commandList->GetCommandList()->RSSetViewports(1, &m_WindowViewport);
 				commandList->GetCommandList()->RSSetScissorRects(1, &m_WindowScissorRect);
 #ifndef _EDITOR
-				commandList->GetCommandList()->OMSetRenderTargets(1, &backRtv, FALSE, &dsv);
+				commandList->GetCommandList()->OMSetRenderTargets(1, &backRtv, FALSE, nullptr);
 				if (renderTex && renderTex->CanBeDrawn())
 				{
 					if (renderTex->CanBeDrawn())
 					{
 						// Bind pipeline + root signature
-						if (auto shaderBind = core::ENGINE->GetResourceAtlas().GetRenderTexShaderBind().lock())
+						if (auto shaderBind = m_pRenderTextureShaderBind.lock())
 						{
 							commandList->GetCommandList()->SetPipelineState(
 								shaderBind->GetPipelineState());
@@ -912,6 +912,7 @@ namespace gallus
 				}
 #else // _EDITOR
 				commandList->GetCommandList()->OMSetRenderTargets(1, &backRtv, FALSE, nullptr);
+
 				// 2. OR render the editor UI.
 				RenderUI(commandQueue, commandList, backRtv);
 #endif // _EDITOR
@@ -956,6 +957,11 @@ namespace gallus
 			//---------------------------------------------------------------------
 			void DX12System::RenderObjects(std::shared_ptr<CommandQueue> a_pCommandQueue, std::shared_ptr<CommandList> a_pCommandList, D3D12_CPU_DESCRIPTOR_HANDLE a_RTVHandle)
 			{
+				if (!core::ENGINE->GetECS().Running())
+				{
+					return;
+				}
+
 				if (!m_pActiveCamera)
 				{
 					return;

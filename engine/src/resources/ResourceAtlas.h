@@ -231,7 +231,7 @@ namespace gallus
 
 			std::vector<std::weak_ptr<resources::EngineResource>> GetResourcesOfType(resources::AssetType a_AssetType, resources::EngineResourceCategory a_Category);
 
-#ifdef _EDITOR
+//#ifdef _EDITOR
 			/// <summary>
 			/// Gets a resource (if it exists) by name and returns the full path and all properties, including metadata.
 			/// </summary>
@@ -263,7 +263,7 @@ namespace gallus
 			{
 				return m_ResourceFolder;
 			}
-#endif _EDITOR // _EDITOR
+//#endif _EDITOR // _EDITOR
 		private:
 			/// <summary>
 			/// Retrieves a resource from the given vector, or loads it if not found.

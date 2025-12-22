@@ -33,83 +33,85 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			bool ShaderBind::CreatePipelineState()
-			{
-				CD3DX12_RASTERIZER_DESC rasterDesc(D3D12_DEFAULT);
-				rasterDesc.CullMode = D3D12_CULL_MODE_BACK;
+            bool ShaderBind::CreatePipelineState()
+            {
+                CD3DX12_RASTERIZER_DESC rasterDesc(D3D12_DEFAULT);
+                rasterDesc.CullMode = D3D12_CULL_MODE_BACK;
 
-				D3D12_BLEND_DESC blendDesc = {};
-				blendDesc.AlphaToCoverageEnable = FALSE;
-				blendDesc.IndependentBlendEnable = FALSE;
+                D3D12_BLEND_DESC blendDesc = {};
+                blendDesc.AlphaToCoverageEnable = FALSE;
+                blendDesc.IndependentBlendEnable = FALSE;
 
-				D3D12_RENDER_TARGET_BLEND_DESC rtBlendDesc = {};
-				rtBlendDesc.BlendEnable = TRUE;
-				rtBlendDesc.LogicOpEnable = FALSE;
-				rtBlendDesc.SrcBlend = D3D12_BLEND_SRC_ALPHA;
-				rtBlendDesc.DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
-				rtBlendDesc.BlendOp = D3D12_BLEND_OP_ADD;
-				rtBlendDesc.SrcBlendAlpha = D3D12_BLEND_ONE;
-				rtBlendDesc.DestBlendAlpha = D3D12_BLEND_INV_SRC_ALPHA;
-				rtBlendDesc.BlendOpAlpha = D3D12_BLEND_OP_ADD;
-				rtBlendDesc.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+                D3D12_RENDER_TARGET_BLEND_DESC rtBlendDesc = {};
+                rtBlendDesc.BlendEnable = TRUE;
+                rtBlendDesc.LogicOpEnable = FALSE;
+                rtBlendDesc.SrcBlend = D3D12_BLEND_SRC_ALPHA;
+                rtBlendDesc.DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+                rtBlendDesc.BlendOp = D3D12_BLEND_OP_ADD;
+                rtBlendDesc.SrcBlendAlpha = D3D12_BLEND_ONE;
+                rtBlendDesc.DestBlendAlpha = D3D12_BLEND_INV_SRC_ALPHA;
+                rtBlendDesc.BlendOpAlpha = D3D12_BLEND_OP_ADD;
+                rtBlendDesc.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+                blendDesc.RenderTarget[0] = rtBlendDesc;
 
-				blendDesc.RenderTarget[0] = rtBlendDesc;
+                D3D12_RT_FORMAT_ARRAY rtvFormats = {};
+                rtvFormats.NumRenderTargets = 1;
+                rtvFormats.RTFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
 
-				CD3DX12_DEPTH_STENCIL_DESC depthDesc(D3D12_DEFAULT);
-				depthDesc.DepthEnable = TRUE;
-				depthDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-				depthDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
-				depthDesc.StencilEnable = FALSE;
+                CD3DX12_DEPTH_STENCIL_DESC depthDesc(D3D12_DEFAULT);
+                if (m_DSVFormat != DXGI_FORMAT_UNKNOWN)
+                {
+                    depthDesc.DepthEnable = TRUE;
+                    depthDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+                    depthDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+                    depthDesc.StencilEnable = FALSE;
+                }
+                else
+                {
+                    depthDesc.DepthEnable = FALSE;
+                }
 
-				D3D12_RT_FORMAT_ARRAY rtvFormats = {};
-				rtvFormats.NumRenderTargets = 1;
-				rtvFormats.RTFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM; // Must match actual RTV
+                struct PipelineStateStream
+                {
+                    CD3DX12_PIPELINE_STATE_STREAM_ROOT_SIGNATURE pRootSignature;
+                    CD3DX12_PIPELINE_STATE_STREAM_INPUT_LAYOUT InputLayout;
+                    CD3DX12_PIPELINE_STATE_STREAM_PRIMITIVE_TOPOLOGY PrimitiveTopologyType;
+                    CD3DX12_PIPELINE_STATE_STREAM_VS VS;
+                    CD3DX12_PIPELINE_STATE_STREAM_PS PS;
+                    CD3DX12_PIPELINE_STATE_STREAM_DEPTH_STENCIL_FORMAT DSVFormat;
+                    CD3DX12_PIPELINE_STATE_STREAM_RENDER_TARGET_FORMATS RTVFormats;
+                    CD3DX12_PIPELINE_STATE_STREAM_RASTERIZER RasterizerState;
+                    CD3DX12_PIPELINE_STATE_STREAM_BLEND_DESC BlendState;
+                    CD3DX12_PIPELINE_STATE_STREAM_DEPTH_STENCIL DepthStencilState;
+                };
 
-				struct PipelineStateStream
-				{
-					CD3DX12_PIPELINE_STATE_STREAM_ROOT_SIGNATURE pRootSignature;
-					CD3DX12_PIPELINE_STATE_STREAM_INPUT_LAYOUT InputLayout;
-					CD3DX12_PIPELINE_STATE_STREAM_PRIMITIVE_TOPOLOGY PrimitiveTopologyType;
-					CD3DX12_PIPELINE_STATE_STREAM_VS VS;
-					CD3DX12_PIPELINE_STATE_STREAM_PS PS;
-					CD3DX12_PIPELINE_STATE_STREAM_DEPTH_STENCIL_FORMAT DSVFormat;
-					CD3DX12_PIPELINE_STATE_STREAM_RENDER_TARGET_FORMATS RTVFormats;
-					CD3DX12_PIPELINE_STATE_STREAM_RASTERIZER RasterizerState;
-					CD3DX12_PIPELINE_STATE_STREAM_BLEND_DESC BlendState;
-					CD3DX12_PIPELINE_STATE_STREAM_DEPTH_STENCIL DepthStencilState;
-				} pipelineStateStream;
+                PipelineStateStream pipelineStateStream;
+                pipelineStateStream.pRootSignature = core::ENGINE->GetDX12().GetRootSignature().Get();
+                pipelineStateStream.InputLayout = { g_aInputLayout, _countof(g_aInputLayout) };
+                pipelineStateStream.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+                pipelineStateStream.VS = CD3DX12_SHADER_BYTECODE(m_pVertexShader->GetShaderBlob().Get());
+                pipelineStateStream.PS = CD3DX12_SHADER_BYTECODE(m_pPixelShader->GetShaderBlob().Get());
+                pipelineStateStream.DSVFormat = m_DSVFormat;
+                pipelineStateStream.RTVFormats = rtvFormats;
+                pipelineStateStream.RasterizerState = rasterDesc;
+                pipelineStateStream.BlendState = CD3DX12_BLEND_DESC(blendDesc);
+                if (m_DSVFormat != DXGI_FORMAT_UNKNOWN)
+                {
+                    pipelineStateStream.DepthStencilState = CD3DX12_PIPELINE_STATE_STREAM_DEPTH_STENCIL(depthDesc);
+                }
 
-				pipelineStateStream.pRootSignature =
-					core::ENGINE->GetDX12().GetRootSignature().Get();
-				pipelineStateStream.InputLayout =
-				{ g_aInputLayout, _countof(g_aInputLayout) };
-				pipelineStateStream.PrimitiveTopologyType =
-					D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-				pipelineStateStream.VS =
-					CD3DX12_SHADER_BYTECODE(m_pVertexShader->GetShaderBlob().Get());
-				pipelineStateStream.PS =
-					CD3DX12_SHADER_BYTECODE(m_pPixelShader->GetShaderBlob().Get());
-				pipelineStateStream.DSVFormat = DXGI_FORMAT_D32_FLOAT;
-				pipelineStateStream.RTVFormats = rtvFormats;
-				pipelineStateStream.RasterizerState = rasterDesc;
-				pipelineStateStream.BlendState = CD3DX12_BLEND_DESC(blendDesc);
-				pipelineStateStream.DepthStencilState =
-					CD3DX12_PIPELINE_STATE_STREAM_DEPTH_STENCIL(depthDesc);
+                D3D12_PIPELINE_STATE_STREAM_DESC desc = {};
+                desc.SizeInBytes = sizeof(pipelineStateStream);
+                desc.pPipelineStateSubobjectStream = &pipelineStateStream;
 
-				D3D12_PIPELINE_STATE_STREAM_DESC desc = {};
-				desc.SizeInBytes = sizeof(pipelineStateStream);
-				desc.pPipelineStateSubobjectStream = &pipelineStateStream;
+                if (FAILED(core::ENGINE->GetDX12().GetDevice()->CreatePipelineState(&desc, IID_PPV_ARGS(&m_pPipelineState))))
+                {
+                    LOG(LOGSEVERITY_ERROR, LOG_CATEGORY_DX12, "Failed creating pipeline state.");
+                    return false;
+                }
 
-				if (FAILED(core::ENGINE->GetDX12().GetDevice()->CreatePipelineState(
-					&desc, IID_PPV_ARGS(&m_pPipelineState))))
-				{
-					LOG(LOGSEVERITY_ERROR, LOG_CATEGORY_DX12,
-						"Failed creating transparent sprite pipeline state.");
-					return false;
-				}
-
-				return true;
-			}
+                return true;
+            }
 
 			//---------------------------------------------------------------------
 			void ShaderBind::Bind(std::shared_ptr<CommandList> a_pCommandList)
