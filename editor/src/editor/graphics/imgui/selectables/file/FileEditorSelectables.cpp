@@ -202,46 +202,106 @@ namespace gallus
 				{
 				}
 
-				ImGui::NewLine();
-				ImGui::DisplayHeader(m_Window.GetBoldFont(), "Info");
+				ImVec2 size = m_Window.GetHeaderSize();
+				std::string id = ImGui::IMGUI_FORMAT_ID(" Show Info",
+					FOLDOUT_ID, "TEX_SHOW_INFO_INSPECTOR");
+				ImGui::FoldOutButton(
+					std::string((m_bShowInfo ? font::ICON_FOLDED_OUT : font::ICON_FOLDED_IN) + id).c_str(), &m_bShowInfo, ImVec2(ImGui::GetContentRegionAvail().x, size.y));
+				
+				if (m_bShowInfo)
+				{
+					ImGui::Indent();
+					ImGui::StartInspectorKeyVal(ImGui::IMGUI_FORMAT_ID("", TABLE_ID, "SPRITE_EXPLORER_ITEM_TABLE_INSPECTOR"), m_Window.GetFramePadding());
 
-				ImGui::StartInspectorKeyVal(ImGui::IMGUI_FORMAT_ID("", TABLE_ID, "SPRITE_EXPLORER_ITEM_TABLE_INSPECTOR"), m_Window.GetFramePadding());
-
-				ImGui::KeyValue([this]
-				{
-					ImGui::AlignTextToFramePadding();
-					ImGui::DisplayHeader(m_Window.GetBoldFont(), "Width: ");
-				},
-					[this, tex]
-				{
-					ImGui::Text(std::to_string(tex->GetResourceDesc().Width).c_str());
-					return false;
-				});
-				ImGui::KeyValue([this]
-				{
-					ImGui::AlignTextToFramePadding();
-					ImGui::DisplayHeader(m_Window.GetBoldFont(), "Height: ");
-				},
-					[this, tex]
-				{
-					ImGui::Text(std::to_string(tex->GetResourceDesc().Height).c_str());
-					return false;
-				});
-				ImGui::KeyValue([this]
-				{
-					ImGui::AlignTextToFramePadding();
-					ImGui::DisplayHeader(m_Window.GetBoldFont(), "Channels: ");
-				},
-					[this, tex]
-				{
-					ImGui::Text(std::to_string(GetFormatChannelCount(tex->GetResourceDesc().Format)).c_str());
-					return false;
-				});
-				ImGui::EndInspectorKeyVal(m_Window.GetFramePadding());
+					ImGui::KeyValue([this]
+						{
+							ImGui::AlignTextToFramePadding();
+							ImGui::DisplayHeader(m_Window.GetBoldFont(), "Width: ");
+						},
+						[this, tex]
+						{
+							ImGui::Text(std::to_string(tex->GetResourceDesc().Width).c_str());
+							return false;
+						});
+					ImGui::KeyValue([this]
+						{
+							ImGui::AlignTextToFramePadding();
+							ImGui::DisplayHeader(m_Window.GetBoldFont(), "Height: ");
+						},
+						[this, tex]
+						{
+							ImGui::Text(std::to_string(tex->GetResourceDesc().Height).c_str());
+							return false;
+						});
+					ImGui::KeyValue([this]
+						{
+							ImGui::AlignTextToFramePadding();
+							ImGui::DisplayHeader(m_Window.GetBoldFont(), "Channels: ");
+						},
+						[this, tex]
+						{
+							ImGui::Text(std::to_string(GetFormatChannelCount(tex->GetResourceDesc().Format)).c_str());
+							return false;
+						});
+					ImGui::EndInspectorKeyVal(m_Window.GetFramePadding());
+					ImGui::Unindent();
+				}
 
 				float width = ImGui::GetContentRegionAvail().x;
 				if (tex->GetTextureType() == graphics::dx12::TextureType::SpriteSheet && ImGui::TextButton(ImGui::IMGUI_FORMAT_ID(font::ICON_IMAGE + std::string(" Open Sprite Editor"), BUTTON_ID, "OPEN_SPRITE_EDITOR_INSPECTOR").c_str(), "Opens the sprite editor for the selected sprite sheet.", ImVec2(width, 0)))
 				{
+				}
+
+				// Sprite dimensions
+				float spriteW = 0.0f;
+				float spriteH = 0.0f;
+				ImVec2 uv0, uv1;
+
+				ImVec2 texturePos = ImGui::GetCursorScreenPos();
+				if (tex->GetTextureType() == graphics::dx12::TextureType::Texture2D)
+				{
+					// Full texture
+					spriteW = static_cast<float>(tex->GetResourceDesc().Width);
+					spriteH = static_cast<float>(tex->GetResourceDesc().Height);
+					uv0 = { 0.0f, 0.0f };
+					uv1 = { 1.0f, 1.0f };
+				}
+				else
+				{
+					const auto& sprite = tex->GetSpriteRect(m_iCurrentSpriteIndex);
+					spriteW = static_cast<float>(sprite.width);
+					spriteH = static_cast<float>(sprite.height);
+
+					const float texWidth = static_cast<float>(tex->GetResourceDesc().Width);
+					const float texHeight = static_cast<float>(tex->GetResourceDesc().Height);
+
+					uv0 = { sprite.x / texWidth, sprite.y / texHeight };                              // top-left
+					uv1 = { (sprite.x + sprite.width) / texWidth, (sprite.y + sprite.height) / texHeight }; // bottom-right
+				}
+
+				ImVec2 avail = ImGui::GetContentRegionAvail() * 0.75f;
+				ImVec2 padding = ImVec2();
+				avail.x -= padding.x * 2.0f;
+				avail.y -= padding.y * 2.0f;
+
+				// Fit inside available space (keep aspect ratio)
+				float scale = std::max(avail.x / spriteW, avail.y / spriteH);
+				float drawW = spriteW * scale;
+				float drawH = spriteH * scale;
+
+				ShowTexturePreview(ImGui::IMGUI_FORMAT_ID("", "IMAGE", "TEX_PREVIEW_INSPECTOR"), tex.get(), m_iCurrentSpriteIndex, {drawW, drawH});
+
+				ImGui::SetCursorScreenPos({ texturePos.x, texturePos.y + (drawH / 2) });
+				if (ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_PREVIOUS, BUTTON_ID, "PREV_TEX_INDEX_PREVIEW_INSPECTOR").c_str()))
+				{
+					m_iCurrentSpriteIndex--;
+					if (m_iCurrentSpriteIndex < 0) m_iCurrentSpriteIndex = tex->GetSpriteRectsSize() - 1; // wrap around
+				}
+				ImGui::SetCursorScreenPos({ (texturePos.x + drawW) - size.x, texturePos.y + (drawH / 2)});
+				if (ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_NEXT, BUTTON_ID, "NEXT_TEX_INDEX_PREVIEW_INSPECTOR").c_str()))
+				{
+					m_iCurrentSpriteIndex++;
+					if (m_iCurrentSpriteIndex >= tex->GetSpriteRectsSize()) m_iCurrentSpriteIndex = 0; // wrap around
 				}
 			}
 

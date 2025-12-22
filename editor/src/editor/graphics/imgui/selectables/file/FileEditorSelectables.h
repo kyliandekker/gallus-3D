@@ -116,6 +116,8 @@ namespace gallus
 				void Render(FileEditorSelectable& a_FileEditorSelectable) override;
 			protected:
 				std::weak_ptr<graphics::dx12::Texture> m_pTexture = {};
+				size_t m_iCurrentSpriteIndex = 0;
+				bool m_bShowInfo = false;
 			};
 
 			class AudioFileEditorSelectables : public FileEditorSelectables

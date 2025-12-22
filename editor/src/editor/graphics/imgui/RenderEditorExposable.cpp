@@ -361,7 +361,7 @@ namespace gallus
 				return changed;
 			}
 
-			bool ShowTexturePreview(const std::string& a_sId, graphics::dx12::Texture* a_pTexture, int spriteIndex)
+			bool ShowTexturePreview(const std::string& a_sId, graphics::dx12::Texture* a_pTexture, int a_iSpriteIndex, const ImVec2& a_vSize)
 			{
 				if (!a_pTexture)
 				{
@@ -370,11 +370,10 @@ namespace gallus
 				}
 
 				// Get the sprite UVs from the texture atlas
-				ImVec2 size = ImVec2(100, 100); // preview size
-				const ImVec2 uv0 = ImVec2(a_pTexture->GetSpriteUV(spriteIndex).uv0.x, a_pTexture->GetSpriteUV(spriteIndex).uv0.y);  // top-left UV
-				const ImVec2 uv1 = ImVec2(a_pTexture->GetSpriteUV(spriteIndex).uv1.x, a_pTexture->GetSpriteUV(spriteIndex).uv1.y); // bottom-right UV
+				const ImVec2 uv0 = ImVec2(a_pTexture->GetSpriteUV(a_iSpriteIndex).uv0.x, a_pTexture->GetSpriteUV(a_iSpriteIndex).uv0.y);  // top-left UV
+				const ImVec2 uv1 = ImVec2(a_pTexture->GetSpriteUV(a_iSpriteIndex).uv1.x, a_pTexture->GetSpriteUV(a_iSpriteIndex).uv1.y); // bottom-right UV
 
-				ImGui::Image(a_pTexture->GetGPUHandle().ptr, size, uv0, uv1);
+				ImGui::Image(a_pTexture->GetGPUHandle().ptr, a_vSize, uv0, uv1);
 
 				return false; // read-only
 			}

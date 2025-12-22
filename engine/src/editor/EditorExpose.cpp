@@ -425,6 +425,25 @@ namespace gallus
 					a_SrcData.SetSrcObject(objectPropertyName, objectSrcData);
 					break;
 				}
+				case EditorFieldWidgetType::EditorFieldWidgetType_Array:
+				{
+					void* pArray = const_cast<void*>(ptr); // SrcData needs non-const
+
+					std::vector<IExposableToEditor>* pVec = reinterpret_cast<std::vector<IExposableToEditor>*>(pArray);
+					resources::SrcData arraySrcData;
+					arraySrcData.SetArray();
+
+					for (size_t i = 0; i < pVec->size(); ++i)
+					{
+						resources::SrcData elementSrcData;
+						elementSrcData.SetObject();
+						SerializeEditorExposable(&(*pVec)[i], elementSrcData);
+						arraySrcData.PushArraySrcObject(elementSrcData);
+					}
+
+					a_SrcData.SetSrcObject(propertyName, arraySrcData);
+					break;
+				}
 			}
 		}
 	}
