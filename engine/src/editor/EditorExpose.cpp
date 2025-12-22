@@ -250,6 +250,47 @@ namespace gallus
 					DeserializeEditorExposable(pEditorObject, objectSrcData);
 					break;
 				}
+				case EditorFieldWidgetType::EditorFieldWidgetType_Array:
+				{
+					const ArrayAccessors* pAccessors = field.m_Options.m_pArrayAccessors;
+					if (pAccessors == nullptr)
+					{
+						break;
+					}
+
+					resources::SrcData arraySrcData;
+					if (!a_SrcData.GetSrcArray(propertyName, arraySrcData))
+					{
+						break;
+					}
+
+					size_t count = 0;
+					if (!arraySrcData.GetArraySize(count))
+					{
+						break;
+					}
+
+					void* pArray = ptr;
+					pAccessors->Resize(pArray, count);
+
+					for (size_t i = 0; i < count; ++i)
+					{
+						resources::SrcData elementSrcData;
+						if (!arraySrcData.GetSrcArrayElement(i, elementSrcData))
+						{
+							continue;
+						}
+
+						void* pElement = pAccessors->GetElement(pArray, i);
+
+						IExposableToEditor* pEditorElement =
+							reinterpret_cast<IExposableToEditor*>(pElement);
+
+						DeserializeEditorExposable(pEditorElement, elementSrcData);
+					}
+
+					break;
+				}
 			}
 		}
 	}
@@ -393,6 +434,38 @@ namespace gallus
 					
 					std::string objectPropertyName = TypeNameToPropertyName(pEditorObject->GetTypeName());
 					a_SrcData.SetSrcObject(objectPropertyName, objectSrcData);
+					break;
+				}
+				case EditorFieldWidgetType::EditorFieldWidgetType_Array:
+				{
+					const ArrayAccessors* pAccessors = field.m_Options.m_pArrayAccessors;
+					if (pAccessors == nullptr)
+					{
+						break;
+					}
+
+					resources::SrcData arraySrcData;
+					arraySrcData.SetArray();
+
+					const void* pArray = ptr;
+					size_t count = pAccessors->GetCount(const_cast<void*>(pArray));
+
+					for (size_t i = 0; i < count; ++i)
+					{
+						const void* pElement = pAccessors->GetElement(const_cast<void*>(pArray), i);
+
+						const IExposableToEditor* pEditorElement =
+							reinterpret_cast<const IExposableToEditor*>(pElement);
+
+						resources::SrcData elementSrcData;
+						elementSrcData.SetObject();
+
+						SerializeEditorExposable(pEditorElement, elementSrcData);
+
+						arraySrcData.PushArraySrcObject(elementSrcData);
+					}
+
+					a_SrcData.SetSrcObject(propertyName, arraySrcData);
 					break;
 				}
 			}

@@ -1,12 +1,11 @@
 #pragma once
 
-// external
 #include <string>
 #include <vector>
 #include <functional>
 #include <cstddef>
+#include <type_traits>
 
-// resources
 #include "resources/AssetType.h"
 
 namespace gallus
@@ -15,6 +14,13 @@ namespace gallus
 	{
 		class SrcData;
 	}
+
+	enum class EditorFieldSerializationType
+	{
+		SerializationType_None,
+		SerializationType_MetaData,
+		SerializationType_File
+	};
 
 	enum class EditorFieldWidgetType
 	{
@@ -34,6 +40,7 @@ namespace gallus
 		EditorFieldWidgetType_EngineResource,
 		EditorFieldWidgetType_Object,
 		EditorFieldWidgetType_ObjectPtr,
+		EditorFieldWidgetType_Array,
 		EditorFieldWidgetType_TexturePreview,
 		EditorFieldWidgetType_Button
 	};
@@ -44,40 +51,46 @@ namespace gallus
 		EditorGizmoType_Transform
 	};
 
-	// Field options with default values
+	class IExposableToEditor;
+
+	struct ArrayAccessors
+	{
+		size_t(*GetCount)(void*);
+		void* (*GetElement)(void*, size_t);
+		void (*Resize)(void*, size_t);
+	};
+
 	struct FieldOptions
 	{
 		EditorFieldWidgetType type = EditorFieldWidgetType::EditorFieldWidgetType_None;
 		gallus::resources::AssetType assetType;
 		std::string min = "";
 		std::string max = "";
-		std::function<std::string(int)> enumToStringFunc = nullptr; // returns string name for index
+		std::function<std::string(int)> enumToStringFunc = nullptr;
 		std::function<void(void*)> buttonFunc = nullptr;
 		std::function<void(void*)> onChangeFunc = nullptr;
 		std::string description;
 		bool disabled = false;
 		bool internal = false;
-
+		bool hideInEditor = false;
 		size_t relatedIndexFieldOffset = 0;
+		const ArrayAccessors* m_pArrayAccessors = nullptr;
+		const std::vector<struct EditorFieldInfo>* m_pElementFields = nullptr;
 	};
 
-	// Gizmo options with default values
 	struct GizmoOptions
 	{
 		EditorGizmoType type = EditorGizmoType::EditorGizmoType_None;
 	};
 
-	// Editor field with direct memory access
 	struct EditorFieldInfo
 	{
 		const char* m_sName;
 		size_t m_iOffset;
 		const char* m_sUIName;
+		EditorFieldSerializationType m_SerializationType;
 		FieldOptions m_Options;
 	};
-
-	// Forward-declare interface so EditorGizmoInfo can mention it (minimal change)
-	class IExposableToEditor;
 
 	struct EditorGizmoInfo
 	{
@@ -86,7 +99,6 @@ namespace gallus
 		GizmoOptions m_Options;
 	};
 
-	// Interface (full definition)
 	class IExposableToEditor
 	{
 	public:
@@ -96,17 +108,63 @@ namespace gallus
 		virtual ~IExposableToEditor() = default;
 	};
 
-	// No parent
-	#define BEGIN_EXPOSE_FIELDS(CLASSNAME) \
+	template<typename T>
+	struct VectorArrayAccessors
+	{
+		static size_t GetCount(void* a_pArray)
+		{
+			std::vector<T>* pVector = static_cast<std::vector<T>*>(a_pArray);
+			return pVector->size();
+		}
+
+		static void* GetElement(void* a_pArray, size_t a_Index)
+		{
+			std::vector<T>* pVector = static_cast<std::vector<T>*>(a_pArray);
+			return &(*pVector)[a_Index];
+		}
+
+		static void Resize(void* a_pArray, size_t a_NewSize)
+		{
+			std::vector<T>* pVector = static_cast<std::vector<T>*>(a_pArray);
+			pVector->resize(a_NewSize);
+		}
+
+		static const ArrayAccessors* Get()
+		{
+			static ArrayAccessors accessors =
+			{
+				&GetCount,
+				&GetElement,
+				&Resize
+			};
+			return &accessors;
+		}
+	};
+
+	template<typename T>
+	inline const std::vector<EditorFieldInfo>* GetEditorFieldsFor()
+	{
+		static_assert(std::is_base_of<IExposableToEditor, T>::value);
+		return &T::StaticEditorFields();
+	}
+
+	template<typename TElement>
+	inline FieldOptions MakeArrayFieldOptions(FieldOptions a_Base = {})
+	{
+		a_Base.type = EditorFieldWidgetType::EditorFieldWidgetType_Array;
+		a_Base.m_pArrayAccessors = VectorArrayAccessors<TElement>::Get();
+		a_Base.m_pElementFields = GetEditorFieldsFor<TElement>();
+		return a_Base;
+	}
+
+#define BEGIN_EXPOSE_FIELDS(CLASSNAME) \
 		public: \
 			static const std::vector<EditorFieldInfo>& StaticEditorFields() \
 			{ \
 				static std::vector<EditorFieldInfo> fields = []() { \
 					std::vector<EditorFieldInfo> f;
 
-
-	// With parent
-	#define BEGIN_EXPOSE_FIELDS_PARENT(CLASSNAME, PARENT) \
+#define BEGIN_EXPOSE_FIELDS_PARENT(CLASSNAME, PARENT) \
 		public: \
 			static const std::vector<EditorFieldInfo>& StaticEditorFields() \
 			{ \
@@ -115,17 +173,16 @@ namespace gallus
 					const auto& parentFields = PARENT::StaticEditorFields(); \
 					f.insert(f.end(), parentFields.begin(), parentFields.end());
 
-	#define EXPOSE_FIELD(CLASSNAME, VAR, UINAME, FIELD_OPTIONS) \
-					f.push_back({ #VAR, offsetof(CLASSNAME, VAR), UINAME, FIELD_OPTIONS });
+#define EXPOSE_FIELD(CLASSNAME, VAR, UINAME, SERIALIZATION_TYPE, FIELD_OPTIONS) \
+					f.push_back({ #VAR, offsetof(CLASSNAME, VAR), UINAME, SERIALIZATION_TYPE, FIELD_OPTIONS });
 
-	#define END_EXPOSE_FIELDS(CLASSNAME) \
+#define END_EXPOSE_FIELDS(CLASSNAME) \
 					return f; \
 				}(); \
 				return fields; \
 			}
 
-		// Gizmos (fields)
-	#define BEGIN_EXPOSE_GIZMOS(CLASSNAME) \
+#define BEGIN_EXPOSE_GIZMOS(CLASSNAME) \
 		public: \
 			static const std::vector<EditorGizmoInfo>& StaticEditorGizmos() \
 			{ \
@@ -139,53 +196,43 @@ namespace gallus
 				return gizmos; \
 			}
 
-	// End-of-class helper: keep as before
-	#define END_EXPOSE_TO_EDITOR(CLASSNAME) \
-	const std::vector<EditorFieldInfo>& GetEditorFields() const override { return CLASSNAME::StaticEditorFields(); } \
-	const std::vector<EditorGizmoInfo>& GetEditorGizmos() const override { return CLASSNAME::StaticEditorGizmos(); } \
-	const char* GetTypeName() const override { return #CLASSNAME; }
+#define END_EXPOSE_TO_EDITOR(CLASSNAME) \
+		const std::vector<EditorFieldInfo>& GetEditorFields() const override { return CLASSNAME::StaticEditorFields(); } \
+		const std::vector<EditorGizmoInfo>& GetEditorGizmos() const override { return CLASSNAME::StaticEditorGizmos(); } \
+		const char* GetTypeName() const override { return #CLASSNAME; }
 
 	template<typename TEnum>
 	inline std::function<std::string(int)> MakeEnumToStringFunc(std::string(*toStringFunc)(TEnum))
 	{
-		// returns a std::function that editor code will call with an int index
 		return [toStringFunc](int value) -> std::string
 			{
-				// Cast the int to the enum type and forward to user's converter
 				return toStringFunc(static_cast<TEnum>(value));
 			};
 	}
 
 	template<typename TObject>
-	inline std::function<void(void*)> MakeButtonFunc(void (TObject::*a_pFunc)())
+	inline std::function<void(void*)> MakeButtonFunc(void (TObject::* a_pFunc)())
 	{
 		return [a_pFunc](void* a_pObject) -> void
-		{
-			TObject* pObject = static_cast<TObject*>(a_pObject);
-			(pObject->*a_pFunc)();
-		};
+			{
+				TObject* pObject = static_cast<TObject*>(a_pObject);
+				(pObject->*a_pFunc)();
+			};
 	}
 
 	template<typename TObject>
-	inline std::function<void(void*)> MakeOnChangeFunc(void (TObject::*a_pFunc)())
+	inline std::function<void(void*)> MakeOnChangeFunc(void (TObject::* a_pFunc)())
 	{
 		return [a_pFunc](void* a_pObject) -> void
-		{
-			TObject* pObject = static_cast<TObject*>(a_pObject);
-			(pObject->*a_pFunc)();
-		};
+			{
+				TObject* pObject = static_cast<TObject*>(a_pObject);
+				(pObject->*a_pFunc)();
+			};
 	}
 
-	// Handy macro that hides the FieldOptions completely and expands to EXPOSE_FIELD for a single-line usage
-	#define EXPOSE_ENUM_FIELD(Class, Var, UIName, EnumType, ToStringFunc, FIELD_OPTIONS) \
-			EXPOSE_FIELD(Class, Var, UIName, FIELD_OPTIONS)
-
-	// Convenience auto macro using EnumTypeToString naming convention
-	#define EXPOSE_ENUM_FIELD_AUTO(Class, Var, UIName, EnumType, FIELD_OPTIONS) \
-			EXPOSE_ENUM_FIELD(Class, Var, UIName, EnumType, EnumType##ToString, FIELD_OPTIONS)
-
 	void DeserializeEditorExposable(IExposableToEditor* a_pObject, const resources::SrcData& a_SrcData);
+
 #ifdef _EDITOR
 	void SerializeEditorExposable(const IExposableToEditor* a_pObject, resources::SrcData& a_SrcData);
-#endif // _EDITOR
-}
+#endif
+		}
