@@ -72,7 +72,7 @@ namespace gallus
 			rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
 			document.Accept(writer);
 
-			const fs::path path = ENGINE->GetSaveDirectory().generic_string() + "/" + m_sFileName;
+			fs::path path = ENGINE->GetSaveDirectory().generic_string() + "/" + m_sFileName;
 			file::CreateDirectory(path.parent_path());
 			if (!file::SaveFile(path, core::Data(buffer.GetString(), buffer.GetSize())))
 			{

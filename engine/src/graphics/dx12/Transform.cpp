@@ -185,6 +185,12 @@ namespace gallus
 			//---------------------------------------------------------------------
 			const DirectX::XMMATRIX Transform::GetWorldMatrix() const
 			{
+				DirectX::XMFLOAT3 scale = m_vScale;
+				if (m_CameraType == CameraType_Screen)
+				{
+					scale = { m_vScale.x, m_vScale.y, 0 };
+				}
+
 				// Use quaternion for rotation
 				DirectX::XMMATRIX translationMatrix = DirectX::XMMatrixTranslationFromVector(DirectX::XMLoadFloat3(&m_vPosition));
 				DirectX::XMMATRIX rotationMatrix = DirectX::XMMatrixRotationQuaternion(m_vRotation);
@@ -196,10 +202,15 @@ namespace gallus
 			//---------------------------------------------------------------------
 			const DirectX::XMMATRIX Transform::GetWorldMatrixWithPivot() const
 			{
-				// Use quaternion for rotation
+				DirectX::XMFLOAT3 scale = m_vScale;
+				if (m_CameraType == CameraType_Screen)
+				{
+					scale = { m_vScale.x, m_vScale.y, 0 };
+				}
+
 				DirectX::XMMATRIX translationMatrix = DirectX::XMMatrixTranslationFromVector(DirectX::XMLoadFloat3(&m_vPosition));
 				DirectX::XMMATRIX rotationMatrix = DirectX::XMMatrixRotationQuaternion(m_vRotation);
-				DirectX::XMMATRIX scaleMatrix = DirectX::XMMatrixScalingFromVector(DirectX::XMLoadFloat3(&m_vScale));
+				DirectX::XMMATRIX scaleMatrix = DirectX::XMMatrixScalingFromVector(DirectX::XMLoadFloat3(&scale));
 
 				DirectX::XMMATRIX pivotTranslation = DirectX::XMMatrixTranslation(m_vPivot.x, m_vPivot.y, m_vPivot.z);
 				DirectX::XMMATRIX invPivotTranslation = DirectX::XMMatrixTranslation(-m_vPivot.x, -m_vPivot.y, -m_vPivot.z);

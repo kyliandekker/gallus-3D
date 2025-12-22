@@ -252,41 +252,30 @@ namespace gallus
 				}
 				case EditorFieldWidgetType::EditorFieldWidgetType_Array:
 				{
-					const ArrayAccessors* pAccessors = field.m_Options.m_pArrayAccessors;
-					if (pAccessors == nullptr)
-					{
-						break;
-					}
+					void* arrayPtr = ptr;
 
-					resources::SrcData arraySrcData;
-					if (!a_SrcData.GetSrcArray(propertyName, arraySrcData))
-					{
+					resources::SrcData arrayData;
+					if (!a_SrcData.GetSrcArray(propertyName, arrayData))
 						break;
-					}
 
 					size_t count = 0;
-					if (!arraySrcData.GetArraySize(count))
-					{
-						break;
-					}
+					arrayData.GetArraySize(count);
 
-					void* pArray = ptr;
-					pAccessors->Resize(pArray, count);
+					field.m_Options.clear(arrayPtr);
+					field.m_Options.reserve(arrayPtr, count);
 
 					for (size_t i = 0; i < count; ++i)
 					{
-						resources::SrcData elementSrcData;
-						if (!arraySrcData.GetSrcArrayElement(i, elementSrcData))
-						{
-							continue;
-						}
+						size_t index = field.m_Options.addElement(arrayPtr);
 
-						void* pElement = pAccessors->GetElement(pArray, i);
+						IExposableToEditor* element =
+							field.m_Options.getElement(arrayPtr, index);
 
-						IExposableToEditor* pEditorElement =
-							reinterpret_cast<IExposableToEditor*>(pElement);
+						resources::SrcData elementData;
+						elementData.SetObject();
+						arrayData.GetSrcArrayElement(i, elementData);
 
-						DeserializeEditorExposable(pEditorElement, elementSrcData);
+						DeserializeEditorExposable(element, elementData);
 					}
 
 					break;
@@ -434,38 +423,6 @@ namespace gallus
 					
 					std::string objectPropertyName = TypeNameToPropertyName(pEditorObject->GetTypeName());
 					a_SrcData.SetSrcObject(objectPropertyName, objectSrcData);
-					break;
-				}
-				case EditorFieldWidgetType::EditorFieldWidgetType_Array:
-				{
-					const ArrayAccessors* pAccessors = field.m_Options.m_pArrayAccessors;
-					if (pAccessors == nullptr)
-					{
-						break;
-					}
-
-					resources::SrcData arraySrcData;
-					arraySrcData.SetArray();
-
-					const void* pArray = ptr;
-					size_t count = pAccessors->GetCount(const_cast<void*>(pArray));
-
-					for (size_t i = 0; i < count; ++i)
-					{
-						const void* pElement = pAccessors->GetElement(const_cast<void*>(pArray), i);
-
-						const IExposableToEditor* pEditorElement =
-							reinterpret_cast<const IExposableToEditor*>(pElement);
-
-						resources::SrcData elementSrcData;
-						elementSrcData.SetObject();
-
-						SerializeEditorExposable(pEditorElement, elementSrcData);
-
-						arraySrcData.PushArraySrcObject(elementSrcData);
-					}
-
-					a_SrcData.SetSrcObject(propertyName, arraySrcData);
 					break;
 				}
 			}

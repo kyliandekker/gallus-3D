@@ -72,7 +72,7 @@ namespace gallus
 
 			void ExplorerWindow::RenderFolder(FileEditorSelectable& a_Resource, int a_Indent, const ImVec2& a_InitialPos)
 			{
-				if (a_Resource.GetFileResource().GetMetaData()->GetAssetType() != gallus::resources::AssetType::Folder)
+				if (a_Resource.GetFileResource().GetAssetType() != gallus::resources::AssetType::Folder)
 				{
 					return;
 				}
@@ -328,7 +328,7 @@ namespace gallus
 
 								if (double_clicked)
 								{
-									if (view->GetFileResource().GetMetaData()->GetAssetType() == gallus::resources::AssetType::Folder)
+									if (view->GetFileResource().GetAssetType() == gallus::resources::AssetType::Folder)
 									{
 										m_pViewedFolder = view;
 										m_bNeedsRefresh = true;

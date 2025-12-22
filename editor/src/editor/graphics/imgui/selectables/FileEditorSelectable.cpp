@@ -47,7 +47,7 @@ namespace gallus
 			void FileEditorSelectable::Select()
 			{
 				m_pFileEditorSelectable;
-				switch (m_FileResource.GetMetaData()->GetAssetType())
+				switch (m_FileResource.GetAssetType())
 				{
 					case resources::AssetType::Folder:
 					{
@@ -127,11 +127,7 @@ namespace gallus
 
 			void FileEditorSelectable::SetIcon()
 			{
-				if (!m_FileResource.GetMetaData())
-				{
-					return;
-				}
-				m_sIcon = AssetTypeToFileIcon(m_FileResource.GetMetaData()->GetAssetType());
+				m_sIcon = AssetTypeToFileIcon(m_FileResource.GetAssetType());
 			}
 
 			std::string FileEditorSelectable::GetIcon() const
@@ -258,7 +254,7 @@ namespace gallus
 
 				ImVec2 contentStartPos = ImVec2(initialPos.x + m_Window.GetFontSize(), initialPos.y + verticalOffset);
 				ImGui::SetCursorPos(contentStartPos);
-				ImGui::TextColored(AssetTypeToColor(m_FileResource.GetMetaData()->GetAssetType()), m_sIcon.c_str());
+				ImGui::TextColored(AssetTypeToColor(m_FileResource.GetAssetType()), m_sIcon.c_str());
 
 				ImVec2 textSize = ImGui::CalcTextSize(m_sDisplayName.c_str());
 
@@ -269,7 +265,7 @@ namespace gallus
 
 				ImGui::Text(m_sDisplayName.c_str());
 
-				std::string assetType = gallus::resources::AssetTypeToString(m_FileResource.GetMetaData()->GetAssetType());
+				std::string assetType = gallus::resources::AssetTypeToString(m_FileResource.GetAssetType());
 
 				textSize = ImGui::CalcTextSize(assetType.c_str());
 
@@ -340,7 +336,7 @@ namespace gallus
 					float horizontalOffset = (m_vSize.x - iconSize.x) / 2.0f;
 					ImVec2 iconPos = ImVec2(initialScreenPos.x + horizontalOffset, initialScreenPos.y + m_Window.GetFontSize());
 					ImGui::SetCursorScreenPos(iconPos);
-					ImGui::TextColored(AssetTypeToColor(m_FileResource.GetMetaData()->GetAssetType()), m_sIcon.c_str());
+					ImGui::TextColored(AssetTypeToColor(m_FileResource.GetAssetType()), m_sIcon.c_str());
 					ImGui::PopFont();
 
 					// Draw file name under icon
@@ -360,7 +356,7 @@ namespace gallus
 			{
 				for (const gallus::resources::FileResource& resource : m_FileResource.GetChildren())
 				{
-					if (resource.GetMetaData() && resource.GetMetaData()->GetAssetType() == gallus::resources::AssetType::Folder)
+					if (resource.GetAssetType() == gallus::resources::AssetType::Folder)
 					{
 						return true;
 					}

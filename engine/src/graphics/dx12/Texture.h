@@ -53,14 +53,18 @@ namespace gallus
 				}
 			}
 
-			struct SpriteRect : public IExposableToEditor
+			class SpriteRect : public IExposableToEditor
 			{
+			public:
+				SpriteRect() : IExposableToEditor()
+				{ }
+
 				uint32_t x;
 				uint32_t y;
 				uint32_t width;
 				uint32_t height;
 
-				BEGIN_EXPOSE_FIELDS_PARENT(SpriteRect, DX12Resource)
+				BEGIN_EXPOSE_FIELDS(SpriteRect)
 					EXPOSE_FIELD(SpriteRect, x, "x", "",
 						{ .type = gallus::EditorFieldWidgetType::EditorFieldWidgetType_Int64 })
 					EXPOSE_FIELD(SpriteRect, y, "y", "",
@@ -69,10 +73,10 @@ namespace gallus
 						{ .type = gallus::EditorFieldWidgetType::EditorFieldWidgetType_Int64 })
 					EXPOSE_FIELD(SpriteRect, height, "height", "",
 						{ .type = gallus::EditorFieldWidgetType::EditorFieldWidgetType_Int64 })
-					END_EXPOSE_FIELDS(SpriteRect)
-					BEGIN_EXPOSE_GIZMOS(Texture)
-					END_EXPOSE_GIZMOS(SpriteRect)
-					END_EXPOSE_TO_EDITOR(SpriteRect)
+				END_EXPOSE_FIELDS(SpriteRect)
+				BEGIN_EXPOSE_GIZMOS(SpriteRect)
+				END_EXPOSE_GIZMOS(SpriteRect)
+				END_EXPOSE_TO_EDITOR(SpriteRect)
 			};
 
 			class SpriteUV
@@ -279,7 +283,6 @@ namespace gallus
 				int32_t m_iSRVIndex = -1;
 				D3D12_SHADER_RESOURCE_VIEW_DESC m_SrvDesc;
 
-
 				TextureType m_TextureType = TextureType::Texture2D;
 				std::vector<SpriteRect> m_aSpriteRects;
 
@@ -290,7 +293,7 @@ namespace gallus
 							.enumToStringFunc = MakeEnumToStringFunc<TextureType>(TextureTypeToString),
 						}))
 					EXPOSE_FIELD(Texture, m_aSpriteRects, "Sprite Rects", "",
-						gallus::MakeArrayFieldOptions<SpriteRect>()
+						MakeArrayFieldOptions<SpriteRect>()
 					)
 				END_EXPOSE_FIELDS(Texture)
 				BEGIN_EXPOSE_GIZMOS(Texture)

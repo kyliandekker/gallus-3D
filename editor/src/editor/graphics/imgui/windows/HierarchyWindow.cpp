@@ -255,7 +255,7 @@ namespace gallus
 							resources::FileResource* dropped = *(resources::FileResource**)payload->Data;
 							if (dropped)
 							{
-								if (dropped->GetMetaData()->GetAssetType() == resources::AssetType::Prefab)
+								if (dropped->GetAssetType() == resources::AssetType::Prefab)
 								{
 									if (auto prefab = core::EDITOR_ENGINE->GetResourceAtlas().LoadPrefab(dropped->GetPath().filename().generic_string()).lock())
 									{
@@ -265,7 +265,7 @@ namespace gallus
 								else
 								{
 									gameplay::EntityID entityID = editor::g_CreateEntity(dropped->GetPath().filename().generic_string());
-									DragAction(entityID, dropped->GetMetaData()->GetAssetType(), dropped->GetPath().filename().generic_string());
+									DragAction(entityID, dropped->GetAssetType(), dropped->GetPath().filename().generic_string());
 								}
 							}
 						}
@@ -312,7 +312,7 @@ namespace gallus
 								resources::FileResource* dropped = *(resources::FileResource**)payload->Data;
 								if (dropped)
 								{
-									DragAction(view->GetEntityID(), dropped->GetMetaData()->GetAssetType(), dropped->GetPath().filename().generic_string());
+									DragAction(view->GetEntityID(), dropped->GetAssetType(), dropped->GetPath().filename().generic_string());
 								}
 							}
 							ImGui::EndDragDropTarget();

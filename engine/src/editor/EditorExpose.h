@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <string>
 #include <vector>
@@ -46,13 +46,6 @@ namespace gallus
 
 	class IExposableToEditor;
 
-	struct ArrayAccessors
-	{
-		size_t(*GetCount)(void*);
-		void* (*GetElement)(void*, size_t);
-		void (*Resize)(void*, size_t);
-	};
-
 	struct FieldOptions
 	{
 		EditorFieldWidgetType type = EditorFieldWidgetType::EditorFieldWidgetType_None;
@@ -66,8 +59,13 @@ namespace gallus
 		bool internal = false;
 		bool hideInEditor = false;
 		size_t relatedIndexFieldOffset = 0;
-		const ArrayAccessors* m_pArrayAccessors = nullptr;
-		const std::vector<struct EditorFieldInfo>* m_pElementFields = nullptr;
+
+		std::function<size_t(void*)> getSize = nullptr;
+		std::function<IExposableToEditor* (void*, size_t)> getElement = nullptr;
+		std::function<size_t(void*)> addElement = nullptr;
+		std::function<void(void*, size_t)> removeElement = nullptr;
+		std::function<void(void*, size_t)> reserve = nullptr;
+		std::function<void(void*)> clear = nullptr;
 	};
 
 	struct GizmoOptions
@@ -101,52 +99,10 @@ namespace gallus
 	};
 
 	template<typename T>
-	struct VectorArrayAccessors
-	{
-		static size_t GetCount(void* a_pArray)
-		{
-			std::vector<T>* pVector = static_cast<std::vector<T>*>(a_pArray);
-			return pVector->size();
-		}
-
-		static void* GetElement(void* a_pArray, size_t a_Index)
-		{
-			std::vector<T>* pVector = static_cast<std::vector<T>*>(a_pArray);
-			return &(*pVector)[a_Index];
-		}
-
-		static void Resize(void* a_pArray, size_t a_NewSize)
-		{
-			std::vector<T>* pVector = static_cast<std::vector<T>*>(a_pArray);
-			pVector->resize(a_NewSize);
-		}
-
-		static const ArrayAccessors* Get()
-		{
-			static ArrayAccessors accessors =
-			{
-				&GetCount,
-				&GetElement,
-				&Resize
-			};
-			return &accessors;
-		}
-	};
-
-	template<typename T>
 	inline const std::vector<EditorFieldInfo>* GetEditorFieldsFor()
 	{
 		static_assert(std::is_base_of<IExposableToEditor, T>::value);
 		return &T::StaticEditorFields();
-	}
-
-	template<typename TElement>
-	inline FieldOptions MakeArrayFieldOptions(FieldOptions a_Base = {})
-	{
-		a_Base.type = EditorFieldWidgetType::EditorFieldWidgetType_Array;
-		a_Base.m_pArrayAccessors = VectorArrayAccessors<TElement>::Get();
-		a_Base.m_pElementFields = GetEditorFieldsFor<TElement>();
-		return a_Base;
 	}
 
 #define BEGIN_EXPOSE_FIELDS(CLASSNAME) \
@@ -222,9 +178,57 @@ namespace gallus
 			};
 	}
 
+	template<typename T>
+	FieldOptions MakeArrayFieldOptions()
+	{
+		static_assert(std::is_base_of<IExposableToEditor, T>::value);
+
+		FieldOptions opts;
+		opts.type = EditorFieldWidgetType::EditorFieldWidgetType_Array;
+
+		opts.getSize = [](void* arrayPtr) -> size_t
+			{
+				auto& vec = *static_cast<std::vector<T>*>(arrayPtr);
+				return vec.size();
+			};
+
+		opts.getElement = [](void* arrayPtr, size_t index)
+			{
+				auto& vec = *static_cast<std::vector<T>*>(arrayPtr);
+				return static_cast<IExposableToEditor*>(&vec[index]);
+			};
+
+		opts.addElement = [](void* arrayPtr)
+			{
+				auto& vec = *static_cast<std::vector<T>*>(arrayPtr);
+				vec.emplace_back();
+				return vec.size() - 1;
+			};
+
+		opts.removeElement = [](void* arrayPtr, size_t index)
+			{
+				auto& vec = *static_cast<std::vector<T>*>(arrayPtr);
+				vec.erase(vec.begin() + index);
+			};
+
+		opts.reserve = [](void* arrayPtr, size_t size)
+			{
+				auto& vec = *static_cast<std::vector<T>*>(arrayPtr);
+				vec.reserve(size);
+			};
+
+		opts.clear = [](void* arrayPtr)
+			{
+				auto& vec = *static_cast<std::vector<T>*>(arrayPtr);
+				vec.clear();
+			};
+
+		return opts;
+	}
+
 	void DeserializeEditorExposable(IExposableToEditor* a_pObject, const resources::SrcData& a_SrcData);
 
 #ifdef _EDITOR
 	void SerializeEditorExposable(const IExposableToEditor* a_pObject, resources::SrcData& a_SrcData);
 #endif
-		}
+}

@@ -17,7 +17,6 @@
 #include "audio/AudioUtils.h"
 
 // resources
-#include "resources/metadata/TextureMetaData.h"
 #include "resources/FileResource.h"
 
 // gameplay
@@ -89,7 +88,7 @@ namespace gallus
 				m_AssetTypeDropdown(a_Window)
 			{
 				m_AssetTypeDropdown.Initialize(
-					a_FileEditorSelectable.GetFileResource().GetMetaData()->GetAssetType(),
+					a_FileEditorSelectable.GetFileResource().GetAssetType(),
 					{
 						resources::AssetType::PixelShader,
 						resources::AssetType::VertexShader,
@@ -113,33 +112,21 @@ namespace gallus
 						bool changed = m_AssetTypeDropdown.Render(ImGui::IMGUI_FORMAT_ID("", COMBO_ID, "ASSETTYPE_SHADER_EXPLORER_ITEM_INSPECTOR").c_str());
 						if (changed)
 						{
-							a_FileEditorSelectable.GetFileResource().GetMetaData()->SetAssetType(m_AssetTypeDropdown.GetValue());
-							a_FileEditorSelectable.GetFileResource().GetMetaData()->Save(a_FileEditorSelectable.GetFileResource().GetPath());
+							//a_FileEditorSelectable.GetFileResource().SetAssetType(m_AssetTypeDropdown.GetValue());
+							//a_FileEditorSelectable.GetFileResource().Save(a_FileEditorSelectable.GetFileResource().GetPath());
 						}
 						return changed;
 					});
 				ImGui::EndInspectorKeyVal(m_Window.GetFramePadding());
 			}
 
-			SpriteFileEditorSelectables::SpriteFileEditorSelectables(ImGuiWindow& a_Window, FileEditorSelectable& a_FileEditorSelectable) : FileEditorSelectables(a_Window, a_FileEditorSelectable),
-				m_TextureTypeDropdown(a_Window)
+			SpriteFileEditorSelectables::SpriteFileEditorSelectables(ImGuiWindow& a_Window, FileEditorSelectable& a_FileEditorSelectable) : FileEditorSelectables(a_Window, a_FileEditorSelectable)
 			{
-				resources::TextureMetaData* metaData = a_FileEditorSelectable.GetFileResource().GetMetaData<resources::TextureMetaData>();
-				m_TextureTypeDropdown.Initialize(
-					metaData->GetTextureType(),
-					{
-						graphics::dx12::TextureType::Texture2D,
-						graphics::dx12::TextureType::SpriteSheet,
-					},
-					graphics::dx12::TextureTypeToString
-				);
+				auto cCommandQueue =
+					core::EDITOR_ENGINE->GetDX12()
+					.GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
 
-				auto cCommandQueue = core::EDITOR_ENGINE->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
-				m_pTexture = core::EDITOR_ENGINE->GetResourceAtlas().LoadTexture(a_FileEditorSelectable.GetFileResource().GetPath().filename().generic_string(), cCommandQueue);
-				if (auto tex = m_pTexture.lock())
-				{
-					tex->SetResourceCategory(gallus::resources::EngineResourceCategory::Editor);
-				}
+				m_pTexture = core::EDITOR_ENGINE->GetResourceAtlas().LoadTexture(a_FileEditorSelectable.GetName(), cCommandQueue);
 			}
 
 			int GetFormatChannelCount(DXGI_FORMAT format)
@@ -205,62 +192,55 @@ namespace gallus
 
 			void SpriteFileEditorSelectables::Render(FileEditorSelectable& a_FileEditorSelectable)
 			{
+				auto tex = m_pTexture.lock();
+				if (!tex)
+				{
+					return;
+				}
+
+				if (RenderObjectFields(tex.get(), false))
+				{
+				}
+
+				ImGui::NewLine();
+				ImGui::DisplayHeader(m_Window.GetBoldFont(), "Info");
+
 				ImGui::StartInspectorKeyVal(ImGui::IMGUI_FORMAT_ID("", TABLE_ID, "SPRITE_EXPLORER_ITEM_TABLE_INSPECTOR"), m_Window.GetFramePadding());
 
-				resources::TextureMetaData* metaData = a_FileEditorSelectable.GetFileResource().GetMetaData<resources::TextureMetaData>();
-				if (auto tex = m_pTexture.lock())
-				{
-					ImGui::KeyValue([this]
-					{
-						ImGui::AlignTextToFramePadding();
-						ImGui::DisplayHeader(m_Window.GetBoldFont(), "Width: ");
-					},
-						[this, tex]
-					{
-						ImGui::Text(std::to_string(tex->GetResourceDesc().Width).c_str());
-						return false;
-					});
-					ImGui::KeyValue([this]
-					{
-						ImGui::AlignTextToFramePadding();
-						ImGui::DisplayHeader(m_Window.GetBoldFont(), "Height: ");
-					},
-						[this, tex]
-					{
-						ImGui::Text(std::to_string(tex->GetResourceDesc().Height).c_str());
-						return false;
-					});
-					ImGui::KeyValue([this]
-					{
-						ImGui::AlignTextToFramePadding();
-						ImGui::DisplayHeader(m_Window.GetBoldFont(), "Channels: ");
-					},
-						[this, tex]
-					{
-						ImGui::Text(std::to_string(GetFormatChannelCount(tex->GetResourceDesc().Format)).c_str());
-						return false;
-					});
-				}
 				ImGui::KeyValue([this]
-					{
-						ImGui::AlignTextToFramePadding();
-						ImGui::DisplayHeader(m_Window.GetBoldFont(), "Type: ");
-					},
-					[this, metaData, a_FileEditorSelectable]
-					{
-						ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
-						bool changed = m_TextureTypeDropdown.Render(ImGui::IMGUI_FORMAT_ID("", COMBO_ID, "TEXTURE_TYPE_SPRITE_EXPLORER_ITEM_INSPECTOR").c_str());
-						if (changed)
-						{
-							metaData->SetTextureType(m_TextureTypeDropdown.GetValue());
-							metaData->Save(a_FileEditorSelectable.GetFileResource().GetPath());
-						}
-						return false;
-					});
+				{
+					ImGui::AlignTextToFramePadding();
+					ImGui::DisplayHeader(m_Window.GetBoldFont(), "Width: ");
+				},
+					[this, tex]
+				{
+					ImGui::Text(std::to_string(tex->GetResourceDesc().Width).c_str());
+					return false;
+				});
+				ImGui::KeyValue([this]
+				{
+					ImGui::AlignTextToFramePadding();
+					ImGui::DisplayHeader(m_Window.GetBoldFont(), "Height: ");
+				},
+					[this, tex]
+				{
+					ImGui::Text(std::to_string(tex->GetResourceDesc().Height).c_str());
+					return false;
+				});
+				ImGui::KeyValue([this]
+				{
+					ImGui::AlignTextToFramePadding();
+					ImGui::DisplayHeader(m_Window.GetBoldFont(), "Channels: ");
+				},
+					[this, tex]
+				{
+					ImGui::Text(std::to_string(GetFormatChannelCount(tex->GetResourceDesc().Format)).c_str());
+					return false;
+				});
 				ImGui::EndInspectorKeyVal(m_Window.GetFramePadding());
 
 				float width = ImGui::GetContentRegionAvail().x;
-				if (metaData->GetTextureType() == graphics::dx12::TextureType::SpriteSheet && ImGui::TextButton(ImGui::IMGUI_FORMAT_ID(font::ICON_IMAGE + std::string(" Open Sprite Editor"), BUTTON_ID, "OPEN_SPRITE_EDITOR_INSPECTOR").c_str(), "Opens the sprite editor for the selected sprite sheet.", ImVec2(width, 0)))
+				if (tex->GetTextureType() == graphics::dx12::TextureType::SpriteSheet && ImGui::TextButton(ImGui::IMGUI_FORMAT_ID(font::ICON_IMAGE + std::string(" Open Sprite Editor"), BUTTON_ID, "OPEN_SPRITE_EDITOR_INSPECTOR").c_str(), "Opens the sprite editor for the selected sprite sheet.", ImVec2(width, 0)))
 				{
 				}
 			}
@@ -268,15 +248,6 @@ namespace gallus
 			AudioFileEditorSelectables::AudioFileEditorSelectables(ImGuiWindow& a_Window, FileEditorSelectable& a_FileEditorSelectable) : FileEditorSelectables(a_Window, a_FileEditorSelectable),
 				m_AssetTypeDropdown(a_Window)
 			{
-				m_AssetTypeDropdown.Initialize(
-					a_FileEditorSelectable.GetFileResource().GetMetaData()->GetAssetType(),
-					{
-						resources::AssetType::Sound,
-						resources::AssetType::Song,
-						resources::AssetType::VO,
-					},
-					resources::AssetTypeToString
-				);
 				LoadAudioData(a_FileEditorSelectable);
 			}
 
@@ -294,9 +265,6 @@ namespace gallus
 						ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
 						if (m_AssetTypeDropdown.Render(ImGui::IMGUI_FORMAT_ID("", COMBO_ID, "ASSETTYPE_AUDIO_EXPLORER_ITEM_INSPECTOR").c_str()))
 						{
-							a_FileEditorSelectable.GetFileResource().GetMetaData()->SetAssetType(m_AssetTypeDropdown.GetValue());
-							a_FileEditorSelectable.SetIcon();
-							a_FileEditorSelectable.GetFileResource().GetMetaData()->Save(a_FileEditorSelectable.GetFileResource().GetPath());
 							return true;
 						}
 						return false;

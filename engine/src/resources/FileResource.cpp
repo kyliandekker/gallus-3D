@@ -18,8 +18,7 @@
 
 // resources
 #include "resources/AssetType.h"
-#include "resources/metadata/MetaData.h"
-#include "resources/metadata/TextureMetaData.h"
+#include "resources/SrcData.h"
 
 namespace gallus
 {
@@ -34,7 +33,6 @@ namespace gallus
 		//---------------------------------------------------------------------
 		FileResource::~FileResource()
 		{
-			delete m_MetaData;
 		}
 
 		//---------------------------------------------------------------------
@@ -62,8 +60,7 @@ namespace gallus
 
 			if (fs::is_directory(m_Path))
 			{
-				m_MetaData = new MetaData();
-				m_MetaData->SetAssetType(AssetType::Folder);
+				m_AssetType = resources::AssetType::Folder;
 
 				// Go through each file/folder and check their status.
 				fs::directory_iterator ds = fs::directory_iterator(m_Path, std::filesystem::directory_options::skip_permission_denied);
@@ -95,43 +92,29 @@ namespace gallus
 			}
 			else
 			{
-				m_MetaData = new MetaData();
-				if (!m_MetaData->Exists(m_Path))
+				std::string extension = m_Path.extension().generic_string();
+				core::Data data;
+				if (file::LoadFile(m_Path.generic_string() + ".meta", data))
 				{
-					std::string extension = m_Path.extension().generic_string();
-
-					// Get the extension. If the extension is not recognized, it will just be ignored.
-					if (FILE_ATLAS.find(extension) != FILE_ATLAS.end())
+					resources::SrcData srcData(data);
+					if (!srcData.GetEnum("assetType", m_AssetType))
 					{
-						auto it = FILE_ATLAS.find(extension);
-
-						m_MetaData->SetAssetType(it->second[0]);
-						m_MetaData->Save(m_Path);
+						LOGF(LOGSEVERITY_WARNING, "%s has no asset type in its meta data.", m_Path.generic_string().c_str());
 					}
 				}
-				else
+				else if (FILE_ATLAS.find(extension) != FILE_ATLAS.end())
 				{
-					// TODO: This is awful.
+					auto it = FILE_ATLAS.find(extension);
 
-					rapidjson::Document doc = m_MetaData->Load(m_Path);
-					m_MetaData->LoadMetaData(doc);
-					AssetType assetType = m_MetaData->GetAssetType();
+					m_AssetType = it->second[0];
 
-					switch (assetType)
-					{
-						case AssetType::Sprite:
-						{
-							delete m_MetaData;
-							m_MetaData = new TextureMetaData();
-							break;
-						}
-						default:
-						{
-							break;
-						}
-					}
-					doc = m_MetaData->Load(m_Path);
-					m_MetaData->LoadMetaData(doc);
+					resources::SrcData srcData;
+					srcData.SetObject();
+
+					srcData.SetEnum("assetType", m_AssetType);
+
+					srcData.GetData(data);
+					file::SaveFile(m_Path.generic_string() + ".meta", data);
 				}
 			}
 
@@ -141,6 +124,12 @@ namespace gallus
 			}
 
 			return true;
+		}
+
+		//---------------------------------------------------------------------
+		resources::AssetType FileResource::GetAssetType() const
+		{
+			return m_AssetType;
 		}
 
 		//---------------------------------------------------------------------

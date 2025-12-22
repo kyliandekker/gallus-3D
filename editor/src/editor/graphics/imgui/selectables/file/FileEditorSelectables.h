@@ -116,7 +116,6 @@ namespace gallus
 				void Render(FileEditorSelectable& a_FileEditorSelectable) override;
 			protected:
 				std::weak_ptr<graphics::dx12::Texture> m_pTexture = {};
-				StringDropdown<graphics::dx12::TextureType> m_TextureTypeDropdown; /// Drop down UI element for selecting asset types.
 			};
 
 			class AudioFileEditorSelectables : public FileEditorSelectables

@@ -16,7 +16,7 @@
 #include "graphics/dx12/CommandQueue.h"
 
 // resources
-#include "resources/metadata/TextureMetaData.h"
+#include "resources/SrcData.h"
 
 namespace gallus
 {
@@ -346,13 +346,11 @@ namespace gallus
 			//---------------------------------------------------------------------
 			void Texture::LoadMetaData()
 			{
-				// TODO: This will fail when _LOAD_BY_PATH is disabled (aka, in game mode later)
-				resources::TextureMetaData metaData;
-				rapidjson::Document doc = metaData.Load(m_Path);
-				metaData.LoadMetaData(doc);
+				core::Data data;
+				file::LoadFile(m_Path.generic_string() + ".meta", data);
+				resources::SrcData srcData(data);
 
-				m_aSpriteRects = metaData.GetSprites();
-				m_TextureType = metaData.GetTextureType();
+				DeserializeEditorExposable(this, srcData);
 			}
 
 			//---------------------------------------------------------------------

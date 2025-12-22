@@ -13,7 +13,6 @@
 
 // resources
 #include "resources/AssetType.h"
-#include "resources/metadata/MetaData.h"
 
 namespace gallus
 {
@@ -114,44 +113,6 @@ namespace gallus
 			}
 
 			/// <summary>
-			/// Retrieves the meta data (if it exists).
-			/// </summary>
-			/// <returns>A pointer to the meta data.</returns>
-			MetaData* GetMetaData()
-			{
-				return m_MetaData;
-			}
-
-			/// <summary>
-			/// Retrieves the meta data (if it exists).
-			/// </summary>
-			/// <returns>A pointer to the meta data.</returns>
-			const MetaData* GetMetaData() const
-			{
-				return m_MetaData;
-			}
-
-			/// <summary>
-			/// Retrieves the meta data and casts it (if it exists).
-			/// </summary>
-			/// <returns>A pointer to the meta data.</returns>
-			template<typename T>
-			T* GetMetaData()
-			{
-				return static_cast<T*>(m_MetaData);
-			}
-
-			/// <summary>
-			/// Retrieves the meta data and casts it (if it exists).
-			/// </summary>
-			/// <returns>A pointer to the meta data.</returns>
-			template<typename T>
-			const T* GetMetaData() const
-			{
-				return static_cast<T*>(m_MetaData);
-			}
-
-			/// <summary>
 			/// Tries and finds a file by name.
 			/// </summary>
 			/// <param name="a_sName">The name to search for.</param>
@@ -166,9 +127,12 @@ namespace gallus
 			/// <param name="a_pFileResource">The file resource if found.</param>
 			/// <returns>True if successful, false otherwise.</returns>
 			bool Find(const fs::path& a_Path, FileResource*& a_pFileResource);
+
+			resources::AssetType GetAssetType() const;
 		protected:
 			std::vector<FileResource> m_aChildren; /// Child resources (only used for folders).
-			MetaData* m_MetaData = nullptr;
+
+			resources::AssetType m_AssetType;
 
 			fs::path m_Path; /// The path of the resource.
 			FileResource* m_Parent = nullptr; // The parent of the resource.

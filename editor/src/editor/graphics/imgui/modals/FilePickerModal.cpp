@@ -147,7 +147,7 @@ namespace gallus
 							m_pSelectedResource = view;
 							m_iSelectedEngineResource = -1;
 
-							if (view->GetFileResource().GetMetaData()->GetAssetType() == gallus::resources::AssetType::Sprite)
+							if (view->GetFileResource().GetAssetType() == gallus::resources::AssetType::Sprite)
 							{
 								LoadTexture(view->GetFileResource().GetPath().filename().generic_string());
 							}
@@ -218,7 +218,7 @@ namespace gallus
 			{
 				for (gallus::resources::FileResource& fileResource : a_File.GetChildren())
 				{
-					if (fileResource.GetMetaData()->GetAssetType() == a_aFileType)
+					if (fileResource.GetAssetType() == a_aFileType)
 					{
 						a_aResources.emplace_back(a_Window, fileResource);
 					}
