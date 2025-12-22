@@ -78,12 +78,12 @@ protected:
 				MaterialData m_MaterialData;
 
 				BEGIN_EXPOSE_FIELDS_PARENT(Material, resources::EngineResource)
-				EXPOSE_FIELD(Material, m_MaterialData.DiffuseColor, "Diffuse Color",
-					{ .type = gallus::EditorFieldWidgetType::EditorFieldWidgetType_Color })
-				EXPOSE_FIELD(Material, m_MaterialData.Metallic, "Metallic",
-					{ .type = gallus::EditorFieldWidgetType::EditorFieldWidgetType_Float })
-				EXPOSE_FIELD(Material, m_MaterialData.Smoothness, "Smoothness",
-					{ .type = gallus::EditorFieldWidgetType::EditorFieldWidgetType_Float })
+					EXPOSE_FIELD(Material, m_MaterialData.DiffuseColor, "Diffuse Color", "", 
+						{ .type = gallus::EditorFieldWidgetType::EditorFieldWidgetType_Color })
+					EXPOSE_FIELD(Material, m_MaterialData.Metallic, "Metallic", "",
+						{ .type = gallus::EditorFieldWidgetType::EditorFieldWidgetType_Float })
+					EXPOSE_FIELD(Material, m_MaterialData.Smoothness, "Smoothness", "",
+						{ .type = gallus::EditorFieldWidgetType::EditorFieldWidgetType_Float })
 				END_EXPOSE_FIELDS(Material)
 				BEGIN_EXPOSE_GIZMOS(Material)
 				END_EXPOSE_GIZMOS(Material)

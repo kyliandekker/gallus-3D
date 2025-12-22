@@ -17,8 +17,7 @@ namespace gallus
 				m_InspectorWindow(a_Window),
 				m_AnimationWindow(a_Window),
 				m_StatsWindow(a_Window),
-				m_FilePickerModal(a_Window),
-				m_SpriteEditorModal(a_Window)
+				m_FilePickerModal(a_Window)
 			{
 			}
 
@@ -37,7 +36,6 @@ namespace gallus
 				m_StatsWindow.Initialize();
 
 				m_FilePickerModal.Initialize();
-				m_SpriteEditorModal.Initialize();
 			}
 
 			void EditorWindowsConfig::Render()
@@ -54,7 +52,6 @@ namespace gallus
 				m_AnimationWindow.Update();
 				m_StatsWindow.Update();
 
-				m_SpriteEditorModal.Update();
 				m_FilePickerModal.Update();
 			}
 		}

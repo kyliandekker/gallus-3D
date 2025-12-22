@@ -14,7 +14,6 @@
 #include "editor/graphics/imgui/windows/StatsWindow.h"
 
 #include "editor/graphics/imgui/modals/FilePickerModal.h"
-#include "editor/graphics/imgui/modals/SpriteEditorModal.h"
 
 namespace gallus
 {
@@ -86,11 +85,6 @@ namespace gallus
 				{
 					return m_FilePickerModal;
 				}
-
-				SpriteEditorModal& GetSpriteEditorModal()
-				{
-					return m_SpriteEditorModal;
-				}
 			private:
 				EditorWindowDock m_EditorWindowDock;
 
@@ -105,7 +99,6 @@ namespace gallus
 				StatsWindow m_StatsWindow;
 
 				FilePickerModal m_FilePickerModal;
-				SpriteEditorModal m_SpriteEditorModal;
 			};
 		}
 	}

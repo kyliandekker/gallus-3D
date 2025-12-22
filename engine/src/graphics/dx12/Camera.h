@@ -114,10 +114,25 @@ namespace gallus
 				DirectX::XMMATRIX m_ProjectionMatrix2D;
 
 				BEGIN_EXPOSE_FIELDS(Camera)
-					EXPOSE_FIELD(Camera, m_Transform.m_vPosition, "Position", (FieldOptions{ .type = EditorFieldWidgetType::EditorFieldWidgetType_Vector3, .description = "The position of the object in 2D space. Defines where the object is located on the screen." }))
-					EXPOSE_FIELD(Camera, m_Transform.m_vRotation, "Rotation", (FieldOptions{ .type = EditorFieldWidgetType::EditorFieldWidgetType_Quaternion, .description = "Rotation in degrees. Controls how much the object is rotated clockwise or counterclockwise." }))
-					EXPOSE_FIELD(Camera, m_Transform.m_vPivot, "Pivot", (FieldOptions{ .type = EditorFieldWidgetType::EditorFieldWidgetType_Vector3, .min = "-0.5", .max = "0.5", .description = "The pivot point for transformations relative to the object's center. Coordinates represent the normalized offset used for scaling and rotation." }))
-					EXPOSE_FIELD(Camera, m_fFoV, "Field of View", (FieldOptions{ .type = EditorFieldWidgetType::EditorFieldWidgetType_Float, .onChangeFunc = MakeOnChangeFunc(&Camera::OnFoVChanged) }))
+					EXPOSE_FIELD(Camera, m_Transform.m_vPosition, "Position", "The position of the object in 2D space. Defines where the object is located on the screen.",
+						(FieldOptions{ 
+							.type = EditorFieldWidgetType::EditorFieldWidgetType_Vector3
+						}))
+					EXPOSE_FIELD(Camera, m_Transform.m_vRotation, "Rotation", "Rotation in degrees. Controls how much the object is rotated clockwise or counterclockwise.",
+						(FieldOptions{ 
+							.type = EditorFieldWidgetType::EditorFieldWidgetType_Quaternion
+						}))
+					EXPOSE_FIELD(Camera, m_Transform.m_vPivot, "Pivot", "The pivot point for transformations relative to the object's center. Coordinates represent the normalized offset used for scaling and rotation.",
+						(FieldOptions{ 
+							.type = EditorFieldWidgetType::EditorFieldWidgetType_Vector3, 
+							.min = "-0.5", 
+							.max = "0.5"
+						}))
+					EXPOSE_FIELD(Camera, m_fFoV, "Field of View", "",
+						(FieldOptions{ 
+							.type = EditorFieldWidgetType::EditorFieldWidgetType_Float, 
+							.onChangeFunc = MakeOnChangeFunc(&Camera::OnFoVChanged) 
+						}))
 				END_EXPOSE_FIELDS(Camera)
 				BEGIN_EXPOSE_GIZMOS(Camera)
 				END_EXPOSE_GIZMOS(Camera)

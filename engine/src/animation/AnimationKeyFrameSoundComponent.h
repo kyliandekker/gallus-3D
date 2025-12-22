@@ -64,13 +64,6 @@ namespace gallus
 #endif // _EDITOR
 		protected:
 			audio::Sound* m_pSound = nullptr;
-			
-			BEGIN_EXPOSE_FIELDS_PARENT(AnimationKeyFrameSoundComponent, AnimationKeyFrameComponentBase)
-				EXPOSE_FIELD(AnimationKeyFrameSoundComponent, m_pSound, "Sound", (FieldOptions{ .type = EditorFieldWidgetType::EditorFieldWidgetType_EngineResource, .assetType = resources::AssetType::Sound }))
-			END_EXPOSE_FIELDS(AnimationKeyFrameSoundComponent)
-			BEGIN_EXPOSE_GIZMOS(AnimationKeyFrameSoundComponent)
-			END_EXPOSE_GIZMOS(AnimationKeyFrameSoundComponent)
-			END_EXPOSE_TO_EDITOR(AnimationKeyFrameSoundComponent)
 		};
 	}
 }

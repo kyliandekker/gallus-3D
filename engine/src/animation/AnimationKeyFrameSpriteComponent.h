@@ -97,18 +97,6 @@ namespace gallus
 		private:
 			std::weak_ptr<graphics::dx12::Texture> m_pTexture = {};
 			int m_iSpriteIndex = 0;
-
-			BEGIN_EXPOSE_FIELDS_PARENT(AnimationKeyFrameSpriteComponent, AnimationKeyFrameComponentBase)
-				EXPOSE_FIELD(AnimationKeyFrameSpriteComponent, m_pTexture, "Texture", (FieldOptions{ .type = EditorFieldWidgetType::EditorFieldWidgetType_EngineResource, .assetType = resources::AssetType::Sprite }))
-				EXPOSE_FIELD(AnimationKeyFrameSpriteComponent, m_iSpriteIndex, "Sprite Index", (FieldOptions{ .type = EditorFieldWidgetType::EditorFieldWidgetType_Int8 }))
-				EXPOSE_FIELD(AnimationKeyFrameSpriteComponent, m_pTexture, "Texture Preview", (FieldOptions{
-				.type = EditorFieldWidgetType::EditorFieldWidgetType_TexturePreview,
-				.relatedIndexFieldOffset = offsetof(AnimationKeyFrameSpriteComponent, m_iSpriteIndex)
-					}))
-			END_EXPOSE_FIELDS(AnimationKeyFrameSpriteComponent)
-			BEGIN_EXPOSE_GIZMOS(AnimationKeyFrameSpriteComponent)
-			END_EXPOSE_GIZMOS(AnimationKeyFrameSpriteComponent)
-			END_EXPOSE_TO_EDITOR(AnimationKeyFrameSpriteComponent)
 		};
 	}
 }

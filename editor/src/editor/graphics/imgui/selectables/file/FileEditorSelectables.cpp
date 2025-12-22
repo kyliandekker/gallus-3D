@@ -262,12 +262,6 @@ namespace gallus
 				float width = ImGui::GetContentRegionAvail().x;
 				if (metaData->GetTextureType() == graphics::dx12::TextureType::SpriteSheet && ImGui::TextButton(ImGui::IMGUI_FORMAT_ID(font::ICON_IMAGE + std::string(" Open Sprite Editor"), BUTTON_ID, "OPEN_SPRITE_EDITOR_INSPECTOR").c_str(), "Opens the sprite editor for the selected sprite sheet.", ImVec2(width, 0)))
 				{
-					SpriteEditorModal& spriteEditorModal = m_Window.GetWindowsConfig<EditorWindowsConfig>().GetSpriteEditorModal();
-
-					spriteEditorModal.SetData(
-						a_FileEditorSelectable.GetFileResource()
-					);
-					spriteEditorModal.Show();
 				}
 			}
 

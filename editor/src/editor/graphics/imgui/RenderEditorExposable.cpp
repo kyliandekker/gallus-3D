@@ -291,7 +291,7 @@ namespace gallus
 					filePickerModal.Show();
 				}
 
-				ImGui::ShowTooltip(a_Field.m_Options.description);
+				ImGui::ShowTooltip(a_Field.m_sDescription);
 				ImGui::PopStyleVar();
 
 				return changed;
@@ -356,7 +356,7 @@ namespace gallus
 					}
 					ImGui::EndCombo();
 				}
-				ImGui::ShowTooltip(a_Field.m_Options.description);
+				ImGui::ShowTooltip(a_Field.m_sDescription);
 
 				return changed;
 			}
@@ -400,7 +400,7 @@ namespace gallus
 						func = [value, &a_Field, &fieldId]
 						{
 							bool val = ShowDragFloat(fieldId, value, a_Field);
-							ImGui::ShowTooltip(a_Field.m_Options.description);
+							ImGui::ShowTooltip(a_Field.m_sDescription);
 							return val;
 						};
 						break;
@@ -413,7 +413,7 @@ namespace gallus
 							int temp = static_cast<int64_t>(*value);
 
 							bool changed = ShowDragInt(fieldId, temp, a_Field);
-							ImGui::ShowTooltip(a_Field.m_Options.description);
+							ImGui::ShowTooltip(a_Field.m_sDescription);
 							if (changed)
 							{
 								*value = static_cast<int8_t>(temp);
@@ -430,7 +430,7 @@ namespace gallus
 							int temp = static_cast<int64_t>(*value);
 
 							bool changed = ShowDragInt(fieldId, temp, a_Field);
-							ImGui::ShowTooltip(a_Field.m_Options.description);
+							ImGui::ShowTooltip(a_Field.m_sDescription);
 							if (changed)
 							{
 								*value = static_cast<int16_t>(temp);
@@ -447,7 +447,7 @@ namespace gallus
 							int temp = static_cast<int64_t>(*value);
 
 							bool changed = ShowDragInt(fieldId, temp, a_Field);
-							ImGui::ShowTooltip(a_Field.m_Options.description);
+							ImGui::ShowTooltip(a_Field.m_sDescription);
 							if (changed)
 							{
 								*value = static_cast<int32_t>(temp);
@@ -464,7 +464,7 @@ namespace gallus
 							int temp = *value;
 
 							bool changed = ShowDragInt(fieldId, temp, a_Field);
-							ImGui::ShowTooltip(a_Field.m_Options.description);
+							ImGui::ShowTooltip(a_Field.m_sDescription);
 							if (changed)
 							{
 								*value = temp;
@@ -479,7 +479,7 @@ namespace gallus
 						func = [&a_Field, &fieldId, value]
 						{
 							bool val = ImGui::Checkbox(fieldId.c_str(), value);
-							ImGui::ShowTooltip(a_Field.m_Options.description);
+							ImGui::ShowTooltip(a_Field.m_sDescription);
 							return val;
 						};
 						break;
@@ -490,7 +490,7 @@ namespace gallus
 						func = [&a_Field, &fieldId, value]
 						{
 							bool val = ImGui::Toggle(fieldId.c_str(), value);
-							ImGui::ShowTooltip(a_Field.m_Options.description);
+							ImGui::ShowTooltip(a_Field.m_sDescription);
 							return val;
 						};
 						break;
@@ -501,7 +501,7 @@ namespace gallus
 						func = [&a_Field, &fieldId, value]
 						{
 							bool val = ShowVector2(fieldId, *value, a_Field);
-							ImGui::ShowTooltip(a_Field.m_Options.description);
+							ImGui::ShowTooltip(a_Field.m_sDescription);
 							return val;
 						};
 						break;
@@ -512,7 +512,7 @@ namespace gallus
 						func = [&a_Field, &fieldId, value]
 						{
 							bool val = ShowVector3(fieldId, *value, a_Field);
-							ImGui::ShowTooltip(a_Field.m_Options.description);
+							ImGui::ShowTooltip(a_Field.m_sDescription);
 							return val;
 						};
 						break;
@@ -525,7 +525,7 @@ namespace gallus
 							bool val = ImGui::ColorEdit4(fieldId.c_str(),
 								reinterpret_cast<float*>(value)
 							);
-							ImGui::ShowTooltip(a_Field.m_Options.description);
+							ImGui::ShowTooltip(a_Field.m_sDescription);
 							return val;
 						};
 						break;
@@ -537,7 +537,7 @@ namespace gallus
 						func = [&a_Field, &fieldId, value]
 						{
 							bool val = ShowQuaternion(fieldId, *value, a_Field);
-							ImGui::ShowTooltip(a_Field.m_Options.description);
+							ImGui::ShowTooltip(a_Field.m_sDescription);
 							return val;
 						};
 						break;
@@ -617,7 +617,7 @@ namespace gallus
 					{
 						func = [ptr, &a_Field, a_pObject]()
 						{
-							if (ImGui::TextButton(a_Field.m_sUIName, a_Field.m_Options.description))
+							if (ImGui::TextButton(a_Field.m_sUIName, a_Field.m_sDescription))
 							{
 								if (a_Field.m_Options.buttonFunc)
 								{
@@ -640,7 +640,7 @@ namespace gallus
 					{
 						ImGui::AlignTextToFramePadding();
 						ImGui::DisplayHeader(core::EDITOR_ENGINE->GetDX12().GetImGuiWindow().GetBoldFont(), a_Field.m_sUIName);
-						ImGui::ShowTooltip(a_Field.m_Options.description);
+						ImGui::ShowTooltip(a_Field.m_sDescription);
 						}, [func, &a_Field]() {
 							bool wasDisabled = a_Field.m_Options.disabled;
 							if (wasDisabled)

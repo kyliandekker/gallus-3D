@@ -37,10 +37,13 @@ namespace gallus
 			DirectX::XMFLOAT3 m_vTranslation = {};
 
 			BEGIN_EXPOSE_FIELDS_PARENT(TransformComponent, Component)
-				EXPOSE_FIELD(TransformComponent, m_Transform, "Transform", (FieldOptions{ .type = EditorFieldWidgetType::EditorFieldWidgetType_Object }))
+				EXPOSE_FIELD(TransformComponent, m_Transform, "Transform", "",
+					(FieldOptions{
+						.type = EditorFieldWidgetType::EditorFieldWidgetType_Object
+					}))
 			END_EXPOSE_FIELDS(TransformComponent)
 			BEGIN_EXPOSE_GIZMOS(TransformComponent)
-				EXPOSE_GIZMO(TransformComponent, m_Transform, (GizmoOptions{ EditorGizmoType::EditorGizmoType_Transform }))
+			EXPOSE_GIZMO(TransformComponent, m_Transform, (GizmoOptions{ EditorGizmoType::EditorGizmoType_Transform }))
 			END_EXPOSE_GIZMOS(TransformComponent)
 			END_EXPOSE_TO_EDITOR(TransformComponent)
 		};

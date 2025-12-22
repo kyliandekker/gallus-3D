@@ -15,13 +15,6 @@ namespace gallus
 		class SrcData;
 	}
 
-	enum class EditorFieldSerializationType
-	{
-		SerializationType_None,
-		SerializationType_MetaData,
-		SerializationType_File
-	};
-
 	enum class EditorFieldWidgetType
 	{
 		EditorFieldWidgetType_None,
@@ -69,7 +62,6 @@ namespace gallus
 		std::function<std::string(int)> enumToStringFunc = nullptr;
 		std::function<void(void*)> buttonFunc = nullptr;
 		std::function<void(void*)> onChangeFunc = nullptr;
-		std::string description;
 		bool disabled = false;
 		bool internal = false;
 		bool hideInEditor = false;
@@ -88,7 +80,7 @@ namespace gallus
 		const char* m_sName;
 		size_t m_iOffset;
 		const char* m_sUIName;
-		EditorFieldSerializationType m_SerializationType;
+		std::string m_sDescription;
 		FieldOptions m_Options;
 	};
 
@@ -173,8 +165,8 @@ namespace gallus
 					const auto& parentFields = PARENT::StaticEditorFields(); \
 					f.insert(f.end(), parentFields.begin(), parentFields.end());
 
-#define EXPOSE_FIELD(CLASSNAME, VAR, UINAME, SERIALIZATION_TYPE, FIELD_OPTIONS) \
-					f.push_back({ #VAR, offsetof(CLASSNAME, VAR), UINAME, SERIALIZATION_TYPE, FIELD_OPTIONS });
+#define EXPOSE_FIELD(CLASSNAME, VAR, UINAME, DESCRIPTION, FIELD_OPTIONS) \
+					f.push_back({ #VAR, offsetof(CLASSNAME, VAR), UINAME, DESCRIPTION, FIELD_OPTIONS });
 
 #define END_EXPOSE_FIELDS(CLASSNAME) \
 					return f; \
