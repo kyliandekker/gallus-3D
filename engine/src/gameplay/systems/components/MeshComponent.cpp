@@ -65,7 +65,8 @@ namespace gallus
 		//---------------------------------------------------------------------
 		void MeshComponent::Render(std::shared_ptr<graphics::dx12::CommandList> a_pCommandList, const EntityID& a_EntityID, const graphics::dx12::Camera& a_Camera)
 		{
-			if (!core::ENGINE->GetECS().GetEntity(m_EntityID)->IsActive())
+			auto entity = core::ENGINE->GetECS().GetEntity(m_EntityID);
+			if (!entity || !entity->IsActive())
 			{
 				return;
 			}
