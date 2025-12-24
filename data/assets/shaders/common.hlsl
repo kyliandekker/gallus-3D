@@ -22,8 +22,8 @@ cbuffer MaterialData : register(b2)
 
 cbuffer DirectionalLightData : register(b3)
 {
+    uint DirectionalLightEnabled;
     float3 LightDirection;
-    float Padding2;
     float4 LightColor;
     float AmbientIntensity;
 };

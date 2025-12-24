@@ -43,10 +43,19 @@ namespace gallus
 				{
 					return m_pResource;
 				}
+
+				const DirectionalLightData& GetDirectionalLightData() const
+				{
+					return m_DirectionalLightData;
+				}
 			protected:
 				DirectionalLightData m_DirectionalLightData;
 
 				BEGIN_EXPOSE_FIELDS_PARENT(DirectionalLight, resources::EngineResource)
+					EXPOSE_FIELD(DirectionalLight, m_DirectionalLightData.DirectionalLightEnabled, "Enabled", ".",
+						(FieldOptions{
+							.type = EditorFieldWidgetType::EditorFieldWidgetType_LongSwitch,
+						}))
 					EXPOSE_FIELD(DirectionalLight, m_DirectionalLightData.LightDirection, "Light Direction", ".",
 						(FieldOptions{
 							.type = EditorFieldWidgetType::EditorFieldWidgetType_Vector3,

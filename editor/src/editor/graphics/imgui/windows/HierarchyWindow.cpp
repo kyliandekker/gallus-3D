@@ -304,6 +304,8 @@ namespace gallus
 						}
 					}
 
+					ImGui::Separator();
+
 					for (EntityEditorSelectable* view : m_aFilteredEntities)
 					{
 						if (!view)

@@ -24,8 +24,8 @@ cbuffer MaterialData
 // @shader_cbuffer(name=DirectionalLightData, register=b3)
 cbuffer DirectionalLightData
 {
+	uint DirectionalLightEnabled;
     float3 LightDirection;
-	float Padding2;
     float4 LightColor;
 	float  AmbientIntensity;
 };

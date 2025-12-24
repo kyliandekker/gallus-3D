@@ -33,8 +33,6 @@ namespace gallus
 
 			void CameraEditorSelectable::RenderEntity(bool& a_bClicked, bool& a_bDoubleClicked, bool a_bSelected)
 			{
-				ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.75f);
-
 				// Set the size of each child
 				ImVec2 childSize = ImVec2(ImGui::GetContentRegionAvail().x, 32);
 				ImVec2 screenCursorPos = ImGui::GetCursorScreenPos();
@@ -107,8 +105,6 @@ namespace gallus
 				ImGui::Text(GetName().c_str());
 
 				ImGui::SetCursorScreenPos(ImVec2(screenCursorPos.x, screenCursorPos.y + childSize.y));
-
-				ImGui::PopStyleVar();
 			}
 
 			//---------------------------------------------------------------------

@@ -25,8 +25,8 @@ struct MaterialData
 
 struct DirectionalLightData
 {
+    uint32_t DirectionalLightEnabled;
     DirectX::XMFLOAT3 LightDirection;
-    float Padding2;
     DirectX::XMFLOAT4 LightColor;
     float AmbientIntensity;
 };

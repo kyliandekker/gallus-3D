@@ -17,7 +17,7 @@ float4 main(PSInput input) : SV_TARGET
     float4 texColor = spriteTexture.Sample(samplerState, input.TEXCOORD);
     float4 finalColor = texColor;
 
-    if (EnableLighting != 0)
+    if (EnableLighting != 0 && DirectionalLightEnabled)
     {
         float3 normal = normalize(input.NORMAL);
         float3 lightDir = -DegreesToDirection(LightDirection); 
