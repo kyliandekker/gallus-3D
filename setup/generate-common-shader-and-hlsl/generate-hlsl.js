@@ -132,7 +132,7 @@ if (ir.vertexInputs.length > 0) {
     cpp.push("const D3D12_INPUT_ELEMENT_DESC g_aInputLayout[] = {");
     vs.fields.forEach(f => {
 		console.log(f);
-        cpp.push(`    { "${f.semantic}", 0, ${DXGI_TYPE_MAP[f.type]}, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },`);
+        cpp.push(`    { "${f.name}", 0, ${DXGI_TYPE_MAP[f.type]}, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },`);
     });
     cpp.push("};\n");
 }
