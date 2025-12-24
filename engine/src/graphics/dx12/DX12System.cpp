@@ -226,7 +226,7 @@ namespace gallus
 				{
 					MeshPartData& squarePrimitive = s_PRIMITIVES[(int) PRIMITIVES::SQUARE];
 					mesh->SetMeshData(squarePrimitive, cCommandQueue);
-					mesh->SetResourceCategory(resources::EngineResourceCategory::Missing);
+					mesh->SetResourceCategory(resources::EngineResourceCategory::System);
 					mesh->SetIsDestroyable(false);
 				}
 
@@ -252,6 +252,7 @@ namespace gallus
 				if (auto material = m_pMaterial.lock())
 				{
 					material->SetColor({1, 1, 1, 1});
+					material->SetEnableLighting(false);
 					material->SetResourceCategory(resources::EngineResourceCategory::System);
 					material->SetIsDestroyable(false);
 				}
@@ -285,6 +286,8 @@ namespace gallus
 				int fenceValue = dCommandQueue->ExecuteCommandList(dCommandList);
 				dCommandQueue->WaitForFenceValue(fenceValue);
 				
+				m_pDirectionalLight = std::make_shared<DirectionalLight>();
+
 				core::ENGINE->GetECS().OnEntitiesUpdated() += std::bind(&DX12System::ReorderSpriteComponents, this);
 				core::ENGINE->GetECS().OnEntityComponentsUpdated() += std::bind(&DX12System::ReorderSpriteComponents, this);
 				ReorderSpriteComponents();
@@ -621,8 +624,14 @@ namespace gallus
 				// b1: Sprite UV rect
 				rootParameters[RootParameters::SPRITE_UV].InitAsConstants(4, RootParameters::SPRITE_UV);
 
-				// b3: Material
+				// b2: Material
 				rootParameters[RootParameters::MATERIAL].InitAsConstantBufferView(RootParameters::MATERIAL);
+
+				// b3: Directional Light
+				rootParameters[RootParameters::DIRECTIONAL_LIGHT].InitAsConstants(
+					sizeof(DirectionalLightData) / 4,
+					RootParameters::DIRECTIONAL_LIGHT
+				);
 
 				// Texture SRV at register t0 (binds a texture)
 				rootParameters[RootParameters::TEX_SRV].InitAsDescriptorTable(1, &descriptorRanges[0], D3D12_SHADER_VISIBILITY_PIXEL);
@@ -834,6 +843,9 @@ namespace gallus
 
 				auto dsv = m_DSV.GetCPUDescriptorHandleForHeapStart();
 
+				commandList->GetCommandList()->SetGraphicsRootSignature(
+					core::ENGINE->GetDX12().GetRootSignature().Get());
+
 				// 1. Render 2D scene into RenderTexture
 				auto renderTex = m_pRenderTexture.lock();
 				if (renderTex)
@@ -855,6 +867,8 @@ namespace gallus
 							nullptr
 						);
 						commandList->GetCommandList()->OMSetRenderTargets(1, &rtRtv, FALSE, &dsv);
+
+						m_pDirectionalLight->Bind(commandList);
 
 						RenderObjects(commandQueue, commandList, rtRtv);
 
@@ -898,8 +912,6 @@ namespace gallus
 				RenderUI(commandQueue, commandList, backRtv);
 #endif // _EDITOR
 
-				commandList->GetCommandList()->SetGraphicsRootSignature(
-					core::ENGINE->GetDX12().GetRootSignature().Get());
 				Present(commandQueue, commandList);
 			}
 

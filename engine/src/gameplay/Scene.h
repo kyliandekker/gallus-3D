@@ -11,6 +11,7 @@
 #include "core/Observable.h"
 
 #define JSON_SCENE_CAMERA_VAR "camera"
+#define JSON_SCENE_DIRECTIONAL_LIGHT_VAR "directionalLight"
 
 #define JSON_SCENE_ENTITIES_VAR "entities"
 #define JSON_SCENE_ENTITIES_VAR_NAME "name"

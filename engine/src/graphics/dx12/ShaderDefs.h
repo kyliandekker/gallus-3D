@@ -15,10 +15,20 @@ struct SpriteUV
 
 struct MaterialData
 {
+    uint32_t EnableLighting;
+    DirectX::XMFLOAT3 Padding0;
     DirectX::XMFLOAT4 DiffuseColor;
     float Metallic;
     float Smoothness;
-    float _Padding[2];
+    DirectX::XMFLOAT2 Padding1;
+};
+
+struct DirectionalLightData
+{
+    DirectX::XMFLOAT3 LightDirection;
+    float Padding2;
+    DirectX::XMFLOAT4 LightColor;
+    float AmbientIntensity;
 };
 
 const D3D12_INPUT_ELEMENT_DESC g_aInputLayout[] = {
@@ -33,7 +43,8 @@ enum RootParameters
     CBV = 0,
     SPRITE_UV = 1,
     MATERIAL = 2,
-    TEX_SRV = 3,
-    SAMPLER_STATE = 4,
+    DIRECTIONAL_LIGHT = 3,
+    TEX_SRV = 4,
+    SAMPLER_STATE = 5,
     NumRootParameters
 };

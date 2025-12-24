@@ -1,21 +1,18 @@
 {
-    "camera": {
-        "position": {
-            "x": 0.0,
-            "y": 0.10000000149011612,
-            "z": -2.9000000953674318
+    "camera": {},
+    "directionalLight": {
+        "lightDirection": {
+            "x": 33.20000076293945,
+            "y": -148.6999969482422,
+            "z": -49.599998474121097
         },
-        "rotation": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0
+        "lightColor": {
+            "r": 1.0,
+            "g": 1.0,
+            "b": 1.0,
+            "a": 1.0
         },
-        "pivot": {
-            "x": -0.5,
-            "y": -0.5,
-            "z": -0.5
-        },
-        "fieldofView": 55.0
+        "ambientIntensity": 0.6000000238418579
     },
     "entities": [
         {
@@ -97,16 +94,6 @@
                         "vertexShader": "vertexShader.hlsl"
                     },
                     "material": "1.mat",
-                    "material": {
-                        "diffuseColor": {
-                            "r": 1.0,
-                            "g": 0.3960784375667572,
-                            "b": 0.0,
-                            "a": 1.0
-                        },
-                        "metallic": 87.0,
-                        "smoothness": 174.0
-                    },
                     "mesh": "mod_chicken.glb",
                     "texture": "tex_chicken_infected.png",
                     "textureIndex": 0
@@ -114,19 +101,60 @@
                 "transform": {
                     "transform": {
                         "position": {
-                            "x": -0.8708978891372681,
-                            "y": 0.7143905162811279,
-                            "z": 7.105427357601002e-15
+                            "x": -0.5709999799728394,
+                            "y": 0.414000004529953,
+                            "z": -1.2000000476837159
                         },
                         "scale": {
                             "x": 1.9000002145767213,
-                            "y": 1.7999995946884156,
-                            "z": 1.9000006914138795
+                            "y": 1.8000004291534424,
+                            "z": 1.9000004529953004
                         },
                         "rotation": {
-                            "x": -18.39398956298828,
-                            "y": -9.465726852416993,
-                            "z": 3.240715742111206
+                            "x": 0.807913601398468,
+                            "y": 0.0,
+                            "z": 0.0
+                        },
+                        "pivot": {
+                            "x": 0.0,
+                            "y": 0.0,
+                            "z": 0.0
+                        },
+                        "cameraType": 0
+                    }
+                }
+            }
+        },
+        {
+            "name": "New GameObject",
+            "isActive": true,
+            "components": {
+                "mesh": {
+                    "shaderBind": {
+                        "pixelShader": "pixelShader.hlsl",
+                        "vertexShader": "vertexShader.hlsl"
+                    },
+                    "material": "1.mat",
+                    "mesh": "square",
+                    "texture": "tex_missing.png",
+                    "textureIndex": 0
+                },
+                "transform": {
+                    "transform": {
+                        "position": {
+                            "x": -0.17918717861175538,
+                            "y": 1.1444705724716187,
+                            "z": -0.5672531723976135
+                        },
+                        "scale": {
+                            "x": 0.9999937415122986,
+                            "y": 0.9999929070472717,
+                            "z": 0.9999924898147583
+                        },
+                        "rotation": {
+                            "x": -180.0,
+                            "y": 0.0,
+                            "z": -3.1857553040026689e-7
                         },
                         "pivot": {
                             "x": 0.0,

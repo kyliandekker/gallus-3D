@@ -10,7 +10,9 @@ const TYPE_MAP_CPP = {
     float2: "DirectX::XMFLOAT2",
     float3: "DirectX::XMFLOAT3",
     float4: "DirectX::XMFLOAT4",
-    float4x4: "DirectX::XMMATRIX"
+    float4x4: "DirectX::XMMATRIX",
+    bool: "bool",
+    uint: "uint32_t"
 };
 
 const TYPE_MAP_HLSL = {
@@ -18,7 +20,9 @@ const TYPE_MAP_HLSL = {
     float2: "float2",
     float3: "float3",
     float4: "float4",
-    float4x4: "float4x4"
+    float4x4: "float4x4",
+    bool: "bool",
+    uint: "uint"
 };
 
 const TYPE_SIZE = {
@@ -121,7 +125,6 @@ for (const cb of Object.values(ir.cbuffers)) {
     }
     if (offset % 16 !== 0) {
         const pad = (align16(offset) - offset) / 4;
-        cpp.push(`    float _Padding[${pad}];`);
     }
     cpp.push("};\n");
 }
@@ -166,7 +169,6 @@ for (const cb of Object.values(ir.cbuffers)) {
     }
     if (offset % 16 !== 0) {
         const pad = (align16(offset) - offset) / 4;
-        hlsl.push(`    float${pad > 1 ? pad : ""} _Padding${padIndex};`);
     }
     hlsl.push("};\n");
 }

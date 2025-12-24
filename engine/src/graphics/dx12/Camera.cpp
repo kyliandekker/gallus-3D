@@ -30,12 +30,6 @@ namespace gallus
 			}
 			
 			//---------------------------------------------------------------------
-			void Camera::Deserialize(const resources::SrcData& a_SrcData)
-			{
-				DeserializeEditorExposable(this, a_SrcData);
-			}
-
-			//---------------------------------------------------------------------
 			void Camera::SetProjection()
 			{
 				m_ProjectionMatrix2D = DirectX::XMMatrixOrthographicOffCenterLH(

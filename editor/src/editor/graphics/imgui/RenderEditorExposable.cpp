@@ -47,7 +47,7 @@ namespace gallus
 					max = std::stof(a_Field.m_Options.max);
 				}
 				ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
-				return ImGui::DragFloat(a_sId.c_str(), a_pValue, 1, min, max);
+				return ImGui::DragFloat(a_sId.c_str(), a_pValue, a_Field.m_Options.step, min, max);
 			}
 
 			bool ShowDragInt(const std::string& a_sId, int& a_Value, const EditorFieldInfo& a_Field)
@@ -66,7 +66,7 @@ namespace gallus
 
 				ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
 
-				return ImGui::DragInt(a_sId.c_str(), &a_Value, 1.0f, min, max);
+				return ImGui::DragInt(a_sId.c_str(), &a_Value, a_Field.m_Options.step, min, max);
 			}
 
 			bool ShowVector2(const std::string& a_sId, DirectX::XMFLOAT2& a_vVector, const EditorFieldInfo& a_Field)
@@ -115,7 +115,7 @@ namespace gallus
 				}
 				float availW = ImGui::GetContentRegionAvail().x;
 				ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
-				if (ImGui::VectorEdit3(a_sId.c_str(), val, 0.1f, min, max))
+				if (ImGui::VectorEdit3(a_sId.c_str(), val, a_Field.m_Options.step, min, max))
 				{
 					a_vVector.x = val[0];
 					a_vVector.y = val[1];
@@ -147,7 +147,7 @@ namespace gallus
 				}
 				float availW = ImGui::GetContentRegionAvail().x;
 				ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
-				if (ImGui::VectorEdit3(a_sId.c_str(), val, 0.1f, min, max))
+				if (ImGui::VectorEdit3(a_sId.c_str(), val, a_Field.m_Options.step, min, max))
 				{
 					DirectX::XMFLOAT3 newRotationDegrees = {
 						val[0] - preRotationDegrees.x,
@@ -228,59 +228,59 @@ namespace gallus
 							{
 								switch (a_Field.m_Options.assetType)
 								{
-									case resources::AssetType::Sprite:
-									{
-										auto cCommandQueue =
-											core::EDITOR_ENGINE->GetDX12()
-											.GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
+								case resources::AssetType::Sprite:
+								{
+									auto cCommandQueue =
+										core::EDITOR_ENGINE->GetDX12()
+										.GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
 
-										*a_pWeak = core::EDITOR_ENGINE->GetResourceAtlas()
-											.LoadTexture(resourceName, cCommandQueue);
+									*a_pWeak = core::EDITOR_ENGINE->GetResourceAtlas()
+										.LoadTexture(resourceName, cCommandQueue);
 
-										break;
-									}
-									case resources::AssetType::Mesh:
-									{
-										auto cCommandQueue =
-											core::EDITOR_ENGINE->GetDX12()
-											.GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
+									break;
+								}
+								case resources::AssetType::Mesh:
+								{
+									auto cCommandQueue =
+										core::EDITOR_ENGINE->GetDX12()
+										.GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
 
-										*a_pWeak = core::EDITOR_ENGINE->GetResourceAtlas()
-											.LoadMesh(resourceName, cCommandQueue);
+									*a_pWeak = core::EDITOR_ENGINE->GetResourceAtlas()
+										.LoadMesh(resourceName, cCommandQueue);
 
-										break;
-									}
-									case resources::AssetType::Material:
-									{
-										*a_pWeak = core::EDITOR_ENGINE->GetResourceAtlas()
-											.LoadMaterial(resourceName);
+									break;
+								}
+								case resources::AssetType::Material:
+								{
+									*a_pWeak = core::EDITOR_ENGINE->GetResourceAtlas()
+										.LoadMaterial(resourceName);
 
-										break;
-									}
-									case resources::AssetType::PixelShader:
-									{
-										*a_pWeak = core::EDITOR_ENGINE->GetResourceAtlas()
-											.LoadPixelShader(resourceName);
-										break;
-									}
-									case resources::AssetType::VertexShader:
-									{
-										*a_pWeak = core::EDITOR_ENGINE->GetResourceAtlas()
-											.LoadVertexShader(resourceName);
-										break;
-									}
-									case resources::AssetType::Prefab:
-									{
-										*a_pWeak = core::EDITOR_ENGINE->GetResourceAtlas()
-											.LoadPrefab(resourceName);
-										break;
-									}
-									case resources::AssetType::Animation:
-									{
-										*a_pWeak = core::EDITOR_ENGINE->GetResourceAtlas()
-											.LoadAnimation(resourceName);
-										break;
-									}
+									break;
+								}
+								case resources::AssetType::PixelShader:
+								{
+									*a_pWeak = core::EDITOR_ENGINE->GetResourceAtlas()
+										.LoadPixelShader(resourceName);
+									break;
+								}
+								case resources::AssetType::VertexShader:
+								{
+									*a_pWeak = core::EDITOR_ENGINE->GetResourceAtlas()
+										.LoadVertexShader(resourceName);
+									break;
+								}
+								case resources::AssetType::Prefab:
+								{
+									*a_pWeak = core::EDITOR_ENGINE->GetResourceAtlas()
+										.LoadPrefab(resourceName);
+									break;
+								}
+								case resources::AssetType::Animation:
+								{
+									*a_pWeak = core::EDITOR_ENGINE->GetResourceAtlas()
+										.LoadAnimation(resourceName);
+									break;
+								}
 								}
 							}
 						},
@@ -391,20 +391,20 @@ namespace gallus
 				std::string fieldId = ImGui::IMGUI_FORMAT_ID("", INPUT_ID, string_extensions::StringToUpper(a_Field.m_sUIName) + "_INSPECTOR");
 				switch (a_Field.m_Options.type)
 				{
-					case EditorFieldWidgetType::EditorFieldWidgetType_Float:
-					{
-						float* value = reinterpret_cast<float*>(ptr);
-						func = [value, &a_Field, &fieldId]
+				case EditorFieldWidgetType::EditorFieldWidgetType_Float:
+				{
+					float* value = reinterpret_cast<float*>(ptr);
+					func = [value, &a_Field, &fieldId]
 						{
 							bool val = ShowDragFloat(fieldId, value, a_Field);
 							ImGui::ShowTooltip(a_Field.m_sDescription);
 							return val;
 						};
-						break;
-					}
-					case EditorFieldWidgetType::EditorFieldWidgetType_Int8:
-					{
-						func = [ptr, &a_Field, &fieldId]
+					break;
+				}
+				case EditorFieldWidgetType::EditorFieldWidgetType_Int8:
+				{
+					func = [ptr, &a_Field, &fieldId]
 						{
 							int8_t* value = reinterpret_cast<int8_t*>(ptr);
 							int temp = static_cast<int64_t>(*value);
@@ -417,11 +417,11 @@ namespace gallus
 							}
 							return changed;
 						};
-						break;
-					}
-					case EditorFieldWidgetType::EditorFieldWidgetType_Int16:
-					{
-						func = [ptr, &a_Field, &fieldId]
+					break;
+				}
+				case EditorFieldWidgetType::EditorFieldWidgetType_Int16:
+				{
+					func = [ptr, &a_Field, &fieldId]
 						{
 							int16_t* value = reinterpret_cast<int16_t*>(ptr);
 							int temp = static_cast<int64_t>(*value);
@@ -434,11 +434,11 @@ namespace gallus
 							}
 							return changed;
 						};
-						break;
-					}
-					case EditorFieldWidgetType::EditorFieldWidgetType_Int32:
-					{
-						func = [ptr, &a_Field, &fieldId]
+					break;
+				}
+				case EditorFieldWidgetType::EditorFieldWidgetType_Int32:
+				{
+					func = [ptr, &a_Field, &fieldId]
 						{
 							int32_t* value = reinterpret_cast<int32_t*>(ptr);
 							int temp = static_cast<int64_t>(*value);
@@ -451,11 +451,11 @@ namespace gallus
 							}
 							return changed;
 						};
-						break;
-					}
-					case EditorFieldWidgetType::EditorFieldWidgetType_Int64:
-					{
-						func = [ptr, &a_Field, &fieldId]
+					break;
+				}
+				case EditorFieldWidgetType::EditorFieldWidgetType_Int64:
+				{
+					func = [ptr, &a_Field, &fieldId]
 						{
 							int64_t* value = reinterpret_cast<int64_t*>(ptr);
 							int temp = *value;
@@ -468,56 +468,70 @@ namespace gallus
 							}
 							return changed;
 						};
-						break;
-					}
-					case EditorFieldWidgetType::EditorFieldWidgetType_Bool:
-					{
-						bool* value = reinterpret_cast<bool*>(ptr);
-						func = [&a_Field, &fieldId, value]
+					break;
+				}
+				case EditorFieldWidgetType::EditorFieldWidgetType_Bool:
+				{
+					bool* value = reinterpret_cast<bool*>(ptr);
+					func = [&a_Field, &fieldId, value]
 						{
 							bool val = ImGui::Checkbox(fieldId.c_str(), value);
 							ImGui::ShowTooltip(a_Field.m_sDescription);
 							return val;
 						};
-						break;
-					}
-					case EditorFieldWidgetType::EditorFieldWidgetType_Switch:
-					{
-						bool* value = reinterpret_cast<bool*>(ptr);
-						func = [&a_Field, &fieldId, value]
+					break;
+				}
+				case EditorFieldWidgetType::EditorFieldWidgetType_Switch:
+				{
+					int32_t* value = reinterpret_cast<int32_t*>(ptr);
+
+					bool bValue = *value;
+					func = [&a_Field, &fieldId, &bValue, value]
+						{
+							bool val = ImGui::Toggle(fieldId.c_str(), &bValue);
+							*value = bValue;
+							ImGui::ShowTooltip(a_Field.m_sDescription);
+							return val;
+						};
+					break;
+				}
+				case EditorFieldWidgetType::EditorFieldWidgetType_LongSwitch:
+				{
+					bool* value = reinterpret_cast<bool*>(ptr);
+					func = [&a_Field, &fieldId, value]
 						{
 							bool val = ImGui::Toggle(fieldId.c_str(), value);
 							ImGui::ShowTooltip(a_Field.m_sDescription);
 							return val;
 						};
-						break;
-					}
-					case EditorFieldWidgetType::EditorFieldWidgetType_Vector2:
-					{
-						DirectX::XMFLOAT2* value = reinterpret_cast<DirectX::XMFLOAT2*>(ptr);
-						func = [&a_Field, &fieldId, value]
+					break;
+				}
+				case EditorFieldWidgetType::EditorFieldWidgetType_Vector2:
+				{
+					DirectX::XMFLOAT2* value = reinterpret_cast<DirectX::XMFLOAT2*>(ptr);
+					func = [&a_Field, &fieldId, value]
 						{
 							bool val = ShowVector2(fieldId, *value, a_Field);
 							ImGui::ShowTooltip(a_Field.m_sDescription);
 							return val;
 						};
-						break;
-					}
-					case EditorFieldWidgetType::EditorFieldWidgetType_Vector3:
-					{
-						DirectX::XMFLOAT3* value = reinterpret_cast<DirectX::XMFLOAT3*>(ptr);
-						func = [&a_Field, &fieldId, value]
+					break;
+				}
+				case EditorFieldWidgetType::EditorFieldWidgetType_Vector3:
+				{
+					DirectX::XMFLOAT3* value = reinterpret_cast<DirectX::XMFLOAT3*>(ptr);
+					func = [&a_Field, &fieldId, value]
 						{
 							bool val = ShowVector3(fieldId, *value, a_Field);
 							ImGui::ShowTooltip(a_Field.m_sDescription);
 							return val;
 						};
-						break;
-					}
-					case EditorFieldWidgetType::EditorFieldWidgetType_Color:
-					{
-						DirectX::XMFLOAT3* value = reinterpret_cast<DirectX::XMFLOAT3*>(ptr);
-						func = [&a_Field, &fieldId, value]
+					break;
+				}
+				case EditorFieldWidgetType::EditorFieldWidgetType_Color:
+				{
+					DirectX::XMFLOAT3* value = reinterpret_cast<DirectX::XMFLOAT3*>(ptr);
+					func = [&a_Field, &fieldId, value]
 						{
 							ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
 							bool val = ImGui::ColorEdit4(fieldId.c_str(),
@@ -526,26 +540,26 @@ namespace gallus
 							ImGui::ShowTooltip(a_Field.m_sDescription);
 							return val;
 						};
-						break;
-					}
-					case EditorFieldWidgetType::EditorFieldWidgetType_Quaternion:
-					{
-						DirectX::XMVECTOR* value = reinterpret_cast<DirectX::XMVECTOR*>(ptr);
+					break;
+				}
+				case EditorFieldWidgetType::EditorFieldWidgetType_Quaternion:
+				{
+					DirectX::XMVECTOR* value = reinterpret_cast<DirectX::XMVECTOR*>(ptr);
 
-						func = [&a_Field, &fieldId, value]
+					func = [&a_Field, &fieldId, value]
 						{
 							bool val = ShowQuaternion(fieldId, *value, a_Field);
 							ImGui::ShowTooltip(a_Field.m_sDescription);
 							return val;
 						};
-						break;
-					}
-					case EditorFieldWidgetType::EditorFieldWidgetType_EngineResource:
-					{
-						std::weak_ptr<gallus::resources::EngineResource>* pWeak =
-							reinterpret_cast<std::weak_ptr<gallus::resources::EngineResource>*>(ptr);
+					break;
+				}
+				case EditorFieldWidgetType::EditorFieldWidgetType_EngineResource:
+				{
+					std::weak_ptr<gallus::resources::EngineResource>* pWeak =
+						reinterpret_cast<std::weak_ptr<gallus::resources::EngineResource>*>(ptr);
 
-						func = [&a_Field, &fieldId, pWeak]()
+					func = [&a_Field, &fieldId, pWeak]()
 						{
 							std::shared_ptr<gallus::resources::EngineResource> locked;
 							if (pWeak)
@@ -559,29 +573,29 @@ namespace gallus
 							return ShowAssetPicker(fieldId, pLocked, pWeak, a_Field);
 						};
 
-						break;
-					}
-					case EditorFieldWidgetType::EditorFieldWidgetType_Object:
-					{
-						showTable = true;
-						IExposableToEditor* editorObject = dynamic_cast<IExposableToEditor*>(reinterpret_cast<IExposableToEditor*>(ptr));
+					break;
+				}
+				case EditorFieldWidgetType::EditorFieldWidgetType_Object:
+				{
+					showTable = true;
+					IExposableToEditor* editorObject = dynamic_cast<IExposableToEditor*>(reinterpret_cast<IExposableToEditor*>(ptr));
 
-						return ShowObject(editorObject, a_bInternal);
-						break;
-					}
-					case EditorFieldWidgetType::EditorFieldWidgetType_ObjectPtr:
-					{
-						showTable = true;
+					return ShowObject(editorObject, a_bInternal);
+					break;
+				}
+				case EditorFieldWidgetType::EditorFieldWidgetType_ObjectPtr:
+				{
+					showTable = true;
 
-						IExposableToEditor** ppEditorObject = reinterpret_cast<IExposableToEditor**>(ptr);
-						IExposableToEditor* pEditorObject = (ppEditorObject ? *ppEditorObject : nullptr);
+					IExposableToEditor** ppEditorObject = reinterpret_cast<IExposableToEditor**>(ptr);
+					IExposableToEditor* pEditorObject = (ppEditorObject ? *ppEditorObject : nullptr);
 
-						return ShowObject(pEditorObject, a_bInternal);
-						break;
-					}
-					case EditorFieldWidgetType::EditorFieldWidgetType_Enum:
-					{
-						func = [ptr, &a_Field, &fieldId]
+					return ShowObject(pEditorObject, a_bInternal);
+					break;
+				}
+				case EditorFieldWidgetType::EditorFieldWidgetType_Enum:
+				{
+					func = [ptr, &a_Field, &fieldId]
 						{
 							int* enumValue = reinterpret_cast<int*>(ptr);
 							int temp = *enumValue;
@@ -593,11 +607,11 @@ namespace gallus
 							}
 							return changed;
 						};
-						break;
-					}
-					case EditorFieldWidgetType::EditorFieldWidgetType_TexturePreview:
-					{
-						func = [ptr, &a_Field, a_pObject]()
+					break;
+				}
+				case EditorFieldWidgetType::EditorFieldWidgetType_TexturePreview:
+				{
+					func = [ptr, &a_Field, a_pObject]()
 						{
 							// texture pointer
 							graphics::dx12::Texture* tex = *reinterpret_cast<graphics::dx12::Texture**>(ptr);
@@ -609,11 +623,11 @@ namespace gallus
 							ShowTexturePreview(a_Field.m_sUIName, tex, spriteIndex);
 							return false;
 						};
-						break;
-					}
-					case EditorFieldWidgetType::EditorFieldWidgetType_Button:
-					{
-						func = [ptr, &a_Field, a_pObject]()
+					break;
+				}
+				case EditorFieldWidgetType::EditorFieldWidgetType_Button:
+				{
+					func = [ptr, &a_Field, a_pObject]()
 						{
 							if (ImGui::TextButton(a_Field.m_sUIName, a_Field.m_sDescription))
 							{
@@ -624,21 +638,21 @@ namespace gallus
 							}
 							return false;
 						};
-						break;
-					}
-					default:
-					{
-						break;
-					}
+					break;
+				}
+				default:
+				{
+					break;
+				}
 				}
 
 				if (showTable)
 				{
 					return ImGui::KeyValue([&a_Field]
-					{
-						ImGui::AlignTextToFramePadding();
-						ImGui::DisplayHeader(core::EDITOR_ENGINE->GetDX12().GetImGuiWindow().GetBoldFont(), a_Field.m_sUIName);
-						ImGui::ShowTooltip(a_Field.m_sDescription);
+						{
+							ImGui::AlignTextToFramePadding();
+							ImGui::DisplayHeader(core::EDITOR_ENGINE->GetDX12().GetImGuiWindow().GetBoldFont(), a_Field.m_sUIName);
+							ImGui::ShowTooltip(a_Field.m_sDescription);
 						}, [func, &a_Field]() {
 							bool wasDisabled = a_Field.m_Options.disabled;
 							if (wasDisabled)
@@ -657,7 +671,7 @@ namespace gallus
 							}
 
 							return success;
-						});
+							});
 				}
 
 				return false;
@@ -724,17 +738,17 @@ namespace gallus
 
 				if (ImGui::IsKeyPressed(ImGuiKey_T) || ImGui::IsKeyPressed(ImGuiKey_P))
 				{
-					core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetLastSceneOperation((int) ImGuizmo::TRANSLATE);
+					core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetLastSceneOperation((int)ImGuizmo::TRANSLATE);
 					core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
 				}
 				if (ImGui::IsKeyPressed(ImGuiKey_R))
 				{
-					core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetLastSceneOperation((int) ImGuizmo::ROTATE);
+					core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetLastSceneOperation((int)ImGuizmo::ROTATE);
 					core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
 				}
 				if (ImGui::IsKeyPressed(ImGuiKey_S))
 				{
-					core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetLastSceneOperation((int) ImGuizmo::SCALE);
+					core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetLastSceneOperation((int)ImGuizmo::SCALE);
 					core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
 				}
 
@@ -744,7 +758,7 @@ namespace gallus
 				if (ImGuizmo::Manipulate(
 					viewFloat,
 					projFloat,
-					(ImGuizmo::OPERATION) core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetLastSceneOperation(),
+					(ImGuizmo::OPERATION)core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetLastSceneOperation(),
 					ImGuizmo::WORLD,
 					objectFloat, 0, &snap))
 				{
@@ -775,15 +789,15 @@ namespace gallus
 
 					switch (gizmo.m_Options.type)
 					{
-						case EditorGizmoType::EditorGizmoType_Transform:
+					case EditorGizmoType::EditorGizmoType_Transform:
+					{
+						graphics::dx12::Transform* value = reinterpret_cast<graphics::dx12::Transform*>(ptr);
+						if (ShowTransformGizmo(a_vScenePos, a_vSize, a_vPanOffset, a_fZoom, *value))
 						{
-							graphics::dx12::Transform* value = reinterpret_cast<graphics::dx12::Transform*>(ptr);
-							if (ShowTransformGizmo(a_vScenePos, a_vSize, a_vPanOffset, a_fZoom, *value))
-							{
-								changed = true;
-							}
-							break;
+							changed = true;
 						}
+						break;
+					}
 					}
 				}
 

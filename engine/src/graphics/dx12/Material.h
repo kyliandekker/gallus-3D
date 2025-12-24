@@ -60,6 +60,11 @@ namespace gallus
 					m_MaterialData.DiffuseColor = a_vColor;
 				}
 
+				void SetEnableLighting(bool a_bEnableLighting)
+				{
+					m_MaterialData.EnableLighting = static_cast<uint32_t>(a_bEnableLighting);
+				}
+
 				void Bind(std::shared_ptr<CommandList> a_CommandList);
 
 				/// <summary>
@@ -74,6 +79,8 @@ protected:
 				MaterialData m_MaterialData;
 
 				BEGIN_EXPOSE_FIELDS_PARENT(Material, resources::EngineResource)
+					EXPOSE_FIELD(Material, m_MaterialData.EnableLighting, "Enable Lighting", "", 
+						{ .type = gallus::EditorFieldWidgetType::EditorFieldWidgetType_LongSwitch })
 					EXPOSE_FIELD(Material, m_MaterialData.DiffuseColor, "Diffuse Color", "", 
 						{ .type = gallus::EditorFieldWidgetType::EditorFieldWidgetType_Color })
 					EXPOSE_FIELD(Material, m_MaterialData.Metallic, "Metallic", "",

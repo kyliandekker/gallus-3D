@@ -12,10 +12,20 @@ cbuffer SpriteUV : register(b1)
 
 cbuffer MaterialData : register(b2)
 {
+    uint EnableLighting;
+    float3 Padding0;
     float4 DiffuseColor;
     float Metallic;
     float Smoothness;
-    float2 _Padding0;
+    float2 Padding1;
+};
+
+cbuffer DirectionalLightData : register(b3)
+{
+    float3 LightDirection;
+    float Padding2;
+    float4 LightColor;
+    float AmbientIntensity;
 };
 
 struct VSInput

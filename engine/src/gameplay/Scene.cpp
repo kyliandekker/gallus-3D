@@ -93,7 +93,19 @@ namespace gallus
 			}
 			else
 			{
-				core::ENGINE->GetDX12().GetCamera().Deserialize(cameraSrcData);
+				DeserializeEditorExposable(&core::ENGINE->GetDX12().GetCamera(), cameraSrcData);
+			}
+			
+			resources::SrcData directionalLightSrcData;
+			cameraSrcData.SetObject();
+
+			if (!srcData.GetSrcObject(JSON_SCENE_DIRECTIONAL_LIGHT_VAR, directionalLightSrcData))
+			{
+				LOGF(LOGSEVERITY_WARNING, LOG_CATEGORY_GAME, "Could not read directional light settings in scene data.");
+			}
+			else if (auto directionalLight = core::ENGINE->GetDX12().GetDirectionalLight().lock())
+			{
+				DeserializeEditorExposable(directionalLight.get(), directionalLightSrcData);
 			}
 			
 			resources::SrcData entitiesSrc;
@@ -223,11 +235,24 @@ namespace gallus
 			resources::SrcData srcData = resources::SrcData();
 			srcData.SetObject();
 
-			resources::SrcData cameraSrcData;
-			cameraSrcData.SetObject();
+			{
+				resources::SrcData cameraSrcData;
+				cameraSrcData.SetObject();
 
-			SerializeEditorExposable(&core::ENGINE->GetDX12().GetCamera(), cameraSrcData);
-			srcData.SetSrcObject(JSON_SCENE_CAMERA_VAR, cameraSrcData);
+				SerializeEditorExposable(&core::ENGINE->GetDX12().GetCamera(), cameraSrcData);
+				srcData.SetSrcObject(JSON_SCENE_CAMERA_VAR, cameraSrcData);
+			}
+
+			{
+				resources::SrcData directionalLightSrcData;
+				directionalLightSrcData.SetObject();
+
+				if (auto directionalLight = core::ENGINE->GetDX12().GetDirectionalLight().lock())
+				{
+					SerializeEditorExposable(directionalLight.get(), directionalLightSrcData);
+					srcData.SetSrcObject(JSON_SCENE_DIRECTIONAL_LIGHT_VAR, directionalLightSrcData);
+				}
+			}
 
 			resources::SrcData entitiesSrc = resources::SrcData();
 			entitiesSrc.SetArray();

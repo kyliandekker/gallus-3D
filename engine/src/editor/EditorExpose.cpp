@@ -110,6 +110,14 @@ namespace gallus
 					a_SrcData.GetBool(propertyName, *(bool*)ptr);
 					break;
 				}
+				case EditorFieldWidgetType::EditorFieldWidgetType_LongSwitch:
+				{
+					int value = 0;
+					a_SrcData.GetInt(propertyName, value);
+					int32_t* pValue = reinterpret_cast<int32_t*>(ptr);
+					*pValue = value;
+					break;
+				}
 				case EditorFieldWidgetType::EditorFieldWidgetType_Vector2:
 				{
 					a_SrcData.GetVector2(propertyName, *(DirectX::XMFLOAT2*)ptr);
@@ -374,6 +382,13 @@ namespace gallus
 				{
 					const bool* value = reinterpret_cast<const bool*>(ptr);
 					a_SrcData.SetBool(propertyName, *value);
+					break;
+				}
+				case EditorFieldWidgetType::EditorFieldWidgetType_LongSwitch:
+				{
+					const int32_t* value = reinterpret_cast<const int32_t*>(ptr);
+					int64_t temp = static_cast<int64_t>(*value);
+					a_SrcData.SetInt(propertyName, temp);
 					break;
 				}
 				case EditorFieldWidgetType::EditorFieldWidgetType_Vector2:

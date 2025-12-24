@@ -14,6 +14,7 @@
 #include "graphics/dx12/Camera.h"
 #include "graphics/dx12/FPSCounter.h"
 #include "graphics/dx12/DX12Resource.h"
+#include "graphics/dx12/DirectionalLight.h"
 
 #ifndef IMGUI_DISABLE
 #include "graphics/imgui/ImGuiWindow.h"
@@ -103,6 +104,11 @@ namespace gallus
 				Camera& GetCamera()
 				{
 					return m_Camera3D;
+				}
+
+				std::weak_ptr<DirectionalLight> GetDirectionalLight()
+				{
+					return m_pDirectionalLight;
 				}
 			protected:
 				/// <summary>
@@ -441,6 +447,7 @@ namespace gallus
 				std::weak_ptr<Texture> m_pRenderTexture = {};
 				std::weak_ptr<ShaderBind> m_pRenderTextureShaderBind = {};
 				std::weak_ptr<Material> m_pMaterial = {};
+				std::shared_ptr<DirectionalLight> m_pDirectionalLight = {};
 
 				FPSCounter m_FpsCounter;
 

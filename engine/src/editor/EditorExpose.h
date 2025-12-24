@@ -25,6 +25,7 @@ namespace gallus
 		EditorFieldWidgetType_Int64,
 		EditorFieldWidgetType_Enum,
 		EditorFieldWidgetType_Bool,
+		EditorFieldWidgetType_LongSwitch,
 		EditorFieldWidgetType_Switch,
 		EditorFieldWidgetType_Vector2,
 		EditorFieldWidgetType_Vector3,
@@ -52,6 +53,7 @@ namespace gallus
 		gallus::resources::AssetType assetType = resources::AssetType::None;
 		std::string min = "";
 		std::string max = "";
+		float step = 1.0f;
 		std::function<std::string(int)> enumToStringFunc = nullptr;
 		std::function<void(void*)> buttonFunc = nullptr;
 		std::function<void(void*)> onChangeFunc = nullptr;

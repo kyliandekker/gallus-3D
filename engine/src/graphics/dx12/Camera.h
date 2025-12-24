@@ -50,8 +50,6 @@ namespace gallus
 				/// <param name="a_fHeight">The height of the rendering viewport.</param>
 				void Init(float a_fWidth, float a_fHeight);
 
-				void Deserialize(const resources::SrcData& a_SrcData);
-
 				/// <summary>
 				/// Sets the projection matrix of the camera using perspective parameters.
 				/// </summary>
