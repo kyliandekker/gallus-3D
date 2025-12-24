@@ -155,7 +155,7 @@ namespace gallus
 
 						if (double_clicked && m_Callback)
 						{
-							m_Callback(1, view->GetFileResource().GetPath().stem().generic_string());
+							m_Callback(1, view->GetFileResource().GetPath().filename().generic_string());
 							Hide();
 							break;
 						}

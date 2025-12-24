@@ -36,7 +36,9 @@ export function generateHeaderFromFont(name, fontPath, glyphs)
 				}).join('\n') + '\n';
 			}
 			
-			var cppHeader = `#pragma once
+			var cppHeader = "// GENERATED FILE - DO NOT EDIT\n\n";
+			
+			cppHeader += `#pragma once
 
 namespace font
 {`;

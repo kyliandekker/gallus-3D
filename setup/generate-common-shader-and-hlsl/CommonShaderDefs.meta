@@ -1,0 +1,38 @@
+// @shader_cbuffer(name=Transform, register=b0)
+cbuffer Transform
+{
+    float4x4 WorldViewProj;
+};
+
+// @shader_cbuffer(name=SpriteUV, register=b1)
+cbuffer SpriteUV
+{
+    float4 uv;
+};
+
+// @shader_cbuffer(name=MaterialData, register=b2)
+cbuffer MaterialData
+{
+    float4 DiffuseColor;
+    float Metallic;
+    float Smoothness;
+};
+
+// @shader_vertex_input
+vertex_input VSInput
+{
+    POSITION  float3 POSITION;
+    TEXCOORD0  float2 TEXCOORD;
+    NORMAL    float3 NORMAL;
+    COLOR     float4 COLOR;
+};
+
+// @shader_root_parameters
+root_parameters
+{
+    CBV              b0 cbuffer Transform;
+    SPRITE_UV        b1 cbuffer Transform;
+    MATERIAL         b3 cbuffer Material;
+    TEX_SRV          t0 Texture2D spriteTexture;
+    SAMPLER_STATE    s0 SamplerState samplerState;
+};

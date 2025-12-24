@@ -1,6 +1,7 @@
 #pragma once
 
 #include "DX12PCH.h"
+#include "graphics/dx12/ShaderDefs.h"
 #include "core/System.h"
 
 // external
@@ -53,25 +54,6 @@ namespace gallus
 			class Material;
 			class ShaderBind;
 			class DX12Resource;
-
-			// Create the vertex input layout
-			const D3D12_INPUT_ELEMENT_DESC g_aInputLayout[] = {
-				{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-				{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-				{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-				{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-			};
-
-			// Root parameters for the game.
-			enum RootParameters
-			{
-				CBV = 0,                // ConstantBuffer<ModelViewProjection> ModelViewProjectionCB : register(b0);
-				SPRITE_UV = 1,    // b1: Sprite rect UVs (float2 uv0, float2 uv1)
-				SPRITE_COLOR = 2,    // b2: Sprite rect UVs (float2 uv0, float2 uv1)
-				MATERIAL = 3,    // b3: Material for meshes
-				TEX_SRV = 4,            // Texture2D texture0 : register(t0);
-				NumRootParameters = 5
-			};
 
 			enum CameraIsolationMode
 			{

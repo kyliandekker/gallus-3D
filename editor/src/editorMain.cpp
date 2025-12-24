@@ -37,7 +37,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR lp
 	std::string cmdLine(wstr.begin(), wstr.end());
 
 	// Initialize systems.
-	std::string name = "Gallus 2D Engine";
+	std::string name = "Gallus Engine";
 	std::string saveDirPath = gallus::file::GetAppDataPath().generic_string() + "/engine";
 	gallus::core::EDITOR_ENGINE = new gallus::core::EditorEngine();
 	gallus::core::EDITOR_ENGINE->SetSaveDirectory(saveDirPath);

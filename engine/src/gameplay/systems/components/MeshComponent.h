@@ -91,7 +91,14 @@ namespace gallus
 				EXPOSE_FIELD(MeshComponent, m_pMaterial, "Material", "",
 					(FieldOptions{ 
 						.type = EditorFieldWidgetType::EditorFieldWidgetType_EngineResource, 
-						.assetType = resources::AssetType::Material 
+						.assetType = resources::AssetType::Material,
+					}))
+				EXPOSE_FIELD(MeshComponent, m_pMaterial, "MaterialView", "",
+					(FieldOptions{ 
+						.type = EditorFieldWidgetType::EditorFieldWidgetType_ObjectPtr, 
+						.assetType = resources::AssetType::Material,
+						.serialize = false,
+						.indent = 1
 					}))
 				EXPOSE_FIELD(MeshComponent, m_pMesh, "Mesh", "Pointer to the texture asset used by this Mesh. Can be nullptr if no texture is assigned. Determines the visual appearance of the Mesh.",
 					(FieldOptions{ 

@@ -46,6 +46,11 @@ namespace gallus
 			{
 				continue;
 			}
+
+			if (!field.m_Options.serialize)
+			{
+				continue;
+			}
 			
 			std::string propertyName = TypeNameToPropertyName(field.m_sUIName);
 
@@ -113,6 +118,11 @@ namespace gallus
 				case EditorFieldWidgetType::EditorFieldWidgetType_Vector3:
 				{
 					a_SrcData.GetVector3(propertyName, *(DirectX::XMFLOAT3*)ptr);
+					break;
+				}
+				case EditorFieldWidgetType::EditorFieldWidgetType_Color:
+				{
+					a_SrcData.GetColor(propertyName, *(DirectX::XMFLOAT4*)ptr);
 					break;
 				}
 				case EditorFieldWidgetType::EditorFieldWidgetType_Quaternion:
@@ -210,6 +220,11 @@ namespace gallus
 						}
 						case resources::AssetType::Material:
 						{
+							std::weak_ptr<graphics::dx12::Material>* pReal =
+								reinterpret_cast<std::weak_ptr<graphics::dx12::Material>*>(ptr);
+
+							(*pReal) = core::ENGINE->GetResourceAtlas()
+								.LoadMaterial(assetName);
 							break;
 						}
 						case resources::AssetType::ShaderBind:
@@ -296,6 +311,11 @@ namespace gallus
 				continue;
 			}
 
+			if (!field.m_Options.serialize)
+			{
+				continue;
+			}
+
 			// These fields are unserializable. They are invalid or purely visual.
 			if (type == EditorFieldWidgetType::EditorFieldWidgetType_None || type == EditorFieldWidgetType::EditorFieldWidgetType_TexturePreview || type == EditorFieldWidgetType::EditorFieldWidgetType_Button)
 			{
@@ -368,6 +388,12 @@ namespace gallus
 					a_SrcData.SetVector3(propertyName, *value);
 					break;
 				}
+				case EditorFieldWidgetType::EditorFieldWidgetType_Color:
+				{
+					const DirectX::XMFLOAT4* value = reinterpret_cast<const DirectX::XMFLOAT4*>(ptr);
+					a_SrcData.SetColor(propertyName, *value);
+					break;
+				}
 				case EditorFieldWidgetType::EditorFieldWidgetType_Quaternion:
 				{
 					const DirectX::XMVECTOR* value = reinterpret_cast<const DirectX::XMVECTOR*>(ptr);
@@ -383,16 +409,17 @@ namespace gallus
 					{
 						switch (field.m_Options.assetType)
 						{
-						case resources::AssetType::Sprite:
-						case resources::AssetType::Mesh:
-						case resources::AssetType::PixelShader:
-						case resources::AssetType::VertexShader:
-						case resources::AssetType::Prefab:
-						case resources::AssetType::Animation:
-						{
-							a_SrcData.SetString(propertyName, pResource->GetName());
-							break;
-						}
+							case resources::AssetType::Sprite:
+							case resources::AssetType::Mesh:
+							case resources::AssetType::Material:
+							case resources::AssetType::PixelShader:
+							case resources::AssetType::VertexShader:
+							case resources::AssetType::Prefab:
+							case resources::AssetType::Animation:
+							{
+								a_SrcData.SetString(propertyName, pResource->GetName());
+								break;
+							}
 						}
 					}
 

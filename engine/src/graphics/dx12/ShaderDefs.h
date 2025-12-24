@@ -1,0 +1,39 @@
+#pragma once
+#include "./DX12PCH.h"
+
+// GENERATED FILE - DO NOT EDIT
+
+struct Transform
+{
+    DirectX::XMMATRIX WorldViewProj;
+};
+
+struct SpriteUV
+{
+    DirectX::XMFLOAT4 uv;
+};
+
+struct MaterialData
+{
+    DirectX::XMFLOAT4 DiffuseColor;
+    float Metallic;
+    float Smoothness;
+    float _Padding[2];
+};
+
+const D3D12_INPUT_ELEMENT_DESC g_aInputLayout[] = {
+    { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+    { "TEXCOORD0", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+    { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+    { "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+};
+
+enum RootParameters
+{
+    CBV = 0,
+    SPRITE_UV = 1,
+    MATERIAL = 2,
+    TEX_SRV = 3,
+    SAMPLER_STATE = 4,
+    NumRootParameters
+};

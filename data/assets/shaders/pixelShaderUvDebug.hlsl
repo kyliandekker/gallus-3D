@@ -9,7 +9,5 @@ struct PSInput
 
 float4 main(PSInput input) : SV_TARGET
 {
-    float4 color = spriteTexture.Sample(samplerState, input.uv);
-
-    return float4(input.uv, 0, 1); 
+    return float4(input.TEXCOORD, 0, 1); 
 }

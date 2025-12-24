@@ -97,7 +97,7 @@ namespace gallus
 				if (file::LoadFile(m_Path.generic_string() + ".meta", data))
 				{
 					resources::SrcData srcData(data);
-					if (!srcData.GetEnum("assetType", m_AssetType))
+					if (!srcData.IsValid() || !srcData.GetEnum("assetType", m_AssetType))
 					{
 						LOGF(LOGSEVERITY_WARNING, "%s has no asset type in its meta data.", m_Path.generic_string().c_str());
 					}
@@ -156,7 +156,7 @@ namespace gallus
 		//---------------------------------------------------------------------
 		bool FileResource::Find(const std::string& a_sName, FileResource*& a_pFileResource)
 		{
-			if (m_Path.filename() == a_sName || m_Path.stem() == a_sName)
+			if (m_Path.filename() == a_sName)
 			{
 				a_pFileResource = this;
 				return true;

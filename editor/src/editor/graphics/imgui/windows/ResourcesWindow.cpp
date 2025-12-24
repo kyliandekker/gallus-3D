@@ -139,13 +139,18 @@ namespace gallus
 						}
 					}
 
+					ImGui::FoldOutButton(
+						ImGui::IMGUI_FORMAT_ID(
+							std::string((m_bMaterialsFoldedOut ? font::ICON_FOLDED_OUT : font::ICON_FOLDED_IN) + std::string(" Material")),
+							FOLDOUT_ID, "MATERIALS_RESOURCES"), &m_bMaterialsFoldedOut, ImVec2(ImGui::GetContentRegionAvail().x, 0));
+
 					if (m_bMaterialsFoldedOut)
 					{
 						auto& materials = core::EDITOR_ENGINE->GetResourceAtlas().GetMaterials();
 						for (std::shared_ptr<graphics::dx12::Material> material : materials)
 						{
 							ImGui::Indent();
-							if (ImGui::CollapsingHeader(ImGui::IMGUI_FORMAT_ID(material.get()->GetName(), FOLDOUT_ID, "MESH_" + material.get()->GetName()).c_str()))
+							if (ImGui::CollapsingHeader(ImGui::IMGUI_FORMAT_ID(material.get()->GetName(), FOLDOUT_ID, "MATERIAL_" + material.get()->GetName()).c_str()))
 							{
 								ImGui::Indent();
 								RenderObjectFields(material.get());

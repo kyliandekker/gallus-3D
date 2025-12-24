@@ -40,7 +40,7 @@ namespace gallus
 					a_pCommandList->GetCommandList()->IASetIndexBuffer(&meshData.m_IndexBuffer.GetIndexBufferView());
 
 					// Update the MVP matrix
-					a_pCommandList->GetCommandList()->SetGraphicsRoot32BitConstants(0, sizeof(DirectX::XMMATRIX) / 4, &a_MVP, 0);
+					a_pCommandList->GetCommandList()->SetGraphicsRoot32BitConstants(RootParameters::CBV, sizeof(DirectX::XMMATRIX) / 4, &a_MVP, 0);
 
 					a_pCommandList->GetCommandList()->DrawIndexedInstanced(static_cast<UINT>(meshData.m_aIndices.size()), 1, 0, 0, 0);
 				}

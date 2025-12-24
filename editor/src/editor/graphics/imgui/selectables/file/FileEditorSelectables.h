@@ -148,7 +148,7 @@ namespace gallus
 
 				void Render(FileEditorSelectable& a_FileEditorSelectable) override;
 			protected:
-				graphics::dx12::Material m_Material;
+				std::weak_ptr<graphics::dx12::Material> m_pMaterial = {};
 			};
 		}
 	}

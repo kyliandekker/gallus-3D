@@ -32,7 +32,7 @@ namespace gallus
 		{
 			Component::SetDefaults(a_EntityID);
 
-			m_pShaderBind = core::ENGINE->GetResourceAtlas().GetDefaultShaderBind();
+			m_pShaderBind = core::ENGINE->GetResourceAtlas().LoadShaderBind("defaultShaderBind");
 			m_pSprite = core::ENGINE->GetResourceAtlas().GetDefaultTexture();
 			m_pMesh = core::ENGINE->GetResourceAtlas().LoadMesh("square");
 			m_vColor = { 1, 1, 1, 1 };
@@ -113,9 +113,6 @@ namespace gallus
 			{
 				material->Bind(a_pCommandList);
 			}
-
-			float colorData[4] = { m_vColor.x, m_vColor.y, m_vColor.z, m_vColor.w };
-			a_pCommandList->GetCommandList()->SetGraphicsRoot32BitConstants(graphics::dx12::RootParameters::SPRITE_COLOR, 4, colorData, 0);
 
 			if (auto tex = m_pSprite.lock())
 			{

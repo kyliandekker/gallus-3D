@@ -252,6 +252,11 @@ namespace gallus
 
 			a_SrcData = SrcData(m_Document[a_sKey.c_str()]);
 
+			if (!a_SrcData.IsValid())
+			{
+				return false;
+			}
+
 			return true;
 		}
 
@@ -287,6 +292,11 @@ namespace gallus
 			}
 
 			a_SrcData = SrcData(m_Document[a_sKey.c_str()]);
+
+			if (!a_SrcData.IsValid())
+			{
+				return false;
+			}
 
 			return true;
 		}
@@ -333,6 +343,11 @@ namespace gallus
 			}
 
 			a_SrcData = SrcData(m_Document.GetArray()[a_iIndex]);
+
+			if (!a_SrcData.IsValid())
+			{
+				return false;
+			}
 
 			return true;
 		}

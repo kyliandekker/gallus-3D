@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "graphics/dx12/DX12PCH.h"
+#include "graphics/dx12/ShaderDefs.h"
 #include "graphics/dx12/DX12Resource.h"
 
 namespace gallus
@@ -9,13 +10,6 @@ namespace gallus
 	{
 		namespace dx12
 		{
-			struct MaterialData
-			{
-				DirectX::XMFLOAT4 DiffuseColor = { 0, 0, 0, 0 };	// Base color of the material
-				float Metallic = 0.0f;                   // 0 = non-metallic, 1 = metallic
-				float Smoothness = 0.0f;                 // 0 = rough, 1 = smooth
-			};
-
 			class CommandList;
 
 			//---------------------------------------------------------------------
@@ -58,6 +52,8 @@ namespace gallus
 				/// <returns>True if loading and compilation were successful, false otherwise.</returns>
 				bool LoadByPath(const fs::path& a_MaterialPath) override;
 #endif // _LOAD_BY_PATH
+
+				void LoadMetaData();
 
 				void SetColor(DirectX::XMFLOAT4 a_vColor)
 				{

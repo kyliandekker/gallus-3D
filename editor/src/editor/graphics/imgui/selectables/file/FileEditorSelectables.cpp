@@ -28,12 +28,27 @@
 #include "editor/EditorGlobalFunctions.h"
 #include "editor/graphics/imgui/RenderEditorExposable.h"
 
+#include "resources/SrcData.h"
+
 namespace gallus
 {
 	namespace graphics
 	{
 		namespace imgui
 		{
+			void SaveMetaData(resources::FileResource& a_FileResource, IExposableToEditor* a_pObject, bool a_bSaveToFile = false)
+			{
+				resources::SrcData srcData;
+				srcData.SetObject();
+				SerializeEditorExposable(a_pObject, srcData);
+
+				fs::path path = a_FileResource.GetPath().generic_string() + (a_bSaveToFile ? "" : ".meta");
+
+				core::Data data;
+				srcData.GetData(data);
+				file::SaveFile(path, data);
+			}
+
 			void SceneFileEditorSelectables::Render(FileEditorSelectable& a_FileEditorSelectable)
 			{
 				float width = ImGui::GetContentRegionAvail().x;
@@ -192,14 +207,15 @@ namespace gallus
 
 			void SpriteFileEditorSelectables::Render(FileEditorSelectable& a_FileEditorSelectable)
 			{
-				auto tex = m_pTexture.lock();
-				if (!tex)
+				auto texture = m_pTexture.lock();
+				if (!texture)
 				{
 					return;
 				}
 
-				if (RenderObjectFields(tex.get(), false))
+				if (RenderObjectFields(texture.get(), false))
 				{
+					SaveMetaData(a_FileEditorSelectable.GetFileResource(), texture.get());
 				}
 
 				ImVec2 size = m_Window.GetHeaderSize();
@@ -218,9 +234,9 @@ namespace gallus
 							ImGui::AlignTextToFramePadding();
 							ImGui::DisplayHeader(m_Window.GetBoldFont(), "Width: ");
 						},
-						[this, tex]
+						[this, texture]
 						{
-							ImGui::Text(std::to_string(tex->GetResourceDesc().Width).c_str());
+							ImGui::Text(std::to_string(texture->GetResourceDesc().Width).c_str());
 							return false;
 						});
 					ImGui::KeyValue([this]
@@ -228,9 +244,9 @@ namespace gallus
 							ImGui::AlignTextToFramePadding();
 							ImGui::DisplayHeader(m_Window.GetBoldFont(), "Height: ");
 						},
-						[this, tex]
+						[this, texture]
 						{
-							ImGui::Text(std::to_string(tex->GetResourceDesc().Height).c_str());
+							ImGui::Text(std::to_string(texture->GetResourceDesc().Height).c_str());
 							return false;
 						});
 					ImGui::KeyValue([this]
@@ -238,9 +254,9 @@ namespace gallus
 							ImGui::AlignTextToFramePadding();
 							ImGui::DisplayHeader(m_Window.GetBoldFont(), "Channels: ");
 						},
-						[this, tex]
+						[this, texture]
 						{
-							ImGui::Text(std::to_string(GetFormatChannelCount(tex->GetResourceDesc().Format)).c_str());
+							ImGui::Text(std::to_string(GetFormatChannelCount(texture->GetResourceDesc().Format)).c_str());
 							return false;
 						});
 					ImGui::EndInspectorKeyVal(m_Window.GetFramePadding());
@@ -248,7 +264,7 @@ namespace gallus
 				}
 
 				float width = ImGui::GetContentRegionAvail().x;
-				if (tex->GetTextureType() == graphics::dx12::TextureType::SpriteSheet && ImGui::TextButton(ImGui::IMGUI_FORMAT_ID(font::ICON_IMAGE + std::string(" Open Sprite Editor"), BUTTON_ID, "OPEN_SPRITE_EDITOR_INSPECTOR").c_str(), "Opens the sprite editor for the selected sprite sheet.", ImVec2(width, 0)))
+				if (texture->GetTextureType() == graphics::dx12::TextureType::SpriteSheet && ImGui::TextButton(ImGui::IMGUI_FORMAT_ID(font::ICON_IMAGE + std::string(" Open Sprite Editor"), BUTTON_ID, "OPEN_SPRITE_EDITOR_INSPECTOR").c_str(), "Opens the sprite editor for the selected sprite sheet.", ImVec2(width, 0)))
 				{
 				}
 
@@ -258,22 +274,22 @@ namespace gallus
 				ImVec2 uv0, uv1;
 
 				ImVec2 texturePos = ImGui::GetCursorScreenPos();
-				if (tex->GetTextureType() == graphics::dx12::TextureType::Texture2D)
+				if (texture->GetTextureType() == graphics::dx12::TextureType::Texture2D)
 				{
 					// Full texture
-					spriteW = static_cast<float>(tex->GetResourceDesc().Width);
-					spriteH = static_cast<float>(tex->GetResourceDesc().Height);
+					spriteW = static_cast<float>(texture->GetResourceDesc().Width);
+					spriteH = static_cast<float>(texture->GetResourceDesc().Height);
 					uv0 = { 0.0f, 0.0f };
 					uv1 = { 1.0f, 1.0f };
 				}
 				else
 				{
-					const auto& sprite = tex->GetSpriteRect(m_iCurrentSpriteIndex);
+					const auto& sprite = texture->GetSpriteRect(m_iCurrentSpriteIndex);
 					spriteW = static_cast<float>(sprite.width);
 					spriteH = static_cast<float>(sprite.height);
 
-					const float texWidth = static_cast<float>(tex->GetResourceDesc().Width);
-					const float texHeight = static_cast<float>(tex->GetResourceDesc().Height);
+					const float texWidth = static_cast<float>(texture->GetResourceDesc().Width);
+					const float texHeight = static_cast<float>(texture->GetResourceDesc().Height);
 
 					uv0 = { sprite.x / texWidth, sprite.y / texHeight };                              // top-left
 					uv1 = { (sprite.x + sprite.width) / texWidth, (sprite.y + sprite.height) / texHeight }; // bottom-right
@@ -289,19 +305,19 @@ namespace gallus
 				float drawW = spriteW * scale;
 				float drawH = spriteH * scale;
 
-				ShowTexturePreview(ImGui::IMGUI_FORMAT_ID("", "IMAGE", "TEX_PREVIEW_INSPECTOR"), tex.get(), m_iCurrentSpriteIndex, {drawW, drawH});
+				ShowTexturePreview(ImGui::IMGUI_FORMAT_ID("", "IMAGE", "TEX_PREVIEW_INSPECTOR"), texture.get(), m_iCurrentSpriteIndex, {drawW, drawH});
 
 				ImGui::SetCursorScreenPos({ texturePos.x, texturePos.y + (drawH / 2) });
 				if (ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_PREVIOUS, BUTTON_ID, "PREV_TEX_INDEX_PREVIEW_INSPECTOR").c_str()))
 				{
 					m_iCurrentSpriteIndex--;
-					if (m_iCurrentSpriteIndex < 0) m_iCurrentSpriteIndex = tex->GetSpriteRectsSize() - 1; // wrap around
+					if (m_iCurrentSpriteIndex < 0) m_iCurrentSpriteIndex = texture->GetSpriteRectsSize() - 1; // wrap around
 				}
 				ImGui::SetCursorScreenPos({ (texturePos.x + drawW) - size.x, texturePos.y + (drawH / 2)});
 				if (ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_NEXT, BUTTON_ID, "NEXT_TEX_INDEX_PREVIEW_INSPECTOR").c_str()))
 				{
 					m_iCurrentSpriteIndex++;
-					if (m_iCurrentSpriteIndex >= tex->GetSpriteRectsSize()) m_iCurrentSpriteIndex = 0; // wrap around
+					if (m_iCurrentSpriteIndex >= texture->GetSpriteRectsSize()) m_iCurrentSpriteIndex = 0; // wrap around
 				}
 			}
 
@@ -474,13 +490,20 @@ namespace gallus
 
 			MaterialFileEditorSelectables::MaterialFileEditorSelectables(ImGuiWindow& a_Window, FileEditorSelectable& a_FileEditorSelectable) : FileEditorSelectables(a_Window, a_FileEditorSelectable)
 			{
-				m_Material.LoadByName(a_FileEditorSelectable.GetFileResource().GetPath().filename().generic_string());
+				m_pMaterial = core::EDITOR_ENGINE->GetResourceAtlas().LoadMaterial(a_FileEditorSelectable.GetFileResource().GetPath().filename().generic_string());
 			}
 
 			void MaterialFileEditorSelectables::Render(FileEditorSelectable& a_FileEditorSelectable)
 			{
-				if (RenderObjectFields(&m_Material, false))
+				auto material = m_pMaterial.lock();
+				if (!material)
 				{
+					return;
+				}
+
+				if (RenderObjectFields(material.get(), false))
+				{
+					SaveMetaData(a_FileEditorSelectable.GetFileResource(), material.get(), true);
 				}
 			}
 		}

@@ -88,7 +88,7 @@ namespace gallus
 						continue;
 					}
 
-					if (res->GetName() == a_sName || (!a_Path.empty() && a_Path == res->GetPath()))
+					if (res->GetName() == a_sName || res->GetPath().filename().generic_string() == a_sName || (!a_Path.empty() && a_Path == res->GetPath()))
 					{
 						return static_cast<int32_t>(i);
 					}

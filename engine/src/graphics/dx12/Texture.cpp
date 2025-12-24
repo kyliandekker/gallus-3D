@@ -27,8 +27,6 @@ namespace gallus
 			//---------------------------------------------------------------------
 			// Texture
 			//---------------------------------------------------------------------
-
-			//---------------------------------------------------------------------
 			bool Texture::LoadByName(const std::string& a_sName, const D3D12_RESOURCE_DESC& a_Description, const D3D12_HEAP_PROPERTIES& a_Heap, const D3D12_RESOURCE_STATES a_ResourceState)
 			{
 				if (!DX12Resource::LoadByName(a_sName, a_Description, a_Heap, a_ResourceState))
@@ -346,9 +344,19 @@ namespace gallus
 			//---------------------------------------------------------------------
 			void Texture::LoadMetaData()
 			{
+				if (m_Path.empty())
+				{
+					return;
+				}
+
 				core::Data data;
 				file::LoadFile(m_Path.generic_string() + ".meta", data);
 				resources::SrcData srcData(data);
+
+				if (!srcData.IsValid())
+				{
+					return;
+				}
 
 				DeserializeEditorExposable(this, srcData);
 			}

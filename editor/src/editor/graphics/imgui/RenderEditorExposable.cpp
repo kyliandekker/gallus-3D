@@ -17,8 +17,6 @@
 #include "graphics/dx12/Mesh.h"
 #include "graphics/dx12/Material.h"
 
-#include "graphics/imgui/views/DataTypes/ColorView.h"
-
 // resources
 #include "resources/SrcData.h"
 
@@ -521,6 +519,7 @@ namespace gallus
 						DirectX::XMFLOAT3* value = reinterpret_cast<DirectX::XMFLOAT3*>(ptr);
 						func = [&a_Field, &fieldId, value]
 						{
+							ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
 							bool val = ImGui::ColorEdit4(fieldId.c_str(),
 								reinterpret_cast<float*>(value)
 							);
@@ -564,7 +563,7 @@ namespace gallus
 					}
 					case EditorFieldWidgetType::EditorFieldWidgetType_Object:
 					{
-						showTable = false;
+						showTable = true;
 						IExposableToEditor* editorObject = dynamic_cast<IExposableToEditor*>(reinterpret_cast<IExposableToEditor*>(ptr));
 
 						return ShowObject(editorObject, a_bInternal);
@@ -572,7 +571,7 @@ namespace gallus
 					}
 					case EditorFieldWidgetType::EditorFieldWidgetType_ObjectPtr:
 					{
-						showTable = false;
+						showTable = true;
 
 						IExposableToEditor** ppEditorObject = reinterpret_cast<IExposableToEditor**>(ptr);
 						IExposableToEditor* pEditorObject = (ppEditorObject ? *ppEditorObject : nullptr);
@@ -681,6 +680,10 @@ namespace gallus
 							continue;
 						}
 
+						for (size_t i = 0; i < field.m_Options.indent; i++)
+						{
+							ImGui::Indent();
+						}
 						if (ShowEditorFieldFromObject(a_pObject, field, field.m_Options.internal))
 						{
 							changed = true;
@@ -688,6 +691,10 @@ namespace gallus
 							{
 								field.m_Options.onChangeFunc(a_pObject);
 							}
+						}
+						for (size_t i = 0; i < field.m_Options.indent; i++)
+						{
+							ImGui::Unindent();
 						}
 					}
 					ImGui::EndInspectorKeyVal(ImVec2());

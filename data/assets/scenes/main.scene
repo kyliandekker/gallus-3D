@@ -25,6 +25,12 @@
                 "sprite": {
                     "static": true,
                     "order": 1,
+                    "color": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    },
                     "shaderBind": {
                         "pixelShader": "pixelShader.hlsl",
                         "vertexShader": "vertexShader.hlsl"
@@ -35,8 +41,8 @@
                 "transform": {
                     "transform": {
                         "position": {
-                            "x": 767.8887329101563,
-                            "y": 245.98379516601563,
+                            "x": 1030.203369140625,
+                            "y": 197.8035888671875,
                             "z": 0.0
                         },
                         "scale": {
@@ -87,8 +93,19 @@
             "components": {
                 "mesh": {
                     "shaderBind": {
-                        "pixelShader": "pixelShader3D.hlsl",
-                        "vertexShader": "vertexShader3D.hlsl"
+                        "pixelShader": "pixelShader.hlsl",
+                        "vertexShader": "vertexShader.hlsl"
+                    },
+                    "material": "1.mat",
+                    "material": {
+                        "diffuseColor": {
+                            "r": 1.0,
+                            "g": 0.3960784375667572,
+                            "b": 0.0,
+                            "a": 1.0
+                        },
+                        "metallic": 87.0,
+                        "smoothness": 174.0
                     },
                     "mesh": "mod_chicken.glb",
                     "texture": "tex_chicken_infected.png",
@@ -97,19 +114,19 @@
                 "transform": {
                     "transform": {
                         "position": {
-                            "x": -0.24861955642700196,
-                            "y": 0.2705696225166321,
-                            "z": -1.1920928244535389e-7
+                            "x": -0.8708978891372681,
+                            "y": 0.7143905162811279,
+                            "z": 7.105427357601002e-15
                         },
                         "scale": {
-                            "x": 1.900001883506775,
-                            "y": 1.7999999523162842,
-                            "z": 1.900001883506775
+                            "x": 1.9000002145767213,
+                            "y": 1.7999995946884156,
+                            "z": 1.9000006914138795
                         },
                         "rotation": {
-                            "x": 0.0,
-                            "y": 9.01809310913086,
-                            "z": 0.0
+                            "x": -18.39398956298828,
+                            "y": -9.465726852416993,
+                            "z": 3.240715742111206
                         },
                         "pivot": {
                             "x": 0.0,

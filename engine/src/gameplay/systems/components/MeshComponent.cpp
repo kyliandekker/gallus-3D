@@ -31,7 +31,7 @@ namespace gallus
 		{
 			Component::SetDefaults(a_EntityID);
 
-			m_pShaderBind = core::ENGINE->GetResourceAtlas().LoadShaderBind("defaultShaderBind3D");
+			m_pShaderBind = core::ENGINE->GetResourceAtlas().LoadShaderBind("defaultShaderBind");
 			m_pTexture = core::ENGINE->GetResourceAtlas().GetDefaultTexture();
 			m_pMesh = core::ENGINE->GetResourceAtlas().GetDefaultMesh();
 			m_vColor = { 1, 1, 1, 1 };

@@ -49,16 +49,18 @@ namespace gallus
 	struct FieldOptions
 	{
 		EditorFieldWidgetType type = EditorFieldWidgetType::EditorFieldWidgetType_None;
-		gallus::resources::AssetType assetType;
+		gallus::resources::AssetType assetType = resources::AssetType::None;
 		std::string min = "";
 		std::string max = "";
 		std::function<std::string(int)> enumToStringFunc = nullptr;
 		std::function<void(void*)> buttonFunc = nullptr;
 		std::function<void(void*)> onChangeFunc = nullptr;
-		bool disabled = false;
-		bool internal = false;
-		bool hideInEditor = false;
+		bool disabled = false;									// If true, field is visible in editor, but cannot interact with it.
+		bool internal = false;									// If true, this makes it so that the field is not visible in inspector view, but is visible in system views.
+		bool hideInEditor = false;								// If true, makes field invisible in the editor.
+		bool serialize = true;									// If false, stops serialization to data.
 		size_t relatedIndexFieldOffset = 0;
+		size_t indent = 0;
 
 		std::function<size_t(void*)> getSize = nullptr;
 		std::function<IExposableToEditor* (void*, size_t)> getElement = nullptr;

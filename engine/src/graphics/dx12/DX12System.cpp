@@ -184,32 +184,16 @@ namespace gallus
 					tex->SetIsDestroyable(false);
 				}
 
-				std::shared_ptr<PixelShader> pixelShader2DPtr = core::ENGINE->GetResourceAtlas().LoadPixelShader("pixelShader.hlsl"); // Default shader.
-				std::shared_ptr<VertexShader> vertexShader2DPtr = core::ENGINE->GetResourceAtlas().LoadVertexShader("vertexShader.hlsl"); // Default shader.
+				std::shared_ptr<PixelShader> pixelShaderPtr = core::ENGINE->GetResourceAtlas().LoadPixelShader("pixelShader.hlsl"); // Default shader.
+				std::shared_ptr<VertexShader> vertexShaderPtr = core::ENGINE->GetResourceAtlas().LoadVertexShader("vertexShader.hlsl"); // Default shader.
 
-				pixelShader2DPtr->SetResourceCategory(resources::EngineResourceCategory::Missing);
-				pixelShader2DPtr->SetIsDestroyable(false);
+				pixelShaderPtr->SetResourceCategory(resources::EngineResourceCategory::Missing);
+				pixelShaderPtr->SetIsDestroyable(false);
 
-				vertexShader2DPtr->SetResourceCategory(resources::EngineResourceCategory::Missing);
-				vertexShader2DPtr->SetIsDestroyable(false);
+				vertexShaderPtr->SetResourceCategory(resources::EngineResourceCategory::Missing);
+				vertexShaderPtr->SetIsDestroyable(false);
 
-				std::weak_ptr<ShaderBind> shaderBind2DPtr = core::ENGINE->GetResourceAtlas().LoadShaderBind("defaultShaderBind", pixelShader2DPtr, vertexShader2DPtr); // Default shader.
-				if (auto shaderBind = shaderBind2DPtr.lock())
-				{
-					shaderBind->SetResourceCategory(resources::EngineResourceCategory::Missing);
-					shaderBind->SetIsDestroyable(false);
-				}
-
-				std::shared_ptr<PixelShader> pixelShader3DPtr = core::ENGINE->GetResourceAtlas().LoadPixelShader("pixelShader3D.hlsl"); // Default shader.
-				std::shared_ptr<VertexShader> vertexShader3DPtr = core::ENGINE->GetResourceAtlas().LoadVertexShader("vertexShader3D.hlsl"); // Default shader.
-
-				pixelShader3DPtr->SetResourceCategory(resources::EngineResourceCategory::Missing);
-				pixelShader3DPtr->SetIsDestroyable(false);
-
-				vertexShader3DPtr->SetResourceCategory(resources::EngineResourceCategory::Missing);
-				vertexShader3DPtr->SetIsDestroyable(false);
-
-				std::weak_ptr<ShaderBind> shaderBind3DPtr = core::ENGINE->GetResourceAtlas().LoadShaderBind("defaultShaderBind3D", pixelShader3DPtr, vertexShader3DPtr, DXGI_FORMAT_D32_FLOAT); // Default shader.
+				std::weak_ptr<ShaderBind> shaderBind3DPtr = core::ENGINE->GetResourceAtlas().LoadShaderBind("defaultShaderBind", pixelShaderPtr, vertexShaderPtr, DXGI_FORMAT_D32_FLOAT); // Default shader.
 				if (auto shaderBind = shaderBind3DPtr.lock())
 				{
 					shaderBind->SetResourceCategory(resources::EngineResourceCategory::Missing);
@@ -632,16 +616,13 @@ namespace gallus
 				CD3DX12_ROOT_PARAMETER1 rootParameters[RootParameters::NumRootParameters]{};
 
 				// CBV at register b0 (Model-View-Projection Matrix)
-				rootParameters[RootParameters::CBV].InitAsConstants(sizeof(DirectX::XMMATRIX) / 4, 0, 0, D3D12_SHADER_VISIBILITY_VERTEX);
+				rootParameters[RootParameters::CBV].InitAsConstants(sizeof(DirectX::XMMATRIX) / 4, RootParameters::CBV, 0, D3D12_SHADER_VISIBILITY_VERTEX);
 
 				// b1: Sprite UV rect
-				rootParameters[SPRITE_UV].InitAsConstants(4, 1); 
-
-				// b2: Sprite Color
-				rootParameters[SPRITE_COLOR].InitAsConstants(4, 2);
+				rootParameters[RootParameters::SPRITE_UV].InitAsConstants(4, RootParameters::SPRITE_UV);
 
 				// b3: Material
-				rootParameters[RootParameters::MATERIAL].InitAsConstantBufferView(3);
+				rootParameters[RootParameters::MATERIAL].InitAsConstantBufferView(RootParameters::MATERIAL);
 
 				// Texture SRV at register t0 (binds a texture)
 				rootParameters[RootParameters::TEX_SRV].InitAsDescriptorTable(1, &descriptorRanges[0], D3D12_SHADER_VISIBILITY_PIXEL);
