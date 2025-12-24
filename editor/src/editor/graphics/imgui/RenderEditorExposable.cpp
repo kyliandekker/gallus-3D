@@ -147,7 +147,7 @@ namespace gallus
 				}
 				float availW = ImGui::GetContentRegionAvail().x;
 				ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
-				if (ImGui::VectorEdit3(a_sId.c_str(), val, a_Field.m_Options.step, min, max))
+				if (ImGui::VectorEdit3(a_sId.c_str(), val, 0.1f, min, max))
 				{
 					DirectX::XMFLOAT3 newRotationDegrees = {
 						val[0] - preRotationDegrees.x,
