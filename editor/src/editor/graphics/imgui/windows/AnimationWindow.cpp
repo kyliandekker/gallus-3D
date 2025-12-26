@@ -169,12 +169,12 @@ namespace gallus
 
 				int frameCount = m_Animation.GetFrameCount() == 0 ? 100 : m_Animation.GetFrameCount();
 
-				ImGui::SetNextItemWidth(100);
+				ImGui::SetNextItemWidth(6.5f * m_Window.GetFontSize());
 				ImGui::DragInt(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "CURRENT_FRAME_ANIMATION_MODAL").c_str(), &m_iCurrentFrame, 1, 0, frameCount, "Frame %i");
 
 				ImGui::SameLine();
 
-				ImGui::SetNextItemWidth(150);
+				ImGui::SetNextItemWidth(10.5f * m_Window.GetFontSize());
 				if (ImGui::DragInt(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "FRAME_COUNT_ANIMATION_MODAL").c_str(), &frameCount, 1, 0, frameCount, "Frame Count %i"))
 				{
 					m_Animation.SetFrameCount(frameCount);

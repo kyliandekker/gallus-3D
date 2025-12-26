@@ -42,11 +42,6 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		void AnimationComponent::LoadAnimation(const std::string& a_sAnimName)
-		{
-		}
-
-		//---------------------------------------------------------------------
 		void AnimationComponent::LoadAnimation()
 		{
 			m_iNextKeyFrameIndex = 0;
@@ -73,21 +68,21 @@ namespace gallus
 			while (m_iNextKeyFrameIndex < animationTrack->GetKeyFrames().size())
 			{
 				animation::AnimationKeyFrame* keyFrame = animationTrack->GetKeyFrames()[m_iNextKeyFrameIndex];
-				int keyFrameNumber = keyFrame->GetFrame(); // actual frame number
+				int keyFrameNumber = keyFrame->GetFrame(); // Actual frame number.
 				float keyFrameTime = keyFrameNumber * FRAME_TIME;
 
 				if (m_fAccumulatedTime >= keyFrameTime)
 				{
 					keyFrame->Activate(m_EntityID);
-					m_iNextKeyFrameIndex++;  // only increment after successfully activating a keyframe
+					m_iNextKeyFrameIndex++;  // Only increment after successfully activating a keyframe.
 				}
 				else
 				{
-					break; // next keyframe is not yet due
+					break; // Next keyframe is not yet due.
 				}
 			}
 
-			// Reset if animation is done
+			// Reset if animation is done.
 			if (!animationTrack->GetKeyFrames().empty() && m_iNextKeyFrameIndex >= animationTrack->GetKeyFrames().size())
 			{
 				m_fAccumulatedTime = 0.0f;

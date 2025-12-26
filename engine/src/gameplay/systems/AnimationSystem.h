@@ -2,11 +2,18 @@
 
 #include "gameplay/ECSBaseSystem.h"
 
+// external
+#include <map>
+
 // gameplay
 #include "gameplay/systems/components/AnimationComponent.h"
 
 namespace gallus
 {
+	namespace animation
+	{
+		class AnimationKeyFrameBaseSystem;
+	}
 	namespace gameplay
 	{
 		//---------------------------------------------------------------------
@@ -32,6 +39,13 @@ namespace gallus
 			/// </summary>
 			/// <returns>A string containing the name of the system.</returns>
 			std::string GetSystemName() const override;
+
+			const std::vector<animation::AnimationKeyFrameBaseSystem*> GetSystems() const
+			{
+				return m_aSystems;
+			}
+		protected:
+			std::vector<animation::AnimationKeyFrameBaseSystem*> m_aSystems;
 		};
 	}
 }

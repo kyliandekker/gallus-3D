@@ -2,20 +2,17 @@
 
 #include "AnimationKeyFrameComponentBase.h"
 
+#define ANIMATION_KEY_FRAME_SOUND_COMPONENT_NAME "Sound"
+#define ANIMATION_KEY_FRAME_SOUND_COMPONENT_PROPERTY_NAME "sound"
+
 namespace gallus
 {
 	namespace audio
 	{
 		class Sound;
 	}
-	namespace resources
-	{
-		class SrcData;
-	}
 	namespace animation
 	{
-		class Animation;
-
 		class AnimationKeyFrameSoundComponent : public AnimationKeyFrameComponentBase
 		{
 		public:
@@ -34,36 +31,30 @@ namespace gallus
 			void Activate(gameplay::EntityID& a_EntityID) override
 			{}
 
-			/// <summary>
-			/// Retrieves the name of the key frame component.
-			/// </summary>
-			/// <returns>A string containing the name.</returns>
 			std::string GetName() const override;
 
-			/// <summary>
-			/// Creates an instance based on source data.
-			/// </summary>
-			/// <param name="a_SrcData">The source data.</param>
-			void Deserialize(const resources::SrcData& a_SrcData) override;
-
-			/// <summary>
-			/// Retrieves the property name of the key frame component.
-			/// </summary>
-			/// <returns>A string containing the property name.</returns>
-			std::string GetPropertyName() const override
+			const std::string GetPropertyName() const override
 			{
-				return "sound";
+				return ANIMATION_KEY_FRAME_SOUND_COMPONENT_PROPERTY_NAME;
 			}
-#ifdef _EDITOR
-			/// <summary>
-			/// Serialized the component to a json document.
-			/// </summary>
-			/// <param name="a_Document">The json document that the data will be put into.</param>
-			/// <param name="a_Allocator">The allocator used by the json document.</param>
-			void Serialize(rapidjson::Value& a_Value, rapidjson::Document::AllocatorType& a_Allocator) const override;
-#endif // _EDITOR
 		protected:
 			audio::Sound* m_pSound = nullptr;
+		};
+
+		class AnimationKeyFrameSoundSystem : public AnimationKeyFrameBaseSystem
+		{
+		public:
+			std::string GetName() const override;
+
+			const std::string GetPropertyName() const override
+			{
+				return ANIMATION_KEY_FRAME_SOUND_COMPONENT_PROPERTY_NAME;
+			}
+
+			AnimationKeyFrameComponentBase* CreateComponent(AnimationKeyFrame& a_KeyFrame) override
+			{
+				return new AnimationKeyFrameSoundComponent(a_KeyFrame);
+			}
 		};
 	}
 }

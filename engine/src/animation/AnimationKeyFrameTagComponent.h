@@ -2,19 +2,11 @@
 
 #include "AnimationKeyFrameComponentBase.h"
 
+#define ANIMATION_KEY_FRAME_TAG_COMPONENT_NAME "Tag"
+#define ANIMATION_KEY_FRAME_TAG_COMPONENT_PROPERTY_NAME "tag"
+
 namespace gallus
 {
-	namespace graphics
-	{
-		namespace dx12
-		{
-			class Texture;
-		}
-	}
-	namespace resources
-	{
-		class SrcData;
-	}
 	namespace animation
 	{
 		class Animation;
@@ -34,53 +26,15 @@ namespace gallus
 			/// Activates the key frame component's behaviour.
 			/// </summary>
 			/// <param name="a_EntityID">The related entity id.</param>
-			void Activate(gameplay::EntityID& a_EntityID) override;
+			void Activate(gameplay::EntityID& a_EntityID) override
+			{ }
 
-			/// <summary>
-			/// Retrieves the name of the key frame component.
-			/// </summary>
-			/// <returns>A string containing the name.</returns>
 			std::string GetName() const override;
-#ifdef _EDITOR
-			/// <summary>
-			/// Serialized the component to a json document.
-			/// </summary>
-			/// <param name="a_Document">The json document that the data will be put into.</param>
-			/// <param name="a_Allocator">The allocator used by the json document.</param>
-			void Serialize(rapidjson::Value& a_Value, rapidjson::Document::AllocatorType& a_Allocator) const override;
 
-			/// <summary>
-			/// Retrieves the tag.
-			/// </summary>
-			/// <returns>The tag.</returns>
-			const std::string& GetTag() const
+			const std::string GetPropertyName() const override
 			{
-				return m_sTag;
+				return ANIMATION_KEY_FRAME_TAG_COMPONENT_PROPERTY_NAME;
 			}
-
-			/// <summary>
-			/// Sets the tag used in this key frame.
-			/// </summary>
-			/// <param name="a_sTag">The tag.</param>
-			void SetTag(const std::string& a_sTag)
-			{
-				m_sTag = a_sTag;
-			}
-#endif // _EDITOR
-			/// <summary>
-			/// Retrieves the property name of the key frame component.
-			/// </summary>
-			/// <returns>A string containing the property name.</returns>
-			std::string GetPropertyName() const override
-			{
-				return "tag";
-			}
-
-			/// <summary>
-			/// Creates an instance based on source data.
-			/// </summary>
-			/// <param name="a_SrcData">The source data.</param>
-			void Deserialize(const resources::SrcData& a_SrcData) override;
 		private:
 			std::string m_sTag;
 
@@ -89,6 +43,22 @@ namespace gallus
 			BEGIN_EXPOSE_GIZMOS(AnimationKeyFrameTagComponent)
 			END_EXPOSE_GIZMOS(AnimationKeyFrameTagComponent)
 			END_EXPOSE_TO_EDITOR(AnimationKeyFrameTagComponent)
+		};
+
+		class AnimationKeyFrameTagSystem : public AnimationKeyFrameBaseSystem
+		{
+		public:
+			std::string GetName() const override;
+
+			const std::string GetPropertyName() const override
+			{
+				return ANIMATION_KEY_FRAME_TAG_COMPONENT_PROPERTY_NAME;
+			}
+
+			AnimationKeyFrameComponentBase* CreateComponent(AnimationKeyFrame& a_KeyFrame) override
+			{
+				return new AnimationKeyFrameTagComponent(a_KeyFrame);
+			}
 		};
 	}
 }

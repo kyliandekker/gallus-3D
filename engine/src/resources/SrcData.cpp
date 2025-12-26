@@ -353,6 +353,17 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
+		bool SrcData::GetAllMemberNames(std::vector<std::string>& a_aMembers) const
+		{
+			a_aMembers.reserve(m_Document.MemberCount());
+			for (auto it = m_Document.MemberBegin(); it != m_Document.MemberEnd(); ++it)
+			{
+				a_aMembers.push_back(it->name.GetString());
+			}
+			return true;
+		}
+
+		//---------------------------------------------------------------------
 		void SrcData::SetObject()
 		{
 			m_Document.SetObject();

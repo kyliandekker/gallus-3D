@@ -2,6 +2,7 @@
 
 // external
 #include <string>
+#include <vector>
 #include <rapidjson/document.h>
 #include <DirectXMath.h>
 
@@ -44,6 +45,7 @@ namespace gallus
 			bool GetSrcArray(const std::string& a_sKey, SrcData& a_SrcData) const;
 			bool GetArraySize(size_t& a_iSize) const;
 			bool GetSrcArrayElement(size_t a_iIndex, SrcData& a_SrcData) const;
+			bool GetAllMemberNames(std::vector<std::string>& a_aMembers) const;
 
 			// setters
 			void SetObject();
@@ -81,9 +83,15 @@ namespace gallus
 				return m_Document;
 			}
 
+			const std::string& GetName() const
+			{
+				return m_sName;
+			}
+
 			void GetData(core::Data& a_Data) const;
 		private:
 			bool m_bIsValid = false;
+			std::string m_sName;
 			rapidjson::Document m_Document;
 		};
 	}

@@ -21,6 +21,7 @@
 // gameplay
 #include "gameplay/Game.h"
 #include "gameplay/ECSBaseSystem.h"
+#include "gameplay/systems/AnimationSystem.h"
 
 // editor
 #include "editor/core/EditorEngine.h"
@@ -89,12 +90,12 @@ namespace gallus
 					ImGui::FoldOutButton(
 						std::string((m_aExpanded[id] ? font::ICON_FOLDED_OUT : font::ICON_FOLDED_IN) + std::string(component->GetName()) + id).c_str(), &m_aExpanded[id], ImVec2(width, size.y));
 					ImGui::SameLine();
-					//if (ImGui::IconButton(ImGui::IMGUI_FORMAT_ID(font::ICON_DELETE, BUTTON_ID, id + "_DELETE_INSPECTOR").c_str(), size, m_Window.GetIconFont()))
-					//{
-					//	m_KeyFrame.RemoveComponent(component);
+					if (ImGui::IconButton(ImGui::IMGUI_FORMAT_ID(font::ICON_DELETE, BUTTON_ID, id + "_DELETE_INSPECTOR").c_str(), "", size))
+					{
+						m_KeyFrame.RemoveComponent(component);
 
-					//	m_KeyFrame.GetAnimation()->SetIsDirty(true);
-					//}
+						m_KeyFrame.GetAnimation()->SetIsDirty(true);
+					}
 
 					ImGui::PopStyleVar();
 					ImGui::PopStyleVar();
@@ -107,6 +108,44 @@ namespace gallus
 						}
 					}
 				}
+
+				ImGui::SetCursorPosX(0 + m_Window.GetFramePadding().x);
+				ImGui::SetCursorPosY(ImGui::GetCursorPosY() + m_Window.GetFramePadding().y);
+
+				float width = ImGui::GetContentRegionAvail().x;
+				if (ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_FOLDER + std::string(" Add Component"), BUTTON_ID, "ADD_KEY_FRAME_COMPONENT_INSPECTOR").c_str(), ImVec2(width, 0)))
+				{
+					ImVec2 buttonPos = ImGui::GetItemRectMin();
+
+					// Set the popup window position just below the button
+					ImGui::SetNextWindowPos(ImVec2(buttonPos.x, buttonPos.y + ImGui::GetItemRectSize().y));
+
+					ImGui::OpenPopup(ImGui::IMGUI_FORMAT_ID("", POPUP_WINDOW_ID, "ADD_KEY_FRAME_COMPONENT_MENU_INSPECTOR").c_str());
+				}
+
+				ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, m_Window.GetFramePadding());
+				ImGui::SetNextWindowSize(ImVec2(width, 0));
+				if (ImGui::BeginPopup(ImGui::IMGUI_FORMAT_ID("", POPUP_WINDOW_ID, "ADD_KEY_FRAME_COMPONENT_MENU_INSPECTOR").c_str()))
+				{
+					for (auto* sys : core::EDITOR_ENGINE->GetECS().GetSystem<gameplay::AnimationSystem>().GetSystems())
+					{
+						bool found = false;
+						for (animation::AnimationKeyFrameComponentBase* component : m_KeyFrame.GetComponents())
+						{
+							if (component->GetPropertyName() == sys->GetPropertyName())
+							{
+								found = true;
+							}
+						}
+						if (!found && ImGui::MenuItem(ImGui::IMGUI_FORMAT_ID(sys->GetName(), MENU_ITEM_ID, "ADD_KEY_FRAME_COMPONENT_MENU_INSPECTOR" + sys->GetPropertyName()).c_str()))
+						{
+							m_KeyFrame.AddComponent(sys->CreateComponent(m_KeyFrame));
+						}
+					}
+
+					ImGui::EndPopup();
+				}
+				ImGui::PopStyleVar();
 
 				ImGui::PopStyleVar();
 			}

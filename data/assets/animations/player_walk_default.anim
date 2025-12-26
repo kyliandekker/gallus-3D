@@ -6,7 +6,7 @@
             "components": {
                 "sprite": {
                     "spriteIndex": 1,
-                    "texture": "tex_walk.png"
+                    "sprite": "tex_walk.png"
                 }
             }
         }

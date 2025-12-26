@@ -6,7 +6,7 @@
             "components": {
                 "sprite": {
                     "spriteIndex": 18,
-                    "texture": "tex_walk.png"
+                    "sprite": "tex_walk.png"
                 }
             }
         },
@@ -14,7 +14,7 @@
             "components": {
                 "sprite": {
                     "spriteIndex": 19,
-                    "texture": "tex_walk.png"
+                    "sprite": "tex_walk.png"
                 }
             }
         },
@@ -22,7 +22,7 @@
             "components": {
                 "sprite": {
                     "spriteIndex": 20,
-                    "texture": "tex_walk.png"
+                    "sprite": "tex_walk.png"
                 }
             }
         },

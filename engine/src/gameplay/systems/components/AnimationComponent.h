@@ -30,8 +30,9 @@ namespace gallus
 			/// <param name="a_UpdateTime">Which order this update is called in.</param>
 			void UpdateRealtime(float a_fDeltaTime, UpdateTime a_UpdateTime) override;
 
-			void LoadAnimation(const std::string& a_sAnimName);
-
+			/// <summary>
+			/// Resets the animation.
+			/// </summary>
 			void LoadAnimation();
 
 			/// <summary>

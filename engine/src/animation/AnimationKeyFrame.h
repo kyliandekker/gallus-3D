@@ -2,9 +2,6 @@
 
 // external
 #include <vector>
-#ifdef _EDITOR
-#include <rapidjson/document.h>
-#endif// _EDITOR
 
 // animation
 #include "animation/AnimationKeyFrameComponentBase.h"
@@ -92,17 +89,9 @@ namespace gallus
 			/// Adds a component (if it does not already exist) and returns it.
 			/// </summary>
 			/// <returns>The component that was added.</returns>
-			template <typename T>
-			T* AddComponent()
+			void AddComponent(AnimationKeyFrameComponentBase* a_pComponent)
 			{
-				if (HasComponent<T>())
-				{
-					return GetComponent<T>();
-				}
-
-				T* comp = new T(*this);
-				m_aAnimationKeyFrameComponents.push_back(comp);
-				return comp;
+				m_aAnimationKeyFrameComponents.push_back(a_pComponent);
 			};
 
 			/// <summary>
@@ -138,13 +127,6 @@ namespace gallus
 			}
 
 			/// <summary>
-			/// Serialized the key frame to a json document.
-			/// </summary>
-			/// <param name="a_Document">The json document that the data will be put into.</param>
-			/// <param name="a_Allocator">The allocator used by the json document.</param>
-			void Serialize(rapidjson::Value& a_Value, rapidjson::Document::AllocatorType& a_Allocator) const;
-
-			/// <summary>
 			/// Removes a component from the key frame.
 			/// </summary>
 			/// <param name="a_pAnimationKeyFrameComponent">The component to remove.</param>
@@ -161,11 +143,6 @@ namespace gallus
 				}
 			}
 #endif // _EDITOR
-			/// <summary>
-			/// Creates an instance based on source data.
-			/// </summary>
-			/// <param name="a_SrcData">The source data.</param>
-			void Deserialize(const resources::SrcData& a_SrcData);
 		private:
 			int m_iFrame = 0;
 
