@@ -80,30 +80,30 @@ namespace gallus
 
 		void g_SetEntityActive(const gameplay::EntityID& a_EntityID, bool a_bActive)
 		{
-			gameplay::Entity* entity = core::EDITOR_ENGINE->GetECS().GetEntity(a_EntityID);
-			if (!entity)
+			auto ent = core::EDITOR_ENGINE->GetECS().GetEntity(a_EntityID).lock();
+			if (!ent)
 			{
 				return;
 			}
 
-			if (entity->IsActive() == a_bActive)
+			if (ent->IsActive() == a_bActive)
 			{
 				return;
 			}
 
-			entity->SetIsActive(a_bActive);
+			ent->SetIsActive(a_bActive);
 			core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
 		}
 
 		void g_RenameEntity(const gameplay::EntityID& a_EntityID, const std::string& a_sName)
 		{
-			gameplay::Entity* entity = core::EDITOR_ENGINE->GetECS().GetEntity(a_EntityID);
-			if (!entity)
+			auto ent = core::EDITOR_ENGINE->GetECS().GetEntity(a_EntityID).lock();
+			if (!ent)
 			{
 				return;
 			}
 
-			entity->SetName(a_sName);
+			ent->SetName(a_sName);
 			core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
 		}
 

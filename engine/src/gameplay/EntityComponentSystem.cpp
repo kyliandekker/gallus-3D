@@ -40,13 +40,16 @@ namespace gallus
 		{
 			std::lock_guard<std::recursive_mutex> lock(m_EntityMutex);
 
-			for (const Entity& entity : m_aEntities)
+			for (const std::weak_ptr<Entity> entity : m_aEntities)
 			{
-				for (AbstractECSSystem* sys : m_aSystems)
+				if (auto ent = entity.lock())
 				{
-					if (entity.IsDestroyed())
+					for (AbstractECSSystem* sys : m_aSystems)
 					{
-						sys->DeleteComponent(entity.GetEntityID());
+						if (ent->IsDestroyed())
+						{
+							sys->DeleteComponent(ent->GetEntityID());
+						}
 					}
 				}
 			}
@@ -54,9 +57,9 @@ namespace gallus
 			size_t oldSize = m_aEntities.size();
 			m_aEntities.erase(
 				std::remove_if(m_aEntities.begin(), m_aEntities.end(),
-				[](const Entity& e)
+				[](std::shared_ptr<Entity> e)
 				{
-					return e.IsDestroyed();
+					return e->IsDestroyed();
 				}),
 				m_aEntities.end()
 			);
@@ -99,7 +102,7 @@ namespace gallus
 			std::lock_guard<std::recursive_mutex> lock(m_EntityMutex);
 
 			const EntityID id(++m_iNextID);
-			m_aEntities.emplace_back(id, a_sName);
+			m_aEntities.push_back(std::make_shared<Entity>(id, a_sName));
 			
 			m_eOnEntitiesUpdated();
 			m_eOnEntityComponentsUpdated();
@@ -120,65 +123,30 @@ namespace gallus
 		{
 			std::lock_guard<std::recursive_mutex> lock(m_EntityMutex);
 
-			auto it = std::find_if(m_aEntities.begin(), m_aEntities.end(), [&](Entity& e)
-				{
-					return e.GetEntityID() == a_ID;
-				});
-			if (it != m_aEntities.end())
+			for (const std::shared_ptr<Entity>& ent : m_aEntities)
 			{
-				it->Destroy();
+				if (ent->GetEntityID() == a_ID)
+				{
+					ent->Destroy();
+					return;
+				}
 			}
 		}
 
 		//---------------------------------------------------------------------
-		const Entity* EntityComponentSystem::GetEntity(const EntityID& a_ID) const
+		std::weak_ptr<Entity> EntityComponentSystem::GetEntityByName(const std::string& a_sName) const
 		{
 			std::lock_guard<std::recursive_mutex> lock(m_EntityMutex);
 
-			auto it = std::find_if(m_aEntities.begin(), m_aEntities.end(),
-				[&](const Entity& e)
-				{
-					return e.GetEntityID() == a_ID;
-				});
-
-			if (it != m_aEntities.end())
+			for (const std::shared_ptr<Entity>& ent : m_aEntities)
 			{
-				return &(*it);
+				if (ent->GetName() == a_sName)
+				{
+					return ent;
+				}
 			}
 
-			return nullptr;
-		}
-
-		const Entity* EntityComponentSystem::GetEntityByName(const std::string& a_sName) const
-		{
-			auto it = std::find_if(m_aEntities.begin(), m_aEntities.end(),
-				[&](const Entity& e)
-			{
-				return e.GetName() == a_sName;
-			});
-
-			if (it != m_aEntities.end())
-			{
-				return &(*it);
-			}
-
-			return nullptr;
-		}
-
-		//---------------------------------------------------------------------
-		Entity* EntityComponentSystem::GetEntity(const EntityID& a_ID)
-		{
-			std::lock_guard<std::recursive_mutex> lock(m_EntityMutex);
-
-			auto it = std::find_if(m_aEntities.begin(), m_aEntities.end(), [&](Entity& e)
-				{
-					return e.GetEntityID() == a_ID;
-				});
-
-			if (it != m_aEntities.end())
-				return &(*it);
-
-			return nullptr;
+			return std::weak_ptr<Entity>();
 		}
 
 		//---------------------------------------------------------------------
@@ -186,9 +154,12 @@ namespace gallus
 		{
 			std::lock_guard<std::recursive_mutex> lock(m_EntityMutex);
 
-			for (Entity& entity : m_aEntities)
+			for (std::weak_ptr<Entity> entity : m_aEntities)
 			{
-				entity.Destroy();
+				if (auto ent = entity.lock())
+				{
+					ent->Destroy();
+				}
 			}
 		}
 
@@ -204,15 +175,18 @@ namespace gallus
 			while (found)
 			{
 				found = false;
-				for (Entity& entity : m_aEntities)
+				for (std::weak_ptr<Entity> entity : m_aEntities)
 				{
-					if (entity.GetName() == name)
+					if (auto ent = entity.lock())
 					{
-						i++;
-						if (i != 0)
+						if (ent->GetName() == name)
 						{
-							name = a_sName + " (" + std::to_string(i) + ")";
-							found = true;
+							i++;
+							if (i != 0)
+							{
+								name = a_sName + " (" + std::to_string(i) + ")";
+								found = true;
+							}
 						}
 					}
 				}
@@ -221,10 +195,15 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		std::vector<Entity>& EntityComponentSystem::GetEntities()
+		std::vector<std::weak_ptr<Entity>> EntityComponentSystem::GetEntities()
 		{
+			std::vector<std::weak_ptr<Entity>> entities;
 			std::lock_guard<std::recursive_mutex> lock(m_EntityMutex);
-			return m_aEntities;
+			for (auto sharedPtr : m_aEntities)
+			{
+				entities.push_back(sharedPtr);
+			}
+			return entities;
 		}
 
 		//---------------------------------------------------------------------
@@ -241,14 +220,6 @@ namespace gallus
 				}
 			}
 			return systems;
-		}
-
-		//---------------------------------------------------------------------
-		std::vector<AbstractECSSystem*> EntityComponentSystem::GetSystemsContainingEntity(const Entity& a_Entity)
-		{
-			std::lock_guard<std::recursive_mutex> lock(m_EntityMutex);
-
-			return GetSystemsContainingEntity(a_Entity.GetEntityID());
 		}
 
 		//---------------------------------------------------------------------

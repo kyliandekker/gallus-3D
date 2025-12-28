@@ -30,13 +30,13 @@ namespace gallus
 
 		void Component::UpdateRealtimeInner(float a_fDeltaTime, UpdateTime a_UpdateTime)
 		{
-			const Entity* entity = core::ENGINE->GetECS().GetEntity(m_EntityID);
-			if (entity == nullptr)
+			auto ent = core::ENGINE->GetECS().GetEntity(m_EntityID).lock();
+			if (!ent)
 			{
 				return;
 			}
 
-			if (!entity->IsActive())
+			if (!ent->IsActive())
 			{
 				return;
 			}

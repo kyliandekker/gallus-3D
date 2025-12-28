@@ -31,7 +31,11 @@ namespace gallus
 		{
 			if (m_fHealth <= 0)
 			{
-				core::ENGINE->GetECS().GetEntity(m_EntityID)->Destroy();
+				auto ent = core::ENGINE->GetECS().GetEntity(m_EntityID).lock();
+				if (!ent)
+				{
+					ent->Destroy();
+				}
 			}
 		}
 	}

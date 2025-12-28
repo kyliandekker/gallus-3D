@@ -123,7 +123,12 @@ namespace gallus
             {
                 case AnimationEvent::AnimationEvent_Delete:
                 {
-                    core::ENGINE->GetECS().GetEntity(a_EntityID)->Destroy();
+                    auto ent = core::ENGINE->GetECS().GetEntity(a_EntityID).lock();
+                    if (!ent)
+                    {
+                        return;
+                    }
+                    ent->Destroy();
                 }
                 default:
                 case AnimationEvent::AnimationEvent_None:

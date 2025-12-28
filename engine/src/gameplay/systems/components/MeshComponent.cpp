@@ -65,8 +65,8 @@ namespace gallus
 		//---------------------------------------------------------------------
 		void MeshComponent::Render(std::shared_ptr<graphics::dx12::CommandList> a_pCommandList, const EntityID& a_EntityID, const graphics::dx12::Camera& a_Camera)
 		{
-			auto entity = core::ENGINE->GetECS().GetEntity(m_EntityID);
-			if (!entity || !entity->IsActive())
+			auto ent = core::ENGINE->GetECS().GetEntity(m_EntityID).lock();
+			if (!ent || !ent->IsActive())
 			{
 				return;
 			}
@@ -97,16 +97,6 @@ namespace gallus
 			const DirectX::XMMATRIX& projectionMatrix = a_Camera.GetProjectionMatrix(transform.GetCameraType());
 
 			DirectX::XMMATRIX mvpMatrix = transform.GetWorldMatrixWithPivot() * viewMatrix * projectionMatrix;
-
-			if (!core::ENGINE->GetECS().GetEntity(a_EntityID))
-			{
-				return;
-			}
-
-			if (!core::ENGINE->GetECS().GetEntity(a_EntityID)->IsActive())
-			{
-				return;
-			}
 
 			if (auto material = core::ENGINE->GetResourceAtlas().GetDefaultMaterial().lock())
 			{

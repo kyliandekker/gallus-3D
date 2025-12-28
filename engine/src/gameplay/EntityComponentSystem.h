@@ -6,6 +6,7 @@
 #include <vector>
 #include <string>
 #include <mutex>
+#include <memory>
 
 // core
 #include "core/Event.h"
@@ -69,18 +70,34 @@ namespace gallus
 			/// Gets entity info from a specific entity.
 			/// </summary>
 			/// <param name="a_ID">The entity.</param>
-			const Entity* GetEntity(const EntityID& a_ID) const;
+			std::weak_ptr<Entity> GetEntity(const EntityID& a_ID) const
+			{
+				std::lock_guard<std::recursive_mutex> lock(m_EntityMutex);
+
+				for (const std::shared_ptr<Entity>& ent : m_aEntities)
+				{
+					if (ent->GetEntityID() == a_ID)
+					{
+						return ent;
+					}
+				}
+
+				return std::weak_ptr<Entity>();
+			}
 
 			/// <summary>
 			/// Gets entity info from a specific entity.
 			/// </summary>
-			const Entity* GetEntityByName(const std::string& a_sName) const;
+			std::weak_ptr<Entity> GetEntityByName(const std::string& a_sName) const;
 
 			/// <summary>
 			/// Gets entity info from a specific entity.
 			/// </summary>
 			/// <param name="a_ID">The entity.</param>
-			Entity* GetEntity(const EntityID& a_ID);
+			std::weak_ptr<Entity> GetEntity(const EntityID& a_ID)
+			{
+				return static_cast<const EntityComponentSystem*>(this)->GetEntity(a_ID);
+			}
 
 			/// <summary>
 			/// Clears all entities and deletes all components.
@@ -138,21 +155,14 @@ namespace gallus
 			/// Retrieves all entities in the ECS.
 			/// </summary>
 			/// <returns>A vector containing all entities in the ECS.</returns>
-			std::vector<Entity>& GetEntities();
+			std::vector<std::weak_ptr<Entity>> GetEntities();
 
 			/// <summary>
 			/// Retrieves all systems that have components for the specified entity id.
 			/// </summary>
-			/// <param name="a_ID">The entity that will be checked.</param>
+			/// <param name="a_EntityID">The entity that will be checked.</param>
 			/// <returns>A vector containing all systems that have components for the entity id.</returns>
-			std::vector<AbstractECSSystem*> GetSystemsContainingEntity(const EntityID& a_ID);
-
-			/// <summary>
-			/// Retrieves all systems that have components for the specified entity id.
-			/// </summary>
-			/// <param name="a_Entity">The entity that will be checked.</param>
-			/// <returns>A vector containing all systems that have components for the entity id.</returns>
-			std::vector<AbstractECSSystem*> GetSystemsContainingEntity(const Entity& a_Entity);
+			std::vector<AbstractECSSystem*> GetSystemsContainingEntity(const EntityID& a_EntityID);
 
 			/// <summary>
 			/// Retrieves all systems in the ECS.
@@ -184,7 +194,7 @@ namespace gallus
 			Event<> m_eOnEntityComponentsUpdated;
 
 			std::vector<AbstractECSSystem*> m_aSystems;
-			std::vector<Entity> m_aEntities;
+			std::vector<std::shared_ptr<Entity>> m_aEntities;
 			unsigned int m_iNextID = 0;
 		};
 	}

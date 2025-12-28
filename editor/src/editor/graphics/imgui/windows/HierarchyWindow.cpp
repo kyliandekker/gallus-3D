@@ -103,17 +103,24 @@ namespace gallus
 
 					for (auto& entity : core::EDITOR_ENGINE->GetECS().GetEntities())
 					{
-						m_aEntities.emplace_back(m_Window, entity.GetEntityID());
+						auto ent = entity.lock();
+						if (!ent)
+						{
+							return;
+						}
+
+						m_aEntities.emplace_back(m_Window, ent->GetEntityID());
 					}
 
 					for (EntityEditorSelectable& view : m_aEntities)
 					{
-						gameplay::Entity* entity = core::EDITOR_ENGINE->GetECS().GetEntity(view.GetEntityID());
-						if (!entity)
+						auto ent = core::EDITOR_ENGINE->GetECS().GetEntity(view.GetEntityID()).lock();
+						if (!ent)
 						{
-							continue;
+							return;
 						}
-						if (m_SearchBar.GetString().empty() || string_extensions::StringToLower(entity->GetName()).find(m_SearchBar.GetString()) != std::string::npos)
+
+						if (m_SearchBar.GetString().empty() || string_extensions::StringToLower(ent->GetName()).find(m_SearchBar.GetString()) != std::string::npos)
 						{
 							m_aFilteredEntities.push_back(&view);
 						}

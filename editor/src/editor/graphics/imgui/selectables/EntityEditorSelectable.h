@@ -8,6 +8,7 @@
 // external
 #include <string>
 #include <map>
+#include <memory>
 
 // editor
 #include "editor/graphics/imgui/EditorSelectable.h"
@@ -64,7 +65,7 @@ namespace gallus
 				gameplay::EntityID& m_EntityID;
 				std::string m_sIcon;
 
-				gameplay::Entity* m_pEntity = nullptr;
+				std::weak_ptr<gameplay::Entity> m_pEntity = {};
 
 				std::map<std::string, bool> m_aExpanded; // A list of component booleans.
 			};

@@ -49,7 +49,11 @@ namespace gallus
 						transformComp.GetTransform().SetPosition(pos);
 
 						// Destroy projectile on first impact.
-						core::ENGINE->GetECS().GetEntity(m_EntityID)->Destroy();
+						auto ent = core::ENGINE->GetECS().GetEntity(m_EntityID).lock();
+						if (!ent)
+						{
+							ent->Destroy();
+						}
 					}
 				}
 			}

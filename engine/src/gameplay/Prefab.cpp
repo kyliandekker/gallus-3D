@@ -65,23 +65,28 @@ namespace gallus
 			resources::SrcData srcData = resources::SrcData();
 			srcData.SetObject();
 
-			auto& entities = core::ENGINE->GetECS().GetEntities();
+			auto entities = core::ENGINE->GetECS().GetEntities();
 			if (!entities.empty())
 			{
-				gameplay::Entity& entity = entities[0];
+				std::weak_ptr<gameplay::Entity> entity = entities[0];
+				auto ent = entity.lock();
+				if (!ent)
+				{
+					return core::Data();
+				}
 
-				srcData.SetString(JSON_SCENE_ENTITIES_VAR_NAME, entity.GetName());
-				srcData.SetBool(JSON_SCENE_ENTITIES_VAR_ACTIVE, entity.IsActive());
+				srcData.SetString(JSON_SCENE_ENTITIES_VAR_NAME, ent->GetName());
+				srcData.SetBool(JSON_SCENE_ENTITIES_VAR_ACTIVE, ent->IsActive());
 
 				resources::SrcData componentsSrc = resources::SrcData();
 				componentsSrc.SetObject();
 
-				for (gameplay::AbstractECSSystem* system : core::ENGINE->GetECS().GetSystemsContainingEntity(entity))
+				for (gameplay::AbstractECSSystem* system : core::ENGINE->GetECS().GetSystemsContainingEntity(ent->GetEntityID()))
 				{
 					resources::SrcData componentSrc = resources::SrcData();
 					componentSrc.SetObject();
 
-					const gameplay::Component* component = system->GetBaseComponent(entity.GetEntityID());
+					const gameplay::Component* component = system->GetBaseComponent(ent->GetEntityID());
 					component->Serialize(componentSrc);
 
 					componentsSrc.SetSrcObject(system->GetPropertyName(), componentSrc);
@@ -126,14 +131,20 @@ namespace gallus
 				return id;
 			}
 
-			gameplay::Entity* entity = core::ENGINE->GetECS().GetEntity(id);
+			std::weak_ptr<gameplay::Entity> entity = core::ENGINE->GetECS().GetEntity(id);
+			auto ent = entity.lock();
+			if (!ent)
+			{
+				LOGF(LOGSEVERITY_WARNING, LOG_CATEGORY_GAME, "Could not spawn entity.");
+				return id;
+			}
 
 			bool isActive = true;
 			if (!srcData.GetBool(JSON_SCENE_ENTITIES_VAR_ACTIVE, isActive))
 			{
 				LOGF(LOGSEVERITY_WARNING, LOG_CATEGORY_GAME, "Could not read active state of entity in prefab data. Defaulting to true.");
 			}
-			entity->SetIsActive(isActive);
+			ent->SetIsActive(isActive);
 			
 			resources::SrcData componentsSrc;
 			if (!srcData.GetSrcObject(JSON_SCENE_ENTITIES_VAR_COMPONENTS, componentsSrc))

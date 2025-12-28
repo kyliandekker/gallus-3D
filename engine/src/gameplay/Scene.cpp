@@ -156,14 +156,20 @@ namespace gallus
 					continue;
 				}
 
-				gameplay::Entity* entity = core::ENGINE->GetECS().GetEntity(id);
+				std::weak_ptr<gameplay::Entity> entity = core::ENGINE->GetECS().GetEntity(id);
+				auto ent = entity.lock();
+				if (!ent)
+				{
+					LOGF(LOGSEVERITY_WARNING, LOG_CATEGORY_GAME, "Could not spawn entity.");
+					continue;
+				}
 
 				bool isActive = true;
 				if (!entitySrc.GetBool(JSON_SCENE_ENTITIES_VAR_ACTIVE, isActive))
 				{
 					LOGF(LOGSEVERITY_WARNING, LOG_CATEGORY_GAME, "Could not read active state of entity index %i in scene data. Defaulting to true.", i);
 				}
-				entity->SetIsActive(isActive);
+				ent->SetIsActive(isActive);
 
 				resources::SrcData componentsSrc;
 				if (!entitySrc.GetSrcObject(JSON_SCENE_ENTITIES_VAR_COMPONENTS, componentsSrc))
@@ -257,23 +263,29 @@ namespace gallus
 			resources::SrcData entitiesSrc = resources::SrcData();
 			entitiesSrc.SetArray();
 
-			for (gameplay::Entity& entity : core::ENGINE->GetECS().GetEntities())
+			for (std::weak_ptr<gameplay::Entity> entity : core::ENGINE->GetECS().GetEntities())
 			{
+				auto ent = entity.lock();
+				if (!ent)
+				{
+					continue;
+				}
+
 				resources::SrcData entitySrc = resources::SrcData();
 				entitySrc.SetObject();
 
-				entitySrc.SetString(JSON_SCENE_ENTITIES_VAR_NAME, entity.GetName());
-				entitySrc.SetBool(JSON_SCENE_ENTITIES_VAR_ACTIVE, entity.IsActive());
+				entitySrc.SetString(JSON_SCENE_ENTITIES_VAR_NAME, ent->GetName());
+				entitySrc.SetBool(JSON_SCENE_ENTITIES_VAR_ACTIVE, ent->IsActive());
 
 				resources::SrcData componentsSrc = resources::SrcData();
 				componentsSrc.SetObject();
 
-				for (gameplay::AbstractECSSystem* system : core::ENGINE->GetECS().GetSystemsContainingEntity(entity))
+				for (gameplay::AbstractECSSystem* system : core::ENGINE->GetECS().GetSystemsContainingEntity(ent->GetEntityID()))
 				{
 					resources::SrcData componentSrc = resources::SrcData();
 					componentSrc.SetObject();
 					
-					const gameplay::Component* component = system->GetBaseComponent(entity.GetEntityID());
+					const gameplay::Component* component = system->GetBaseComponent(ent->GetEntityID());
 					component->Serialize(componentSrc);
 
 					componentsSrc.SetSrcObject(system->GetPropertyName(), componentSrc);

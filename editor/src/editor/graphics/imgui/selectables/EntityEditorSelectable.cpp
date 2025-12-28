@@ -36,12 +36,13 @@ namespace gallus
 				m_bShowDelete = true;
 
 				m_pEntity = core::EDITOR_ENGINE->GetECS().GetEntity(m_EntityID);
-				if (!m_pEntity)
+				auto ent = m_pEntity.lock();
+				if (!ent)
 				{
-					return;
+					ent->Destroy();
 				}
 
-				gameplay::EntityID& entityId = m_pEntity->GetEntityID();
+				gameplay::EntityID& entityId = ent->GetEntityID();
 
 				for (auto* sys : core::EDITOR_ENGINE->GetECS().GetSystems())
 				{
@@ -59,13 +60,13 @@ namespace gallus
 
 			void EntityEditorSelectable::RenderEntity(bool& a_bClicked, bool& a_bDoubleClicked, bool a_bSelected)
 			{
-				gameplay::Entity* entity = core::EDITOR_ENGINE->GetECS().GetEntity(m_EntityID);
-				if (!entity)
+				auto ent = m_pEntity.lock();
+				if (!ent)
 				{
-					return;
+					ent->Destroy();
 				}
 
-				bool wasInactive = !entity->IsActive();
+				bool wasInactive = !ent->IsActive();
 				if (wasInactive)
 				{
 					ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
@@ -103,8 +104,8 @@ namespace gallus
 				float checkboxHeight = ImGui::GetFrameHeight();
 				ImVec2 centerPos = ImVec2(m_Window.GetWindowPadding().x, buttonCursorPos.y + (childSize.y - checkboxHeight) * 0.5f);
 				ImGui::SetCursorPos(centerPos);
-				bool temp = entity->IsActive();
-				if (ImGui::Checkbox(ImGui::IMGUI_FORMAT_ID("", CHECKBOX_ID, string_extensions::StringToUpper(entity->GetName()) + "_HIERARCHY").c_str(), &temp))
+				bool temp = ent->IsActive();
+				if (ImGui::Checkbox(ImGui::IMGUI_FORMAT_ID("", CHECKBOX_ID, string_extensions::StringToUpper(ent->GetName()) + "_HIERARCHY").c_str(), &temp))
 				{
 					editor::g_SetEntityActive(m_EntityID, temp);
 				}
@@ -137,7 +138,7 @@ namespace gallus
 				ImGui::SetCursorPos(centerPos);
 				ImGui::Text(m_sIcon.c_str());
 
-				ImVec2 textSize = ImGui::CalcTextSize(entity->GetName().c_str());
+				ImVec2 textSize = ImGui::CalcTextSize(ent->GetName().c_str());
 
 				// Calculate position to center the icon
 				centerPos = ImVec2(
@@ -145,10 +146,10 @@ namespace gallus
 					buttonCursorPos.y + (childSize.y - textSize.y) * 0.5f
 				);
 				ImGui::SetCursorPos(centerPos);
-				ImGui::Text(entity->GetName().c_str());
+				ImGui::Text(ent->GetName().c_str());
 
 				ImGui::SetCursorScreenPos(ImVec2(screenCursorPos.x, screenCursorPos.y));
-				ImGui::InvisibleButton(ImGui::IMGUI_FORMAT_ID("", BUTTON_ID, string_extensions::StringToUpper(entity->GetName()) + "_HIERARCHY").c_str(), childSize);
+				ImGui::InvisibleButton(ImGui::IMGUI_FORMAT_ID("", BUTTON_ID, string_extensions::StringToUpper(ent->GetName()) + "_HIERARCHY").c_str(), childSize);
 
 				if (wasInactive)
 				{
@@ -193,7 +194,8 @@ namespace gallus
 			//---------------------------------------------------------------------
 			std::string EntityEditorSelectable::GetName() const
 			{
-				return m_pEntity ? m_pEntity->GetName() : "";
+				auto ent = m_pEntity.lock();
+				return ent ? ent->GetName() : "";
 			}
 
 			//---------------------------------------------------------------------
