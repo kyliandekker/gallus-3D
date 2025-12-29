@@ -53,6 +53,45 @@ namespace gallus
 			}
 
 			/// <summary>
+			/// Sets the parent of the entity.
+			/// </summary>
+			/// <param name="a_EntityID">The parent of the entity.</param>
+			void SetParent(const EntityID& a_EntityID)
+			{
+				if (m_EntityID == m_ParentID)
+				{
+					return;
+				}
+				m_ParentID = a_EntityID;
+			}
+
+			/// <summary>
+			/// Clears the parent of the entity.
+			/// </summary>
+			void Clear()
+			{
+				m_ParentID.SetInvalid();
+			}
+
+			/// <summary>
+			/// Gets a reference to the entity�s unique identifier.
+			/// </summary>
+			/// <returns>Reference to the entity ID.</returns>
+			EntityID& GetParent()
+			{
+				return m_ParentID;
+			}
+
+			/// <summary>
+			/// Gets a constant reference to the entity�s unique identifier.
+			/// </summary>
+			/// <returns>Constant reference to the entity ID.</returns>
+			const EntityID& GetParent() const
+			{
+				return m_ParentID;
+			}
+
+			/// <summary>
 			/// Sets the name of the entity.
 			/// </summary>
 			/// <param name="a_sName">The new name of the entity.</param>
@@ -80,12 +119,14 @@ namespace gallus
 			}
 
 			/// <summary>
+			/// Destroys the entity and all its children.
+			/// </summary>
+			void Destroy();
+
+			/// <summary>
 			/// Marks the entity as destroyed.
 			/// </summary>
-			void Destroy()
-			{
-				m_bIsDestroyed = true;
-			}
+			void SetDestroy();
 
 			/// <summary>
 			/// Checks if the entity is currently active.
@@ -107,6 +148,7 @@ namespace gallus
 			}
 		private:
 			EntityID m_EntityID;
+			EntityID m_ParentID;
 			std::string m_sName;
 			bool m_bIsDestroyed = false;
 			bool m_bIsActive = true;

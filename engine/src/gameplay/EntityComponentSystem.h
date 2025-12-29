@@ -100,6 +100,11 @@ namespace gallus
 			}
 
 			/// <summary>
+			/// Destroys an entity by ID.
+			/// </summary>
+			void Destroy(const EntityID& a_EntityID);
+
+			/// <summary>
 			/// Clears all entities and deletes all components.
 			/// </summary>
 			void Clear();

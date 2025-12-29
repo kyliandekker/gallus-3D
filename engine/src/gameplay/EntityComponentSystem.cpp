@@ -150,6 +150,22 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
+		void EntityComponentSystem::Destroy(const EntityID& a_EntityID)
+		{
+			std::lock_guard<std::recursive_mutex> lock(m_EntityMutex);
+
+			for (const std::shared_ptr<Entity>& ent : m_aEntities)
+			{
+				if (ent->GetParent() == a_EntityID)
+				{
+					ent->Destroy();
+				}
+			}
+			auto ent = GetEntity(a_EntityID).lock();
+			ent->SetDestroy();
+		}
+
+		//---------------------------------------------------------------------
 		void EntityComponentSystem::Clear()
 		{
 			std::lock_guard<std::recursive_mutex> lock(m_EntityMutex);
