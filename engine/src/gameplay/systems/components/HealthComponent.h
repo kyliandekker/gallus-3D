@@ -39,16 +39,16 @@ namespace gallus
 			float m_fHealth = 100;
 			float m_fMaxHealth = 100;
 
-				BEGIN_EXPOSABLE_PARENT(HealthComponent, Component)
-					EXPOSE_FIELD(m_fHealth, "Health", "The current health of the entity. Represents how much damage it can take before being destroyed or dying.",
-						.type = EditorFieldWidgetType::EditorFieldWidgetType_Float,
+				BEGIN_SERIALIZE_PARENT(HealthComponent, Component)
+					SERIALIZE_FIELD(m_fHealth, "Health", "The current health of the entity. Represents how much damage it can take before being destroyed or dying.",
+						.type = FieldSerializationType::FieldSerializationType_Float,
 						.min = "0",
 						.max = "1000")
-					EXPOSE_FIELD(m_fMaxHealth, "Max Health", "The maximum health the entity can have.",
-						.type = EditorFieldWidgetType::EditorFieldWidgetType_Float,
+					SERIALIZE_FIELD(m_fMaxHealth, "Max Health", "The maximum health the entity can have.",
+						.type = FieldSerializationType::FieldSerializationType_Float,
 						.min = "0",
 						.max = "1000")
-				END_EXPOSABLE(HealthComponent)
+				END_SERIALIZE(HealthComponent)
 		};
 	}
 }

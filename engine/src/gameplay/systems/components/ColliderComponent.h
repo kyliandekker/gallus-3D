@@ -30,12 +30,12 @@ namespace gallus
 
 			std::set<gameplay::EntityID> m_aEntitiesToIgnore;
 
-				BEGIN_EXPOSABLE_PARENT(ColliderComponent, Component)
-					EXPOSE_FIELD(m_vOffset, "Offset", "The local offset of the collider relative to the object's pivot or position. Adjusts where the collider is positioned without moving the object itself.",
-						.type = EditorFieldWidgetType::EditorFieldWidgetType_Vector2)
-					EXPOSE_FIELD(m_vSize, "Size", "The size of the collider in local space. Determines the width and height of the collision area.",
-						.type = EditorFieldWidgetType::EditorFieldWidgetType_Vector2)
-				END_EXPOSABLE(ColliderComponent)
+				BEGIN_SERIALIZE_PARENT(ColliderComponent, Component)
+					SERIALIZE_FIELD(m_vOffset, "Offset", "The local offset of the collider relative to the object's pivot or position. Adjusts where the collider is positioned without moving the object itself.",
+						.type = FieldSerializationType::FieldSerializationType_Vector2)
+					SERIALIZE_FIELD(m_vSize, "Size", "The size of the collider in local space. Determines the width and height of the collision area.",
+						.type = FieldSerializationType::FieldSerializationType_Vector2)
+				END_SERIALIZE(ColliderComponent)
 		};
 	}
 }

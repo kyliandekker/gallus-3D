@@ -76,8 +76,8 @@ namespace gallus
 			protected:
 				Microsoft::WRL::ComPtr<ID3DBlob> m_pShaderBlob = nullptr;
 
-				BEGIN_EXPOSABLE_PARENT(Shader, resources::EngineResource)
-				END_EXPOSABLE(Shader)
+				BEGIN_SERIALIZE_PARENT(Shader, resources::EngineResource)
+				END_SERIALIZE(Shader)
 			};
 
 			class PixelShader : public Shader
@@ -107,8 +107,8 @@ namespace gallus
 				bool LoadByPath(const fs::path& a_PixelShaderPath) override;
 #endif // _LOAD_BY_PATH
 			protected:
-				BEGIN_EXPOSABLE_PARENT(PixelShader, Shader)
-				END_EXPOSABLE(PixelShader)
+				BEGIN_SERIALIZE_PARENT(PixelShader, Shader)
+				END_SERIALIZE(PixelShader)
 			};
 
 			class VertexShader : public Shader
@@ -138,8 +138,8 @@ namespace gallus
 				bool LoadByPath(const fs::path& a_VertexShaderPath) override;
 #endif // _LOAD_BY_PATH
 			protected:
-				BEGIN_EXPOSABLE_PARENT(VertexShader, Shader)
-				END_EXPOSABLE(VertexShader)
+				BEGIN_SERIALIZE_PARENT(VertexShader, Shader)
+				END_SERIALIZE(VertexShader)
 			};
 		}
 	}

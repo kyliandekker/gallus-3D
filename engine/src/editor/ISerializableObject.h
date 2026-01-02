@@ -15,28 +15,28 @@ namespace gallus
 		class SrcData;
 	}
 
-	enum class EditorFieldWidgetType
+	enum class FieldSerializationType
 	{
-		EditorFieldWidgetType_None,
-		EditorFieldWidgetType_Float,
-		EditorFieldWidgetType_Int8,
-		EditorFieldWidgetType_Int16,
-		EditorFieldWidgetType_Int32,
-		EditorFieldWidgetType_Int64,
-		EditorFieldWidgetType_Enum,
-		EditorFieldWidgetType_Bool,
-		EditorFieldWidgetType_LongSwitch,
-		EditorFieldWidgetType_Switch,
-		EditorFieldWidgetType_Vector2,
-		EditorFieldWidgetType_Vector3,
-		EditorFieldWidgetType_Color,
-		EditorFieldWidgetType_Quaternion,
-		EditorFieldWidgetType_EngineResource,
-		EditorFieldWidgetType_Object,
-		EditorFieldWidgetType_ObjectPtr,
-		EditorFieldWidgetType_Array,
-		EditorFieldWidgetType_TexturePreview,
-		EditorFieldWidgetType_Button
+		FieldSerializationType_None,
+		FieldSerializationType_Float,
+		FieldSerializationType_Int8,
+		FieldSerializationType_Int16,
+		FieldSerializationType_Int32,
+		FieldSerializationType_Int64,
+		FieldSerializationType_Enum,
+		FieldSerializationType_Bool,
+		FieldSerializationType_LongSwitch,
+		FieldSerializationType_Switch,
+		FieldSerializationType_Vector2,
+		FieldSerializationType_Vector3,
+		FieldSerializationType_Color,
+		FieldSerializationType_Quaternion,
+		FieldSerializationType_EngineResource,
+		FieldSerializationType_Object,
+		FieldSerializationType_ObjectPtr,
+		FieldSerializationType_Array,
+		FieldSerializationType_TexturePreview,
+		FieldSerializationType_Button
 	};
 
 	enum class EditorGizmoType
@@ -45,11 +45,11 @@ namespace gallus
 		EditorGizmoType_Transform
 	};
 
-	class IExposableToEditor;
+	class ISerializableObject;
 
-	struct FieldOptions
+	struct FieldSerializationOptions
 	{
-		EditorFieldWidgetType type = EditorFieldWidgetType::EditorFieldWidgetType_None;
+		FieldSerializationType type = FieldSerializationType::FieldSerializationType_None;
 		gallus::resources::AssetType assetType = resources::AssetType::None;
 		std::string min = "";
 		std::string max = "";
@@ -65,7 +65,7 @@ namespace gallus
 		size_t indent = 0;
 
 		std::function<size_t(void*)> getSize = nullptr;
-		std::function<IExposableToEditor* (void*, size_t)> getElement = nullptr;
+		std::function<ISerializableObject* (void*, size_t)> getElement = nullptr;
 		std::function<size_t(void*)> addElement = nullptr;
 		std::function<void(void*, size_t)> removeElement = nullptr;
 		std::function<void(void*, size_t)> reserve = nullptr;
@@ -77,13 +77,13 @@ namespace gallus
 		EditorGizmoType type = EditorGizmoType::EditorGizmoType_None;
 	};
 
-	struct EditorFieldInfo
+	struct FieldSerializationInfo
 	{
 		const char* m_sName;
 		size_t m_iOffset;
 		const char* m_sUIName;
 		std::string m_sDescription;
-		FieldOptions m_Options;
+		FieldSerializationOptions m_Options;
 	};
 
 	struct EditorGizmoInfo
@@ -93,67 +93,67 @@ namespace gallus
 		GizmoOptions m_Options;
 	};
 
-	class IExposableToEditor
+	class ISerializableObject
 	{
 	public:
-		virtual const std::vector<EditorFieldInfo>& GetEditorFields() const = 0;
+		virtual const std::vector<FieldSerializationInfo>& GetEditorFields() const = 0;
 		virtual const std::vector<EditorGizmoInfo>& GetEditorGizmos() const = 0;
 		virtual const char* GetTypeName() const = 0;
-		virtual ~IExposableToEditor() = default;
+		virtual ~ISerializableObject() = default;
 	};
 
 	template<typename T>
-	inline const std::vector<EditorFieldInfo>* GetEditorFieldsFor()
+	inline const std::vector<FieldSerializationInfo>* GetEditorFieldsFor()
 	{
-		static_assert(std::is_base_of<IExposableToEditor, T>::value);
+		static_assert(std::is_base_of<ISerializableObject, T>::value);
 		return &T::StaticEditorFields();
 	}
 
-#define BEGIN_EXPOSABLE(CLASSNAME) \
+#define BEGIN_SERIALIZE(CLASSNAME) \
 		public: \
-			using _ExposableClass = CLASSNAME; \
+			using _SerializedClass = CLASSNAME; \
 			using _FieldClass = CLASSNAME; \
 			using _GizmoClass = CLASSNAME; \
-			static std::pair<std::vector<EditorFieldInfo>, std::vector<EditorGizmoInfo>> _InitializeExposables() { \
-				std::vector<EditorFieldInfo> f; \
+			static std::pair<std::vector<FieldSerializationInfo>, std::vector<EditorGizmoInfo>> _InitializeSerializedFields() { \
+				std::vector<FieldSerializationInfo> f; \
 				std::vector<EditorGizmoInfo> g;
 
-#define BEGIN_EXPOSABLE_PARENT(CLASSNAME, PARENT) \
+#define BEGIN_SERIALIZE_PARENT(CLASSNAME, PARENT) \
 		public: \
-			using _ExposableClass = CLASSNAME; \
+			using _SerializedClass = CLASSNAME; \
 			using _FieldClass = CLASSNAME; \
 			using _GizmoClass = CLASSNAME; \
-			static std::pair<std::vector<EditorFieldInfo>, std::vector<EditorGizmoInfo>> _InitializeExposables() { \
-				std::vector<EditorFieldInfo> f; \
+			static std::pair<std::vector<FieldSerializationInfo>, std::vector<EditorGizmoInfo>> _InitializeSerializedFields() { \
+				std::vector<FieldSerializationInfo> f; \
 				std::vector<EditorGizmoInfo> g; \
 				const auto& parentFields = PARENT::StaticEditorFields(); \
 				f.insert(f.end(), parentFields.begin(), parentFields.end());
 
-#define EXPOSE_FIELD(VAR, UINAME, DESCRIPTION, ...) \
-				f.push_back({ #VAR, offsetof(_FieldClass, VAR), UINAME, DESCRIPTION, FieldOptions{ __VA_ARGS__ } });
+#define SERIALIZE_FIELD(VAR, UINAME, DESCRIPTION, ...) \
+				f.push_back({ #VAR, offsetof(_FieldClass, VAR), UINAME, DESCRIPTION, FieldSerializationOptions{ __VA_ARGS__ } });
 
-#define EXPOSE_FIELD_SIMPLE(VAR, UINAME, DESCRIPTION, FIELD_TYPE) \
-				f.push_back({ #VAR, offsetof(_FieldClass, VAR), UINAME, DESCRIPTION, FieldOptions{ .type = FIELD_TYPE } });
+#define SERIALIZE_FIELD_SIMPLE(VAR, UINAME, DESCRIPTION, FIELD_TYPE) \
+				f.push_back({ #VAR, offsetof(_FieldClass, VAR), UINAME, DESCRIPTION, FieldSerializationOptions{ .type = FIELD_TYPE } });
 
-#define EXPOSE_FIELD_OPTIONS(VAR, UINAME, DESCRIPTION, OPTIONS) \
+#define SERIALIZE_FIELD_OPTIONS(VAR, UINAME, DESCRIPTION, OPTIONS) \
             f.push_back({ #VAR, offsetof(_FieldClass, VAR), UINAME, DESCRIPTION, OPTIONS });
 
 #define EXPOSE_GIZMO(VAR, GIZMO_OPTIONS) \
 				g.push_back({ #VAR, offsetof(_GizmoClass, VAR), GIZMO_OPTIONS });
 
-#define END_EXPOSABLE(CLASSNAME) \
+#define END_SERIALIZE(CLASSNAME) \
 				return { f, g }; \
 			} \
-			static const std::vector<EditorFieldInfo>& StaticEditorFields() { \
-				static auto [fields, gizmos] = _InitializeExposables(); \
+			static const std::vector<FieldSerializationInfo>& StaticEditorFields() { \
+				static auto [fields, gizmos] = _InitializeSerializedFields(); \
 				return fields; \
 			} \
 			static const std::vector<EditorGizmoInfo>& StaticEditorGizmos() { \
-				static auto [fields, gizmos] = _InitializeExposables(); \
+				static auto [fields, gizmos] = _InitializeSerializedFields(); \
 				return gizmos; \
 			} \
-			const std::vector<EditorFieldInfo>& GetEditorFields() const override { return _ExposableClass::StaticEditorFields(); } \
-			const std::vector<EditorGizmoInfo>& GetEditorGizmos() const override { return _ExposableClass::StaticEditorGizmos(); } \
+			const std::vector<FieldSerializationInfo>& GetEditorFields() const override { return _SerializedClass::StaticEditorFields(); } \
+			const std::vector<EditorGizmoInfo>& GetEditorGizmos() const override { return _SerializedClass::StaticEditorGizmos(); } \
 			const char* GetTypeName() const override { return #CLASSNAME; }
 
 	template<typename TEnum>
@@ -186,12 +186,12 @@ namespace gallus
 	}
 
 	template<typename T>
-	FieldOptions MakeArrayFieldOptions()
+	FieldSerializationOptions MakeArrayFieldSerializationOptions()
 	{
-		static_assert(std::is_base_of<IExposableToEditor, T>::value);
+		static_assert(std::is_base_of<ISerializableObject, T>::value);
 
-		FieldOptions opts;
-		opts.type = EditorFieldWidgetType::EditorFieldWidgetType_Array;
+		FieldSerializationOptions opts;
+		opts.type = FieldSerializationType::FieldSerializationType_Array;
 
 		opts.getSize = [](void* arrayPtr) -> size_t
 			{
@@ -202,7 +202,7 @@ namespace gallus
 		opts.getElement = [](void* arrayPtr, size_t index)
 			{
 				auto& vec = *static_cast<std::vector<T>*>(arrayPtr);
-				return static_cast<IExposableToEditor*>(&vec[index]);
+				return static_cast<ISerializableObject*>(&vec[index]);
 			};
 
 		opts.addElement = [](void* arrayPtr)
@@ -233,9 +233,9 @@ namespace gallus
 		return opts;
 	}
 
-	void DeserializeEditorExposable(IExposableToEditor* a_pObject, const resources::SrcData& a_SrcData);
+	void DeserializeFields(ISerializableObject* a_pObject, const resources::SrcData& a_SrcData);
 
 #ifdef _EDITOR
-	void SerializeEditorExposable(const IExposableToEditor* a_pObject, resources::SrcData& a_SrcData);
+	void SerializeFields(const ISerializableObject* a_pObject, resources::SrcData& a_SrcData);
 #endif
 		}

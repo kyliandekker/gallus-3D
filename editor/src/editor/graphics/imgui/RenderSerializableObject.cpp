@@ -1,4 +1,4 @@
-#include "RenderEditorExposable.h"
+#include "RenderSerializableObject.h"
 
 // external
 #include <imgui/imgui.h>
@@ -22,7 +22,7 @@
 
 // editor
 #include "editor/core/EditorEngine.h"
-#include "editor/EditorExpose.h"
+#include "editor/ISerializableObject.h"
 #include "editor/graphics/imgui/EditorWindowsConfig.h"
 
 // gameplay
@@ -34,7 +34,7 @@ namespace gallus
 	{
 		namespace imgui
 		{
-			bool ShowDragFloat(const std::string& a_sId, float* a_pValue, const EditorFieldInfo& a_Field)
+			bool ShowDragFloat(const std::string& a_sId, float* a_pValue, const FieldSerializationInfo& a_Field)
 			{
 				float min = -FLT_MAX;
 				float max = FLT_MAX;
@@ -50,7 +50,7 @@ namespace gallus
 				return ImGui::DragFloat(a_sId.c_str(), a_pValue, a_Field.m_Options.step, min, max);
 			}
 
-			bool ShowDragInt(const std::string& a_sId, int& a_Value, const EditorFieldInfo& a_Field)
+			bool ShowDragInt(const std::string& a_sId, int& a_Value, const FieldSerializationInfo& a_Field)
 			{
 				int min = std::numeric_limits<int>::min();
 				int max = std::numeric_limits<int>::max();
@@ -69,7 +69,7 @@ namespace gallus
 				return ImGui::DragInt(a_sId.c_str(), &a_Value, a_Field.m_Options.step, min, max);
 			}
 
-			bool ShowVector2(const std::string& a_sId, DirectX::XMFLOAT2& a_vVector, const EditorFieldInfo& a_Field)
+			bool ShowVector2(const std::string& a_sId, DirectX::XMFLOAT2& a_vVector, const FieldSerializationInfo& a_Field)
 			{
 				float val[2] = {
 					a_vVector.x,
@@ -96,7 +96,7 @@ namespace gallus
 				return false;
 			}
 
-			bool ShowVector3(const std::string& a_sId, DirectX::XMFLOAT3& a_vVector, const EditorFieldInfo& a_Field)
+			bool ShowVector3(const std::string& a_sId, DirectX::XMFLOAT3& a_vVector, const FieldSerializationInfo& a_Field)
 			{
 				float val[3] = {
 					a_vVector.x,
@@ -125,7 +125,7 @@ namespace gallus
 				return false;
 			}
 
-			bool ShowQuaternion(const std::string& a_sId, DirectX::XMVECTOR& a_vVector, const EditorFieldInfo& a_Field)
+			bool ShowQuaternion(const std::string& a_sId, DirectX::XMVECTOR& a_vVector, const FieldSerializationInfo& a_Field)
 			{
 				DirectX::XMFLOAT3 preRotationDegrees = graphics::dx12::Transform::QuaternionToEuler(a_vVector);
 
@@ -162,7 +162,7 @@ namespace gallus
 				return false;
 			}
 
-			bool ShowObject(IExposableToEditor* obj, bool a_bInternal)
+			bool ShowObject(ISerializableObject* obj, bool a_bInternal)
 			{
 				if (!obj)
 				{
@@ -171,7 +171,7 @@ namespace gallus
 				}
 
 				bool changed = false;
-				for (const EditorFieldInfo& subField : obj->GetEditorFields())
+				for (const FieldSerializationInfo& subField : obj->GetEditorFields())
 				{
 					if (ShowEditorFieldFromObject(obj, subField, a_bInternal))
 					{
@@ -185,7 +185,7 @@ namespace gallus
 				const std::string& a_sId,
 				gallus::resources::EngineResource* a_pLocked,
 				std::weak_ptr<gallus::resources::EngineResource>* a_pWeak,
-				const EditorFieldInfo& a_Field)
+				const FieldSerializationInfo& a_Field)
 			{
 				bool changed = false;
 
@@ -295,7 +295,7 @@ namespace gallus
 				return changed;
 			}
 
-			bool ShowEnumDropdown(const std::string& a_sId, int* a_pValue, const EditorFieldInfo& a_Field)
+			bool ShowEnumDropdown(const std::string& a_sId, int* a_pValue, const FieldSerializationInfo& a_Field)
 			{
 				if (!a_Field.m_Options.enumToStringFunc)
 				{
@@ -376,7 +376,7 @@ namespace gallus
 				return false; // read-only
 			}
 
-			bool ShowEditorFieldFromObject(IExposableToEditor* a_pObject, const EditorFieldInfo& a_Field, bool a_bInternal)
+			bool ShowEditorFieldFromObject(ISerializableObject* a_pObject, const FieldSerializationInfo& a_Field, bool a_bInternal)
 			{
 				if (a_Field.m_Options.internal != a_bInternal)
 				{
@@ -391,7 +391,7 @@ namespace gallus
 				std::string fieldId = ImGui::IMGUI_FORMAT_ID("", INPUT_ID, string_extensions::StringToUpper(a_Field.m_sUIName) + "_INSPECTOR");
 				switch (a_Field.m_Options.type)
 				{
-				case EditorFieldWidgetType::EditorFieldWidgetType_Float:
+				case FieldSerializationType::FieldSerializationType_Float:
 				{
 					float* value = reinterpret_cast<float*>(ptr);
 					func = [value, &a_Field, &fieldId]
@@ -402,7 +402,7 @@ namespace gallus
 						};
 					break;
 				}
-				case EditorFieldWidgetType::EditorFieldWidgetType_Int8:
+				case FieldSerializationType::FieldSerializationType_Int8:
 				{
 					func = [ptr, &a_Field, &fieldId]
 						{
@@ -419,7 +419,7 @@ namespace gallus
 						};
 					break;
 				}
-				case EditorFieldWidgetType::EditorFieldWidgetType_Int16:
+				case FieldSerializationType::FieldSerializationType_Int16:
 				{
 					func = [ptr, &a_Field, &fieldId]
 						{
@@ -436,7 +436,7 @@ namespace gallus
 						};
 					break;
 				}
-				case EditorFieldWidgetType::EditorFieldWidgetType_Int32:
+				case FieldSerializationType::FieldSerializationType_Int32:
 				{
 					func = [ptr, &a_Field, &fieldId]
 						{
@@ -453,7 +453,7 @@ namespace gallus
 						};
 					break;
 				}
-				case EditorFieldWidgetType::EditorFieldWidgetType_Int64:
+				case FieldSerializationType::FieldSerializationType_Int64:
 				{
 					func = [ptr, &a_Field, &fieldId]
 						{
@@ -470,7 +470,7 @@ namespace gallus
 						};
 					break;
 				}
-				case EditorFieldWidgetType::EditorFieldWidgetType_Bool:
+				case FieldSerializationType::FieldSerializationType_Bool:
 				{
 					bool* value = reinterpret_cast<bool*>(ptr);
 					func = [&a_Field, &fieldId, value]
@@ -481,7 +481,7 @@ namespace gallus
 						};
 					break;
 				}
-				case EditorFieldWidgetType::EditorFieldWidgetType_Switch:
+				case FieldSerializationType::FieldSerializationType_Switch:
 				{
 					int32_t* value = reinterpret_cast<int32_t*>(ptr);
 
@@ -495,7 +495,7 @@ namespace gallus
 						};
 					break;
 				}
-				case EditorFieldWidgetType::EditorFieldWidgetType_LongSwitch:
+				case FieldSerializationType::FieldSerializationType_LongSwitch:
 				{
 					uint32_t* pValue = reinterpret_cast<uint32_t*>(ptr);
 
@@ -516,7 +516,7 @@ namespace gallus
 
 					break;
 				}
-				case EditorFieldWidgetType::EditorFieldWidgetType_Vector2:
+				case FieldSerializationType::FieldSerializationType_Vector2:
 				{
 					DirectX::XMFLOAT2* value = reinterpret_cast<DirectX::XMFLOAT2*>(ptr);
 					func = [&a_Field, &fieldId, value]
@@ -527,7 +527,7 @@ namespace gallus
 						};
 					break;
 				}
-				case EditorFieldWidgetType::EditorFieldWidgetType_Vector3:
+				case FieldSerializationType::FieldSerializationType_Vector3:
 				{
 					DirectX::XMFLOAT3* value = reinterpret_cast<DirectX::XMFLOAT3*>(ptr);
 					func = [&a_Field, &fieldId, value]
@@ -538,7 +538,7 @@ namespace gallus
 						};
 					break;
 				}
-				case EditorFieldWidgetType::EditorFieldWidgetType_Color:
+				case FieldSerializationType::FieldSerializationType_Color:
 				{
 					DirectX::XMFLOAT3* value = reinterpret_cast<DirectX::XMFLOAT3*>(ptr);
 					func = [&a_Field, &fieldId, value]
@@ -552,7 +552,7 @@ namespace gallus
 						};
 					break;
 				}
-				case EditorFieldWidgetType::EditorFieldWidgetType_Quaternion:
+				case FieldSerializationType::FieldSerializationType_Quaternion:
 				{
 					DirectX::XMVECTOR* value = reinterpret_cast<DirectX::XMVECTOR*>(ptr);
 
@@ -564,7 +564,7 @@ namespace gallus
 						};
 					break;
 				}
-				case EditorFieldWidgetType::EditorFieldWidgetType_EngineResource:
+				case FieldSerializationType::FieldSerializationType_EngineResource:
 				{
 					std::weak_ptr<gallus::resources::EngineResource>* pWeak =
 						reinterpret_cast<std::weak_ptr<gallus::resources::EngineResource>*>(ptr);
@@ -585,25 +585,25 @@ namespace gallus
 
 					break;
 				}
-				case EditorFieldWidgetType::EditorFieldWidgetType_Object:
+				case FieldSerializationType::FieldSerializationType_Object:
 				{
 					showTable = true;
-					IExposableToEditor* editorObject = dynamic_cast<IExposableToEditor*>(reinterpret_cast<IExposableToEditor*>(ptr));
+					ISerializableObject* editorObject = dynamic_cast<ISerializableObject*>(reinterpret_cast<ISerializableObject*>(ptr));
 
 					return ShowObject(editorObject, a_bInternal);
 					break;
 				}
-				case EditorFieldWidgetType::EditorFieldWidgetType_ObjectPtr:
+				case FieldSerializationType::FieldSerializationType_ObjectPtr:
 				{
 					showTable = true;
 
-					IExposableToEditor** ppEditorObject = reinterpret_cast<IExposableToEditor**>(ptr);
-					IExposableToEditor* pEditorObject = (ppEditorObject ? *ppEditorObject : nullptr);
+					ISerializableObject** ppEditorObject = reinterpret_cast<ISerializableObject**>(ptr);
+					ISerializableObject* pEditorObject = (ppEditorObject ? *ppEditorObject : nullptr);
 
 					return ShowObject(pEditorObject, a_bInternal);
 					break;
 				}
-				case EditorFieldWidgetType::EditorFieldWidgetType_Enum:
+				case FieldSerializationType::FieldSerializationType_Enum:
 				{
 					func = [ptr, &a_Field, &fieldId]
 						{
@@ -619,7 +619,7 @@ namespace gallus
 						};
 					break;
 				}
-				case EditorFieldWidgetType::EditorFieldWidgetType_TexturePreview:
+				case FieldSerializationType::FieldSerializationType_TexturePreview:
 				{
 					func = [ptr, &a_Field, a_pObject]()
 						{
@@ -635,7 +635,7 @@ namespace gallus
 						};
 					break;
 				}
-				case EditorFieldWidgetType::EditorFieldWidgetType_Button:
+				case FieldSerializationType::FieldSerializationType_Button:
 				{
 					func = [ptr, &a_Field, a_pObject]()
 						{
@@ -687,7 +687,7 @@ namespace gallus
 				return false;
 			}
 
-			bool RenderObjectFields(IExposableToEditor* a_pObject, bool a_bInternal)
+			bool RenderObjectFields(ISerializableObject* a_pObject, bool a_bInternal)
 			{
 				const auto& fields = a_pObject->GetEditorFields();
 
@@ -697,7 +697,7 @@ namespace gallus
 				bool changed = false;
 				if (tableActive)
 				{
-					for (const EditorFieldInfo& field : fields)
+					for (const FieldSerializationInfo& field : fields)
 					{
 						if (!a_bInternal && field.m_Options.internal)
 						{
@@ -783,7 +783,7 @@ namespace gallus
 				return false;
 			}
 
-			bool RenderObjectGizmos(const ImVec2& a_vScenePos, const ImVec2& a_vSize, const ImVec2& a_vPanOffset, float a_fZoom, IExposableToEditor* a_pObject)
+			bool RenderObjectGizmos(const ImVec2& a_vScenePos, const ImVec2& a_vSize, const ImVec2& a_vPanOffset, float a_fZoom, ISerializableObject* a_pObject)
 			{
 				if (!a_pObject)
 				{

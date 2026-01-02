@@ -102,8 +102,8 @@ namespace gallus
 		protected:
 			core::Data m_Data;
 			
-				BEGIN_EXPOSABLE_PARENT(Scene, resources::EngineResource)
-				END_EXPOSABLE(Scene)
+				BEGIN_SERIALIZE_PARENT(Scene, resources::EngineResource)
+				END_SERIALIZE(Scene)
 		};
 	}
 }

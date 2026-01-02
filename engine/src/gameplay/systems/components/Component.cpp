@@ -19,13 +19,13 @@ namespace gallus
 #ifdef _EDITOR
 		void Component::Serialize(resources::SrcData& a_SrcData) const
 		{
-			SerializeEditorExposable(this, a_SrcData);
+			SerializeFields(this, a_SrcData);
 		}
 #endif // _EDITOR
 
 		void Component::Deserialize(const resources::SrcData& a_SrcData)
 		{
-			DeserializeEditorExposable(this, a_SrcData);
+			DeserializeFields(this, a_SrcData);
 		}
 
 		void Component::UpdateRealtimeInner(float a_fDeltaTime, UpdateTime a_UpdateTime)

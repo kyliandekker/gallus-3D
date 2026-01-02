@@ -10,7 +10,7 @@
 // graphics
 #include "graphics/dx12/Transform.h"
 
-#include "editor/EditorExpose.h"
+#include "editor/ISerializableObject.h"
 
 namespace gallus
 {
@@ -34,7 +34,7 @@ namespace gallus
 			//---------------------------------------------------------------------
 			// Camera
 			//---------------------------------------------------------------------
-			class Camera : public IExposableToEditor
+			class Camera : public ISerializableObject
 			{
 			public:
 				/// <summary>
@@ -111,19 +111,19 @@ namespace gallus
 				DirectX::XMMATRIX m_ProjectionMatrix3D;
 				DirectX::XMMATRIX m_ProjectionMatrix2D;
 
-				BEGIN_EXPOSABLE(Camera)
-				 	EXPOSE_FIELD(m_Transform.m_vPosition, "Position", "The position of the object in 2D space. Defines where the object is located on the screen.",
-				 		.type = EditorFieldWidgetType::EditorFieldWidgetType_Vector3)
-				 	EXPOSE_FIELD(m_Transform.m_vRotation, "Rotation", "Rotation in degrees. Controls how much the object is rotated clockwise or counterclockwise.",
-				 		.type = EditorFieldWidgetType::EditorFieldWidgetType_Quaternion)
-				 	EXPOSE_FIELD(m_Transform.m_vPivot, "Pivot", "The pivot point for transformations relative to the object's center. Coordinates represent the normalized offset used for scaling and rotation.",
-				 		.type = EditorFieldWidgetType::EditorFieldWidgetType_Vector3,
+				BEGIN_SERIALIZE(Camera)
+				 	SERIALIZE_FIELD(m_Transform.m_vPosition, "Position", "The position of the object in 2D space. Defines where the object is located on the screen.",
+				 		.type = FieldSerializationType::FieldSerializationType_Vector3)
+				 	SERIALIZE_FIELD(m_Transform.m_vRotation, "Rotation", "Rotation in degrees. Controls how much the object is rotated clockwise or counterclockwise.",
+				 		.type = FieldSerializationType::FieldSerializationType_Quaternion)
+				 	SERIALIZE_FIELD(m_Transform.m_vPivot, "Pivot", "The pivot point for transformations relative to the object's center. Coordinates represent the normalized offset used for scaling and rotation.",
+				 		.type = FieldSerializationType::FieldSerializationType_Vector3,
 				 		.min = "-0.5",
 				 		.max = "0.5")
-				 	EXPOSE_FIELD(m_fFoV, "Field of View", "",
-				 		.type = EditorFieldWidgetType::EditorFieldWidgetType_Float,
+				 	SERIALIZE_FIELD(m_fFoV, "Field of View", "",
+				 		.type = FieldSerializationType::FieldSerializationType_Float,
 				 		.onChangeFunc = MakeOnChangeFunc(&Camera::OnFoVChanged))
-				END_EXPOSABLE(Camera)
+				END_SERIALIZE(Camera)
 			};
 		}
 	}

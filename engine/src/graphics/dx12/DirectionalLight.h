@@ -51,17 +51,17 @@ namespace gallus
 			protected:
 				DirectionalLightData m_DirectionalLightData;
 
-				BEGIN_EXPOSABLE_PARENT(DirectionalLight, resources::EngineResource)
-				 	EXPOSE_FIELD(m_DirectionalLightData.DirectionalLightEnabled, "Enabled", ".",
-				 		.type = EditorFieldWidgetType::EditorFieldWidgetType_LongSwitch)
-				 	EXPOSE_FIELD(m_DirectionalLightData.LightDirection, "Light Direction", ".",
-				 		.type = EditorFieldWidgetType::EditorFieldWidgetType_Vector3)
-				 	EXPOSE_FIELD(m_DirectionalLightData.LightColor, "Light Color", "",
-				 		.type = gallus::EditorFieldWidgetType::EditorFieldWidgetType_Color)
-				 	EXPOSE_FIELD(m_DirectionalLightData.AmbientIntensity, "Ambient Intensity", "",
-				 		.type = EditorFieldWidgetType::EditorFieldWidgetType_Float,
+				BEGIN_SERIALIZE_PARENT(DirectionalLight, resources::EngineResource)
+				 	SERIALIZE_FIELD(m_DirectionalLightData.DirectionalLightEnabled, "Enabled", ".",
+				 		.type = FieldSerializationType::FieldSerializationType_LongSwitch)
+				 	SERIALIZE_FIELD(m_DirectionalLightData.LightDirection, "Light Direction", ".",
+				 		.type = FieldSerializationType::FieldSerializationType_Vector3)
+				 	SERIALIZE_FIELD(m_DirectionalLightData.LightColor, "Light Color", "",
+				 		.type = gallus::FieldSerializationType::FieldSerializationType_Color)
+				 	SERIALIZE_FIELD(m_DirectionalLightData.AmbientIntensity, "Ambient Intensity", "",
+				 		.type = FieldSerializationType::FieldSerializationType_Float,
 				 		.step = 0.1f)
-				END_EXPOSABLE(DirectionalLight)
+				END_SERIALIZE(DirectionalLight)
 			};
 		}
 	}

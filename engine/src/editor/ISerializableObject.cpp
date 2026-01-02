@@ -1,4 +1,4 @@
-#include "./EditorExpose.h"
+#include "./ISerializableObject.h"
 
 #include "graphics/dx12/Transform.h"
 
@@ -30,14 +30,14 @@ namespace gallus
 		return propertyName;
 	}
 
-	void DeserializeEditorExposable(IExposableToEditor* a_pObject, const resources::SrcData& a_SrcData)
+	void DeserializeFields(ISerializableObject* a_pObject, const resources::SrcData& a_SrcData)
 	{
-		for (const EditorFieldInfo& field : a_pObject->GetEditorFields())
+		for (const FieldSerializationInfo& field : a_pObject->GetEditorFields())
 		{
-			EditorFieldWidgetType type = field.m_Options.type;
+			FieldSerializationType type = field.m_Options.type;
 
 			// These fields are unserializable. They are invalid or purely visual.
-			if (type == EditorFieldWidgetType::EditorFieldWidgetType_None || type == EditorFieldWidgetType::EditorFieldWidgetType_TexturePreview || type == EditorFieldWidgetType::EditorFieldWidgetType_Button)
+			if (type == FieldSerializationType::FieldSerializationType_None || type == FieldSerializationType::FieldSerializationType_TexturePreview || type == FieldSerializationType::FieldSerializationType_Button)
 			{
 				continue;
 			}
@@ -58,12 +58,12 @@ namespace gallus
 			
 			switch (type)
 			{
-				case EditorFieldWidgetType::EditorFieldWidgetType_Float:
+				case FieldSerializationType::FieldSerializationType_Float:
 				{
 					a_SrcData.GetFloat(propertyName, *(float*)ptr);
 					break;
 				}
-				case EditorFieldWidgetType::EditorFieldWidgetType_Int8:
+				case FieldSerializationType::FieldSerializationType_Int8:
 				{
 					int value = 0;
 					a_SrcData.GetInt(propertyName, value);
@@ -71,7 +71,7 @@ namespace gallus
 					*pValue = value;
 					break;
 				}
-				case EditorFieldWidgetType::EditorFieldWidgetType_Int16:
+				case FieldSerializationType::FieldSerializationType_Int16:
 				{
 					int value = 0;
 					a_SrcData.GetInt(propertyName, value);
@@ -79,7 +79,7 @@ namespace gallus
 					*pValue = value;
 					break;
 				}
-				case EditorFieldWidgetType::EditorFieldWidgetType_Int32:
+				case FieldSerializationType::FieldSerializationType_Int32:
 				{
 					int value = 0;
 					a_SrcData.GetInt(propertyName, value);
@@ -87,7 +87,7 @@ namespace gallus
 					*pValue = value;
 					break;
 				}
-				case EditorFieldWidgetType::EditorFieldWidgetType_Int64:
+				case FieldSerializationType::FieldSerializationType_Int64:
 				{
 					int value = 0;
 					a_SrcData.GetInt(propertyName, value);
@@ -95,7 +95,7 @@ namespace gallus
 					*pValue = value;
 					break;
 				}
-				case EditorFieldWidgetType::EditorFieldWidgetType_Enum:
+				case FieldSerializationType::FieldSerializationType_Enum:
 				{
 					int enumValue = 0;
 					a_SrcData.GetInt(propertyName, enumValue);
@@ -104,13 +104,13 @@ namespace gallus
 					*pEnum = static_cast<int32_t>(enumValue);
 					break;
 				}
-				case EditorFieldWidgetType::EditorFieldWidgetType_Bool:
-				case EditorFieldWidgetType::EditorFieldWidgetType_Switch:
+				case FieldSerializationType::FieldSerializationType_Bool:
+				case FieldSerializationType::FieldSerializationType_Switch:
 				{
 					a_SrcData.GetBool(propertyName, *(bool*)ptr);
 					break;
 				}
-				case EditorFieldWidgetType::EditorFieldWidgetType_LongSwitch:
+				case FieldSerializationType::FieldSerializationType_LongSwitch:
 				{
 					int value = 0;
 					a_SrcData.GetInt(propertyName, value);
@@ -118,22 +118,22 @@ namespace gallus
 					*pValue = value;
 					break;
 				}
-				case EditorFieldWidgetType::EditorFieldWidgetType_Vector2:
+				case FieldSerializationType::FieldSerializationType_Vector2:
 				{
 					a_SrcData.GetVector2(propertyName, *(DirectX::XMFLOAT2*)ptr);
 					break;
 				}
-				case EditorFieldWidgetType::EditorFieldWidgetType_Vector3:
+				case FieldSerializationType::FieldSerializationType_Vector3:
 				{
 					a_SrcData.GetVector3(propertyName, *(DirectX::XMFLOAT3*)ptr);
 					break;
 				}
-				case EditorFieldWidgetType::EditorFieldWidgetType_Color:
+				case FieldSerializationType::FieldSerializationType_Color:
 				{
 					a_SrcData.GetColor(propertyName, *(DirectX::XMFLOAT4*)ptr);
 					break;
 				}
-				case EditorFieldWidgetType::EditorFieldWidgetType_Quaternion:
+				case FieldSerializationType::FieldSerializationType_Quaternion:
 				{
 					DirectX::XMFLOAT3 eulerAngles = VEC_ZERO;
 					a_SrcData.GetVector3(propertyName, eulerAngles);
@@ -141,7 +141,7 @@ namespace gallus
 					memcpy(ptr, &quaternion, sizeof(quaternion));
 					break;
 				}
-				case EditorFieldWidgetType::EditorFieldWidgetType_EngineResource:
+				case FieldSerializationType::FieldSerializationType_EngineResource:
 				{
 					std::string assetName = "";
 					if (!a_SrcData.GetString(propertyName, assetName))
@@ -246,9 +246,9 @@ namespace gallus
 					}
 					break;
 				}
-				case EditorFieldWidgetType::EditorFieldWidgetType_Object:
+				case FieldSerializationType::FieldSerializationType_Object:
 				{
-					IExposableToEditor* editorObject = dynamic_cast<IExposableToEditor*>(reinterpret_cast<IExposableToEditor*>(ptr));
+					ISerializableObject* editorObject = dynamic_cast<ISerializableObject*>(reinterpret_cast<ISerializableObject*>(ptr));
 					
 					resources::SrcData objectSrcData;
 					objectSrcData.SetObject();
@@ -256,13 +256,13 @@ namespace gallus
 					std::string objectPropertyName = TypeNameToPropertyName(editorObject->GetTypeName());
 					a_SrcData.GetSrcObject(objectPropertyName, objectSrcData);
 
-					DeserializeEditorExposable(editorObject, objectSrcData);
+					DeserializeFields(editorObject, objectSrcData);
 					break;
 				}
-				case EditorFieldWidgetType::EditorFieldWidgetType_ObjectPtr:
+				case FieldSerializationType::FieldSerializationType_ObjectPtr:
 				{
-					IExposableToEditor** ppEditorObject = reinterpret_cast<IExposableToEditor**>(ptr);
-					IExposableToEditor* pEditorObject = (ppEditorObject ? *ppEditorObject : nullptr);
+					ISerializableObject** ppEditorObject = reinterpret_cast<ISerializableObject**>(ptr);
+					ISerializableObject* pEditorObject = (ppEditorObject ? *ppEditorObject : nullptr);
 					
 					resources::SrcData objectSrcData;
 					objectSrcData.SetObject();
@@ -270,10 +270,10 @@ namespace gallus
 					std::string objectPropertyName = TypeNameToPropertyName(pEditorObject->GetTypeName());
 					a_SrcData.GetSrcObject(objectPropertyName, objectSrcData);
 
-					DeserializeEditorExposable(pEditorObject, objectSrcData);
+					DeserializeFields(pEditorObject, objectSrcData);
 					break;
 				}
-				case EditorFieldWidgetType::EditorFieldWidgetType_Array:
+				case FieldSerializationType::FieldSerializationType_Array:
 				{
 					void* arrayPtr = ptr;
 
@@ -291,14 +291,14 @@ namespace gallus
 					{
 						size_t index = field.m_Options.addElement(arrayPtr);
 
-						IExposableToEditor* element =
+						ISerializableObject* element =
 							field.m_Options.getElement(arrayPtr, index);
 
 						resources::SrcData elementData;
 						elementData.SetObject();
 						arrayData.GetSrcArrayElement(i, elementData);
 
-						DeserializeEditorExposable(element, elementData);
+						DeserializeFields(element, elementData);
 					}
 
 					break;
@@ -307,11 +307,11 @@ namespace gallus
 		}
 	}
 
-	void SerializeEditorExposable(const IExposableToEditor* a_pObject, resources::SrcData& a_SrcData)
+	void SerializeFields(const ISerializableObject* a_pObject, resources::SrcData& a_SrcData)
 	{
-		for (const EditorFieldInfo& field : a_pObject->GetEditorFields())
+		for (const FieldSerializationInfo& field : a_pObject->GetEditorFields())
 		{
-			EditorFieldWidgetType type = field.m_Options.type;
+			FieldSerializationType type = field.m_Options.type;
 
 			// Internal fields should not be serialized.
 			if (field.m_Options.internal)
@@ -325,7 +325,7 @@ namespace gallus
 			}
 
 			// These fields are unserializable. They are invalid or purely visual.
-			if (type == EditorFieldWidgetType::EditorFieldWidgetType_None || type == EditorFieldWidgetType::EditorFieldWidgetType_TexturePreview || type == EditorFieldWidgetType::EditorFieldWidgetType_Button)
+			if (type == FieldSerializationType::FieldSerializationType_None || type == FieldSerializationType::FieldSerializationType_TexturePreview || type == FieldSerializationType::FieldSerializationType_Button)
 			{
 				continue;
 			}
@@ -336,87 +336,87 @@ namespace gallus
 
 			switch (type)
 			{
-				case EditorFieldWidgetType::EditorFieldWidgetType_Float:
+				case FieldSerializationType::FieldSerializationType_Float:
 				{
 					const float* value = reinterpret_cast<const float*>(ptr);
 					a_SrcData.SetFloat(propertyName, *value);
 					break;
 				}
-				case EditorFieldWidgetType::EditorFieldWidgetType_Int8:
+				case FieldSerializationType::FieldSerializationType_Int8:
 				{
 					const int8_t* value = reinterpret_cast<const int8_t*>(ptr);
 					int64_t temp = static_cast<int64_t>(*value);
 					a_SrcData.SetInt(propertyName, temp);
 					break;
 				}
-				case EditorFieldWidgetType::EditorFieldWidgetType_Int16:
+				case FieldSerializationType::FieldSerializationType_Int16:
 				{
 					const int16_t* value = reinterpret_cast<const int16_t*>(ptr);
 					int64_t temp = static_cast<int64_t>(*value);
 					a_SrcData.SetInt(propertyName, temp);
 					break;
 				}
-				case EditorFieldWidgetType::EditorFieldWidgetType_Int32:
+				case FieldSerializationType::FieldSerializationType_Int32:
 				{
 					const int32_t* value = reinterpret_cast<const int32_t*>(ptr);
 					int64_t temp = static_cast<int64_t>(*value);
 					a_SrcData.SetInt(propertyName, temp);
 					break;
 				}
-				case EditorFieldWidgetType::EditorFieldWidgetType_Int64:
+				case FieldSerializationType::FieldSerializationType_Int64:
 				{
 					const int64_t* value = reinterpret_cast<const int64_t*>(ptr);
 					int64_t temp = *value;
 					a_SrcData.SetInt(propertyName, temp);
 					break;
 				}
-				case EditorFieldWidgetType::EditorFieldWidgetType_Enum:
+				case FieldSerializationType::FieldSerializationType_Enum:
 				{
 					const int32_t* value = reinterpret_cast<const int32_t*>(ptr);
 					int64_t temp = static_cast<int64_t>(*value);
 					a_SrcData.SetInt(propertyName, temp);
 					break;
 				}
-				case EditorFieldWidgetType::EditorFieldWidgetType_Bool:
-				case EditorFieldWidgetType::EditorFieldWidgetType_Switch:
+				case FieldSerializationType::FieldSerializationType_Bool:
+				case FieldSerializationType::FieldSerializationType_Switch:
 				{
 					const bool* value = reinterpret_cast<const bool*>(ptr);
 					a_SrcData.SetBool(propertyName, *value);
 					break;
 				}
-				case EditorFieldWidgetType::EditorFieldWidgetType_LongSwitch:
+				case FieldSerializationType::FieldSerializationType_LongSwitch:
 				{
 					const int32_t* value = reinterpret_cast<const int32_t*>(ptr);
 					int64_t temp = static_cast<int64_t>(*value);
 					a_SrcData.SetInt(propertyName, temp);
 					break;
 				}
-				case EditorFieldWidgetType::EditorFieldWidgetType_Vector2:
+				case FieldSerializationType::FieldSerializationType_Vector2:
 				{
 					const DirectX::XMFLOAT2* value = reinterpret_cast<const DirectX::XMFLOAT2*>(ptr);
 					a_SrcData.SetVector2(propertyName, *value);
 					break;
 				}
-				case EditorFieldWidgetType::EditorFieldWidgetType_Vector3:
+				case FieldSerializationType::FieldSerializationType_Vector3:
 				{
 					const DirectX::XMFLOAT3* value = reinterpret_cast<const DirectX::XMFLOAT3*>(ptr);
 					a_SrcData.SetVector3(propertyName, *value);
 					break;
 				}
-				case EditorFieldWidgetType::EditorFieldWidgetType_Color:
+				case FieldSerializationType::FieldSerializationType_Color:
 				{
 					const DirectX::XMFLOAT4* value = reinterpret_cast<const DirectX::XMFLOAT4*>(ptr);
 					a_SrcData.SetColor(propertyName, *value);
 					break;
 				}
-				case EditorFieldWidgetType::EditorFieldWidgetType_Quaternion:
+				case FieldSerializationType::FieldSerializationType_Quaternion:
 				{
 					const DirectX::XMVECTOR* value = reinterpret_cast<const DirectX::XMVECTOR*>(ptr);
 					const DirectX::XMFLOAT3 eulerAngles = graphics::dx12::Transform::QuaternionToEuler(*value);
 					a_SrcData.SetVector3(propertyName, eulerAngles);
 					break;
 				}
-				case EditorFieldWidgetType::EditorFieldWidgetType_EngineResource:
+				case FieldSerializationType::FieldSerializationType_EngineResource:
 				{
 					const std::weak_ptr<const gallus::resources::EngineResource>* pWeak = reinterpret_cast<const std::weak_ptr<const gallus::resources::EngineResource>*>(ptr);
 
@@ -440,38 +440,38 @@ namespace gallus
 
 					break;
 				}
-				case EditorFieldWidgetType::EditorFieldWidgetType_Object:
+				case FieldSerializationType::FieldSerializationType_Object:
 				{
-					const IExposableToEditor* editorObject = dynamic_cast<const IExposableToEditor*>(reinterpret_cast<const IExposableToEditor*>(ptr));
+					const ISerializableObject* editorObject = dynamic_cast<const ISerializableObject*>(reinterpret_cast<const ISerializableObject*>(ptr));
 					
 					resources::SrcData objectSrcData;
 					objectSrcData.SetObject();
 
-					SerializeEditorExposable(editorObject, objectSrcData);
+					SerializeFields(editorObject, objectSrcData);
 					
 					std::string objectPropertyName = TypeNameToPropertyName(editorObject->GetTypeName());
 					a_SrcData.SetSrcObject(objectPropertyName, objectSrcData);
 					break;
 				}
-				case EditorFieldWidgetType::EditorFieldWidgetType_ObjectPtr:
+				case FieldSerializationType::FieldSerializationType_ObjectPtr:
 				{
-					const IExposableToEditor* const* ppEditorObject = reinterpret_cast<const IExposableToEditor* const*>(ptr);
-					const IExposableToEditor* pEditorObject = (ppEditorObject ? *ppEditorObject : nullptr);
+					const ISerializableObject* const* ppEditorObject = reinterpret_cast<const ISerializableObject* const*>(ptr);
+					const ISerializableObject* pEditorObject = (ppEditorObject ? *ppEditorObject : nullptr);
 					
 					resources::SrcData objectSrcData;
 					objectSrcData.SetObject();
 
-					SerializeEditorExposable(pEditorObject, objectSrcData);
+					SerializeFields(pEditorObject, objectSrcData);
 					
 					std::string objectPropertyName = TypeNameToPropertyName(pEditorObject->GetTypeName());
 					a_SrcData.SetSrcObject(objectPropertyName, objectSrcData);
 					break;
 				}
-				case EditorFieldWidgetType::EditorFieldWidgetType_Array:
+				case FieldSerializationType::FieldSerializationType_Array:
 				{
 					void* pArray = const_cast<void*>(ptr); // SrcData needs non-const
 
-					std::vector<IExposableToEditor>* pVec = reinterpret_cast<std::vector<IExposableToEditor>*>(pArray);
+					std::vector<ISerializableObject>* pVec = reinterpret_cast<std::vector<ISerializableObject>*>(pArray);
 					resources::SrcData arraySrcData;
 					arraySrcData.SetArray();
 
@@ -479,7 +479,7 @@ namespace gallus
 					{
 						resources::SrcData elementSrcData;
 						elementSrcData.SetObject();
-						SerializeEditorExposable(&(*pVec)[i], elementSrcData);
+						SerializeFields(&(*pVec)[i], elementSrcData);
 						arraySrcData.PushArraySrcObject(elementSrcData);
 					}
 

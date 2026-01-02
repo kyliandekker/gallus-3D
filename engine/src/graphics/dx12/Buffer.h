@@ -45,8 +45,8 @@ namespace gallus
 				/// <param name="a_iElementSize">The size in bytes of a single element.</param>
 				virtual void CreateViews(size_t a_iNumElements, size_t a_iElementSize);
 
-				BEGIN_EXPOSABLE_PARENT(Buffer, DX12Resource)
-				END_EXPOSABLE(Buffer)
+				BEGIN_SERIALIZE_PARENT(Buffer, DX12Resource)
+				END_SERIALIZE(Buffer)
 			};
 		}
 	}

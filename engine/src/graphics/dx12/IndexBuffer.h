@@ -48,8 +48,8 @@ namespace gallus
 
 				D3D12_INDEX_BUFFER_VIEW m_IndexBufferView;
 
-				BEGIN_EXPOSABLE_PARENT(IndexBuffer, Buffer)
-				END_EXPOSABLE(IndexBuffer)
+				BEGIN_SERIALIZE_PARENT(IndexBuffer, Buffer)
+				END_SERIALIZE(IndexBuffer)
 			};
 		}
 	}

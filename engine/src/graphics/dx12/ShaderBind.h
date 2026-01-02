@@ -95,14 +95,14 @@ namespace gallus
 
 				Microsoft::WRL::ComPtr<ID3D12PipelineState> m_pPipelineState = nullptr;
 
-				BEGIN_EXPOSABLE_PARENT(ShaderBind, resources::EngineResource)
-				// 	EXPOSE_FIELD(m_pPixelShader, "Pixel Shader", "Pointer to the pixel shader asset used for rendering this object. Can be nullptr if no specific pixel shader is assigned.",
-				// 		.type = EditorFieldWidgetType::EditorFieldWidgetType_EngineResource,
+				BEGIN_SERIALIZE_PARENT(ShaderBind, resources::EngineResource)
+				// 	SERIALIZE_FIELD(m_pPixelShader, "Pixel Shader", "Pointer to the pixel shader asset used for rendering this object. Can be nullptr if no specific pixel shader is assigned.",
+				// 		.type = FieldSerializationType::FieldSerializationType_EngineResource,
 				// 		.assetType = resources::AssetType::PixelShader)
-				// 	EXPOSE_FIELD(m_pVertexShader, "Vertex Shader", "Pointer to the vertex shader asset used for rendering this object. Can be nullptr if no specific vertex shader is assigned.",
-				// 		.type = EditorFieldWidgetType::EditorFieldWidgetType_EngineResource,
+				// 	SERIALIZE_FIELD(m_pVertexShader, "Vertex Shader", "Pointer to the vertex shader asset used for rendering this object. Can be nullptr if no specific vertex shader is assigned.",
+				// 		.type = FieldSerializationType::FieldSerializationType_EngineResource,
 				// 		.assetType = resources::AssetType::VertexShader)
-				END_EXPOSABLE(ShaderBind)
+				END_SERIALIZE(ShaderBind)
 			};
 		}
 	}

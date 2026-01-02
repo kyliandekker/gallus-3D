@@ -26,7 +26,7 @@
 #include "editor/graphics/imgui/EditorWindowsConfig.h"
 #include "editor/core/EditorEngine.h"
 #include "editor/EditorGlobalFunctions.h"
-#include "editor/graphics/imgui/RenderEditorExposable.h"
+#include "editor/graphics/imgui/RenderSerializableObject.h"
 
 #include "resources/SrcData.h"
 
@@ -36,11 +36,11 @@ namespace gallus
 	{
 		namespace imgui
 		{
-			void SaveMetaData(resources::FileResource& a_FileResource, IExposableToEditor* a_pObject, bool a_bSaveToFile = false)
+			void SaveMetaData(resources::FileResource& a_FileResource, ISerializableObject* a_pObject, bool a_bSaveToFile = false)
 			{
 				resources::SrcData srcData;
 				srcData.SetObject();
-				SerializeEditorExposable(a_pObject, srcData);
+				SerializeFields(a_pObject, srcData);
 
 				fs::path path = a_FileResource.GetPath().generic_string() + (a_bSaveToFile ? "" : ".meta");
 

@@ -51,8 +51,8 @@ namespace gallus
 
 				D3D12_VERTEX_BUFFER_VIEW m_VertexBufferView;
 
-				BEGIN_EXPOSABLE_PARENT(VertexBuffer, Buffer)
-				END_EXPOSABLE(VertexBuffer)
+				BEGIN_SERIALIZE_PARENT(VertexBuffer, Buffer)
+				END_SERIALIZE(VertexBuffer)
 			};
 		}
 	}

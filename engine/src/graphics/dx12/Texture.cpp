@@ -358,7 +358,7 @@ namespace gallus
 					return;
 				}
 
-				DeserializeEditorExposable(this, srcData);
+				DeserializeFields(this, srcData);
 			}
 
 			//---------------------------------------------------------------------

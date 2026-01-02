@@ -18,7 +18,7 @@
 
 // editor
 #include "editor/core/EditorEngine.h"
-#include "editor/graphics/imgui/RenderEditorExposable.h"
+#include "editor/graphics/imgui/RenderSerializableObject.h"
 
 namespace gallus
 {

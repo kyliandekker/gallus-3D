@@ -83,29 +83,29 @@ namespace gallus
 			std::weak_ptr<graphics::dx12::Material> m_pMaterial = {};
 			DirectX::XMFLOAT4 m_vColor = { 1, 1, 1, 1 };
 
-				BEGIN_EXPOSABLE_PARENT(MeshComponent, Component)
-				 	EXPOSE_FIELD(m_pShaderBind, "Shader Bind", "",
-				 		.type = EditorFieldWidgetType::EditorFieldWidgetType_ObjectPtr)
-				 	EXPOSE_FIELD(m_pMaterial, "Material", "",
-				 		.type = EditorFieldWidgetType::EditorFieldWidgetType_EngineResource,
+				BEGIN_SERIALIZE_PARENT(MeshComponent, Component)
+				 	SERIALIZE_FIELD(m_pShaderBind, "Shader Bind", "",
+				 		.type = FieldSerializationType::FieldSerializationType_ObjectPtr)
+				 	SERIALIZE_FIELD(m_pMaterial, "Material", "",
+				 		.type = FieldSerializationType::FieldSerializationType_EngineResource,
 				 		.assetType = resources::AssetType::Material)
-				 	EXPOSE_FIELD(m_pMaterial, "MaterialView", "",
-				 		.type = EditorFieldWidgetType::EditorFieldWidgetType_ObjectPtr,
+				 	SERIALIZE_FIELD(m_pMaterial, "MaterialView", "",
+				 		.type = FieldSerializationType::FieldSerializationType_ObjectPtr,
 				 		.assetType = resources::AssetType::Material,
 				 		.serialize = false,
 				 		.indent = 1)
-				 	EXPOSE_FIELD(m_pMesh, "Mesh", "Pointer to the texture asset used by this Mesh. Can be nullptr if no texture is assigned. Determines the visual appearance of the Mesh.",
-				 		.type = EditorFieldWidgetType::EditorFieldWidgetType_EngineResource,
+				 	SERIALIZE_FIELD(m_pMesh, "Mesh", "Pointer to the texture asset used by this Mesh. Can be nullptr if no texture is assigned. Determines the visual appearance of the Mesh.",
+				 		.type = FieldSerializationType::FieldSerializationType_EngineResource,
 				 		.assetType = resources::AssetType::Mesh)
-				 	EXPOSE_FIELD(m_pTexture, "Texture", "Pointer to the mesh asset used by this Mesh. Can be nullptr if no texture is assigned. Determines the visual appearance of the Mesh.",
-				 		.type = EditorFieldWidgetType::EditorFieldWidgetType_EngineResource,
+				 	SERIALIZE_FIELD(m_pTexture, "Texture", "Pointer to the mesh asset used by this Mesh. Can be nullptr if no texture is assigned. Determines the visual appearance of the Mesh.",
+				 		.type = FieldSerializationType::FieldSerializationType_EngineResource,
 				 		.assetType = resources::AssetType::Sprite)
-				 	EXPOSE_FIELD(m_iTextureIndex, "Texture Index", "Index of the Mesh within a texture atlas. Used when the texture contains multiple rects to select which one is displayed.",
-				 		.type = EditorFieldWidgetType::EditorFieldWidgetType_Int8)
-				 	EXPOSE_FIELD(m_pTexture, "Texture Preview", "",
-				 		.type = EditorFieldWidgetType::EditorFieldWidgetType_TexturePreview,
+				 	SERIALIZE_FIELD(m_iTextureIndex, "Texture Index", "Index of the Mesh within a texture atlas. Used when the texture contains multiple rects to select which one is displayed.",
+				 		.type = FieldSerializationType::FieldSerializationType_Int8)
+				 	SERIALIZE_FIELD(m_pTexture, "Texture Preview", "",
+				 		.type = FieldSerializationType::FieldSerializationType_TexturePreview,
 				 		.relatedIndexFieldOffset = offsetof(MeshComponent, m_iTextureIndex))
-				END_EXPOSABLE(MeshComponent)
+				END_SERIALIZE(MeshComponent)
 		};
 	}
 }

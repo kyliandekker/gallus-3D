@@ -142,8 +142,8 @@ namespace gallus
 				std::wstring m_wsName = L"";
 				D3D12_RESOURCE_STATES m_CurrentState = D3D12_RESOURCE_STATE_COMMON;
 
-				BEGIN_EXPOSABLE_PARENT(DX12Resource, resources::EngineResource)
-				END_EXPOSABLE(DX12Resource)
+				BEGIN_SERIALIZE_PARENT(DX12Resource, resources::EngineResource)
+				END_SERIALIZE(DX12Resource)
 			};
 		}
 	}

@@ -93,7 +93,7 @@ namespace gallus
 			}
 			else
 			{
-				DeserializeEditorExposable(&core::ENGINE->GetDX12().GetCamera(), cameraSrcData);
+				DeserializeFields(&core::ENGINE->GetDX12().GetCamera(), cameraSrcData);
 			}
 			
 			resources::SrcData directionalLightSrcData;
@@ -105,7 +105,7 @@ namespace gallus
 			}
 			else if (auto directionalLight = core::ENGINE->GetDX12().GetDirectionalLight().lock())
 			{
-				DeserializeEditorExposable(directionalLight.get(), directionalLightSrcData);
+				DeserializeFields(directionalLight.get(), directionalLightSrcData);
 			}
 			
 			resources::SrcData entitiesSrc;
@@ -245,7 +245,7 @@ namespace gallus
 				resources::SrcData cameraSrcData;
 				cameraSrcData.SetObject();
 
-				SerializeEditorExposable(&core::ENGINE->GetDX12().GetCamera(), cameraSrcData);
+				SerializeFields(&core::ENGINE->GetDX12().GetCamera(), cameraSrcData);
 				srcData.SetSrcObject(JSON_SCENE_CAMERA_VAR, cameraSrcData);
 			}
 
@@ -255,7 +255,7 @@ namespace gallus
 
 				if (auto directionalLight = core::ENGINE->GetDX12().GetDirectionalLight().lock())
 				{
-					SerializeEditorExposable(directionalLight.get(), directionalLightSrcData);
+					SerializeFields(directionalLight.get(), directionalLightSrcData);
 					srcData.SetSrcObject(JSON_SCENE_DIRECTIONAL_LIGHT_VAR, directionalLightSrcData);
 				}
 			}

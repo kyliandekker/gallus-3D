@@ -2,7 +2,7 @@
 
 #include "utils/general_utils.h"
 
-#include "editor/EditorExpose.h"
+#include "editor/ISerializableObject.h"
 
 namespace gallus
 {
@@ -15,7 +15,7 @@ namespace gallus
 			//---------------------------------------------------------------------
 			Camera::Camera()
 #ifdef _EDITOR
-				: IExposableToEditor()
+				: ISerializableObject()
 #endif // _EDITOR
 			{ }
 			

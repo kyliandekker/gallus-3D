@@ -67,11 +67,11 @@ namespace gallus
 			bool m_bIsPlaying = false;
 			float m_fAccumulatedTime = 0.0f;
 
-			BEGIN_EXPOSABLE_PARENT(AnimationComponent, Component)
-				EXPOSE_FIELD(m_pStartingAnimation, "Starting Animation", "If set, the sprite will start with this animation.",
-					.type = EditorFieldWidgetType::EditorFieldWidgetType_EngineResource,
+			BEGIN_SERIALIZE_PARENT(AnimationComponent, Component)
+				SERIALIZE_FIELD(m_pStartingAnimation, "Starting Animation", "If set, the sprite will start with this animation.",
+					.type = FieldSerializationType::FieldSerializationType_EngineResource,
 					.assetType = resources::AssetType::Animation)
-			END_EXPOSABLE(AnimationComponent)
+			END_SERIALIZE(AnimationComponent)
 		};
 	}
 }

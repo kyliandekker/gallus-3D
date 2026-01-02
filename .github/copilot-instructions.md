@@ -112,7 +112,7 @@ Located in `engine/src/graphics/dx12/`:
 ## Editor-Specific Features
 
 ### Editor Exposure Macro System
-Components/resources expose fields to the editor via macros (in `engine/src/editor/EditorExpose.h`):
+Components/resources expose fields to the editor via macros (in `engine/src/editor/ISerializableObject.h`):
 
 ```cpp
 BEGIN_EXPOSE_FIELDS_PARENT(ClassName, ParentClass)
@@ -208,7 +208,7 @@ These macros auto-generate editor UI for tweaking component properties at runtim
 - `graphics/imgui/` - ImGui integration (ImGuiLayer, ImGuizmoLayer)
 - `gameplay/` - ECS systems (Entity, Component, EntityComponentSystem, various
   components/systems)
-- `editor/` - ImGui editor code (EditorExpose macros, editor UI)
+- `editor/` - ImGui editor code (ISerializableObject macros, editor UI)
 - `resources/` - Resource management (ResourceAtlas, SrcData)
 - `external/` - Third-party libraries (GLM, ImGui, RapidJSON, tiny_gltf, stb_image)
 - `game/` - Game-specific code (game logic, prefabs, scenes)

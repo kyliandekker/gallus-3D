@@ -391,9 +391,9 @@ inline std::string D3D12_RESOURCE_STATESToString(D3D12_RESOURCE_STATES state) {
 **Severity:** Low | **Files:** Texture.h
 
 ```cpp
-class SpriteRect : public IExposableToEditor {
+class SpriteRect : public ISerializableObject {
 public:
-    SpriteRect() : IExposableToEditor() { }  // Empty constructor body
+    SpriteRect() : ISerializableObject() { }  // Empty constructor body
     
     uint32_t x = 0;      // Public member - should use private with accessors
     uint32_t y = 0;

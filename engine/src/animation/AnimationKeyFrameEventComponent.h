@@ -47,8 +47,8 @@ namespace gallus
 		private:
 			AnimationEvent m_Event;
 
-			BEGIN_EXPOSABLE_PARENT(AnimationKeyFrameEventComponent, AnimationKeyFrameComponentBase)
-			END_EXPOSABLE(AnimationKeyFrameEventComponent)
+			BEGIN_SERIALIZE_PARENT(AnimationKeyFrameEventComponent, AnimationKeyFrameComponentBase)
+			END_SERIALIZE(AnimationKeyFrameEventComponent)
 		};
 
 		class AnimationKeyFrameEventSystem : public AnimationKeyFrameBaseSystem

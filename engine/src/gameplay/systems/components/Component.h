@@ -8,7 +8,7 @@
 #include "gameplay/systems/UpdateTime.h"
 
 // editor
-#include "editor/EditorExpose.h"
+#include "editor/ISerializableObject.h"
 
 namespace gallus
 {
@@ -21,7 +21,7 @@ namespace gallus
 		//---------------------------------------------------------------------
 		// Component
 		//---------------------------------------------------------------------
-		class Component : public IExposableToEditor
+		class Component : public ISerializableObject
 		{
 		public:
 			/// <summary>
@@ -102,8 +102,8 @@ namespace gallus
 			gameplay::EntityID m_EntityID;
 			bool m_bIsDestroyed = false;
 
-			BEGIN_EXPOSABLE(Component)
-			END_EXPOSABLE(Component)
+			BEGIN_SERIALIZE(Component)
+			END_SERIALIZE(Component)
 		};
 	}
 }

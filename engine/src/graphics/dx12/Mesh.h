@@ -321,8 +321,8 @@ namespace gallus
 			private:
 				std::vector<MeshPartData> m_aMeshData;
 
-				BEGIN_EXPOSABLE_PARENT(Mesh, resources::EngineResource)
-				END_EXPOSABLE(Mesh)
+				BEGIN_SERIALIZE_PARENT(Mesh, resources::EngineResource)
+				END_SERIALIZE(Mesh)
 			};
 		}
 	}

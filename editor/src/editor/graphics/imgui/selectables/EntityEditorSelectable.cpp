@@ -19,7 +19,7 @@
 
 // editor
 #include "editor/core/EditorEngine.h"
-#include "editor/graphics/imgui/RenderEditorExposable.h"
+#include "editor/graphics/imgui/RenderSerializableObject.h"
 #include "editor/EditorGlobalFunctions.h"
 
 namespace gallus

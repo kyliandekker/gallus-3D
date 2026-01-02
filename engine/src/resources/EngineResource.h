@@ -13,7 +13,7 @@
 #include "resources/AssetType.h"
 
 // editor
-#include "editor/EditorExpose.h"
+#include "editor/ISerializableObject.h"
 
 namespace gallus
 {
@@ -62,7 +62,7 @@ namespace gallus
 		/// <summary>
 		/// Represents an engine resource with details like category, type and name.
 		/// </summary>
-		class EngineResource : public IExposableToEditor
+		class EngineResource : public ISerializableObject
 		{
 		public:
 			/// <summary>
@@ -203,30 +203,30 @@ namespace gallus
 			std::filesystem::path m_Path;
 #endif // _LOAD_BY_PATH
 
-			BEGIN_EXPOSABLE(EngineResource)
-			// 	EXPOSE_FIELD(m_bIsDestroyable, "Is Destroyable", "Indicates if this resource can be destroyed or deleted.",
-			// 		.type = EditorFieldWidgetType::EditorFieldWidgetType_Bool,
+			BEGIN_SERIALIZE(EngineResource)
+			// 	SERIALIZE_FIELD(m_bIsDestroyable, "Is Destroyable", "Indicates if this resource can be destroyed or deleted.",
+			// 		.type = FieldSerializationType::FieldSerializationType_Bool,
 			// 		.disabled = true,
 			// 		.internal = true)
-			// 	EXPOSE_FIELD(m_bIsLocked, "Is Locked", "Indicates if this resource is locked from modifications.",
-			// 		.type = EditorFieldWidgetType::EditorFieldWidgetType_Bool,
+			// 	SERIALIZE_FIELD(m_bIsLocked, "Is Locked", "Indicates if this resource is locked from modifications.",
+			// 		.type = FieldSerializationType::FieldSerializationType_Bool,
 			// 		.disabled = true,
 			// 		.internal = true)
-			// 	EXPOSE_FIELD(m_bIsUnique, "Is Unique", "Specifies if this resource is unique and cannot have duplicates.",
-			// 		.type = EditorFieldWidgetType::EditorFieldWidgetType_Bool,
+			// 	SERIALIZE_FIELD(m_bIsUnique, "Is Unique", "Specifies if this resource is unique and cannot have duplicates.",
+			// 		.type = FieldSerializationType::FieldSerializationType_Bool,
 			// 		.disabled = true,
 			// 		.internal = true)
-			// 	EXPOSE_FIELD(m_ResourceCategory, "Resource Category", "The category this resource belongs to, used for organizational purposes.",
-			// 		.type = EditorFieldWidgetType::EditorFieldWidgetType_Enum,
+			// 	SERIALIZE_FIELD(m_ResourceCategory, "Resource Category", "The category this resource belongs to, used for organizational purposes.",
+			// 		.type = FieldSerializationType::FieldSerializationType_Enum,
 			// 		.enumToStringFunc = MakeEnumToStringFunc<EngineResourceCategory>(EngineResourceCategoryToString),
 			// 		.disabled = true,
 			// 		.internal = true)
-			// 	EXPOSE_FIELD(m_AssetType, "Asset Type", "The specific type of asset this resource represents.",
-			// 		.type = EditorFieldWidgetType::EditorFieldWidgetType_Enum,
+			// 	SERIALIZE_FIELD(m_AssetType, "Asset Type", "The specific type of asset this resource represents.",
+			// 		.type = FieldSerializationType::FieldSerializationType_Enum,
 			// 		.enumToStringFunc = MakeEnumToStringFunc<AssetType>(AssetTypeToString),
 			// 		.disabled = true,
 			// 		.internal = true)
-			END_EXPOSABLE(EngineResource)
+			END_SERIALIZE(EngineResource)
 		};
 	}
 }

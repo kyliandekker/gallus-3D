@@ -29,13 +29,13 @@ namespace gallus
 			
 			std::weak_ptr<gameplay::Prefab> m_ExplosionPrefab = {};
 
-				BEGIN_EXPOSABLE_PARENT(ProjectileComponent, Component)
-				 	EXPOSE_FIELD(m_fDamage, "Damage", "The amount of damage this projectile deals when it hits a target.",
-				 		.type = EditorFieldWidgetType::EditorFieldWidgetType_Float)
-				 	EXPOSE_FIELD(m_ExplosionPrefab, "Explosion Prefab", "Pointer to a prefab that is spawned when the projectile explodes or impacts. Can be nullptr if no explosion effect is used.",
-				 		.type = EditorFieldWidgetType::EditorFieldWidgetType_EngineResource,
+				BEGIN_SERIALIZE_PARENT(ProjectileComponent, Component)
+				 	SERIALIZE_FIELD(m_fDamage, "Damage", "The amount of damage this projectile deals when it hits a target.",
+				 		.type = FieldSerializationType::FieldSerializationType_Float)
+				 	SERIALIZE_FIELD(m_ExplosionPrefab, "Explosion Prefab", "Pointer to a prefab that is spawned when the projectile explodes or impacts. Can be nullptr if no explosion effect is used.",
+				 		.type = FieldSerializationType::FieldSerializationType_EngineResource,
 				 		.assetType = resources::AssetType::Prefab)
-				END_EXPOSABLE(ProjectileComponent)
+				END_SERIALIZE(ProjectileComponent)
 		};
 	}
 }

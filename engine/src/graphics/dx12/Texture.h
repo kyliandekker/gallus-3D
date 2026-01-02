@@ -52,10 +52,10 @@ namespace gallus
 				}
 			}
 
-			class SpriteRect : public IExposableToEditor
+			class SpriteRect : public ISerializableObject
 			{
 			public:
-				SpriteRect() : IExposableToEditor()
+				SpriteRect() : ISerializableObject()
 				{}
 
 				uint32_t x = 0;
@@ -63,12 +63,12 @@ namespace gallus
 				uint32_t width = 0;
 				uint32_t height = 0;
 
-				BEGIN_EXPOSABLE(SpriteRect)
-					EXPOSE_FIELD(x, "x", "", .type = gallus::EditorFieldWidgetType::EditorFieldWidgetType_Int64)
-					EXPOSE_FIELD(y, "y", "", .type = gallus::EditorFieldWidgetType::EditorFieldWidgetType_Int64)
-					EXPOSE_FIELD(width, "width", "", .type = gallus::EditorFieldWidgetType::EditorFieldWidgetType_Int64)
-					EXPOSE_FIELD(height, "height", "", .type = gallus::EditorFieldWidgetType::EditorFieldWidgetType_Int64)
-				END_EXPOSABLE(SpriteRect)
+				BEGIN_SERIALIZE(SpriteRect)
+					SERIALIZE_FIELD(x, "x", "", .type = gallus::FieldSerializationType::FieldSerializationType_Int64)
+					SERIALIZE_FIELD(y, "y", "", .type = gallus::FieldSerializationType::FieldSerializationType_Int64)
+					SERIALIZE_FIELD(width, "width", "", .type = gallus::FieldSerializationType::FieldSerializationType_Int64)
+					SERIALIZE_FIELD(height, "height", "", .type = gallus::FieldSerializationType::FieldSerializationType_Int64)
+				END_SERIALIZE(SpriteRect)
 			};
 
 			class SpriteUV
@@ -278,12 +278,12 @@ namespace gallus
 				TextureType m_TextureType = TextureType::Texture2D;
 				std::vector<SpriteRect> m_aSpriteRects;
 
-				BEGIN_EXPOSABLE_PARENT(Texture, DX12Resource)
-					EXPOSE_FIELD(m_TextureType, "Texture Type", "The type of texture. Sprite sheet for multiple sprites, or texture for only 1.",
-						.type = EditorFieldWidgetType::EditorFieldWidgetType_Enum,
+				BEGIN_SERIALIZE_PARENT(Texture, DX12Resource)
+					SERIALIZE_FIELD(m_TextureType, "Texture Type", "The type of texture. Sprite sheet for multiple sprites, or texture for only 1.",
+						.type = FieldSerializationType::FieldSerializationType_Enum,
 						.enumToStringFunc = MakeEnumToStringFunc<TextureType>(TextureTypeToString))
-					EXPOSE_FIELD_OPTIONS(m_aSpriteRects, "Sprite Rects", "Enables multiple sprites from one image.", MakeArrayFieldOptions<SpriteRect>())
-				END_EXPOSABLE(Texture)
+					SERIALIZE_FIELD_OPTIONS(m_aSpriteRects, "Sprite Rects", "Enables multiple sprites from one image.", MakeArrayFieldSerializationOptions<SpriteRect>())
+				END_SERIALIZE(Texture)
 			};
 		}
 	}

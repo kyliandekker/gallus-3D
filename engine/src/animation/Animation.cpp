@@ -103,7 +103,7 @@ namespace gallus
                     }
 
                     auto* keyFrameComp = sys->CreateComponent(*keyFrame);
-                    DeserializeEditorExposable(keyFrameComp, sysSrcData);
+                    DeserializeFields(keyFrameComp, sysSrcData);
                     keyFrame->AddComponent(keyFrameComp);
                 }
             }
@@ -171,7 +171,7 @@ namespace gallus
                     resources::SrcData componentSrcData;
                     componentSrcData.SetObject();
 
-                    SerializeEditorExposable(component, componentSrcData);
+                    SerializeFields(component, componentSrcData);
                     componentsSrcData.SetSrcObject(component->GetPropertyName(), componentSrcData);
                 }
 

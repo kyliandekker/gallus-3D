@@ -36,11 +36,11 @@ namespace gallus
 			graphics::dx12::Transform m_Transform;
 			DirectX::XMFLOAT3 m_vTranslation = {};
 
-			BEGIN_EXPOSABLE_PARENT(TransformComponent, Component)
-				EXPOSE_FIELD(m_Transform, "Transform", "",
-					.type = EditorFieldWidgetType::EditorFieldWidgetType_Object)
+			BEGIN_SERIALIZE_PARENT(TransformComponent, Component)
+				SERIALIZE_FIELD(m_Transform, "Transform", "",
+					.type = FieldSerializationType::FieldSerializationType_Object)
 				EXPOSE_GIZMO(m_Transform, EditorGizmoType::EditorGizmoType_Transform)
-			END_EXPOSABLE(TransformComponent)
+			END_SERIALIZE(TransformComponent)
 		};
 	}
 }

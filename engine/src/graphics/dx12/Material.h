@@ -78,16 +78,16 @@ namespace gallus
 protected:
 				MaterialData m_MaterialData;
 
-				BEGIN_EXPOSABLE_PARENT(Material, resources::EngineResource)
-				 	EXPOSE_FIELD(m_MaterialData.EnableLighting, "Enable Lighting", "",
-				 		.type = gallus::EditorFieldWidgetType::EditorFieldWidgetType_LongSwitch)
-				 	EXPOSE_FIELD(m_MaterialData.DiffuseColor, "Diffuse Color", "",
-				 		.type = gallus::EditorFieldWidgetType::EditorFieldWidgetType_Color)
-				 	EXPOSE_FIELD(m_MaterialData.Metallic, "Metallic", "",
-				 		.type = gallus::EditorFieldWidgetType::EditorFieldWidgetType_Float)
-				 	EXPOSE_FIELD(m_MaterialData.Smoothness, "Smoothness", "",
-				 		.type = gallus::EditorFieldWidgetType::EditorFieldWidgetType_Float)
-				END_EXPOSABLE(Material)
+				BEGIN_SERIALIZE_PARENT(Material, resources::EngineResource)
+				 	SERIALIZE_FIELD(m_MaterialData.EnableLighting, "Enable Lighting", "",
+				 		.type = gallus::FieldSerializationType::FieldSerializationType_LongSwitch)
+				 	SERIALIZE_FIELD(m_MaterialData.DiffuseColor, "Diffuse Color", "",
+				 		.type = gallus::FieldSerializationType::FieldSerializationType_Color)
+				 	SERIALIZE_FIELD(m_MaterialData.Metallic, "Metallic", "",
+				 		.type = gallus::FieldSerializationType::FieldSerializationType_Float)
+				 	SERIALIZE_FIELD(m_MaterialData.Smoothness, "Smoothness", "",
+				 		.type = gallus::FieldSerializationType::FieldSerializationType_Float)
+				END_SERIALIZE(Material)
 			};
 		}
 	}

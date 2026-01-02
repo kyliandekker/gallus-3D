@@ -6,7 +6,7 @@
 
 #include <string>
 
-#include "editor/EditorExpose.h"
+#include "editor/ISerializableObject.h"
 
 constexpr DirectX::XMVECTOR UP = { 0, 1, 0 }; /// Up vector.
 constexpr DirectX::XMFLOAT3 VEC_ZERO = { 0, 0, 0 }; /// Zero vector.
@@ -51,7 +51,7 @@ namespace gallus
 			//---------------------------------------------------------------------
 			// Transform
 			//---------------------------------------------------------------------
-			class Transform : public IExposableToEditor
+			class Transform : public ISerializableObject
 			{
 			public:
 				static DirectX::XMFLOAT3 QuaternionToEuler(const DirectX::XMVECTOR & quat);
@@ -150,21 +150,21 @@ namespace gallus
 
 				friend class Camera;
 
-				BEGIN_EXPOSABLE(Transform)
-				 	EXPOSE_FIELD(m_vPosition, "Position", "The position of the object in 2D space. Defines where the object is located on the screen.",
-				 		.type = EditorFieldWidgetType::EditorFieldWidgetType_Vector3)
-				 	EXPOSE_FIELD(m_vScale, "Scale", "The size multiplier of the object. A value of 1 means default size, values greater than 1 enlarge the object, and values below 1 shrink it.",
-				 		.type = EditorFieldWidgetType::EditorFieldWidgetType_Vector3)
-				 	EXPOSE_FIELD(m_vRotation, "Rotation", "Rotation in degrees. Controls how much the object is rotated clockwise or counterclockwise.",
-				 		.type = EditorFieldWidgetType::EditorFieldWidgetType_Quaternion)
-				 	EXPOSE_FIELD(m_vPivot, "Pivot", "The pivot point for transformations relative to the object's center. Coordinates represent the normalized offset used for scaling and rotation.",
-				 		.type = EditorFieldWidgetType::EditorFieldWidgetType_Vector3,
+				BEGIN_SERIALIZE(Transform)
+				 	SERIALIZE_FIELD(m_vPosition, "Position", "The position of the object in 2D space. Defines where the object is located on the screen.",
+				 		.type = FieldSerializationType::FieldSerializationType_Vector3)
+				 	SERIALIZE_FIELD(m_vScale, "Scale", "The size multiplier of the object. A value of 1 means default size, values greater than 1 enlarge the object, and values below 1 shrink it.",
+				 		.type = FieldSerializationType::FieldSerializationType_Vector3)
+				 	SERIALIZE_FIELD(m_vRotation, "Rotation", "Rotation in degrees. Controls how much the object is rotated clockwise or counterclockwise.",
+				 		.type = FieldSerializationType::FieldSerializationType_Quaternion)
+				 	SERIALIZE_FIELD(m_vPivot, "Pivot", "The pivot point for transformations relative to the object's center. Coordinates represent the normalized offset used for scaling and rotation.",
+				 		.type = FieldSerializationType::FieldSerializationType_Vector3,
 				 		.min = "-0.5",
 				 		.max = "0.5")
-				 	EXPOSE_FIELD(m_CameraType, "Camera Type", "Whether the camera is rendering 3D or 2D.",
-				 		.type = EditorFieldWidgetType::EditorFieldWidgetType_Enum,
+				 	SERIALIZE_FIELD(m_CameraType, "Camera Type", "Whether the camera is rendering 3D or 2D.",
+				 		.type = FieldSerializationType::FieldSerializationType_Enum,
 				 		.enumToStringFunc = MakeEnumToStringFunc<graphics::dx12::CameraType>(graphics::dx12::CameraTypeToString))
-				END_EXPOSABLE(Transform)
+				END_SERIALIZE(Transform)
 			};
 		}
 	}

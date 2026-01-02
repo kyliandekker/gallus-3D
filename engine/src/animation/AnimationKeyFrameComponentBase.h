@@ -3,7 +3,7 @@
 // external
 #include <string>
 
-#include "editor/EditorExpose.h"
+#include "editor/ISerializableObject.h"
 
 namespace gallus
 {
@@ -15,7 +15,7 @@ namespace gallus
 	{
 		class AnimationKeyFrame;
 
-		class AnimationKeyFrameComponentBase : public IExposableToEditor
+		class AnimationKeyFrameComponentBase : public ISerializableObject
 		{
 		public:
 			/// <summary>
@@ -39,11 +39,8 @@ namespace gallus
 		protected:
 			AnimationKeyFrame& m_KeyFrame;
 
-			BEGIN_EXPOSABLE(AnimationKeyFrameComponentBase)
-			// END_EXPOSE_FIELDS(AnimationKeyFrameComponentBase)
-			// BEGIN_EXPOSE_GIZMOS(AnimationKeyFrameComponentBase)
-			// END_EXPOSE_GIZMOS(AnimationKeyFrameComponentBase)
-			END_EXPOSABLE(AnimationKeyFrameComponentBase)
+			BEGIN_SERIALIZE(AnimationKeyFrameComponentBase)
+			END_SERIALIZE(AnimationKeyFrameComponentBase)
 		};
 
 		class AnimationKeyFrameBaseSystem
