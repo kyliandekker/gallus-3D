@@ -62,27 +62,18 @@ namespace gallus
 			float m_fMass = 1.0f;
 			float m_fLinearDamping = 0.98f;
 
-			BEGIN_EXPOSE_FIELDS_PARENT(RigidbodyComponent, Component)
-				EXPOSE_FIELD(RigidbodyComponent, m_bUseGravity, "Use Gravity", "Determines whether the object is affected by gravity. When true, the rigidbody will accelerate downward according to the physics system; when false, it will ignore gravity.",
-					(FieldOptions{ 
-						.type = EditorFieldWidgetType::EditorFieldWidgetType_Switch, 
-					}))
-				EXPOSE_FIELD(RigidbodyComponent, m_fMass, "Mass", "The mass of the rigidbody. Affects how forces influence the object; higher mass makes it harder to accelerate.",
-					(FieldOptions{ 
-						.type = EditorFieldWidgetType::EditorFieldWidgetType_Float, 
-						.min = "0.0001", 
-						.max = "9999999", 
-					}))
-				EXPOSE_FIELD(RigidbodyComponent, m_fLinearDamping, "Linear Damping", "The linear damping factor applied to the rigidbody�s velocity. Values closer to 1 reduce movement slowly, values closer to 0 slow the object more quickly over time.",
-					(FieldOptions{ 
-						.type = EditorFieldWidgetType::EditorFieldWidgetType_Float, 
-						.min = "0.01", 
-						.max = "1.0f", 
-					}))
-			END_EXPOSE_FIELDS(RigidbodyComponent)
-			BEGIN_EXPOSE_GIZMOS(RigidbodyComponent)
-			END_EXPOSE_GIZMOS(RigidbodyComponent)
-			END_EXPOSE_TO_EDITOR(RigidbodyComponent)
+				BEGIN_EXPOSABLE_PARENT(RigidbodyComponent, Component)
+				 	EXPOSE_FIELD(m_bUseGravity, "Use Gravity", "Determines whether the object is affected by gravity. When true, the rigidbody will accelerate downward according to the physics system; when false, it will ignore gravity.",
+				 		.type = EditorFieldWidgetType::EditorFieldWidgetType_Switch)
+				 	EXPOSE_FIELD(m_fMass, "Mass", "The mass of the rigidbody. Affects how forces influence the object; higher mass makes it harder to accelerate.",
+				 		.type = EditorFieldWidgetType::EditorFieldWidgetType_Float,
+				 		.min = "0.0001",
+				 		.max = "9999999")
+				 	EXPOSE_FIELD(m_fLinearDamping, "Linear Damping", "The linear damping factor applied to the rigidbody�s velocity. Values closer to 1 reduce movement slowly, values closer to 0 slow the object more quickly over time.",
+				 		.type = EditorFieldWidgetType::EditorFieldWidgetType_Float,
+				 		.min = "0.01",
+				 		.max = "1.0f")
+				END_EXPOSABLE(RigidbodyComponent)
 		};
 	}
 }

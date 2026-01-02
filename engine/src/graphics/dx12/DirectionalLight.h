@@ -51,26 +51,17 @@ namespace gallus
 			protected:
 				DirectionalLightData m_DirectionalLightData;
 
-				BEGIN_EXPOSE_FIELDS_PARENT(DirectionalLight, resources::EngineResource)
-					EXPOSE_FIELD(DirectionalLight, m_DirectionalLightData.DirectionalLightEnabled, "Enabled", ".",
-						(FieldOptions{
-							.type = EditorFieldWidgetType::EditorFieldWidgetType_LongSwitch,
-						}))
-					EXPOSE_FIELD(DirectionalLight, m_DirectionalLightData.LightDirection, "Light Direction", ".",
-						(FieldOptions{
-							.type = EditorFieldWidgetType::EditorFieldWidgetType_Vector3,
-						}))
-					EXPOSE_FIELD(DirectionalLight, m_DirectionalLightData.LightColor, "Light Color", "",
-						{ .type = gallus::EditorFieldWidgetType::EditorFieldWidgetType_Color })
-					EXPOSE_FIELD(DirectionalLight, m_DirectionalLightData.AmbientIntensity, "Ambient Intensity", "",
-						(FieldOptions{
-							.type = EditorFieldWidgetType::EditorFieldWidgetType_Float,
-							.step = 0.1f,
-							}))
-					END_EXPOSE_FIELDS(DirectionalLight)
-					BEGIN_EXPOSE_GIZMOS(DirectionalLight)
-					END_EXPOSE_GIZMOS(DirectionalLight)
-					END_EXPOSE_TO_EDITOR(DirectionalLight)
+				BEGIN_EXPOSABLE_PARENT(DirectionalLight, resources::EngineResource)
+				 	EXPOSE_FIELD(m_DirectionalLightData.DirectionalLightEnabled, "Enabled", ".",
+				 		.type = EditorFieldWidgetType::EditorFieldWidgetType_LongSwitch)
+				 	EXPOSE_FIELD(m_DirectionalLightData.LightDirection, "Light Direction", ".",
+				 		.type = EditorFieldWidgetType::EditorFieldWidgetType_Vector3)
+				 	EXPOSE_FIELD(m_DirectionalLightData.LightColor, "Light Color", "",
+				 		.type = gallus::EditorFieldWidgetType::EditorFieldWidgetType_Color)
+				 	EXPOSE_FIELD(m_DirectionalLightData.AmbientIntensity, "Ambient Intensity", "",
+				 		.type = EditorFieldWidgetType::EditorFieldWidgetType_Float,
+				 		.step = 0.1f)
+				END_EXPOSABLE(DirectionalLight)
 			};
 		}
 	}

@@ -76,11 +76,8 @@ namespace gallus
 			protected:
 				Microsoft::WRL::ComPtr<ID3DBlob> m_pShaderBlob = nullptr;
 
-				BEGIN_EXPOSE_FIELDS_PARENT(Shader, resources::EngineResource)
-				END_EXPOSE_FIELDS(Shader)
-				BEGIN_EXPOSE_GIZMOS(Shader)
-				END_EXPOSE_GIZMOS(Shader)
-				END_EXPOSE_TO_EDITOR(Shader)
+				BEGIN_EXPOSABLE_PARENT(Shader, resources::EngineResource)
+				END_EXPOSABLE(Shader)
 			};
 
 			class PixelShader : public Shader
@@ -110,11 +107,8 @@ namespace gallus
 				bool LoadByPath(const fs::path& a_PixelShaderPath) override;
 #endif // _LOAD_BY_PATH
 			protected:
-				BEGIN_EXPOSE_FIELDS_PARENT(PixelShader, Shader)
-				END_EXPOSE_FIELDS(PixelShader)
-				BEGIN_EXPOSE_GIZMOS(PixelShader)
-				END_EXPOSE_GIZMOS(PixelShader)
-				END_EXPOSE_TO_EDITOR(PixelShader)
+				BEGIN_EXPOSABLE_PARENT(PixelShader, Shader)
+				END_EXPOSABLE(PixelShader)
 			};
 
 			class VertexShader : public Shader
@@ -144,11 +138,8 @@ namespace gallus
 				bool LoadByPath(const fs::path& a_VertexShaderPath) override;
 #endif // _LOAD_BY_PATH
 			protected:
-				BEGIN_EXPOSE_FIELDS_PARENT(VertexShader, Shader)
-				END_EXPOSE_FIELDS(VertexShader)
-				BEGIN_EXPOSE_GIZMOS(VertexShader)
-				END_EXPOSE_GIZMOS(VertexShader)
-				END_EXPOSE_TO_EDITOR(VertexShader)
+				BEGIN_EXPOSABLE_PARENT(VertexShader, Shader)
+				END_EXPOSABLE(VertexShader)
 			};
 		}
 	}

@@ -38,11 +38,8 @@ namespace gallus
 		private:
 			std::string m_sTag;
 
-			BEGIN_EXPOSE_FIELDS_PARENT(AnimationKeyFrameTagComponent, AnimationKeyFrameComponentBase)
-			END_EXPOSE_FIELDS(AnimationKeyFrameTagComponent)
-			BEGIN_EXPOSE_GIZMOS(AnimationKeyFrameTagComponent)
-			END_EXPOSE_GIZMOS(AnimationKeyFrameTagComponent)
-			END_EXPOSE_TO_EDITOR(AnimationKeyFrameTagComponent)
+			BEGIN_EXPOSABLE_PARENT(AnimationKeyFrameTagComponent, AnimationKeyFrameComponentBase)
+			END_EXPOSABLE(AnimationKeyFrameTagComponent)
 		};
 
 		class AnimationKeyFrameTagSystem : public AnimationKeyFrameBaseSystem

@@ -102,11 +102,8 @@ namespace gallus
 		protected:
 			core::Data m_Data;
 			
-			BEGIN_EXPOSE_FIELDS_PARENT(Scene, resources::EngineResource)
-			END_EXPOSE_FIELDS(Scene)
-			BEGIN_EXPOSE_GIZMOS(Scene)
-			END_EXPOSE_GIZMOS(Scene)
-			END_EXPOSE_TO_EDITOR(Scene)
+				BEGIN_EXPOSABLE_PARENT(Scene, resources::EngineResource)
+				END_EXPOSABLE(Scene)
 		};
 	}
 }

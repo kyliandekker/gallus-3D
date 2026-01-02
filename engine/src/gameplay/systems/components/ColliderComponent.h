@@ -30,19 +30,12 @@ namespace gallus
 
 			std::set<gameplay::EntityID> m_aEntitiesToIgnore;
 
-			BEGIN_EXPOSE_FIELDS_PARENT(ColliderComponent, Component)
-				EXPOSE_FIELD(ColliderComponent, m_vOffset, "Offset", "The local offset of the collider relative to the object's pivot or position. Adjusts where the collider is positioned without moving the object itself.",
-					(FieldOptions{
-						.type = EditorFieldWidgetType::EditorFieldWidgetType_Vector2, 
-					}))
-				EXPOSE_FIELD(ColliderComponent, m_vSize, "Size", "The size of the collider in local space. Determines the width and height of the collision area.",
-					(FieldOptions{ 
-						.type = EditorFieldWidgetType::EditorFieldWidgetType_Vector2
-					}))
-			END_EXPOSE_FIELDS(ColliderComponent)
-			BEGIN_EXPOSE_GIZMOS(ColliderComponent)
-			END_EXPOSE_GIZMOS(ColliderComponent)
-			END_EXPOSE_TO_EDITOR(ColliderComponent)
+				BEGIN_EXPOSABLE_PARENT(ColliderComponent, Component)
+					EXPOSE_FIELD(m_vOffset, "Offset", "The local offset of the collider relative to the object's pivot or position. Adjusts where the collider is positioned without moving the object itself.",
+						.type = EditorFieldWidgetType::EditorFieldWidgetType_Vector2)
+					EXPOSE_FIELD(m_vSize, "Size", "The size of the collider in local space. Determines the width and height of the collision area.",
+						.type = EditorFieldWidgetType::EditorFieldWidgetType_Vector2)
+				END_EXPOSABLE(ColliderComponent)
 		};
 	}
 }

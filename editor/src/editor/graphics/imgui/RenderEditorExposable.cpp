@@ -497,13 +497,23 @@ namespace gallus
 				}
 				case EditorFieldWidgetType::EditorFieldWidgetType_LongSwitch:
 				{
-					bool* value = reinterpret_cast<bool*>(ptr);
-					func = [&a_Field, &fieldId, value]
+					uint32_t* pValue = reinterpret_cast<uint32_t*>(ptr);
+
+					func = [&a_Field, &fieldId, pValue]()
 						{
-							bool val = ImGui::Toggle(fieldId.c_str(), value);
+							bool bValue = (*pValue != 0);
+
+							bool bChanged = ImGui::Toggle(fieldId.c_str(), &bValue);
 							ImGui::ShowTooltip(a_Field.m_sDescription);
-							return val;
+
+							if (bChanged)
+							{
+								*pValue = bValue ? 1u : 0u;
+							}
+
+							return bChanged;
 						};
+
 					break;
 				}
 				case EditorFieldWidgetType::EditorFieldWidgetType_Vector2:

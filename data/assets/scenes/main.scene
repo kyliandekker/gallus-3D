@@ -30,7 +30,7 @@
             "b": 1.0,
             "a": 1.0
         },
-        "ambientIntensity": 0.6000000238418579
+        "ambientIntensity": 0.4000000059604645
     },
     "entities": [
         {
@@ -46,10 +46,7 @@
                         "b": 1.0,
                         "a": 1.0
                     },
-                    "shaderBind": {
-                        "pixelShader": "pixelShader.hlsl",
-                        "vertexShader": "vertexShader.hlsl"
-                    },
+                    "shaderBind": {},
                     "sprite": "tex_walk.png",
                     "spriteIndex": 1
                 },
@@ -107,10 +104,7 @@
             "isActive": true,
             "components": {
                 "mesh": {
-                    "shaderBind": {
-                        "pixelShader": "pixelShader.hlsl",
-                        "vertexShader": "vertexShader.hlsl"
-                    },
+                    "shaderBind": {},
                     "material": "1.mat",
                     "mesh": "mod_chicken.glb",
                     "texture": "tex_chicken_infected.png",
@@ -132,47 +126,6 @@
                             "x": 0.807913601398468,
                             "y": 0.0,
                             "z": 0.0
-                        },
-                        "pivot": {
-                            "x": 0.0,
-                            "y": 0.0,
-                            "z": 0.0
-                        },
-                        "cameraType": 0
-                    }
-                }
-            }
-        },
-        {
-            "name": "New GameObject",
-            "isActive": true,
-            "components": {
-                "mesh": {
-                    "shaderBind": {
-                        "pixelShader": "pixelShader.hlsl",
-                        "vertexShader": "vertexShader.hlsl"
-                    },
-                    "material": "1.mat",
-                    "mesh": "square",
-                    "texture": "tex_missing.png",
-                    "textureIndex": 0
-                },
-                "transform": {
-                    "transform": {
-                        "position": {
-                            "x": -0.17918717861175538,
-                            "y": 1.1444705724716187,
-                            "z": -0.5672531723976135
-                        },
-                        "scale": {
-                            "x": 0.9999937415122986,
-                            "y": 0.9999929070472717,
-                            "z": 0.9999924898147583
-                        },
-                        "rotation": {
-                            "x": 179.9999542236328,
-                            "y": 1.8988578613134134e-13,
-                            "z": 3.185754451351386e-7
                         },
                         "pivot": {
                             "x": 0.0,

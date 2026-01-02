@@ -29,20 +29,13 @@ namespace gallus
 			
 			std::weak_ptr<gameplay::Prefab> m_ExplosionPrefab = {};
 
-			BEGIN_EXPOSE_FIELDS_PARENT(ProjectileComponent, Component)
-				EXPOSE_FIELD(ProjectileComponent, m_fDamage, "Damage", "The amount of damage this projectile deals when it hits a target.",
-					(FieldOptions{ 
-						.type = EditorFieldWidgetType::EditorFieldWidgetType_Float, 
-					}))
-				EXPOSE_FIELD(ProjectileComponent, m_ExplosionPrefab, "Explosion Prefab", "Pointer to a prefab that is spawned when the projectile explodes or impacts. Can be nullptr if no explosion effect is used.",
-					(FieldOptions{ 
-						.type = EditorFieldWidgetType::EditorFieldWidgetType_EngineResource, 
-						.assetType = resources::AssetType::Prefab, 
-					}))
-			END_EXPOSE_FIELDS(ProjectileComponent)
-			BEGIN_EXPOSE_GIZMOS(ProjectileComponent)
-			END_EXPOSE_GIZMOS(ProjectileComponent)
-			END_EXPOSE_TO_EDITOR(ProjectileComponent)
+				BEGIN_EXPOSABLE_PARENT(ProjectileComponent, Component)
+				 	EXPOSE_FIELD(m_fDamage, "Damage", "The amount of damage this projectile deals when it hits a target.",
+				 		.type = EditorFieldWidgetType::EditorFieldWidgetType_Float)
+				 	EXPOSE_FIELD(m_ExplosionPrefab, "Explosion Prefab", "Pointer to a prefab that is spawned when the projectile explodes or impacts. Can be nullptr if no explosion effect is used.",
+				 		.type = EditorFieldWidgetType::EditorFieldWidgetType_EngineResource,
+				 		.assetType = resources::AssetType::Prefab)
+				END_EXPOSABLE(ProjectileComponent)
 		};
 	}
 }

@@ -63,19 +63,19 @@ namespace gallus
 				uint32_t width = 0;
 				uint32_t height = 0;
 
-				BEGIN_EXPOSE_FIELDS(SpriteRect)
-					EXPOSE_FIELD(SpriteRect, x, "x", "",
-						{ .type = gallus::EditorFieldWidgetType::EditorFieldWidgetType_Int64 })
-					EXPOSE_FIELD(SpriteRect, y, "y", "",
-						{ .type = gallus::EditorFieldWidgetType::EditorFieldWidgetType_Int64 })
-					EXPOSE_FIELD(SpriteRect, width, "width", "",
-						{ .type = gallus::EditorFieldWidgetType::EditorFieldWidgetType_Int64 })
-					EXPOSE_FIELD(SpriteRect, height, "height", "",
-						{ .type = gallus::EditorFieldWidgetType::EditorFieldWidgetType_Int64 })
-				END_EXPOSE_FIELDS(SpriteRect)
-				BEGIN_EXPOSE_GIZMOS(SpriteRect)
-				END_EXPOSE_GIZMOS(SpriteRect)
-				END_EXPOSE_TO_EDITOR(SpriteRect)
+				BEGIN_EXPOSABLE(SpriteRect)
+				// 	EXPOSE_FIELD(SpriteRect, x, "x", "",
+				// 		{ .type = gallus::EditorFieldWidgetType::EditorFieldWidgetType_Int64 })
+				// 	EXPOSE_FIELD(SpriteRect, y, "y", "",
+				// 		{ .type = gallus::EditorFieldWidgetType::EditorFieldWidgetType_Int64 })
+				// 	EXPOSE_FIELD(SpriteRect, width, "width", "",
+				// 		{ .type = gallus::EditorFieldWidgetType::EditorFieldWidgetType_Int64 })
+				// 	EXPOSE_FIELD(SpriteRect, height, "height", "",
+				// 		{ .type = gallus::EditorFieldWidgetType::EditorFieldWidgetType_Int64 })
+				// END_EXPOSE_FIELDS(SpriteRect)
+				// BEGIN_EXPOSE_GIZMOS(SpriteRect)
+				// END_EXPOSE_GIZMOS(SpriteRect)
+				END_EXPOSABLE(SpriteRect)
 			};
 
 			class SpriteUV
@@ -285,19 +285,13 @@ namespace gallus
 				TextureType m_TextureType = TextureType::Texture2D;
 				std::vector<SpriteRect> m_aSpriteRects;
 
-				BEGIN_EXPOSE_FIELDS_PARENT(Texture, DX12Resource)
-					EXPOSE_FIELD(Texture, m_TextureType, "Texture Type", "The type of texture. Sprite sheet for multiple sprites, or texture for only 1.",
-						(FieldOptions{
-							.type = EditorFieldWidgetType::EditorFieldWidgetType_Enum,
-							.enumToStringFunc = MakeEnumToStringFunc<TextureType>(TextureTypeToString),
-						}))
-					EXPOSE_FIELD(Texture, m_aSpriteRects, "Sprite Rects", "Enables multiple sprites from one image.",
-						MakeArrayFieldOptions<SpriteRect>()
-					)
-				END_EXPOSE_FIELDS(Texture)
-				BEGIN_EXPOSE_GIZMOS(Texture)
-				END_EXPOSE_GIZMOS(Texture)
-				END_EXPOSE_TO_EDITOR(Texture)
+				BEGIN_EXPOSABLE_PARENT(Texture, DX12Resource)
+					EXPOSE_FIELD(m_TextureType, "Texture Type", "The type of texture. Sprite sheet for multiple sprites, or texture for only 1.",
+						.type = EditorFieldWidgetType::EditorFieldWidgetType_Enum,
+						.enumToStringFunc = MakeEnumToStringFunc<TextureType>(TextureTypeToString))
+					//EXPOSE_FIELD(m_aSpriteRects, "Sprite Rects", "Enables multiple sprites from one image.",
+					//	.type = EditorFieldWidgetType::EditorFieldWidgetType_Array)
+				END_EXPOSABLE(Texture)
 			};
 		}
 	}

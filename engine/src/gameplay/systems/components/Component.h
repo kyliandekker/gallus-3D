@@ -102,11 +102,8 @@ namespace gallus
 			gameplay::EntityID m_EntityID;
 			bool m_bIsDestroyed = false;
 
-			BEGIN_EXPOSE_FIELDS(Component)
-			END_EXPOSE_FIELDS(Component)
-			BEGIN_EXPOSE_GIZMOS(Component)
-			END_EXPOSE_GIZMOS(Component)
-			END_EXPOSE_TO_EDITOR(Component)
+			BEGIN_EXPOSABLE(Component)
+			END_EXPOSABLE(Component)
 		};
 	}
 }

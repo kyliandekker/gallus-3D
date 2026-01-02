@@ -39,11 +39,11 @@ namespace gallus
 		protected:
 			AnimationKeyFrame& m_KeyFrame;
 
-			BEGIN_EXPOSE_FIELDS(AnimationKeyFrameComponentBase)
-			END_EXPOSE_FIELDS(AnimationKeyFrameComponentBase)
-			BEGIN_EXPOSE_GIZMOS(AnimationKeyFrameComponentBase)
-			END_EXPOSE_GIZMOS(AnimationKeyFrameComponentBase)
-			END_EXPOSE_TO_EDITOR(AnimationKeyFrameComponentBase)
+			BEGIN_EXPOSABLE(AnimationKeyFrameComponentBase)
+			// END_EXPOSE_FIELDS(AnimationKeyFrameComponentBase)
+			// BEGIN_EXPOSE_GIZMOS(AnimationKeyFrameComponentBase)
+			// END_EXPOSE_GIZMOS(AnimationKeyFrameComponentBase)
+			END_EXPOSABLE(AnimationKeyFrameComponentBase)
 		};
 
 		class AnimationKeyFrameBaseSystem

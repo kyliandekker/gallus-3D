@@ -203,43 +203,30 @@ namespace gallus
 			std::filesystem::path m_Path;
 #endif // _LOAD_BY_PATH
 
-			BEGIN_EXPOSE_FIELDS(EngineResource)
-				EXPOSE_FIELD(EngineResource, m_bIsDestroyable, "Is Destroyable", "Indicates if this resource can be destroyed or deleted.", 
-					(FieldOptions{
-						.type = EditorFieldWidgetType::EditorFieldWidgetType_Bool,
-						.disabled = true,
-						.internal = true
-						}))
-				EXPOSE_FIELD(EngineResource, m_bIsLocked, "Is Locked", "Indicates if this resource is locked from modifications.", 
-					(FieldOptions{ 
-						.type = EditorFieldWidgetType::EditorFieldWidgetType_Bool, 
-						.disabled = true, 
-						.internal = true 
-					}))
-				EXPOSE_FIELD(EngineResource, m_bIsUnique, "Is Unique", "Specifies if this resource is unique and cannot have duplicates.",
-					(FieldOptions{ 
-						.type = EditorFieldWidgetType::EditorFieldWidgetType_Bool, 
-						.disabled = true, 
-						.internal = true 
-					}))
-				EXPOSE_FIELD(EngineResource, m_ResourceCategory, "Resource Category", "The category this resource belongs to, used for organizational purposes.",
-					(FieldOptions{
-						.type = EditorFieldWidgetType::EditorFieldWidgetType_Enum,
-						.enumToStringFunc = MakeEnumToStringFunc<EngineResourceCategory>(EngineResourceCategoryToString),
-						.disabled = true,
-						.internal = true
-					}))
-				EXPOSE_FIELD(EngineResource, m_AssetType, "Asset Type", "The specific type of asset this resource represents.",
-					(FieldOptions{
-						.type = EditorFieldWidgetType::EditorFieldWidgetType_Enum,
-						.enumToStringFunc = MakeEnumToStringFunc<AssetType>(AssetTypeToString),
-						.disabled = true ,
-						.internal = true
-					}))
-				END_EXPOSE_FIELDS(EngineResource)
-				BEGIN_EXPOSE_GIZMOS(EngineResource)
-				END_EXPOSE_GIZMOS(EngineResource)
-				END_EXPOSE_TO_EDITOR(EngineResource)
+			BEGIN_EXPOSABLE(EngineResource)
+			// 	EXPOSE_FIELD(m_bIsDestroyable, "Is Destroyable", "Indicates if this resource can be destroyed or deleted.",
+			// 		.type = EditorFieldWidgetType::EditorFieldWidgetType_Bool,
+			// 		.disabled = true,
+			// 		.internal = true)
+			// 	EXPOSE_FIELD(m_bIsLocked, "Is Locked", "Indicates if this resource is locked from modifications.",
+			// 		.type = EditorFieldWidgetType::EditorFieldWidgetType_Bool,
+			// 		.disabled = true,
+			// 		.internal = true)
+			// 	EXPOSE_FIELD(m_bIsUnique, "Is Unique", "Specifies if this resource is unique and cannot have duplicates.",
+			// 		.type = EditorFieldWidgetType::EditorFieldWidgetType_Bool,
+			// 		.disabled = true,
+			// 		.internal = true)
+			// 	EXPOSE_FIELD(m_ResourceCategory, "Resource Category", "The category this resource belongs to, used for organizational purposes.",
+			// 		.type = EditorFieldWidgetType::EditorFieldWidgetType_Enum,
+			// 		.enumToStringFunc = MakeEnumToStringFunc<EngineResourceCategory>(EngineResourceCategoryToString),
+			// 		.disabled = true,
+			// 		.internal = true)
+			// 	EXPOSE_FIELD(m_AssetType, "Asset Type", "The specific type of asset this resource represents.",
+			// 		.type = EditorFieldWidgetType::EditorFieldWidgetType_Enum,
+			// 		.enumToStringFunc = MakeEnumToStringFunc<AssetType>(AssetTypeToString),
+			// 		.disabled = true,
+			// 		.internal = true)
+			END_EXPOSABLE(EngineResource)
 		};
 	}
 }

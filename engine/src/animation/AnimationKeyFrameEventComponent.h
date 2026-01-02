@@ -47,11 +47,8 @@ namespace gallus
 		private:
 			AnimationEvent m_Event;
 
-			BEGIN_EXPOSE_FIELDS_PARENT(AnimationKeyFrameEventComponent, AnimationKeyFrameComponentBase)
-			END_EXPOSE_FIELDS(AnimationKeyFrameEventComponent)
-			BEGIN_EXPOSE_GIZMOS(AnimationKeyFrameEventComponent)
-			END_EXPOSE_GIZMOS(AnimationKeyFrameEventComponent)
-			END_EXPOSE_TO_EDITOR(AnimationKeyFrameEventComponent)
+			BEGIN_EXPOSABLE_PARENT(AnimationKeyFrameEventComponent, AnimationKeyFrameComponentBase)
+			END_EXPOSABLE(AnimationKeyFrameEventComponent)
 		};
 
 		class AnimationKeyFrameEventSystem : public AnimationKeyFrameBaseSystem

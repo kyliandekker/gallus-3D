@@ -146,11 +146,11 @@ namespace gallus
 			int m_iFrameCount = 0;
 			bool m_bIsLooping = false;
 
-			BEGIN_EXPOSE_FIELDS_PARENT(Animation, resources::EngineResource)
-			END_EXPOSE_FIELDS(Animation)
-			BEGIN_EXPOSE_GIZMOS(Animation)
-			END_EXPOSE_GIZMOS(Animation)
-			END_EXPOSE_TO_EDITOR(Animation)
+			BEGIN_EXPOSABLE_PARENT(Animation, resources::EngineResource)
+			// END_EXPOSE_FIELDS(Animation)
+			// BEGIN_EXPOSE_GIZMOS(Animation)
+			// END_EXPOSE_GIZMOS(Animation)
+			END_EXPOSABLE(Animation)
 		};
 	}
 }

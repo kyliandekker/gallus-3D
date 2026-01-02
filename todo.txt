@@ -1,6 +1,6 @@
-Key frame should deserialize inside class instead of animation track
+Key frame should deserialize inside class instead of animation track ✓
 Animation track should be shared with others ✓
-Key frame components are fucking hardcoded now
+Key frame components are fucking hardcoded now ✓
 Top bar for new scene, etc ✓
 Tooltip hovers ✓
 Debug shapes ✓
@@ -10,3 +10,5 @@ Scene sys needs refactor because it is awful and illogical ✓
 Whole engine resource needs refactor because it is a mess ✓ 
 Path loading only needs to be editor based ✓
 Sprite modal is awful
+Turn DX12System into a coordinator class and split up the parts
+Stuff in DX12System should probably be unique_ptrs
