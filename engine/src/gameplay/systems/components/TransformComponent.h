@@ -39,7 +39,7 @@ namespace gallus
 			BEGIN_EXPOSABLE_PARENT(TransformComponent, Component)
 				EXPOSE_FIELD(m_Transform, "Transform", "",
 					.type = EditorFieldWidgetType::EditorFieldWidgetType_Object)
-				// EXPOSE_GIZMO(m_Transform, EditorGizmoType::EditorGizmoType_Transform)
+				EXPOSE_GIZMO(m_Transform, EditorGizmoType::EditorGizmoType_Transform)
 			END_EXPOSABLE(TransformComponent)
 		};
 	}

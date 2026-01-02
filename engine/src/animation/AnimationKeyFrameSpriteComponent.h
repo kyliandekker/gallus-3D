@@ -57,9 +57,6 @@ namespace gallus
 			 		.type = EditorFieldWidgetType::EditorFieldWidgetType_TexturePreview,
 			 		.relatedIndexFieldOffset = offsetof(AnimationKeyFrameSpriteComponent, m_iSpriteIndex)
 			 	)
-			// END_EXPOSE_FIELDS(AnimationKeyFrameSpriteComponent)
-			// BEGIN_EXPOSE_GIZMOS(AnimationKeyFrameSpriteComponent)
-			// END_EXPOSE_GIZMOS(AnimationKeyFrameSpriteComponent)
 			END_EXPOSABLE(AnimationKeyFrameSpriteComponent)
 		};
 

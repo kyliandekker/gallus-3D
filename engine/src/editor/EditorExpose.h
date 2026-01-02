@@ -109,133 +109,52 @@ namespace gallus
 		return &T::StaticEditorFields();
 	}
 
-// ===== SIMPLIFIED MACRO SYSTEM (v2) =====
-// Ultra-clean syntax: just BEGIN_EXPOSABLE, then EXPOSE_FIELD/EXPOSE_GIZMO, then END_EXPOSABLE
-// Class name is captured automatically - no need to pass it or repeat it!
-
-// Main macro: Sets up field and gizmo static methods
-// Usage: Place once in the public section of your class
 #define BEGIN_EXPOSABLE(CLASSNAME) \
 		public: \
 			using _ExposableClass = CLASSNAME; \
 			using _FieldClass = CLASSNAME; \
 			using _GizmoClass = CLASSNAME; \
-			static const std::vector<EditorFieldInfo>& StaticEditorFields() \
-			{ \
-				static std::vector<EditorFieldInfo> fields = []() { \
-					std::vector<EditorFieldInfo> f;
+			static std::pair<std::vector<EditorFieldInfo>, std::vector<EditorGizmoInfo>> _InitializeExposables() { \
+				std::vector<EditorFieldInfo> f; \
+				std::vector<EditorGizmoInfo> g;
 
-// Main macro with parent class inheritance
 #define BEGIN_EXPOSABLE_PARENT(CLASSNAME, PARENT) \
 		public: \
 			using _ExposableClass = CLASSNAME; \
 			using _FieldClass = CLASSNAME; \
 			using _GizmoClass = CLASSNAME; \
-			static const std::vector<EditorFieldInfo>& StaticEditorFields() \
-			{ \
-				static std::vector<EditorFieldInfo> fields = []() { \
-					std::vector<EditorFieldInfo> f; \
-					const auto& parentFields = PARENT::StaticEditorFields(); \
-					f.insert(f.end(), parentFields.begin(), parentFields.end());
+			static std::pair<std::vector<EditorFieldInfo>, std::vector<EditorGizmoInfo>> _InitializeExposables() { \
+				std::vector<EditorFieldInfo> f; \
+				std::vector<EditorGizmoInfo> g; \
+				const auto& parentFields = PARENT::StaticEditorFields(); \
+				f.insert(f.end(), parentFields.begin(), parentFields.end());
 
-// Add a field with full options
 #define EXPOSE_FIELD(VAR, UINAME, DESCRIPTION, ...) \
-					f.push_back({ #VAR, offsetof(_FieldClass, VAR), UINAME, DESCRIPTION, FieldOptions{ __VA_ARGS__ } });
+				f.push_back({ #VAR, offsetof(_FieldClass, VAR), UINAME, DESCRIPTION, FieldOptions{ __VA_ARGS__ } });
 
-// Add a field with just type (simple cases)
-#define EXPOSE_FIELD_SIMPLE(VAR, UINAME, FIELD_TYPE) \
-					f.push_back({ #VAR, offsetof(_FieldClass, VAR), UINAME, "", FieldOptions{ .type = FIELD_TYPE } });
+#define EXPOSE_FIELD_SIMPLE(VAR, UINAME, DESCRIPTION, FIELD_TYPE) \
+				f.push_back({ #VAR, offsetof(_FieldClass, VAR), UINAME, DESCRIPTION, FieldOptions{ .type = FIELD_TYPE } });
 
-// Add a gizmo (no class name needed - uses _GizmoClass from BEGIN_EXPOSABLE)
-// NOTE: `EXPOSE_GIZMO` must be used after `END_EXPOSE_FIELDS()` (or you may call
-// `END_EXPOSABLE(CLASSNAME)` immediately after fields if there are no gizmos).
-// This keeps macro behavior simple and predictable.
+#define EXPOSE_FIELD_OPTIONS(VAR, UINAME, DESCRIPTION, OPTIONS) \
+            f.push_back({ #VAR, offsetof(_FieldClass, VAR), UINAME, DESCRIPTION, OPTIONS });
+
 #define EXPOSE_GIZMO(VAR, GIZMO_OPTIONS) \
-					g.push_back({ #VAR, offsetof(_GizmoClass, VAR), GIZMO_OPTIONS });
+				g.push_back({ #VAR, offsetof(_GizmoClass, VAR), GIZMO_OPTIONS });
 
-// Close the entire exposable section (generates GetEditorFields, GetEditorGizmos, GetTypeName overrides)
-// CLASSNAME is needed here to stringify it for GetTypeName override
 #define END_EXPOSABLE(CLASSNAME) \
-					return f; \
-				}(); \
+				return { f, g }; \
+			} \
+			static const std::vector<EditorFieldInfo>& StaticEditorFields() { \
+				static auto [fields, gizmos] = _InitializeExposables(); \
 				return fields; \
 			} \
-			static const std::vector<EditorGizmoInfo>& StaticEditorGizmos() \
-			{ \
-				static std::vector<EditorGizmoInfo> gizmos = []() { \
-					std::vector<EditorGizmoInfo> g; \
-					return g; \
-				}(); \
+			static const std::vector<EditorGizmoInfo>& StaticEditorGizmos() { \
+				static auto [fields, gizmos] = _InitializeExposables(); \
 				return gizmos; \
 			} \
 			const std::vector<EditorFieldInfo>& GetEditorFields() const override { return _ExposableClass::StaticEditorFields(); } \
 			const std::vector<EditorGizmoInfo>& GetEditorGizmos() const override { return _ExposableClass::StaticEditorGizmos(); } \
 			const char* GetTypeName() const override { return #CLASSNAME; }
-
-// Variant for when you only have gizmos (no END_EXPOSE_FIELDS needed)
-/* Removed END_EXPOSABLE_WITH_GIZMOS helper - behavior unified into END_EXPOSABLE(CLASSNAME).
-   To declare gizmos, call `END_EXPOSE_FIELDS()` first, then `EXPOSE_GIZMO(...)` calls,
-   and finally `END_EXPOSABLE(CLASSNAME)`. This keeps macro control flow explicit and
-   avoids preprocessor state complexities. */
-
-// ===== BACKWARD COMPATIBILITY - OLD STYLE MACROS =====
-// These old macros still work for gradual migration (not recommended for new code)
-
-#define BEGIN_EXPOSE_FIELDS(CLASSNAME) \
-		public: \
-			static const std::vector<EditorFieldInfo>& StaticEditorFields() \
-			{ \
-				static std::vector<EditorFieldInfo> fields = []() { \
-					std::vector<EditorFieldInfo> f; \
-					using _FieldClass = CLASSNAME;
-
-#define BEGIN_EXPOSE_FIELDS_PARENT(CLASSNAME, PARENT) \
-		public: \
-			static const std::vector<EditorFieldInfo>& StaticEditorFields() \
-			{ \
-				static std::vector<EditorFieldInfo> fields = []() { \
-					std::vector<EditorFieldInfo> f; \
-					using _FieldClass = CLASSNAME; \
-					const auto& parentFields = PARENT::StaticEditorFields(); \
-					f.insert(f.end(), parentFields.begin(), parentFields.end());
-
-/* Backwards compatibility: provide END_EXPOSE_FIELDS and END_EXPOSE_GIZMOS
-	so older code can still use the legacy macros. These close the lambdas
-	opened by BEGIN_EXPOSE_FIELDS / BEGIN_EXPOSE_GIZMOS and leave the
-	overrides to `END_EXPOSE_TO_EDITOR`. New code should prefer the
-	unified BEGIN_EXPOSABLE / END_EXPOSABLE pattern. */
-
-#define END_EXPOSE_FIELDS(CLASSNAME) \
-						  return f; \
-					 }(); \
-					 return fields; \
-				}
-
-#define BEGIN_EXPOSE_GIZMOS(CLASSNAME) \
-		public: \
-			static const std::vector<EditorGizmoInfo>& StaticEditorGizmos() \
-			{ \
-				static std::vector<EditorGizmoInfo> gizmos = []() { \
-					std::vector<EditorGizmoInfo> g; \
-					using _GizmoClass = CLASSNAME;
-
-// Close gizmos lambda (legacy macro)
-#define END_EXPOSE_GIZMOS(CLASSNAME) \
-					return g; \
-				}(); \
-				return gizmos; \
-			}
-
-#define END_EXPOSE_TO_EDITOR(CLASSNAME) \
-		const std::vector<EditorFieldInfo>& GetEditorFields() const override { return CLASSNAME::StaticEditorFields(); } \
-		const std::vector<EditorGizmoInfo>& GetEditorGizmos() const override { return CLASSNAME::StaticEditorGizmos(); } \
-		const char* GetTypeName() const override { return #CLASSNAME; }
-
-#define EXPOSE_FIELD_LEGACY(CLASSNAME, VAR, UINAME, DESCRIPTION, FIELD_OPTIONS) \
-					f.push_back({ #VAR, offsetof(CLASSNAME, VAR), UINAME, DESCRIPTION, FIELD_OPTIONS });
-
-#define EXPOSE_GIZMO_LEGACY(CLASSNAME, VAR, GIZMO_OPTIONS) \
-			g.push_back({ #VAR, offsetof(CLASSNAME, VAR), GIZMO_OPTIONS });
 
 	template<typename TEnum>
 	inline std::function<std::string(int)> MakeEnumToStringFunc(std::string(*toStringFunc)(TEnum))
