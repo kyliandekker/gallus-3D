@@ -157,6 +157,30 @@ namespace gallus
 
 				return a_vQuat;
 			}
+			
+			//---------------------------------------------------------------------
+			DirectX::XMVECTOR Transform::AddRotationLocal(
+				DirectX::XMVECTOR& a_vQuat,
+				const DirectX::XMFLOAT3& a_vAddition)
+			{
+				float pitch = DirectX::XMConvertToRadians(a_vAddition.x);
+				float yaw = DirectX::XMConvertToRadians(a_vAddition.y);
+				float roll = DirectX::XMConvertToRadians(a_vAddition.z);
+
+				DirectX::XMVECTOR deltaQuat =
+					DirectX::XMQuaternionRotationRollPitchYaw(
+						pitch,
+						yaw,
+						roll
+					);
+
+				// Local-space accumulation
+				a_vQuat = DirectX::XMQuaternionMultiply(deltaQuat, a_vQuat);
+
+				a_vQuat = DirectX::XMQuaternionNormalize(a_vQuat);
+
+				return a_vQuat;
+			}
 
 			//---------------------------------------------------------------------
 			const DirectX::XMVECTOR& Transform::GetRotationQ() const

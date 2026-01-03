@@ -55,6 +55,8 @@ namespace gallus
 
 				float m_fZoom = 1.0f;
 				ImVec2 m_vPanOffset = ImVec2(0.0f, 0.0f);
+				float m_fCameraPitch = 0.0f;
+				float m_fCameraYaw = 0.0f;
 			};
 
 			class FullSceneWindow : public SceneWindow

@@ -57,6 +57,7 @@ namespace gallus
 				static DirectX::XMFLOAT3 QuaternionToEuler(const DirectX::XMVECTOR & quat);
 				static DirectX::XMVECTOR EulerToQuaternion(const DirectX::XMFLOAT3& a_vEuler);
 				static DirectX::XMVECTOR AddRotation(DirectX::XMVECTOR& a_vQuat, const DirectX::XMFLOAT3& a_vAddition);
+				static DirectX::XMVECTOR AddRotationLocal(DirectX::XMVECTOR& a_vQuat, const DirectX::XMFLOAT3& a_vAddition);
 
 				Transform();
 

@@ -96,7 +96,7 @@ namespace gallus
 				}
 
 				if (ImGui::CheckboxButton(
-					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_PLAY), BUTTON_ID, "PLAY_SCENE").c_str(),  & isStarted, "Starts or stops the game simulation using the currently loaded scene. When stopping, the scene is reloaded to its original editor state.", m_Window.GetHeaderSize()))
+					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_PLAY), BUTTON_ID, "PLAY_SCENE").c_str(), &isStarted, "Starts or stops the game simulation using the currently loaded scene. When stopping, the scene is reloaded to its original editor state.", m_Window.GetHeaderSize()))
 				{
 					core::EDITOR_ENGINE->GetEditor().SetSelectable(nullptr);
 					if (isStarted)
@@ -161,7 +161,7 @@ namespace gallus
 					ImGui::IMGUI_FORMAT_ID(camIsolationModeIcon, BUTTON_ID, "CAMERA_ISOLATION_MODE_SCENE").c_str(), "Cycles camera rendering between combined 2D and 3D, 3D-only, and 2D-only modes.", m_Window.GetHeaderSize()))
 				{
 					camIsolationMode = ++camIsolationMode % 3;
-					core::EDITOR_ENGINE->GetDX12().SetCameraIsolationMode((graphics::dx12::CameraIsolationMode)camIsolationMode);
+					core::EDITOR_ENGINE->GetDX12().SetCameraIsolationMode((graphics::dx12::CameraIsolationMode) camIsolationMode);
 				}
 
 				ImGui::EndToolbar(ImVec2(0, 0));
@@ -245,7 +245,7 @@ namespace gallus
 
 				ImGui::SetCursorPos(imagePos);
 				ImGui::Image(
-					(ImTextureID)tex->GetGPUHandle().ptr,
+					(ImTextureID) tex->GetGPUHandle().ptr,
 					imageSize
 				);
 
@@ -286,7 +286,6 @@ namespace gallus
 				{
 					return;
 				}
-
 
 				int camIsolationMode = core::EDITOR_ENGINE->GetDX12().GetCameraIsolationMode();
 				if (camIsolationMode == graphics::dx12::CameraIsolationMode_2D)
@@ -538,8 +537,125 @@ namespace gallus
 				BaseWindow::Update();
 			}
 
+			//---------------------------------------------------------------------
 			void SceneWindow::HandleCameraInput(double a_fDeltaTime, const ImVec2& a_vSceneStartPos, const ImVec2& a_vSize)
 			{
+				ImVec2 imageMin = { a_vSceneStartPos.x + m_vPanOffset.x, a_vSceneStartPos.y + m_vPanOffset.y };
+				ImVec2 imageMax = imageMin + ImVec2(a_vSize.x * m_fZoom, a_vSize.y * m_fZoom);
+				ImGui::GetWindowDrawList()->AddRectFilled(imageMin, imageMax, IM_COL32(255, 255, 255, 255), 0.0f, 0);
+
+				ImGuiIO& io = ImGui::GetIO();
+				ImVec2 mouse = io.MousePos;
+
+				static bool s_bMoving = false;
+				static bool s_bRotating = false;
+				static bool s_bFirstRotateFrame = false;
+				static float s_fYawDegrees = 0.0f;
+				static float s_fPitchDegrees = 0.0f;
+				static POINT s_CenterPos = { 0, 0 };
+
+				graphics::dx12::Camera& camera = core::EDITOR_ENGINE->GetEditor().GetEditorCamera();
+				graphics::dx12::Transform& transform = camera.GetTransform();
+				DirectX::XMFLOAT3 position = transform.GetPosition();
+
+				const float moveSpeed = 20.0f;
+				const float rotationSpeed = 0.1f;
+				float moveDistance = moveSpeed * static_cast<float>(a_fDeltaTime);
+
+				int camIsolationMode = core::EDITOR_ENGINE->GetDX12().GetCameraIsolationMode();
+				bool bHovered = ImGui::IsWindowHovered() && mouse.x >= imageMin.x && mouse.y >= imageMin.y && mouse.x <= imageMax.x && mouse.y <= imageMax.y;
+
+				if (!bHovered || !ImGui::IsMouseDown(ImGuiMouseButton_Right))
+				{
+					if (s_bMoving || s_bRotating)
+					{
+						s_bMoving = false;
+						s_bRotating = false;
+						s_bFirstRotateFrame = false;
+						ImGui::SetMouseCursor(ImGuiMouseCursor_Arrow);
+					}
+					return;
+				}
+
+				ImVec2 viewportCenter = { (imageMin.x + imageMax.x) * 0.5f, (imageMin.y + imageMax.y) * 0.5f };
+				s_CenterPos.x = static_cast<LONG>(viewportCenter.x);
+				s_CenterPos.y = static_cast<LONG>(viewportCenter.y);
+
+				if (!s_bMoving && !s_bRotating)
+				{
+					s_bMoving = true;
+					s_bRotating = true;
+					s_bFirstRotateFrame = true;
+					ImGui::SetMouseCursor(ImGuiMouseCursor_None);
+				}
+
+				if (s_bFirstRotateFrame)
+				{
+					SetCursorPos(s_CenterPos.x, s_CenterPos.y);
+					s_bFirstRotateFrame = false;
+				}
+
+				POINT currentPos;
+				GetCursorPos(&currentPos);
+				float deltaX = static_cast<float>(currentPos.x - s_CenterPos.x);
+				float deltaY = static_cast<float>(currentPos.y - s_CenterPos.y);
+				SetCursorPos(s_CenterPos.x, s_CenterPos.y);
+
+				if (camIsolationMode == graphics::dx12::CameraIsolationMode_2D)
+				{
+					position.x -= deltaX * moveSpeed * static_cast<float>(a_fDeltaTime);
+					position.y -= deltaY * moveSpeed * static_cast<float>(a_fDeltaTime);
+					transform.SetPosition(position);
+					return;
+				}
+
+				s_fYawDegrees += -deltaX * rotationSpeed;
+				s_fPitchDegrees += -deltaY * rotationSpeed;
+				if (s_fPitchDegrees > 89.0f) s_fPitchDegrees = 89.0f;
+				if (s_fPitchDegrees < -89.0f) s_fPitchDegrees = -89.0f;
+
+				DirectX::XMVECTOR yawQuat = DirectX::XMQuaternionRotationAxis(DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f), DirectX::XMConvertToRadians(s_fYawDegrees));
+				DirectX::XMVECTOR pitchQuat = DirectX::XMQuaternionRotationAxis(DirectX::XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f), DirectX::XMConvertToRadians(s_fPitchDegrees));
+				DirectX::XMVECTOR rotation = DirectX::XMQuaternionNormalize(DirectX::XMQuaternionMultiply(pitchQuat, yawQuat));
+				transform.SetRotation(rotation);
+
+				DirectX::XMMATRIX rotMatrix = DirectX::XMMatrixRotationQuaternion(rotation);
+				DirectX::XMFLOAT4X4 m;
+				DirectX::XMStoreFloat4x4(&m, rotMatrix);
+				DirectX::XMFLOAT3 right(m.m[0][0], m.m[0][1], m.m[0][2]);
+				DirectX::XMFLOAT3 up(m.m[1][0], m.m[1][1], m.m[1][2]);
+				DirectX::XMFLOAT3 forward(m.m[2][0], m.m[2][1], m.m[2][2]);
+
+				if (ImGui::IsKeyDown(ImGuiKey_W))
+				{
+					position.x += forward.x * moveDistance; position.y += forward.y * moveDistance; position.z += forward.z * moveDistance;
+				}
+				if (ImGui::IsKeyDown(ImGuiKey_S))
+				{
+					position.x -= forward.x * moveDistance; position.y -= forward.y * moveDistance; position.z -= forward.z * moveDistance;
+				}
+				if (ImGui::IsKeyDown(ImGuiKey_A))
+				{
+					position.x -= right.x * moveDistance; position.y -= right.y * moveDistance; position.z -= right.z * moveDistance;
+				}
+				if (ImGui::IsKeyDown(ImGuiKey_D))
+				{
+					position.x += right.x * moveDistance; position.y += right.y * moveDistance; position.z += right.z * moveDistance;
+				}
+				if (ImGui::IsKeyDown(ImGuiKey_Q))
+				{
+					position.x -= up.x * moveDistance; position.y -= up.y * moveDistance; position.z -= up.z * moveDistance;
+				}
+				if (ImGui::IsKeyDown(ImGuiKey_E))
+				{
+					position.x += up.x * moveDistance; position.y += up.y * moveDistance; position.z += up.z * moveDistance;
+				}
+				if (io.MouseWheel != 0.0f)
+				{
+					position.x += forward.x * io.MouseWheel * moveDistance * 2.0f; position.y += forward.y * io.MouseWheel * moveDistance * 2.0f; position.z += forward.z * io.MouseWheel * moveDistance * 2.0f;
+				}
+
+				transform.SetPosition(position);
 			}
 
 
