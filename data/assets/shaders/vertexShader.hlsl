@@ -8,7 +8,7 @@ PSInput main(VSInput input)
 
     output.POSITION = mul(WorldViewProj, worldPos);
 	output.TEXCOORD = lerp(uv.xy, uv.zw, input.TEXCOORD);
-    output.NORMAL = normalize(mul((float3x3)WorldViewProj, input.NORMAL));
+    output.NORMAL = normalize(mul((float3x3)WorldMatrix, input.NORMAL));
     output.COLOR = input.COLOR;
 
     return output;

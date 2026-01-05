@@ -47,7 +47,7 @@ namespace gallus
 				void Render() override;
 				void Draw2DGrid(const ImVec2& a_vScenePos, const ImVec2& a_vSize, const ImVec2& a_vPanOffset, float a_fZoom);
 			private:
-				void DrawComponentGizmos(const ImVec2& a_vSceneStartPos, const ImVec2& a_vSize);
+				void DrawSerializedObjectGizmos(const ImVec2& a_vSceneStartPos, const ImVec2& a_vSize);
 				void DrawGizmos(const ImVec2& a_vScenePos, const ImVec2& a_vSize, const ImVec2& a_vPanOffset, float a_fZoom);
 				void DrawViewportPanel();
 

@@ -142,14 +142,12 @@ namespace gallus
 				{
 					m_CameraType = a_CameraType;
 				}
-			private:
+
 				DirectX::XMFLOAT3 m_vPosition = VEC_ZERO;
 				DirectX::XMFLOAT3 m_vScale = VEC_IDENTITY;
 				DirectX::XMVECTOR m_vRotation = { DirectX::XMQuaternionIdentity() };
 				DirectX::XMFLOAT3 m_vPivot = VEC_PIVOT_CENTER;
-				graphics::dx12::CameraType m_CameraType;
-
-				friend class Camera;
+				graphics::dx12::CameraType m_CameraType = CameraType::CameraType_World;
 
 				BEGIN_SERIALIZE(Transform)
 				 	SERIALIZE_FIELD(m_vPosition, "Position", "The position of the object in 2D space. Defines where the object is located on the screen.",

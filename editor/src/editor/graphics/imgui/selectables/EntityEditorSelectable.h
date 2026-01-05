@@ -46,6 +46,8 @@ namespace gallus
 					return m_EntityID;
 				}
 
+				bool RenderEditorFields() override;
+
 				bool RenderGizmos(
 					const ImVec2& a_vScenePos,
 					const ImVec2& a_vSize,
@@ -59,8 +61,6 @@ namespace gallus
 				std::string GetName() const override;
 
 				std::string GetIcon() const override;
-
-				void RenderEditorFields() override;
 			private:
 				gameplay::EntityID& m_EntityID;
 				std::string m_sIcon;

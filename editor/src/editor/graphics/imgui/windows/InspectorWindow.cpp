@@ -161,7 +161,10 @@ namespace gallus
 					(ImGui::GetContentRegionAvail().y) - m_Window.GetFramePadding().y),
 					ImGuiChildFlags_Borders))
 				{
-					selectable->RenderEditorFields();
+					if (selectable->RenderEditorFields())
+					{
+						core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
+					}
 				}
 				ImGui::EndChild();
 

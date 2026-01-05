@@ -21,6 +21,11 @@ namespace gallus
 				EditorSelectable(ImGuiWindow& a_Window) : ImGuiUIView(a_Window)
 				{}
 
+				virtual bool RenderEditorFields()
+				{
+					return false;
+				}
+
 				virtual bool RenderGizmos(
 					const ImVec2& a_vScenePos,
 					const ImVec2& a_vSize,
@@ -29,9 +34,6 @@ namespace gallus
 				{
 					return false;
 				}
-
-				virtual void RenderEditorFields()
-				{}
 
 				void Render() override
 				{}

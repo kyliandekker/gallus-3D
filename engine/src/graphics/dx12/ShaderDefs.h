@@ -3,9 +3,10 @@
 
 // GENERATED FILE - DO NOT EDIT
 
-struct Transform
+struct ShaderTransform
 {
     DirectX::XMMATRIX WorldViewProj;
+    DirectX::XMMATRIX WorldMatrix;
 };
 
 struct SpriteUV

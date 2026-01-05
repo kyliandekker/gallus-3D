@@ -159,26 +159,6 @@ namespace gallus
 				ImGui::SetCursorScreenPos(ImVec2(screenCursorPos.x, screenCursorPos.y + childSize.y));
 			}
 
-			bool EntityEditorSelectable::RenderGizmos(const ImVec2& a_vScenePos, const ImVec2& a_vSize, const ImVec2& a_vPanOffset, float a_fZoom)
-			{
-				std::lock_guard<std::recursive_mutex> lock(core::EDITOR_ENGINE->GetECS().m_EntityMutex);
-
-				bool changed = false;
-				for (auto* sys : core::EDITOR_ENGINE->GetECS().GetSystems())
-				{
-					if (sys->HasComponent(GetEntityID()))
-					{
-						auto* comp = sys->GetBaseComponent(GetEntityID());
-
-						if (RenderObjectGizmos(a_vScenePos, a_vSize, a_vPanOffset, a_fZoom, comp))
-						{
-							changed = true;
-						}
-					}
-				}
-				return changed;
-			}
-
 			//---------------------------------------------------------------------
 			void EntityEditorSelectable::OnRename(const std::string& a_sName)
 			{
@@ -205,8 +185,9 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			void EntityEditorSelectable::RenderEditorFields()
+			bool EntityEditorSelectable::RenderEditorFields()
 			{
+				bool changed = false;
 				std::lock_guard<std::recursive_mutex> lock(core::EDITOR_ENGINE->GetECS().m_EntityMutex);
 
 				ImGui::SetCursorPosY(0);
@@ -247,7 +228,7 @@ namespace gallus
 						{
 							if (RenderObjectFields(comp))
 							{
-								core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
+								changed = true;
 							}
 						}
 					}
@@ -283,12 +264,35 @@ namespace gallus
 						if (ImGui::MenuItem(ImGui::IMGUI_FORMAT_ID(sys->GetSystemName(), MENU_ITEM_ID, "ADD_COMPONENT_MENU_INSPECTOR_" + sys->GetPropertyName()).c_str()))
 						{
 							editor::g_CreateComponent(sys, m_EntityID);
+							changed = true;
 						}
 					}
 
 					ImGui::EndPopup();
 				}
 				ImGui::PopStyleVar();
+
+				return changed;
+			}
+
+			bool EntityEditorSelectable::RenderGizmos(const ImVec2& a_vScenePos, const ImVec2& a_vSize, const ImVec2& a_vPanOffset, float a_fZoom)
+			{
+				std::lock_guard<std::recursive_mutex> lock(core::EDITOR_ENGINE->GetECS().m_EntityMutex);
+
+				bool changed = false;
+				for (auto* sys : core::EDITOR_ENGINE->GetECS().GetSystems())
+				{
+					if (sys->HasComponent(GetEntityID()))
+					{
+						auto* comp = sys->GetBaseComponent(GetEntityID());
+
+						if (RenderObjectGizmos(a_vScenePos, a_vSize, a_vPanOffset, a_fZoom, comp))
+						{
+							changed = true;
+						}
+					}
+				}
+				return changed;
 			}
 		}
 	}

@@ -46,7 +46,7 @@ namespace gallus
 
 				void OnDelete() override;
 
-				void RenderEditorFields() override;
+				bool RenderEditorFields() override;
 			protected:
 				animation::AnimationKeyFrame& m_KeyFrame;
 				animation::Animation& m_Animation;

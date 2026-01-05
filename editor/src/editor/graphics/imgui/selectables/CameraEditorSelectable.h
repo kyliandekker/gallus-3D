@@ -34,7 +34,13 @@ namespace gallus
 
 				std::string GetIcon() const override;
 
-				void RenderEditorFields() override;
+				bool RenderEditorFields() override;
+
+				bool RenderGizmos(
+					const ImVec2& a_vScenePos,
+					const ImVec2& a_vSize,
+					const ImVec2& a_vPanOffset,
+					float a_fZoom) override;
 			private:
 				std::string m_sIcon;
 				bool m_bExpanded = false;

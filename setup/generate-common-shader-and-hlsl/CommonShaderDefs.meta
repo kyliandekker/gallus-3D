@@ -1,7 +1,8 @@
-// @shader_cbuffer(name=Transform, register=b0)
-cbuffer Transform
+// @shader_cbuffer(name=ShaderTransform, register=b0)
+cbuffer ShaderTransform
 {
     float4x4 WorldViewProj;
+    float4x4 WorldMatrix;
 };
 
 // @shader_cbuffer(name=SpriteUV, register=b1)
@@ -43,7 +44,7 @@ vertex_input VSInput
 root_parameters
 {
     CBV							b0 cbuffer Transform;
-    SPRITE_UV					b1 cbuffer Transform;
+    SPRITE_UV					b1 cbuffer SpriteUV;
     MATERIAL         			b2 cbuffer Material;
     DIRECTIONAL_LIGHT			b3 cbuffer DirectionalLight;
     TEX_SRV						t0 Texture2D spriteTexture;

@@ -96,7 +96,8 @@ namespace gallus
 			const DirectX::XMMATRIX viewMatrix = a_Camera.GetViewMatrix(transform.GetCameraType());
 			const DirectX::XMMATRIX& projectionMatrix = a_Camera.GetProjectionMatrix(transform.GetCameraType());
 
-			DirectX::XMMATRIX mvpMatrix = transform.GetWorldMatrixWithPivot() * viewMatrix * projectionMatrix;
+			DirectX::XMMATRIX mMatrix = transform.GetWorldMatrixWithPivot();
+			DirectX::XMMATRIX mvpMatrix = mMatrix * viewMatrix * projectionMatrix;
 
 			if (auto material = core::ENGINE->GetResourceAtlas().GetDefaultMaterial().lock())
 			{
@@ -131,7 +132,7 @@ namespace gallus
 			{
 				if (mesh->IsValid())
 				{
-					mesh->Render(a_pCommandList, mvpMatrix);
+					mesh->Render(a_pCommandList, mvpMatrix, mMatrix);
 				}
 			}
 		}

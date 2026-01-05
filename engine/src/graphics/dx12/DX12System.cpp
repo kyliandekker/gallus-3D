@@ -618,8 +618,7 @@ namespace gallus
 				// Define root parameters
 				CD3DX12_ROOT_PARAMETER1 rootParameters[RootParameters::NumRootParameters]{};
 
-				// CBV at register b0 (Model-View-Projection Matrix)
-				rootParameters[RootParameters::CBV].InitAsConstants(sizeof(DirectX::XMMATRIX) / 4, RootParameters::CBV, 0, D3D12_SHADER_VISIBILITY_VERTEX);
+				rootParameters[RootParameters::CBV].InitAsConstants(sizeof(ShaderTransform) / 4, RootParameters::CBV, 0, D3D12_SHADER_VISIBILITY_VERTEX);
 
 				// b1: Sprite UV rect
 				rootParameters[RootParameters::SPRITE_UV].InitAsConstants(4, RootParameters::SPRITE_UV);

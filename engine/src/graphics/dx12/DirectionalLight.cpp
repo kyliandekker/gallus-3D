@@ -10,6 +10,19 @@ namespace gallus
 	{
 		namespace dx12
 		{
+			DirectX::XMFLOAT3 GetForwardFromQuaternion(const DirectX::XMVECTOR& a_Rotation)
+			{
+				DirectX::XMVECTOR rotation = DirectX::XMQuaternionNormalize(a_Rotation);
+				DirectX::XMVECTOR forward = DirectX::XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
+
+				DirectX::XMVECTOR result = DirectX::XMVector3Rotate(forward, rotation);
+
+				DirectX::XMFLOAT3 out;
+				DirectX::XMStoreFloat3(&out, DirectX::XMVector3Normalize(result));
+
+				return out;
+			}
+
 			//---------------------------------------------------------------------
 			// DirectionalLight
 			//---------------------------------------------------------------------
@@ -25,6 +38,7 @@ namespace gallus
 				void* mappedData;
 				CD3DX12_RANGE readRange(0, 0);
 				m_pResource->Map(0, &readRange, &mappedData);
+				m_DirectionalLightData.LightDirection = GetForwardFromQuaternion(m_Transform.GetRotationQ());
 				memcpy(mappedData, &m_DirectionalLightData, sizeof(DirectionalLightData));
 				m_pResource->Unmap(0, nullptr);
 

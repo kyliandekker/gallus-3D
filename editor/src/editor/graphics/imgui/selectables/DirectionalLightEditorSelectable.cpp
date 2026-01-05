@@ -137,8 +137,10 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			void DirectionalLightEditorSelectable::RenderEditorFields()
+			bool DirectionalLightEditorSelectable::RenderEditorFields()
 			{
+				bool changed = false;
+
 				std::lock_guard<std::recursive_mutex> lock(core::EDITOR_ENGINE->GetECS().m_EntityMutex);
 
 				ImGui::SetCursorPosY(0);
@@ -169,7 +171,7 @@ namespace gallus
 
 					if (RenderObjectFields(light.get()))
 					{
-						core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
+						changed = true;
 					}
 				}
 
@@ -177,6 +179,17 @@ namespace gallus
 
 				ImGui::SetCursorPosX(0 + m_Window.GetFramePadding().x);
 				ImGui::SetCursorPosY(ImGui::GetCursorPosY() + m_Window.GetFramePadding().y);
+
+				return changed;
+			}
+
+			bool DirectionalLightEditorSelectable::RenderGizmos(const ImVec2& a_vScenePos, const ImVec2& a_vSize, const ImVec2& a_vPanOffset, float a_fZoom)
+			{
+				if (RenderObjectGizmos(a_vScenePos, a_vSize, a_vPanOffset, a_fZoom, core::EDITOR_ENGINE->GetDX12().GetDirectionalLight().lock().get()))
+				{
+					return true;
+				}
+				return false;
 			}
 		}
 	}

@@ -3,6 +3,7 @@
 #include "graphics/dx12/DX12PCH.h"
 #include "graphics/dx12/ShaderDefs.h"
 #include "graphics/dx12/DX12Resource.h"
+#include "graphics/dx12/Transform.h"
 
 namespace gallus
 {
@@ -49,18 +50,20 @@ namespace gallus
 					return m_DirectionalLightData;
 				}
 			protected:
+				Transform m_Transform;
 				DirectionalLightData m_DirectionalLightData;
 
 				BEGIN_SERIALIZE_PARENT(DirectionalLight, resources::EngineResource)
 				 	SERIALIZE_FIELD(m_DirectionalLightData.DirectionalLightEnabled, "Enabled", ".",
 				 		.type = FieldSerializationType::FieldSerializationType_LongSwitch)
-				 	SERIALIZE_FIELD(m_DirectionalLightData.LightDirection, "Light Direction", ".",
-				 		.type = FieldSerializationType::FieldSerializationType_Vector3)
+				 	SERIALIZE_FIELD(m_Transform.m_vRotation, "Light Direction", ".",
+				 		.type = FieldSerializationType::FieldSerializationType_Quaternion)
 				 	SERIALIZE_FIELD(m_DirectionalLightData.LightColor, "Light Color", "",
 				 		.type = gallus::FieldSerializationType::FieldSerializationType_Color)
 				 	SERIALIZE_FIELD(m_DirectionalLightData.AmbientIntensity, "Ambient Intensity", "",
 				 		.type = FieldSerializationType::FieldSerializationType_Float,
 				 		.step = 0.1f)
+					EXPOSE_GIZMO(m_Transform, EditorGizmoType::EditorGizmoType_Transform)
 				END_SERIALIZE(DirectionalLight)
 			};
 		}

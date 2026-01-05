@@ -251,7 +251,7 @@ namespace gallus
 
 				if (core::EDITOR_ENGINE->GetEditor().GetCameraMode() == editor::CameraMode::CAMERA_MODE_SCENE)
 				{
-					DrawComponentGizmos(imageScreenPos, textureSize);
+					DrawSerializedObjectGizmos(imageScreenPos, textureSize);
 				}
 
 				ImU32 borderColor = IM_COL32(255, 255, 255, 255); // white border
@@ -353,7 +353,7 @@ namespace gallus
 						drawList->AddLine(ImVec2(rectMin.x, originY), ImVec2(rectMax.x, originY), axisXColor, 1.5f);
 					}
 				}
-				else if (camIsolationMode == graphics::dx12::CameraIsolationMode_3D)
+				else 
 				{
 					// Get the camera projection and view matrices
 					DirectX::XMMATRIX camProj = core::EDITOR_ENGINE->GetEditor().GetEditorCamera().GetProjectionMatrix(graphics::dx12::CameraType_World);
@@ -365,7 +365,7 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			void SceneWindow::DrawComponentGizmos(const ImVec2& a_vSceneStartPos, const ImVec2& a_vSize)
+			void SceneWindow::DrawSerializedObjectGizmos(const ImVec2& a_vSceneStartPos, const ImVec2& a_vSize)
 			{
 				if (!core::EDITOR_ENGINE->GetEditor().GetSelectable().get())
 				{
@@ -542,7 +542,6 @@ namespace gallus
 			{
 				ImVec2 imageMin = { a_vSceneStartPos.x + m_vPanOffset.x, a_vSceneStartPos.y + m_vPanOffset.y };
 				ImVec2 imageMax = imageMin + ImVec2(a_vSize.x * m_fZoom, a_vSize.y * m_fZoom);
-				ImGui::GetWindowDrawList()->AddRectFilled(imageMin, imageMax, IM_COL32(255, 255, 255, 255), 0.0f, 0);
 
 				ImGuiIO& io = ImGui::GetIO();
 				ImVec2 mouse = io.MousePos;

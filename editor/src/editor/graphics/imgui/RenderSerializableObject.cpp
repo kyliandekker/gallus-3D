@@ -799,15 +799,30 @@ namespace gallus
 
 					switch (gizmo.m_Options.type)
 					{
-					case EditorGizmoType::EditorGizmoType_Transform:
-					{
-						graphics::dx12::Transform* value = reinterpret_cast<graphics::dx12::Transform*>(ptr);
-						if (ShowTransformGizmo(a_vScenePos, a_vSize, a_vPanOffset, a_fZoom, *value))
+						case EditorGizmoType::EditorGizmoType_Transform:
 						{
-							changed = true;
+							graphics::dx12::Transform* value = reinterpret_cast<graphics::dx12::Transform*>(ptr);
+							if (ShowTransformGizmo(a_vScenePos, a_vSize, a_vPanOffset, a_fZoom, *value))
+							{
+								changed = true;
+							}
+							break;
 						}
-						break;
-					}
+						case EditorGizmoType::EditorGizmoType_Direction:
+						{
+							DirectX::XMFLOAT3* value = reinterpret_cast<DirectX::XMFLOAT3*>(ptr);
+
+							graphics::dx12::Transform transform;
+							transform.SetPosition({ 0, 0, 0 });
+							transform.SetRotation(graphics::dx12::Transform::EulerToQuaternion(*value));
+							if (ShowTransformGizmo(a_vScenePos, a_vSize, a_vPanOffset, a_fZoom, transform))
+							{
+								*value = transform.GetRotationV();
+
+								changed = true;
+							}
+							break;
+						}
 					}
 				}
 

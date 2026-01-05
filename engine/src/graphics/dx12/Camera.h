@@ -123,6 +123,7 @@ namespace gallus
 				 	SERIALIZE_FIELD(m_fFoV, "Field of View", "",
 				 		.type = FieldSerializationType::FieldSerializationType_Float,
 				 		.onChangeFunc = MakeOnChangeFunc(&Camera::OnFoVChanged))
+					EXPOSE_GIZMO(m_Transform, EditorGizmoType::EditorGizmoType_Transform)
 				END_SERIALIZE(Camera)
 			};
 		}

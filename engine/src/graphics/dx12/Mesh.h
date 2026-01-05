@@ -274,7 +274,8 @@ namespace gallus
 				/// </summary>
 				/// <param name="a_pCommandList">The command list used to issue GPU draw calls.</param>
 				/// <param name="a_MVP">The mvp of the mesh.</param>
-				void Render(std::shared_ptr<CommandList> a_pCommandList, const DirectX::XMMATRIX& a_MVP);
+				/// <param name="a_M">The world matrix of the mesh.</param>
+				void Render(std::shared_ptr<CommandList> a_pCommandList, const DirectX::XMMATRIX& a_MVP, const DirectX::XMMATRIX& a_M);
 
 				/// <summary>
 				/// Checks whether the mesh contains valid data and is ready for rendering.

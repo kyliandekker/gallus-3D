@@ -396,14 +396,15 @@ namespace gallus
 				return m_pFileEditorSelectable->OpenFile(*this);
 			}
 
-			void FileEditorSelectable::RenderEditorFields()
+			bool FileEditorSelectable::RenderEditorFields()
 			{
 				if (!m_pFileEditorSelectable)
 				{
-					return;
+					return false;
 				}
 
 				m_pFileEditorSelectable->Render(*this);
+				return true;
 			}
 
 			bool FileEditorSelectable::SearchForPath(const fs::path& a_Path, FileEditorSelectable*& a_pExplorerFile)

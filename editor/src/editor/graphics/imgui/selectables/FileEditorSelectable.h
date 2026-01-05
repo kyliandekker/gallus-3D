@@ -140,7 +140,7 @@ namespace gallus
 
 				void OnDoubleClicked() override;
 
-				void RenderEditorFields() override;
+				bool RenderEditorFields() override;
 			private:
 				gallus::resources::FileResource& m_FileResource;
 				std::string m_sDisplayName; /// The name that will be displayed in imgui.

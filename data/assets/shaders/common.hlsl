@@ -1,8 +1,9 @@
 // GENERATED FILE - DO NOT EDIT
 
-cbuffer Transform : register(b0)
+cbuffer ShaderTransform : register(b0)
 {
     float4x4 WorldViewProj;
+    float4x4 WorldMatrix;
 };
 
 cbuffer SpriteUV : register(b1)

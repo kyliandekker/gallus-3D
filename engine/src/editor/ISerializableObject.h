@@ -42,7 +42,8 @@ namespace gallus
 	enum class EditorGizmoType
 	{
 		EditorGizmoType_None,
-		EditorGizmoType_Transform
+		EditorGizmoType_Transform,
+		EditorGizmoType_Direction
 	};
 
 	class ISerializableObject;

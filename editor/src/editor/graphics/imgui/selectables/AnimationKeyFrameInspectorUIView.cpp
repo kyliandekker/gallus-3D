@@ -65,8 +65,9 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			void AnimationKeyFrameEditorSelectable::RenderEditorFields()
+			bool AnimationKeyFrameEditorSelectable::RenderEditorFields()
 			{
+				bool changed = false;
 				ImGui::SetCursorPosY(0);
 				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
 
@@ -94,7 +95,7 @@ namespace gallus
 					{
 						m_KeyFrame.RemoveComponent(component);
 
-						m_KeyFrame.GetAnimation()->SetIsDirty(true);
+						changed = true;
 					}
 
 					ImGui::PopStyleVar();
@@ -104,7 +105,7 @@ namespace gallus
 					{
 						if (RenderObjectFields(component))
 						{
-							m_KeyFrame.GetAnimation()->SetIsDirty(true);
+							changed = true;
 						}
 					}
 				}
@@ -140,6 +141,7 @@ namespace gallus
 						if (!found && ImGui::MenuItem(ImGui::IMGUI_FORMAT_ID(sys->GetName(), MENU_ITEM_ID, "ADD_KEY_FRAME_COMPONENT_MENU_INSPECTOR" + sys->GetPropertyName()).c_str()))
 						{
 							m_KeyFrame.AddComponent(sys->CreateComponent(m_KeyFrame));
+							changed = true;
 						}
 					}
 
@@ -148,6 +150,8 @@ namespace gallus
 				ImGui::PopStyleVar();
 
 				ImGui::PopStyleVar();
+
+				return changed;
 			}
 		}
 	}
