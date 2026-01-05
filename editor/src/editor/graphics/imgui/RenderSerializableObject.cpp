@@ -783,6 +783,43 @@ namespace gallus
 				return false;
 			}
 
+			DirectX::XMFLOAT2 WorldToScreen(const DirectX::XMFLOAT3& worldPos, const DirectX::XMMATRIX& view, const DirectX::XMMATRIX& proj, const ImVec2& viewportSize)
+			{
+				using namespace DirectX;
+
+				XMVECTOR vWorld = XMLoadFloat3(&worldPos);
+				XMVECTOR vClip = XMVector3Transform(vWorld, view * proj);
+
+				// Perspective divide
+				XMFLOAT4 clip;
+				XMStoreFloat4(&clip, vClip);
+				float ndcX = clip.x / clip.w;
+				float ndcY = clip.y / clip.w;
+
+				// Convert NDC to screen
+				XMFLOAT2 screen;
+				screen.x = (ndcX * 0.5f + 0.5f) * viewportSize.x;
+				screen.y = (1.0f - (ndcY * 0.5f + 0.5f)) * viewportSize.y; // ImGui Y is top-left
+				return screen;
+			}
+
+			void DrawDirectionalLightGizmo(const gallus::graphics::dx12::DirectionalLight& light, const DirectX::XMMATRIX& view, const DirectX::XMMATRIX& proj, const ImVec2& viewportSize)
+			{
+				ImDrawList* drawList = ImGui::GetForegroundDrawList();
+
+				DirectX::XMFLOAT2 start = WorldToScreen(light.GetTransform().GetPosition(), view, proj, viewportSize);
+
+				// End point = start + direction * length
+				DirectX::XMFLOAT3 endWorld;
+				endWorld.x = light.GetTransform().GetPosition().x + light.GetDirectionalLightData().LightDirection.x * 2.0f;
+				endWorld.y = light.GetTransform().GetPosition().y + light.GetDirectionalLightData().LightDirection.y * 2.0f;
+				endWorld.z = light.GetTransform().GetPosition().z + light.GetDirectionalLightData().LightDirection.z * 2.0f;
+
+				DirectX::XMFLOAT2 end = WorldToScreen(endWorld, view, proj, viewportSize);
+
+				drawList->AddLine(ImVec2(start.x, start.y), ImVec2(end.x, end.y), IM_COL32(255, 255, 255, 255), 2.0f);
+			}
+
 			bool RenderObjectGizmos(const ImVec2& a_vScenePos, const ImVec2& a_vSize, const ImVec2& a_vPanOffset, float a_fZoom, ISerializableObject* a_pObject)
 			{
 				if (!a_pObject)
@@ -810,17 +847,8 @@ namespace gallus
 						}
 						case EditorGizmoType::EditorGizmoType_Direction:
 						{
-							DirectX::XMFLOAT3* value = reinterpret_cast<DirectX::XMFLOAT3*>(ptr);
+							graphics::dx12::Transform* transform = reinterpret_cast<graphics::dx12::Transform*>(ptr);
 
-							graphics::dx12::Transform transform;
-							transform.SetPosition({ 0, 0, 0 });
-							transform.SetRotation(graphics::dx12::Transform::EulerToQuaternion(*value));
-							if (ShowTransformGizmo(a_vScenePos, a_vSize, a_vPanOffset, a_fZoom, transform))
-							{
-								*value = transform.GetRotationV();
-
-								changed = true;
-							}
 							break;
 						}
 					}

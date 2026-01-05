@@ -9,6 +9,8 @@ Weak ptrs for everything instead of raw ptrs ✓
 Scene sys needs refactor because it is awful and illogical ✓
 Whole engine resource needs refactor because it is a mess ✓ 
 Path loading only needs to be editor based ✓
+
 Sprite modal is awful
 Turn DX12System into a coordinator class and split up the parts
 Stuff in DX12System should probably be unique_ptrs
+Buffer needs a rewrite

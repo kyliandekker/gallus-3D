@@ -49,6 +49,11 @@ namespace gallus
 				{
 					return m_DirectionalLightData;
 				}
+
+				const Transform& GetTransform() const
+				{
+					return m_Transform;
+				}
 			protected:
 				Transform m_Transform;
 				DirectionalLightData m_DirectionalLightData;
