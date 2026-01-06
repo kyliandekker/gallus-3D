@@ -275,7 +275,7 @@ namespace gallus
 				return changed;
 			}
 
-			bool EntityEditorSelectable::RenderGizmos(const ImVec2& a_vScenePos, const ImVec2& a_vSize, const ImVec2& a_vPanOffset, float a_fZoom)
+			bool EntityEditorSelectable::RenderGizmos(const ImRect& a_SceneViewRect)
 			{
 				std::lock_guard<std::recursive_mutex> lock(core::EDITOR_ENGINE->GetECS().m_EntityMutex);
 
@@ -286,7 +286,7 @@ namespace gallus
 					{
 						auto* comp = sys->GetBaseComponent(GetEntityID());
 
-						if (RenderObjectGizmos(a_vScenePos, a_vSize, a_vPanOffset, a_fZoom, comp))
+						if (RenderObjectGizmos(a_SceneViewRect, comp))
 						{
 							changed = true;
 						}

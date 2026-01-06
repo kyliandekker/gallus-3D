@@ -727,7 +727,7 @@ namespace gallus
 				return changed;
 			}
 
-			bool ShowTransformGizmo(const ImVec2& a_vScenePos, const ImVec2& a_vSize, const ImVec2& a_vPanOffset, float a_fZoom, graphics::dx12::Transform& a_Transform)
+			bool ShowTransformGizmo(const ImRect& a_SceneViewRect, graphics::dx12::Transform& a_Transform)
 			{
 				DirectX::XMMATRIX pivotOffset = DirectX::XMMatrixTranslation(a_Transform.GetPivot().x, a_Transform.GetPivot().y, 0.0f);
 				DirectX::XMMATRIX objectMat = a_Transform.GetWorldMatrix();
@@ -820,7 +820,7 @@ namespace gallus
 				drawList->AddLine(ImVec2(start.x, start.y), ImVec2(end.x, end.y), IM_COL32(255, 255, 255, 255), 2.0f);
 			}
 
-			bool RenderObjectGizmos(const ImVec2& a_vScenePos, const ImVec2& a_vSize, const ImVec2& a_vPanOffset, float a_fZoom, ISerializableObject* a_pObject)
+			bool RenderObjectGizmos(const ImRect& a_SceneViewRect, ISerializableObject* a_pObject)
 			{
 				if (!a_pObject)
 				{
@@ -839,7 +839,7 @@ namespace gallus
 						case EditorGizmoType::EditorGizmoType_Transform:
 						{
 							graphics::dx12::Transform* value = reinterpret_cast<graphics::dx12::Transform*>(ptr);
-							if (ShowTransformGizmo(a_vScenePos, a_vSize, a_vPanOffset, a_fZoom, *value))
+							if (ShowTransformGizmo(a_SceneViewRect, *value))
 							{
 								changed = true;
 							}

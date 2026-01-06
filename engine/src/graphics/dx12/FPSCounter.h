@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 // external
 #include <cstdint>
@@ -17,80 +17,80 @@ namespace gallus
 		class FPSCounter
 		{
 		public:
-            FPSCounter()
-            {
-                Initialize();
-            }
+			FPSCounter()
+			{
+				Initialize();
+			}
 
-            void Initialize()
-            {
-                m_tPrevious = clock::now();
+			void Initialize()
+			{
+				m_tPrevious = clock::now();
 
-                m_iFrameUpdates = 0;
-                m_iFrames = 0;
-                m_bLimitFPS = false;
-                m_fFrameDurationTarget = 0.0;
+				m_iFrameUpdates = 0;
+				m_iFrames = 0;
+				m_bLimitFPS = false;
+				m_fFrameDurationTarget = 0.0;
 
-                m_fLag = 0.0;
-                m_iFrameCounter = 0;
-                m_fFPSTimer = 0.0;
-                m_fDeltaTime = 0.0;
-                m_fFPS = 0.0;
-            }
+				m_fLag = 0.0;
+				m_iFrameCounter = 0;
+				m_fFPSTimer = 0.0;
+				m_fDeltaTime = 0.0;
+				m_fFPS = 0.0;
+			}
 
-            void Update();
+			void Update();
 
-            void SetTargetFPS(int targetFPS)
-            {
-                m_fTargetFPS = targetFPS;
-                if (m_fTargetFPS > 0)
-                {
-                    m_bLimitFPS = true;
-                    m_fFrameDurationTarget = 1.0 / static_cast<double>(m_fTargetFPS);
-                }
-            }
+			void SetTargetFPS(int targetFPS)
+			{
+				m_fTargetFPS = targetFPS;
+				if (m_fTargetFPS > 0)
+				{
+					m_bLimitFPS = true;
+					m_fFrameDurationTarget = 1.0 / static_cast<double>(m_fTargetFPS);
+				}
+			}
 
-            void DisableFPSLimit()
-            {
-                m_bLimitFPS = false;
-            }
+			void DisableFPSLimit()
+			{
+				m_bLimitFPS = false;
+			}
 
-            bool IsFPSLimited() const
-            {
-                return m_bLimitFPS;
-            }
+			bool IsFPSLimited() const
+			{
+				return m_bLimitFPS;
+			}
 
-            float GetFPS() const
-            {
-                return m_fFPS;
-            }
+			float GetFPS() const
+			{
+				return m_fFPS;
+			}
 
-            float GetDeltaTime() const
-            {
-                return m_fDeltaTime;
-            }
+			float GetDeltaTime() const
+			{
+				return m_fDeltaTime;
+			}
 
-            float GetTargetFPS() const
-            {
-                return m_fTargetFPS;
-            }
+			float GetTargetFPS() const
+			{
+				return m_fTargetFPS;
+			}
 
-            Event<float> m_eOnNewFrame;
+			Event<float> m_eOnNewFrame;
 		private:
 			using clock = std::chrono::high_resolution_clock;
 
-            clock::time_point m_tPrevious;
-            int m_iFrameUpdates = 0;
-            int m_iFrames = 0;
+			clock::time_point m_tPrevious;
+			int m_iFrameUpdates = 0;
+			int m_iFrames = 0;
 			bool m_bLimitFPS = false;
 			double m_fFrameDurationTarget = 0.0f;
-            float m_fTargetFPS = 60.0f;
+			float m_fTargetFPS = 60.0f;
 
-            double m_fLag = 0.0f;
+			double m_fLag = 0.0f;
 			int m_iFrameCounter = 0;
-            double m_fFPSTimer = 0.0f;
-            double m_fDeltaTime = 0.0f;
-            double m_fFPS = 0.0f;
+			double m_fFPSTimer = 0.0f;
+			double m_fDeltaTime = 0.0f;
+			double m_fFPS = 0.0f;
 		};
 	}
 }

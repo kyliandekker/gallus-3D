@@ -165,9 +165,9 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			bool CameraEditorSelectable::RenderGizmos(const ImVec2& a_vScenePos, const ImVec2& a_vSize, const ImVec2& a_vPanOffset, float a_fZoom)
+			bool CameraEditorSelectable::RenderGizmos(const ImRect& a_SceneViewRect)
 			{
-				if (RenderObjectGizmos(a_vScenePos, a_vSize, a_vPanOffset, a_fZoom, &core::EDITOR_ENGINE->GetDX12().GetCamera()))
+				if (RenderObjectGizmos(a_SceneViewRect, &core::EDITOR_ENGINE->GetDX12().GetCamera()))
 				{
 					return true;
 				}

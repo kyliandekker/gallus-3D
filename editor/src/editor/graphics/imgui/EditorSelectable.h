@@ -7,6 +7,7 @@
 
 // external
 #include <imgui/imgui.h>
+#include <imgui/imgui_internal.h>
 #include <string>
 
 namespace gallus
@@ -26,11 +27,7 @@ namespace gallus
 					return false;
 				}
 
-				virtual bool RenderGizmos(
-					const ImVec2& a_vScenePos,
-					const ImVec2& a_vSize,
-					const ImVec2& a_vPanOffset,
-					float a_fZoom)
+				virtual bool RenderGizmos(const ImRect& a_SceneViewRect)
 				{
 					return false;
 				}

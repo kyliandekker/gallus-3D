@@ -1,4 +1,4 @@
-﻿#include "FPSCounter.h"
+#include "FPSCounter.h"
 
 // external
 #include <thread>
@@ -8,7 +8,7 @@ namespace gallus
 	namespace graphics
 	{
 		void FPSCounter::Update()
-		{
+        {
 			clock::time_point current = clock::now();
 			std::chrono::duration<double> elapsed = current - m_tPrevious;
 			m_tPrevious = current;
@@ -31,6 +31,6 @@ namespace gallus
 			m_iFrames += m_iFrameUpdates;
 
 			std::this_thread::sleep_for(std::chrono::milliseconds(1));
-		}
+        }
 	}
 }

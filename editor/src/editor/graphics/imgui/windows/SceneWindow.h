@@ -6,15 +6,85 @@
 #include "graphics/imgui/windows/BaseWindow.h"
 
 // external
-#include <imgui\ImGuizmo.h>
+#include <functional>
+#include <imgui/ImGuizmo.h>
+#include <imgui/imgui_internal.h>
 
 namespace gallus
 {
 	namespace graphics
 	{
+		namespace dx12
+		{
+			class Texture;
+		}
 		namespace imgui
 		{
 			class ImGuiWindow;
+
+			class ToolbarItem
+			{
+			public:
+				virtual void Render() = 0;
+			};
+
+			//---------------------------------------------------------------------
+			// ToolbarButton
+			//---------------------------------------------------------------------
+			class ToolbarButton : public ToolbarItem
+			{
+			public:
+				ToolbarButton(std::function<void()> a_ButtonFunc, std::function<bool()> a_DisabledCondition = []()
+					{
+						return false;
+					});
+
+				void Render() override;
+			private:
+				std::function<void()> m_ButtonFunc;
+				std::function<bool()> m_DisabledCondition;
+			};
+
+			//---------------------------------------------------------------------
+			// ToolbarBreak
+			//---------------------------------------------------------------------
+			class ToolbarBreak : public ToolbarItem
+			{
+			public:
+				ToolbarBreak(const ImVec2& a_vBreakSize) : m_vBreakSize(a_vBreakSize)
+				{}
+
+				void Render() override;
+			private:
+				ImVec2 m_vBreakSize = {};
+			};
+
+			//---------------------------------------------------------------------
+			// Toolbar
+			//---------------------------------------------------------------------
+			class Toolbar
+			{
+			public:
+				Toolbar() = default;
+				Toolbar(const ImVec2& a_vSize) : m_vToolbarSize(a_vSize)
+				{}
+
+				void StartToolbar();
+				void EndToolbar();
+
+				void Render();
+
+				const ImVec2& GetToolbarSize() const
+				{
+					return m_vToolbarSize;
+				}
+
+				std::vector<ToolbarButton> m_aButtons;
+			private:
+				ImVec2 m_vToolbarStartScreenPos = {};
+				ImVec2 m_vToolbarStartPos = {};
+				ImVec2 m_vToolbarSize = {};
+			};
 
 			//---------------------------------------------------------------------
 			// SceneWindow
@@ -31,6 +101,8 @@ namespace gallus
 				/// <param name="a_Window">The ImGui window for rendering the view.</param>
 				SceneWindow(ImGuiWindow& a_Window);
 
+				bool Initialize() override;
+
 				/// <summary>
 				/// Cleans up and destroys the scene window.
 				/// </summary>
@@ -45,18 +117,31 @@ namespace gallus
 				/// Renders the scene window.
 				/// </summary>
 				void Render() override;
-				void Draw2DGrid(const ImVec2& a_vScenePos, const ImVec2& a_vSize, const ImVec2& a_vPanOffset, float a_fZoom);
-			private:
-				void DrawSerializedObjectGizmos(const ImVec2& a_vSceneStartPos, const ImVec2& a_vSize);
-				void DrawGizmos(const ImVec2& a_vScenePos, const ImVec2& a_vSize, const ImVec2& a_vPanOffset, float a_fZoom);
-				void DrawViewportPanel();
+			protected:
+				virtual void PopulateToolbar();
+				void DrawToolbar();
 
-				void HandleCameraInput(double a_fDeltaTime, const ImVec2& a_vSceneStartPos, const ImVec2& a_vSize);
+				void HandleViewportControls();
+
+				graphics::dx12::Texture* GetRenderTexture() const;
+				ImRect GetRenderTextureRect(gallus::graphics::dx12::Texture* a_pTexture) const;
+
+				void DrawSceneView(gallus::graphics::dx12::Texture* a_pTexture, const ImRect& a_SceneViewRect) const;
+				void DrawSceneBackground(const ImRect& a_SceneViewRect) const;
+				void SetupSceneGizmos( const ImRect& a_SceneViewRect) const;
+				void DrawSceneGrid(const ImRect& a_SceneViewRect) const;
+				void DrawSceneTexture(gallus::graphics::dx12::Texture* a_pTexture, const ImRect& a_SceneViewRect) const;
+				void DrawSceneGizmos( const ImRect& a_SceneViewRect) const;
+				void DrawSceneViewBorder(const ImRect& a_SceneViewRect) const;
+
+				void HandleSceneViewControls(double a_fDeltaTime, const ImRect& a_vSceneRect);
+
+				void DrawViewportPanel();
 
 				float m_fZoom = 1.0f;
 				ImVec2 m_vPanOffset = ImVec2(0.0f, 0.0f);
-				float m_fCameraPitch = 0.0f;
-				float m_fCameraYaw = 0.0f;
+
+				Toolbar m_Toolbar;
 			};
 
 			class FullSceneWindow : public SceneWindow
@@ -77,6 +162,8 @@ namespace gallus
 				/// Renders the scene window.
 				/// </summary>
 				void Render() override;
+			private:
+				void PopulateToolbar() override;
 			};
 		}
 	}

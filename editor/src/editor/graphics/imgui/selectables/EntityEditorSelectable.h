@@ -48,11 +48,7 @@ namespace gallus
 
 				bool RenderEditorFields() override;
 
-				bool RenderGizmos(
-					const ImVec2& a_vScenePos,
-					const ImVec2& a_vSize,
-					const ImVec2& a_vPanOffset,
-					float a_fZoom) override;
+				bool RenderGizmos(const ImRect& a_SceneViewRect) override;
 
 				void OnRename(const std::string& a_sName) override;
 

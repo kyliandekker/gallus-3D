@@ -137,7 +137,7 @@ namespace gallus
 				f.push_back({ #VAR, offsetof(_FieldClass, VAR), UINAME, DESCRIPTION, FieldSerializationOptions{ .type = FIELD_TYPE } });
 
 #define SERIALIZE_FIELD_OPTIONS(VAR, UINAME, DESCRIPTION, OPTIONS) \
-			f.push_back({ #VAR, offsetof(_FieldClass, VAR), UINAME, DESCRIPTION, OPTIONS });
+            f.push_back({ #VAR, offsetof(_FieldClass, VAR), UINAME, DESCRIPTION, OPTIONS });
 
 #define EXPOSE_GIZMO(VAR, GIZMO_OPTIONS) \
 				g.push_back({ #VAR, offsetof(_GizmoClass, VAR), GIZMO_OPTIONS });

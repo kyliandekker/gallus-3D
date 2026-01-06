@@ -183,9 +183,9 @@ namespace gallus
 				return changed;
 			}
 
-			bool DirectionalLightEditorSelectable::RenderGizmos(const ImVec2& a_vScenePos, const ImVec2& a_vSize, const ImVec2& a_vPanOffset, float a_fZoom)
+			bool DirectionalLightEditorSelectable::RenderGizmos(const ImRect& a_SceneViewRect)
 			{
-				if (RenderObjectGizmos(a_vScenePos, a_vSize, a_vPanOffset, a_fZoom, core::EDITOR_ENGINE->GetDX12().GetDirectionalLight().lock().get()))
+				if (RenderObjectGizmos(a_SceneViewRect, core::EDITOR_ENGINE->GetDX12().GetDirectionalLight().lock().get()))
 				{
 					return true;
 				}
