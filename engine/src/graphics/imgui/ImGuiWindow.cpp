@@ -336,7 +336,7 @@ namespace gallus
 			//---------------------------------------------------------------------
 			void ImGuiWindow::UpdateMouseCursor()
 			{
-				if (ImGui::IsAnyItemHovered())
+				if (ImGui::IsAnyItemHovered() && ImGui::GetMouseCursor() == ImGuiMouseCursor_Arrow)
 				{
 					ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
 				}

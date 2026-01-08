@@ -18,6 +18,7 @@
 #include "editor/graphics/imgui/selectables/EntityEditorSelectable.h"
 #include "editor/graphics/imgui/selectables/CameraEditorSelectable.h"
 #include "editor/graphics/imgui/selectables/DirectionalLightEditorSelectable.h"
+#include "editor/graphics/imgui/views/Toolbar.h"
 
 namespace gallus
 {
@@ -74,6 +75,10 @@ namespace gallus
 				/// </summary>
 				void Render() override;
 			private:
+				// Toolbar.
+				void PopulateToolbar();
+				void DrawToolbar();
+
 				void DragAction(const gameplay::EntityID& a_EntityID, resources::AssetType a_AssetType, const std::string& a_sFileName);
 
 				/// <summary>
@@ -93,6 +98,7 @@ namespace gallus
 				void OnSceneDirty(const bool oldVal, const bool newVal);
 
 				bool m_bNeedsRefresh = true; /// Whether the hierarchy needs to refresh the results shown in the hierarchy window.
+				bool m_bSpawnEntity = false;
 
 				gameplay::EntityID m_PreviousEntityID;
 				std::vector<EntityEditorSelectable> m_aEntities; /// List of entities shown in the hierarchy window.
@@ -101,7 +107,9 @@ namespace gallus
 				DirectionalLightEditorSelectable m_DirectionalLightView;
 				std::vector<std::string> m_aEntityIcons; /// List of entities shown in the hierarchy window.
 
-				SearchBarInput m_SearchBar; /// Search bar to filter specific messages in the hierarchy window.
+				std::string m_sSearchBarText;
+
+				Toolbar m_Toolbar;
 			};
 		}
 	}

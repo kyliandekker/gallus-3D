@@ -116,10 +116,10 @@ namespace gallus
 			void SceneWindow::PopulateBaseToolbar()
 			{
 				ImVec2 toolbarSize = ImVec2(0, m_Window.GetHeaderSize().y);
-				m_Toolbar = Toolbar(toolbarSize);
+				m_Toolbar = Toolbar(ImGui::IMGUI_FORMAT_ID("", CHILD_ID, "TOOLBAR_SCENE"), toolbarSize);
 
 				// Play button.
-				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(
+				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_Window,
 					// TODO: This should probably be a global function.
 					[this]()
 					{
@@ -161,7 +161,7 @@ namespace gallus
 				));
 
 				// Pause button.
-				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(
+				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_Window,
 					[this]()
 					{
 						bool isPaused = gameplay::GAME.IsPaused();
@@ -179,7 +179,7 @@ namespace gallus
 				));
 
 				// Full screen mode button.
-				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(
+				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_Window,
 					
 					[this]()
 					{
@@ -200,7 +200,7 @@ namespace gallus
 			void SceneWindow::PopulateToolbar()
 			{
 				// Grid button.
-				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(
+				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_Window,
 					[this]()
 					{
 						editor::EditorSettings& editorSettings = core::EDITOR_ENGINE->GetEditor().GetEditorSettings();
@@ -216,7 +216,7 @@ namespace gallus
 				));
 
 				// Camera mode button.
-				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(
+				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_Window,
 					
 					[this]()
 					{
@@ -232,7 +232,7 @@ namespace gallus
 				));
 
 				// Camera isolation mode button.
-				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(
+				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_Window,
 					
 					[this]()
 					{

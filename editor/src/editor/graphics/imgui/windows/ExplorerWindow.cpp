@@ -37,10 +37,8 @@ namespace gallus
 			//---------------------------------------------------------------------
 			// ExplorerWindow
 			//---------------------------------------------------------------------
-			ExplorerWindow::ExplorerWindow(ImGuiWindow& a_Window) : BaseWindow(a_Window, ImGuiWindowFlags_NoCollapse, std::string(font::ICON_FOLDER) + " Explorer", "Explorer"), m_SearchBar(a_Window)
-			{
-				m_SearchBar.Initialize("");
-			}
+			ExplorerWindow::ExplorerWindow(ImGuiWindow& a_Window) : BaseWindow(a_Window, ImGuiWindowFlags_NoCollapse, std::string(font::ICON_FOLDER) + " Explorer", "Explorer")
+			{}
 
 			//---------------------------------------------------------------------
 			bool ExplorerWindow::Initialize()
@@ -82,23 +80,33 @@ namespace gallus
 			void ExplorerWindow::PopulateToolbar()
 			{
 				ImVec2 toolbarSize = ImVec2(0, m_Window.GetHeaderSize().y);
-				m_Toolbar = Toolbar(toolbarSize);
+				m_Toolbar = Toolbar(ImGui::IMGUI_FORMAT_ID("", CHILD_ID, "TOOLBAR_EXPLORER"), toolbarSize);
 
 				// Rescan button.
-				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(
+				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarSearchbar(m_Window,
+					ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "SEARCHBAR_EXPLORER"),
+					200,
+					[this](const std::string& a_sResult)
+					{
+						m_sSearchBarText = a_sResult;
+						m_bNeedsRefresh = true;
+					}
+				));
+
+				// Rescan button.
+				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_Window,
 					[this]()
 					{
-						m_bDoRescan = false; // Reset it every frame.
 						if (ImGui::IconButton(
 							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_REFRESH), BUTTON_ID, "RESCAN_EXPLORER").c_str(), "Triggers a full rescan of the asset database, updating all folders and files in the explorer.", m_Window.GetHeaderSize()))
 						{
-							m_bDoRescan = true;
+							m_bNeedsRescan = true;
 						}
 					}
 				));
 
 				// List button.
-				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(
+				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_Window,
 					[this]()
 					{
 						editor::EditorSettings& editorSettings = core::EDITOR_ENGINE->GetEditor().GetEditorSettings();
@@ -116,7 +124,7 @@ namespace gallus
 				));
 
 				// Grid button.
-				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(
+				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_Window,
 					[this]()
 					{
 						editor::EditorSettings& editorSettings = core::EDITOR_ENGINE->GetEditor().GetEditorSettings();
@@ -203,6 +211,7 @@ namespace gallus
 									continue;
 								}
 
+								// store these outside of view mode because both use them.
 								bool
 									clicked = false,
 									right_clicked = false,
@@ -341,7 +350,7 @@ namespace gallus
 
 					for (FileEditorSelectable& view : m_pViewedFolder.get()->GetChildren())
 					{
-						if (m_SearchBar.GetString().empty() || string_extensions::StringToLower(view.GetFileResource().GetPath().filename().generic_string()).find(m_SearchBar.GetString()) != std::string::npos)
+						if (m_sSearchBarText.empty() || string_extensions::StringToLower(view.GetFileResource().GetPath().filename().generic_string()).find(m_sSearchBarText) != std::string::npos)
 						{
 							m_aFilteredExplorerItems.push_back(&view);
 						}
@@ -387,7 +396,7 @@ namespace gallus
 				ImGui::SameLine();
 				DrawFiles();
 
-				if (m_bDoRescan)
+				if (m_bNeedsRescan)
 				{
 					const FileEditorSelectable* derivedPtr = dynamic_cast<const FileEditorSelectable*>(core::EDITOR_ENGINE->GetEditor().GetSelectable().get());
 					if (derivedPtr)

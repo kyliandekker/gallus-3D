@@ -13,9 +13,6 @@
 // core
 #include "core/Observable.h"
 
-// graphics
-#include "graphics/imgui/views/DataTypes/StringTextInput.h"
-
 // utils
 #include "utils/file_abstractions.h"
 
@@ -79,6 +76,7 @@ namespace gallus
 				void PopulateToolbar();
 				void DrawToolbar();
 
+				// Folder drawing.
 				void DrawFolders();
 				void DrawFiles();
 
@@ -106,14 +104,12 @@ namespace gallus
 
 				core::Observable<FileEditorSelectable*> m_pViewedFolder; /// Selected resource used for context menu.
 
-				SearchBarInput m_SearchBar; /// Search bar to filter specific explorer items in the explorer window.
-
 				fs::path m_PreviousSelectablePath;
 				fs::path m_PreviousViewedFolderPath;
 
-				bool m_bDoRescan = false; // TODO: Why are there three of these?
-				bool m_bNeedsRescan = true; /// Whether the explorer needs to refresh the results shown in the explorer window.
-				bool m_bNeedsRefresh = true; /// Whether the explorer needs to refresh the results shown in the explorer window.
+				std::string m_sSearchBarText;
+				bool m_bNeedsRescan = true; /// Whether the explorer needs to rescan the entire assets folder.
+				bool m_bNeedsRefresh = true; /// Whether the explorer needs to filter specific assets out of the asset folder.
 
 				Toolbar m_Toolbar;
 			};
