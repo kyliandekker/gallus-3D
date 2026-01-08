@@ -36,6 +36,7 @@ namespace gallus
 
 			bool GetString(const std::string& a_sKey, std::string& a_sString) const;
 			bool GetVector2(const std::string& a_sKey, DirectX::XMFLOAT2& a_vVector) const;
+			bool GetIVector2(const std::string& a_sKey, DirectX::XMINT2& a_vVector) const;
 			bool GetVector3(const std::string& a_sKey, DirectX::XMFLOAT3& a_vVector) const;
 			bool GetColor(const std::string& a_sKey, DirectX::XMFLOAT4& a_vVector) const;
 
@@ -61,6 +62,7 @@ namespace gallus
 
 			void SetString(const std::string& a_sKey, const std::string& a_sString);
 			void SetVector2(const std::string& a_sKey, const DirectX::XMFLOAT2& a_vVector);
+			void SetIVector2(const std::string& a_sKey, const DirectX::XMINT2& a_vVector);
 			void SetVector3(const std::string& a_sKey, const DirectX::XMFLOAT3& a_vVector);
 			void SetColor(const std::string& a_sKey, const DirectX::XMFLOAT4& a_vVector);
 

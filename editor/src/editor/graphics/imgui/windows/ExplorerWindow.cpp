@@ -34,11 +34,15 @@ namespace gallus
 	{
 		namespace imgui
 		{
+			//---------------------------------------------------------------------
+			// ExplorerWindow
+			//---------------------------------------------------------------------
 			ExplorerWindow::ExplorerWindow(ImGuiWindow& a_Window) : BaseWindow(a_Window, ImGuiWindowFlags_NoCollapse, std::string(font::ICON_FOLDER) + " Explorer", "Explorer"), m_SearchBar(a_Window)
 			{
 				m_SearchBar.Initialize("");
 			}
 
+			//---------------------------------------------------------------------
 			bool ExplorerWindow::Initialize()
 			{
 				core::EDITOR_ENGINE->GetEditor().GetAssetDatabase().GetOnScanCompleted() += std::bind(&ExplorerWindow::OnScanCompleted, this);
@@ -46,10 +50,13 @@ namespace gallus
 				core::EDITOR_ENGINE->GetEditor().GetSelectable().OnChanged() += std::bind(&ExplorerWindow::OnSelectableChanged, this, std::placeholders::_1, std::placeholders::_2);
 
 				m_pViewedFolder.OnChanged() += std::bind(&ExplorerWindow::OnViewedFolderChanged, this, std::placeholders::_1, std::placeholders::_2);
+				
+				PopulateToolbar();
 
 				return BaseWindow::Initialize();
 			}
 
+			//---------------------------------------------------------------------
 			bool ExplorerWindow::Destroy()
 			{
 				core::EDITOR_ENGINE->GetEditor().GetAssetDatabase().GetOnScanCompleted() -= std::bind(&ExplorerWindow::OnScanCompleted, this);
@@ -61,6 +68,7 @@ namespace gallus
 				return BaseWindow::Destroy();
 			}
 
+			//---------------------------------------------------------------------
 			void ExplorerWindow::Update()
 			{
 				if (core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetFullScreenPlayMode())
@@ -70,6 +78,198 @@ namespace gallus
 				BaseWindow::Update();
 			}
 
+			//---------------------------------------------------------------------
+			void ExplorerWindow::PopulateToolbar()
+			{
+				ImVec2 toolbarSize = ImVec2(0, m_Window.GetHeaderSize().y);
+				m_Toolbar = Toolbar(toolbarSize);
+
+				// Rescan button.
+				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(
+					[this]()
+					{
+						m_bDoRescan = false; // Reset it every frame.
+						if (ImGui::IconButton(
+							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_REFRESH), BUTTON_ID, "RESCAN_EXPLORER").c_str(), "Triggers a full rescan of the asset database, updating all folders and files in the explorer.", m_Window.GetHeaderSize()))
+						{
+							m_bDoRescan = true;
+						}
+					}
+				));
+
+				// List button.
+				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(
+					[this]()
+					{
+						editor::EditorSettings& editorSettings = core::EDITOR_ENGINE->GetEditor().GetEditorSettings();
+						bool list = editorSettings.GetExplorerViewMode() == ExplorerViewMode::ExplorerViewMode_List;
+						if (ImGui::IconCheckboxButton(
+							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_LIST), BUTTON_ID, "LIST_EXPLORER").c_str(), &list, "Switches the explorer display to a vertical list of items, showing file names and metadata in a single column.", m_Window.GetHeaderSize(), list ? ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent) : ImGui::GetStyleColorVec4(ImGuiCol_Text)))
+						{
+							if (list)
+							{
+								editorSettings.SetExplorerViewMode(ExplorerViewMode::ExplorerViewMode_List);
+								editorSettings.Save();
+							}
+						}
+					}
+				));
+
+				// Grid button.
+				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(
+					[this]()
+					{
+						editor::EditorSettings& editorSettings = core::EDITOR_ENGINE->GetEditor().GetEditorSettings();
+						bool grid = editorSettings.GetExplorerViewMode() == ExplorerViewMode::ExplorerViewMode_Grid;
+						if (ImGui::IconCheckboxButton(
+							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_GRID), BUTTON_ID, "GRID_EXPLORER").c_str(), &grid, "Switches the explorer display to a grid of icons, useful for browsing visually.", m_Window.GetHeaderSize(), grid ? ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent) : ImGui::GetStyleColorVec4(ImGuiCol_Text)))
+						{
+							if (grid)
+							{
+								editorSettings.SetExplorerViewMode(ExplorerViewMode::ExplorerViewMode_Grid);
+								editorSettings.Save();
+							}
+						}
+					}
+				));
+			}
+
+			//---------------------------------------------------------------------
+			void ExplorerWindow::DrawToolbar()
+			{
+				// Start toolbar.
+				m_Toolbar.StartToolbar();
+
+				// Render toolbar.
+				m_Toolbar.Render();
+
+				// End toolbar.
+				m_Toolbar.EndToolbar();
+			}
+
+			//---------------------------------------------------------------------
+			void ExplorerWindow::DrawFolders()
+			{
+				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, m_Window.GetWindowPadding());
+				if (ImGui::BeginChild(
+					ImGui::IMGUI_FORMAT_ID("", CHILD_ID, "DIRECTORIES_EXPLORER").c_str(),
+					ImVec2(
+					0,
+					ImGui::GetContentRegionAvail().y - m_Window.GetFramePadding().y
+					),
+					ImGuiChildFlags_Borders | ImGuiChildFlags_ResizeX
+					))
+				{
+					ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+					for (FileEditorSelectable& view : m_aExplorerItems)
+					{
+						RenderFolder(view, 0, ImGui::GetCursorPos());
+					}
+					ImGui::PopStyleVar();
+				}
+				ImGui::EndChild();
+				ImGui::PopStyleVar();
+			}
+
+			//---------------------------------------------------------------------
+			void ExplorerWindow::DrawFiles()
+			{
+				int viewMode = core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetExplorerViewMode();
+				ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, viewMode == ExplorerViewMode::ExplorerViewMode_List ? ImVec2() : m_Window.GetWindowPadding());
+				if (ImGui::BeginChild(
+					ImGui::IMGUI_FORMAT_ID("", CHILD_ID, "FILES_EXPLORER").c_str(),
+					ImVec2(
+					ImGui::GetContentRegionAvail().x - m_Window.GetFramePadding().x,
+					ImGui::GetContentRegionAvail().y - m_Window.GetFramePadding().y
+					),
+					ImGuiChildFlags_Borders
+					))
+				{
+					if (m_pViewedFolder.get())
+					{
+						if (ImGui::BeginChild(
+							ImGui::IMGUI_FORMAT_ID("", CHILD_ID, "FILES_INNER_EXPLORER").c_str(),
+							ImVec2(
+							0,
+							0
+							)
+							))
+						{
+							int count = m_pViewedFolder.get()->GetParent() ? 1 : 0;
+							for (FileEditorSelectable* view : m_aFilteredExplorerItems)
+							{
+								if (!view)
+								{
+									continue;
+								}
+
+								bool
+									clicked = false,
+									right_clicked = false,
+									double_clicked = false;
+
+								if (viewMode == ExplorerViewMode::ExplorerViewMode_List)
+								{
+									view->RenderList(
+										clicked,
+										right_clicked,
+										double_clicked,
+										core::EDITOR_ENGINE->GetEditor().GetSelectable().get() == view,
+										false
+									);
+								}
+								else
+								{
+									ImVec2 viewSize = m_Window.GetHeaderSize() * 2.0f;
+
+									// Calculate the maximum number of icons that can fit horizontally as squares
+									int iconsPerRow = static_cast<int>(ImGui::GetContentRegionAvail().x / viewSize.x);
+									iconsPerRow = std::max(1, iconsPerRow); // Ensure at least 1 icon fits
+
+									// Get the available space in the window
+									view->RenderGrid(
+										viewSize,
+										clicked,
+										right_clicked,
+										double_clicked,
+										core::EDITOR_ENGINE->GetEditor().GetSelectable().get() == view,
+										false
+									);
+
+									count++;
+									if (count % iconsPerRow != 0)
+									{
+										ImGui::SameLine();
+									}
+								}
+
+								if (double_clicked)
+								{
+									if (view->GetFileResource().GetAssetType() == gallus::resources::AssetType::Folder)
+									{
+										m_pViewedFolder = view;
+										m_bNeedsRefresh = true;
+									}
+									else
+									{
+										view->OnDoubleClicked();
+									}
+								}
+
+								if (clicked)
+								{
+									core::EDITOR_ENGINE->GetEditor().SetSelectable(view);
+								}
+							}
+						}
+						ImGui::EndChild();
+					}
+				}
+				ImGui::EndChild();
+				ImGui::PopStyleVar();
+			}
+			
+			//---------------------------------------------------------------------
 			void ExplorerWindow::RenderFolder(FileEditorSelectable& a_Resource, int a_Indent, const ImVec2& a_InitialPos)
 			{
 				if (a_Resource.GetFileResource().GetAssetType() != gallus::resources::AssetType::Folder)
@@ -100,6 +300,7 @@ namespace gallus
 				}
 			}
 
+			//---------------------------------------------------------------------
 			void ExplorerWindow::Render()
 			{
 				if (!core::EDITOR_ENGINE)
@@ -175,184 +376,18 @@ namespace gallus
 					}
 				}
 
-				ImVec2 toolbarSize = ImVec2(ImGui::GetContentRegionAvail().x, m_Window.GetHeaderSize().y);
-				ImGui::BeginToolbar(toolbarSize);
+				DrawToolbar();
 
-				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
-				ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0);
+				ImGui::SetCursorPos({
+					ImGui::GetCursorPos().x + m_Window.GetFramePadding().x,
+					ImGui::GetCursorPos().y + m_Window.GetFramePadding().y,
+				});
 
-				float topPosY = ImGui::GetCursorPosY();
-
-				bool doRescan = false;
-				if (ImGui::IconButton(
-					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_REFRESH), BUTTON_ID, "RESCAN_EXPLORER").c_str(), "Triggers a full rescan of the asset database, updating all folders and files in the explorer.", m_Window.GetHeaderSize()))
-				{
-					doRescan = true;
-				}
-
+				DrawFolders();
 				ImGui::SameLine();
+				DrawFiles();
 
-				bool list = m_ExplorerViewMode == ExplorerViewMode::ExplorerViewMode_List;
-				bool grid = m_ExplorerViewMode == ExplorerViewMode::ExplorerViewMode_Grid;
-				if (ImGui::IconCheckboxButton(
-					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_LIST), BUTTON_ID, "LIST_EXPLORER").c_str(), &list, "Switches the explorer display to a vertical list of items, showing file names and metadata in a single column.", m_Window.GetHeaderSize(), list ? ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent) : ImGui::GetStyleColorVec4(ImGuiCol_Text)))
-				{
-					if (list)
-					{
-						m_ExplorerViewMode = ExplorerViewMode::ExplorerViewMode_List;
-					}
-				}
-
-				ImGui::SameLine();
-
-				if (ImGui::IconCheckboxButton(
-					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_GRID), BUTTON_ID, "GRID_EXPLORER").c_str(), &grid, "Switches the explorer display to a grid of icons, useful for browsing visually.", m_Window.GetHeaderSize(), grid ? ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent) : ImGui::GetStyleColorVec4(ImGuiCol_Text)))
-				{
-					if (grid)
-					{
-						m_ExplorerViewMode = ExplorerViewMode::ExplorerViewMode_Grid;
-					}
-				}
-
-				ImVec2 endPos = ImGui::GetCursorPos();
-
-				float searchbarWidth = 300;
-				float inputPadding = m_Window.GetFramePadding().x / 2;
-				ImVec2 searchBarPos = ImVec2(
-					ImGui::GetCursorPosX() + ImGui::GetContentRegionAvail().x - (searchbarWidth + m_Window.GetWindowPadding().x),
-					(topPosY + (toolbarSize.y / 2)) - (((inputPadding * 2) + m_Window.GetFontSize()) / 2)
-				);
-				ImGui::SetCursorPos(searchBarPos);
-				if (m_SearchBar.Render(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "SEARCHBAR_EXPLORER").c_str(), ImVec2(searchbarWidth, toolbarSize.y), inputPadding))
-				{
-					m_bNeedsRefresh = true;
-				}
-
-				ImGui::SetCursorPos(endPos);
-
-				ImGui::PopStyleVar();
-				ImGui::PopStyleVar();
-
-				ImGui::EndToolbar(ImVec2(m_Window.GetWindowPadding().x, 0));
-
-				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, m_Window.GetWindowPadding());
-				ImGui::SetCursorPosY(ImGui::GetCursorPos().y + m_Window.GetFramePadding().y);
-				if (ImGui::BeginChild(
-					ImGui::IMGUI_FORMAT_ID("", CHILD_ID, "DIRECTORIES_EXPLORER").c_str(),
-					ImVec2(
-					0,
-					ImGui::GetContentRegionAvail().y - m_Window.GetFramePadding().y
-					),
-					ImGuiChildFlags_Borders | ImGuiChildFlags_ResizeX
-					))
-				{
-					ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
-					for (FileEditorSelectable& view : m_aExplorerItems)
-					{
-						RenderFolder(view, 0, ImGui::GetCursorPos());
-					}
-					ImGui::PopStyleVar();
-				}
-				ImGui::EndChild();
-
-				std::string popUpID = ImGui::IMGUI_FORMAT_ID("", POPUP_WINDOW_ID, "RESOURCE_OPTIONS_EXPLORER");
-
-				ImGui::SameLine();
-				ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, m_ExplorerViewMode == ExplorerViewMode::ExplorerViewMode_List ? ImVec2() : m_Window.GetWindowPadding());
-				if (ImGui::BeginChild(
-					ImGui::IMGUI_FORMAT_ID("", CHILD_ID, "FILES_EXPLORER").c_str(),
-					ImVec2(
-					ImGui::GetContentRegionAvail().x - m_Window.GetFramePadding().x,
-					ImGui::GetContentRegionAvail().y - m_Window.GetFramePadding().y
-					),
-					ImGuiChildFlags_Borders
-					))
-				{
-					if (m_pViewedFolder.get())
-					{
-						if (ImGui::BeginChild(
-							ImGui::IMGUI_FORMAT_ID("", CHILD_ID, "FILES_INNER_EXPLORER").c_str(),
-							ImVec2(
-							0,
-							0
-							)
-							))
-						{
-							int count = m_pViewedFolder.get()->GetParent() ? 1 : 0;
-							for (FileEditorSelectable* view : m_aFilteredExplorerItems)
-							{
-								if (!view)
-								{
-									continue;
-								}
-
-								bool
-									clicked = false,
-									right_clicked = false,
-									double_clicked = false;
-
-								if (m_ExplorerViewMode == ExplorerViewMode::ExplorerViewMode_List)
-								{
-									view->RenderList(
-										clicked,
-										right_clicked,
-										double_clicked,
-										core::EDITOR_ENGINE->GetEditor().GetSelectable().get() == view,
-										false
-									);
-								}
-								else
-								{
-									ImVec2 viewSize = m_Window.GetHeaderSize() * 2.0f;
-
-									// Calculate the maximum number of icons that can fit horizontally as squares
-									int iconsPerRow = static_cast<int>(ImGui::GetContentRegionAvail().x / viewSize.x);
-									iconsPerRow = std::max(1, iconsPerRow); // Ensure at least 1 icon fits
-
-									// Get the available space in the window
-									view->RenderGrid(
-										viewSize,
-										clicked,
-										right_clicked,
-										double_clicked,
-										core::EDITOR_ENGINE->GetEditor().GetSelectable().get() == view,
-										false
-									);
-
-									count++;
-									if (count % iconsPerRow != 0)
-									{
-										ImGui::SameLine();
-									}
-								}
-
-								if (double_clicked)
-								{
-									if (view->GetFileResource().GetAssetType() == gallus::resources::AssetType::Folder)
-									{
-										m_pViewedFolder = view;
-										m_bNeedsRefresh = true;
-									}
-									else
-									{
-										view->OnDoubleClicked();
-									}
-								}
-
-								if (clicked)
-								{
-									core::EDITOR_ENGINE->GetEditor().SetSelectable(view);
-								}
-							}
-						}
-						ImGui::EndChild();
-					}
-				}
-				ImGui::EndChild();
-				ImGui::PopStyleVar();
-				ImGui::PopStyleVar();
-
-				if (doRescan)
+				if (m_bDoRescan)
 				{
 					const FileEditorSelectable* derivedPtr = dynamic_cast<const FileEditorSelectable*>(core::EDITOR_ENGINE->GetEditor().GetSelectable().get());
 					if (derivedPtr)
@@ -364,17 +399,20 @@ namespace gallus
 				}
 			}
 
+			//---------------------------------------------------------------------
 			void ExplorerWindow::SetSelectable(FileEditorSelectable* a_pView)
 			{
 				core::EDITOR_ENGINE->GetEditor().SetSelectable(a_pView);
 			}
 
+			//---------------------------------------------------------------------
 			void ExplorerWindow::OnScanCompleted()
 			{
 				m_bNeedsRescan = true;
 				m_bNeedsRefresh = true;
 			}
 
+			//---------------------------------------------------------------------
 			void ExplorerWindow::OnSelectableChanged(const EditorSelectable* oldVal, const EditorSelectable* newVal)
 			{
 				if (!newVal)
@@ -393,6 +431,7 @@ namespace gallus
 				}
 			}
 
+			//---------------------------------------------------------------------
 			void ExplorerWindow::OnViewedFolderChanged(const FileEditorSelectable* oldVal, const FileEditorSelectable* newVal)
 			{
 				if (!newVal)

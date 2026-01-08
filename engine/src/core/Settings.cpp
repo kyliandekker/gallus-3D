@@ -15,6 +15,9 @@
 // utils
 #include "utils/file_abstractions.h"
 
+// resources
+#include "resources/SrcData.h"
+
 namespace gallus
 {
 	namespace core
@@ -23,35 +26,20 @@ namespace gallus
 		// Settings
 		//---------------------------------------------------------------------
 		Settings::Settings(const std::string& a_sFileName) : m_sFileName(a_sFileName)
-		{
-
-		}
+		{}
 
 		//---------------------------------------------------------------------
 		bool Settings::Load()
 		{
-			DataStream data;
 			const fs::path path = ENGINE->GetSaveDirectory().generic_string() + "/" + m_sFileName;
-
+			core::Data data;
 			if (!file::LoadFile(path, data))
 			{
-				Save();
+				LOGF(LOGSEVERITY_ERROR, LOG_CATEGORY_GAME, "Something went wrong when trying to load settings file \"%s\".", path.generic_string().c_str());
 				return false;
 			}
 
-			rapidjson::Document document;
-			document.Parse(reinterpret_cast<char*>(data.data()), data.size());
-
-			if (document.HasParseError())
-			{
-				Save();
-				return false;
-			}
-
-			if (!LoadVars(document))
-			{
-				return false;
-			}
+			DeserializeFields(this, resources::SrcData(data));
 
 			return true;
 		}
@@ -59,24 +47,22 @@ namespace gallus
 		//---------------------------------------------------------------------
 		bool Settings::Save() const
 		{
-			rapidjson::Document document;
-			document.SetObject();
-			rapidjson::Document::AllocatorType& allocator = document.GetAllocator();
-
-			if (!SaveVars(document, allocator))
+			if (m_sFileName.empty())
 			{
 				return false;
 			}
 
-			rapidjson::StringBuffer buffer;
-			rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
-			document.Accept(writer);
+			resources::SrcData srcData;
+			srcData.SetObject();
+			SerializeFields(this, srcData);
 
-			fs::path path = ENGINE->GetSaveDirectory().generic_string() + "/" + m_sFileName;
-			file::CreateDirectory(path.parent_path());
-			if (!file::SaveFile(path, core::Data(buffer.GetString(), buffer.GetSize())))
+			const fs::path path = ENGINE->GetSaveDirectory().generic_string() + "/" + m_sFileName;
+
+			core::Data data;
+			srcData.GetData(data);
+			if (!file::SaveFile(path, data))
 			{
-				LOGF(LOGSEVERITY_ERROR, LOG_CATEGORY_CORE, "Something went wrong when trying to save the settings: \"%s\".", path.filename().generic_string().c_str());
+				LOGF(LOGSEVERITY_ERROR, LOG_CATEGORY_GAME, "Something went wrong when trying to save settings file \"%s\".", path.generic_string().c_str());
 				return false;
 			}
 

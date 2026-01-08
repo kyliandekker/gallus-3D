@@ -222,9 +222,9 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			glm::ivec2 Texture::GetSize() const
+			DirectX::XMFLOAT2 Texture::GetSize() const
 			{
-				return glm::ivec2(GetResourceDesc().Width, GetResourceDesc().Height);
+				return { static_cast<float>(GetResourceDesc().Width), static_cast<float>(GetResourceDesc().Height) };
 			}
 
 			//---------------------------------------------------------------------
@@ -372,7 +372,7 @@ namespace gallus
 				}
 
 				const auto& r = m_aSpriteRects[a_iIndex];
-				glm::ivec2 size = GetSize(); // returns {width, height} of texture
+				DirectX::XMFLOAT2 size = GetSize(); // returns {width, height} of texture
 
 				float u0 = (static_cast<float>(r.x) + 0.5f) / static_cast<float>(size.x);
 				float v0 = (static_cast<float>(r.y) + 0.5f) / static_cast<float>(size.y);

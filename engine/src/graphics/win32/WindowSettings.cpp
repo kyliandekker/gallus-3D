@@ -40,81 +40,25 @@ namespace gallus
 			{}
 
 			//---------------------------------------------------------------------
-			bool WindowSettings::LoadVars(const rapidjson::Document& a_Document)
-			{
-				m_vSize = glm::vec2(DEFAULT_SIZE_X, DEFAULT_SIZE_Y);
-
-				// Window size
-				if (a_Document.HasMember(JSON_WINDOW_SIZE_VAR))
-				{
-					glm::ivec2 temp;
-					GetInt(a_Document[JSON_WINDOW_SIZE_VAR], JSON_WINDOW_SIZE_X_VAR, temp.x);
-					GetInt(a_Document[JSON_WINDOW_SIZE_VAR], JSON_WINDOW_SIZE_Y_VAR, temp.y);
-
-					if (temp.x != 0)
-					{
-						m_vSize.x = temp.x;
-					}
-					if (temp.y != 0)
-					{
-						m_vSize.y = temp.y;
-					}
-				}
-
-				// Window position
-				if (a_Document.HasMember(JSON_WINDOW_POSITION_VAR))
-				{
-					glm::ivec2 temp;
-					GetInt(a_Document[JSON_WINDOW_POSITION_VAR], JSON_WINDOW_POSITION_X_VAR, temp.x);
-					GetInt(a_Document[JSON_WINDOW_POSITION_VAR], JSON_WINDOW_POSITION_Y_VAR, temp.y);
-
-					if (temp.x != 0)
-					{
-						m_vPosition.x = temp.x;
-					}
-					if (temp.y != 0)
-					{
-						m_vPosition.y = temp.y;
-					}
-				}
-
-				return true;
-			}
-
-			//---------------------------------------------------------------------
-			bool WindowSettings::SaveVars(rapidjson::Document& a_Document, rapidjson::Document::AllocatorType& a_Allocator) const
-			{
-				a_Document.AddMember(JSON_WINDOW_SIZE_VAR, rapidjson::Value().SetObject(), a_Allocator);
-				a_Document[JSON_WINDOW_SIZE_VAR].AddMember(JSON_WINDOW_SIZE_X_VAR, m_vSize.x, a_Allocator);
-				a_Document[JSON_WINDOW_SIZE_VAR].AddMember(JSON_WINDOW_SIZE_Y_VAR, m_vSize.y, a_Allocator);
-
-				a_Document.AddMember(JSON_WINDOW_POSITION_VAR, rapidjson::Value().SetObject(), a_Allocator);
-				a_Document[JSON_WINDOW_POSITION_VAR].AddMember(JSON_WINDOW_POSITION_X_VAR, m_vPosition.x, a_Allocator);
-				a_Document[JSON_WINDOW_POSITION_VAR].AddMember(JSON_WINDOW_POSITION_Y_VAR, m_vPosition.y, a_Allocator);
-
-				return true;
-			}
-
-			//---------------------------------------------------------------------
-			void WindowSettings::SetSize(const glm::ivec2& a_vSize)
+			void WindowSettings::SetSize(const IVector2& a_vSize)
 			{
 				m_vSize = a_vSize;
 			}
 
 			//---------------------------------------------------------------------
-			const glm::ivec2& WindowSettings::GetSize() const
+			const IVector2& WindowSettings::GetSize() const
 			{
 				return m_vSize;
 			}
 
 			//---------------------------------------------------------------------
-			void WindowSettings::SetPosition(const glm::ivec2& a_vPosition)
+			void WindowSettings::SetPosition(const IVector2& a_vPosition)
 			{
 				m_vPosition = a_vPosition;
 			}
 
 			//---------------------------------------------------------------------
-			const glm::ivec2& WindowSettings::GetPosition() const
+			const IVector2& WindowSettings::GetPosition() const
 			{
 				return m_vPosition;
 			}

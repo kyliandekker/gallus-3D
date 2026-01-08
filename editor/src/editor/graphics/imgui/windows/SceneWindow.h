@@ -6,9 +6,10 @@
 #include "graphics/imgui/windows/BaseWindow.h"
 
 // external
-#include <functional>
 #include <imgui/ImGuizmo.h>
 #include <imgui/imgui_internal.h>
+
+#include "editor/graphics/imgui/views/Toolbar.h"
 
 namespace gallus
 {
@@ -21,70 +22,6 @@ namespace gallus
 		namespace imgui
 		{
 			class ImGuiWindow;
-
-			class ToolbarItem
-			{
-			public:
-				virtual void Render() = 0;
-			};
-
-			//---------------------------------------------------------------------
-			// ToolbarButton
-			//---------------------------------------------------------------------
-			class ToolbarButton : public ToolbarItem
-			{
-			public:
-				ToolbarButton(std::function<void()> a_ButtonFunc, std::function<bool()> a_DisabledCondition = []()
-					{
-						return false;
-					});
-
-				void Render() override;
-			private:
-				std::function<void()> m_ButtonFunc;
-				std::function<bool()> m_DisabledCondition;
-			};
-
-			//---------------------------------------------------------------------
-			// ToolbarBreak
-			//---------------------------------------------------------------------
-			class ToolbarBreak : public ToolbarItem
-			{
-			public:
-				ToolbarBreak(const ImVec2& a_vBreakSize) : m_vBreakSize(a_vBreakSize)
-				{}
-
-				void Render() override;
-			private:
-				ImVec2 m_vBreakSize = {};
-			};
-
-			//---------------------------------------------------------------------
-			// Toolbar
-			//---------------------------------------------------------------------
-			class Toolbar
-			{
-			public:
-				Toolbar() = default;
-				Toolbar(const ImVec2& a_vSize) : m_vToolbarSize(a_vSize)
-				{}
-
-				void StartToolbar();
-				void EndToolbar();
-
-				void Render();
-
-				const ImVec2& GetToolbarSize() const
-				{
-					return m_vToolbarSize;
-				}
-
-				std::vector<ToolbarButton> m_aButtons;
-			private:
-				ImVec2 m_vToolbarStartScreenPos = {};
-				ImVec2 m_vToolbarStartPos = {};
-				ImVec2 m_vToolbarSize = {};
-			};
 
 			//---------------------------------------------------------------------
 			// SceneWindow
@@ -118,14 +55,19 @@ namespace gallus
 				/// </summary>
 				void Render() override;
 			protected:
+				// Toolbar.
+				void PopulateBaseToolbar();
 				virtual void PopulateToolbar();
 				void DrawToolbar();
 
+				// Viewport.
 				void HandleViewportControls();
 
+				// Render texture.
 				graphics::dx12::Texture* GetRenderTexture() const;
-				ImRect GetRenderTextureRect(gallus::graphics::dx12::Texture* a_pTexture) const;
+				virtual ImRect GetRenderTextureRect(gallus::graphics::dx12::Texture* a_pTexture) const;
 
+				// Scene view
 				void DrawSceneView(gallus::graphics::dx12::Texture* a_pTexture, const ImRect& a_SceneViewRect) const;
 				void DrawSceneBackground(const ImRect& a_SceneViewRect) const;
 				void SetupSceneGizmos( const ImRect& a_SceneViewRect) const;
@@ -133,9 +75,11 @@ namespace gallus
 				void DrawSceneTexture(gallus::graphics::dx12::Texture* a_pTexture, const ImRect& a_SceneViewRect) const;
 				void DrawSceneGizmos( const ImRect& a_SceneViewRect) const;
 				void DrawSceneViewBorder(const ImRect& a_SceneViewRect) const;
-
+				
+				// Scene view controls.
 				void HandleSceneViewControls(double a_fDeltaTime, const ImRect& a_vSceneRect);
 
+				// TODO: Unused for now.
 				void DrawViewportPanel();
 
 				float m_fZoom = 1.0f;
@@ -164,6 +108,10 @@ namespace gallus
 				void Render() override;
 			private:
 				void PopulateToolbar() override;
+				
+				ImRect GetRenderTextureRect(gallus::graphics::dx12::Texture* a_pTexture) const override;
+
+				void DrawFPS(const ImRect& a_SceneViewRect);
 			};
 		}
 	}

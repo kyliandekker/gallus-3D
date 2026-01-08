@@ -21,6 +21,7 @@
 
 // editor
 #include "editor/graphics/imgui/selectables/FileEditorSelectable.h"
+#include "editor/graphics/imgui/views/Toolbar.h"
 
 namespace gallus
 {
@@ -30,7 +31,7 @@ namespace gallus
 		{
 			class ImGuiWindow;
 
-			enum class ExplorerViewMode
+			enum ExplorerViewMode
 			{
 				ExplorerViewMode_List,
 				ExplorerViewMode_Grid
@@ -74,6 +75,13 @@ namespace gallus
 				/// </summary>
 				void Render() override;
 			private:
+				// Toolbar.
+				void PopulateToolbar();
+				void DrawToolbar();
+
+				void DrawFolders();
+				void DrawFiles();
+
 				/// <summary>
 				/// Renders a folder in the explorer.
 				/// </summary>
@@ -93,11 +101,6 @@ namespace gallus
 
 				void OnViewedFolderChanged(const FileEditorSelectable* oldVal, const FileEditorSelectable* newVal);
 
-				ExplorerViewMode m_ExplorerViewMode = ExplorerViewMode::ExplorerViewMode_List; // How are explorer resources shown?
-
-				bool m_bNeedsRescan = true; /// Whether the explorer needs to refresh the results shown in the explorer window.
-				bool m_bNeedsRefresh = true; /// Whether the explorer needs to refresh the results shown in the explorer window.
-
 				std::vector<FileEditorSelectable> m_aExplorerItems;
 				std::vector<FileEditorSelectable*> m_aFilteredExplorerItems;
 
@@ -107,6 +110,12 @@ namespace gallus
 
 				fs::path m_PreviousSelectablePath;
 				fs::path m_PreviousViewedFolderPath;
+
+				bool m_bDoRescan = false; // TODO: Why are there three of these?
+				bool m_bNeedsRescan = true; /// Whether the explorer needs to refresh the results shown in the explorer window.
+				bool m_bNeedsRefresh = true; /// Whether the explorer needs to refresh the results shown in the explorer window.
+
+				Toolbar m_Toolbar;
 			};
 		}
 	}

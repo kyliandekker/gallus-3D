@@ -17,7 +17,7 @@ namespace gallus
 #ifdef _EDITOR
 				: ISerializableObject()
 #endif // _EDITOR
-			{ }
+			{}
 			
 			//---------------------------------------------------------------------
 			void Camera::Init(float a_fWidth, float a_fHeight)

@@ -19,6 +19,7 @@ namespace gallus
 	{
 		FieldSerializationType_None,
 		FieldSerializationType_Float,
+		FieldSerializationType_Int,
 		FieldSerializationType_Int8,
 		FieldSerializationType_Int16,
 		FieldSerializationType_Int32,
@@ -28,6 +29,7 @@ namespace gallus
 		FieldSerializationType_LongSwitch,
 		FieldSerializationType_Switch,
 		FieldSerializationType_Vector2,
+		FieldSerializationType_IVector2,
 		FieldSerializationType_Vector3,
 		FieldSerializationType_Color,
 		FieldSerializationType_Quaternion,

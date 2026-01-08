@@ -3,13 +3,14 @@
 #include "core/System.h"
 
 // external
-#include <glm/vec2.hpp>
 #include <wtypes.h>
 #include <string>
 #include <queue>
 
 // core
 #include "core/Event.h"
+
+#include "utils/math.h"
 
 // gameplay
 #include "graphics/win32/WindowSettings.h"
@@ -157,13 +158,13 @@ namespace gallus
 				/// Retrieves the real (physical) size of the window.
 				/// </summary>
 				/// <returns>A 2D vector representing the width and height of the window.</returns>
-				glm::ivec2 GetRealSize() const;
+				IVector2 GetRealSize() const;
 
 				/// <summary>
 				/// Retrieves the position of the window on the screen.
 				/// </summary>
 				/// <returns>A 2D vector representing the x and y position of the window.</returns>
-				glm::ivec2 GetPosition() const;
+				IVector2 GetPosition() const;
 
 				SimpleEvent<> m_eOnWinProc;
 			protected:
@@ -171,13 +172,13 @@ namespace gallus
 				/// Sets the size of the window.
 				/// </summary>
 				/// <param name="a_vSize">The size of the window</param>
-				void SetSize(const glm::ivec2& a_vSize);
+				void SetSize(const IVector2& a_vSize);
 
 				/// <summary>
 				/// Sets the position of the window.
 				/// </summary>
 				/// <param name="a_vPosition">The position the window will be rendered at.</param>
-				void SetPosition(const glm::ivec2& a_vPosition);
+				void SetPosition(const IVector2& a_vPosition);
 
 				/// <summary>
 				/// Indicates whether the thread should sleep or wake to run work.
@@ -200,7 +201,7 @@ namespace gallus
 				/// </summary>
 				/// <param name="a_vPosition">The position the window will be rendered at.</param>
 				/// <param name="a_vSize">The size of the window</param>
-				void ChangeSize(const glm::ivec2& a_vPosition, const glm::ivec2& a_vSize);
+				void ChangeSize(const IVector2& a_vPosition, const IVector2& a_vSize);
 
 				/// <summary>
 				/// Called once on the thread to perform initialization steps.

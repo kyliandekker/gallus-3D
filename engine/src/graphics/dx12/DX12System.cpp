@@ -29,7 +29,7 @@ namespace gallus
 			//---------------------------------------------------------------------
 			// DX12System
 			//---------------------------------------------------------------------
-			bool DX12System::Initialize(bool a_bWait, HWND a_hWnd, const glm::ivec2& a_vSize, win32::Window* a_pWindow)
+			bool DX12System::Initialize(bool a_bWait, HWND a_hWnd, const IVector2& a_vSize, win32::Window* a_pWindow)
 			{
 				m_vSize = a_vSize;
 				m_hWnd = a_hWnd;
@@ -170,7 +170,7 @@ namespace gallus
 				// Get the copy command queue.
 				std::shared_ptr<CommandQueue> cCommandQueue = GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
 
-				CreateRenderTexture({ RENDER_TEX_SIZE.x, RENDER_TEX_SIZE.y });
+				CreateRenderTexture({ static_cast<int>(RENDER_TEX_SIZE.x), static_cast<int>(RENDER_TEX_SIZE.y) });
 
 				m_eOnInitialize(*this);
 #ifndef IMGUI_DISABLE
@@ -270,7 +270,7 @@ namespace gallus
 					}
 				}
 
-				Resize({}, m_vSize);
+				Resize({0, 0}, m_vSize);
 
 				m_Camera3D.Init(RENDER_TEX_SIZE.x, RENDER_TEX_SIZE.y);
 				m_Camera3D.GetTransform().SetPosition({ 0.0f, 1.0f, -2.0f });
@@ -700,11 +700,11 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			void DX12System::AfterResize(const glm::ivec2& a_vSize)
+			void DX12System::AfterResize(const IVector2& a_vSize)
 			{}
 
 			//---------------------------------------------------------------------
-			void DX12System::Resize(const glm::ivec2& a_vPos, const glm::ivec2& a_vSize)
+			void DX12System::Resize(const IVector2& a_vPos, const IVector2& a_vSize)
 			{
 				if (a_vSize.x == 0 || a_vSize.y == 0)
 				{
@@ -747,7 +747,7 @@ namespace gallus
 				m_WindowViewport = CD3DX12_VIEWPORT(0.0f, 0.0f, m_vSize.x, m_vSize.y);
 				m_WindowScissorRect = CD3DX12_RECT(0, 0, m_vSize.x, m_vSize.y);
 
-				m_vSize = glm::vec2(a_vSize.x, a_vSize.y);
+				m_vSize = IVector2(a_vSize.x, a_vSize.y);
 			}
 
 			//---------------------------------------------------------------------
@@ -1031,7 +1031,7 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			void DX12System::CreateRenderTexture(const glm::ivec2& a_vSize)
+			void DX12System::CreateRenderTexture(const IVector2& a_vSize)
 			{
 				if (auto renderTex = m_pRenderTexture.lock())
 				{

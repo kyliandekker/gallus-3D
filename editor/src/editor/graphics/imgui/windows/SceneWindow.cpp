@@ -14,6 +14,8 @@
 #include "graphics/imgui/font_icon.h"
 #include "graphics/imgui/ImGuiWindow.h"
 
+#include "utils/math.h"
+
 // gameplay
 #include "gameplay/Game.h"
 
@@ -28,100 +30,20 @@ namespace gallus
 		namespace imgui
 		{
 			//---------------------------------------------------------------------
-			// Toolbar
-			//---------------------------------------------------------------------
-			ToolbarButton::ToolbarButton(std::function<void()> a_ButtonFunc, std::function<bool()> a_DisabledCondition) :
-				m_ButtonFunc(a_ButtonFunc),
-				m_DisabledCondition(a_DisabledCondition)
-			{}
-
-			//---------------------------------------------------------------------
-			void ToolbarButton::Render()
-			{
-				bool wasDisabled = m_DisabledCondition();
-				if (wasDisabled)
-				{
-					ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-					ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
-				}
-				m_ButtonFunc();
-				if (wasDisabled)
-				{
-					ImGui::PopItemFlag();
-					ImGui::PopStyleVar();
-				}
-			}
-
-			//---------------------------------------------------------------------
-			void ToolbarBreak::Render()
-			{
-				ImGui::InvisibleButton("INVISIBLE_BUTTON", m_vBreakSize);
-			}
-
-			//---------------------------------------------------------------------
-			void Toolbar::StartToolbar()
-			{
-				if (m_vToolbarSize.x == 0)
-				{
-					m_vToolbarSize.x = ImGui::GetContentRegionAvail().x;
-				}
-				if (m_vToolbarSize.y == 0)
-				{
-					m_vToolbarSize.y = ImGui::GetContentRegionAvail().y;
-				}
-
-				m_vToolbarStartScreenPos = ImGui::GetCursorScreenPos();
-				m_vToolbarStartPos = ImGui::GetCursorPos();
-
-				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
-				ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0);
-
-				ImDrawList* draw_list = ImGui::GetWindowDrawList();
-
-				ImVec2 header_min = m_vToolbarStartScreenPos;
-				ImVec2 header_max = ImVec2(header_min.x + m_vToolbarSize.x, header_min.y + m_vToolbarSize.y);
-
-				draw_list->AddRectFilled(header_min, header_max, ImGui::GetColorU32(ImGuiCol_Button), 0);
-			}
-
-			//---------------------------------------------------------------------
-			void Toolbar::EndToolbar()
-			{
-				ImGui::SetCursorScreenPos({
-					m_vToolbarStartScreenPos.x,
-					m_vToolbarStartScreenPos.y + m_vToolbarSize.y
-					});
-
-				ImGui::PopStyleVar();
-				ImGui::PopStyleVar();
-			}
-
-			//---------------------------------------------------------------------
-			void Toolbar::Render()
-			{
-				for (size_t i = 0; i < m_aButtons.size(); i++)
-				{
-					m_aButtons[i].Render();
-					if (i < m_aButtons.size() - 1)
-					{
-						ImGui::SameLine();
-					}
-				}
-			}
-
-			//---------------------------------------------------------------------
 			// SceneWindow
 			//---------------------------------------------------------------------
 			SceneWindow::SceneWindow(ImGuiWindow& a_Window) : BaseWindow(a_Window, ImGuiWindowFlags_NoCollapse, std::string(font::ICON_SCENE) + " Scene", "Scene")
 			{}
-
+			
+			//---------------------------------------------------------------------
 			bool SceneWindow::Initialize()
 			{
+				PopulateBaseToolbar();
 				PopulateToolbar();
 
 				ImGuizmo::Enable(true);
 
-				return true;
+				return BaseWindow::Initialize();
 			}
 
 			//---------------------------------------------------------------------
@@ -189,15 +111,15 @@ namespace gallus
 
 				//DrawViewportPanel();
 			}
-
+			
 			//---------------------------------------------------------------------
-			void SceneWindow::PopulateToolbar()
+			void SceneWindow::PopulateBaseToolbar()
 			{
 				ImVec2 toolbarSize = ImVec2(0, m_Window.GetHeaderSize().y);
 				m_Toolbar = Toolbar(toolbarSize);
 
 				// Play button.
-				m_Toolbar.m_aButtons.emplace_back(
+				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(
 					// TODO: This should probably be a global function.
 					[this]()
 					{
@@ -236,10 +158,10 @@ namespace gallus
 					{
 						return core::EDITOR_ENGINE->GetEditor().GetEditorMethod() != editor::EditorMethod::EDITOR_METHOD_SCENE;
 					}
-				);
+				));
 
 				// Pause button.
-				m_Toolbar.m_aButtons.emplace_back(
+				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(
 					[this]()
 					{
 						bool isPaused = gameplay::GAME.IsPaused();
@@ -254,44 +176,10 @@ namespace gallus
 					{
 						return !gameplay::GAME.IsStarted();
 					}
-					
-				);
-
-				// Grid button.
-				m_Toolbar.m_aButtons.emplace_back(
-					[this]()
-					{
-						editor::EditorSettings& editorSettings = core::EDITOR_ENGINE->GetEditor().GetEditorSettings();
-
-						bool showGrid = editorSettings.GetShowGrid();
-						if (ImGui::CheckboxButton(
-							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_SCENE), BUTTON_ID, "SHOW_GRID_SCENE").c_str(), &showGrid, "Toggles visibility of the scene grid to assist with spatial alignment and positioning.", ImVec2(m_Toolbar.GetToolbarSize().y, m_Toolbar.GetToolbarSize().y)))
-						{
-							editorSettings.SetShowGrid(showGrid);
-							editorSettings.Save();
-						}
-					}
-				);
-
-				// Camera mode button.
-				m_Toolbar.m_aButtons.emplace_back(
-					
-					[this]()
-					{
-						editor::Editor& editor = core::EDITOR_ENGINE->GetEditor();
-
-						bool inGameMode = editor.GetCameraMode() == editor::CameraMode::CAMERA_MODE_GAME;
-						if (ImGui::CheckboxButton(
-							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_CAMERA), BUTTON_ID, "CAMERA_MODE_GAME_SCENE").c_str(), &inGameMode, "Switches between the editor scene camera and the in-game camera view.", ImVec2(m_Toolbar.GetToolbarSize().y, m_Toolbar.GetToolbarSize().y)))
-						{
-							editor.SetCameraMode(inGameMode ? editor::CameraMode::CAMERA_MODE_GAME : editor::CameraMode::CAMERA_MODE_SCENE);
-						}
-					}
-					
-				);
+				));
 
 				// Full screen mode button.
-				m_Toolbar.m_aButtons.emplace_back(
+				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(
 					
 					[this]()
 					{
@@ -305,11 +193,46 @@ namespace gallus
 							editorSettings.Save();
 						}
 					}
+				));
+			}
+
+			//---------------------------------------------------------------------
+			void SceneWindow::PopulateToolbar()
+			{
+				// Grid button.
+				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(
+					[this]()
+					{
+						editor::EditorSettings& editorSettings = core::EDITOR_ENGINE->GetEditor().GetEditorSettings();
+
+						bool showGrid = editorSettings.GetShowGrid();
+						if (ImGui::CheckboxButton(
+							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_SCENE), BUTTON_ID, "SHOW_GRID_SCENE").c_str(), &showGrid, "Toggles visibility of the scene grid to assist with spatial alignment and positioning.", ImVec2(m_Toolbar.GetToolbarSize().y, m_Toolbar.GetToolbarSize().y)))
+						{
+							editorSettings.SetShowGrid(showGrid);
+							editorSettings.Save();
+						}
+					}
+				));
+
+				// Camera mode button.
+				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(
 					
-				);
+					[this]()
+					{
+						editor::Editor& editor = core::EDITOR_ENGINE->GetEditor();
+
+						bool inGameMode = editor.GetCameraMode() == editor::CameraMode::CAMERA_MODE_GAME;
+						if (ImGui::CheckboxButton(
+							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_CAMERA), BUTTON_ID, "CAMERA_MODE_GAME_SCENE").c_str(), &inGameMode, "Switches between the editor scene camera and the in-game camera view.", ImVec2(m_Toolbar.GetToolbarSize().y, m_Toolbar.GetToolbarSize().y)))
+						{
+							editor.SetCameraMode(inGameMode ? editor::CameraMode::CAMERA_MODE_GAME : editor::CameraMode::CAMERA_MODE_SCENE);
+						}
+					}
+				));
 
 				// Camera isolation mode button.
-				m_Toolbar.m_aButtons.emplace_back(
+				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(
 					
 					[this]()
 					{
@@ -324,8 +247,7 @@ namespace gallus
 							dx12System.SetCameraIsolationMode((graphics::dx12::CameraIsolationMode) camIsolationMode);
 						}
 					}
-					
-				);
+				));
 			}
 
 			//---------------------------------------------------------------------
@@ -385,7 +307,7 @@ namespace gallus
 				if (changed)
 				{
 					editorSettings.SetSceneZoom(m_fZoom);
-					editorSettings.SetScenePanOffset(glm::vec2(m_vPanOffset.x, m_vPanOffset.y));
+					editorSettings.SetScenePanOffset(m_vPanOffset);
 					editorSettings.Save();
 				}
 			}
@@ -412,7 +334,7 @@ namespace gallus
 					return ImRect();
 				}
 
-				glm::ivec2 texSize = a_pTexture->GetSize();
+				Vector2 texSize = a_pTexture->GetSize();
 				ImVec2 textureSize = ImVec2(
 					static_cast<float>(texSize.x),
 					static_cast<float>(texSize.y)
@@ -710,8 +632,8 @@ namespace gallus
 				else
 				{
 					// Update yaw/pitch
-					s_fYawDegrees += -deltaX * rotationSpeed;
-					s_fPitchDegrees += -deltaY * rotationSpeed;
+					s_fYawDegrees += deltaX * rotationSpeed;
+					s_fPitchDegrees += deltaY * rotationSpeed;
 
 					if (s_fPitchDegrees > 89.0f) s_fPitchDegrees = 89.0f;
 					if (s_fPitchDegrees < -89.0f) s_fPitchDegrees = -89.0f;
@@ -949,6 +871,20 @@ namespace gallus
 					return;
 				}
 
+				ImRect sceneViewRect = GetRenderTextureRect(tex);
+				DrawSceneBackground(sceneViewRect);
+				DrawSceneTexture(tex, sceneViewRect);
+				DrawSceneViewBorder(sceneViewRect);
+				DrawFPS(sceneViewRect);
+			}
+
+			//---------------------------------------------------------------------
+			void FullSceneWindow::PopulateToolbar()
+			{}
+			
+			//---------------------------------------------------------------------
+			ImRect FullSceneWindow::GetRenderTextureRect(gallus::graphics::dx12::Texture * a_pTexture) const
+			{
 				// Available region (minus padding)
 				ImVec2 avail = ImGui::GetContentRegionAvail();
 				ImVec2 padding = ImVec2(0, m_Window.GetFramePadding().y);
@@ -956,7 +892,7 @@ namespace gallus
 				avail.y -= padding.y * 2.0f;
 
 				// Fit inside available space (keep aspect ratio)
-				glm::ivec2 size = tex->GetSize();
+				Vector2 size = a_pTexture->GetSize();
 				float scale = std::min(avail.x / size.x, avail.y / size.y);
 				float drawW = size.x * scale;
 				float drawH = size.y * scale;
@@ -972,18 +908,19 @@ namespace gallus
 					sceneViewPosition,
 					{ sceneViewPosition.x + drawW, sceneViewPosition.y + drawH }
 				};
+				return sceneViewRect;
+			}
 
-				DrawSceneBackground(sceneViewRect);
-				DrawSceneTexture(tex, sceneViewRect);
-				DrawSceneViewBorder(sceneViewRect);
-
+			//---------------------------------------------------------------------
+			void FullSceneWindow::DrawFPS(const ImRect& a_SceneViewRect)
+			{
 				ImVec2 windowPadding = m_Window.GetWindowPadding();
 				// Draw FPS.
 				{
 					std::string fpsValue = std::to_string(static_cast<uint64_t>(std::round(core::EDITOR_ENGINE->GetDX12().GetFPS().GetFPS()))) + " graphics fps";
 
 					ImGui::PushFont(m_Window.GetCapitalFont());
-					ImGui::SetCursorScreenPos(ImVec2(sceneViewRect.GetTR().x - (ImGui::CalcTextSize(fpsValue.c_str()).x + windowPadding.x), sceneViewRect.GetTR().y + windowPadding.y));
+					ImGui::SetCursorScreenPos(ImVec2(a_SceneViewRect.GetTR().x - (ImGui::CalcTextSize(fpsValue.c_str()).x + windowPadding.x), a_SceneViewRect.GetTR().y + windowPadding.y));
 					ImGui::TextColored(ImVec4(1, 1, 0, 1), fpsValue.c_str());
 					ImGui::PopFont();
 				}
@@ -992,96 +929,10 @@ namespace gallus
 					std::string fpsValue = std::to_string(static_cast<uint64_t>(std::round(gameplay::GAME.GetFPS().GetFPS()))) + " game fps";
 
 					ImGui::PushFont(m_Window.GetCapitalFont());
-					ImGui::SetCursorScreenPos(ImVec2(sceneViewRect.GetTR().x - (ImGui::CalcTextSize(fpsValue.c_str()).x + windowPadding.x), sceneViewRect.GetTR().y + (m_Window.GetFontSize() * 2) + windowPadding.y));
+					ImGui::SetCursorScreenPos(ImVec2(a_SceneViewRect.GetTR().x - (ImGui::CalcTextSize(fpsValue.c_str()).x + windowPadding.x), a_SceneViewRect.GetTR().y + (m_Window.GetFontSize() * 2) + windowPadding.y));
 					ImGui::TextColored(ImVec4(1, 1, 0, 1), fpsValue.c_str());
 					ImGui::PopFont();
 				}
-			}
-
-			//---------------------------------------------------------------------
-			void FullSceneWindow::PopulateToolbar()
-			{
-				ImVec2 toolbarSize = ImVec2(0, m_Window.GetHeaderSize().y);
-				m_Toolbar = Toolbar(toolbarSize);
-
-				// Play button.
-				m_Toolbar.m_aButtons.emplace_back(
-					// TODO: This should probably be a global function.
-					[this]()
-					{
-						bool isStarted = gameplay::GAME.IsStarted();
-						if (ImGui::CheckboxButton(
-							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_PLAY), BUTTON_ID, "PLAY_SCENE").c_str(), &isStarted, "Starts or stops the game simulation using the currently loaded scene. When stopping, the scene is reloaded to its original editor state.", ImVec2(m_Toolbar.GetToolbarSize().y, m_Toolbar.GetToolbarSize().y)))
-						{
-							editor::Editor& editor = core::EDITOR_ENGINE->GetEditor();
-
-							editor.SetSelectable(nullptr);
-
-							// If we start the game, set the game scene to the scene that is currently opened in the editor.
-							if (isStarted)
-							{
-								const fs::path scenePath = editor.GetScene().GetPath();
-
-								gameplay::Scene& gameScene = gameplay::GAME.GetScene();
-								gameScene.LoadByPath(scenePath);
-								gameScene.LoadData();
-							}
-							// If we stop the game, we want to load back the initial scene.
-							// TODO: We should not do this, we should go back to a (possibly) edited version of the scene.
-							else
-							{
-								gameplay::Scene& editorScene = editor.GetScene();
-								const fs::path scenePath = editorScene.GetPath();
-
-								editorScene.LoadByPath(scenePath);
-								editorScene.LoadData();
-							}
-							gameplay::GAME.SetIsStarted(isStarted);
-						}
-					},
-					// Disable if the editor is in prefab mode.
-					[]()
-					{
-						return core::EDITOR_ENGINE->GetEditor().GetEditorMethod() != editor::EditorMethod::EDITOR_METHOD_SCENE;
-					}
-				);
-
-				// Pause button.
-				m_Toolbar.m_aButtons.emplace_back(
-					[this]()
-					{
-						bool isPaused = gameplay::GAME.IsPaused();
-						if (ImGui::CheckboxButton(
-							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_PAUSE), BUTTON_ID, "PAUSE_SCENE").c_str(), &isPaused, "Pauses or resumes the game simulation while preserving the current runtime state.", ImVec2(m_Toolbar.GetToolbarSize().y, m_Toolbar.GetToolbarSize().y)))
-						{
-							gameplay::GAME.SetIsPaused(isPaused);
-						}
-					},
-					// Disable if not in game mode.
-					[]()
-					{
-						return !gameplay::GAME.IsStarted();
-					}
-
-				);
-
-				// Full screen mode button.
-				m_Toolbar.m_aButtons.emplace_back(
-
-					[this]()
-					{
-						editor::EditorSettings& editorSettings = core::EDITOR_ENGINE->GetEditor().GetEditorSettings();
-
-						bool inFullScreen = editorSettings.GetFullScreenPlayMode();
-						if (ImGui::CheckboxButton(
-							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_GAMEMODE), BUTTON_ID, "FULL_SCREEN_PLAY_MODE_SCENE").c_str(), &inFullScreen, "Toggles fullscreen play mode, rendering the game view without editor UI overlays.", ImVec2(m_Toolbar.GetToolbarSize().y, m_Toolbar.GetToolbarSize().y)))
-						{
-							editorSettings.SetFullScreenPlayMode(inFullScreen);
-							editorSettings.Save();
-						}
-					}
-
-				);
 			}
 		}
 	}

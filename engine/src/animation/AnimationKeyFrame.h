@@ -31,7 +31,7 @@ namespace gallus
 			AnimationKeyFrame(int a_iFrame, Animation& a_Animation) :
 				m_iFrame(a_iFrame),
 				m_pAnimation(&a_Animation)
-			{ }
+			{}
 
 			/// <summary>
 			/// Converts an animation event enumeration value to its corresponding string representation.

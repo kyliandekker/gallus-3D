@@ -9,8 +9,10 @@
 #include <wtypes.h>
 #include <memory>
 #include <vector>
-#include <glm/vec2.hpp>
 #include <string>
+
+// utils
+#include "utils/math.h"
 
 namespace gallus
 {
@@ -100,7 +102,7 @@ namespace gallus
 				/// </summary>
 				/// <param name="a_vPos">Position of the window.</param>
 				/// <param name="a_vSize">Size of the window.</param>
-				void Resize(const glm::ivec2& a_vPos, const glm::ivec2& a_vSize);
+				void Resize(const IVector2& a_vPos, const IVector2& a_vSize);
 
 				/// <summary>
 				/// Called when the render target is cleaned.

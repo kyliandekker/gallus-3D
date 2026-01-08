@@ -35,7 +35,7 @@ namespace gallus
 			// AnimationWindow
 			//---------------------------------------------------------------------
 			AnimationWindow::AnimationWindow(ImGuiWindow& a_Window) : BaseWindow(a_Window, ImGuiWindowFlags_NoCollapse, std::string(font::ICON_ANIMATION) + " Animation", "Animation")
-			{ }
+			{}
 
 			//---------------------------------------------------------------------
 			AnimationWindow::~AnimationWindow()

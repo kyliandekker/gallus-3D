@@ -55,12 +55,22 @@ namespace gallus
 			std::string propertyName = TypeNameToPropertyName(field.m_sUIName);
 
 			void* ptr = reinterpret_cast<char*>(a_pObject) + field.m_iOffset;
+
+			const resources::SrcData* dataToUse = &a_SrcData;
 			
 			switch (type)
 			{
 				case FieldSerializationType::FieldSerializationType_Float:
 				{
 					a_SrcData.GetFloat(propertyName, *(float*)ptr);
+					break;
+				}
+				case FieldSerializationType::FieldSerializationType_Int:
+				{
+					int value = 0;
+					a_SrcData.GetInt(propertyName, value);
+					int* pValue = reinterpret_cast<int*>(ptr);
+					*pValue = value;
 					break;
 				}
 				case FieldSerializationType::FieldSerializationType_Int8:
@@ -121,6 +131,11 @@ namespace gallus
 				case FieldSerializationType::FieldSerializationType_Vector2:
 				{
 					a_SrcData.GetVector2(propertyName, *(DirectX::XMFLOAT2*)ptr);
+					break;
+				}
+				case FieldSerializationType::FieldSerializationType_IVector2:
+				{
+					a_SrcData.GetIVector2(propertyName, *(DirectX::XMINT2*)ptr);
 					break;
 				}
 				case FieldSerializationType::FieldSerializationType_Vector3:
@@ -342,6 +357,13 @@ namespace gallus
 					a_SrcData.SetFloat(propertyName, *value);
 					break;
 				}
+				case FieldSerializationType::FieldSerializationType_Int:
+				{
+					const int* value = reinterpret_cast<const int*>(ptr);
+					int64_t temp = static_cast<int64_t>(*value);
+					a_SrcData.SetInt(propertyName, temp);
+					break;
+				}
 				case FieldSerializationType::FieldSerializationType_Int8:
 				{
 					const int8_t* value = reinterpret_cast<const int8_t*>(ptr);
@@ -395,6 +417,12 @@ namespace gallus
 				{
 					const DirectX::XMFLOAT2* value = reinterpret_cast<const DirectX::XMFLOAT2*>(ptr);
 					a_SrcData.SetVector2(propertyName, *value);
+					break;
+				}
+				case FieldSerializationType::FieldSerializationType_IVector2:
+				{
+					const DirectX::XMINT2* value = reinterpret_cast<const DirectX::XMINT2*>(ptr);
+					a_SrcData.SetIVector2(propertyName, *value);
 					break;
 				}
 				case FieldSerializationType::FieldSerializationType_Vector3:

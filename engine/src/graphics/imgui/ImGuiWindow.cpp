@@ -286,7 +286,7 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			void ImGuiWindow::Resize(const glm::ivec2& a_vPos, const glm::ivec2& a_vSize)
+			void ImGuiWindow::Resize(const IVector2& a_vPos, const IVector2& a_vSize)
 			{
 				ImGuiIO& io = ImGui::GetIO();
 				io.DisplaySize.x = static_cast<float>(a_vSize.x);

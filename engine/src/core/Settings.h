@@ -2,14 +2,14 @@
 
 // external
 #include <string>
-#include <rapidjson/document.h>
+
+// editor
+#include "editor/ISerializableObject.h"
 
 namespace gallus
 {
 	namespace core
 	{
-/// Whether DX12 makes a full log of creating devices, resources, etc (spam).
-#define LOG_SETTINGS 0
 		//---------------------------------------------------------------------
 		// Settings
 		//---------------------------------------------------------------------
@@ -17,7 +17,7 @@ namespace gallus
 		/// Manages editor settings, including window size, log visibility filters, 
 		/// and tracking previously opened projects.
 		/// </summary>
-		class Settings
+		class Settings : public ISerializableObject
 		{
 		public:
 			/// <summary>
@@ -38,19 +38,10 @@ namespace gallus
 			/// <returns>True if the settings were saved successfully, otherwise false.</returns>
 			bool Save() const;
 		private:
-			/// <summary>
-			/// Virtual method for loading specific vars.
-			/// </summary>
-			/// <returns>True if the settings were loaded successfully, otherwise false.</returns>
-			virtual bool LoadVars(const rapidjson::Document& a_Document) = 0;
-
-			/// <summary>
-			/// Virtual method for saving specific vars.
-			/// </summary>
-			/// <returns>True if the settings were saved successfully, otherwise false.</returns>
-			virtual bool SaveVars(rapidjson::Document& a_Document, rapidjson::Document::AllocatorType& a_Allocator) const = 0;
-
 			std::string m_sFileName;
+
+			BEGIN_SERIALIZE(Settings)
+			END_SERIALIZE(Settings)
 		};
 	}
 }

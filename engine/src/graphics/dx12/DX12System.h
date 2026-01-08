@@ -5,9 +5,15 @@
 #include "core/System.h"
 
 // external
-#include <glm/vec2.hpp>
 #include <memory>
 #include <mutex>
+
+#ifndef IMGUI_DISABLE
+#include "graphics/imgui/ImGuiWindow.h"
+#endif // IMGUI_DISABLE
+
+// core
+#include "core/Event.h"
 
 // graphics
 #include "graphics/dx12/HeapAllocation.h"
@@ -16,12 +22,8 @@
 #include "graphics/dx12/DX12Resource.h"
 #include "graphics/dx12/DirectionalLight.h"
 
-#ifndef IMGUI_DISABLE
-#include "graphics/imgui/ImGuiWindow.h"
-#endif // IMGUI_DISABLE
-
-// core
-#include "core/Event.h"
+// utils
+#include "utils/math.h"
 
 // gameplay
 #include "gameplay/systems/components/SpriteComponent.h"
@@ -80,7 +82,7 @@ namespace gallus
 				/// <param name="a_vSize">Size of the window.</param>
 				/// <param name="a_pWindow">The window.</param>
 				/// <returns>True if the initialization was successful, otherwise false.</returns>
-				bool Initialize(bool a_bWait, HWND a_hWnd, const glm::ivec2& a_vSize, win32::Window* a_pWindow);
+				bool Initialize(bool a_bWait, HWND a_hWnd, const IVector2& a_vSize, win32::Window* a_pWindow);
 
 				/// <summary>
 				/// Cleans up resources and destroys the dx12 window.
@@ -188,7 +190,7 @@ namespace gallus
 				/// </summary>
 				/// <param name="a_vPos">The position of the window.</param>
 				/// <param name="a_vSize">The size of the window.</param>
-				void Resize(const glm::ivec2& a_vPos, const glm::ivec2& a_vSize);
+				void Resize(const IVector2& a_vPos, const IVector2& a_vSize);
 
 				/// <summary>
 				/// Resizes the depth buffer.
@@ -371,7 +373,7 @@ namespace gallus
 
 				SimpleEvent<DX12System&> m_eOnInitialize;
 				SimpleEvent<std::shared_ptr<dx12::CommandList>> m_eOnRender;
-				SimpleEvent<const glm::ivec2&, const glm::ivec2&> m_eOnResize;
+				SimpleEvent<const IVector2&, const IVector2&> m_eOnResize;
 				Event<float> m_eOnNewFrame;
 
 				const Event<float>& OnNewFrame() const
@@ -401,13 +403,13 @@ namespace gallus
 				/// Creates the render texture.
 				/// </summary>
 				/// <param name="a_vSize">The size of the render texture.</param>
-				void CreateRenderTexture(const glm::ivec2& a_vSize);
+				void CreateRenderTexture(const IVector2& a_vSize);
 
 				/// <summary>
 				/// Method called after successful resize.
 				/// </summary>
 				/// <param name="a_vSize">The size of the window.</param>
-				void AfterResize(const glm::ivec2& a_vSize);
+				void AfterResize(const IVector2& a_vSize);
 
 				Microsoft::WRL::ComPtr<IDXGIAdapter4> m_pAdapter = nullptr;
 				Microsoft::WRL::ComPtr<ID3D12Device2> m_pDevice = nullptr;
@@ -440,7 +442,7 @@ namespace gallus
 				D3D12_VIEWPORT m_WindowViewport;
 				D3D12_RECT m_WindowScissorRect;
 
-				glm::ivec2 m_vSize = { 1920, 1080 };
+				IVector2 m_vSize = { 1920, 1080 };
 #ifndef IMGUI_DISABLE
 				imgui::ImGuiWindow m_ImGuiWindow;
 #endif // IMGUI_DISABLE

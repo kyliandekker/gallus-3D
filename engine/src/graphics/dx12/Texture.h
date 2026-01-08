@@ -8,7 +8,6 @@
 #include <string>
 #include <memory>
 #include <cstdint>
-#include <glm/vec2.hpp>
 
 // utils
 #include "utils/file_abstractions.h"
@@ -74,8 +73,8 @@ namespace gallus
 			class SpriteUV
 			{
 			public:
-				glm::vec2 uv0 = { 0.0f, 0.0f }; // top-left
-				glm::vec2 uv1 = { 1.0f, 1.0f }; // bottom-right
+				DirectX::XMFLOAT2 uv0 = { 0.0f, 0.0f }; // top-left
+				DirectX::XMFLOAT2 uv1 = { 1.0f, 1.0f }; // bottom-right
 			};
 
 			//---------------------------------------------------------------------
@@ -158,7 +157,7 @@ namespace gallus
 				/// Retrieves the size of the texture.
 				/// </summary>
 				/// <returns>Returns a vector representing the width and the height.</returns>
-				glm::ivec2 GetSize() const;
+				DirectX::XMFLOAT2 GetSize() const;
 
 				/// <summary>
 				/// Creates the SRV for the texture.

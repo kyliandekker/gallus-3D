@@ -27,7 +27,7 @@ namespace gallus
 			/// </summary>
 			/// <param name="a_EntityID">The related entity id.</param>
 			void Activate(gameplay::EntityID& a_EntityID) override
-			{ }
+			{}
 
 			std::string GetName() const override;
 

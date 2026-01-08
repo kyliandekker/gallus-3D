@@ -4,7 +4,6 @@
 
 // external
 #include <memory>
-#include <glm/vec4.hpp>
 
 // graphics
 #include "graphics/dx12/DX12PCH.h"

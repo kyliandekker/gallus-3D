@@ -4,7 +4,6 @@
 
 // external
 #include <memory>
-#include <glm/vec4.hpp>
 
 // graphics
 #include "graphics/dx12/DX12PCH.h"
@@ -80,32 +79,33 @@ namespace gallus
 			std::weak_ptr<graphics::dx12::ShaderBind> m_pShaderBind = {};
 			std::weak_ptr<graphics::dx12::Texture> m_pTexture = {};
 			int8_t m_iTextureIndex = 0;
+			int8_t m_iTextureInwdex = 2;
 			std::weak_ptr<graphics::dx12::Material> m_pMaterial = {};
 			DirectX::XMFLOAT4 m_vColor = { 1, 1, 1, 1 };
 
-				BEGIN_SERIALIZE_PARENT(MeshComponent, Component)
-				 	SERIALIZE_FIELD(m_pShaderBind, "Shader Bind", "",
-				 		.type = FieldSerializationType::FieldSerializationType_ObjectPtr)
-				 	SERIALIZE_FIELD(m_pMaterial, "Material", "",
-				 		.type = FieldSerializationType::FieldSerializationType_EngineResource,
-				 		.assetType = resources::AssetType::Material)
-				 	SERIALIZE_FIELD(m_pMaterial, "MaterialView", "",
-				 		.type = FieldSerializationType::FieldSerializationType_ObjectPtr,
-				 		.assetType = resources::AssetType::Material,
-				 		.serialize = false,
-				 		.indent = 1)
-				 	SERIALIZE_FIELD(m_pMesh, "Mesh", "Pointer to the texture asset used by this Mesh. Can be nullptr if no texture is assigned. Determines the visual appearance of the Mesh.",
-				 		.type = FieldSerializationType::FieldSerializationType_EngineResource,
-				 		.assetType = resources::AssetType::Mesh)
-				 	SERIALIZE_FIELD(m_pTexture, "Texture", "Pointer to the mesh asset used by this Mesh. Can be nullptr if no texture is assigned. Determines the visual appearance of the Mesh.",
-				 		.type = FieldSerializationType::FieldSerializationType_EngineResource,
-				 		.assetType = resources::AssetType::Sprite)
-				 	SERIALIZE_FIELD(m_iTextureIndex, "Texture Index", "Index of the Mesh within a texture atlas. Used when the texture contains multiple rects to select which one is displayed.",
-				 		.type = FieldSerializationType::FieldSerializationType_Int8)
-				 	SERIALIZE_FIELD(m_pTexture, "Texture Preview", "",
-				 		.type = FieldSerializationType::FieldSerializationType_TexturePreview,
-				 		.relatedIndexFieldOffset = offsetof(MeshComponent, m_iTextureIndex))
-				END_SERIALIZE(MeshComponent)
+			BEGIN_SERIALIZE_PARENT(MeshComponent, Component)
+			 	SERIALIZE_FIELD(m_pShaderBind, "Shader Bind", "",
+			 		.type = FieldSerializationType::FieldSerializationType_ObjectPtr)
+			 	SERIALIZE_FIELD(m_pMaterial, "Material", "",
+			 		.type = FieldSerializationType::FieldSerializationType_EngineResource,
+			 		.assetType = resources::AssetType::Material)
+			 	SERIALIZE_FIELD(m_pMaterial, "MaterialView", "",
+			 		.type = FieldSerializationType::FieldSerializationType_ObjectPtr,
+			 		.assetType = resources::AssetType::Material,
+			 		.serialize = false,
+			 		.indent = 1)
+			 	SERIALIZE_FIELD(m_pMesh, "Mesh", "Pointer to the texture asset used by this Mesh. Can be nullptr if no texture is assigned. Determines the visual appearance of the Mesh.",
+			 		.type = FieldSerializationType::FieldSerializationType_EngineResource,
+			 		.assetType = resources::AssetType::Mesh)
+			 	SERIALIZE_FIELD(m_pTexture, "Texture", "Pointer to the mesh asset used by this Mesh. Can be nullptr if no texture is assigned. Determines the visual appearance of the Mesh.",
+			 		.type = FieldSerializationType::FieldSerializationType_EngineResource,
+			 		.assetType = resources::AssetType::Sprite)
+			 	SERIALIZE_FIELD(m_iTextureIndex, "Texture Index", "Index of the Mesh within a texture atlas. Used when the texture contains multiple rects to select which one is displayed.",
+			 		.type = FieldSerializationType::FieldSerializationType_Int8)
+			 	SERIALIZE_FIELD(m_pTexture, "Texture Preview", "",
+			 		.type = FieldSerializationType::FieldSerializationType_TexturePreview,
+			 		.relatedIndexFieldOffset = offsetof(MeshComponent, m_iTextureIndex))
+			END_SERIALIZE(MeshComponent)
 		};
 	}
 }

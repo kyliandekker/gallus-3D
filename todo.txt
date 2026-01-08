@@ -15,7 +15,9 @@ Turn DX12System into a coordinator class and split up the parts
 Stuff in DX12System should probably be unique_ptrs
 Buffer needs a rewrite
 Editor keybind context
-Remove glm completely
+Remove glm completely ✓
 Scene window rewrite ✓
 Replace toolbars everywhere
 Camera isolation mode needs to be saved in editor settings
+List/grid mode needs to be saved in editor settings
+Expose vars the same way as IEditorExposable in EditorSettings, with category

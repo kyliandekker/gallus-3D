@@ -12,10 +12,10 @@ namespace gallus
 				ImGuiWindowsConfig() = default;
 
 				virtual void Initialize()
-				{ }
+				{}
 
 				virtual void Render()
-				{ }
+				{}
 			};
 		}
 	}

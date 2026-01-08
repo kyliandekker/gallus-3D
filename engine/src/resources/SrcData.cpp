@@ -158,6 +158,35 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
+		bool SrcData::GetIVector2(const std::string& a_sKey, DirectX::XMINT2& a_vVector) const
+		{
+			if (m_Document.HasParseError() || m_Document.IsNull())
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Document is empty.");
+				return false;
+			}
+
+			if (!m_Document.HasMember(a_sKey.c_str()) || !m_Document[a_sKey.c_str()].IsObject())
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" is not present or not an object/vector.", a_sKey.c_str());
+				return false;
+			}
+
+			if (!rapidjson::GetInt(m_Document[a_sKey.c_str()], SRC_DATA_VECTOR_X, a_vVector.x))
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" does not have an x axis.", a_sKey.c_str());
+				return false;
+			}
+			if (!rapidjson::GetInt(m_Document[a_sKey.c_str()], SRC_DATA_VECTOR_Y, a_vVector.y))
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" does not have an y axis.", a_sKey.c_str());
+				return false;
+			}
+
+			return true;
+		}
+
+		//---------------------------------------------------------------------
 		bool SrcData::GetVector3(const std::string& a_sKey, DirectX::XMFLOAT3& a_vVector) const
 		{
 			if (m_Document.HasParseError() || m_Document.IsNull())
@@ -233,11 +262,6 @@ namespace gallus
 		//---------------------------------------------------------------------
 		bool SrcData::GetSrcObject(const std::string& a_sKey, SrcData& a_SrcData) const
 		{
-			core::DataStream data;
-			GetData(data);
-
-			file::SaveFile(fs::path("C:/ekkes/test.txt"), data);
-
 			if (m_Document.HasParseError() || m_Document.IsNull())
 			{
 				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Document is empty.");
@@ -251,13 +275,7 @@ namespace gallus
 			}
 
 			a_SrcData = SrcData(m_Document[a_sKey.c_str()]);
-
-			if (!a_SrcData.IsValid())
-			{
-				return false;
-			}
-
-			return true;
+			return a_SrcData.IsValid();
 		}
 
 		//---------------------------------------------------------------------
@@ -406,6 +424,18 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
+		void SrcData::SetIVector2(const std::string& a_sKey, const DirectX::XMINT2& a_vVector)
+		{
+			rapidjson::Document::AllocatorType& allocator = m_Document.GetAllocator();
+			rapidjson::Value vectorObj(rapidjson::kObjectType);
+
+			vectorObj.AddMember(rapidjson::Value(SRC_DATA_VECTOR_X, allocator).Move(), a_vVector.x, allocator);
+			vectorObj.AddMember(rapidjson::Value(SRC_DATA_VECTOR_Y, allocator).Move(), a_vVector.y, allocator);
+
+			m_Document.AddMember(rapidjson::Value(a_sKey.c_str(), allocator).Move(), vectorObj, allocator);
+		}
+
+		//---------------------------------------------------------------------
 		void SrcData::SetVector3(const std::string& a_sKey, const DirectX::XMFLOAT3& a_vVector)
 		{
 			rapidjson::Document::AllocatorType& allocator = m_Document.GetAllocator();
@@ -435,9 +465,7 @@ namespace gallus
 		//---------------------------------------------------------------------
 		void SrcData::SetSrcObject(const std::string& a_sKey, SrcData& a_SrcData)
 		{
-			rapidjson::Value copy;
-			copy.CopyFrom(a_SrcData.GetDocument(), m_Document.GetAllocator()); // allocator-safe deep copy
-			m_Document.AddMember(rapidjson::Value(a_sKey.c_str(), m_Document.GetAllocator()).Move(), copy, m_Document.GetAllocator());
+			rapidjson::SetOrAddMember(m_Document, a_sKey.c_str(), a_SrcData.GetDocument());
 		}
 
 		//---------------------------------------------------------------------

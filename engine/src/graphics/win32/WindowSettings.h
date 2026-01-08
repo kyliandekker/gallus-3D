@@ -2,8 +2,8 @@
 
 #include "core/Settings.h"
 
-// external
-#include <glm/vec2.hpp>
+// utils
+#include "utils/math.h"
 
 namespace gallus
 {
@@ -30,41 +30,36 @@ namespace gallus
 				/// <summary>
 				/// Sets the window size.
 				/// </summary>
-				/// <param name="a_Size">The new size as a glm::vec2.</param>
-				void SetSize(const glm::ivec2& a_vSize);
+				/// <param name="a_Size">The new size.</param>
+				void SetSize(const IVector2& a_vSize);
 
 				/// <summary>
 				/// Retrieves the current editor window size.
 				/// </summary>
-				/// <returns>The current window size as a glm::ivec2.</returns>
-				const glm::ivec2& GetSize() const;
+				/// <returns>The current window size as a IVector2.</returns>
+				const IVector2& GetSize() const;
 
 				/// <summary>
 				/// Sets the window position.
 				/// </summary>
-				/// <param name="a_vPosition">The new position as a glm::vec2.</param>
-				void SetPosition(const glm::ivec2& a_vPosition);
+				/// <param name="a_vPosition">The new position.</param>
+				void SetPosition(const IVector2& a_vPosition);
 
 				/// <summary>
 				/// Retrieves the current editor window position.
 				/// </summary>
-				/// <returns>The current window position as a glm::ivec2.</returns>
-				const glm::ivec2& GetPosition() const;
+				/// <returns>The current window position.</returns>
+				const IVector2& GetPosition() const;
 			private:
-				/// <summary>
-				/// Virtual method for loading specific vars.
-				/// </summary>
-				/// <returns>True if the settings were loaded successfully, otherwise false.</returns>
-				bool LoadVars(const rapidjson::Document& a_Document);
+				IVector2 m_vSize = { 400, 400 }; /// The window size.
+				IVector2 m_vPosition; /// The window position.
 
-				/// <summary>
-				/// Virtual method for saving specific vars.
-				/// </summary>
-				/// <returns>True if the settings were saved successfully, otherwise false.</returns>
-				bool SaveVars(rapidjson::Document& a_Document, rapidjson::Document::AllocatorType& a_Allocator) const;
-
-				glm::ivec2 m_vSize = { 400, 400 }; /// The window size.
-				glm::ivec2 m_vPosition; /// The window position.
+				BEGIN_SERIALIZE_PARENT(WindowSettings, Settings)
+					SERIALIZE_FIELD(m_vSize, "size", "",
+						.type = FieldSerializationType::FieldSerializationType_IVector2)
+					SERIALIZE_FIELD(m_vPosition, "position", "",
+						.type = FieldSerializationType::FieldSerializationType_IVector2)
+				END_SERIALIZE(WindowSettings)
 			};
 		}
 	}

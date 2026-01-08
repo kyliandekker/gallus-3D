@@ -1,8 +1,5 @@
 #include "Engine.h"
 
-// external
-#include <glm/vec2.hpp>
-
 // core
 #include "core/ArgProcessor.h"
 
@@ -34,7 +31,7 @@ namespace gallus
 			m_Window.Initialize(true, a_hInstance);
 			m_Window.SetTitle(a_sName);
 
-			const glm::ivec2 size = m_Window.GetRealSize();
+			const IVector2 size = m_Window.GetRealSize();
 			if (!m_DX12.Initialize(true, m_Window.GetHWnd(), size, &m_Window))
 			{
 				return false;

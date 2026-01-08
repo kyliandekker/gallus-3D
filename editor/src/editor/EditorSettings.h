@@ -2,8 +2,7 @@
 
 #include "core/Settings.h"
 
-// external
-#include <glm/vec2.hpp>
+#include "utils/math.h"
 
 namespace gallus
 {
@@ -20,7 +19,7 @@ namespace gallus
 			/// </summary>
 			/// <param name="a_sFileName">The name the settings file should have.</param>
 			EditorSettings(const std::string& a_sFileName) : core::Settings(a_sFileName)
-			{ }
+			{}
 
 			/// <summary>
 			/// Sets whether the console should automatically scroll to the bottom.
@@ -170,13 +169,13 @@ namespace gallus
 			/// Sets the scene pan offset.
 			/// </summary>
 			/// <param name="a_vScenePanOffset">The offset of the scene window.</param>
-			void SetScenePanOffset(const glm::vec2& a_vScenePanOffset);
+			void SetScenePanOffset(const Vector2& a_vScenePanOffset);
 
 			/// <summary>
 			/// Determines the offset of the scene window.
 			/// </summary>
 			/// <returns>Vector representing the offset.</returns>
-			const glm::vec2& GetScenePanOffset() const;
+			const Vector2& GetScenePanOffset() const;
 
 			/// <summary>
 			/// Sets the scene operation.
@@ -191,6 +190,18 @@ namespace gallus
 			int GetLastSceneOperation() const;
 
 			/// <summary>
+			/// Sets the view mode in explorer (list, grid, etc).
+			/// </summary>
+			/// <param name="a_iExplorerViewMode">The index of the grid mode.</param>
+			void SetExplorerViewMode(int a_iExplorerViewMode);
+
+			/// <summary>
+			/// Determines the view mode in the explorer (list, grid, etc).
+			/// </summary>
+			/// <returns>Integer representing the view mode.</returns>
+			int GetExplorerViewMode() const;
+
+			/// <summary>
 			/// Sets whether FPS should be shown in decimals.
 			/// </summary>
 			/// <param name="a_bFPSPrecision">True to round up FPS numbers, false to show full numbers.</param>
@@ -202,18 +213,6 @@ namespace gallus
 			/// <returns>True if FPS numbers are rounded up, false otherwise.</param>
 			bool GetFPSPrecision() const;
 		private:
-			/// <summary>
-			/// Virtual method for loading specific vars.
-			/// </summary>
-			/// <returns>True if the settings were loaded successfully, otherwise false.</returns>
-			bool LoadVars(const rapidjson::Document& a_Document) override;
-
-			/// <summary>
-			/// Virtual method for saving specific vars.
-			/// </summary>
-			/// <returns>True if the settings were saved successfully, otherwise false.</returns>
-			bool SaveVars(rapidjson::Document& a_Document, rapidjson::Document::AllocatorType& a_Allocator) const override;
-
 			bool m_bScrollToBottom = false; /// Auto-scroll setting for the console.
 			bool m_bShowInfo = true; /// Check for info log messages.
 			bool m_bShowTest = true; /// Check for test log messages.
@@ -226,12 +225,51 @@ namespace gallus
 
 			bool m_bShowGrid = false;
 			bool m_bFullScreenPlayMode = false;
-
 			float m_fSceneZoom = 1.0f;
-			glm::vec2 m_vScenePanOffset = glm::vec2(0.0f, 0.0f);
+			Vector2 m_vScenePanOffset = Vector2(0.0f, 0.0f);
 			int m_iLastSceneOperation = 7;
 
+			int m_iExplorerViewMode = 0;
+
 			bool m_bFPSPrecision = false;
+
+			BEGIN_SERIALIZE_PARENT(EditorSettings, Settings)
+				SERIALIZE_FIELD(m_bScrollToBottom, "Scroll To Bottom", "",
+					.type = FieldSerializationType::FieldSerializationType_Bool)
+				SERIALIZE_FIELD(m_bShowInfo, "Show Info", "",
+					.type = FieldSerializationType::FieldSerializationType_Bool)
+				SERIALIZE_FIELD(m_bShowTest, "Show Test", "",
+					.type = FieldSerializationType::FieldSerializationType_Bool)
+				SERIALIZE_FIELD(m_bShowWarning, "Show Warning", "",
+					.type = FieldSerializationType::FieldSerializationType_Bool)
+				SERIALIZE_FIELD(m_bShowError, "Show Error", "",
+					.type = FieldSerializationType::FieldSerializationType_Bool)
+				SERIALIZE_FIELD(m_bShowAssert, "Show Assert", "",
+					.type = FieldSerializationType::FieldSerializationType_Bool)
+				SERIALIZE_FIELD(m_bShowSuccess, "Show Success", "",
+					.type = FieldSerializationType::FieldSerializationType_Bool)
+				SERIALIZE_FIELD(m_bShowInfoSuccess, "Show Info Success", "",
+					.type = FieldSerializationType::FieldSerializationType_Bool)
+				SERIALIZE_FIELD(m_bShowAwesome, "Show Awesome", "",
+					.type = FieldSerializationType::FieldSerializationType_Bool)
+
+				SERIALIZE_FIELD(m_bShowGrid, "Show Grid", "",
+					.type = FieldSerializationType::FieldSerializationType_Bool)
+				SERIALIZE_FIELD(m_bFullScreenPlayMode, "Show Full Screen Play Mode", "",
+					.type = FieldSerializationType::FieldSerializationType_Bool)
+				SERIALIZE_FIELD(m_fSceneZoom, "Scene Zoom", "",
+					.type = FieldSerializationType::FieldSerializationType_Float)
+				SERIALIZE_FIELD(m_vScenePanOffset, "Pan Offset", "",
+					.type = FieldSerializationType::FieldSerializationType_Vector2)
+				SERIALIZE_FIELD(m_iLastSceneOperation, "Last Scene Operation", "",
+					.type = FieldSerializationType::FieldSerializationType_Int)
+
+				SERIALIZE_FIELD(m_iExplorerViewMode, "Explorer View Mode", "",
+					.type = FieldSerializationType::FieldSerializationType_Int)
+
+				SERIALIZE_FIELD(m_bFPSPrecision, "Fps Precision", "",
+					.type = FieldSerializationType::FieldSerializationType_Bool)
+			END_SERIALIZE(Settings)
 		};
 	}
 }

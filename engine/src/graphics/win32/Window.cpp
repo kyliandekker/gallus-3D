@@ -177,47 +177,47 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			glm::ivec2 Window::GetRealSize() const
+			IVector2 Window::GetRealSize() const
 			{
 				RECT rect;
 				GetClientRect(m_hWnd, &rect);
 
-				const glm::ivec2 size = glm::ivec2(rect.right - rect.left, rect.bottom - rect.top);
+				const IVector2 size = IVector2(rect.right - rect.left, rect.bottom - rect.top);
 				return size;
 			}
 
 			//---------------------------------------------------------------------
-			glm::ivec2 Window::GetPosition() const
+			IVector2 Window::GetPosition() const
 			{
 				RECT rect;
 				GetWindowRect(m_hWnd, &rect); // This gives screen coordinates
 
-				return glm::ivec2(rect.left, rect.top);
+				return IVector2(rect.left, rect.top);
 			}
 
 			//---------------------------------------------------------------------
-			void Window::SetSize(const glm::ivec2& a_vSize)
+			void Window::SetSize(const IVector2& a_vSize)
 			{
 				RECT rc = { 0, 0, a_vSize.x, a_vSize.y };
 				AdjustWindowRectEx(&rc, GetWindowLong(m_hWnd, GWL_STYLE), FALSE, GetWindowLong(m_hWnd, GWL_EXSTYLE));
 
-				const glm::ivec2 totalSize(rc.right - rc.left, rc.bottom - rc.top);
+				const IVector2 totalSize(rc.right - rc.left, rc.bottom - rc.top);
 
 				ChangeSize(GetPosition(), totalSize);
 			}
 
 			//---------------------------------------------------------------------
-			void Window::SetPosition(const glm::ivec2& a_vPosition)
+			void Window::SetPosition(const IVector2& a_vPosition)
 			{
 				RECT rect;
 				// Get the current window position and size
 				GetWindowRect(m_hWnd, &rect);
 
-				ChangeSize(a_vPosition, glm::ivec2(rect.right - rect.left, rect.bottom - rect.top));
+				ChangeSize(a_vPosition, IVector2(rect.right - rect.left, rect.bottom - rect.top));
 			}
 
 			//---------------------------------------------------------------------
-			void Window::ChangeSize(const glm::ivec2& a_vPosition, const glm::ivec2& a_vSize)
+			void Window::ChangeSize(const IVector2& a_vPosition, const IVector2& a_vSize)
 			{
 				SetWindowPos(
 					m_hWnd,                // Handle to the window

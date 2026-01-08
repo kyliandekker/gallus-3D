@@ -25,7 +25,7 @@ namespace gallus
 		namespace imgui
 		{
 			EditorWindowDock::EditorWindowDock(ImGuiWindow& a_Window) : MainWindowDock(a_Window)
-			{ }
+			{}
 
 			void EditorWindowDock::Render()
 			{

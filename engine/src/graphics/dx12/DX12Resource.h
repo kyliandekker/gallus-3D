@@ -32,7 +32,7 @@ namespace gallus
 				/// Constructs a dx12 resource without any details.
 				/// </summary>
 				DX12Resource() : resources::EngineResource()
-				{ }
+				{}
 
 				/// <summary>
 				/// Destroys the dx12 resource.

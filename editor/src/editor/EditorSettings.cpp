@@ -1,33 +1,7 @@
 ﻿#include "EditorSettings.h"
 
 // external
-#include <rapidjson/document.h>
-#include <rapidjson/stringbuffer.h>
-#include <rapidjson/prettywriter.h>
-#include <rapidjson/utils.h>
 #include <string>
-
-#define JSON_EDITOR_SETTINGS_CONSOLE_VAR "console"
-#define JSON_EDITOR_SETTINGS_CONSOLE_SCROLL_TO_BOTTOM_VAR "scrollToBottom"
-#define JSON_EDITOR_SETTINGS_CONSOLE_INFO_VAR "info"
-#define JSON_EDITOR_SETTINGS_CONSOLE_TEST_VAR "test"
-#define JSON_EDITOR_SETTINGS_CONSOLE_WARNING_VAR "warning"
-#define JSON_EDITOR_SETTINGS_CONSOLE_ERROR_VAR "error"
-#define JSON_EDITOR_SETTINGS_CONSOLE_ASSERT_VAR "assert"
-#define JSON_EDITOR_SETTINGS_CONSOLE_SUCCESS_VAR "success"
-#define JSON_EDITOR_SETTINGS_CONSOLE_INFOSUCCESS_VAR "infoSuccess"
-#define JSON_EDITOR_SETTINGS_CONSOLE_AWESOME_VAR "awesome"
-
-#define JSON_EDITOR_SETTINGS_SHOW_GRID_VAR "showGrid"
-#define JSON_EDITOR_SETTINGS_PLAY_MODE_VAR "playMode"
-
-#define JSON_EDITOR_SETTINGS_SCENE_VAR "scene"
-#define JSON_EDITOR_SETTINGS_SCENE_ZOOM "zoom"
-#define JSON_EDITOR_SETTINGS_SCENE_PAN_OFFSET "panOffset"
-#define JSON_EDITOR_SETTINGS_SCENE_PAN_OFFSET_X "x"
-#define JSON_EDITOR_SETTINGS_SCENE_PAN_OFFSET_Y "y"
-#define JSON_EDITOR_SETTINGS_SCENE_LAST_OPERATION "lastOperation"
-#define JSON_EDITOR_SETTINGS_SCENE_DRAW_BOUNDS "drawBounds"
 
 namespace gallus
 {
@@ -35,71 +9,6 @@ namespace gallus
 	{
 		//---------------------------------------------------------------------
 		// Settings
-		//---------------------------------------------------------------------
-		bool EditorSettings::LoadVars(const rapidjson::Document& a_Document)
-		{
-			if (a_Document.HasMember(JSON_EDITOR_SETTINGS_CONSOLE_VAR) && a_Document[JSON_EDITOR_SETTINGS_CONSOLE_VAR].IsObject())
-			{
-				GetBool(a_Document[JSON_EDITOR_SETTINGS_CONSOLE_VAR], JSON_EDITOR_SETTINGS_CONSOLE_SCROLL_TO_BOTTOM_VAR, m_bScrollToBottom);
-
-				GetBool(a_Document[JSON_EDITOR_SETTINGS_CONSOLE_VAR], JSON_EDITOR_SETTINGS_CONSOLE_ASSERT_VAR, m_bShowAssert);
-				GetBool(a_Document[JSON_EDITOR_SETTINGS_CONSOLE_VAR], JSON_EDITOR_SETTINGS_CONSOLE_ERROR_VAR, m_bShowError);
-				GetBool(a_Document[JSON_EDITOR_SETTINGS_CONSOLE_VAR], JSON_EDITOR_SETTINGS_CONSOLE_WARNING_VAR, m_bShowWarning);
-				GetBool(a_Document[JSON_EDITOR_SETTINGS_CONSOLE_VAR], JSON_EDITOR_SETTINGS_CONSOLE_INFO_VAR, m_bShowInfo);
-				GetBool(a_Document[JSON_EDITOR_SETTINGS_CONSOLE_VAR], JSON_EDITOR_SETTINGS_CONSOLE_TEST_VAR, m_bShowTest);
-				GetBool(a_Document[JSON_EDITOR_SETTINGS_CONSOLE_VAR], JSON_EDITOR_SETTINGS_CONSOLE_SUCCESS_VAR, m_bShowSuccess);
-				GetBool(a_Document[JSON_EDITOR_SETTINGS_CONSOLE_VAR], JSON_EDITOR_SETTINGS_CONSOLE_INFOSUCCESS_VAR, m_bShowInfoSuccess);
-				GetBool(a_Document[JSON_EDITOR_SETTINGS_CONSOLE_VAR], JSON_EDITOR_SETTINGS_CONSOLE_AWESOME_VAR, m_bShowAwesome);
-			}
-
-			if (a_Document.HasMember(JSON_EDITOR_SETTINGS_SCENE_VAR) && a_Document[JSON_EDITOR_SETTINGS_SCENE_VAR].IsObject())
-			{
-				GetFloat(a_Document[JSON_EDITOR_SETTINGS_SCENE_VAR], JSON_EDITOR_SETTINGS_SCENE_ZOOM, m_fSceneZoom);
-				if (a_Document[JSON_EDITOR_SETTINGS_SCENE_VAR].HasMember(JSON_EDITOR_SETTINGS_SCENE_PAN_OFFSET) && a_Document[JSON_EDITOR_SETTINGS_SCENE_VAR][JSON_EDITOR_SETTINGS_SCENE_PAN_OFFSET].IsObject())
-				{
-					GetFloat(a_Document[JSON_EDITOR_SETTINGS_SCENE_VAR][JSON_EDITOR_SETTINGS_SCENE_PAN_OFFSET], JSON_EDITOR_SETTINGS_SCENE_PAN_OFFSET_X, m_vScenePanOffset.x);
-					GetFloat(a_Document[JSON_EDITOR_SETTINGS_SCENE_VAR][JSON_EDITOR_SETTINGS_SCENE_PAN_OFFSET], JSON_EDITOR_SETTINGS_SCENE_PAN_OFFSET_Y, m_vScenePanOffset.y);
-				}
-				GetInt(a_Document[JSON_EDITOR_SETTINGS_SCENE_VAR], JSON_EDITOR_SETTINGS_SCENE_LAST_OPERATION, m_iLastSceneOperation);
-				GetBool(a_Document[JSON_EDITOR_SETTINGS_SCENE_VAR], JSON_EDITOR_SETTINGS_SHOW_GRID_VAR, m_bShowGrid);
-				GetBool(a_Document[JSON_EDITOR_SETTINGS_SCENE_VAR], JSON_EDITOR_SETTINGS_PLAY_MODE_VAR, m_bFullScreenPlayMode);
-			}
-
-			return true;
-		}
-
-		//---------------------------------------------------------------------
-		bool EditorSettings::SaveVars(rapidjson::Document& a_Document, rapidjson::Document::AllocatorType& a_Allocator) const
-		{
-			rapidjson::Document consoleDoc;
-			consoleDoc.SetObject();
-			consoleDoc.AddMember(JSON_EDITOR_SETTINGS_CONSOLE_SCROLL_TO_BOTTOM_VAR, m_bScrollToBottom, a_Allocator);
-			consoleDoc.AddMember(JSON_EDITOR_SETTINGS_CONSOLE_ASSERT_VAR, m_bShowAssert, a_Allocator);
-			consoleDoc.AddMember(JSON_EDITOR_SETTINGS_CONSOLE_ERROR_VAR, m_bShowError, a_Allocator);
-			consoleDoc.AddMember(JSON_EDITOR_SETTINGS_CONSOLE_WARNING_VAR, m_bShowWarning, a_Allocator);
-			consoleDoc.AddMember(JSON_EDITOR_SETTINGS_CONSOLE_INFO_VAR, m_bShowInfo, a_Allocator);
-			consoleDoc.AddMember(JSON_EDITOR_SETTINGS_CONSOLE_TEST_VAR, m_bShowTest, a_Allocator);
-			consoleDoc.AddMember(JSON_EDITOR_SETTINGS_CONSOLE_SUCCESS_VAR, m_bShowSuccess, a_Allocator);
-			consoleDoc.AddMember(JSON_EDITOR_SETTINGS_CONSOLE_INFOSUCCESS_VAR, m_bShowInfoSuccess, a_Allocator);
-			consoleDoc.AddMember(JSON_EDITOR_SETTINGS_CONSOLE_AWESOME_VAR, m_bShowAwesome, a_Allocator);
-			a_Document.AddMember(JSON_EDITOR_SETTINGS_CONSOLE_VAR, consoleDoc, a_Allocator);
-
-			rapidjson::Document sceneDoc;
-			sceneDoc.SetObject();
-			sceneDoc.AddMember(JSON_EDITOR_SETTINGS_SCENE_ZOOM, m_fSceneZoom, a_Allocator);
-			rapidjson::Document scenePanOffsetDoc;
-			scenePanOffsetDoc.SetObject();
-			scenePanOffsetDoc.AddMember(JSON_EDITOR_SETTINGS_SCENE_PAN_OFFSET_X, m_vScenePanOffset.x, a_Allocator);
-			scenePanOffsetDoc.AddMember(JSON_EDITOR_SETTINGS_SCENE_PAN_OFFSET_Y, m_vScenePanOffset.y, a_Allocator);
-			sceneDoc.AddMember(JSON_EDITOR_SETTINGS_SCENE_PAN_OFFSET, scenePanOffsetDoc, a_Allocator);
-			sceneDoc.AddMember(JSON_EDITOR_SETTINGS_SCENE_LAST_OPERATION, m_iLastSceneOperation, a_Allocator);
-			sceneDoc.AddMember(JSON_EDITOR_SETTINGS_SHOW_GRID_VAR, m_bShowGrid, a_Allocator);
-			sceneDoc.AddMember(JSON_EDITOR_SETTINGS_PLAY_MODE_VAR, m_bFullScreenPlayMode, a_Allocator);
-			a_Document.AddMember(JSON_EDITOR_SETTINGS_SCENE_VAR, sceneDoc, a_Allocator);
-
-			return true;
-		}
-
 		//---------------------------------------------------------------------
 		void EditorSettings::SetScrollToBottom(bool a_bScrollToBottom)
 		{
@@ -245,13 +154,13 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		void EditorSettings::SetScenePanOffset(const glm::vec2& a_vScenePanOffset)
+		void EditorSettings::SetScenePanOffset(const Vector2& a_vScenePanOffset)
 		{
 			m_vScenePanOffset = a_vScenePanOffset;
 		}
 
 		//---------------------------------------------------------------------
-		const glm::vec2& EditorSettings::GetScenePanOffset() const
+		const Vector2& EditorSettings::GetScenePanOffset() const
 		{
 			return m_vScenePanOffset;
 		}
@@ -266,6 +175,18 @@ namespace gallus
 		int EditorSettings::GetLastSceneOperation() const
 		{
 			return m_iLastSceneOperation;
+		}
+		
+		//---------------------------------------------------------------------
+		void EditorSettings::SetExplorerViewMode(int a_iExplorerViewMode)
+		{
+			m_iExplorerViewMode = a_iExplorerViewMode;
+		}
+		
+		//---------------------------------------------------------------------
+		int EditorSettings::GetExplorerViewMode() const
+		{
+			return m_iExplorerViewMode;
 		}
 
 		//---------------------------------------------------------------------
