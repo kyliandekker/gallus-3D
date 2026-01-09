@@ -38,8 +38,6 @@ namespace ImGui
 	bool IconCheckboxButton(const std::string& a_Label, bool* a_pValue, const std::string& a_sDescription, const ImVec2& a_vSize, const ImVec4& a_Color = ImGui::GetStyle().Colors[ImGuiCol_Text]);
 	bool ConsoleButton(const std::string& a_Label, bool* a_pValue, const std::string& a_sDescription, const ImVec2& a_vSize, int a_iNumber, const ImVec4& a_Color = ImGui::GetStyle().Colors[ImGuiCol_Text], const ImVec4& a_vCircleColor = ImGui::GetStyle().Colors[ImGuiCol_TabActive]);
 
-	void BeginToolbar(const ImVec2& a_Size);
-	void EndToolbar(const ImVec2& a_Padding);
 	void DisplayHeader(ImFont* a_BoldFont, const std::string& a_Label);
 
 	bool InputTextStdString(const std::string& label, std::string* str, ImGuiInputTextFlags flags = 0);

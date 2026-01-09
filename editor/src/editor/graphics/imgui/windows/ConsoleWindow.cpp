@@ -85,271 +85,271 @@ namespace gallus
 					return;
 				}
 
-				gallus::editor::EditorSettings& editorSettings = core::EDITOR_ENGINE->GetEditor().GetEditorSettings();
+				//gallus::editor::EditorSettings& editorSettings = core::EDITOR_ENGINE->GetEditor().GetEditorSettings();
 
-				// Filter messages if need be.
-				if (m_bNeedsRefresh)
-				{
-					std::vector<bool> filters =
-					{
-						editorSettings.GetShowAssert(),
-						editorSettings.GetShowError(),
-						editorSettings.GetShowWarning(),
-						editorSettings.GetShowInfo(),
-						editorSettings.GetShowTest(),
-						editorSettings.GetShowSuccess(),
-						editorSettings.GetShowInfoSuccess(),
-						editorSettings.GetShowAwesome(),
-					};
+				//// Filter messages if need be.
+				//if (m_bNeedsRefresh)
+				//{
+				//	std::vector<bool> filters =
+				//	{
+				//		editorSettings.GetShowAssert(),
+				//		editorSettings.GetShowError(),
+				//		editorSettings.GetShowWarning(),
+				//		editorSettings.GetShowInfo(),
+				//		editorSettings.GetShowTest(),
+				//		editorSettings.GetShowSuccess(),
+				//		editorSettings.GetShowInfoSuccess(),
+				//		editorSettings.GetShowAwesome(),
+				//	};
 
-					// Mutex to ensure new messages cannot be added.
-					std::lock_guard<std::mutex> lock(MESSAGE_MUTEX);
+				//	// Mutex to ensure new messages cannot be added.
+				//	std::lock_guard<std::mutex> lock(MESSAGE_MUTEX);
 
-					m_bNeedsRefresh = false;
-					m_aFilteredMessages.clear();
+				//	m_bNeedsRefresh = false;
+				//	m_aFilteredMessages.clear();
 
-					std::string searchString = string_extensions::StringToLower(m_SearchBar.GetString());
-					for (size_t i = 0; i < m_aMessages.size(); i++)
-					{
-						auto& message = m_aMessages[i];
-						if (filters[message.GetSeverity()])
-						{
-							if (searchString.empty() || ((string_extensions::StringToLower(message.GetRawMessage()).find(searchString) != std::string::npos) || (string_extensions::StringToLower(message.GetCategory()).find(searchString) != std::string::npos)))
-							{
-								m_aFilteredMessages.push_back(i);
-							}
-						}
-					}
-				}
+				//	std::string searchString = string_extensions::StringToLower(m_SearchBar.GetString());
+				//	for (size_t i = 0; i < m_aMessages.size(); i++)
+				//	{
+				//		auto& message = m_aMessages[i];
+				//		if (filters[message.GetSeverity()])
+				//		{
+				//			if (searchString.empty() || ((string_extensions::StringToLower(message.GetRawMessage()).find(searchString) != std::string::npos) || (string_extensions::StringToLower(message.GetCategory()).find(searchString) != std::string::npos)))
+				//			{
+				//				m_aFilteredMessages.push_back(i);
+				//			}
+				//		}
+				//	}
+				//}
 
-				ImVec2 toolbarSize = ImVec2(ImGui::GetContentRegionAvail().x, m_Window.GetHeaderSize().y);
-				ImGui::BeginToolbar(toolbarSize);
+				//ImVec2 toolbarSize = ImVec2(ImGui::GetContentRegionAvail().x, m_Window.GetHeaderSize().y);
+				//ImGui::BeginToolbar(toolbarSize);
 
-				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
-				ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0);
+				//ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+				//ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0);
 
-				float topPosY = ImGui::GetCursorPosY();
+				//float topPosY = ImGui::GetCursorPosY();
 
-				if (ImGui::IconButton(
-					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_CLEAR), BUTTON_ID, "CLEAR_CONSOLE").c_str(), "Clears all log messages from the console, including filtered and unfiltered messages.", m_Window.GetHeaderSize()))
-				{
-					std::lock_guard<std::mutex> lock(MESSAGE_MUTEX);
-					m_aFilteredMessages.clear();
-					m_aMessages.clear();
+				//if (ImGui::IconButton(
+				//	ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_CLEAR), BUTTON_ID, "CLEAR_CONSOLE").c_str(), "Clears all log messages from the console, including filtered and unfiltered messages.", m_Window.GetHeaderSize()))
+				//{
+				//	std::lock_guard<std::mutex> lock(MESSAGE_MUTEX);
+				//	m_aFilteredMessages.clear();
+				//	m_aMessages.clear();
 
-					CountMessages();
-				}
+				//	CountMessages();
+				//}
 
-				ImGui::SameLine();
-				bool scrollToBottom = editorSettings.GetScrollToBottom();
-				if (ImGui::CheckboxButton(
-					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_SCROLL_TO_BOTTOM) + " Scroll to bottom", BUTTON_ID, "SCROLL_TO_BOTTOM_CONSOLE").c_str(), &scrollToBottom, "Toggles automatic scrolling of the console view to always show the latest messages.", ImVec2(10 * m_Window.GetFontSize(), toolbarSize.y)))
-				{
-					editorSettings.SetScrollToBottom(scrollToBottom);
-					editorSettings.Save();
-					m_bNeedsRefresh = true;
-				}
+				//ImGui::SameLine();
+				//bool scrollToBottom = editorSettings.GetScrollToBottom();
+				//if (ImGui::CheckboxButton(
+				//	ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_SCROLL_TO_BOTTOM) + " Scroll to bottom", BUTTON_ID, "SCROLL_TO_BOTTOM_CONSOLE").c_str(), &scrollToBottom, "Toggles automatic scrolling of the console view to always show the latest messages.", ImVec2(10 * m_Window.GetFontSize(), toolbarSize.y)))
+				//{
+				//	editorSettings.SetScrollToBottom(scrollToBottom);
+				//	editorSettings.Save();
+				//	m_bNeedsRefresh = true;
+				//}
 
-				ImGui::SameLine();
-				bool showInfo = editorSettings.GetShowInfo();
-				if (ImGui::ConsoleButton(
-					ImGui::IMGUI_FORMAT_ID(LogSeverityToIcon(LOGSEVERITY_INFO).c_str(), BUTTON_ID, "SHOW_INFO_CONSOLE").c_str(), &showInfo, "Toggles visibility of informational log messages.", m_Window.GetHeaderSize(), m_aMessageCount[LOGSEVERITY_INFO], S_ICON_COLORS[LOGSEVERITY_INFO]))
-				{
-					editorSettings.SetShowInfo(showInfo);
-					editorSettings.Save();
-					m_bNeedsRefresh = true;
-				}
+				//ImGui::SameLine();
+				//bool showInfo = editorSettings.GetShowInfo();
+				//if (ImGui::ConsoleButton(
+				//	ImGui::IMGUI_FORMAT_ID(LogSeverityToIcon(LOGSEVERITY_INFO).c_str(), BUTTON_ID, "SHOW_INFO_CONSOLE").c_str(), &showInfo, "Toggles visibility of informational log messages.", m_Window.GetHeaderSize(), m_aMessageCount[LOGSEVERITY_INFO], S_ICON_COLORS[LOGSEVERITY_INFO]))
+				//{
+				//	editorSettings.SetShowInfo(showInfo);
+				//	editorSettings.Save();
+				//	m_bNeedsRefresh = true;
+				//}
 
-				ImGui::SameLine();
-				bool showTest = editorSettings.GetShowTest();
-				if (ImGui::ConsoleButton(
-					ImGui::IMGUI_FORMAT_ID(LogSeverityToIcon(LOGSEVERITY_TEST).c_str(), BUTTON_ID, "SHOW_TEST_CONSOLE").c_str(), &showTest, "Toggles visibility of test log messages used for quick testing.", m_Window.GetHeaderSize(), m_aMessageCount[LOGSEVERITY_TEST], S_ICON_COLORS[LOGSEVERITY_TEST]))
-				{
-					editorSettings.SetShowTest(showTest);
-					editorSettings.Save();
-					m_bNeedsRefresh = true;
-				}
+				//ImGui::SameLine();
+				//bool showTest = editorSettings.GetShowTest();
+				//if (ImGui::ConsoleButton(
+				//	ImGui::IMGUI_FORMAT_ID(LogSeverityToIcon(LOGSEVERITY_TEST).c_str(), BUTTON_ID, "SHOW_TEST_CONSOLE").c_str(), &showTest, "Toggles visibility of test log messages used for quick testing.", m_Window.GetHeaderSize(), m_aMessageCount[LOGSEVERITY_TEST], S_ICON_COLORS[LOGSEVERITY_TEST]))
+				//{
+				//	editorSettings.SetShowTest(showTest);
+				//	editorSettings.Save();
+				//	m_bNeedsRefresh = true;
+				//}
 
-				ImGui::SameLine();
-				bool showWarning = editorSettings.GetShowWarning();
-				if (ImGui::ConsoleButton(
-					ImGui::IMGUI_FORMAT_ID(LogSeverityToIcon(LOGSEVERITY_WARNING).c_str(), BUTTON_ID, "SHOW_WARNING_CONSOLE").c_str(), &showWarning, "Toggles visibility of warning log messages, indicating potential issues.", m_Window.GetHeaderSize(), m_aMessageCount[LOGSEVERITY_WARNING], S_ICON_COLORS[LOGSEVERITY_WARNING]))
-				{
-					editorSettings.SetShowWarning(showWarning);
-					editorSettings.Save();
-					m_bNeedsRefresh = true;
-				}
+				//ImGui::SameLine();
+				//bool showWarning = editorSettings.GetShowWarning();
+				//if (ImGui::ConsoleButton(
+				//	ImGui::IMGUI_FORMAT_ID(LogSeverityToIcon(LOGSEVERITY_WARNING).c_str(), BUTTON_ID, "SHOW_WARNING_CONSOLE").c_str(), &showWarning, "Toggles visibility of warning log messages, indicating potential issues.", m_Window.GetHeaderSize(), m_aMessageCount[LOGSEVERITY_WARNING], S_ICON_COLORS[LOGSEVERITY_WARNING]))
+				//{
+				//	editorSettings.SetShowWarning(showWarning);
+				//	editorSettings.Save();
+				//	m_bNeedsRefresh = true;
+				//}
 
-				ImGui::SameLine();
-				bool showError = editorSettings.GetShowError();
-				if (ImGui::ConsoleButton(
-					ImGui::IMGUI_FORMAT_ID(LogSeverityToIcon(LOGSEVERITY_ERROR).c_str(), BUTTON_ID, "SHOW_ERROR_CONSOLE").c_str(), &showError, "Toggles visibility of error log messages, indicating runtime or critical errors.", m_Window.GetHeaderSize(), m_aMessageCount[LOGSEVERITY_ERROR], S_ICON_COLORS[LOGSEVERITY_ERROR], S_ICON_COLORS[LOGSEVERITY_ASSERT]))
-				{
-					editorSettings.SetShowError(showError);
-					editorSettings.Save();
-					m_bNeedsRefresh = true;
-				}
+				//ImGui::SameLine();
+				//bool showError = editorSettings.GetShowError();
+				//if (ImGui::ConsoleButton(
+				//	ImGui::IMGUI_FORMAT_ID(LogSeverityToIcon(LOGSEVERITY_ERROR).c_str(), BUTTON_ID, "SHOW_ERROR_CONSOLE").c_str(), &showError, "Toggles visibility of error log messages, indicating runtime or critical errors.", m_Window.GetHeaderSize(), m_aMessageCount[LOGSEVERITY_ERROR], S_ICON_COLORS[LOGSEVERITY_ERROR], S_ICON_COLORS[LOGSEVERITY_ASSERT]))
+				//{
+				//	editorSettings.SetShowError(showError);
+				//	editorSettings.Save();
+				//	m_bNeedsRefresh = true;
+				//}
 
-				ImGui::SameLine();
-				bool showAssert = editorSettings.GetShowAssert();
-				if (ImGui::ConsoleButton(
-					ImGui::IMGUI_FORMAT_ID(LogSeverityToIcon(LOGSEVERITY_ASSERT).c_str(), BUTTON_ID, "SHOW_ASSERT_CONSOLE").c_str(), &showAssert, "Toggles visibility of assert messages, typically generated by failed assertions in code.", m_Window.GetHeaderSize(), m_aMessageCount[LOGSEVERITY_ASSERT], S_ICON_COLORS[LOGSEVERITY_ASSERT], S_ICON_COLORS[LOGSEVERITY_ASSERT]))
-				{
-					editorSettings.SetShowAssert(showAssert);
-					editorSettings.Save();
-					m_bNeedsRefresh = true;
-				}
+				//ImGui::SameLine();
+				//bool showAssert = editorSettings.GetShowAssert();
+				//if (ImGui::ConsoleButton(
+				//	ImGui::IMGUI_FORMAT_ID(LogSeverityToIcon(LOGSEVERITY_ASSERT).c_str(), BUTTON_ID, "SHOW_ASSERT_CONSOLE").c_str(), &showAssert, "Toggles visibility of assert messages, typically generated by failed assertions in code.", m_Window.GetHeaderSize(), m_aMessageCount[LOGSEVERITY_ASSERT], S_ICON_COLORS[LOGSEVERITY_ASSERT], S_ICON_COLORS[LOGSEVERITY_ASSERT]))
+				//{
+				//	editorSettings.SetShowAssert(showAssert);
+				//	editorSettings.Save();
+				//	m_bNeedsRefresh = true;
+				//}
 
-				ImGui::SameLine();
-				bool showSuccess = editorSettings.GetShowSuccess();
-				if (ImGui::ConsoleButton(
-					ImGui::IMGUI_FORMAT_ID(LogSeverityToIcon(LOGSEVERITY_SUCCESS).c_str(), BUTTON_ID, "SHOW_SUCCESS_CONSOLE").c_str(), &showSuccess, "Toggles visibility of success log messages, often used for visual confirmation of events.", m_Window.GetHeaderSize(), m_aMessageCount[LOGSEVERITY_SUCCESS], S_ICON_COLORS[LOGSEVERITY_SUCCESS]))
-				{
-					editorSettings.SetShowSuccess(showSuccess);
-					editorSettings.Save();
-					m_bNeedsRefresh = true;
-				}
+				//ImGui::SameLine();
+				//bool showSuccess = editorSettings.GetShowSuccess();
+				//if (ImGui::ConsoleButton(
+				//	ImGui::IMGUI_FORMAT_ID(LogSeverityToIcon(LOGSEVERITY_SUCCESS).c_str(), BUTTON_ID, "SHOW_SUCCESS_CONSOLE").c_str(), &showSuccess, "Toggles visibility of success log messages, often used for visual confirmation of events.", m_Window.GetHeaderSize(), m_aMessageCount[LOGSEVERITY_SUCCESS], S_ICON_COLORS[LOGSEVERITY_SUCCESS]))
+				//{
+				//	editorSettings.SetShowSuccess(showSuccess);
+				//	editorSettings.Save();
+				//	m_bNeedsRefresh = true;
+				//}
 
-				ImGui::SameLine();
-				bool showInfoSuccess = editorSettings.GetShowInfoSuccess();
-				if (ImGui::ConsoleButton(
-					ImGui::IMGUI_FORMAT_ID(LogSeverityToIcon(LOGSEVERITY_INFO_SUCCESS).c_str(), BUTTON_ID, "SHOW_INFO_SUCCESS_CONSOLE").c_str(), &showInfoSuccess, "Toggles visibility of informational success messages, combining info and success levels. Often used between informational and success log messages.", m_Window.GetHeaderSize(), m_aMessageCount[LOGSEVERITY_INFO_SUCCESS], S_ICON_COLORS[LOGSEVERITY_INFO_SUCCESS]))
-				{
-					editorSettings.SetShowInfoSuccess(showInfoSuccess);
-					editorSettings.Save();
-					m_bNeedsRefresh = true;
-				}
+				//ImGui::SameLine();
+				//bool showInfoSuccess = editorSettings.GetShowInfoSuccess();
+				//if (ImGui::ConsoleButton(
+				//	ImGui::IMGUI_FORMAT_ID(LogSeverityToIcon(LOGSEVERITY_INFO_SUCCESS).c_str(), BUTTON_ID, "SHOW_INFO_SUCCESS_CONSOLE").c_str(), &showInfoSuccess, "Toggles visibility of informational success messages, combining info and success levels. Often used between informational and success log messages.", m_Window.GetHeaderSize(), m_aMessageCount[LOGSEVERITY_INFO_SUCCESS], S_ICON_COLORS[LOGSEVERITY_INFO_SUCCESS]))
+				//{
+				//	editorSettings.SetShowInfoSuccess(showInfoSuccess);
+				//	editorSettings.Save();
+				//	m_bNeedsRefresh = true;
+				//}
 
-				ImGui::SameLine();
-				bool showAwesome = editorSettings.GetShowAwesome();
-				if (ImGui::ConsoleButton(
-					ImGui::IMGUI_FORMAT_ID(LogSeverityToIcon(LOGSEVERITY_AWESOME).c_str(), BUTTON_ID, "SHOW_AWESOME_CONSOLE").c_str(), &showAwesome, "Toggles visibility of awesome messages, special messages for notable events or achievements.", m_Window.GetHeaderSize(), m_aMessageCount[LOGSEVERITY_AWESOME], S_ICON_COLORS[LOGSEVERITY_AWESOME]))
-				{
-					editorSettings.SetShowAwesome(showAwesome);
-					editorSettings.Save();
-					m_bNeedsRefresh = true;
-				}
+				//ImGui::SameLine();
+				//bool showAwesome = editorSettings.GetShowAwesome();
+				//if (ImGui::ConsoleButton(
+				//	ImGui::IMGUI_FORMAT_ID(LogSeverityToIcon(LOGSEVERITY_AWESOME).c_str(), BUTTON_ID, "SHOW_AWESOME_CONSOLE").c_str(), &showAwesome, "Toggles visibility of awesome messages, special messages for notable events or achievements.", m_Window.GetHeaderSize(), m_aMessageCount[LOGSEVERITY_AWESOME], S_ICON_COLORS[LOGSEVERITY_AWESOME]))
+				//{
+				//	editorSettings.SetShowAwesome(showAwesome);
+				//	editorSettings.Save();
+				//	m_bNeedsRefresh = true;
+				//}
 
-				ImVec2 endPos = ImGui::GetCursorPos();
+				//ImVec2 endPos = ImGui::GetCursorPos();
 
-				float searchbarWidth = 300;
-				float inputPadding = m_Window.GetFramePadding().x / 2;
-				ImVec2 searchBarPos = ImVec2(
-					ImGui::GetCursorPosX() + ImGui::GetContentRegionAvail().x - (searchbarWidth + m_Window.GetWindowPadding().x),
-					(topPosY + (toolbarSize.y / 2)) - (((inputPadding * 2) + m_Window.GetFontSize()) / 2)
-				);
-				ImGui::SetCursorPos(searchBarPos);
-				if (m_SearchBar.Render(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "SEARCHBAR_CONSOLE").c_str(), ImVec2(searchbarWidth, toolbarSize.y), inputPadding))
-				{
-					m_bNeedsRefresh = true;
-				}
+				//float searchbarWidth = 300;
+				//float inputPadding = m_Window.GetFramePadding().x / 2;
+				//ImVec2 searchBarPos = ImVec2(
+				//	ImGui::GetCursorPosX() + ImGui::GetContentRegionAvail().x - (searchbarWidth + m_Window.GetWindowPadding().x),
+				//	(topPosY + (toolbarSize.y / 2)) - (((inputPadding * 2) + m_Window.GetFontSize()) / 2)
+				//);
+				//ImGui::SetCursorPos(searchBarPos);
+				//if (m_SearchBar.Render(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "SEARCHBAR_CONSOLE").c_str(), ImVec2(searchbarWidth, toolbarSize.y), inputPadding))
+				//{
+				//	m_bNeedsRefresh = true;
+				//}
 
-				ImGui::SetCursorPos(endPos);
+				//ImGui::SetCursorPos(endPos);
 
-				ImGui::PopStyleVar();
-				ImGui::PopStyleVar();
+				//ImGui::PopStyleVar();
+				//ImGui::PopStyleVar();
 
-				ImGui::EndToolbar(ImVec2(0, 0));
+				//ImGui::EndToolbar(ImVec2(0, 0));
 
-				ImGui::SetCursorPos(ImVec2(ImGui::GetCursorPos().x + m_Window.GetFramePadding().x, ImGui::GetCursorPos().y + m_Window.GetFramePadding().y));
-				if (ImGui::BeginChild(
-					ImGui::IMGUI_FORMAT_ID("", CHILD_ID, "BOX_LOGGER").c_str(),
-					ImVec2(
-					ImGui::GetContentRegionAvail().x - m_Window.GetFramePadding().x,
-					ImGui::GetContentRegionAvail().y - m_Window.GetFramePadding().y
-					),
-					ImGuiChildFlags_Borders
-					))
-				{
-					static const float timestamp_width = ImGui::CalcTextSize("00:00:00:0000").x;
+				//ImGui::SetCursorPos(ImVec2(ImGui::GetCursorPos().x + m_Window.GetFramePadding().x, ImGui::GetCursorPos().y + m_Window.GetFramePadding().y));
+				//if (ImGui::BeginChild(
+				//	ImGui::IMGUI_FORMAT_ID("", CHILD_ID, "BOX_LOGGER").c_str(),
+				//	ImVec2(
+				//	ImGui::GetContentRegionAvail().x - m_Window.GetFramePadding().x,
+				//	ImGui::GetContentRegionAvail().y - m_Window.GetFramePadding().y
+				//	),
+				//	ImGuiChildFlags_Borders
+				//	))
+				//{
+				//	static const float timestamp_width = ImGui::CalcTextSize("00:00:00:0000").x;
 
-					ImGui::PushTextWrapPos();
-					std::lock_guard<std::mutex> lock(MESSAGE_MUTEX);
-					for (size_t i = 0; i < m_aFilteredMessages.size(); i++)
-					{
-						ImVec2 startingPos = ImGui::GetCursorScreenPos();
+				//	ImGui::PushTextWrapPos();
+				//	std::lock_guard<std::mutex> lock(MESSAGE_MUTEX);
+				//	for (size_t i = 0; i < m_aFilteredMessages.size(); i++)
+				//	{
+				//		ImVec2 startingPos = ImGui::GetCursorScreenPos();
 
-						auto& message = m_aMessages[m_aFilteredMessages[i]];
-						ImVec4 color = S_ICON_COLORS[message.GetSeverity()];
+				//		auto& message = m_aMessages[m_aFilteredMessages[i]];
+				//		ImVec4 color = S_ICON_COLORS[message.GetSeverity()];
 
-						time_t time_t = std::chrono::system_clock::to_time_t(message.GetTime());
-						std::string id = ImGui::IMGUI_FORMAT_ID("",
-							FOLDOUT_ID, string_extensions::StringToUpper(std::to_string(i) + "_" + std::to_string(time_t) + "_" + message.GetCategory() + "_MESSAGE_LOGGER"));
+				//		time_t time_t = std::chrono::system_clock::to_time_t(message.GetTime());
+				//		std::string id = ImGui::IMGUI_FORMAT_ID("",
+				//			FOLDOUT_ID, string_extensions::StringToUpper(std::to_string(i) + "_" + std::to_string(time_t) + "_" + message.GetCategory() + "_MESSAGE_LOGGER"));
 
-						ImVec2 buttonSize = ImVec2(ImGui::GetContentRegionAvail().x, m_Window.GetFontSize() + (m_Window.GetFramePadding().y * 2));
-						if (ImGui::InvisibleButton(id.c_str(), buttonSize))
-						{
-							m_aExpanded[id] = !m_aExpanded[id];
-						}
+				//		ImVec2 buttonSize = ImVec2(ImGui::GetContentRegionAvail().x, m_Window.GetFontSize() + (m_Window.GetFramePadding().y * 2));
+				//		if (ImGui::InvisibleButton(id.c_str(), buttonSize))
+				//		{
+				//			m_aExpanded[id] = !m_aExpanded[id];
+				//		}
 
-						ImGui::SetCursorScreenPos(startingPos + m_Window.GetFramePadding());
+				//		ImGui::SetCursorScreenPos(startingPos + m_Window.GetFramePadding());
 
-						std::string foldoutIcon = m_aExpanded[id] ? font::ICON_FOLDED_OUT : font::ICON_FOLDED_IN;
+				//		std::string foldoutIcon = m_aExpanded[id] ? font::ICON_FOLDED_OUT : font::ICON_FOLDED_IN;
 
-						ImVec2 pos = ImGui::GetCursorScreenPos();
-						ImVec2 iconSize = ImGui::CalcTextSize(message.GetIcon().c_str());
+				//		ImVec2 pos = ImGui::GetCursorScreenPos();
+				//		ImVec2 iconSize = ImGui::CalcTextSize(message.GetIcon().c_str());
 
-						ImGui::TextUnformatted(foldoutIcon.c_str());
+				//		ImGui::TextUnformatted(foldoutIcon.c_str());
 
-						pos.x += m_Window.GetFontSize();
-						ImGui::SetCursorScreenPos(pos);
+				//		pos.x += m_Window.GetFontSize();
+				//		ImGui::SetCursorScreenPos(pos);
 
-						ImGui::TextColored(color, message.GetIcon().c_str());
+				//		ImGui::TextColored(color, message.GetIcon().c_str());
 
-						ImGui::SetCursorScreenPos(ImVec2(
-							pos.x + iconSize.x + (m_Window.GetFontSize() / 2),
-							pos.y + (iconSize.y - ImGui::CalcTextSize(message.GetRawMessage().c_str()).y) * 0.5f));
-						ImGui::TextColored(S_TEXT_COLORS[message.GetSeverity()], message.GetRawMessage().c_str());
+				//		ImGui::SetCursorScreenPos(ImVec2(
+				//			pos.x + iconSize.x + (m_Window.GetFontSize() / 2),
+				//			pos.y + (iconSize.y - ImGui::CalcTextSize(message.GetRawMessage().c_str()).y) * 0.5f));
+				//		ImGui::TextColored(S_TEXT_COLORS[message.GetSeverity()], message.GetRawMessage().c_str());
 
-						if (m_aExpanded[id])
-						{
-							ImGui::Indent();
+				//		if (m_aExpanded[id])
+				//		{
+				//			ImGui::Indent();
 
-							ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+				//			ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
 
-							struct tm buf;
+				//			struct tm buf;
 
-							localtime_s(&buf, &time_t);
+				//			localtime_s(&buf, &time_t);
 
-							std::string s(30, '\0');
-							std::strftime(&s[0], s.size(), "%Y-%m-%d %H:%M:%S", &buf);
+				//			std::string s(30, '\0');
+				//			std::strftime(&s[0], s.size(), "%Y-%m-%d %H:%M:%S", &buf);
 
-							ImGui::TextColored(ImVec4(1, 1, 1, 0.5f), s.c_str());
+				//			ImGui::TextColored(ImVec4(1, 1, 1, 0.5f), s.c_str());
 
-							ImVec2 fileTextSize = ImGui::CalcTextSize(message.GetLocation().generic_string().c_str());
-							ImRect rect =
-							{
-								ImGui::GetCursorScreenPos(),
-								ImGui::GetCursorScreenPos() + fileTextSize,
-							};
-							ImGui::TextColored(ImVec4(1, 1, 1, 0.5f), message.GetLocation().generic_string().c_str());
-							std::string filePath = message.GetLocation().generic_string();
-							int line = message.GetLine();
-							if (ImGui::IsMouseHoveringRect(rect.Min, rect.Max))
-							{
-								ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
+				//			ImVec2 fileTextSize = ImGui::CalcTextSize(message.GetLocation().generic_string().c_str());
+				//			ImRect rect =
+				//			{
+				//				ImGui::GetCursorScreenPos(),
+				//				ImGui::GetCursorScreenPos() + fileTextSize,
+				//			};
+				//			ImGui::TextColored(ImVec4(1, 1, 1, 0.5f), message.GetLocation().generic_string().c_str());
+				//			std::string filePath = message.GetLocation().generic_string();
+				//			int line = message.GetLine();
+				//			if (ImGui::IsMouseHoveringRect(rect.Min, rect.Max))
+				//			{
+				//				ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
 
-								if (ImGui::IsMouseClicked(0))
-								{
-									std::string cmd = "code -g \"" + filePath + "\":" + std::to_string(line);
-									system(cmd.c_str()); 
-								}
-							}
+				//				if (ImGui::IsMouseClicked(0))
+				//				{
+				//					std::string cmd = "code -g \"" + filePath + "\":" + std::to_string(line);
+				//					system(cmd.c_str()); 
+				//				}
+				//			}
 
-							ImGui::PopStyleVar();
+				//			ImGui::PopStyleVar();
 
-							ImGui::Unindent();
-						}
+				//			ImGui::Unindent();
+				//		}
 
-						if (scrollToBottom)
-						{
-							ImGui::SetScrollHereY(1.0f);
-						}
-					}
+				//		if (scrollToBottom)
+				//		{
+				//			ImGui::SetScrollHereY(1.0f);
+				//		}
+				//	}
 
-					ImGui::PopTextWrapPos();
-				}
-				ImGui::EndChild();
+				//	ImGui::PopTextWrapPos();
+				//}
+				//ImGui::EndChild();
 			}
 
 			//---------------------------------------------------------------------

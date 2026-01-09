@@ -16,6 +16,7 @@
 
 // editor
 #include "editor/graphics/imgui/selectables/AnimationKeyFrameEditorSelectable.h"
+#include "editor/graphics/imgui/views/Toolbar.h"
 
 namespace gallus
 {
@@ -63,6 +64,12 @@ namespace gallus
 				~AnimationWindow();
 
 				/// <summary>
+				/// Initializes all values and behaviours associated with the hierarchy window.
+				/// </summary>
+				/// <returns>True if initialization is successful, otherwise false.</returns>
+				bool Initialize() override;
+
+				/// <summary>
 				/// Update loop for the window. This is where all ImGui interaction should be like buttons, etc.
 				/// </summary>
 				void Update() override;
@@ -78,6 +85,10 @@ namespace gallus
 				/// <param name="a_File">The animation file.</param>
 				void SetData(gallus::resources::FileResource& a_File);
 			protected:
+				// Toolbar.
+				void PopulateToolbar();
+				void DrawToolbar();
+
 				void SetCurrentFrame(int a_iIndex);
 
 				std::shared_ptr<graphics::dx12::Texture> m_pPreviewTexture = nullptr;
@@ -88,6 +99,8 @@ namespace gallus
 
 				int m_iCurrentFrame = 0;
 				int m_iSelectedKeyFrame = -1;
+
+				Toolbar m_Toolbar;
 			};
 		}
 	}

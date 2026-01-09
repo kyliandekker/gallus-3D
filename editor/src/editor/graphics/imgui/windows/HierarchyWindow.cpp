@@ -75,6 +75,66 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
+			void HierarchyWindow::PopulateToolbar()
+			{
+				ImVec2 toolbarSize = ImVec2(0, m_Window.GetHeaderSize().y);
+				m_Toolbar = Toolbar(ImGui::IMGUI_FORMAT_ID("", CHILD_ID, "TOOLBAR_EXPLORER"), toolbarSize);
+
+				// Rescan button.
+				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarSearchbar(m_Window,
+					ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "SEARCHBAR_HIERARCHY"),
+					200,
+					[this](const std::string& a_sResult)
+					{
+						m_sSearchBarText = a_sResult;
+						m_bNeedsRefresh = true;
+					}
+				));
+
+				// Spawn entity button.
+				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_Window,
+					[this]()
+					{
+						m_bSpawnEntity = false;
+						if (ImGui::IconButton(
+							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_MODEL), BUTTON_ID, "SPAWN_ENTITY_HIERARCHY").c_str(), "Spawns an entity in the currently opened scene.", m_Window.GetHeaderSize()))
+						{
+							m_bSpawnEntity = true;
+						}
+					}
+				));
+
+				// Save button.
+				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_Window,
+					[this]()
+					{
+						if (ImGui::IconButton(
+							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_SAVE), BUTTON_ID, "SAVE_HIERARCHY").c_str(), "Saves the currently opened scene data to its scene file.", m_Window.GetHeaderSize(), ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent)))
+						{
+							editor::g_SaveScene();
+						}
+					},
+					[]()
+					{
+						return !(core::EDITOR_ENGINE->GetEditor().GetScene().IsDirty() && !gameplay::GAME.IsStarted());
+					}
+				));
+			}
+
+			//---------------------------------------------------------------------
+			void HierarchyWindow::DrawToolbar()
+			{
+				// Start toolbar.
+				m_Toolbar.StartToolbar();
+
+				// Render toolbar.
+				m_Toolbar.Render();
+
+				// End toolbar.
+				m_Toolbar.EndToolbar();
+			}
+
+			//---------------------------------------------------------------------
 			void HierarchyWindow::Update()
 			{
 				if (core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetFullScreenPlayMode())
@@ -156,286 +216,141 @@ namespace gallus
 
 				DrawToolbar();
 
-				return;
+				ImGui::SetCursorPos({
+					ImGui::GetCursorPos().x + m_Window.GetFramePadding().x,
+					ImGui::GetCursorPos().y + m_Window.GetFramePadding().y,
+				});
 
-				//ImVec2 toolbarSize = ImVec2(ImGui::GetContentRegionAvail().x, m_Window.GetHeaderSize().y);
-				//ImGui::BeginToolbar(toolbarSize);
-
-				//ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
-				//ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0);
-
-				//float topPosY = ImGui::GetCursorPosY();
-
-				//bool prefabMode = core::EDITOR_ENGINE->GetEditor().GetEditorMethod() == editor::EditorMethod::EDITOR_METHOD_PREFAB;
-				//if (prefabMode)
-				//{
-				//	ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-				//	ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
-				//}
-
-				//bool spawnEntity = false;
-				//if (ImGui::IconButton(
-				//	ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_MODEL), BUTTON_ID, "SPAWN_ENTITY_HIERARCHY").c_str(), "Spawns an entity in the currently opened scene.", m_Window.GetHeaderSize()))
-				//{
-				//	spawnEntity = true;
-				//}
-				//ImGui::SameLine();
-
-				//bool isDelete = ImGui::IsKeyPressed(ImGuiKey_Delete);
-				//bool isDuplicate = (ImGui::IsKeyPressed(ImGuiKey_D) && ImGui::IsKeyDown(ImGuiKey::ImGuiKey_LeftCtrl)) || (ImGui::IsKeyPressed(ImGuiKey_LeftCtrl) && ImGui::IsKeyDown(ImGuiKey::ImGuiKey_D));
-				//if (isDelete || isDuplicate)
-				//{
-				//	if (graphics::imgui::EntityEditorSelectable* ent = dynamic_cast<graphics::imgui::EntityEditorSelectable*>(core::EDITOR_ENGINE->GetEditor().GetSelectable().get()))
-				//	{
-				//		if (isDelete)
-				//		{
-				//			editor::g_DeleteEntity(ent->GetEntityID());
-				//		}
-				//		else if (isDuplicate)
-				//		{
-				//			// TODO: Duplicate functionality.
-				//		}
-				//	}
-				//}
-
-				//if (prefabMode)
-				//{
-				//	ImGui::PopItemFlag();
-				//	ImGui::PopStyleVar();
-				//}
-
-				//bool wasDirty = core::EDITOR_ENGINE->GetEditor().GetScene().IsDirty() && !gameplay::GAME.IsStarted();
-				//if (!wasDirty)
-				//{
-				//	ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-				//	ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
-				//}
-
-				//if (ImGui::IconButton(
-				//	ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_SAVE), BUTTON_ID, "SAVE_HIERARCHY").c_str(), "Saves the currently opened scene data to its scene file.", m_Window.GetHeaderSize(), ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent)))
-				//{
-				//	editor::g_SaveScene();
-				//}
-
-				//ImVec2 endPos = ImGui::GetCursorPos();
-
-				//if (!wasDirty)
-				//{
-				//	ImGui::PopItemFlag();
-				//	ImGui::PopStyleVar();
-				//}
-
-				//if (ImGui::IsKeyDown(ImGuiMod_Ctrl) && ImGui::IsKeyPressed(ImGuiKey_S) && wasDirty)
-				//{
-				//	editor::g_SaveScene();
-				//}
-
-				//ImGui::PopStyleVar();
-				//ImGui::PopStyleVar();
-
-				//float searchbarWidth = 200;
-				//float inputPadding = m_Window.GetFramePadding().x / 2;
-				//ImVec2 searchBarPos = ImVec2(
-				//	ImGui::GetCursorPosX() + ImGui::GetContentRegionAvail().x - (searchbarWidth + m_Window.GetWindowPadding().x),
-				//	(topPosY + (toolbarSize.y / 2)) - (((inputPadding * 2) + m_Window.GetFontSize()) / 2)
-				//);
-				//ImGui::SetCursorPos(searchBarPos);
-				//if (m_SearchBar.Render(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "HIERARCHY_CONSOLE").c_str(), ImVec2(searchbarWidth, toolbarSize.y), inputPadding))
-				//{
-				//	m_bNeedsRefresh = true;
-				//}
-
-				//ImGui::SetCursorPos(endPos);
-
-				//ImGui::EndToolbar(ImVec2(0, 0));
-
-				//ImGui::SetCursorPos(ImVec2(ImGui::GetCursorPos().x + m_Window.GetFramePadding().x, ImGui::GetCursorPos().y + m_Window.GetFramePadding().y));
-				//if (ImGui::BeginChild(
-				//	ImGui::IMGUI_FORMAT_ID("", CHILD_ID, "ENTITIES_HIERARCHY").c_str(),
-				//	ImVec2(
-				//		ImGui::GetContentRegionAvail().x - m_Window.GetFramePadding().x,
-				//		ImGui::GetContentRegionAvail().y - m_Window.GetFramePadding().y
-				//	),
-				//	ImGuiChildFlags_Borders
-				//	))
-				//{
-				//	ImVec2 childSize = ImGui::GetContentRegionAvail();
-				//	ImGui::InvisibleButton("HIERARCHY_DROP_TARGET", childSize);
-				//	if (ImGui::BeginDragDropTarget())
-				//	{
-				//		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("EXPLORER_ITEM"))
-				//		{
-				//			IM_ASSERT(payload->DataSize == sizeof(resources::FileResource*));
-				//			resources::FileResource* dropped = *(resources::FileResource**)payload->Data;
-				//			if (dropped)
-				//			{
-				//				if (dropped->GetAssetType() == resources::AssetType::Prefab)
-				//				{
-				//					if (auto prefab = core::EDITOR_ENGINE->GetResourceAtlas().LoadPrefab(dropped->GetPath().filename().generic_string()).lock())
-				//					{
-				//						editor::g_InstantiatePrefab(*prefab);
-				//					}
-				//				}
-				//				else
-				//				{
-				//					gameplay::EntityID entityID = editor::g_CreateEntity(dropped->GetPath().filename().generic_string());
-				//					DragAction(entityID, dropped->GetAssetType(), dropped->GetPath().filename().generic_string());
-				//				}
-				//			}
-				//		}
-				//		ImGui::EndDragDropTarget();
-				//	}
-				//	ImGui::SetCursorPos(ImVec2(0, 0));
-
-				//	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
-
-				//	{
-				//		bool
-				//			clicked = false,
-				//			doubleClicked = false;
-
-				//		m_CameraView.RenderEntity(clicked, doubleClicked, core::EDITOR_ENGINE->GetEditor().GetSelectable().get() == &m_CameraView);
-
-				//		if (clicked)
-				//		{
-				//			core::EDITOR_ENGINE->GetEditor().SetSelectable(&m_CameraView);
-				//		}
-				//	}
-
-				//	{
-				//		bool
-				//			clicked = false,
-				//			doubleClicked = false;
-
-				//		m_DirectionalLightView.RenderEntity(clicked, doubleClicked, core::EDITOR_ENGINE->GetEditor().GetSelectable().get() == &m_DirectionalLightView);
-
-				//		if (clicked)
-				//		{
-				//			core::EDITOR_ENGINE->GetEditor().SetSelectable(&m_DirectionalLightView);
-				//		}
-				//	}
-
-				//	ImGui::Separator();
-
-				//	for (EntityEditorSelectable* view : m_aFilteredEntities)
-				//	{
-				//		if (!view)
-				//		{
-				//			continue;
-				//		}
-
-				//		bool
-				//			clicked = false,
-				//			doubleClicked = false;
-
-				//		view->RenderEntity(
-				//			clicked,
-				//			doubleClicked,
-				//			core::EDITOR_ENGINE->GetEditor().GetSelectable().get() == view
-				//		);
-				//		if (ImGui::BeginDragDropTarget())
-				//		{
-				//			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("EXPLORER_ITEM"))
-				//			{
-				//				IM_ASSERT(payload->DataSize == sizeof(resources::FileResource*));
-				//				resources::FileResource* dropped = *(resources::FileResource**)payload->Data;
-				//				if (dropped)
-				//				{
-				//					DragAction(view->GetEntityID(), dropped->GetAssetType(), dropped->GetPath().filename().generic_string());
-				//				}
-				//			}
-				//			ImGui::EndDragDropTarget();
-				//		}
-
-				//		if (clicked)
-				//		{
-				//			SetSelectable(view);
-				//		}
-				//		if (doubleClicked)
-				//		{
-				//			gameplay::TransformSystem& transformSys = core::ENGINE->GetECS().GetSystem<gameplay::TransformSystem>();
-				//			if (transformSys.HasComponent(view->GetEntityID()))
-				//			{
-				//				gameplay::TransformComponent& transformComponent = transformSys.GetComponent(view->GetEntityID());
-				//				DirectX::XMFLOAT3 pos = { 
-				//					transformComponent.GetTransform().GetPosition().x - (graphics::dx12::RENDER_TEX_SIZE.x / 2), 
-				//					transformComponent.GetTransform().GetPosition().y - (graphics::dx12::RENDER_TEX_SIZE.y / 2),
-				//					transformComponent.GetTransform().GetPosition().z
-				//				};
-				//				core::EDITOR_ENGINE->GetEditor().GetEditorCamera().GetTransform().SetPosition(pos);
-				//			}
-				//		}
-				//	}
-				//	ImGui::PopStyleVar();
-				//}
-				//ImGui::EndChild();
-
-				//if (spawnEntity)
-				//{
-				//	const EntityEditorSelectable* derivedPtr = dynamic_cast<const EntityEditorSelectable*>(core::EDITOR_ENGINE->GetEditor().GetSelectable().get());
-				//	if (derivedPtr)
-				//	{
-				//		core::EDITOR_ENGINE->GetEditor().SetSelectable(nullptr);
-				//	}
-				//	
-				//	editor::g_CreateEntity();
-				//}
-			}
-
-			//---------------------------------------------------------------------
-			void HierarchyWindow::PopulateToolbar()
-			{
-				ImVec2 toolbarSize = ImVec2(0, m_Window.GetHeaderSize().y);
-				m_Toolbar = Toolbar(ImGui::IMGUI_FORMAT_ID("", CHILD_ID, "TOOLBAR_EXPLORER"), toolbarSize);
-
-				// Rescan button.
-				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarSearchbar(m_Window,
-					ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "SEARCHBAR_HIERARCHY"),
-					200,
-					[this](const std::string& a_sResult)
+				if (ImGui::BeginChild(
+					ImGui::IMGUI_FORMAT_ID("", CHILD_ID, "ENTITIES_HIERARCHY").c_str(),
+					ImVec2(
+						ImGui::GetContentRegionAvail().x - m_Window.GetFramePadding().x,
+						ImGui::GetContentRegionAvail().y - m_Window.GetFramePadding().y
+					),
+					ImGuiChildFlags_Borders
+					))
+				{
+					ImVec2 childSize = ImGui::GetContentRegionAvail();
+					ImGui::InvisibleButton("HIERARCHY_DROP_TARGET", childSize);
+					if (ImGui::BeginDragDropTarget())
 					{
-						m_sSearchBarText = a_sResult;
-						m_bNeedsRefresh = true;
-					}
-				));
-
-				// Spawn entity button.
-				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_Window,
-					[this]()
-					{
-						m_bSpawnEntity = false;
-						if (ImGui::IconButton(
-							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_MODEL), BUTTON_ID, "SPAWN_ENTITY_HIERARCHY").c_str(), "Spawns an entity in the currently opened scene.", m_Window.GetHeaderSize()))
+						if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("EXPLORER_ITEM"))
 						{
-							m_bSpawnEntity = true;
+							IM_ASSERT(payload->DataSize == sizeof(resources::FileResource*));
+							resources::FileResource* dropped = *(resources::FileResource**)payload->Data;
+							if (dropped)
+							{
+								if (dropped->GetAssetType() == resources::AssetType::Prefab)
+								{
+									if (auto prefab = core::EDITOR_ENGINE->GetResourceAtlas().LoadPrefab(dropped->GetPath().filename().generic_string()).lock())
+									{
+										editor::g_InstantiatePrefab(*prefab);
+									}
+								}
+								else
+								{
+									gameplay::EntityID entityID = editor::g_CreateEntity(dropped->GetPath().filename().generic_string());
+									DragAction(entityID, dropped->GetAssetType(), dropped->GetPath().filename().generic_string());
+								}
+							}
+						}
+						ImGui::EndDragDropTarget();
+					}
+					ImGui::SetCursorPos(ImVec2(0, 0));
+
+					ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+
+					{
+						bool
+							clicked = false,
+							doubleClicked = false;
+
+						m_CameraView.RenderEntity(clicked, doubleClicked, core::EDITOR_ENGINE->GetEditor().GetSelectable().get() == &m_CameraView);
+
+						if (clicked)
+						{
+							core::EDITOR_ENGINE->GetEditor().SetSelectable(&m_CameraView);
 						}
 					}
-				));
 
-				// Save button.
-				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_Window,
-					[this]()
 					{
-						if (ImGui::IconButton(
-							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_SAVE), BUTTON_ID, "SAVE_HIERARCHY").c_str(), "Saves the currently opened scene data to its scene file.", m_Window.GetHeaderSize(), ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent)))
+						bool
+							clicked = false,
+							doubleClicked = false;
+
+						m_DirectionalLightView.RenderEntity(clicked, doubleClicked, core::EDITOR_ENGINE->GetEditor().GetSelectable().get() == &m_DirectionalLightView);
+
+						if (clicked)
 						{
-							editor::g_SaveScene();
+							core::EDITOR_ENGINE->GetEditor().SetSelectable(&m_DirectionalLightView);
 						}
 					}
-				));
-			}
 
-			//---------------------------------------------------------------------
-			void HierarchyWindow::DrawToolbar()
-			{
-				// Start toolbar.
-				m_Toolbar.StartToolbar();
+					ImGui::Separator();
 
-				// Render toolbar.
-				m_Toolbar.Render();
+					for (EntityEditorSelectable* view : m_aFilteredEntities)
+					{
+						if (!view)
+						{
+							continue;
+						}
 
-				// End toolbar.
-				m_Toolbar.EndToolbar();
+						bool
+							clicked = false,
+							doubleClicked = false;
+
+						view->RenderEntity(
+							clicked,
+							doubleClicked,
+							core::EDITOR_ENGINE->GetEditor().GetSelectable().get() == view
+						);
+						if (ImGui::BeginDragDropTarget())
+						{
+							if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("EXPLORER_ITEM"))
+							{
+								IM_ASSERT(payload->DataSize == sizeof(resources::FileResource*));
+								resources::FileResource* dropped = *(resources::FileResource**)payload->Data;
+								if (dropped)
+								{
+									DragAction(view->GetEntityID(), dropped->GetAssetType(), dropped->GetPath().filename().generic_string());
+								}
+							}
+							ImGui::EndDragDropTarget();
+						}
+
+						if (clicked)
+						{
+							SetSelectable(view);
+						}
+						if (doubleClicked)
+						{
+							gameplay::TransformSystem& transformSys = core::ENGINE->GetECS().GetSystem<gameplay::TransformSystem>();
+							if (transformSys.HasComponent(view->GetEntityID()))
+							{
+								gameplay::TransformComponent& transformComponent = transformSys.GetComponent(view->GetEntityID());
+								DirectX::XMFLOAT3 pos = { 
+									transformComponent.GetTransform().GetPosition().x - (graphics::dx12::RENDER_TEX_SIZE.x / 2), 
+									transformComponent.GetTransform().GetPosition().y - (graphics::dx12::RENDER_TEX_SIZE.y / 2),
+									transformComponent.GetTransform().GetPosition().z
+								};
+								core::EDITOR_ENGINE->GetEditor().GetEditorCamera().GetTransform().SetPosition(pos);
+							}
+						}
+					}
+					ImGui::PopStyleVar();
+				}
+				ImGui::EndChild();
+
+				if (m_bSpawnEntity)
+				{
+					const EntityEditorSelectable* derivedPtr = dynamic_cast<const EntityEditorSelectable*>(core::EDITOR_ENGINE->GetEditor().GetSelectable().get());
+					if (derivedPtr)
+					{
+						core::EDITOR_ENGINE->GetEditor().SetSelectable(nullptr);
+					}
+					
+					editor::g_CreateEntity();
+				}
 			}
 
 			//---------------------------------------------------------------------

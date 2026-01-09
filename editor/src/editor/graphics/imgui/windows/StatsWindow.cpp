@@ -60,7 +60,7 @@ namespace gallus
 					return;
 				}
 
-				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+				/*ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
 				ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0);
 
 				ImVec2 startToolbarPos = ImGui::GetCursorPos();
@@ -180,7 +180,7 @@ namespace gallus
 
 				ImGui::PopStyleVar();
 				ImGui::PopStyleVar();
-				ImGui::PopStyleVar();
+				ImGui::PopStyleVar();*/
 			}
 
 			//---------------------------------------------------------------------
