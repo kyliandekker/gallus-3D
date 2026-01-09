@@ -15,6 +15,7 @@
 
 // editor
 #include "editor/graphics/imgui/selectables/FileEditorSelectable.h"
+#include "editor/graphics/imgui/views/Toolbar.h"
 
 namespace gallus
 {
@@ -39,6 +40,12 @@ namespace gallus
 				InspectorWindow(ImGuiWindow& a_Window);
 
 				/// <summary>
+				/// Initializes all behaviours and values for the window.
+				/// </summary>
+				/// <returns>True if initialization is successful, otherwise false.</returns>
+				bool Initialize() override;
+
+				/// <summary>
 				/// Destroys and disables the inspector window.
 				/// </summary>
 				/// <returns>True if destruction is successful, otherwise false.</returns>
@@ -54,7 +61,15 @@ namespace gallus
 				/// </summary>
 				void Render() override;
 			private:
+				// Toolbar.
+				void PopulateToolbar();
+				void DrawToolbar();
+
 				StringTextInput m_NameInput; /// Inspector input for editing the entity's name.
+
+				Toolbar m_Toolbar;
+
+				bool m_bDeleteSelectable = false;
 			};
 		}
 	}

@@ -35,16 +35,54 @@ namespace gallus
 			{
 			}
 
-			bool StatsWindow::Initialize()
-			{
-				core::EDITOR_ENGINE->GetDX12().OnNewFrame() += std::bind(&StatsWindow::OnNewGraphicsFrame, this, std::placeholders::_1);
-				gameplay::GAME.OnNewFrame() += std::bind(&StatsWindow::OnNewGameFrame, this, std::placeholders::_1);
-				return true;
-			}
-
 			//---------------------------------------------------------------------
 			StatsWindow::~StatsWindow()
 			{}
+
+			//---------------------------------------------------------------------
+			bool StatsWindow::Initialize()
+			{
+				PopulateToolbar();
+
+				core::EDITOR_ENGINE->GetDX12().OnNewFrame() += std::bind(&StatsWindow::OnNewGraphicsFrame, this, std::placeholders::_1);
+				gameplay::GAME.OnNewFrame() += std::bind(&StatsWindow::OnNewGameFrame, this, std::placeholders::_1);
+				return BaseWindow::Initialize();
+			}
+
+			//---------------------------------------------------------------------
+			void StatsWindow::PopulateToolbar()
+			{
+				ImVec2 toolbarSize = ImVec2(0, m_Window.GetHeaderSize().y);
+				m_Toolbar = Toolbar(ImGui::IMGUI_FORMAT_ID("", CHILD_ID, "TOOLBAR_ANIMATION"), toolbarSize);
+
+				// Round up button.
+				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_Window,
+
+					[this]()
+					{
+						bool roundUpFPS = core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetFPSPrecision();
+						if (ImGui::CheckboxButton(
+							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_SETTINGS) + " Round Up Values", BUTTON_ID, "ROUND_UP_FPS_STATS").c_str(), &roundUpFPS, "Rounds up FPS values to zero decimals.", ImVec2(10.5f * m_Window.GetFontSize(), m_Window.GetHeaderSize().y)))
+						{
+							core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetFPSPrecision(roundUpFPS);
+							core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
+						}
+					}
+				));
+			}
+
+			//---------------------------------------------------------------------
+			void StatsWindow::DrawToolbar()
+			{
+				// Start toolbar.
+				m_Toolbar.StartToolbar();
+
+				// Render toolbar.
+				m_Toolbar.Render();
+
+				// End toolbar.
+				m_Toolbar.EndToolbar();
+			}
 
 			//---------------------------------------------------------------------
 			void StatsWindow::Update()
@@ -60,26 +98,12 @@ namespace gallus
 					return;
 				}
 
-				/*ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
-				ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0);
+				DrawToolbar();
 
-				ImVec2 startToolbarPos = ImGui::GetCursorPos();
-				ImVec2 toolbarSize = ImVec2(ImGui::GetContentRegionAvail().x, m_Window.GetHeaderSize().y);
-				ImGui::BeginToolbar(toolbarSize);
-
-				bool roundUpFPS = core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetFPSPrecision();
-				if (ImGui::CheckboxButton(
-					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_SETTINGS) + " Round Up Values", BUTTON_ID, "ROUND_UP_FPS_STATS").c_str(), &roundUpFPS, "Rounds up FPS values to zero decimals.", ImVec2(10.5f * m_Window.GetFontSize(), m_Window.GetHeaderSize().y)))
-				{
-					core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetFPSPrecision(roundUpFPS);
-					core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
-				}
-
-				ImGui::EndToolbar(ImVec2(0, 0));
-				ImGui::SetCursorPos(ImVec2(startToolbarPos.x + m_Window.GetFramePadding().y, startToolbarPos.y + toolbarSize.y + m_Window.GetFramePadding().y));
-
-				ImGui::PopStyleVar();
-				ImGui::PopStyleVar();
+				ImGui::SetCursorPos({
+					ImGui::GetCursorPos().x + m_Window.GetFramePadding().x,
+					ImGui::GetCursorPos().y + m_Window.GetFramePadding().y,
+				});
 
 				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, m_Window.GetWindowPadding());
 				ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, m_Window.GetWindowPadding());
@@ -95,6 +119,7 @@ namespace gallus
 					ImGuiWindowFlags_AlwaysVerticalScrollbar
 				))
 				{
+					bool roundUpFPS = core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetFPSPrecision();
 					if (gameplay::GAME.IsStarted())
 					{
 						ImGui::Indent();
@@ -180,7 +205,7 @@ namespace gallus
 
 				ImGui::PopStyleVar();
 				ImGui::PopStyleVar();
-				ImGui::PopStyleVar();*/
+				ImGui::PopStyleVar();
 			}
 
 			//---------------------------------------------------------------------

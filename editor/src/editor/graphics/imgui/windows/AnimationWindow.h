@@ -39,8 +39,7 @@ namespace gallus
 
 			constexpr float ANIMATION_FRAME_PIXEL_WIDTH_DEFAULT = 25.0f;
 			inline float ANIMATION_FRAME_PIXEL_WIDTH = 25.0f;
-			constexpr float LEGEND_PADDING = 25.0f;
-			constexpr float LEGEND_HEIGHT = 70.0f;
+			constexpr float LEGEND_HEIGHT = 50.0f;
 			constexpr float TRACK_SIZE = 50;
 
 			//---------------------------------------------------------------------
@@ -89,15 +88,18 @@ namespace gallus
 				void PopulateToolbar();
 				void DrawToolbar();
 
+				void RemoveKeyFrame(size_t a_iIndex);
+				void AddKeyFrame(size_t a_iIndex);
+
 				void SetCurrentFrame(int a_iIndex);
 
 				std::shared_ptr<graphics::dx12::Texture> m_pPreviewTexture = nullptr;
 				gallus::resources::FileResource* m_pFile = nullptr;
 
 				animation::Animation m_Animation;
-				std::vector<AnimationKeyFrameEditorSelectable> m_KeyFrameSelectables;
+				AnimationKeyFrameEditorSelectable* m_KeyFrameSelectable = nullptr;
 
-				int m_iCurrentFrame = 0;
+				int m_iSelectedFrame = 0;
 				int m_iSelectedKeyFrame = -1;
 
 				Toolbar m_Toolbar;

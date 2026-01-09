@@ -348,9 +348,10 @@ namespace gallus
 				{
 					m_aFilteredExplorerItems.clear();
 
+					std::string searchString = string_extensions::StringToLower(m_sSearchBarText);
 					for (FileEditorSelectable& view : m_pViewedFolder.get()->GetChildren())
 					{
-						if (m_sSearchBarText.empty() || string_extensions::StringToLower(view.GetFileResource().GetPath().filename().generic_string()).find(m_sSearchBarText) != std::string::npos)
+						if (searchString.empty() || string_extensions::StringToLower(view.GetFileResource().GetPath().filename().generic_string()).find(searchString) != std::string::npos)
 						{
 							m_aFilteredExplorerItems.push_back(&view);
 						}

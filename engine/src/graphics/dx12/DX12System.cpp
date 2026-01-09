@@ -294,7 +294,7 @@ namespace gallus
 
 				m_FpsCounter.Initialize();
 				m_FpsCounter.m_eOnNewFrame += std::bind(&DX12System::NewFrame, this, std::placeholders::_1);
-				m_FpsCounter.SetTargetFPS(60);
+				m_FpsCounter.DisableFPSLimit();
 
 				LOG(LOGSEVERITY_SUCCESS, LOG_CATEGORY_DX12, "Initialized dx12 system.");
 

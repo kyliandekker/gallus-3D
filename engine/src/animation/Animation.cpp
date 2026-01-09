@@ -145,7 +145,6 @@ namespace gallus
 		}
 
 #ifdef _EDITOR
-
 		//---------------------------------------------------------------------
 		bool Animation::Save(const fs::path& a_Path) const
 		{
@@ -189,7 +188,7 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		void Animation::AddKeyFrame(int a_iFrame)
+		void Animation::AddKeyFrame(size_t a_iFrame)
 		{
 			for (AnimationKeyFrame* keyFrame : m_aKeyFrames)
 			{
@@ -204,7 +203,7 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		void Animation::RemoveKeyFrame(int a_iIndex)
+		void Animation::RemoveKeyFrame(size_t a_iIndex)
 		{
 			m_aKeyFrames.erase(m_aKeyFrames.begin() + a_iIndex);
 			Sort();
@@ -236,6 +235,21 @@ namespace gallus
 					return a->GetFrame() < b->GetFrame();
 				}
 			);
+		}
+
+		//---------------------------------------------------------------------
+		int32_t Animation::GetKeyFrameAtFrame(size_t a_iIndex)
+		{
+			size_t i = 0;
+			for (AnimationKeyFrame* keyFrame : m_aKeyFrames)
+			{
+				if (a_iIndex == keyFrame->GetFrame())
+				{
+					return i;
+				}
+				i++;
+			}
+			return -1;
 		}
 #endif // _EDITOR
 	}

@@ -13,24 +13,45 @@ namespace gallus
 			std::chrono::duration<double> elapsed = current - m_tPrevious;
 			m_tPrevious = current;
 
-			m_fLag += elapsed.count();
-			m_fFPSTimer += elapsed.count();
+			double deltaSeconds = elapsed.count();
 
-			m_iFrameUpdates = 0;
+			m_fFPSTimer += deltaSeconds;
 
-			m_fDeltaTime = m_fFrameDurationTarget;
-			while (m_fLag >= m_fFrameDurationTarget)
+			if (m_bLimitFPS)
 			{
-				m_fLag -= m_fFrameDurationTarget;
-				m_iFrameUpdates++;
-				m_fFPS = static_cast<double>(m_iFrames) / m_fFPSTimer;
+				m_fLag += deltaSeconds;
+				m_iFrameUpdates = 0;
 
-				m_eOnNewFrame(m_fFrameDurationTarget);
+				while (m_fLag >= m_fFrameDurationTarget)
+				{
+					m_fLag -= m_fFrameDurationTarget;
+					m_iFrameUpdates++;
+
+					m_eOnNewFrame(m_fFrameDurationTarget);
+				}
+
+				m_fDeltaTime = m_fFrameDurationTarget;
+				m_iFrames += m_iFrameUpdates;
+			}
+			else
+			{
+				m_fDeltaTime = deltaSeconds;
+				m_iFrames++;
+
+				m_eOnNewFrame(m_fDeltaTime);
 			}
 
-			m_iFrames += m_iFrameUpdates;
+			if (m_fFPSTimer >= 1.0)
+			{
+				m_fFPS = static_cast<double>(m_iFrames) / m_fFPSTimer;
+				m_iFrames = 0;
+				m_fFPSTimer = 0.0;
+			}
 
-			std::this_thread::sleep_for(std::chrono::milliseconds(1));
+			if (m_bLimitFPS)
+			{
+				std::this_thread::sleep_for(std::chrono::milliseconds(1));
+			}
 		}
 	}
 }

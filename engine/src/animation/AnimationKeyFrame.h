@@ -28,7 +28,7 @@ namespace gallus
 			/// Constructs a key frame at a given frame.
 			/// </summary>
 			/// <param name="a_iFrame">The frame where the key frame sits.</param>
-			AnimationKeyFrame(int a_iFrame, Animation& a_Animation) :
+			AnimationKeyFrame(size_t a_iFrame, Animation& a_Animation) :
 				m_iFrame(a_iFrame),
 				m_pAnimation(&a_Animation)
 			{}
@@ -43,7 +43,7 @@ namespace gallus
 			/// Retrieves the frame where the key frame activates.
 			/// </summary>
 			/// <returns>A number representing the frame.</returns>
-			int GetFrame() const
+			size_t GetFrame() const
 			{
 				return m_iFrame;
 			}
@@ -53,7 +53,7 @@ namespace gallus
 			/// Sets the frame where this key frame activates.
 			/// </summary>
 			/// <param name="a_iFrame">The frame.</param>
-			void SetFrame(int a_iFrame)
+			void SetFrame(size_t a_iFrame)
 			{
 				m_iFrame = a_iFrame;
 			}
@@ -144,7 +144,7 @@ namespace gallus
 			}
 #endif // _EDITOR
 		private:
-			int m_iFrame = 0;
+			size_t m_iFrame = 0;
 
 			std::vector<AnimationKeyFrameComponentBase*> m_aAnimationKeyFrameComponents;
 			Animation* m_pAnimation = nullptr;

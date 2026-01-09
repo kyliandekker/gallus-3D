@@ -10,11 +10,11 @@
 #include <mutex>
 #include <map>
 
-// graphics
-#include "graphics/imgui/views/DataTypes/StringTextInput.h"
-
 // logger
 #include "logger/Logger.h"
+
+// editor
+#include "editor/graphics/imgui/views/Toolbar.h"
 
 namespace gallus
 {
@@ -47,6 +47,12 @@ namespace gallus
 				~ConsoleWindow();
 
 				/// <summary>
+				/// Initializes all values and behaviours associated with the console window.
+				/// </summary>
+				/// <returns>True if initialization is successful, otherwise false.</returns>
+				bool Initialize() override;
+
+				/// <summary>
 				/// Update loop for the window. This is where all ImGui interaction should be like buttons, etc.
 				/// </summary>
 				void Update() override;
@@ -57,16 +63,14 @@ namespace gallus
 				void Render() override;
 
 				/// <summary>
-				/// Initializes all values and behaviours associated with the console window.
-				/// </summary>
-				/// <returns>True if initialization is successful, otherwise false.</returns>
-				bool Initialize() override;
-
-				/// <summary>
 				/// Destroys and disables the console window.
 				/// </summary>
 				/// <returns>True if destruction is successful, otherwise false.</returns>
 				bool Destroy() override;
+			private:
+				// Toolbar.
+				void PopulateToolbar();
+				void DrawToolbar();
 
 				/// <summary>
 				/// Adds a new console message to the console window.
@@ -81,15 +85,17 @@ namespace gallus
 				void LoggerCallback(const logger::LoggerMessage& a_Message);
 
 				void CountMessages();
-			private:
+
 				bool m_bNeedsRefresh = true; /// Whether the console needs to refresh the results shown in the console window.
 				std::vector<logger::LoggerMessage> m_aMessages; /// List of messages retrieved from the logger.
 				std::vector<size_t> m_aFilteredMessages; /// List of messages shown in the console window.
 				std::vector<size_t> m_aMessageCount; /// List of messages shown in the console window.
 
-				SearchBarInput m_SearchBar; /// Search bar to filter specific messages in the console window.
-
 				std::map<std::string, bool> m_aExpanded; // A list of logger message booleans.
+
+				std::string m_sSearchBarText;
+
+				Toolbar m_Toolbar;
 			};
 		}
 	}

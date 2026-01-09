@@ -72,6 +72,10 @@ namespace gallus
 
 			float GetTargetFPS() const
 			{
+				if (!m_bLimitFPS)
+				{
+					return 1000;
+				}
 				return m_fTargetFPS;
 			}
 

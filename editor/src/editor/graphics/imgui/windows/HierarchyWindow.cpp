@@ -78,9 +78,9 @@ namespace gallus
 			void HierarchyWindow::PopulateToolbar()
 			{
 				ImVec2 toolbarSize = ImVec2(0, m_Window.GetHeaderSize().y);
-				m_Toolbar = Toolbar(ImGui::IMGUI_FORMAT_ID("", CHILD_ID, "TOOLBAR_EXPLORER"), toolbarSize);
+				m_Toolbar = Toolbar(ImGui::IMGUI_FORMAT_ID("", CHILD_ID, "TOOLBAR_HIERARCHY"), toolbarSize);
 
-				// Rescan button.
+				// Search bar.
 				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarSearchbar(m_Window,
 					ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "SEARCHBAR_HIERARCHY"),
 					200,
@@ -172,6 +172,7 @@ namespace gallus
 						m_aEntities.emplace_back(m_Window, ent->GetEntityID());
 					}
 
+					std::string searchString = string_extensions::StringToLower(m_sSearchBarText);
 					for (EntityEditorSelectable& view : m_aEntities)
 					{
 						auto ent = core::EDITOR_ENGINE->GetECS().GetEntity(view.GetEntityID()).lock();
@@ -180,7 +181,7 @@ namespace gallus
 							return;
 						}
 
-						if (m_sSearchBarText.empty() || string_extensions::StringToLower(ent->GetName()).find(m_sSearchBarText) != std::string::npos)
+						if (searchString.empty() || string_extensions::StringToLower(ent->GetName()).find(searchString) != std::string::npos)
 						{
 							m_aFilteredEntities.push_back(&view);
 						}

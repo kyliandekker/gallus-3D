@@ -69,13 +69,13 @@ namespace gallus
 			/// Adds a key frame to a given frame number.
 			/// </summary>
 			/// <param name="a_iFrame">The frame number to add the key frame to.</param>
-			void AddKeyFrame(int a_iFrame);
+			void AddKeyFrame(size_t a_iFrame);
 
 			/// <summary>
 			/// Removes a key frame from a given frame number.
 			/// </summary>
 			/// <param name="a_iFrame">The frame number to remove the key frame from.</param>
-			void RemoveKeyFrame(int a_iIndex);
+			void RemoveKeyFrame(size_t a_iIndex);
 
 			/// <summary>
 			/// Removes a key frame from a given frame number.
@@ -87,6 +87,8 @@ namespace gallus
 			/// Sorts the animation track's key frames based on their frame position.
 			/// </summary>
 			void Sort();
+
+			int32_t GetKeyFrameAtFrame(size_t a_iIndex);
 #endif // _EDITOR
 			/// <summary>
 			/// Returns whether the resource is a valid resource.

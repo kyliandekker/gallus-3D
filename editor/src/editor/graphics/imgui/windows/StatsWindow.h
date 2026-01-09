@@ -8,6 +8,9 @@
 // external
 #include <vector>
 
+// editor
+#include "editor/graphics/imgui/views/Toolbar.h"
+
 namespace gallus
 {
 	namespace resources
@@ -35,6 +38,10 @@ namespace gallus
 				/// <param name="a_Window">The ImGui window for rendering the view.</param>
 				StatsWindow(ImGuiWindow& a_Window);
 
+				/// <summary>
+				/// Initializes all values and behaviours associated with the hierarchy window.
+				/// </summary>
+				/// <returns>True if initialization is successful, otherwise false.</returns>
 				bool Initialize() override;
 
 				/// <summary>
@@ -55,8 +62,14 @@ namespace gallus
 				void OnNewGraphicsFrame(float a_fFPS);
 				void OnNewGameFrame(float a_fFPS);
 			protected:
+				// Toolbar.
+				void PopulateToolbar();
+				void DrawToolbar();
+
 				std::vector<float> m_aGraphicsFPSValues;
 				std::vector<float> m_aGameFPSValues;
+
+				Toolbar m_Toolbar;
 			};
 		}
 	}
