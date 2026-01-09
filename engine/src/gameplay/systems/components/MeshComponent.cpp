@@ -137,10 +137,7 @@ namespace gallus
 			}
 		}
 
-		/// <summary>
-		/// Sets the sprite index.
-		/// </summary>
-		/// <param name="a_iMeshIndex">The index the sprite should have.</param>
+		//---------------------------------------------------------------------
 		void MeshComponent::SetTextureIndex(int8_t a_iMeshIndex)
 		{
 			size_t numMeshRects = 0;
@@ -157,6 +154,12 @@ namespace gallus
 				a_iMeshIndex = numMeshRects;
 			}
 			m_iTextureIndex = a_iMeshIndex;
+		}
+
+		//---------------------------------------------------------------------
+		void MeshComponent::SetMaterial(std::weak_ptr<graphics::dx12::Material> a_pMaterial)
+		{
+			m_pMaterial = a_pMaterial;
 		}
 	}
 }

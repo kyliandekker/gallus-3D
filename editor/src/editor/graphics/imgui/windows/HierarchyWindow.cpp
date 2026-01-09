@@ -456,6 +456,19 @@ namespace gallus
 					}
 					case resources::AssetType::Material:
 					{
+						std::shared_ptr<graphics::dx12::CommandQueue> cCommandQueue = core::ENGINE->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
+
+						gameplay::MeshSystem& meshSystem = core::EDITOR_ENGINE->GetECS().GetSystem<gameplay::MeshSystem>();
+
+						gameplay::MeshComponent* component = editor::g_CreateComponentOfType<gameplay::MeshComponent>(&meshSystem, a_EntityID);
+						if (!component)
+						{
+							return;
+						}
+
+						component->SetMaterial(
+							core::EDITOR_ENGINE->GetResourceAtlas().LoadMaterial(a_sFileName)
+						);
 						break;
 					}
 				}

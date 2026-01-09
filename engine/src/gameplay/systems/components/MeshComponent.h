@@ -53,19 +53,25 @@ namespace gallus
 			/// Sets the shader used by the mesh component.
 			/// </summary>
 			/// <param name="a_Shader">Reference to the shader bind that the mesh component will use.</param>
-			void SetShader(std::weak_ptr < graphics::dx12::ShaderBind> a_pShaderBind);
+			void SetShader(std::weak_ptr<graphics::dx12::ShaderBind> a_pShaderBind);
 
 			/// <summary>
 			/// Sets the texture used by the mesh component.
 			/// </summary>
 			/// <param name="a_Texture">Reference to the texture that the mesh component will use.</param>
-			void SetTexture(std::weak_ptr < graphics::dx12::Texture> a_pTexture);
+			void SetTexture(std::weak_ptr<graphics::dx12::Texture> a_pTexture);
 
 			/// <summary>
 			/// Sets the texture index.
 			/// </summary>
 			/// <param name="a_iTextureIndex">The index the texture should have.</param>
 			void SetTextureIndex(int8_t a_iTextureIndex);
+
+			/// <summary>
+			/// Sets the material.
+			/// </summary>
+			/// <param name="a_pMaterial">The material the mesh should have.</param>
+			void SetMaterial(std::weak_ptr<graphics::dx12::Material> a_pMaterial);
 
 			/// <summary>
 			/// Renders the mesh.
