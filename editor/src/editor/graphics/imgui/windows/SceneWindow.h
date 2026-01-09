@@ -79,13 +79,12 @@ namespace gallus
 				// Scene view controls.
 				void HandleSceneViewControls(double a_fDeltaTime, const ImRect& a_vSceneRect);
 
-				// TODO: Unused for now.
 				void DrawViewportPanel();
 
 				float m_fZoom = 1.0f;
 				ImVec2 m_vPanOffset = ImVec2(0.0f, 0.0f);
 
-				Toolbar m_Toolbar;
+				Toolbar m_TopToolbar;
 			};
 
 			class FullSceneWindow : public SceneWindow

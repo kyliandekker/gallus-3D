@@ -232,7 +232,8 @@ namespace gallus
 					))
 				{
 					ImVec2 childSize = ImGui::GetContentRegionAvail();
-					ImGui::InvisibleButton("HIERARCHY_DROP_TARGET", childSize);
+					ImGui::InvisibleButton("HIERARCHY_DROP_TARGET", childSize,
+						ImGuiButtonFlags_AllowOverlap | ImGuiButtonFlags_MouseButtonLeft);
 					if (ImGui::BeginDragDropTarget())
 					{
 						if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("EXPLORER_ITEM"))

@@ -126,14 +126,18 @@ namespace gallus
 			/// <param name="a_ID"></param>
 			Component* CreateBaseComponent(const EntityID& a_ID, const resources::SrcData& a_SrcData = resources::SrcData()) override
 			{
-				if (!HasComponent(a_ID))
+				bool existed = HasComponent(a_ID);
+				if (!existed)
 				{
 					ComponentType t;
 					m_mComponents.insert(std::make_pair(a_ID, t));
 				}
 				ComponentType& comp = m_mComponents.at(a_ID);
-				comp.SetDefaults(a_ID);
-				comp.Deserialize(a_SrcData);
+				if (!existed)
+				{
+					comp.SetDefaults(a_ID);
+					comp.Deserialize(a_SrcData);
+				}
 				core::ENGINE->GetECS().OnEntityComponentsUpdated().invoke();
 				return &comp;
 			}

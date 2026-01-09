@@ -87,6 +87,8 @@ namespace gallus
 				// Draw the toolbar first.
 				DrawToolbar();
 
+				ImVec2 startPos = ImGui::GetCursorScreenPos();
+
 				// Begin scene part.
 				ImVec2 windowSize = ImGui::GetContentRegionAvail();
 				if (ImGui::BeginChild("SceneScroll", windowSize, 0,
@@ -109,23 +111,27 @@ namespace gallus
 				}
 				ImGui::EndChild();
 
-				//DrawViewportPanel();
+				ImGui::SetCursorScreenPos(startPos);
+
+				DrawViewportPanel();
 			}
 			
 			//---------------------------------------------------------------------
 			void SceneWindow::PopulateBaseToolbar()
 			{
+				// ---- Top toolbar ----
+
 				ImVec2 toolbarSize = ImVec2(0, m_Window.GetHeaderSize().y);
-				m_Toolbar = Toolbar(ImGui::IMGUI_FORMAT_ID("", CHILD_ID, "TOOLBAR_SCENE"), toolbarSize);
+				m_TopToolbar = Toolbar(ImGui::IMGUI_FORMAT_ID("", CHILD_ID, "TOOLBAR_SCENE"), toolbarSize);
 
 				// Play button.
-				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_Window,
+				m_TopToolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_Window,
 					// TODO: This should probably be a global function.
 					[this]()
 					{
 						bool isStarted = gameplay::GAME.IsStarted();
 						if (ImGui::CheckboxButton(
-							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_PLAY), BUTTON_ID, "PLAY_SCENE").c_str(), &isStarted, "Starts or stops the game simulation using the currently loaded scene. When stopping, the scene is reloaded to its original editor state.", ImVec2(m_Toolbar.GetToolbarSize().y, m_Toolbar.GetToolbarSize().y)))
+							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_PLAY), BUTTON_ID, "PLAY_SCENE").c_str(), &isStarted, "Starts or stops the game simulation using the currently loaded scene. When stopping, the scene is reloaded to its original editor state.", ImVec2(m_TopToolbar.GetToolbarSize().y, m_TopToolbar.GetToolbarSize().y)))
 						{
 							editor::Editor& editor = core::EDITOR_ENGINE->GetEditor();
 
@@ -161,12 +167,12 @@ namespace gallus
 				));
 
 				// Pause button.
-				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_Window,
+				m_TopToolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_Window,
 					[this]()
 					{
 						bool isPaused = gameplay::GAME.IsPaused();
 						if (ImGui::CheckboxButton(
-							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_PAUSE), BUTTON_ID, "PAUSE_SCENE").c_str(), &isPaused, "Pauses or resumes the game simulation while preserving the current runtime state.", ImVec2(m_Toolbar.GetToolbarSize().y, m_Toolbar.GetToolbarSize().y)))
+							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_PAUSE), BUTTON_ID, "PAUSE_SCENE").c_str(), &isPaused, "Pauses or resumes the game simulation while preserving the current runtime state.", ImVec2(m_TopToolbar.GetToolbarSize().y, m_TopToolbar.GetToolbarSize().y)))
 						{
 							gameplay::GAME.SetIsPaused(isPaused);
 						}
@@ -179,7 +185,7 @@ namespace gallus
 				));
 
 				// Full screen mode button.
-				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_Window,
+				m_TopToolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_Window,
 					
 					[this]()
 					{
@@ -187,7 +193,7 @@ namespace gallus
 
 						bool inFullScreen = editorSettings.GetFullScreenPlayMode();
 						if (ImGui::CheckboxButton(
-							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_GAMEMODE), BUTTON_ID, "FULL_SCREEN_PLAY_MODE_SCENE").c_str(), &inFullScreen, "Toggles fullscreen play mode, rendering the game view without editor UI overlays.", ImVec2(m_Toolbar.GetToolbarSize().y, m_Toolbar.GetToolbarSize().y)))
+							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_GAMEMODE), BUTTON_ID, "FULL_SCREEN_PLAY_MODE_SCENE").c_str(), &inFullScreen, "Toggles fullscreen play mode, rendering the game view without editor UI overlays.", ImVec2(m_TopToolbar.GetToolbarSize().y, m_TopToolbar.GetToolbarSize().y)))
 						{
 							editorSettings.SetFullScreenPlayMode(inFullScreen);
 							editorSettings.Save();
@@ -200,14 +206,14 @@ namespace gallus
 			void SceneWindow::PopulateToolbar()
 			{
 				// Grid button.
-				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_Window,
+				m_TopToolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_Window,
 					[this]()
 					{
 						editor::EditorSettings& editorSettings = core::EDITOR_ENGINE->GetEditor().GetEditorSettings();
 
 						bool showGrid = editorSettings.GetShowGrid();
 						if (ImGui::CheckboxButton(
-							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_SCENE), BUTTON_ID, "SHOW_GRID_SCENE").c_str(), &showGrid, "Toggles visibility of the scene grid to assist with spatial alignment and positioning.", ImVec2(m_Toolbar.GetToolbarSize().y, m_Toolbar.GetToolbarSize().y)))
+							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_SCENE), BUTTON_ID, "SHOW_GRID_SCENE").c_str(), &showGrid, "Toggles visibility of the scene grid to assist with spatial alignment and positioning.", ImVec2(m_TopToolbar.GetToolbarSize().y, m_TopToolbar.GetToolbarSize().y)))
 						{
 							editorSettings.SetShowGrid(showGrid);
 							editorSettings.Save();
@@ -216,7 +222,7 @@ namespace gallus
 				));
 
 				// Camera mode button.
-				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_Window,
+				m_TopToolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_Window,
 					
 					[this]()
 					{
@@ -224,7 +230,7 @@ namespace gallus
 
 						bool inGameMode = editor.GetCameraMode() == editor::CameraMode::CAMERA_MODE_GAME;
 						if (ImGui::CheckboxButton(
-							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_CAMERA), BUTTON_ID, "CAMERA_MODE_GAME_SCENE").c_str(), &inGameMode, "Switches between the editor scene camera and the in-game camera view.", ImVec2(m_Toolbar.GetToolbarSize().y, m_Toolbar.GetToolbarSize().y)))
+							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_CAMERA), BUTTON_ID, "CAMERA_MODE_GAME_SCENE").c_str(), &inGameMode, "Switches between the editor scene camera and the in-game camera view.", ImVec2(m_TopToolbar.GetToolbarSize().y, m_TopToolbar.GetToolbarSize().y)))
 						{
 							editor.SetCameraMode(inGameMode ? editor::CameraMode::CAMERA_MODE_GAME : editor::CameraMode::CAMERA_MODE_SCENE);
 						}
@@ -232,7 +238,7 @@ namespace gallus
 				));
 
 				// Camera isolation mode button.
-				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_Window,
+				m_TopToolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_Window,
 					
 					[this]()
 					{
@@ -254,13 +260,13 @@ namespace gallus
 			void SceneWindow::DrawToolbar()
 			{
 				// Start toolbar.
-				m_Toolbar.StartToolbar();
+				m_TopToolbar.StartToolbar();
 
 				// Render toolbar.
-				m_Toolbar.Render();
+				m_TopToolbar.Render();
 
 				// End toolbar.
-				m_Toolbar.EndToolbar();
+				m_TopToolbar.EndToolbar();
 			}
 
 			//---------------------------------------------------------------------
@@ -718,121 +724,72 @@ namespace gallus
 			//---------------------------------------------------------------------
 			void SceneWindow::DrawViewportPanel()
 			{
-				//ImGuiWindowFlags toolbarFlags =
-				//	ImGuiWindowFlags_NoTitleBar |
-				//	ImGuiWindowFlags_NoResize |
-				//	ImGuiWindowFlags_NoFocusOnAppearing |
-				//	ImGuiWindowFlags_NoNav |
-				//	ImGuiWindowFlags_NoScrollbar;
+				ImVec2 windowSize = {
+					m_Window.GetHeaderSize().x,
+					ImGui::GetContentRegionAvail().y
+				};
 
-				//ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 12.0f);
-				//ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 12.0f);
-				//ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.1f, 0.1f, 0.1f, 0.9f));
+				const int buttons = 4;
 
-				//// Fixed toolbar size
-				//ImVec2 toolbarSize(m_Window.GetHeaderSize().x + (m_Window.GetWindowPadding().x * 2), m_Window.GetHeaderSize().x * 5); // width x height
-				//ImGui::SetNextWindowSize(toolbarSize, ImGuiCond_Always);
-				//if (ImGui::Begin(ImGui::IMGUI_FORMAT_ID("", WINDOW_ID, "SCENE_TOOLBAR").c_str(), nullptr, toolbarFlags))
-				//{
-				//	// Create a child for the actual content (with border)
-				//	ImGuiWindowFlags childFlags =
-				//		ImGuiWindowFlags_NoScrollbar |
-				//		ImGuiWindowFlags_NoScrollWithMouse;
+				if (ImGui::BeginChild("Operations", windowSize, 0,
+					ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse))
+				{
+					ImGui::SetCursorScreenPos(ImVec2(
+						ImGui::GetCursorScreenPos().x,
+						ImGui::GetCursorScreenPos().y + (windowSize.y / 2) - ((buttons * m_Window.GetHeaderSize().y) / 2)
+					));
 
-				//	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, m_Window.GetWindowPadding());
-				//	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(m_Window.GetFramePadding().x * 2, m_Window.GetFramePadding().y * 2));
+					ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+					ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0);
 
-				//	ImGui::SetCursorPos(ImVec2(ImGui::GetCursorPos().x + m_Window.GetFramePadding().x, ImGui::GetCursorPos().y + m_Window.GetFramePadding().y));
-				//	if (ImGui::BeginChild(
-				//		ImGui::IMGUI_FORMAT_ID("", CHILD_ID, "SCENE_TOOLBAR_CHILD").c_str(),
-				//		ImVec2(
-				//		m_Window.GetHeaderSize().x,
-				//		ImGui::GetContentRegionAvail().y - m_Window.GetFramePadding().y
-				//		),
-				//		ImGuiChildFlags_None
-				//		))
-				//	{
-				//		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
-				//		ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0);
+					bool isTranslate = core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetLastSceneOperation() == ImGuizmo::TRANSLATE;
+					if (ImGui::IconCheckboxButton(
+						ImGui::IMGUI_FORMAT_ID(font::ICON_GIZMO_TRANSLATE, BUTTON_ID, "TRANSLATE").c_str(),
+						&isTranslate, "Enables position manipulation of the selected object using translation gizmos.",
+						m_Window.GetHeaderSize(),
+						isTranslate ? ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent) : ImGui::GetStyleColorVec4(ImGuiCol_Text)))
+					{
+						core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetLastSceneOperation((int) ImGuizmo::TRANSLATE);
+						core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
+					}
 
-				//		bool isTranslate = core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetLastSceneOperation() == ImGuizmo::TRANSLATE;
-				//		if (ImGui::IconCheckboxButton(
-				//			ImGui::IMGUI_FORMAT_ID(font::ICON_TRANSLATE, BUTTON_ID, "TRANSLATE").c_str(),
-				//			&isTranslate, "Enables position manipulation of the selected object using translation gizmos.",
-				//			m_Window.GetHeaderSize(),
-				//			isTranslate ? ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent) : ImGui::GetStyleColorVec4(ImGuiCol_Text)))
-				//		{
-				//			core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetLastSceneOperation((int) ImGuizmo::TRANSLATE);
-				//			core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
-				//		}
+					bool isRotate = core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetLastSceneOperation() == ImGuizmo::ROTATE;
+					if (ImGui::IconCheckboxButton(
+						ImGui::IMGUI_FORMAT_ID(font::ICON_GIZMO_ROTATE, BUTTON_ID, "ROTATE").c_str(),
+						&isRotate, "Enables rotation manipulation of the selected object using rotation gizmos.",
+						m_Window.GetHeaderSize(),
+						isRotate ? ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent) : ImGui::GetStyleColorVec4(ImGuiCol_Text)))
+					{
+						core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetLastSceneOperation((int) ImGuizmo::ROTATE);
+						core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
+					}
 
-				//		bool isRotate = core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetLastSceneOperation() == ImGuizmo::ROTATE;
-				//		if (ImGui::IconCheckboxButton(
-				//			ImGui::IMGUI_FORMAT_ID(font::ICON_ROTATE, BUTTON_ID, "ROTATE").c_str(),
-				//			&isRotate, "Enables rotation manipulation of the selected object using rotation gizmos.",
-				//			m_Window.GetHeaderSize(),
-				//			isRotate ? ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent) : ImGui::GetStyleColorVec4(ImGuiCol_Text)))
-				//		{
-				//			core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetLastSceneOperation((int) ImGuizmo::ROTATE);
-				//			core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
-				//		}
+					bool isScale = core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetLastSceneOperation() == ImGuizmo::SCALE;
+					if (ImGui::IconCheckboxButton(
+						ImGui::IMGUI_FORMAT_ID(font::ICON_GIZMO_SCALE, BUTTON_ID, "SCALE").c_str(),
+						&isScale, "Enables scale manipulation of the selected object using scaling gizmos.",
+						m_Window.GetHeaderSize(),
+						isScale ? ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent) : ImGui::GetStyleColorVec4(ImGuiCol_Text)))
+					{
+						core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetLastSceneOperation((int) ImGuizmo::SCALE);
+						core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
+					}
 
-				//		bool isScale = core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetLastSceneOperation() == ImGuizmo::SCALE;
-				//		if (ImGui::IconCheckboxButton(
-				//			ImGui::IMGUI_FORMAT_ID(font::ICON_SCALE, BUTTON_ID, "SCALE").c_str(),
-				//			&isScale, "Enables scale manipulation of the selected object using scaling gizmos.",
-				//			m_Window.GetHeaderSize(),
-				//			isScale ? ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent) : ImGui::GetStyleColorVec4(ImGuiCol_Text)))
-				//		{
-				//			core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetLastSceneOperation((int) ImGuizmo::SCALE);
-				//			core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
-				//		}
+					bool isAll = core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetLastSceneOperation() == ImGuizmo::UNIVERSAL;
+					if (ImGui::IconCheckboxButton(
+						ImGui::IMGUI_FORMAT_ID(font::ICON_GIZMO_ALL, BUTTON_ID, "ALL").c_str(),
+						&isAll, "Enables all manipulations of the selected object.",
+						m_Window.GetHeaderSize(),
+						isAll ? ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent) : ImGui::GetStyleColorVec4(ImGuiCol_Text)))
+					{
+						core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetLastSceneOperation((int) ImGuizmo::UNIVERSAL);
+						core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
+					}
 
-				//		ImGui::PopStyleVar();
-				//		ImGui::PopStyleVar();
-				//	}
-				//	ImGui::EndChild();
-
-				//	ImGui::PopStyleVar();
-				//	ImGui::PopStyleVar();
-				//	ImGui::PopStyleVar();
-
-				//	// --- DRAGGING ON BORDER ONLY ---
-				//	// Border thickness from style
-				//	float borderThickness = ImGui::GetStyle().FrameBorderSize + 3.0f;
-
-				//	// Expand the whole toolbar rect
-				//	ImVec2 winPos = ImGui::GetWindowPos();
-				//	ImVec2 winSize = ImGui::GetWindowSize();
-
-				//	ImRect borderRect(
-				//		winPos,
-				//		ImVec2(winPos.x + winSize.x, winPos.y + winSize.y)
-				//	);
-
-				//	// Shrink inside rect (where child lives)
-				//	ImRect innerRect(
-				//		winPos.x + borderThickness,
-				//		winPos.y + borderThickness,
-				//		winPos.x + winSize.x - borderThickness,
-				//		winPos.y + winSize.y - borderThickness
-				//	);
-
-				//	// Border = full area - inner area
-				//	if (ImGui::IsMouseHoveringRect(borderRect.Min, borderRect.Max) &&
-				//		!ImGui::IsMouseHoveringRect(innerRect.Min, innerRect.Max))
-				//	{
-				//		if (ImGui::IsMouseDragging(ImGuiMouseButton_Left))
-				//		{
-				//			ImVec2 newPos = winPos + ImGui::GetIO().MouseDelta;
-				//			ImGui::SetWindowPos(newPos);
-				//		}
-				//	}
-				//}
-
-				//ImGui::End();
-				//ImGui::PopStyleVar();
-				//ImGui::PopStyleColor();
+					ImGui::PopStyleVar();
+					ImGui::PopStyleVar();
+				}
+				ImGui::EndChild();
 			}
 
 			//---------------------------------------------------------------------

@@ -74,14 +74,19 @@ namespace gallus
 				float width = ImGui::GetContentRegionAvail().x;
 				if (ImGui::TextButton(ImGui::IMGUI_FORMAT_ID(font::ICON_FILE_MODEL + std::string(" Open Animation"), BUTTON_ID, "OPEN_ANIMATION_FILE_INSPECTOR").c_str(), "Opens the selected animation file in the Animation Window for editing.", ImVec2(width, 0)))
 				{
-					AnimationWindow& animationWindow = m_Window.GetWindowsConfig<EditorWindowsConfig>().GetAnimationWindow();
-
-					animationWindow.SetData(
-						a_FileEditorSelectable.GetFileResource()
-					);
-
-					animationWindow.Focus();
+					OpenFile(a_FileEditorSelectable);
 				}
+			}
+
+			void AnimationFileEditorSelectables::OpenFile(FileEditorSelectable& a_FileEditorSelectable)
+			{
+				AnimationWindow& animationWindow = m_Window.GetWindowsConfig<EditorWindowsConfig>().GetAnimationWindow();
+
+				animationWindow.SetData(
+					a_FileEditorSelectable.GetFileResource()
+				);
+
+				animationWindow.Focus();
 			}
 
 			void PrefabFileEditorSelectables::Render(FileEditorSelectable& a_FileEditorSelectable)

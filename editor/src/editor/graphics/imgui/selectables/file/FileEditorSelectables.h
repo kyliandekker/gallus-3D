@@ -75,6 +75,8 @@ namespace gallus
 				{}
 
 				void Render(FileEditorSelectable& a_FileEditorSelectable) override;
+
+				void OpenFile(FileEditorSelectable& a_FileEditorSelectable) override;
 			};
 
 			class PrefabFileEditorSelectables : public FileEditorSelectables
