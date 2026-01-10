@@ -213,5 +213,11 @@ namespace gallus
 			}
 			m_aLastOpenedScenes.emplace_back(a_sName);
 		}
+
+		//---------------------------------------------------------------------
+		const std::vector<OpenedScene>& EditorSettings::GetLastOpenedScenes() const
+		{
+			return m_aLastOpenedScenes;
+		}
 	}
 }

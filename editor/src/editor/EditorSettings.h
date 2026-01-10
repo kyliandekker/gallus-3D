@@ -230,6 +230,8 @@ namespace gallus
 			bool GetFPSPrecision() const;
 
 			void AddSceneToRecentScenes(const std::string& a_sName);
+
+			const std::vector<OpenedScene>& GetLastOpenedScenes() const;
 		private:
 			bool m_bScrollToBottom = false; /// Auto-scroll setting for the console.
 			bool m_bShowInfo = true; /// Check for info log messages.

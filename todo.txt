@@ -15,9 +15,11 @@ List/grid mode needs to be saved in editor settings ✓
 Replace toolbars everywhere ✓
 Expose vars the same way as IEditorExposable in EditorSettings, with category ✓
 Editor keybind context ✓
+Drag resources onto resource picker ✓
 
 Sprite modal is awful
 Turn DX12System into a coordinator class and split up the parts
 Stuff in DX12System should probably be unique_ptrs
 Buffer needs a rewrite
 Camera isolation mode needs to be saved in editor settings
+Loading a scene now loads by path, it should load by name like the rest

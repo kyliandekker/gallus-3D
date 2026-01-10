@@ -66,6 +66,18 @@ namespace gallus
 							}
 						}
 					}
+					if (ImGui::BeginMenu(ImGui::IMGUI_FORMAT_ID(font::ICON_FILE_SCENE + std::string(" Open Recent Scene"), MENU_ID, "OPEN_RECENT_SCENE_EDITOR").c_str()))
+					{
+						for (const editor::OpenedScene& scene : core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetLastOpenedScenes())
+						{
+							fs::path path = scene.name;
+							if (ImGui::MenuItem(ImGui::IMGUI_FORMAT_ID(font::ICON_FILE_SCENE + std::string(" ") + path.filename().generic_string(), MENU_ITEM_ID, scene.name + "_EDITOR").c_str(), "CTRL+S"))
+							{
+								editor::g_SetScene(scene.name, editor::EditorMethod::EDITOR_METHOD_SCENE);
+							}
+						}
+						ImGui::EndMenu();
+					}
 					ImGui::Separator();
 					bool wasDirty = core::EDITOR_ENGINE->GetEditor().GetScene().IsDirty() && !gameplay::GAME.IsStarted();
 					if (!wasDirty)

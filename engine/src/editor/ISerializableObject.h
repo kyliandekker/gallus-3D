@@ -70,12 +70,12 @@ namespace gallus
 		size_t relatedIndexFieldOffset = 0;
 		size_t indent = 0;
 
-		std::function<size_t(void*)> getSize = nullptr;
-		std::function<ISerializableObject* (void*, size_t)> getElement = nullptr;
-		std::function<size_t(void*)> addElement = nullptr;
-		std::function<void(void*, size_t)> removeElement = nullptr;
-		std::function<void(void*, size_t)> reserve = nullptr;
-		std::function<void(void*)> clear = nullptr;
+		std::function<size_t(void* arrayPtr)> getSize = nullptr;
+		std::function<ISerializableObject* (void* arrayPtr, size_t index)> getElement = nullptr;
+		std::function<size_t(void* arrayPtr)> addElement = nullptr;
+		std::function<void(void* arrayPtr, size_t index)> removeElement = nullptr;
+		std::function<void(void* arrayPtr, size_t amount)> reserve = nullptr;
+		std::function<void(void* arrayPtr)> clear = nullptr;
 		FieldSerializationType arrayType;
 	};
 
