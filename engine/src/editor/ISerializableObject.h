@@ -5,6 +5,7 @@
 #include <functional>
 #include <cstddef>
 #include <type_traits>
+#include <memory>
 
 #include "resources/AssetType.h"
 
@@ -12,6 +13,7 @@ namespace gallus
 {
 	namespace resources
 	{
+		class EngineResource;
 		class SrcData;
 	}
 
@@ -235,6 +237,7 @@ namespace gallus
 
 		return opts;
 	}
+	void DeserializeResource(std::weak_ptr<gallus::resources::EngineResource>* a_pWeak, resources::AssetType a_FieldAssetType, resources::AssetType a_AssetType, const std::string& a_sFileName);
 
 	void DeserializeFields(ISerializableObject* a_pObject, const resources::SrcData& a_SrcData);
 

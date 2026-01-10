@@ -37,6 +37,11 @@ namespace gallus
 			{
 				return (m_iFlags & static_cast<T>(a_eFlag)) != 0;
 			}
+			
+			bool HasFlagOnly(Enum a_eFlag) const
+			{
+				return m_iFlags == static_cast<T>(a_eFlag);
+			}
 
 			void Clear()
 			{

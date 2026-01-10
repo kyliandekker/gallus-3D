@@ -374,18 +374,6 @@ namespace gallus
 					m_bNeedsRefresh = false;
 				}
 
-				bool isDelete = ImGui::IsKeyPressed(ImGuiKey_Delete);
-				if (isDelete)
-				{
-					if (graphics::imgui::FileEditorSelectable* file = dynamic_cast<graphics::imgui::FileEditorSelectable*>(core::EDITOR_ENGINE->GetEditor().GetSelectable().get()))
-					{
-						if (file)
-						{
-							file->OnDelete();
-						}
-					}
-				}
-
 				DrawToolbar();
 
 				ImGui::SetCursorPos({

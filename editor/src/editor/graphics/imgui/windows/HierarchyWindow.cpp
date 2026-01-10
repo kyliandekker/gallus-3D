@@ -24,6 +24,7 @@
 // editor
 #include "editor/core/EditorEngine.h"
 #include "editor/EditorGlobalFunctions.h"
+#include "editor/EditorInputScope.h"
 
 #include "resources/FileResource.h"
 
@@ -58,6 +59,8 @@ namespace gallus
 				core::EDITOR_ENGINE->GetEditor().IsAnyDirty().OnChanged() += std::bind(&HierarchyWindow::OnSceneDirty, this, std::placeholders::_1, std::placeholders::_2);
 
 				PopulateToolbar();
+
+				RegisterKeybinds();
 
 				return BaseWindow::Initialize();
 			}
@@ -122,6 +125,19 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
+			void HierarchyWindow::RegisterKeybinds()
+			{
+				editor::SetKeybindInputScope(editor::Keybind::Keybind_S,
+					static_cast<uint32_t>(editor::EditorInputScope::EditorInputScope_Ctrl));
+
+				editor::SetKeybindInputScope(editor::Keybind::Keybind_Ctrl,
+					static_cast<uint32_t>(editor::EditorInputScope::EditorInputScope_Operations));
+
+				editor::SetKeybindInputScope(editor::Keybind::Keybind_Shift,
+					static_cast<uint32_t>(editor::EditorInputScope::EditorInputScope_Operations));
+			}
+
+			//---------------------------------------------------------------------
 			void HierarchyWindow::DrawToolbar()
 			{
 				// Start toolbar.
@@ -147,9 +163,37 @@ namespace gallus
 			//---------------------------------------------------------------------
 			void HierarchyWindow::Render()
 			{
+				editor::ActivateInputScope(editor::EditorInputScope::EditorInputScope_Operations);
+
 				if (!core::EDITOR_ENGINE)
 				{
 					return;
+				}
+
+				if (editor::CanActivate(editor::Keybind::Keybind_Ctrl, editor::EditorInputScope::EditorInputScope_Operations, false))
+				{
+					editor::ActivateInputScope(editor::EditorInputScope::EditorInputScope_Ctrl);
+				}
+				else
+				{
+					editor::DeactivateInputScope(editor::EditorInputScope::EditorInputScope_Ctrl);
+				}
+
+				if (editor::CanActivate(editor::Keybind::Keybind_Shift, editor::EditorInputScope::EditorInputScope_Operations, false))
+				{
+					editor::ActivateInputScope(editor::EditorInputScope::EditorInputScope_Shift);
+				}
+				else
+				{
+					editor::DeactivateInputScope(editor::EditorInputScope::EditorInputScope_Shift);
+				}
+
+				if (editor::CanActivate(editor::Keybind::Keybind_S, editor::EditorInputScope::EditorInputScope_Ctrl, false))
+				{
+					if ((core::EDITOR_ENGINE->GetEditor().GetScene().IsDirty() && !gameplay::GAME.IsStarted()))
+					{
+						editor::g_SaveScene();
+					}
 				}
 
 				std::lock_guard<std::recursive_mutex> lock(core::EDITOR_ENGINE->GetECS().m_EntityMutex);

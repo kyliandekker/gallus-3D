@@ -14,10 +14,10 @@ Scene window rewrite ✓
 List/grid mode needs to be saved in editor settings ✓
 Replace toolbars everywhere ✓
 Expose vars the same way as IEditorExposable in EditorSettings, with category ✓
+Editor keybind context ✓
 
 Sprite modal is awful
 Turn DX12System into a coordinator class and split up the parts
 Stuff in DX12System should probably be unique_ptrs
 Buffer needs a rewrite
-Editor keybind context
 Camera isolation mode needs to be saved in editor settings

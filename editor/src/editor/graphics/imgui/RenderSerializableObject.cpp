@@ -208,6 +208,19 @@ namespace gallus
 				ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x - buttonSize.x);
 				ImGui::InputText(a_sId.c_str(), buf, sizeof(buf), ImGuiInputTextFlags_ReadOnly);
 				ImGui::PopItemFlag();
+				if (ImGui::BeginDragDropTarget())
+				{
+					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("EXPLORER_ITEM"))
+					{
+						IM_ASSERT(payload->DataSize == sizeof(resources::FileResource*));
+						resources::FileResource* dropped = *(resources::FileResource**) payload->Data;
+						if (dropped)
+						{
+							DeserializeResource(a_pWeak, a_Field.m_Options.assetType, dropped->GetAssetType(), dropped->GetPath().filename().generic_string());
+						}
+					}
+					ImGui::EndDragDropTarget();
+				}
 
 				ImGui::SameLine();
 
@@ -226,62 +239,7 @@ namespace gallus
 						{
 							if (success == 1)
 							{
-								switch (a_Field.m_Options.assetType)
-								{
-								case resources::AssetType::Sprite:
-								{
-									auto cCommandQueue =
-										core::EDITOR_ENGINE->GetDX12()
-										.GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
-
-									*a_pWeak = core::EDITOR_ENGINE->GetResourceAtlas()
-										.LoadTexture(resourceName, cCommandQueue);
-
-									break;
-								}
-								case resources::AssetType::Mesh:
-								{
-									auto cCommandQueue =
-										core::EDITOR_ENGINE->GetDX12()
-										.GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
-
-									*a_pWeak = core::EDITOR_ENGINE->GetResourceAtlas()
-										.LoadMesh(resourceName, cCommandQueue);
-
-									break;
-								}
-								case resources::AssetType::Material:
-								{
-									*a_pWeak = core::EDITOR_ENGINE->GetResourceAtlas()
-										.LoadMaterial(resourceName);
-
-									break;
-								}
-								case resources::AssetType::PixelShader:
-								{
-									*a_pWeak = core::EDITOR_ENGINE->GetResourceAtlas()
-										.LoadPixelShader(resourceName);
-									break;
-								}
-								case resources::AssetType::VertexShader:
-								{
-									*a_pWeak = core::EDITOR_ENGINE->GetResourceAtlas()
-										.LoadVertexShader(resourceName);
-									break;
-								}
-								case resources::AssetType::Prefab:
-								{
-									*a_pWeak = core::EDITOR_ENGINE->GetResourceAtlas()
-										.LoadPrefab(resourceName);
-									break;
-								}
-								case resources::AssetType::Animation:
-								{
-									*a_pWeak = core::EDITOR_ENGINE->GetResourceAtlas()
-										.LoadAnimation(resourceName);
-									break;
-								}
-								}
+								DeserializeResource(a_pWeak, a_Field.m_Options.assetType, a_Field.m_Options.assetType, resourceName);
 							}
 						},
 						a_Field.m_Options.assetType);
@@ -746,22 +704,6 @@ namespace gallus
 				float projFloat[16];
 				DirectX::XMStoreFloat4x4(reinterpret_cast<DirectX::XMFLOAT4X4*>(projFloat), projMat);
 
-				if (ImGui::IsKeyPressed(ImGuiKey_T) || ImGui::IsKeyPressed(ImGuiKey_P))
-				{
-					core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetLastSceneOperation((int)ImGuizmo::TRANSLATE);
-					core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
-				}
-				if (ImGui::IsKeyPressed(ImGuiKey_R))
-				{
-					core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetLastSceneOperation((int)ImGuizmo::ROTATE);
-					core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
-				}
-				if (ImGui::IsKeyPressed(ImGuiKey_S))
-				{
-					core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetLastSceneOperation((int)ImGuizmo::SCALE);
-					core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
-				}
-
 				bool useSnap = ImGui::IsKeyDown(ImGuiKey_LeftShift);
 				float snap = useSnap ? 1.0f : 0.0f;
 
@@ -847,8 +789,6 @@ namespace gallus
 						}
 						case EditorGizmoType::EditorGizmoType_Direction:
 						{
-							graphics::dx12::Transform* transform = reinterpret_cast<graphics::dx12::Transform*>(ptr);
-
 							break;
 						}
 					}

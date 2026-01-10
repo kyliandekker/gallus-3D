@@ -60,6 +60,9 @@ namespace gallus
 				virtual void PopulateToolbar();
 				void DrawToolbar();
 
+				// Keybinds.
+				void RegisterKeybinds();
+
 				// Viewport.
 				void HandleViewportControls();
 
@@ -85,6 +88,9 @@ namespace gallus
 				ImVec2 m_vPanOffset = ImVec2(0.0f, 0.0f);
 
 				Toolbar m_TopToolbar;
+
+				bool m_bViewportChanged = false;
+				float m_fMoveSpeed = 20.0f;
 			};
 
 			class FullSceneWindow : public SceneWindow

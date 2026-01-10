@@ -79,6 +79,8 @@ namespace gallus
 				void PopulateToolbar();
 				void DrawToolbar();
 
+				void RegisterKeybinds();
+
 				void DragAction(const gameplay::EntityID& a_EntityID, resources::AssetType a_AssetType, const std::string& a_sFileName);
 
 				/// <summary>

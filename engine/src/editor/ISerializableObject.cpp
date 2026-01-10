@@ -1,12 +1,25 @@
 #include "./ISerializableObject.h"
 
-#include "graphics/dx12/Transform.h"
-
+// core
 #include "core/Engine.h"
 
 // resources
 #include "resources/SrcData.h"
 #include "resources/EngineResource.h"
+
+// graphics
+#include "graphics/dx12/Transform.h"
+#include "graphics/dx12/Material.h"
+#include "graphics/dx12/Texture.h"
+#include "graphics/dx12/Mesh.h"
+#include "graphics/dx12/Shader.h"
+
+// animation
+#include "animation/Animation.h"
+
+// gameplay
+#include "gameplay/Scene.h"
+#include "gameplay/Prefab.h"
 
 // utils
 #include "utils/string_extensions.h"
@@ -28,6 +41,71 @@ namespace gallus
 			propertyName.end()
 		);
 		return propertyName;
+	}
+
+	void DeserializeResource(std::weak_ptr<gallus::resources::EngineResource>* a_pWeak, resources::AssetType a_FieldAssetType, resources::AssetType a_AssetType, const std::string& a_sFileName)
+	{
+		if (a_FieldAssetType != a_AssetType)
+		{
+			return;
+		}
+
+		switch (a_AssetType)
+		{
+			case resources::AssetType::Sprite:
+			{
+				auto cCommandQueue =
+					core::ENGINE->GetDX12()
+					.GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
+
+				*a_pWeak = core::ENGINE->GetResourceAtlas()
+					.LoadTexture(a_sFileName, cCommandQueue);
+
+				break;
+			}
+			case resources::AssetType::Mesh:
+			{
+				auto cCommandQueue =
+					core::ENGINE->GetDX12()
+					.GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
+
+				*a_pWeak = core::ENGINE->GetResourceAtlas()
+					.LoadMesh(a_sFileName, cCommandQueue);
+
+				break;
+			}
+			case resources::AssetType::Material:
+			{
+				*a_pWeak = core::ENGINE->GetResourceAtlas()
+					.LoadMaterial(a_sFileName);
+
+				break;
+			}
+			case resources::AssetType::PixelShader:
+			{
+				*a_pWeak = core::ENGINE->GetResourceAtlas()
+					.LoadPixelShader(a_sFileName);
+				break;
+			}
+			case resources::AssetType::VertexShader:
+			{
+				*a_pWeak = core::ENGINE->GetResourceAtlas()
+					.LoadVertexShader(a_sFileName);
+				break;
+			}
+			case resources::AssetType::Prefab:
+			{
+				*a_pWeak = core::ENGINE->GetResourceAtlas()
+					.LoadPrefab(a_sFileName);
+				break;
+			}
+			case resources::AssetType::Animation:
+			{
+				*a_pWeak = core::ENGINE->GetResourceAtlas()
+					.LoadAnimation(a_sFileName);
+				break;
+			}
+		}
 	}
 
 	void DeserializeFields(ISerializableObject* a_pObject, const resources::SrcData& a_SrcData)
@@ -164,101 +242,8 @@ namespace gallus
 						continue;
 					}
 
-					resources::AssetType assetType = field.m_Options.assetType;
-					switch (assetType)
-					{
-						case resources::AssetType::Sprite:
-						{
-							std::weak_ptr<graphics::dx12::Texture>* pReal =
-								reinterpret_cast<std::weak_ptr<graphics::dx12::Texture>*>(ptr);
-
-							auto cCommandQueue =
-								core::ENGINE->GetDX12()
-								.GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
-
-							(*pReal) = core::ENGINE->GetResourceAtlas()
-								.LoadTexture(assetName, cCommandQueue);
-							break;
-						}
-						case resources::AssetType::Sound:
-						{
-							break;
-						}
-						case resources::AssetType::Song:
-						{
-							break;
-						}
-						case resources::AssetType::VO:
-						{
-							break;
-						}
-						case resources::AssetType::Animation:
-						{
-							std::weak_ptr<animation::Animation>* pReal =
-								reinterpret_cast<std::weak_ptr<animation::Animation>*>(ptr);
-
-							(*pReal) = core::ENGINE->GetResourceAtlas()
-								.LoadAnimation(assetName);
-							break;
-						}
-						case resources::AssetType::PixelShader:
-						{
-							std::weak_ptr<graphics::dx12::PixelShader>* pReal =
-								reinterpret_cast<std::weak_ptr<graphics::dx12::PixelShader>*>(ptr);
-
-							(*pReal) = core::ENGINE->GetResourceAtlas()
-								.LoadPixelShader(assetName);
-							break;
-						}
-						case resources::AssetType::VertexShader:
-						{
-							std::weak_ptr<graphics::dx12::VertexShader>* pReal =
-								reinterpret_cast<std::weak_ptr<graphics::dx12::VertexShader>*>(ptr);
-
-							(*pReal) = core::ENGINE->GetResourceAtlas()
-								.LoadVertexShader(assetName);
-							break;
-						}
-						case resources::AssetType::Prefab:
-						{
-							std::weak_ptr<gameplay::Prefab>* pReal =
-								reinterpret_cast<std::weak_ptr<gameplay::Prefab>*>(ptr);
-
-							(*pReal) = core::ENGINE->GetResourceAtlas()
-								.LoadPrefab(assetName);
-							break;
-						}
-						case resources::AssetType::Mesh:
-						{
-							std::weak_ptr<graphics::dx12::Mesh>* pReal =
-								reinterpret_cast<std::weak_ptr<graphics::dx12::Mesh>*>(ptr);
-
-							auto cCommandQueue =
-								core::ENGINE->GetDX12()
-								.GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
-
-							(*pReal) = core::ENGINE->GetResourceAtlas()
-								.LoadMesh(assetName, cCommandQueue);
-							break;
-						}
-						case resources::AssetType::Material:
-						{
-							std::weak_ptr<graphics::dx12::Material>* pReal =
-								reinterpret_cast<std::weak_ptr<graphics::dx12::Material>*>(ptr);
-
-							(*pReal) = core::ENGINE->GetResourceAtlas()
-								.LoadMaterial(assetName);
-							break;
-						}
-						case resources::AssetType::ShaderBind:
-						case resources::AssetType::Scene:
-						case resources::AssetType::None:
-						case resources::AssetType::Folder:
-						default:
-						{
-							break;
-						}
-					}
+					std::weak_ptr<gallus::resources::EngineResource>* weakPtr = reinterpret_cast<std::weak_ptr<gallus::resources::EngineResource>*>(ptr);
+					DeserializeResource(weakPtr, field.m_Options.assetType, field.m_Options.assetType, assetName);
 					break;
 				}
 				case FieldSerializationType::FieldSerializationType_Object:

@@ -327,6 +327,13 @@ namespace gallus
 					{
 						ImGui::GetWindowDrawList()->AddRectFilled(initialScreenPos, initialScreenPos + m_vSize, ImGui::ColorConvertFloat4ToU32(ImGui::GetStyleColorVec4(ImGuiCol_HeaderActive)));
 					}
+					if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
+					{
+						resources::FileResource* pFile = &m_FileResource;
+						ImGui::SetDragDropPayload("EXPLORER_ITEM", &pFile, sizeof(FileResource*));
+						ImGui::Text(m_sDisplayName.c_str());
+						ImGui::EndDragDropSource();
+					}
 
 					ImGui::PushFont(m_Window.GetBigIconFont());
 

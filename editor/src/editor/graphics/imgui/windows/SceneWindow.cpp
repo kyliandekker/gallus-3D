@@ -22,6 +22,7 @@
 // editor
 #include "editor/core/EditorEngine.h"
 #include "editor/graphics/imgui/selectables/EntityEditorSelectable.h"
+#include "editor/EditorInputScope.h"
 
 namespace gallus
 {
@@ -40,6 +41,8 @@ namespace gallus
 			{
 				PopulateBaseToolbar();
 				PopulateToolbar();
+
+				RegisterKeybinds();
 
 				ImGuizmo::Enable(true);
 
@@ -94,6 +97,8 @@ namespace gallus
 				if (ImGui::BeginChild("SceneScroll", windowSize, 0,
 					ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse))
 				{
+					ImVec2 viewportPos = ImGui::GetCursorScreenPos();
+
 					// Handle zooming, panning, etc.
 					HandleViewportControls();
 
@@ -108,6 +113,8 @@ namespace gallus
 						// Handle specific controls like camera.
 						HandleSceneViewControls(core::EDITOR_ENGINE->GetDX12().GetFPS().GetDeltaTime(), sceneViewRect);
 					}
+
+					ImGui::SetCursorScreenPos(viewportPos);
 				}
 				ImGui::EndChild();
 
@@ -270,6 +277,36 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
+			void SceneWindow::RegisterKeybinds()
+			{
+				editor::SetKeybindInputScope(editor::Keybind::Keybind_Zoom,
+					static_cast<uint32_t>(editor::EditorInputScope::EditorInputScope_SceneHover) |
+					static_cast<uint32_t>(editor::EditorInputScope::EditorInputScope_Viewport) | static_cast<uint32_t>(editor::EditorInputScope::EditorInputScope_SceneHoverRightClick));
+
+				editor::SetKeybindInputScope(editor::Keybind::Keybind_W,
+					static_cast<uint32_t>(editor::EditorInputScope::EditorInputScope_SceneHoverRightClick));
+				editor::SetKeybindInputScope(editor::Keybind::Keybind_A,
+					static_cast<uint32_t>(editor::EditorInputScope::EditorInputScope_SceneHoverRightClick));
+				editor::SetKeybindInputScope(editor::Keybind::Keybind_S,
+					static_cast<uint32_t>(editor::EditorInputScope::EditorInputScope_SceneHoverRightClick) | static_cast<uint32_t>(editor::EditorInputScope::EditorInputScope_SceneHover) | static_cast<uint32_t>(editor::EditorInputScope::EditorInputScope_Viewport));
+				editor::SetKeybindInputScope(editor::Keybind::Keybind_D,
+					static_cast<uint32_t>(editor::EditorInputScope::EditorInputScope_SceneHoverRightClick));
+				editor::SetKeybindInputScope(editor::Keybind::Keybind_Q,
+					static_cast<uint32_t>(editor::EditorInputScope::EditorInputScope_SceneHoverRightClick));
+				editor::SetKeybindInputScope(editor::Keybind::Keybind_E,
+					static_cast<uint32_t>(editor::EditorInputScope::EditorInputScope_SceneHoverRightClick));
+				editor::SetKeybindInputScope(editor::Keybind::Keybind_Shift,
+					static_cast<uint32_t>(editor::EditorInputScope::EditorInputScope_SceneHoverRightClick));
+
+				editor::SetKeybindInputScope(editor::Keybind::Keybind_T,
+					static_cast<uint32_t>(editor::EditorInputScope::EditorInputScope_SceneHover) | static_cast<uint32_t>(editor::EditorInputScope::EditorInputScope_Viewport));
+				editor::SetKeybindInputScope(editor::Keybind::Keybind_P,
+					static_cast<uint32_t>(editor::EditorInputScope::EditorInputScope_SceneHover) | static_cast<uint32_t>(editor::EditorInputScope::EditorInputScope_Viewport));
+				editor::SetKeybindInputScope(editor::Keybind::Keybind_R,
+					static_cast<uint32_t>(editor::EditorInputScope::EditorInputScope_SceneHover) | static_cast<uint32_t>(editor::EditorInputScope::EditorInputScope_Viewport));
+			}
+
+			//---------------------------------------------------------------------
 			void SceneWindow::HandleViewportControls()
 			{
 				ImGuiIO& io = ImGui::GetIO();
@@ -280,13 +317,20 @@ namespace gallus
 				m_fZoom = editorSettings.GetSceneZoom();
 				m_vPanOffset = ImVec2(editorSettings.GetScenePanOffset().x, editorSettings.GetScenePanOffset().y);
 
+				if (!ImGui::IsWindowHovered())
+				{
+					editor::DeactivateInputScope(editor::EditorInputScope::EditorInputScope_Viewport);
+					return;
+				}
 				bool changed = false;
 
 				// Zoom with mouse wheel
 				if (ImGui::IsWindowHovered())
 				{
+					editor::ActivateInputScope(editor::EditorInputScope::EditorInputScope_Viewport);
+
 					float wheel = io.MouseWheel;
-					if (wheel != 0.0f)
+					if (editor::CanActivate(editor::Keybind::Keybind_Zoom, editor::EditorInputScope::EditorInputScope_Viewport))
 					{
 						ImVec2 beforeZoom = (mouseLocal - m_vPanOffset) / m_fZoom;
 						m_fZoom = std::clamp(m_fZoom * (wheel > 0 ? 1.1f : 0.9f), 0.05f, 4.0f);
@@ -300,14 +344,6 @@ namespace gallus
 						m_vPanOffset += io.MouseDelta;
 						changed = true;
 					}
-				}
-
-				// Reset keybind.
-				if (ImGui::IsKeyPressed(ImGuiKey_R) && ImGui::IsKeyDown(ImGuiKey_LeftCtrl))
-				{
-					m_fZoom = 1.0f;
-					m_vPanOffset = ImVec2(0, 0);
-					changed = true;
 				}
 
 				if (changed)
@@ -554,171 +590,179 @@ namespace gallus
 				ImGuiIO& io = ImGui::GetIO();
 				ImVec2 mouse = io.MousePos;
 
-				// Static state for camera movement
-				static bool s_bMoving = false;
-				static bool s_bRotating = false;
-				static bool s_bFirstRotateFrame = false;
-
-				// Determine if mouse is inside scene viewport and right button is held
+				// Check if mouse is inside the scene rect
 				bool bHovered = ImGui::IsWindowHovered() &&
 					mouse.x >= a_vSceneRect.Min.x && mouse.y >= a_vSceneRect.Min.y &&
 					mouse.x <= a_vSceneRect.Max.x && mouse.y <= a_vSceneRect.Max.y;
 
-				bool allowInteraction = bHovered && ImGui::IsMouseDown(ImGuiMouseButton_Right);
-
-				// Reset movement/rotation if not interacting
-				if (!allowInteraction)
+				bool mouseRightDown = ImGui::IsMouseDown(ImGuiMouseButton_Right);
+				if (bHovered && mouseRightDown)
 				{
-					s_bMoving = false;
-					s_bRotating = false;
-					s_bFirstRotateFrame = false;
+					editor::ActivateInputScope(editor::EditorInputScope::EditorInputScope_SceneHoverRightClick);
+				}
+				else
+				{
+					editor::DeactivateInputScope(editor::EditorInputScope::EditorInputScope_SceneHoverRightClick);
+				}
+
+				if (bHovered)
+				{
+					editor::ActivateInputScope(editor::EditorInputScope::EditorInputScope_SceneHover);
+				}
+				else
+				{
+					editor::DeactivateInputScope(editor::EditorInputScope::EditorInputScope_SceneHover);
+				}
+
+				if (!bHovered)
+				{
 					return;
 				}
+
+				graphics::dx12::Transform& transform = camera.GetTransform();
+				DirectX::XMFLOAT3 position = transform.GetPosition();
+
+				const float rotationSpeed = 0.1f;
+
+				// Increase speed.
+				if (editor::CanActivate(editor::Keybind::Keybind_Zoom, editor::EditorInputScope::EditorInputScope_SceneHoverRightClick, false))
+				{
+					m_fMoveSpeed *= (io.MouseWheel > 0 ? 1.1f : 0.9f);
+					m_fMoveSpeed = std::clamp(m_fMoveSpeed, 0.0f, 200.0f);
+				}
+
+				float totalMoveSpeed = m_fMoveSpeed;
+				// Extra speed when pressing shift.
+				if (editor::CanActivate(editor::Keybind::Keybind_Shift, editor::EditorInputScope::EditorInputScope_SceneHoverRightClick, false))
+				{
+					totalMoveSpeed += (m_fMoveSpeed / 2);
+				}
+				float moveDistance = totalMoveSpeed * static_cast<float>(a_fDeltaTime);
+				int camIsolationMode = dx12System.GetCameraIsolationMode();
 
 				static float s_fYawDegrees = 0.0f;
 				static float s_fPitchDegrees = 0.0f;
 				static POINT s_CenterPos = { 0, 0 };
+				static bool s_bFirstFrame = true;
 
-				// Camera references
-				graphics::dx12::Transform& transform = camera.GetTransform();
-				DirectX::XMFLOAT3 position = transform.GetPosition();
-
-				// Movement settings
-				const float moveSpeed = 20.0f;
-				const float rotationSpeed = 0.1f;
-				float moveDistance = moveSpeed * static_cast<float>(a_fDeltaTime);
-
-				int camIsolationMode = dx12System.GetCameraIsolationMode();
-
-					// Compute viewport center in screen space
-				ImVec2 viewportCenterLocal =
+				// Only handle movement and rotation if right mouse is held
+				if (mouseRightDown)
 				{
-					(a_vSceneRect.Min.x + a_vSceneRect.Max.x) * 0.5f,
-					(a_vSceneRect.Min.y + a_vSceneRect.Max.y) * 0.5f
-				};
+					// Initialize first frame
+					if (s_bFirstFrame)
+					{
+						s_bFirstFrame = false;
+						ImVec2 viewportCenterLocal = {
+							(a_vSceneRect.Min.x + a_vSceneRect.Max.x) * 0.5f,
+							(a_vSceneRect.Min.y + a_vSceneRect.Max.y) * 0.5f
+						};
+						ImGuiViewport* viewport = ImGui::GetWindowViewport();
+						ImVec2 windowPos = viewport->Pos;
+						float dpiScale = viewport->DpiScale;
+						s_CenterPos.x = static_cast<LONG>((windowPos.x + viewportCenterLocal.x) * dpiScale);
+						s_CenterPos.y = static_cast<LONG>((windowPos.y + viewportCenterLocal.y) * dpiScale);
+						ImGui::SetMouseCursor(ImGuiMouseCursor_None);
+						SetCursorPos(s_CenterPos.x, s_CenterPos.y);
+					}
 
-				ImGuiViewport* viewport = ImGui::GetWindowViewport();
-				ImVec2 windowPos = viewport->Pos;
-				float dpiScale = viewport->DpiScale;
-
-				s_CenterPos.x = static_cast<LONG>((windowPos.x + viewportCenterLocal.x) * dpiScale);
-				s_CenterPos.y = static_cast<LONG>((windowPos.y + viewportCenterLocal.y) * dpiScale);
-
-				// Initialize first frame of movement
-				if (!s_bMoving && !s_bRotating)
-				{
-					s_bMoving = true;
-					s_bRotating = true;
-					s_bFirstRotateFrame = true;
-					ImGui::SetMouseCursor(ImGuiMouseCursor_None);
-				}
-
-				// Lock cursor to center on first rotation frame
-				if (s_bFirstRotateFrame)
-				{
-					s_bFirstRotateFrame = false;
+					// Calculate mouse delta for rotation
+					POINT currentPos;
+					GetCursorPos(&currentPos);
+					float deltaX = static_cast<float>(currentPos.x - s_CenterPos.x);
+					float deltaY = static_cast<float>(currentPos.y - s_CenterPos.y);
 					SetCursorPos(s_CenterPos.x, s_CenterPos.y);
-				}
 
-				// Calculate mouse delta
-				POINT currentPos;
-				GetCursorPos(&currentPos);
-				float deltaX = static_cast<float>(currentPos.x - s_CenterPos.x);
-				float deltaY = static_cast<float>(currentPos.y - s_CenterPos.y);
-				SetCursorPos(s_CenterPos.x, s_CenterPos.y);
+					if (camIsolationMode != graphics::dx12::CameraIsolationMode_2D)
+					{
+						// Update yaw/pitch
+						s_fYawDegrees += deltaX * rotationSpeed;
+						s_fPitchDegrees += deltaY * rotationSpeed;
 
-				// 2D camera movement
-				if (camIsolationMode == graphics::dx12::CameraIsolationMode_2D)
-				{
-					position.x -= deltaX * moveSpeed * static_cast<float>(a_fDeltaTime);
-					position.y -= deltaY * moveSpeed * static_cast<float>(a_fDeltaTime);
-					transform.SetPosition(position);
+						if (s_fPitchDegrees > 89.0f) s_fPitchDegrees = 89.0f;
+						if (s_fPitchDegrees < -89.0f) s_fPitchDegrees = -89.0f;
+
+						// Compute rotation quaternion
+						DirectX::XMVECTOR yawQuat = DirectX::XMQuaternionRotationAxis(
+							DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f),
+							DirectX::XMConvertToRadians(s_fYawDegrees)
+						);
+						DirectX::XMVECTOR pitchQuat = DirectX::XMQuaternionRotationAxis(
+							DirectX::XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f),
+							DirectX::XMConvertToRadians(s_fPitchDegrees)
+						);
+						DirectX::XMVECTOR rotation = DirectX::XMQuaternionNormalize(
+							DirectX::XMQuaternionMultiply(pitchQuat, yawQuat)
+						);
+						transform.SetRotation(rotation);
+
+						// Extract directions for movement
+						DirectX::XMMATRIX rotMatrix = DirectX::XMMatrixRotationQuaternion(rotation);
+						DirectX::XMFLOAT4X4 m;
+						DirectX::XMStoreFloat4x4(&m, rotMatrix);
+						DirectX::XMFLOAT3 right(m.m[0][0], m.m[0][1], m.m[0][2]);
+						DirectX::XMFLOAT3 up(m.m[1][0], m.m[1][1], m.m[1][2]);
+						DirectX::XMFLOAT3 forward(m.m[2][0], m.m[2][1], m.m[2][2]);
+
+						// Keyboard movement (WASD + QE)
+						if (editor::CanActivate(editor::Keybind::Keybind_W, editor::EditorInputScope::EditorInputScope_SceneHoverRightClick, false))
+						{
+							position.x += forward.x * moveDistance;
+							position.y += forward.y * moveDistance;
+							position.z += forward.z * moveDistance;
+						}
+						if (editor::CanActivate(editor::Keybind::Keybind_S, editor::EditorInputScope::EditorInputScope_SceneHoverRightClick, false))
+						{
+							position.x -= forward.x * moveDistance;
+							position.y -= forward.y * moveDistance;
+							position.z -= forward.z * moveDistance;
+						}
+						if (editor::CanActivate(editor::Keybind::Keybind_A, editor::EditorInputScope::EditorInputScope_SceneHoverRightClick, false))
+						{
+							position.x -= right.x * moveDistance;
+							position.y -= right.y * moveDistance;
+							position.z -= right.z * moveDistance;
+						}
+						if (editor::CanActivate(editor::Keybind::Keybind_D, editor::EditorInputScope::EditorInputScope_SceneHoverRightClick, false))
+						{
+							position.x += right.x * moveDistance;
+							position.y += right.y * moveDistance;
+							position.z += right.z * moveDistance;
+						}
+						if (editor::CanActivate(editor::Keybind::Keybind_Q, editor::EditorInputScope::EditorInputScope_SceneHoverRightClick, false))
+						{
+							position.x -= up.x * moveDistance;
+							position.y -= up.y * moveDistance;
+							position.z -= up.z * moveDistance;
+						}
+						if (editor::CanActivate(editor::Keybind::Keybind_E, editor::EditorInputScope::EditorInputScope_SceneHoverRightClick, false))
+						{
+							position.x += up.x * moveDistance;
+							position.y += up.y * moveDistance;
+							position.z += up.z * moveDistance;
+						}
+					}
 				}
-				// 3D camera movement and rotation
 				else
 				{
-					// Update yaw/pitch
-					s_fYawDegrees += deltaX * rotationSpeed;
-					s_fPitchDegrees += deltaY * rotationSpeed;
+					// Reset first-frame flag when right button is released
+					s_bFirstFrame = true;
+				}
 
-					if (s_fPitchDegrees > 89.0f) s_fPitchDegrees = 89.0f;
-					if (s_fPitchDegrees < -89.0f) s_fPitchDegrees = -89.0f;
-
-					// Compute rotation quaternion
-					DirectX::XMVECTOR yawQuat = DirectX::XMQuaternionRotationAxis(
-						DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f),
-						DirectX::XMConvertToRadians(s_fYawDegrees)
-					);
-
-					DirectX::XMVECTOR pitchQuat = DirectX::XMQuaternionRotationAxis(
-						DirectX::XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f),
-						DirectX::XMConvertToRadians(s_fPitchDegrees)
-					);
-
-					DirectX::XMVECTOR rotation = DirectX::XMQuaternionNormalize(
-						DirectX::XMQuaternionMultiply(pitchQuat, yawQuat)
-					);
-
-					transform.SetRotation(rotation);
-
-					// Extract direction vectors
+				// Mouse wheel zoom always works
+				if (editor::CanActivate(editor::Keybind::Keybind_Zoom, editor::EditorInputScope::EditorInputScope_SceneHover))
+				{
+					DirectX::XMVECTOR rotation = transform.GetRotationQ();
 					DirectX::XMMATRIX rotMatrix = DirectX::XMMatrixRotationQuaternion(rotation);
 					DirectX::XMFLOAT4X4 m;
 					DirectX::XMStoreFloat4x4(&m, rotMatrix);
-
-					DirectX::XMFLOAT3 right(m.m[0][0], m.m[0][1], m.m[0][2]);
-					DirectX::XMFLOAT3 up(m.m[1][0], m.m[1][1], m.m[1][2]);
 					DirectX::XMFLOAT3 forward(m.m[2][0], m.m[2][1], m.m[2][2]);
 
-					// Keyboard movement
-					if (ImGui::IsKeyDown(ImGuiKey_W))
-					{
-						position.x += forward.x * moveDistance;
-						position.y += forward.y * moveDistance;
-						position.z += forward.z * moveDistance;
-					}
-					if (ImGui::IsKeyDown(ImGuiKey_S))
-					{
-						position.x -= forward.x * moveDistance;
-						position.y -= forward.y * moveDistance;
-						position.z -= forward.z * moveDistance;
-					}
-					if (ImGui::IsKeyDown(ImGuiKey_A))
-					{
-						position.x -= right.x * moveDistance;
-						position.y -= right.y * moveDistance;
-						position.z -= right.z * moveDistance;
-					}
-					if (ImGui::IsKeyDown(ImGuiKey_D))
-					{
-						position.x += right.x * moveDistance;
-						position.y += right.y * moveDistance;
-						position.z += right.z * moveDistance;
-					}
-					if (ImGui::IsKeyDown(ImGuiKey_Q))
-					{
-						position.x -= up.x * moveDistance;
-						position.y -= up.y * moveDistance;
-						position.z -= up.z * moveDistance;
-					}
-					if (ImGui::IsKeyDown(ImGuiKey_E))
-					{
-						position.x += up.x * moveDistance;
-						position.y += up.y * moveDistance;
-						position.z += up.z * moveDistance;
-					}
-
-					// Mouse wheel zoom
-					if (io.MouseWheel != 0.0f)
-					{
-						position.x += forward.x * io.MouseWheel * moveDistance * 2.0f;
-						position.y += forward.y * io.MouseWheel * moveDistance * 2.0f;
-						position.z += forward.z * io.MouseWheel * moveDistance * 2.0f;
-					}
-
-					// Apply final position
-					transform.SetPosition(position);
+					position.x += forward.x * io.MouseWheel * moveDistance * 2.0f;
+					position.y += forward.y * io.MouseWheel * moveDistance * 2.0f;
+					position.z += forward.z * io.MouseWheel * moveDistance * 2.0f;
 				}
+
+				transform.SetPosition(position);
 			}
 
 			//---------------------------------------------------------------------
@@ -784,6 +828,29 @@ namespace gallus
 					{
 						core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetLastSceneOperation((int) ImGuizmo::UNIVERSAL);
 						core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
+					}
+
+					editor::EditorInputScope inputScopesToCheck[2] = {
+						editor::EditorInputScope::EditorInputScope_Viewport,
+						editor::EditorInputScope::EditorInputScope_SceneHover,
+					};
+					for (editor::EditorInputScope inputScope : inputScopesToCheck)
+					{
+						if (editor::CanActivate(editor::Keybind::Keybind_T, inputScope)|| editor::CanActivate(editor::Keybind::Keybind_P, inputScope))
+						{
+							core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetLastSceneOperation((int) ImGuizmo::TRANSLATE);
+							core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
+						}
+						if (editor::CanActivate(editor::Keybind::Keybind_R, inputScope))
+						{
+							core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetLastSceneOperation((int) ImGuizmo::ROTATE);
+							core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
+						}
+						if (editor::CanActivate(editor::Keybind::Keybind_S, inputScope))
+						{
+							core::EDITOR_ENGINE->GetEditor().GetEditorSettings().SetLastSceneOperation((int) ImGuizmo::SCALE);
+							core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
+						}
 					}
 
 					ImGui::PopStyleVar();

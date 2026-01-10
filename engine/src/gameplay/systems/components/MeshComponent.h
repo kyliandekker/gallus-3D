@@ -92,7 +92,7 @@ namespace gallus
 			BEGIN_SERIALIZE_PARENT(MeshComponent, Component)
 			 	SERIALIZE_FIELD(m_pShaderBind, "Shader Bind", "",
 			 		.type = FieldSerializationType::FieldSerializationType_ObjectPtr)
-			 	SERIALIZE_FIELD(m_pMaterial, "Material", "",
+			 	SERIALIZE_FIELD(m_pMaterial, "Material", "Pointer to the material asset used by this Mesh. Can be nullptr if no material is assigned. Determines the visual appearance of the Mesh.",
 			 		.type = FieldSerializationType::FieldSerializationType_EngineResource,
 			 		.assetType = resources::AssetType::Material)
 			 	SERIALIZE_FIELD(m_pMaterial, "MaterialView", "",
@@ -100,7 +100,7 @@ namespace gallus
 			 		.assetType = resources::AssetType::Material,
 			 		.serialize = false,
 			 		.indent = 1)
-			 	SERIALIZE_FIELD(m_pMesh, "Mesh", "Pointer to the texture asset used by this Mesh. Can be nullptr if no texture is assigned. Determines the visual appearance of the Mesh.",
+			 	SERIALIZE_FIELD(m_pMesh, "Mesh", "Pointer to the texture asset used by this Mesh. Can be nullptr if no mesh is assigned. Determines the visual appearance of the Mesh.",
 			 		.type = FieldSerializationType::FieldSerializationType_EngineResource,
 			 		.assetType = resources::AssetType::Mesh)
 			 	SERIALIZE_FIELD(m_pTexture, "Texture", "Pointer to the mesh asset used by this Mesh. Can be nullptr if no texture is assigned. Determines the visual appearance of the Mesh.",
