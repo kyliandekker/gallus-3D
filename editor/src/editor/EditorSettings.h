@@ -8,6 +8,22 @@ namespace gallus
 {
 	namespace editor
 	{
+		class OpenedScene : public ISerializableObject
+		{
+		public:
+			OpenedScene() : ISerializableObject()
+			{}
+			OpenedScene(const std::string& a_sName) : ISerializableObject(),
+				name(a_sName)
+			{}
+
+			std::string name;
+
+			BEGIN_SERIALIZE(OpenedScene)
+				SERIALIZE_FIELD(name, "name", "", .type = gallus::FieldSerializationType::FieldSerializationType_String)
+			END_SERIALIZE(OpenedScene)
+		};
+
 		//---------------------------------------------------------------------
 		// EditorSettings
 		//---------------------------------------------------------------------
@@ -212,6 +228,8 @@ namespace gallus
 			/// </summary>
 			/// <returns>True if FPS numbers are rounded up, false otherwise.</param>
 			bool GetFPSPrecision() const;
+
+			void AddSceneToRecentScenes(const std::string& a_sName);
 		private:
 			bool m_bScrollToBottom = false; /// Auto-scroll setting for the console.
 			bool m_bShowInfo = true; /// Check for info log messages.
@@ -232,6 +250,8 @@ namespace gallus
 			int m_iExplorerViewMode = 0;
 
 			bool m_bFPSPrecision = false;
+
+			std::vector<OpenedScene> m_aLastOpenedScenes;
 
 			BEGIN_SERIALIZE_PARENT(EditorSettings, Settings)
 				SERIALIZE_FIELD(m_bScrollToBottom, "Scroll To Bottom", "",
@@ -269,6 +289,8 @@ namespace gallus
 
 				SERIALIZE_FIELD(m_bFPSPrecision, "Fps Precision", "",
 					.type = FieldSerializationType::FieldSerializationType_Bool)
+
+				SERIALIZE_FIELD_OPTIONS(m_aLastOpenedScenes, "Last Scenes Opened", "Saves the last opened scenes.", MakeArrayFieldSerializationOptions<OpenedScene>())
 			END_SERIALIZE(Settings)
 		};
 	}

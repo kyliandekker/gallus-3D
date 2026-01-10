@@ -200,5 +200,18 @@ namespace gallus
 		{
 			return m_bFPSPrecision;
 		}
+
+		//---------------------------------------------------------------------
+		void EditorSettings::AddSceneToRecentScenes(const std::string& a_sName)
+		{
+			for (const OpenedScene& name : m_aLastOpenedScenes)
+			{
+				if (a_sName == name.name)
+				{
+					return;
+				}
+			}
+			m_aLastOpenedScenes.emplace_back(a_sName);
+		}
 	}
 }

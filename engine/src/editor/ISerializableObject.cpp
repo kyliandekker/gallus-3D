@@ -303,6 +303,18 @@ namespace gallus
 
 					break;
 				}
+				case FieldSerializationType::FieldSerializationType_String:
+				{
+					std::string value = "";
+					if (!a_SrcData.GetString(propertyName, value))
+					{
+						continue;
+					}
+
+					std::string* pString = reinterpret_cast<std::string*>(ptr);
+					*pString = value;
+					break;
+				}
 			}
 		}
 	}
@@ -484,19 +496,26 @@ namespace gallus
 				{
 					void* pArray = const_cast<void*>(ptr); // SrcData needs non-const
 
-					std::vector<ISerializableObject>* pVec = reinterpret_cast<std::vector<ISerializableObject>*>(pArray);
 					resources::SrcData arraySrcData;
 					arraySrcData.SetArray();
 
-					for (size_t i = 0; i < pVec->size(); ++i)
+					size_t size = field.m_Options.getSize(pArray);
+
+					for (size_t i = 0; i < size; ++i)
 					{
 						resources::SrcData elementSrcData;
 						elementSrcData.SetObject();
-						SerializeFields(&(*pVec)[i], elementSrcData);
+						SerializeFields(field.m_Options.getElement(pArray, i), elementSrcData);
 						arraySrcData.PushArraySrcObject(elementSrcData);
 					}
 
 					a_SrcData.SetSrcObject(propertyName, arraySrcData);
+					break;
+				}
+				case FieldSerializationType::FieldSerializationType_String:
+				{
+					const std::string* value = reinterpret_cast<const std::string*>(ptr);
+					a_SrcData.SetString(propertyName, *value);
 					break;
 				}
 			}

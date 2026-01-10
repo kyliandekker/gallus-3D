@@ -44,6 +44,9 @@ namespace gallus
 
 			core::EDITOR_ENGINE->GetEditor().GetScene().LoadByPath(a_Path);
 			core::EDITOR_ENGINE->GetEditor().GetScene().LoadData();
+
+			core::EDITOR_ENGINE->GetEditor().GetEditorSettings().AddSceneToRecentScenes(a_Path.generic_string());
+			core::EDITOR_ENGINE->GetEditor().GetEditorSettings().Save();
 		}
 
 		gameplay::EntityID g_CreateEntity(const std::string& a_sName)

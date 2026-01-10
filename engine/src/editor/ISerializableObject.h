@@ -40,7 +40,8 @@ namespace gallus
 		FieldSerializationType_ObjectPtr,
 		FieldSerializationType_Array,
 		FieldSerializationType_TexturePreview,
-		FieldSerializationType_Button
+		FieldSerializationType_Button,
+		FieldSerializationType_String
 	};
 
 	enum class EditorGizmoType
@@ -75,6 +76,7 @@ namespace gallus
 		std::function<void(void*, size_t)> removeElement = nullptr;
 		std::function<void(void*, size_t)> reserve = nullptr;
 		std::function<void(void*)> clear = nullptr;
+		FieldSerializationType arrayType;
 	};
 
 	struct GizmoOptions
