@@ -629,6 +629,9 @@ namespace gallus
 				{
 					m_fMoveSpeed *= (io.MouseWheel > 0 ? 1.1f : 0.9f);
 					m_fMoveSpeed = std::clamp(m_fMoveSpeed, 0.0f, 200.0f);
+
+					ImVec2 initialPos = ImGui::GetCursorScreenPos();
+					ImGui::ShowStaticTooltip(initialPos, std::to_string(m_fMoveSpeed));
 				}
 
 				float totalMoveSpeed = m_fMoveSpeed;

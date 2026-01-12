@@ -82,6 +82,7 @@ namespace ImGui
 	bool IVectorEdit2(const std::string& label, int col[2]);
 
 	void ShowTooltip(const std::string& a_sText);
+	void ShowStaticTooltip(const ImVec2& a_vPos, const std::string& a_sText);
 }
 
 #endif

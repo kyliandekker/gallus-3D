@@ -218,22 +218,6 @@ namespace gallus
 		//---------------------------------------------------------------------
 		inline bool CanActivate(Keybind a_Keybind, EditorInputScope a_InputScope, bool a_bOnlyKeybind = true)
 		{
-			std::vector<EditorInputScope> inputScopes = GetAllActiveInputScopes();
-			if (!inputScopes.empty())
-			{
-				for (size_t i = inputScopes.size(); i-- > 0; )
-				{
-					EditorInputScope inputScope = inputScopes[i];
-					printf("%s", EditorInputScopeToString(inputScope).c_str());
-
-					if (i != 0)
-					{
-						printf(" > ");
-					}
-				}
-				printf("\n");
-			}
-
 			ImGuiIO& io = ImGui::GetIO();
 
 			// Find the keybind input scope

@@ -98,7 +98,6 @@ namespace gallus
 					}
 					ImGui::EndMenu();
 				}
-				// TODO: Edit Icon.
 				if (ImGui::BeginMenu(ImGui::IMGUI_FORMAT_ID(font::ICON_EDIT + std::string(" Edit"), MENU_ID, "CREATE_EDITOR").c_str()))
 				{
 					if (ImGui::MenuItem(ImGui::IMGUI_FORMAT_ID(font::ICON_MODEL + std::string(" Create Entity"), MENU_ITEM_ID, "CREATE_ENTITY_EDITOR").c_str(), "CTRL+SHIFT+N"))
@@ -127,6 +126,14 @@ namespace gallus
 						{
 							file->OnShowInExplorer();
 						}
+					}
+					ImGui::EndMenu();
+				}
+				if (ImGui::BeginMenu(ImGui::IMGUI_FORMAT_ID(font::ICON_SETTINGS + std::string(" Utils"), MENU_ID, "UTILS_EDITOR").c_str()))
+				{
+					if (ImGui::MenuItem(ImGui::IMGUI_FORMAT_ID(font::ICON_FOLDER_SHOW + std::string(" Settings Folder"), MENU_ITEM_ID, "SETTINGS_FOLDER_EDITOR").c_str()))
+					{
+						file::OpenInExplorer(core::EDITOR_ENGINE->GetSaveDirectory());
 					}
 					ImGui::EndMenu();
 				}

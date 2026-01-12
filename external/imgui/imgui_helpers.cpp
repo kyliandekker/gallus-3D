@@ -535,6 +535,30 @@ namespace ImGui
 			ImGui::PopStyleVar();
 		}
 	}
+
+	void ShowStaticTooltip(const ImVec2& a_vPos, const std::string& a_sText)
+	{
+		ImVec2 textSize = ImGui::CalcTextSize(a_sText.c_str());
+		ImRect textRect = {
+			{ a_vPos.x, a_vPos.y },
+			{ a_vPos.x + textSize.x, a_vPos.y + textSize.y },
+		};
+
+		// Draw background.
+		ImU32 backgroundColor = IM_COL32(0, 0, 0, 255);
+		ImU32 textColor = IM_COL32(255, 255, 255, 255);
+		ImGui::GetForegroundDrawList()->AddRectFilled(
+			textRect.Min,
+			textRect.Max,
+			backgroundColor,
+			0.0f
+		);
+		ImGui::GetForegroundDrawList()->AddText(
+			textRect.Min,
+			textColor,
+			a_sText.c_str()
+		);
+	}
 }
 
 #endif
