@@ -90,6 +90,8 @@ namespace gallus
 			/// </summary>
 			/// <returns>A <see cref="core::Data"/> object representing the scene�s data.</returns>
 			virtual const core::Data GetSceneData() const;
+			
+			void SetSceneData(const core::Data& a_Data);
 #endif // _EDITOR
 			/// <summary>
 			/// Checks if the scene is in a valid state.

@@ -8,6 +8,8 @@
 #include <imgui/imgui_internal.h>
 #include <imgui/ImGuizmo.h>
 
+#include "core/DataStream.h"
+
 // graphics
 #include "graphics/dx12/Texture.h"
 
@@ -143,12 +145,15 @@ namespace gallus
 							editor::Editor& editor = core::EDITOR_ENGINE->GetEditor();
 
 							editor.SetSelectable(nullptr);
-							
+
 							// If we start the game, set the game scene to the scene that is currently opened in the editor.
 							if (isStarted)
 							{
-								const fs::path scenePath = editor.GetScene().GetPath();
-
+								gameplay::Scene& editorScene = editor.GetScene();
+								editorScene.SetSceneData(editorScene.GetSceneData());
+									
+								const fs::path scenePath = editorScene.GetPath();
+								
 								gameplay::Scene& gameScene = gameplay::GAME.GetScene();
 								gameScene.LoadByPath(scenePath);
 								gameScene.LoadData();
@@ -158,9 +163,6 @@ namespace gallus
 							else
 							{
 								gameplay::Scene& editorScene = editor.GetScene();
-								const fs::path scenePath = editorScene.GetPath();
-
-								editorScene.LoadByPath(scenePath);
 								editorScene.LoadData();
 							}
 							gameplay::GAME.SetIsStarted(isStarted);

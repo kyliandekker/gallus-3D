@@ -228,10 +228,7 @@ namespace gallus
 				}
 				case FieldSerializationType::FieldSerializationType_Quaternion:
 				{
-					DirectX::XMFLOAT3 eulerAngles = VEC_ZERO;
-					a_SrcData.GetVector3(propertyName, eulerAngles);
-					DirectX::XMVECTOR quaternion = graphics::dx12::Transform::EulerToQuaternion(eulerAngles);
-					memcpy(ptr, &quaternion, sizeof(quaternion));
+					a_SrcData.GetVector4(propertyName, *(DirectX::XMFLOAT4*) ptr);
 					break;
 				}
 				case FieldSerializationType::FieldSerializationType_EngineResource:
@@ -436,9 +433,7 @@ namespace gallus
 				}
 				case FieldSerializationType::FieldSerializationType_Quaternion:
 				{
-					const DirectX::XMVECTOR* value = reinterpret_cast<const DirectX::XMVECTOR*>(ptr);
-					const DirectX::XMFLOAT3 eulerAngles = graphics::dx12::Transform::QuaternionToEuler(*value);
-					a_SrcData.SetVector3(propertyName, eulerAngles);
+					a_SrcData.SetVector4(propertyName, *(const DirectX::XMFLOAT4*) ptr);
 					break;
 				}
 				case FieldSerializationType::FieldSerializationType_EngineResource:

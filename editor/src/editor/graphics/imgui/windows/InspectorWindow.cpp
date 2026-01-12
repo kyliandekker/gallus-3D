@@ -51,11 +51,15 @@ namespace gallus
 				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_Window,
 					[this]()
 					{
-						if (ImGui::TextButton(
-							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_FOLDER_SHOW), BUTTON_ID, "SHOW_IN_EXPLORER_INSPECTOR").c_str(), "Opens the asset database or file explorer at the location of the selected object.", m_Window.GetHeaderSize()))
+						EditorSelectable* selectable = core::EDITOR_ENGINE->GetEditor().GetSelectable();
+						if (selectable->GetShowShowInExplorer())
 						{
-							EditorSelectable* selectable = core::EDITOR_ENGINE->GetEditor().GetSelectable();
-							selectable->OnShowInExplorer();
+							if (ImGui::TextButton(
+								ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_FOLDER_SHOW), BUTTON_ID, "SHOW_IN_EXPLORER_INSPECTOR").c_str(), "Opens the asset database or file explorer at the location of the selected object.", m_Window.GetHeaderSize()))
+							{
+								EditorSelectable* selectable = core::EDITOR_ENGINE->GetEditor().GetSelectable();
+								selectable->OnShowInExplorer();
+							}
 						}
 					},
 					[]()
@@ -69,10 +73,14 @@ namespace gallus
 				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_Window,
 					[this]()
 					{
-						if (ImGui::TextButton(
-							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_DELETE), BUTTON_ID, "DELETE_INSPECTOR").c_str(), "Deletes the currently selected object from the scene or asset database.", m_Window.GetHeaderSize()))
+						EditorSelectable* selectable = core::EDITOR_ENGINE->GetEditor().GetSelectable();
+						if (selectable->GetShowDelete())
 						{
-							m_bDeleteSelectable = true;
+							if (ImGui::TextButton(
+								ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_DELETE), BUTTON_ID, "DELETE_INSPECTOR").c_str(), "Deletes the currently selected object from the scene or asset database.", m_Window.GetHeaderSize()))
+							{
+								m_bDeleteSelectable = true;
+							}
 						}
 					},
 					[]()
@@ -210,6 +218,7 @@ namespace gallus
 				if (m_bDeleteSelectable)
 				{
 					selectable->OnDelete();
+					m_bDeleteSelectable = false;
 				}
 			}
 		}

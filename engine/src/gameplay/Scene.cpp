@@ -85,11 +85,12 @@ namespace gallus
 
 			resources::SrcData cameraSrcData;
 			cameraSrcData.SetObject();
-
+			
+			core::ENGINE->GetDX12().GetCamera().GetTransform().SetRotation(DirectX::XMQuaternionIdentity());
+			core::ENGINE->GetDX12().GetCamera().Init(graphics::dx12::RENDER_TEX_SIZE.x, graphics::dx12::RENDER_TEX_SIZE.y);
 			if (!srcData.GetSrcObject(JSON_SCENE_CAMERA_VAR, cameraSrcData))
 			{
 				LOGF(LOGSEVERITY_WARNING, LOG_CATEGORY_GAME, "Could not read camera settings in scene data.");
-				core::ENGINE->GetDX12().GetCamera().Init(graphics::dx12::RENDER_TEX_SIZE.x, graphics::dx12::RENDER_TEX_SIZE.y);
 			}
 			else
 			{
@@ -300,6 +301,12 @@ namespace gallus
 			core::Data data;
 			srcData.GetData(data);
 			return data;
+		}
+		
+		//---------------------------------------------------------------------
+		void Scene::SetSceneData(const core::Data& a_Data)
+		{
+			m_Data = a_Data;
 		}
 #endif // _EDITOR
 	}

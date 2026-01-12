@@ -20,6 +20,7 @@ namespace gallus
 		#define SRC_DATA_VECTOR_X "x"
 		#define SRC_DATA_VECTOR_Y "y"
 		#define SRC_DATA_VECTOR_Z "z"
+		#define SRC_DATA_VECTOR_W "w"
 
 		#define SRC_DATA_VECTOR_R "r"
 		#define SRC_DATA_VECTOR_G "g"
@@ -214,6 +215,45 @@ namespace gallus
 			if (!rapidjson::GetFloat(m_Document[a_sKey.c_str()], SRC_DATA_VECTOR_Z, a_vVector.z))
 			{
 				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" does not have an z axis.", a_sKey.c_str());
+				return false;
+			}
+
+			return true;
+		}
+
+		//---------------------------------------------------------------------
+		bool SrcData::GetVector4(const std::string& a_sKey, DirectX::XMFLOAT4& a_vVector) const
+		{
+			if (m_Document.HasParseError() || m_Document.IsNull())
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Document is empty.");
+				return false;
+			}
+
+			if (!m_Document.HasMember(a_sKey.c_str()) || !m_Document[a_sKey.c_str()].IsObject())
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" is not present or not an object/vector.", a_sKey.c_str());
+				return false;
+			}
+
+			if (!rapidjson::GetFloat(m_Document[a_sKey.c_str()], SRC_DATA_VECTOR_X, a_vVector.x))
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" does not have an x axis.", a_sKey.c_str());
+				return false;
+			}
+			if (!rapidjson::GetFloat(m_Document[a_sKey.c_str()], SRC_DATA_VECTOR_Y, a_vVector.y))
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" does not have an y axis.", a_sKey.c_str());
+				return false;
+			}
+			if (!rapidjson::GetFloat(m_Document[a_sKey.c_str()], SRC_DATA_VECTOR_Z, a_vVector.z))
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" does not have an z axis.", a_sKey.c_str());
+				return false;
+			}
+			if (!rapidjson::GetFloat(m_Document[a_sKey.c_str()], SRC_DATA_VECTOR_W, a_vVector.w))
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" does not have an w axis.", a_sKey.c_str());
 				return false;
 			}
 
@@ -444,6 +484,20 @@ namespace gallus
 			vectorObj.AddMember(rapidjson::Value(SRC_DATA_VECTOR_X, allocator).Move(), a_vVector.x, allocator);
 			vectorObj.AddMember(rapidjson::Value(SRC_DATA_VECTOR_Y, allocator).Move(), a_vVector.y, allocator);
 			vectorObj.AddMember(rapidjson::Value(SRC_DATA_VECTOR_Z, allocator).Move(), a_vVector.z, allocator);
+
+			m_Document.AddMember(rapidjson::Value(a_sKey.c_str(), allocator).Move(), vectorObj, allocator);
+		}
+
+		//---------------------------------------------------------------------
+		void SrcData::SetVector4(const std::string& a_sKey, const DirectX::XMFLOAT4& a_vVector)
+		{
+			rapidjson::Document::AllocatorType& allocator = m_Document.GetAllocator();
+			rapidjson::Value vectorObj(rapidjson::kObjectType);
+
+			vectorObj.AddMember(rapidjson::Value(SRC_DATA_VECTOR_X, allocator).Move(), a_vVector.x, allocator);
+			vectorObj.AddMember(rapidjson::Value(SRC_DATA_VECTOR_Y, allocator).Move(), a_vVector.y, allocator);
+			vectorObj.AddMember(rapidjson::Value(SRC_DATA_VECTOR_Z, allocator).Move(), a_vVector.z, allocator);
+			vectorObj.AddMember(rapidjson::Value(SRC_DATA_VECTOR_W, allocator).Move(), a_vVector.w, allocator);
 
 			m_Document.AddMember(rapidjson::Value(a_sKey.c_str(), allocator).Move(), vectorObj, allocator);
 		}
