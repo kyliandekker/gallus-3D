@@ -172,7 +172,7 @@ namespace gallus
 						}
 
 						ImGui::Unindent();
-						if (ImPlot::BeginPlot(ImGui::IMGUI_FORMAT_ID("", PLOT_ID, "GRAPHICS_FPS_STATS").c_str(), ImVec2(ImGui::GetContentRegionAvail().x, 300), ImPlotFlags_CanvasOnly | ImPlotFlags_NoInputs | ImPlotFlags_NoFrame))
+						if (ImPlot::BeginPlot(ImGui::IMGUI_FORMAT_ID("", PLOT_ID, "GRAPHICS_FPS_STATS").c_str(), ImVec2(ImGui::GetContentRegionAvail().x, 300), ImPlotFlags_CanvasOnly | ImPlotFlags_NoChild | ImPlotFlags_NoInputs | ImPlotFlags_NoFrame))
 						{
 							ImPlot::SetupAxis(ImAxis_X1, "");
 							ImPlot::SetupAxis(ImAxis_Y1, "");
@@ -186,7 +186,7 @@ namespace gallus
 							ImPlot::EndPlot();
 						}
 
-						if (ImPlot::BeginPlot(ImGui::IMGUI_FORMAT_ID("", PLOT_ID, "GAME_FPS_STATS").c_str(), ImVec2(ImGui::GetContentRegionAvail().x, 300), ImPlotFlags_CanvasOnly | ImPlotFlags_NoInputs | ImPlotFlags_NoFrame))
+						if (ImPlot::BeginPlot(ImGui::IMGUI_FORMAT_ID("", PLOT_ID, "GAME_FPS_STATS").c_str(), ImVec2(ImGui::GetContentRegionAvail().x, 300), ImPlotFlags_CanvasOnly | ImPlotFlags_NoChild | ImPlotFlags_NoInputs | ImPlotFlags_NoFrame))
 						{
 							ImPlot::SetupAxis(ImAxis_X1, "");
 							ImPlot::SetupAxis(ImAxis_Y1, "");
