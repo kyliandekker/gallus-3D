@@ -9,6 +9,8 @@ namespace gallus
 {
 	namespace gameplay
 	{
+		class TransformSystem;
+
 		//---------------------------------------------------------------------
 		// TransformComponent
 		//---------------------------------------------------------------------
@@ -41,6 +43,9 @@ namespace gallus
 					.type = FieldSerializationType::FieldSerializationType_Object)
 				EXPOSE_GIZMO(m_Transform, EditorGizmoType::EditorGizmoType_Transform)
 			END_SERIALIZE(TransformComponent)
+
+			// cache
+			gameplay::TransformSystem* m_pTransformSystem = nullptr;
 		};
 	}
 }

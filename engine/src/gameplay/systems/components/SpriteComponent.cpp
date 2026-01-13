@@ -39,6 +39,17 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
+		void SpriteComponent::Init()
+		{
+			// cache is in the init function of component.
+			Component::Init();
+
+			// cache
+			m_pRootSignature = core::ENGINE->GetDX12().GetRootSignature().Get();
+			m_pTransformSystem = &m_pECS->GetSystem<gameplay::TransformSystem>();
+		}
+
+		//---------------------------------------------------------------------
 		void SpriteComponent::SetMesh(std::weak_ptr<graphics::dx12::Mesh> a_pMesh)
 		{
 			m_pMesh = a_pMesh;
@@ -62,10 +73,9 @@ namespace gallus
 			}
 
 			graphics::dx12::Transform transform;
-			TransformSystem& transformSys = core::ENGINE->GetECS().GetSystem<TransformSystem>();
-			if (transformSys.HasComponent(a_EntityID))
+			if (m_pTransformSystem->HasComponent(a_EntityID))
 			{
-				transform = transformSys.GetComponent(a_EntityID).GetTransform();
+				transform = m_pTransformSystem->GetComponent(a_EntityID).GetTransform();
 			}
 
 			if (transform.GetCameraType() == graphics::dx12::CameraType_Screen)
@@ -110,8 +120,8 @@ namespace gallus
 				}
 			}
 
-			//a_pCommandList->GetCommandList()->SetPipelineState(graphics::dx12::PipelineStateCache::GetOrCreate());
-			a_pCommandList->GetCommandList()->SetGraphicsRootSignature(core::ENGINE->GetDX12().GetRootSignature().Get());
+			a_pCommandList->GetCommandList()->SetPipelineState(m_pPipelineState);
+			a_pCommandList->GetCommandList()->SetGraphicsRootSignature(m_pRootSignature);
 
 			if (auto mesh = m_pMesh.lock())
 			{

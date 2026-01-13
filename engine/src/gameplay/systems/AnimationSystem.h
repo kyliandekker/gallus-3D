@@ -22,6 +22,8 @@ namespace gallus
 		class AnimationSystem : public ECSBaseSystem<AnimationComponent>
 		{
 		public:
+			~AnimationSystem();
+
 			/// <summary>
 			/// Initializes the system, setting up necessary resources.
 			/// </summary>

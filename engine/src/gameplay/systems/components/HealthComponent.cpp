@@ -29,9 +29,14 @@ namespace gallus
 		//---------------------------------------------------------------------
 		void HealthComponent::UpdateRealtime(float a_fDeltaTime, UpdateTime a_UpdateTime)
 		{
+			if (!m_pECS)
+			{
+				return;
+			}
+
 			if (m_fHealth <= 0)
 			{
-				auto ent = core::ENGINE->GetECS().GetEntity(m_EntityID).lock();
+				auto ent = m_pECS->GetEntity(m_EntityID).lock();
 				if (!ent)
 				{
 					ent->Destroy();

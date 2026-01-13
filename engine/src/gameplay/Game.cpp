@@ -34,14 +34,15 @@ namespace gallus
 
 			m_Scene.SetResourceCategory(resources::EngineResourceCategory::Game);
 
-			core::ENGINE->GetECS().CreateSystem<MeshSystem>().Initialize();
-			core::ENGINE->GetECS().CreateSystem<SpriteSystem>().Initialize();
-			core::ENGINE->GetECS().CreateSystem<TransformSystem>().Initialize();
-			core::ENGINE->GetECS().CreateSystem<HealthSystem>().Initialize();
-			core::ENGINE->GetECS().CreateSystem<CollisionSystem>().Initialize();
-			core::ENGINE->GetECS().CreateSystem<ProjectileSystem>().Initialize();
-			core::ENGINE->GetECS().CreateSystem<AnimationSystem>().Initialize();
-			core::ENGINE->GetECS().CreateSystem<RigidbodySystem>().Initialize();
+			gameplay::EntityComponentSystem& ecs = core::ENGINE->GetECS();
+			ecs.CreateSystem<MeshSystem>().Initialize();
+			ecs.CreateSystem<SpriteSystem>().Initialize();
+			ecs.CreateSystem<TransformSystem>().Initialize();
+			ecs.CreateSystem<HealthSystem>().Initialize();
+			ecs.CreateSystem<CollisionSystem>().Initialize();
+			ecs.CreateSystem<ProjectileSystem>().Initialize();
+			ecs.CreateSystem<AnimationSystem>().Initialize();
+			ecs.CreateSystem<RigidbodySystem>().Initialize();
 
 			core::ENGINE->GetWindow().OnQuit() += std::bind(&Game::Shutdown, this);
 
@@ -89,15 +90,7 @@ namespace gallus
 
 			if (updateRealtime)
 			{
-				//const gameplay::Entity* player = core::ENGINE->GetECS().GetEntityByName("Player");
-
-				//if (player)
-				//{
-				//	gameplay::TransformSystem& transformSys = core::ENGINE->GetECS().GetSystem<gameplay::TransformSystem>();
-				//	gameplay::TransformComponent& transformComponent = transformSys.GetComponent(player->GetEntityID());
-				//	DirectX::XMFLOAT3 pos = { transformComponent.GetTransform().GetPosition().x - (graphics::dx12::RENDER_TEX_SIZE.x / 2), transformComponent.GetTransform().GetPosition().y - (graphics::dx12::RENDER_TEX_SIZE.y / 2), transformComponent.GetTransform().GetPosition().z };
-				//	core::ENGINE->GetDX12().GetActiveCamera().GetTransform().SetPosition(pos);
-				//}
+				// TODO: Game shared code.
 			}
 		}
 

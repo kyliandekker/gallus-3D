@@ -42,15 +42,12 @@ namespace gallus
 				return;
 			}
 
-			TransformSystem& transformSys = core::ENGINE->GetECS().GetSystem<TransformSystem>();
-
-			TransformComponent& transformComp = transformSys.GetComponent(m_EntityID);
 			DirectX::XMFLOAT3 newPos = {
-				transformComp.GetTransform().GetPosition().x + m_vTranslation.x,
-				transformComp.GetTransform().GetPosition().y + m_vTranslation.y,
-				transformComp.GetTransform().GetPosition().z + m_vTranslation.z
+				m_Transform.GetPosition().x + m_vTranslation.x,
+				m_Transform.GetPosition().y + m_vTranslation.y,
+				m_Transform.GetPosition().z + m_vTranslation.z
 			};
-			transformComp.GetTransform().SetPosition(newPos);
+			m_Transform.SetPosition(newPos);
 
 			m_vTranslation = {};
 		}

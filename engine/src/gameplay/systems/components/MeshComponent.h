@@ -26,11 +26,14 @@ namespace gallus
 			class Camera;
 			class PixelShader;
 			class VertexShader;
+
+			class DX12System;
 		}
 	}
 	namespace gameplay
 	{
 		struct EntityID;
+		class TransformSystem;
 
 		//---------------------------------------------------------------------
 		// MeshComponent
@@ -88,8 +91,6 @@ namespace gallus
 			std::weak_ptr<graphics::dx12::Material> m_pMaterial = {};
 			DirectX::XMFLOAT4 m_vColor = { 1, 1, 1, 1 };
 
-			ID3D12PipelineState* m_pPipelineState = nullptr;
-
 			void OnShadersChanged();
 
 			BEGIN_SERIALIZE_PARENT(MeshComponent, Component)
@@ -101,26 +102,31 @@ namespace gallus
 					.type = FieldSerializationType::FieldSerializationType_EngineResource,
 					.assetType = resources::AssetType::VertexShader,
 					.onChangeFunc = MakeOnChangeFunc(&MeshComponent::OnShadersChanged))
-			 	SERIALIZE_FIELD(m_pMaterial, "Material", "Pointer to the material asset used by this Mesh. Can be nullptr if no material is assigned. Determines the visual appearance of the Mesh.",
-			 		.type = FieldSerializationType::FieldSerializationType_EngineResource,
-			 		.assetType = resources::AssetType::Material)
-			 	SERIALIZE_FIELD(m_pMaterial, "MaterialView", "",
-			 		.type = FieldSerializationType::FieldSerializationType_ObjectPtr,
-			 		.assetType = resources::AssetType::Material,
-			 		.serialize = false,
-			 		.indent = 1)
-			 	SERIALIZE_FIELD(m_pMesh, "Mesh", "Pointer to the texture asset used by this Mesh. Can be nullptr if no mesh is assigned. Determines the visual appearance of the Mesh.",
-			 		.type = FieldSerializationType::FieldSerializationType_EngineResource,
-			 		.assetType = resources::AssetType::Mesh)
-			 	SERIALIZE_FIELD(m_pTexture, "Texture", "Pointer to the mesh asset used by this Mesh. Can be nullptr if no texture is assigned. Determines the visual appearance of the Mesh.",
-			 		.type = FieldSerializationType::FieldSerializationType_EngineResource,
-			 		.assetType = resources::AssetType::Sprite)
-			 	SERIALIZE_FIELD(m_iTextureIndex, "Texture Index", "Index of the Mesh within a texture atlas. Used when the texture contains multiple rects to select which one is displayed.",
-			 		.type = FieldSerializationType::FieldSerializationType_Int8)
-			 	SERIALIZE_FIELD(m_pTexture, "Texture Preview", "",
-			 		.type = FieldSerializationType::FieldSerializationType_TexturePreview,
-			 		.relatedIndexFieldOffset = offsetof(MeshComponent, m_iTextureIndex))
+				SERIALIZE_FIELD(m_pMaterial, "Material", "Pointer to the material asset used by this Mesh. Can be nullptr if no material is assigned. Determines the visual appearance of the Mesh.",
+					.type = FieldSerializationType::FieldSerializationType_EngineResource,
+					.assetType = resources::AssetType::Material)
+				SERIALIZE_FIELD(m_pMaterial, "MaterialView", "",
+					.type = FieldSerializationType::FieldSerializationType_ObjectPtr,
+					.assetType = resources::AssetType::Material,
+					.serialize = false,
+					.indent = 1)
+				SERIALIZE_FIELD(m_pMesh, "Mesh", "Pointer to the texture asset used by this Mesh. Can be nullptr if no mesh is assigned. Determines the visual appearance of the Mesh.",
+					.type = FieldSerializationType::FieldSerializationType_EngineResource,
+					.assetType = resources::AssetType::Mesh)
+				SERIALIZE_FIELD(m_pTexture, "Texture", "Pointer to the mesh asset used by this Mesh. Can be nullptr if no texture is assigned. Determines the visual appearance of the Mesh.",
+					.type = FieldSerializationType::FieldSerializationType_EngineResource,
+					.assetType = resources::AssetType::Sprite)
+				SERIALIZE_FIELD(m_iTextureIndex, "Texture Index", "Index of the Mesh within a texture atlas. Used when the texture contains multiple rects to select which one is displayed.",
+					.type = FieldSerializationType::FieldSerializationType_Int8)
+				SERIALIZE_FIELD(m_pTexture, "Texture Preview", "",
+					.type = FieldSerializationType::FieldSerializationType_TexturePreview,
+					.relatedIndexFieldOffset = offsetof(MeshComponent, m_iTextureIndex))
 			END_SERIALIZE(MeshComponent)
+
+			// cache
+			ID3D12PipelineState* m_pPipelineState = nullptr;
+			ID3D12RootSignature* m_pRootSignature = nullptr;
+			gameplay::TransformSystem* m_pTransformSystem = nullptr;
 		};
 	}
 }

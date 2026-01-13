@@ -29,6 +29,7 @@ namespace gallus
 	namespace gameplay
 	{
 		struct EntityID;
+		class TransformSystem;
 
 		//---------------------------------------------------------------------
 		// SpriteComponent
@@ -40,6 +41,11 @@ namespace gallus
 			/// Initializes the component.
 			/// </summary>
 			void SetDefaults(const gameplay::EntityID& a_EntityID) override;
+
+			/// <summary>
+			/// Initializes the component in runtime.
+			/// </summary>
+			void Init() override;
 
 			/// <summary>
 			/// Sets the mesh used by the mesh component.
@@ -86,23 +92,28 @@ namespace gallus
 			int8_t m_iSpriteIndex = 0;
 			DirectX::XMFLOAT4 m_vColor = { 1, 1, 1, 1 };
 
-				BEGIN_SERIALIZE_PARENT(SpriteComponent, Component)
-				 	SERIALIZE_FIELD(m_bIsStatic, "Static", "Determines whether the sprite should stick on the screen or not.",
-				 		.type = FieldSerializationType::FieldSerializationType_Bool)
-				 	SERIALIZE_FIELD(m_iOrder, "Order", "Determines what sprites overlap other sprites.",
-				 		.type = FieldSerializationType::FieldSerializationType_Int8,
-				 		.onChangeFunc = MakeOnChangeFunc(&SpriteComponent::OnOrderChanged))
-				 	SERIALIZE_FIELD(m_vColor, "Color", "Determines what color the sprite has.",
-				 		.type = FieldSerializationType::FieldSerializationType_Color)
-				 	SERIALIZE_FIELD(m_pSprite, "Sprite", "Pointer to the texture asset used by this sprite. Can be nullptr if no texture is assigned. Determines the visual appearance of the sprite.",
-				 		.type = FieldSerializationType::FieldSerializationType_EngineResource,
-				 		.assetType = resources::AssetType::Sprite)
-				 	SERIALIZE_FIELD(m_iSpriteIndex, "Sprite Index", "Index of the sprite within a texture atlas. Used when the texture contains multiple sprites to select which one is displayed.",
-				 		.type = FieldSerializationType::FieldSerializationType_Int8)
-				 	SERIALIZE_FIELD(m_pSprite, "Sprite Preview", "",
-				 		.type = FieldSerializationType::FieldSerializationType_TexturePreview,
-				 		.relatedIndexFieldOffset = offsetof(SpriteComponent, m_iSpriteIndex))
-				END_SERIALIZE(SpriteComponent)
+			BEGIN_SERIALIZE_PARENT(SpriteComponent, Component)
+			 	SERIALIZE_FIELD(m_bIsStatic, "Static", "Determines whether the sprite should stick on the screen or not.",
+			 		.type = FieldSerializationType::FieldSerializationType_Bool)
+			 	SERIALIZE_FIELD(m_iOrder, "Order", "Determines what sprites overlap other sprites.",
+			 		.type = FieldSerializationType::FieldSerializationType_Int8,
+			 		.onChangeFunc = MakeOnChangeFunc(&SpriteComponent::OnOrderChanged))
+			 	SERIALIZE_FIELD(m_vColor, "Color", "Determines what color the sprite has.",
+			 		.type = FieldSerializationType::FieldSerializationType_Color)
+			 	SERIALIZE_FIELD(m_pSprite, "Sprite", "Pointer to the texture asset used by this sprite. Can be nullptr if no texture is assigned. Determines the visual appearance of the sprite.",
+			 		.type = FieldSerializationType::FieldSerializationType_EngineResource,
+			 		.assetType = resources::AssetType::Sprite)
+			 	SERIALIZE_FIELD(m_iSpriteIndex, "Sprite Index", "Index of the sprite within a texture atlas. Used when the texture contains multiple sprites to select which one is displayed.",
+			 		.type = FieldSerializationType::FieldSerializationType_Int8)
+			 	SERIALIZE_FIELD(m_pSprite, "Sprite Preview", "",
+			 		.type = FieldSerializationType::FieldSerializationType_TexturePreview,
+			 		.relatedIndexFieldOffset = offsetof(SpriteComponent, m_iSpriteIndex))
+			END_SERIALIZE(SpriteComponent)
+
+			// cache
+			ID3D12PipelineState* m_pPipelineState = nullptr;
+			ID3D12RootSignature* m_pRootSignature = nullptr;
+			gameplay::TransformSystem* m_pTransformSystem = nullptr;
 		};
 	}
 }

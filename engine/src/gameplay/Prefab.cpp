@@ -45,8 +45,9 @@ namespace gallus
 		bool Prefab::LoadData()
 		{
 			// Clear all entities.
-			core::ENGINE->GetECS().Clear();
-			while (!core::ENGINE->GetECS().GetEntities().empty())
+			gameplay::EntityComponentSystem& ecs = core::ENGINE->GetECS();
+			ecs.Clear();
+			while (!ecs.GetEntities().empty())
 			{
 			}
 
@@ -65,7 +66,8 @@ namespace gallus
 			resources::SrcData srcData = resources::SrcData();
 			srcData.SetObject();
 
-			auto entities = core::ENGINE->GetECS().GetEntities();
+			gameplay::EntityComponentSystem& ecs = core::ENGINE->GetECS();
+			auto entities = ecs.GetEntities();
 			if (!entities.empty())
 			{
 				std::weak_ptr<gameplay::Entity> entity = entities[0];
@@ -81,7 +83,7 @@ namespace gallus
 				resources::SrcData componentsSrc = resources::SrcData();
 				componentsSrc.SetObject();
 
-				for (gameplay::AbstractECSSystem* system : core::ENGINE->GetECS().GetSystemsContainingEntity(ent->GetEntityID()))
+				for (gameplay::AbstractECSSystem* system : ecs.GetSystemsContainingEntity(ent->GetEntityID()))
 				{
 					resources::SrcData componentSrc = resources::SrcData();
 					componentSrc.SetObject();
@@ -118,20 +120,21 @@ namespace gallus
 				return false;
 			}
 
-			std::string name = core::ENGINE->GetECS().GetUniqueName("New GameObject");
+			gameplay::EntityComponentSystem& ecs = core::ENGINE->GetECS();
+			std::string name = ecs.GetUniqueName("New GameObject");
 			if (!srcData.GetString(JSON_SCENE_ENTITIES_VAR_NAME, name))
 			{
 				LOGF(LOGSEVERITY_WARNING, LOG_CATEGORY_GAME, "Could not read name of entity in prefab data. Defaulting to using name \"\".", name.c_str());
 			}
 
-			id = core::ENGINE->GetECS().CreateEntity(core::ENGINE->GetECS().GetUniqueName(name));
+			id = ecs.CreateEntity(ecs.GetUniqueName(name));
 			if (!id.IsValid())
 			{
 				LOGF(LOGSEVERITY_WARNING, LOG_CATEGORY_GAME, "Could not spawn entity.");
 				return id;
 			}
 
-			std::weak_ptr<gameplay::Entity> entity = core::ENGINE->GetECS().GetEntity(id);
+			std::weak_ptr<gameplay::Entity> entity = ecs.GetEntity(id);
 			auto ent = entity.lock();
 			if (!ent)
 			{
@@ -153,7 +156,7 @@ namespace gallus
 			}
 
 			// Create all components.
-			for (gameplay::AbstractECSSystem* system : core::ENGINE->GetECS().GetSystems())
+			for (gameplay::AbstractECSSystem* system : ecs.GetSystems())
 			{
 				if (componentsSrc.HasSrcObject(system->GetPropertyName()))
 				{

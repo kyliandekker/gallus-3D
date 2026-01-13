@@ -32,8 +32,9 @@ namespace gallus
 		{
 			Component::SetDefaults(a_EntityID);
 
-			m_pTexture = core::ENGINE->GetResourceAtlas().GetDefaultTexture();
-			m_pMesh = core::ENGINE->GetResourceAtlas().GetDefaultMesh();
+			resources::ResourceAtlas& resourceAtlas = core::ENGINE->GetResourceAtlas();
+			m_pTexture = resourceAtlas.GetDefaultTexture();
+			m_pMesh = resourceAtlas.GetDefaultMesh();
 			m_vColor = { 1, 1, 1, 1 };
 
 			TransformSystem& transformSys = core::ENGINE->GetECS().GetSystem<TransformSystem>();
@@ -47,7 +48,14 @@ namespace gallus
 		//---------------------------------------------------------------------
 		void MeshComponent::Init()
 		{
+			// cache is in the init function of component.
+			Component::Init();
+
 			OnShadersChanged();
+
+			// cache
+			m_pRootSignature = core::ENGINE->GetDX12().GetRootSignature().Get();
+			m_pTransformSystem = &m_pECS->GetSystem<gameplay::TransformSystem>();
 		}
 
 		//---------------------------------------------------------------------
@@ -65,22 +73,31 @@ namespace gallus
 		//---------------------------------------------------------------------
 		void MeshComponent::Render(std::shared_ptr<graphics::dx12::CommandList> a_pCommandList, const EntityID& a_EntityID, const graphics::dx12::Camera& a_Camera)
 		{
+			if (!m_pECS)
+			{
+				return;
+			}
+			
 			if (!m_pPipelineState)
 			{
 				return;
 			}
+			
+			if (!m_pRootSignature)
+			{
+				return;
+			}
 
-			auto ent = core::ENGINE->GetECS().GetEntity(m_EntityID).lock();
+			auto ent = m_pECS->GetEntity(m_EntityID).lock();
 			if (!ent || !ent->IsActive())
 			{
 				return;
 			}
 
 			graphics::dx12::Transform transform;
-			TransformSystem& transformSys = core::ENGINE->GetECS().GetSystem<TransformSystem>();
-			if (transformSys.HasComponent(a_EntityID))
+			if (m_pTransformSystem->HasComponent(a_EntityID))
 			{
-				transform = transformSys.GetComponent(a_EntityID).GetTransform();
+				transform = m_pTransformSystem->GetComponent(a_EntityID).GetTransform();
 			}
 
 			if (transform.GetCameraType() == graphics::dx12::CameraType_Screen)
@@ -126,7 +143,7 @@ namespace gallus
 			}
 
 			a_pCommandList->GetCommandList()->SetPipelineState(m_pPipelineState);
-			a_pCommandList->GetCommandList()->SetGraphicsRootSignature(core::ENGINE->GetDX12().GetRootSignature().Get());
+			a_pCommandList->GetCommandList()->SetGraphicsRootSignature(m_pRootSignature);
 
 			if (auto mesh = m_pMesh.lock())
 			{

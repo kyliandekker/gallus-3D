@@ -18,6 +18,16 @@ namespace gallus
 		//---------------------------------------------------------------------
 		// AnimationSystem
 		//---------------------------------------------------------------------
+		AnimationSystem::~AnimationSystem()
+		{
+			for (animation::AnimationKeyFrameBaseSystem* system : m_aSystems)
+			{
+				delete system;
+			}
+			m_aSystems.clear();
+		}
+
+		//---------------------------------------------------------------------
 		bool AnimationSystem::Initialize()
 		{
 			m_aUpdateTimes.AddFlag(UpdateTime::UPDATE_TIME_FRAME_END);

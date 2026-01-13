@@ -4,8 +4,7 @@
 #include <string>
 
 // gameplay
-#include "gameplay/EntityID.h"
-#include "gameplay/systems/UpdateTime.h"
+#include "gameplay/EntityID.h" // TODO: Pretty sure this can be forward declared, can it not?
 
 // editor
 #include "editor/ISerializableObject.h"
@@ -18,6 +17,9 @@ namespace gallus
 	}
 	namespace gameplay
 	{
+		enum class UpdateTime : uint32_t;
+		class EntityComponentSystem;
+
 		//---------------------------------------------------------------------
 		// Component
 		//---------------------------------------------------------------------
@@ -25,7 +27,7 @@ namespace gallus
 		{
 		public:
 			/// <summary>
-			/// Deconstructs the component.
+			/// Destroys the component.
 			/// </summary>
 			virtual ~Component() = default;
 
@@ -40,17 +42,13 @@ namespace gallus
 			/// <summary>
 			/// Initializes the component after deserialization.
 			/// </summary>
-			virtual void Init()
-			{}
+			virtual void Init();
 
 			/// <summary>
 			/// Initializes the component in runtime.
 			/// </summary>
 			virtual void InitRealtime()
-			{
-				m_bInitialized = true;
-			}
-
+			{}
 #ifdef _EDITOR
 			/// <summary>
 			/// Serialized the component to a json document.
@@ -110,6 +108,9 @@ namespace gallus
 
 			BEGIN_SERIALIZE(Component)
 			END_SERIALIZE(Component)
+
+			// cache
+			gameplay::EntityComponentSystem* m_pECS = nullptr;
 		};
 	}
 }
