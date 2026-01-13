@@ -30,7 +30,6 @@ namespace gallus
 			class Texture;
 			class PixelShader;
 			class VertexShader;
-			class ShaderBind;
 			class Mesh;
 			class Material;
 
@@ -115,16 +114,6 @@ namespace gallus
 			bool HasVertexShader(const std::string& a_sName);
 
 			/// <summary>
-			/// Loads a shader bind.
-			/// </summary>
-			std::weak_ptr<graphics::dx12::ShaderBind> LoadShaderBind(const std::string& a_sName, std::shared_ptr<graphics::dx12::PixelShader> a_PixelShader, std::shared_ptr<graphics::dx12::VertexShader> a_VertexShader, CD3DX12_PIPELINE_STATE_STREAM_DEPTH_STENCIL_FORMAT a_DSVFormat = DXGI_FORMAT_D32_FLOAT);
-
-			/// <summary>
-			/// Loads a shader bind.
-			/// </summary>
-			std::weak_ptr<graphics::dx12::ShaderBind> LoadShaderBind(const std::string& a_sName);
-
-			/// <summary>
 			/// Loads a scene.
 			/// </summary>
 			bool LoadScene(const std::string& a_sName, gameplay::Scene& a_Scene);
@@ -175,11 +164,6 @@ namespace gallus
 			std::weak_ptr<graphics::dx12::VertexShader> GetDefaultVertexShader();
 
 			/// <summary>
-			/// Retrieves the default shader bind (used as fallback).
-			/// </summary>
-			std::weak_ptr<graphics::dx12::ShaderBind> GetDefaultShaderBind();
-
-			/// <summary>
 			/// Retrieves the default texture (used as fallback).
 			/// </summary>
 			std::weak_ptr<graphics::dx12::Texture> GetDefaultTexture();
@@ -208,11 +192,6 @@ namespace gallus
 			/// Gets the list of loaded vertex shaders.
 			/// </summary>
 			const std::vector<std::shared_ptr<graphics::dx12::VertexShader>>& GetVertexShaders() const;
-
-			/// <summary>
-			/// Gets the list of shader binds.
-			/// </summary>
-			const std::vector<std::shared_ptr<graphics::dx12::ShaderBind>>& GetShaderBinds() const;
 
 			/// <summary>
 			/// Gets the list of loaded meshes.
@@ -292,7 +271,6 @@ namespace gallus
 			std::vector<std::shared_ptr<graphics::dx12::Texture>> m_aTextures;
 			std::vector<std::shared_ptr<graphics::dx12::PixelShader>> m_aPixelShaders;
 			std::vector<std::shared_ptr<graphics::dx12::VertexShader>> m_aVertexShaders;
-			std::vector<std::shared_ptr<graphics::dx12::ShaderBind>> m_aShaderBinds;
 			std::vector<std::shared_ptr<graphics::dx12::Mesh>> m_aMeshes;
 			std::vector<std::shared_ptr<gameplay::Prefab>> m_aPrefabs;
 			std::vector<std::shared_ptr<animation::Animation>> m_aAnimations;

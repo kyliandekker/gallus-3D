@@ -12,7 +12,6 @@
 #include "graphics/dx12/Mesh.h"
 #include "graphics/dx12/Material.h"
 #include "graphics/dx12/Shader.h"
-#include "graphics/dx12/ShaderBind.h"
 
 #include "graphics/imgui/font_icon.h"
 #include "graphics/imgui/ImGuiWindow.h"
@@ -193,27 +192,6 @@ namespace gallus
 						{
 							ImGui::Indent();
 							if (ImGui::CollapsingHeader(ImGui::IMGUI_FORMAT_ID(shader.get()->GetName(), FOLDOUT_ID, "VERTEX_SHADER_" + shader.get()->GetName()).c_str()))
-							{
-								ImGui::Indent();
-								RenderObjectFields(shader.get());
-								ImGui::Unindent();
-							}
-							ImGui::Unindent();
-						}
-					}
-
-					ImGui::FoldOutButton(
-						ImGui::IMGUI_FORMAT_ID(
-							std::string((m_bShaderBindsFoldedOut ? font::ICON_FOLDED_OUT : font::ICON_FOLDED_IN) + std::string(" Shader Binds")),
-							FOLDOUT_ID, "SHADER_BINDS_RESOURCES"), &m_bShaderBindsFoldedOut, ImVec2(ImGui::GetContentRegionAvail().x, 0));
-
-					if (m_bShaderBindsFoldedOut)
-					{
-						auto& shaderBinds = core::EDITOR_ENGINE->GetResourceAtlas().GetShaderBinds();
-						for (std::shared_ptr<graphics::dx12::ShaderBind> shader : shaderBinds)
-						{
-							ImGui::Indent();
-							if (ImGui::CollapsingHeader(ImGui::IMGUI_FORMAT_ID(shader.get()->GetName(), FOLDOUT_ID, "SHADER_BIND_" + shader.get()->GetName()).c_str()))
 							{
 								ImGui::Indent();
 								RenderObjectFields(shader.get());

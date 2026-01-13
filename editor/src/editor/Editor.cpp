@@ -29,13 +29,6 @@ namespace gallus
 		//---------------------------------------------------------------------
 		bool Editor::Initialize(bool a_bWait)
 		{
-			m_CurrentScene.SetResourceCategory(resources::EngineResourceCategory::Editor);
-			m_EditorCamera.Init(graphics::dx12::RENDER_TEX_SIZE.x, graphics::dx12::RENDER_TEX_SIZE.y);
-			m_EditorCamera.GetTransform().SetPosition({ 0.0f, 1.0f, -2.0f });
-
-			m_CurrentScene.IsDirty().OnChanged() += std::bind(&Editor::SceneOrPrefabDirtyChanged, this, std::placeholders::_1, std::placeholders::_2);
-			m_Prefab.IsDirty().OnChanged() += std::bind(&Editor::SceneOrPrefabDirtyChanged, this, std::placeholders::_1, std::placeholders::_2);
-
 			LOG(LOGSEVERITY_INFO, LOG_CATEGORY_EDITOR, "Initializing editor.");
 
 			return ThreadedSystem::Initialize(a_bWait);
@@ -94,6 +87,15 @@ namespace gallus
 			m_AssetDatabase.Initialize();
 
 			m_EditorSettings.Load();
+
+			m_CurrentScene.SetResourceCategory(resources::EngineResourceCategory::Editor);
+			m_EditorCamera.Init(graphics::dx12::RENDER_TEX_SIZE.x, graphics::dx12::RENDER_TEX_SIZE.y);
+			m_EditorCamera.GetTransform().SetPosition({ 0.0f, 1.0f, -2.0f });
+
+			m_CurrentScene.IsDirty().OnChanged() += std::bind(&Editor::SceneOrPrefabDirtyChanged, this, std::placeholders::_1, std::placeholders::_2);
+			m_Prefab.IsDirty().OnChanged() += std::bind(&Editor::SceneOrPrefabDirtyChanged, this, std::placeholders::_1, std::placeholders::_2);
+
+			core::EDITOR_ENGINE->GetDX12().SetDimensionDrawMode((graphics::dx12::DimensionDrawMode) m_EditorSettings.GetDimensionDrawMode());
 
 			LOG(LOGSEVERITY_SUCCESS, LOG_CATEGORY_EDITOR, "Initialized editor.");
 

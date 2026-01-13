@@ -10,7 +10,6 @@
 // graphics
 #include "graphics/dx12/Texture.h"
 #include "graphics/dx12/Shader.h"
-#include "graphics/dx12/ShaderBind.h"
 #include "graphics/dx12/Mesh.h"
 #include "graphics/dx12/Material.h"
 #include "graphics/dx12/CommandList.h"
@@ -103,8 +102,10 @@ namespace gallus
 			m_aTextures.reserve(MAX_RESOURCES);
 			m_aPixelShaders.reserve(MAX_RESOURCES);
 			m_aVertexShaders.reserve(MAX_RESOURCES);
-			m_aShaderBinds.reserve(MAX_RESOURCES);
 			m_aMeshes.reserve(MAX_RESOURCES);
+			m_aPrefabs.reserve(MAX_RESOURCES);
+			m_aAnimations.reserve(MAX_RESOURCES);
+			m_aMaterials.reserve(MAX_RESOURCES);
 
 			std::string resourceFolder = core::ARGS.GetArgument<std::string>(ASSET_PATH_ARG);
 			if (resourceFolder.empty())
@@ -229,33 +230,6 @@ namespace gallus
 		bool ResourceAtlas::HasVertexShader(const std::string& a_sName)
 		{
 			return HasResource(m_aVertexShaders, a_sName, fs::path());
-		}
-
-		//---------------------------------------------------------------------
-		std::weak_ptr<graphics::dx12::ShaderBind> ResourceAtlas::LoadShaderBind(const std::string& a_sName, std::shared_ptr<graphics::dx12::PixelShader> a_PixelShader, std::shared_ptr<graphics::dx12::VertexShader> a_VertexShader, CD3DX12_PIPELINE_STATE_STREAM_DEPTH_STENCIL_FORMAT a_DSVFormat)
-		{
-			for (std::shared_ptr<graphics::dx12::ShaderBind>& shaderBind : m_aShaderBinds)
-			{
-				if (shaderBind->HasPixelShader(a_PixelShader) && shaderBind->HasVertexShader(a_VertexShader))
-				{
-					return shaderBind;
-				}
-			}
-
-			std::shared_ptr<graphics::dx12::ShaderBind> shaderBind = std::make_shared<graphics::dx12::ShaderBind>();
-			shaderBind->LoadByName(a_sName, a_PixelShader, a_VertexShader, a_DSVFormat);
-			shaderBind->CreatePipelineState();
-			m_aShaderBinds.push_back(shaderBind);
-
-			return shaderBind;
-		}
-
-		//---------------------------------------------------------------------
-		std::weak_ptr<graphics::dx12::ShaderBind> ResourceAtlas::LoadShaderBind(const std::string& a_sName)
-		{
-			std::shared_ptr<graphics::dx12::ShaderBind> shaderBind = GetResource(m_aShaderBinds, a_sName, fs::path());
-
-			return shaderBind;
 		}
 
 		//---------------------------------------------------------------------
@@ -410,12 +384,6 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		std::weak_ptr<graphics::dx12::ShaderBind> ResourceAtlas::GetDefaultShaderBind()
-		{
-			return m_aShaderBinds[MISSING];
-		}
-
-		//---------------------------------------------------------------------
 		std::weak_ptr<graphics::dx12::Texture> ResourceAtlas::GetDefaultTexture()
 		{
 			return m_aTextures[MISSING + 1];
@@ -449,12 +417,6 @@ namespace gallus
 		const std::vector<std::shared_ptr<graphics::dx12::VertexShader>>& ResourceAtlas::GetVertexShaders() const
 		{
 			return m_aVertexShaders;
-		}
-
-		//---------------------------------------------------------------------
-		const std::vector<std::shared_ptr<graphics::dx12::ShaderBind>>& ResourceAtlas::GetShaderBinds() const
-		{
-			return m_aShaderBinds;
 		}
 
 		//---------------------------------------------------------------------
@@ -528,17 +490,6 @@ namespace gallus
 				case resources::AssetType::VertexShader:
 				{
 					for (auto resource : m_aVertexShaders)
-					{
-						if (a_Category == resources::EngineResourceCategory::Unknown || resource->GetResourceCategory() == a_Category)
-						{
-							engineResources.push_back(resource);
-						}
-					}
-					break;
-				}
-				case resources::AssetType::ShaderBind:
-				{
-					for (auto resource : m_aShaderBinds)
 					{
 						if (a_Category == resources::EngineResourceCategory::Unknown || resource->GetResourceCategory() == a_Category)
 						{

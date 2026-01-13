@@ -31,7 +31,6 @@ namespace gallus
 			PixelShader,
 			VertexShader,
 			Prefab,
-			ShaderBind,
 			Mesh,
 			Material,
 		};
@@ -88,10 +87,6 @@ namespace gallus
 				case AssetType::Prefab:
 				{
 					return "Prefab";
-				}
-				case AssetType::ShaderBind:
-				{
-					return "Shader Bind";
 				}
 				case AssetType::Mesh:
 				{
@@ -183,7 +178,6 @@ namespace gallus
 				}
 				case resources::AssetType::PixelShader:
 				case resources::AssetType::VertexShader:
-				case resources::AssetType::ShaderBind:
 				{
 					return ShiftWithinFamily(base, 4, 6);
 				}
@@ -251,10 +245,6 @@ namespace gallus
 					{
 						return font::ICON_FILE_MODEL;
 					}
-					case resources::AssetType::ShaderBind:
-					{
-						return font::ICON_FILE_SETTINGS;
-					}
 					case resources::AssetType::Mesh:
 					{
 						return font::ICON_FILE_MODEL;
@@ -314,10 +304,6 @@ namespace gallus
 			//		case AssetType::Prefab:
 			//		{
 			//			return font::ICON_MODEL;
-			//		}
-			//		case AssetType::ShaderBind:
-			//		{
-			//			return font::ICON_SETTINGS;
 			//		}
 			//		case AssetType::Mesh:
 			//		{

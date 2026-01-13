@@ -11,8 +11,6 @@
 // resources
 #include "resources/AssetType.h"
 
-#include "graphics/dx12/Material.h"
-
 namespace gallus
 {
 	namespace graphics
@@ -23,9 +21,11 @@ namespace gallus
 
 			class Transform;
 			class Texture;
-			class ShaderBind;
 			class Mesh;
+			class Material;
 			class Camera;
+			class PixelShader;
+			class VertexShader;
 		}
 	}
 	namespace gameplay
@@ -44,16 +44,15 @@ namespace gallus
 			void SetDefaults(const gameplay::EntityID& a_EntityID) override;
 
 			/// <summary>
+			/// Initializes the component in runtime.
+			/// </summary>
+			void Init() override;
+
+			/// <summary>
 			/// Sets the mesh used by the mesh component.
 			/// </summary>
 			/// <param name="a_Mesh">Reference to the mesh that the mesh component will use.</param>
 			void SetMesh(std::weak_ptr<graphics::dx12::Mesh> a_pMesh);
-
-			/// <summary>
-			/// Sets the shader used by the mesh component.
-			/// </summary>
-			/// <param name="a_Shader">Reference to the shader bind that the mesh component will use.</param>
-			void SetShader(std::weak_ptr<graphics::dx12::ShaderBind> a_pShaderBind);
 
 			/// <summary>
 			/// Sets the texture used by the mesh component.
@@ -81,17 +80,27 @@ namespace gallus
 			/// <param name="a_Camera">The camera.</param>
 			void Render(std::shared_ptr<graphics::dx12::CommandList> a_pCommandList, const EntityID& a_EntityID, const graphics::dx12::Camera& a_Camera);
 		private:
+			std::weak_ptr<graphics::dx12::PixelShader> m_pPixelShader = {};
+			std::weak_ptr<graphics::dx12::VertexShader> m_pVertexShader = {};
 			std::weak_ptr<graphics::dx12::Mesh> m_pMesh = {};
-			std::weak_ptr<graphics::dx12::ShaderBind> m_pShaderBind = {};
 			std::weak_ptr<graphics::dx12::Texture> m_pTexture = {};
 			int8_t m_iTextureIndex = 0;
-			int8_t m_iTextureInwdex = 2;
 			std::weak_ptr<graphics::dx12::Material> m_pMaterial = {};
 			DirectX::XMFLOAT4 m_vColor = { 1, 1, 1, 1 };
 
+			ID3D12PipelineState* m_pPipelineState = nullptr;
+
+			void OnShadersChanged();
+
 			BEGIN_SERIALIZE_PARENT(MeshComponent, Component)
-			 	SERIALIZE_FIELD(m_pShaderBind, "Shader Bind", "",
-			 		.type = FieldSerializationType::FieldSerializationType_ObjectPtr)
+				SERIALIZE_FIELD(m_pPixelShader, "Pixel Shader", "Pointer to the pixel shader asset used for rendering this object. Can be nullptr if no specific pixel shader is assigned.",
+					.type = FieldSerializationType::FieldSerializationType_EngineResource,
+					.assetType = resources::AssetType::PixelShader,
+					.onChangeFunc = MakeOnChangeFunc(&MeshComponent::OnShadersChanged))
+				SERIALIZE_FIELD(m_pVertexShader, "Vertex Shader", "Pointer to the vertex shader asset used for rendering this object. Can be nullptr if no specific vertex shader is assigned.",
+					.type = FieldSerializationType::FieldSerializationType_EngineResource,
+					.assetType = resources::AssetType::VertexShader,
+					.onChangeFunc = MakeOnChangeFunc(&MeshComponent::OnShadersChanged))
 			 	SERIALIZE_FIELD(m_pMaterial, "Material", "Pointer to the material asset used by this Mesh. Can be nullptr if no material is assigned. Determines the visual appearance of the Mesh.",
 			 		.type = FieldSerializationType::FieldSerializationType_EngineResource,
 			 		.assetType = resources::AssetType::Material)

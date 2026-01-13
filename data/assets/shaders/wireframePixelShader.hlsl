@@ -2,5 +2,5 @@
 
 float4 main(PSInput input) : SV_TARGET
 {
-    return float4(input.TEXCOORD, 0, 1); 
+    return float4(0.0, 0.0, 0.0, 1.0);
 }

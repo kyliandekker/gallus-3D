@@ -477,10 +477,6 @@ namespace gallus
 					//{
 					//	break;
 					//}
-					case resources::AssetType::ShaderBind:
-					{
-						break;
-					}
 					case resources::AssetType::Mesh:
 					{
 						std::shared_ptr<graphics::dx12::CommandQueue> cCommandQueue = core::ENGINE->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);

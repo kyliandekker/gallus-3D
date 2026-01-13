@@ -26,6 +26,7 @@ namespace gallus
 		void Component::Deserialize(const resources::SrcData& a_SrcData)
 		{
 			DeserializeFields(this, a_SrcData);
+			Init();
 		}
 
 		void Component::UpdateRealtimeInner(float a_fDeltaTime, UpdateTime a_UpdateTime)

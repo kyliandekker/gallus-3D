@@ -22,7 +22,6 @@ namespace gallus
 
 			class Transform;
 			class Texture;
-			class ShaderBind;
 			class Mesh;
 			class Camera;
 		}
@@ -47,12 +46,6 @@ namespace gallus
 			/// </summary>
 			/// <param name="a_Mesh">Reference to the mesh that the mesh component will use.</param>
 			void SetMesh(std::weak_ptr<graphics::dx12::Mesh> a_pMesh);
-
-			/// <summary>
-			/// Sets the shader used by the mesh component.
-			/// </summary>
-			/// <param name="a_Shader">Reference to the shader bind that the mesh component will use.</param>
-			void SetShader(std::weak_ptr < graphics::dx12::ShaderBind> a_pShaderBind);
 
 			/// <summary>
 			/// Sets the texture used by the mesh component.
@@ -89,7 +82,6 @@ namespace gallus
 			int8_t m_iOrder = false;
 
 			std::weak_ptr<graphics::dx12::Mesh> m_pMesh = {};
-			std::weak_ptr<graphics::dx12::ShaderBind> m_pShaderBind = {};
 			std::weak_ptr<graphics::dx12::Texture> m_pSprite = {};
 			int8_t m_iSpriteIndex = 0;
 			DirectX::XMFLOAT4 m_vColor = { 1, 1, 1, 1 };
@@ -102,8 +94,6 @@ namespace gallus
 				 		.onChangeFunc = MakeOnChangeFunc(&SpriteComponent::OnOrderChanged))
 				 	SERIALIZE_FIELD(m_vColor, "Color", "Determines what color the sprite has.",
 				 		.type = FieldSerializationType::FieldSerializationType_Color)
-				 	SERIALIZE_FIELD(m_pShaderBind, "Shader Bind", "",
-				 		.type = FieldSerializationType::FieldSerializationType_ObjectPtr)
 				 	SERIALIZE_FIELD(m_pSprite, "Sprite", "Pointer to the texture asset used by this sprite. Can be nullptr if no texture is assigned. Determines the visual appearance of the sprite.",
 				 		.type = FieldSerializationType::FieldSerializationType_EngineResource,
 				 		.assetType = resources::AssetType::Sprite)

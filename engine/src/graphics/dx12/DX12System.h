@@ -55,14 +55,21 @@ namespace gallus
 			class CommandList;
 			class Texture;
 			class Material;
-			class ShaderBind;
 			class DX12Resource;
 
-			enum CameraIsolationMode
+			enum DimensionDrawMode
 			{
-				CameraIsolationMode_2D3D,
-				CameraIsolationMode_3D,
-				CameraIsolationMode_2D,
+				DimensionDrawMode_2D3D,
+				DimensionDrawMode_3D,
+				DimensionDrawMode_2D,
+			};
+
+			enum ShadingDrawMode
+			{
+				ShadingDrawMode_Wireframe,
+				ShadingDrawMode_Shaded_Wireframe,
+				ShadingDrawMode_Unlit,
+				ShadingDrawMode_Shaded,
 			};
 
 			//---------------------------------------------------------------------
@@ -343,21 +350,39 @@ namespace gallus
 				}
 				
 				/// <summary>
-				/// Sets the camera isolation mode, rendering only 2D, 3D or both.
+				/// Sets the dimension draw mode, rendering only 2D, 3D or both.
 				/// </summary>
-				/// <param name="a_CameraIsolationMode">The camera isolation mode.</param>
-				void SetCameraIsolationMode(CameraIsolationMode a_CameraIsolationMode)
+				/// <param name="a_DimensionDrawMode">The dimension draw mode.</param>
+				void SetDimensionDrawMode(DimensionDrawMode a_DimensionDrawMode)
 				{
-					m_CameraIsolationMode = a_CameraIsolationMode;
+					m_DimensionDrawMode = a_DimensionDrawMode;
 				}
 				
 				/// <summary>
-				/// Retrieves the camera isolation mode, rendering only 2D, 3D or both.
+				/// Retrieves the dimension draw mode, rendering only 2D, 3D or both.
 				/// </summary>
-				/// <returns>The camera isolation mode.</returns>
-				CameraIsolationMode GetCameraIsolationMode() const
+				/// <returns>The dimension draw mode.</returns>
+				DimensionDrawMode GetDimensionDrawMode() const
 				{
-					return m_CameraIsolationMode;
+					return m_DimensionDrawMode;
+				}
+				
+				/// <summary>
+				/// Sets the shading draw mode, rendering only wireframe, unlit, etc.
+				/// </summary>
+				/// <param name="a_ShadingDrawMode">The shading draw mode.</param>
+				void SetShadingDrawMode(ShadingDrawMode a_ShadingDrawMode)
+				{
+					m_ShadingDrawMode = a_ShadingDrawMode;
+				}
+				
+				/// <summary>
+				/// Retrieves the shading draw mode, rendering only wireframe, unlit, etc.
+				/// </summary>
+				/// <returns>The shading draw mode.</returns>
+				ShadingDrawMode GetShadingDrawMode() const
+				{
+					return m_ShadingDrawMode;
 				}
 
 				/// <summary>
@@ -447,7 +472,7 @@ namespace gallus
 				imgui::ImGuiWindow m_ImGuiWindow;
 #endif // IMGUI_DISABLE
 				std::weak_ptr<Texture> m_pRenderTexture = {};
-				std::weak_ptr<ShaderBind> m_pRenderTextureShaderBind = {};
+				ID3D12PipelineState* m_pRenderTextureShaderBind = {};
 				std::weak_ptr<Material> m_pMaterial = {};
 				std::shared_ptr<DirectionalLight> m_pDirectionalLight = {};
 
@@ -455,7 +480,8 @@ namespace gallus
 
 				Camera m_Camera3D;
 				Camera* m_pActiveCamera = &m_Camera3D;
-				CameraIsolationMode m_CameraIsolationMode;
+				DimensionDrawMode m_DimensionDrawMode;
+				ShadingDrawMode m_ShadingDrawMode;
 
 				std::vector<gameplay::SpriteComponent*> m_aOrderedSprites;
 			};

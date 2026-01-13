@@ -223,8 +223,56 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
+			std::string DimensionDrawModeToIcon(graphics::dx12::DimensionDrawMode a_DimensionDrawMode)
+			{
+				switch (a_DimensionDrawMode)
+				{
+					case graphics::dx12::DimensionDrawMode::DimensionDrawMode_2D:
+					{
+						return font::ICON_DRAW_MODE_2D;
+					}
+					case graphics::dx12::DimensionDrawMode::DimensionDrawMode_3D:
+					{
+						return font::ICON_DRAW_MODE_3D;
+					}
+					case graphics::dx12::DimensionDrawMode::DimensionDrawMode_2D3D:
+					{
+						return font::ICON_DRAW_MODE_2D3D;
+					}
+				}
+				return "";
+			}
+
+			//---------------------------------------------------------------------
+			std::string ShadingDrawModeToIcon(graphics::dx12::ShadingDrawMode a_ShadingDrawMode)
+			{
+				switch (a_ShadingDrawMode)
+				{
+					case graphics::dx12::ShadingDrawMode::ShadingDrawMode_Wireframe:
+					{
+						return font::ICON_DRAW_MODE_WIREFRAME;
+					}
+					case graphics::dx12::ShadingDrawMode::ShadingDrawMode_Shaded_Wireframe:
+					{
+						return font::ICON_DRAW_MODE_SHADED_WIREFRAME;
+					}
+					case graphics::dx12::ShadingDrawMode::ShadingDrawMode_Unlit:
+					{
+						return font::ICON_DRAW_MODE_UNLIT;
+					}
+					case graphics::dx12::ShadingDrawMode::ShadingDrawMode_Shaded:
+					{
+						return font::ICON_DRAW_MODE_SHADED;
+					}
+				}
+				return "";
+			}
+
+			//---------------------------------------------------------------------
 			void SceneWindow::PopulateToolbar()
 			{
+				m_TopToolbar.m_aToolbarItems.emplace_back(new ToolbarBreak(m_Window, ImVec2(m_TopToolbar.GetToolbarSize().y, m_TopToolbar.GetToolbarSize().y)));
+
 				// Grid button.
 				m_TopToolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_Window,
 					[this]()
@@ -257,20 +305,50 @@ namespace gallus
 					}
 				));
 
-				// Camera isolation mode button.
+				m_TopToolbar.m_aToolbarItems.emplace_back(new ToolbarBreak(m_Window, ImVec2(m_TopToolbar.GetToolbarSize().y, m_TopToolbar.GetToolbarSize().y)));
+
+				// Dimension draw mode button.
 				m_TopToolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_Window,
 					
 					[this]()
 					{
 						graphics::dx12::DX12System& dx12System = core::EDITOR_ENGINE->GetDX12();
+						editor::EditorSettings& editorSettings = core::EDITOR_ENGINE->GetEditor().GetEditorSettings();
 
-						int camIsolationMode = dx12System.GetCameraIsolationMode();
-						std::string camIsolationModeIcon = camIsolationMode == 0 ? font::ICON_2D3D : (camIsolationMode == 1 ? font::ICON_3D : font::ICON_2D);
-						if (ImGui::TextButton(
-							ImGui::IMGUI_FORMAT_ID(camIsolationModeIcon, BUTTON_ID, "CAMERA_ISOLATION_MODE_SCENE").c_str(), "Cycles camera rendering between combined 2D and 3D, 3D-only, and 2D-only modes.", m_Window.GetHeaderSize()))
+						int dimensionDrawMode = editorSettings.GetDimensionDrawMode();
+						bool isDimensionDrawMode = true;
+						std::string dimensionDrawModeIcon = DimensionDrawModeToIcon((graphics::dx12::DimensionDrawMode) dimensionDrawMode);
+						if (ImGui::CheckboxButton(
+							ImGui::IMGUI_FORMAT_ID(dimensionDrawModeIcon, BUTTON_ID, "DIMENSION_DRAW_MODE_SCENE").c_str(), &isDimensionDrawMode, "Cycles camera rendering between combined 2D and 3D, 3D-only, and 2D-only modes.", m_Window.GetHeaderSize()))
 						{
-							camIsolationMode = ++camIsolationMode % 3;
-							dx12System.SetCameraIsolationMode((graphics::dx12::CameraIsolationMode) camIsolationMode);
+							dimensionDrawMode = ++dimensionDrawMode % (graphics::dx12::DimensionDrawMode_3D + 1);
+							editorSettings.SetDimensionDrawMode((graphics::dx12::DimensionDrawMode) dimensionDrawMode);
+							editorSettings.Save();
+
+							dx12System.SetDimensionDrawMode((graphics::dx12::DimensionDrawMode) dimensionDrawMode);
+						}
+					}
+				));
+
+				// Shading draw mode button.
+				m_TopToolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_Window,
+					
+					[this]()
+					{
+						graphics::dx12::DX12System& dx12System = core::EDITOR_ENGINE->GetDX12();
+						editor::EditorSettings& editorSettings = core::EDITOR_ENGINE->GetEditor().GetEditorSettings();
+
+						int shadingDrawMode = editorSettings.GetShadingDrawMode();
+						bool isShadingDrawMode = true;
+						std::string shadingDrawModeIcon = ShadingDrawModeToIcon((graphics::dx12::ShadingDrawMode) shadingDrawMode);
+						if (ImGui::CheckboxButton(
+							ImGui::IMGUI_FORMAT_ID(shadingDrawModeIcon, BUTTON_ID, "SHADING_DRAW_MODE_SCENE").c_str(), &isShadingDrawMode, "Cycles mesh rendering between wireframe, shaded wireframe, unlit and shaded.", m_Window.GetHeaderSize()))
+						{
+							shadingDrawMode = ++shadingDrawMode % (graphics::dx12::ShadingDrawMode_Shaded + 1);
+							editorSettings.SetShadingDrawMode((graphics::dx12::ShadingDrawMode) shadingDrawMode);
+							editorSettings.Save();
+
+							dx12System.SetShadingDrawMode((graphics::dx12::ShadingDrawMode) shadingDrawMode);
 						}
 					}
 				));
@@ -452,8 +530,8 @@ namespace gallus
 			{
 				ImGuizmo::BeginFrame();
 
-				int camIsolationMode = core::EDITOR_ENGINE->GetDX12().GetCameraIsolationMode();
-				if (camIsolationMode == graphics::dx12::CameraIsolationMode_2D)
+				int dimensionDrawMode = core::EDITOR_ENGINE->GetDX12().GetDimensionDrawMode();
+				if (dimensionDrawMode == graphics::dx12::DimensionDrawMode_2D)
 				{
 					ImGuizmo::SetOrthographic(true);
 				}
@@ -475,8 +553,8 @@ namespace gallus
 				}
 
 				graphics::dx12::DX12System& dx12System = core::EDITOR_ENGINE->GetDX12();
-				int camIsolationMode = dx12System.GetCameraIsolationMode();
-				if (camIsolationMode == graphics::dx12::CameraIsolationMode_2D)
+				int dimensionDrawMode = dx12System.GetDimensionDrawMode();
+				if (dimensionDrawMode == graphics::dx12::DimensionDrawMode_2D)
 				{
 					ImDrawList* drawList = ImGui::GetWindowDrawList();
 
@@ -651,7 +729,7 @@ namespace gallus
 					totalMoveSpeed += (m_fMoveSpeed / 2);
 				}
 				float moveDistance = totalMoveSpeed * static_cast<float>(a_fDeltaTime);
-				int camIsolationMode = dx12System.GetCameraIsolationMode();
+				int dimensionDrawMode = dx12System.GetDimensionDrawMode();
 
 				float& yaw = s_mCameraRotation[&camera].first;
 				float& pitch = s_mCameraRotation[&camera].second;
@@ -685,7 +763,7 @@ namespace gallus
 					float deltaY = static_cast<float>(currentPos.y - s_CenterPos.y);
 					SetCursorPos(s_CenterPos.x, s_CenterPos.y);
 
-					if (camIsolationMode != graphics::dx12::CameraIsolationMode_2D)
+					if (dimensionDrawMode != graphics::dx12::DimensionDrawMode_2D)
 					{
 						// Update yaw/pitch
 						yaw += deltaX * rotationSpeed;

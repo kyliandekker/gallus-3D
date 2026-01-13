@@ -7,9 +7,11 @@
 #include "graphics/dx12/CommandQueue.h"
 #include "graphics/dx12/CommandList.h"
 #include "graphics/dx12/Shader.h"
-#include "graphics/dx12/ShaderBind.h"
 #include "graphics/dx12/Texture.h"
 #include "graphics/dx12/Mesh.h"
+#include "graphics/dx12/Material.h"
+
+#include "graphics/dx12/ShaderFactory.h"
 
 #include "graphics/win32/Window.h"
 
@@ -193,12 +195,7 @@ namespace gallus
 				vertexShaderPtr->SetResourceCategory(resources::EngineResourceCategory::Missing);
 				vertexShaderPtr->SetIsDestroyable(false);
 
-				std::weak_ptr<ShaderBind> shaderBind3DPtr = core::ENGINE->GetResourceAtlas().LoadShaderBind("defaultShaderBind", pixelShaderPtr, vertexShaderPtr, DXGI_FORMAT_D32_FLOAT); // Default shader.
-				if (auto shaderBind = shaderBind3DPtr.lock())
-				{
-					shaderBind->SetResourceCategory(resources::EngineResourceCategory::Missing);
-					shaderBind->SetIsDestroyable(false);
-				}
+				PipelineStateCache::GetOrCreate(pixelShaderPtr, vertexShaderPtr, DXGI_FORMAT_D32_FLOAT);
 
 				std::shared_ptr<PixelShader> renderTexPixelShaderPtr = core::ENGINE->GetResourceAtlas().LoadPixelShader("renderTexPixelShader.hlsl"); // Default render tex shader.
 				std::shared_ptr<VertexShader> renderTexVertexShaderPtr = core::ENGINE->GetResourceAtlas().LoadVertexShader("renderTexVertexShader.hlsl"); // Default render tex shader.
@@ -207,12 +204,7 @@ namespace gallus
 				renderTexVertexShaderPtr->SetResourceCategory(resources::EngineResourceCategory::Missing);
 				renderTexVertexShaderPtr->SetIsDestroyable(false);
 
-				m_pRenderTextureShaderBind = core::ENGINE->GetResourceAtlas().LoadShaderBind("renderTexShaderBind", renderTexPixelShaderPtr, renderTexVertexShaderPtr, DXGI_FORMAT_UNKNOWN); // Render Tex shader.
-				if (auto renderTexShaderBind = m_pRenderTextureShaderBind.lock())
-				{
-					renderTexShaderBind->SetResourceCategory(resources::EngineResourceCategory::Missing);
-					renderTexShaderBind->SetIsDestroyable(false);
-				}
+				m_pRenderTextureShaderBind = PipelineStateCache::GetOrCreate(renderTexPixelShaderPtr, renderTexVertexShaderPtr, DXGI_FORMAT_UNKNOWN);
 
 				std::weak_ptr<Mesh> meshPtr = core::ENGINE->GetResourceAtlas().LoadMesh("mod_missing.glb", cCommandQueue); // Default mesh.
 				if (auto mesh = meshPtr.lock())
@@ -890,10 +882,9 @@ namespace gallus
 					if (renderTex->CanBeDrawn())
 					{
 						// Bind pipeline + root signature
-						if (auto shaderBind = m_pRenderTextureShaderBind.lock())
+						if (m_pRenderTextureShaderBind)
 						{
-							commandList->GetCommandList()->SetPipelineState(
-								shaderBind->GetPipelineState());
+							commandList->GetCommandList()->SetPipelineState(m_pRenderTextureShaderBind);
 						}
 
 						renderTex->Bind(commandList);

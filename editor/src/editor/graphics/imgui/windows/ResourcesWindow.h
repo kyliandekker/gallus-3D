@@ -57,8 +57,7 @@ namespace gallus
 					m_bMeshesFoldedOut = false,
 					m_bMaterialsFoldedOut = false,
 					m_bPixelShadersFoldedOut = false,
-					m_bVertexShadersFoldedOut = false,
-					m_bShaderBindsFoldedOut = false;
+					m_bVertexShadersFoldedOut = false;
 			};
 		}
 	}

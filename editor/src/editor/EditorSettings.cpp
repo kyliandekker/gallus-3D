@@ -219,5 +219,29 @@ namespace gallus
 		{
 			return m_aLastOpenedScenes;
 		}
+
+		//---------------------------------------------------------------------
+        void EditorSettings::SetDimensionDrawMode(int a_iDimensionDrawMode)
+        {
+			m_iDimensionDrawMode = a_iDimensionDrawMode;
+		}
+
+		//---------------------------------------------------------------------
+		int EditorSettings::GetDimensionDrawMode() const
+		{
+			return m_iDimensionDrawMode;
+		}
+
+		//---------------------------------------------------------------------
+		void EditorSettings::SetShadingDrawMode(int a_iShadingDrawMode)
+		{
+			m_iShadingDrawMode = a_iShadingDrawMode;
+		}
+
+		//---------------------------------------------------------------------
+		int EditorSettings::GetShadingDrawMode() const
+		{
+			return m_iShadingDrawMode;
+		}
 	}
 }

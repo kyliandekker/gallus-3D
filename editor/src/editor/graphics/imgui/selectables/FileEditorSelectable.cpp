@@ -99,11 +99,6 @@ namespace gallus
 						m_pFileEditorSelectable = new PrefabFileEditorSelectables(m_Window, *this);
 						break;
 					}
-					case resources::AssetType::ShaderBind:
-					{
-						m_pFileEditorSelectable = nullptr;
-						break;
-					}
 					case resources::AssetType::Mesh:
 					{
 						m_pFileEditorSelectable = nullptr;

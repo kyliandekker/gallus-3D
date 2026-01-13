@@ -6,11 +6,12 @@
 // graphics
 #include "graphics/dx12/Texture.h"
 #include "graphics/dx12/Mesh.h"
-#include "graphics/dx12/ShaderBind.h"
+#include "graphics/dx12/Material.h"
 #include "graphics/dx12/Shader.h"
 #include "graphics/dx12/Transform.h"
 #include "graphics/dx12/CommandList.h"
 #include "graphics/dx12/CommandQueue.h"
+#include "graphics/dx12/ShaderFactory.h"
 
 // resources
 #include "resources/SrcData.h"
@@ -31,7 +32,6 @@ namespace gallus
 		{
 			Component::SetDefaults(a_EntityID);
 
-			m_pShaderBind = core::ENGINE->GetResourceAtlas().LoadShaderBind("defaultShaderBind");
 			m_pTexture = core::ENGINE->GetResourceAtlas().GetDefaultTexture();
 			m_pMesh = core::ENGINE->GetResourceAtlas().GetDefaultMesh();
 			m_vColor = { 1, 1, 1, 1 };
@@ -45,15 +45,15 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		void MeshComponent::SetMesh(std::weak_ptr<graphics::dx12::Mesh> a_pMesh)
+		void MeshComponent::Init()
 		{
-			m_pMesh = a_pMesh;
+			OnShadersChanged();
 		}
 
 		//---------------------------------------------------------------------
-		void MeshComponent::SetShader(std::weak_ptr<graphics::dx12::ShaderBind> a_pShaderBind)
+		void MeshComponent::SetMesh(std::weak_ptr<graphics::dx12::Mesh> a_pMesh)
 		{
-			m_pShaderBind = a_pShaderBind;
+			m_pMesh = a_pMesh;
 		}
 
 		//---------------------------------------------------------------------
@@ -65,6 +65,11 @@ namespace gallus
 		//---------------------------------------------------------------------
 		void MeshComponent::Render(std::shared_ptr<graphics::dx12::CommandList> a_pCommandList, const EntityID& a_EntityID, const graphics::dx12::Camera& a_Camera)
 		{
+			if (!m_pPipelineState)
+			{
+				return;
+			}
+
 			auto ent = core::ENGINE->GetECS().GetEntity(m_EntityID).lock();
 			if (!ent || !ent->IsActive())
 			{
@@ -80,14 +85,14 @@ namespace gallus
 
 			if (transform.GetCameraType() == graphics::dx12::CameraType_Screen)
 			{
-				if (core::ENGINE->GetDX12().GetCameraIsolationMode() != graphics::dx12::CameraIsolationMode::CameraIsolationMode_2D && core::ENGINE->GetDX12().GetCameraIsolationMode() != graphics::dx12::CameraIsolationMode::CameraIsolationMode_2D3D)
+				if (core::ENGINE->GetDX12().GetDimensionDrawMode() != graphics::dx12::DimensionDrawMode::DimensionDrawMode_2D && core::ENGINE->GetDX12().GetDimensionDrawMode() != graphics::dx12::DimensionDrawMode::DimensionDrawMode_2D3D)
 				{
 					return;
 				}
 			}
 			else if (transform.GetCameraType() == graphics::dx12::CameraType_World)
 			{
-				if (core::ENGINE->GetDX12().GetCameraIsolationMode() != graphics::dx12::CameraIsolationMode::CameraIsolationMode_3D && core::ENGINE->GetDX12().GetCameraIsolationMode() != graphics::dx12::CameraIsolationMode::CameraIsolationMode_2D3D)
+				if (core::ENGINE->GetDX12().GetDimensionDrawMode() != graphics::dx12::DimensionDrawMode::DimensionDrawMode_3D && core::ENGINE->GetDX12().GetDimensionDrawMode() != graphics::dx12::DimensionDrawMode::DimensionDrawMode_2D3D)
 				{
 					return;
 				}
@@ -120,13 +125,8 @@ namespace gallus
 				}
 			}
 
-			if (auto shaderBind = m_pShaderBind.lock())
-			{
-				if (shaderBind->IsValid())
-				{
-					shaderBind->Bind(a_pCommandList);
-				}
-			}
+			a_pCommandList->GetCommandList()->SetPipelineState(m_pPipelineState);
+			a_pCommandList->GetCommandList()->SetGraphicsRootSignature(core::ENGINE->GetDX12().GetRootSignature().Get());
 
 			if (auto mesh = m_pMesh.lock())
 			{
@@ -135,6 +135,12 @@ namespace gallus
 					mesh->Render(a_pCommandList, mvpMatrix, mMatrix);
 				}
 			}
+		}
+
+		//---------------------------------------------------------------------
+		void MeshComponent::OnShadersChanged()
+		{
+			m_pPipelineState = graphics::dx12::PipelineStateCache::GetOrCreate(m_pPixelShader, m_pVertexShader, DXGI_FORMAT_D32_FLOAT);
 		}
 
 		//---------------------------------------------------------------------

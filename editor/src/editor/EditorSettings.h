@@ -229,9 +229,41 @@ namespace gallus
 			/// <returns>True if FPS numbers are rounded up, false otherwise.</param>
 			bool GetFPSPrecision() const;
 
+			/// <summary>
+			/// Adds a scene to the recently opened scenes.
+			/// </summary>
+			/// <param name="a_sName">Scene path.</param>
 			void AddSceneToRecentScenes(const std::string& a_sName);
 
+			/// <summary>
+			/// Retrieves an array of scenes that got opened last.
+			/// </summary>
+			/// <returns>An array containing OpenedScenes.</param>
 			const std::vector<OpenedScene>& GetLastOpenedScenes() const;
+
+			/// <summary>
+			/// Sets the dimension draw mode (2D, 3D, both).
+			/// </summary>
+			/// <param name="a_iDimensionDrawMode">The type of the dimension draw mode.</param>
+			void SetDimensionDrawMode(int a_iDimensionDrawMode);
+
+			/// <summary>
+			/// Determines whether the editor should render only 2D, 3D or both.
+			/// </summary>
+			/// <returns>Integer representing the dimension draw mode.</returns>
+			int GetDimensionDrawMode() const;
+
+			/// <summary>
+			/// Sets the shading draw mode (wireframes, unlit, shaded, etc).
+			/// </summary>
+			/// <param name="a_iShadingDrawMode">The type of the shading draw mode.</param>
+			void SetShadingDrawMode(int a_iShadingDrawMode);
+
+			/// <summary>
+			/// Determines whether the editor should render only wireframes, unlit, etc.
+			/// </summary>
+			/// <returns>Integer representing the shading draw mode.</returns>
+			int GetShadingDrawMode() const;
 		private:
 			bool m_bScrollToBottom = false; /// Auto-scroll setting for the console.
 			bool m_bShowInfo = true; /// Check for info log messages.
@@ -254,6 +286,9 @@ namespace gallus
 			bool m_bFPSPrecision = false;
 
 			std::vector<OpenedScene> m_aLastOpenedScenes;
+
+			int m_iDimensionDrawMode = 0;
+			int m_iShadingDrawMode = 0;
 
 			BEGIN_SERIALIZE_PARENT(EditorSettings, Settings)
 				SERIALIZE_FIELD(m_bScrollToBottom, "Scroll To Bottom", "",
@@ -291,6 +326,11 @@ namespace gallus
 
 				SERIALIZE_FIELD(m_bFPSPrecision, "Fps Precision", "",
 					.type = FieldSerializationType::FieldSerializationType_Bool)
+
+				SERIALIZE_FIELD(m_iDimensionDrawMode, "Dimension Draw Mode", "",
+					.type = FieldSerializationType::FieldSerializationType_Int)
+				SERIALIZE_FIELD(m_iShadingDrawMode, "Shading Draw Mode", "",
+					.type = FieldSerializationType::FieldSerializationType_Int)
 
 				SERIALIZE_FIELD_OPTIONS(m_aLastOpenedScenes, "Last Scenes Opened", "Saves the last opened scenes.", MakeArrayFieldSerializationOptions<OpenedScene>())
 			END_SERIALIZE(Settings)

@@ -38,6 +38,12 @@ namespace gallus
 			}
 
 			/// <summary>
+			/// Initializes the component after deserialization.
+			/// </summary>
+			virtual void Init()
+			{}
+
+			/// <summary>
 			/// Initializes the component in runtime.
 			/// </summary>
 			virtual void InitRealtime()
