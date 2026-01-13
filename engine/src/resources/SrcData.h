@@ -4,10 +4,15 @@
 #include <string>
 #include <vector>
 #include <rapidjson/document.h>
-#include <DirectXMath.h>
 
 namespace gallus
 {
+	class Vector2;
+	class IVector2;
+	class Vector3;
+	class Vector4;
+	class Color4;
+
 	namespace core
 	{
 		class Data;
@@ -35,11 +40,11 @@ namespace gallus
 			bool GetFloat(const std::string& a_sKey, float& a_fFloat) const;
 
 			bool GetString(const std::string& a_sKey, std::string& a_sString) const;
-			bool GetVector2(const std::string& a_sKey, DirectX::XMFLOAT2& a_vVector) const;
-			bool GetIVector2(const std::string& a_sKey, DirectX::XMINT2& a_vVector) const;
-			bool GetVector3(const std::string& a_sKey, DirectX::XMFLOAT3& a_vVector) const;
-			bool GetVector4(const std::string& a_sKey, DirectX::XMFLOAT4& a_vVector) const;
-			bool GetColor(const std::string& a_sKey, DirectX::XMFLOAT4& a_vVector) const;
+			bool GetVector2(const std::string& a_sKey, Vector2& a_vVector) const;
+			bool GetIVector2(const std::string& a_sKey, IVector2& a_vVector) const;
+			bool GetVector3(const std::string& a_sKey, Vector3& a_vVector) const;
+			bool GetVector4(const std::string& a_sKey, Vector4& a_vVector) const;
+			bool GetColor(const std::string& a_sKey, Color4& a_vVector) const;
 
 			bool GetSrcObject(const std::string& a_sKey, SrcData& a_SrcData) const;
 			bool HasSrcObject(const std::string& a_sKey) const;
@@ -62,11 +67,11 @@ namespace gallus
 			void SetFloat(const std::string& a_sKey, float a_iFloat);
 
 			void SetString(const std::string& a_sKey, const std::string& a_sString);
-			void SetVector2(const std::string& a_sKey, const DirectX::XMFLOAT2& a_vVector);
-			void SetIVector2(const std::string& a_sKey, const DirectX::XMINT2& a_vVector);
-			void SetVector3(const std::string& a_sKey, const DirectX::XMFLOAT3& a_vVector);
-			void SetVector4(const std::string& a_sKey, const DirectX::XMFLOAT4& a_vVector);
-			void SetColor(const std::string& a_sKey, const DirectX::XMFLOAT4& a_vVector);
+			void SetVector2(const std::string& a_sKey, const Vector2& a_vVector);
+			void SetIVector2(const std::string& a_sKey, const IVector2& a_vVector);
+			void SetVector3(const std::string& a_sKey, const Vector3& a_vVector);
+			void SetVector4(const std::string& a_sKey, const Vector4& a_vVector);
+			void SetColor(const std::string& a_sKey, const Color4& a_vVector);
 
 			void SetSrcObject(const std::string& a_sKey, SrcData& a_SrcData);
 			void PushArraySrcObject(SrcData& a_SrcData);

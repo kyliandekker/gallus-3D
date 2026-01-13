@@ -112,6 +112,17 @@ namespace gallus
 						// Draw the scene view.
 						DrawSceneView(tex, sceneViewRect);
 
+						graphics::dx12::DX12System& dx12System = core::EDITOR_ENGINE->GetDX12();
+						graphics::dx12::Camera& editorCamera = core::EDITOR_ENGINE->GetEditor().GetEditorCamera();
+						
+						ImU32 backgroundColor = IM_COL32(255, 255, 255, 255);
+						ImGui::GetWindowDrawList()->AddText(
+							sceneViewRect.Min + m_Window.GetFramePadding(),
+							backgroundColor,
+							&dx12System.GetActiveCamera() != &editorCamera ? "Game Camera" : "Editor Camera"
+						);
+
+
 						// Handle specific controls like camera.
 						HandleSceneViewControls(core::EDITOR_ENGINE->GetDX12().GetFPS().GetDeltaTime(), sceneViewRect);
 					}
@@ -579,15 +590,12 @@ namespace gallus
 				);
 			}
 
+			static std::unordered_map<graphics::dx12::Camera*, std::pair<float, float>> s_mCameraRotation;
 			//---------------------------------------------------------------------
 			void SceneWindow::HandleSceneViewControls(double a_fDeltaTime, const ImRect& a_vSceneRect)
 			{
 				graphics::dx12::DX12System& dx12System = core::EDITOR_ENGINE->GetDX12();
-				graphics::dx12::Camera& camera = core::EDITOR_ENGINE->GetEditor().GetEditorCamera();
-				if (&dx12System.GetActiveCamera() != &camera)
-				{
-					return;
-				}
+				graphics::dx12::Camera& camera = dx12System.GetActiveCamera();
 
 				ImGuiIO& io = ImGui::GetIO();
 				ImVec2 mouse = io.MousePos;
@@ -645,8 +653,8 @@ namespace gallus
 				float moveDistance = totalMoveSpeed * static_cast<float>(a_fDeltaTime);
 				int camIsolationMode = dx12System.GetCameraIsolationMode();
 
-				static float s_fYawDegrees = 0.0f;
-				static float s_fPitchDegrees = 0.0f;
+				float& yaw = s_mCameraRotation[&camera].first;
+				float& pitch = s_mCameraRotation[&camera].second;
 				static POINT s_CenterPos = { 0, 0 };
 				static bool s_bFirstFrame = true;
 
@@ -680,20 +688,20 @@ namespace gallus
 					if (camIsolationMode != graphics::dx12::CameraIsolationMode_2D)
 					{
 						// Update yaw/pitch
-						s_fYawDegrees += deltaX * rotationSpeed;
-						s_fPitchDegrees += deltaY * rotationSpeed;
+						yaw += deltaX * rotationSpeed;
+						pitch += deltaY * rotationSpeed;
 
-						if (s_fPitchDegrees > 89.0f) s_fPitchDegrees = 89.0f;
-						if (s_fPitchDegrees < -89.0f) s_fPitchDegrees = -89.0f;
+						if (pitch > 89.0f) pitch = 89.0f;
+						if (pitch < -89.0f) pitch = -89.0f;
 
 						// Compute rotation quaternion
 						DirectX::XMVECTOR yawQuat = DirectX::XMQuaternionRotationAxis(
 							DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f),
-							DirectX::XMConvertToRadians(s_fYawDegrees)
+							DirectX::XMConvertToRadians(yaw)
 						);
 						DirectX::XMVECTOR pitchQuat = DirectX::XMQuaternionRotationAxis(
 							DirectX::XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f),
-							DirectX::XMConvertToRadians(s_fPitchDegrees)
+							DirectX::XMConvertToRadians(pitch)
 						);
 						DirectX::XMVECTOR rotation = DirectX::XMQuaternionNormalize(
 							DirectX::XMQuaternionMultiply(pitchQuat, yawQuat)

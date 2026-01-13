@@ -11,7 +11,8 @@
 // logger
 #include "logger/Logger.h"
 
-#include "core/DataStream.h"
+// utils
+#include "utils/math.h"
 
 namespace gallus
 {
@@ -130,7 +131,7 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		bool SrcData::GetVector2(const std::string& a_sKey, DirectX::XMFLOAT2& a_vVector) const
+		bool SrcData::GetVector2(const std::string& a_sKey, Vector2& a_vVector) const
 		{
 			if (m_Document.HasParseError() || m_Document.IsNull())
 			{
@@ -159,7 +160,7 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		bool SrcData::GetIVector2(const std::string& a_sKey, DirectX::XMINT2& a_vVector) const
+		bool SrcData::GetIVector2(const std::string& a_sKey, IVector2& a_vVector) const
 		{
 			if (m_Document.HasParseError() || m_Document.IsNull())
 			{
@@ -188,7 +189,7 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		bool SrcData::GetVector3(const std::string& a_sKey, DirectX::XMFLOAT3& a_vVector) const
+		bool SrcData::GetVector3(const std::string& a_sKey, Vector3& a_vVector) const
 		{
 			if (m_Document.HasParseError() || m_Document.IsNull())
 			{
@@ -222,7 +223,7 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		bool SrcData::GetVector4(const std::string& a_sKey, DirectX::XMFLOAT4& a_vVector) const
+		bool SrcData::GetVector4(const std::string& a_sKey, Vector4& a_vVector) const
 		{
 			if (m_Document.HasParseError() || m_Document.IsNull())
 			{
@@ -261,7 +262,7 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		bool SrcData::GetColor(const std::string& a_sKey, DirectX::XMFLOAT4& a_vVector) const
+		bool SrcData::GetColor(const std::string& a_sKey, Color4& a_vVector) const
 		{
 			if (m_Document.HasParseError() || m_Document.IsNull())
 			{
@@ -275,22 +276,22 @@ namespace gallus
 				return false;
 			}
 
-			if (!rapidjson::GetFloat(m_Document[a_sKey.c_str()], SRC_DATA_VECTOR_R, a_vVector.x))
+			if (!rapidjson::GetFloat(m_Document[a_sKey.c_str()], SRC_DATA_VECTOR_R, a_vVector.r))
 			{
 				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" does not have an r axis.", a_sKey.c_str());
 				return false;
 			}
-			if (!rapidjson::GetFloat(m_Document[a_sKey.c_str()], SRC_DATA_VECTOR_G, a_vVector.y))
+			if (!rapidjson::GetFloat(m_Document[a_sKey.c_str()], SRC_DATA_VECTOR_G, a_vVector.g))
 			{
 				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" does not have an g axis.", a_sKey.c_str());
 				return false;
 			}
-			if (!rapidjson::GetFloat(m_Document[a_sKey.c_str()], SRC_DATA_VECTOR_B, a_vVector.z))
+			if (!rapidjson::GetFloat(m_Document[a_sKey.c_str()], SRC_DATA_VECTOR_B, a_vVector.b))
 			{
 				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" does not have an b axis.", a_sKey.c_str());
 				return false;
 			}
-			if (!rapidjson::GetFloat(m_Document[a_sKey.c_str()], SRC_DATA_VECTOR_A, a_vVector.w))
+			if (!rapidjson::GetFloat(m_Document[a_sKey.c_str()], SRC_DATA_VECTOR_A, a_vVector.a))
 			{
 				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" does not have an a axis.", a_sKey.c_str());
 				return false;
@@ -452,7 +453,7 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		void SrcData::SetVector2(const std::string& a_sKey, const DirectX::XMFLOAT2& a_vVector)
+		void SrcData::SetVector2(const std::string& a_sKey, const Vector2& a_vVector)
 		{
 			rapidjson::Document::AllocatorType& allocator = m_Document.GetAllocator();
 			rapidjson::Value vectorObj(rapidjson::kObjectType);
@@ -464,7 +465,7 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		void SrcData::SetIVector2(const std::string& a_sKey, const DirectX::XMINT2& a_vVector)
+		void SrcData::SetIVector2(const std::string& a_sKey, const IVector2& a_vVector)
 		{
 			rapidjson::Document::AllocatorType& allocator = m_Document.GetAllocator();
 			rapidjson::Value vectorObj(rapidjson::kObjectType);
@@ -476,7 +477,7 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		void SrcData::SetVector3(const std::string& a_sKey, const DirectX::XMFLOAT3& a_vVector)
+		void SrcData::SetVector3(const std::string& a_sKey, const Vector3& a_vVector)
 		{
 			rapidjson::Document::AllocatorType& allocator = m_Document.GetAllocator();
 			rapidjson::Value vectorObj(rapidjson::kObjectType);
@@ -489,7 +490,7 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		void SrcData::SetVector4(const std::string& a_sKey, const DirectX::XMFLOAT4& a_vVector)
+		void SrcData::SetVector4(const std::string& a_sKey, const Vector4& a_vVector)
 		{
 			rapidjson::Document::AllocatorType& allocator = m_Document.GetAllocator();
 			rapidjson::Value vectorObj(rapidjson::kObjectType);
@@ -503,15 +504,15 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		void SrcData::SetColor(const std::string& a_sKey, const DirectX::XMFLOAT4& a_vVector)
+		void SrcData::SetColor(const std::string& a_sKey, const Color4& a_vVector)
 		{
 			rapidjson::Document::AllocatorType& allocator = m_Document.GetAllocator();
 			rapidjson::Value vectorObj(rapidjson::kObjectType);
 
-			vectorObj.AddMember(rapidjson::Value(SRC_DATA_VECTOR_R, allocator).Move(), a_vVector.x, allocator);
-			vectorObj.AddMember(rapidjson::Value(SRC_DATA_VECTOR_G, allocator).Move(), a_vVector.y, allocator);
-			vectorObj.AddMember(rapidjson::Value(SRC_DATA_VECTOR_B, allocator).Move(), a_vVector.z, allocator);
-			vectorObj.AddMember(rapidjson::Value(SRC_DATA_VECTOR_A, allocator).Move(), a_vVector.w, allocator);
+			vectorObj.AddMember(rapidjson::Value(SRC_DATA_VECTOR_R, allocator).Move(), a_vVector.r, allocator);
+			vectorObj.AddMember(rapidjson::Value(SRC_DATA_VECTOR_G, allocator).Move(), a_vVector.g, allocator);
+			vectorObj.AddMember(rapidjson::Value(SRC_DATA_VECTOR_B, allocator).Move(), a_vVector.b, allocator);
+			vectorObj.AddMember(rapidjson::Value(SRC_DATA_VECTOR_A, allocator).Move(), a_vVector.a, allocator);
 
 			m_Document.AddMember(rapidjson::Value(a_sKey.c_str(), allocator).Move(), vectorObj, allocator);
 		}

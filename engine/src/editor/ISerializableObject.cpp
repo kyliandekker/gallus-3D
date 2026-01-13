@@ -208,27 +208,37 @@ namespace gallus
 				}
 				case FieldSerializationType::FieldSerializationType_Vector2:
 				{
-					a_SrcData.GetVector2(propertyName, *(DirectX::XMFLOAT2*)ptr);
+					Vector2 vec2;
+					a_SrcData.GetVector2(propertyName, vec2);
+					*(DirectX::XMFLOAT2*) ptr = vec2;
 					break;
 				}
 				case FieldSerializationType::FieldSerializationType_IVector2:
 				{
-					a_SrcData.GetIVector2(propertyName, *(DirectX::XMINT2*)ptr);
+					IVector2 ivec2;
+					a_SrcData.GetIVector2(propertyName, ivec2);
+					*(DirectX::XMINT2*) ptr = ivec2;
 					break;
 				}
 				case FieldSerializationType::FieldSerializationType_Vector3:
 				{
-					a_SrcData.GetVector3(propertyName, *(DirectX::XMFLOAT3*)ptr);
+					Vector3 vec3;
+					a_SrcData.GetVector3(propertyName, vec3);
+					*(DirectX::XMFLOAT3*) ptr = vec3;
 					break;
 				}
 				case FieldSerializationType::FieldSerializationType_Color:
 				{
-					a_SrcData.GetColor(propertyName, *(DirectX::XMFLOAT4*)ptr);
+					Color4 col;
+					a_SrcData.GetColor(propertyName, col);
+					*(DirectX::XMFLOAT4*) ptr = col;
 					break;
 				}
 				case FieldSerializationType::FieldSerializationType_Quaternion:
 				{
-					a_SrcData.GetVector4(propertyName, *(DirectX::XMFLOAT4*) ptr);
+					Vector4 vec4;
+					a_SrcData.GetVector4(propertyName, vec4);
+					*(DirectX::XMFLOAT4*) ptr = vec4;
 					break;
 				}
 				case FieldSerializationType::FieldSerializationType_EngineResource:
@@ -428,7 +438,7 @@ namespace gallus
 				case FieldSerializationType::FieldSerializationType_Color:
 				{
 					const DirectX::XMFLOAT4* value = reinterpret_cast<const DirectX::XMFLOAT4*>(ptr);
-					a_SrcData.SetColor(propertyName, *value);
+					a_SrcData.SetColor(propertyName, { *value });
 					break;
 				}
 				case FieldSerializationType::FieldSerializationType_Quaternion:
