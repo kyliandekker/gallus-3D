@@ -6,6 +6,7 @@
 #include <cstddef>
 #include <type_traits>
 #include <memory>
+#include <unordered_set>
 
 #include "resources/AssetType.h"
 
@@ -107,6 +108,21 @@ namespace gallus
 		virtual const std::vector<EditorGizmoInfo>& GetEditorGizmos() const = 0;
 		virtual const char* GetTypeName() const = 0;
 		virtual ~ISerializableObject() = default;
+
+#ifdef _EDITOR
+		void MarkFieldChanged(const FieldSerializationInfo* field)
+		{
+			m_PendingChangedFields.insert(field);
+		}
+
+		bool ConsumeFieldChanged(const FieldSerializationInfo* field)
+		{
+			return m_PendingChangedFields.erase(field) > 0;
+		}
+
+	private:
+		std::unordered_set<const FieldSerializationInfo*> m_PendingChangedFields;
+#endif
 	};
 
 	template<typename T>

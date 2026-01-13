@@ -185,6 +185,7 @@ namespace gallus
 				const std::string& a_sId,
 				gallus::resources::EngineResource* a_pLocked,
 				std::weak_ptr<gallus::resources::EngineResource>* a_pWeak,
+				ISerializableObject* a_pObject,
 				const FieldSerializationInfo& a_Field)
 			{
 				bool changed = false;
@@ -235,11 +236,12 @@ namespace gallus
 						.GetWindowsConfig<EditorWindowsConfig>().GetFilePickerModal();
 
 					filePickerModal.SetData(
-						[a_pWeak, &a_Field](int success, const std::string& resourceName)
+						[a_pWeak, &a_Field, a_pObject](int success, const std::string& resourceName)
 						{
 							if (success == 1)
 							{
 								DeserializeResource(a_pWeak, a_Field.m_Options.assetType, a_Field.m_Options.assetType, resourceName);
+								a_pObject->MarkFieldChanged(&a_Field);
 							}
 						},
 						a_Field.m_Options.assetType);
@@ -249,6 +251,11 @@ namespace gallus
 
 				ImGui::ShowTooltip(a_Field.m_sDescription);
 				ImGui::PopStyleVar();
+
+				if (a_pObject->ConsumeFieldChanged(&a_Field))
+				{
+					changed = true;
+				}
 
 				return changed;
 			}
@@ -527,7 +534,7 @@ namespace gallus
 					std::weak_ptr<gallus::resources::EngineResource>* pWeak =
 						reinterpret_cast<std::weak_ptr<gallus::resources::EngineResource>*>(ptr);
 
-					func = [&a_Field, &fieldId, pWeak]()
+					func = [&a_Field, &fieldId, pWeak, a_pObject]()
 						{
 							std::shared_ptr<gallus::resources::EngineResource> locked;
 							if (pWeak)
@@ -538,7 +545,7 @@ namespace gallus
 							gallus::resources::EngineResource* pLocked =
 								(locked.get()) ? locked.get() : nullptr;
 
-							return ShowAssetPicker(fieldId, pLocked, pWeak, a_Field);
+							return ShowAssetPicker(fieldId, pLocked, pWeak, a_pObject, a_Field);
 						};
 
 					break;
