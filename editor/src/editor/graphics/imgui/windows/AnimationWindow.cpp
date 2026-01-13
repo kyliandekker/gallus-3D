@@ -15,6 +15,7 @@
 // animation
 #include "animation/AnimationKeyFrameSpriteComponent.h"
 #include "animation/AnimationKeyFrameEventComponent.h"
+#include "animation/AnimationKeyFrame.h"
 
 // utils
 #include "utils/string_extensions.h"

@@ -2,9 +2,6 @@
 
 #include "AnimationKeyFrameComponentBase.h"
 
-// animation
-#include "animation/AnimationEvents.h"
-
 #define ANIMATION_KEY_FRAME_EVENT_COMPONENT_NAME "Event"
 #define ANIMATION_KEY_FRAME_EVENT_COMPONENT_PROPERTY_NAME "event"
 
@@ -12,6 +9,8 @@ namespace gallus
 {
 	namespace animation
 	{
+		enum class AnimationEvent;
+
 		class AnimationKeyFrameEventComponent : public AnimationKeyFrameComponentBase
 		{
 		public:

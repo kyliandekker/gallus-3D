@@ -5,8 +5,6 @@
 // external
 #include <DirectXMath.h>
 
-#include "core/Observable.h"
-
 // graphics
 #include "graphics/dx12/Transform.h"
 

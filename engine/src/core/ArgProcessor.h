@@ -1,9 +1,9 @@
+#pragma once
+
 // external
 #include <string>
 #include <vector>
 #include <memory>
-
-#pragma once
 
 constexpr const char* ASSET_PATH_ARG = "assetPath";
 constexpr const char* ASSERT_LEVEL_ARG = "assertLevel";

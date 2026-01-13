@@ -9,7 +9,7 @@ namespace gallus
 {
 	namespace gameplay
 	{
-		class EntityID;
+		struct EntityID;
 	}
 	namespace animation
 	{
@@ -30,8 +30,7 @@ namespace gallus
 			/// Activates the key frame component's behaviour.
 			/// </summary>
 			/// <param name="a_EntityID">The related entity id.</param>
-			virtual void Activate(gameplay::EntityID& a_EntityID)
-			{}
+			virtual void Activate(gameplay::EntityID& a_EntityID);
 
 			virtual std::string GetName() const = 0;
 

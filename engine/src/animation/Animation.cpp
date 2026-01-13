@@ -19,6 +19,7 @@
 #include "resources/SrcData.h"
 
 #include "animation/AnimationEvents.h"
+#include "animation/AnimationKeyFrame.h"
 
 #define ANIMATION_TRACK_FRAME_COUNT_VAR "frameCount"
 #define ANIMATION_TRACK_LOOP_VAR "loop"

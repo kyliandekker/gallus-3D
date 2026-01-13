@@ -6,11 +6,12 @@
 // animation
 #include "animation/AnimationKeyFrameComponentBase.h"
 
-// gameplay
-#include "gameplay/EntityID.h"
-
 namespace gallus
 {
+	namespace gameplay
+	{
+		struct EntityID;
+	}
 	namespace resources
 	{
 		class SrcData;

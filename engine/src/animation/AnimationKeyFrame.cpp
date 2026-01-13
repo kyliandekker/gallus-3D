@@ -2,6 +2,8 @@
 
 #include "animation/Animation.h"
 
+#include "gameplay/EntityID.h"
+
 namespace gallus
 {
 	namespace animation

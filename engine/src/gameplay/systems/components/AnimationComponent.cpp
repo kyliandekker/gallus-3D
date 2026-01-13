@@ -5,6 +5,7 @@
 
 // animation
 #include "animation/Animation.h"
+#include "animation/AnimationKeyFrame.h"
 
 // resources
 #include "resources/SrcData.h"

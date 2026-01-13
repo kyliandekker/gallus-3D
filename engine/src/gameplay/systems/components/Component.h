@@ -4,7 +4,7 @@
 #include <string>
 
 // gameplay
-#include "gameplay/EntityID.h" // TODO: Pretty sure this can be forward declared, can it not?
+#include "gameplay/EntityID.h" 
 
 // editor
 #include "editor/ISerializableObject.h"

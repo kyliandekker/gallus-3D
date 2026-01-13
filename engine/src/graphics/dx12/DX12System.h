@@ -22,17 +22,13 @@
 #include "graphics/dx12/DX12Resource.h"
 #include "graphics/dx12/DirectionalLight.h"
 
-// utils
-#include "utils/math.h"
-
-// gameplay
-#include "gameplay/systems/components/SpriteComponent.h"
-
 #undef min
 #undef max
 
 namespace gallus
 {
+	class IVector2;
+
 	namespace gameplay
 	{
 		class SpriteComponent;
