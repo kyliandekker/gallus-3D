@@ -27,11 +27,11 @@ namespace gallus
 			SrcData(const rapidjson::Value& a_Value);
 
 			// getters
-			bool GetInt(const std::string& a_sKey, int& a_iInt) const;
+			bool GetInt(const std::string& a_sKey, int32_t& a_iInt) const;
 			template <typename T>
 			bool GetEnum(const std::string& a_sKey, T& a_Enum) const
 			{
-				int enumVal = 0;
+				int32_t enumVal = 0;
 				bool success = GetInt(a_sKey, enumVal);
 				a_Enum = static_cast<T>(enumVal);
 				return success;
@@ -57,12 +57,12 @@ namespace gallus
 			// setters
 			void SetObject();
 			void SetArray();
-			void SetInt(const std::string& a_sKey, int a_iInt);
+			void SetInt(const std::string& a_sKey, int32_t a_iInt);
 			void SetBool(const std::string& a_sKey, bool a_iBool);
 			template <typename T>
 			void SetEnum(const std::string& a_sKey, T a_Enum)
 			{
-				SetInt(a_sKey, static_cast<int>(a_Enum));
+				SetInt(a_sKey, static_cast<int32_t>(a_Enum));
 			}
 			void SetFloat(const std::string& a_sKey, float a_iFloat);
 

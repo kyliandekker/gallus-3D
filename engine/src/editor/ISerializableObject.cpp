@@ -143,17 +143,9 @@ namespace gallus
 					a_SrcData.GetFloat(propertyName, *(float*)ptr);
 					break;
 				}
-				case FieldSerializationType::FieldSerializationType_Int:
-				{
-					int value = 0;
-					a_SrcData.GetInt(propertyName, value);
-					int* pValue = reinterpret_cast<int*>(ptr);
-					*pValue = value;
-					break;
-				}
 				case FieldSerializationType::FieldSerializationType_Int8:
 				{
-					int value = 0;
+					int32_t value = 0;
 					a_SrcData.GetInt(propertyName, value);
 					int8_t* pValue = reinterpret_cast<int8_t*>(ptr);
 					*pValue = value;
@@ -161,7 +153,7 @@ namespace gallus
 				}
 				case FieldSerializationType::FieldSerializationType_Int16:
 				{
-					int value = 0;
+					int32_t value = 0;
 					a_SrcData.GetInt(propertyName, value);
 					int16_t* pValue = reinterpret_cast<int16_t*>(ptr);
 					*pValue = value;
@@ -169,23 +161,15 @@ namespace gallus
 				}
 				case FieldSerializationType::FieldSerializationType_Int32:
 				{
-					int value = 0;
+					int32_t value = 0;
 					a_SrcData.GetInt(propertyName, value);
 					int32_t* pValue = reinterpret_cast<int32_t*>(ptr);
 					*pValue = value;
 					break;
 				}
-				case FieldSerializationType::FieldSerializationType_Int64:
-				{
-					int value = 0;
-					a_SrcData.GetInt(propertyName, value);
-					int64_t* pValue = reinterpret_cast<int64_t*>(ptr);
-					*pValue = value;
-					break;
-				}
 				case FieldSerializationType::FieldSerializationType_Enum:
 				{
-					int enumValue = 0;
+					int32_t enumValue = 0;
 					a_SrcData.GetInt(propertyName, enumValue);
 
 					int32_t* pEnum = reinterpret_cast<int32_t*>(ptr);
@@ -361,13 +345,6 @@ namespace gallus
 					a_SrcData.SetFloat(propertyName, *value);
 					break;
 				}
-				case FieldSerializationType::FieldSerializationType_Int:
-				{
-					const int* value = reinterpret_cast<const int*>(ptr);
-					int64_t temp = static_cast<int64_t>(*value);
-					a_SrcData.SetInt(propertyName, temp);
-					break;
-				}
 				case FieldSerializationType::FieldSerializationType_Int8:
 				{
 					const int8_t* value = reinterpret_cast<const int8_t*>(ptr);
@@ -386,13 +363,6 @@ namespace gallus
 				{
 					const int32_t* value = reinterpret_cast<const int32_t*>(ptr);
 					int64_t temp = static_cast<int64_t>(*value);
-					a_SrcData.SetInt(propertyName, temp);
-					break;
-				}
-				case FieldSerializationType::FieldSerializationType_Int64:
-				{
-					const int64_t* value = reinterpret_cast<const int64_t*>(ptr);
-					int64_t temp = *value;
 					a_SrcData.SetInt(propertyName, temp);
 					break;
 				}

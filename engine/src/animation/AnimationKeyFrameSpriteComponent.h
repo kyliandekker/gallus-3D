@@ -43,7 +43,7 @@ namespace gallus
 			}
 		private:
 			std::weak_ptr<graphics::dx12::Texture> m_pSprite = {};
-			int m_iSpriteIndex = 0;
+			uint16_t m_iSpriteIndex = 0;
 
 			BEGIN_SERIALIZE_PARENT(AnimationKeyFrameSpriteComponent, AnimationKeyFrameComponentBase)
 			 	SERIALIZE_FIELD(m_pSprite, "Sprite", "Pointer to the texture asset used by this sprite. Can be nullptr if no texture is assigned. Determines the visual appearance of the sprite.",
@@ -51,7 +51,7 @@ namespace gallus
 			 		.assetType = resources::AssetType::Sprite,
 			 	)
 			 	SERIALIZE_FIELD(m_iSpriteIndex, "Sprite Index", "Index of the sprite within a texture atlas. Used when the texture contains multiple sprites to select which one is displayed.",
-			 		.type = FieldSerializationType::FieldSerializationType_Int8
+			 		.type = FieldSerializationType::FieldSerializationType_Int16
 			 	)
 			 	SERIALIZE_FIELD(m_pSprite, "Sprite Preview", "",
 			 		.type = FieldSerializationType::FieldSerializationType_TexturePreview,

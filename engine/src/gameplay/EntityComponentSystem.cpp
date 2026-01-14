@@ -171,7 +171,7 @@ namespace gallus
 			std::string name = a_sName;
 
 			bool found = true;
-			int i = 0;
+			size_t i = 0;
 			while (found)
 			{
 				found = false;

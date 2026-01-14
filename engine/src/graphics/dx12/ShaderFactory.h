@@ -106,6 +106,12 @@ namespace gallus
 					std::shared_ptr<PixelShader> ps = key.pixelShader.lock();
 					std::shared_ptr<VertexShader> vs = key.vertexShader.lock();
 
+					if (!ps || !vs)
+					{
+						LOG(LOGSEVERITY_ERROR, LOG_CATEGORY_DX12, "Failed creating pipeline state because pixel shader or vertex shader were null.");
+						return nullptr;
+					}
+
 					PipelineStateStream pipelineStateStream;
 					pipelineStateStream.pRootSignature = core::ENGINE->GetDX12().GetRootSignature().Get();
 					pipelineStateStream.InputLayout = { g_aInputLayout, _countof(g_aInputLayout) };

@@ -362,11 +362,11 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			SpriteUV Texture::GetSpriteUV(int a_iIndex) const
+			SpriteUV Texture::GetSpriteUV(uint16_t a_iIndex) const
 			{
 				SpriteUV uv;
 
-				if (a_iIndex < 0 || a_iIndex >= static_cast<int>(m_aSpriteRects.size()))
+				if (a_iIndex < 0 || a_iIndex >= static_cast<uint16_t>(m_aSpriteRects.size()))
 				{
 					return uv;
 				}

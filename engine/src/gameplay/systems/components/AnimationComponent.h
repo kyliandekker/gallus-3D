@@ -62,7 +62,7 @@ namespace gallus
 			
 			std::weak_ptr<animation::Animation> m_pStartingAnimation;
 
-			int m_iNextKeyFrameIndex = 0;
+			uint16_t m_iNextKeyFrameIndex = 0;
 			bool m_bIsLooping = false;
 			bool m_bIsPlaying = false;
 			float m_fAccumulatedTime = 0.0f;

@@ -67,7 +67,7 @@ namespace gallus
 			/// Sets the texture index.
 			/// </summary>
 			/// <param name="a_iTextureIndex">The index the texture should have.</param>
-			void SetTextureIndex(int8_t a_iTextureIndex);
+			void SetTextureIndex(uint16_t a_iTextureIndex);
 
 			/// <summary>
 			/// Sets the material.
@@ -87,7 +87,7 @@ namespace gallus
 			std::weak_ptr<graphics::dx12::VertexShader> m_pVertexShader = {};
 			std::weak_ptr<graphics::dx12::Mesh> m_pMesh = {};
 			std::weak_ptr<graphics::dx12::Texture> m_pTexture = {};
-			int8_t m_iTextureIndex = 0;
+			uint16_t m_iTextureIndex = 0;
 			std::weak_ptr<graphics::dx12::Material> m_pMaterial = {};
 			DirectX::XMFLOAT4 m_vColor = { 1, 1, 1, 1 };
 
@@ -117,7 +117,7 @@ namespace gallus
 					.type = FieldSerializationType::FieldSerializationType_EngineResource,
 					.assetType = resources::AssetType::Sprite)
 				SERIALIZE_FIELD(m_iTextureIndex, "Texture Index", "Index of the Mesh within a texture atlas. Used when the texture contains multiple rects to select which one is displayed.",
-					.type = FieldSerializationType::FieldSerializationType_Int8)
+					.type = FieldSerializationType::FieldSerializationType_Int16)
 				SERIALIZE_FIELD(m_pTexture, "Texture Preview", "",
 					.type = FieldSerializationType::FieldSerializationType_TexturePreview,
 					.relatedIndexFieldOffset = offsetof(MeshComponent, m_iTextureIndex))

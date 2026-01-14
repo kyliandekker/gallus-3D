@@ -24,6 +24,8 @@ namespace gallus
 			class Texture;
 			class Mesh;
 			class Camera;
+			class PixelShader;
+			class VertexShader;
 		}
 	}
 	namespace gameplay
@@ -86,13 +88,25 @@ namespace gallus
 
 			bool m_bIsStatic = false;
 			int8_t m_iOrder = false;
-
+			
+			std::weak_ptr<graphics::dx12::PixelShader> m_pPixelShader = {};
+			std::weak_ptr<graphics::dx12::VertexShader> m_pVertexShader = {};
 			std::weak_ptr<graphics::dx12::Mesh> m_pMesh = {};
 			std::weak_ptr<graphics::dx12::Texture> m_pSprite = {};
-			int8_t m_iSpriteIndex = 0;
+			uint16_t m_iSpriteIndex = 0;
 			DirectX::XMFLOAT4 m_vColor = { 1, 1, 1, 1 };
 
+			void OnShadersChanged();
+
 			BEGIN_SERIALIZE_PARENT(SpriteComponent, Component)
+				SERIALIZE_FIELD(m_pPixelShader, "Pixel Shader", "Pointer to the pixel shader asset used for rendering this object. Can be nullptr if no specific pixel shader is assigned.",
+					.type = FieldSerializationType::FieldSerializationType_EngineResource,
+					.assetType = resources::AssetType::PixelShader,
+					.onChangeFunc = MakeOnChangeFunc(&SpriteComponent::OnShadersChanged))
+				SERIALIZE_FIELD(m_pVertexShader, "Vertex Shader", "Pointer to the vertex shader asset used for rendering this object. Can be nullptr if no specific vertex shader is assigned.",
+					.type = FieldSerializationType::FieldSerializationType_EngineResource,
+					.assetType = resources::AssetType::VertexShader,
+					.onChangeFunc = MakeOnChangeFunc(&SpriteComponent::OnShadersChanged))
 			 	SERIALIZE_FIELD(m_bIsStatic, "Static", "Determines whether the sprite should stick on the screen or not.",
 			 		.type = FieldSerializationType::FieldSerializationType_Bool)
 			 	SERIALIZE_FIELD(m_iOrder, "Order", "Determines what sprites overlap other sprites.",
@@ -104,7 +118,7 @@ namespace gallus
 			 		.type = FieldSerializationType::FieldSerializationType_EngineResource,
 			 		.assetType = resources::AssetType::Sprite)
 			 	SERIALIZE_FIELD(m_iSpriteIndex, "Sprite Index", "Index of the sprite within a texture atlas. Used when the texture contains multiple sprites to select which one is displayed.",
-			 		.type = FieldSerializationType::FieldSerializationType_Int8)
+			 		.type = FieldSerializationType::FieldSerializationType_Int16)
 			 	SERIALIZE_FIELD(m_pSprite, "Sprite Preview", "",
 			 		.type = FieldSerializationType::FieldSerializationType_TexturePreview,
 			 		.relatedIndexFieldOffset = offsetof(SpriteComponent, m_iSpriteIndex))

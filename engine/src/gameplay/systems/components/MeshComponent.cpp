@@ -161,7 +161,7 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		void MeshComponent::SetTextureIndex(int8_t a_iMeshIndex)
+		void MeshComponent::SetTextureIndex(uint16_t a_iMeshIndex)
 		{
 			size_t numMeshRects = 0;
 			if (auto tex = m_pTexture.lock())
@@ -174,7 +174,7 @@ namespace gallus
 			}
 			else if (a_iMeshIndex > numMeshRects)
 			{
-				a_iMeshIndex = numMeshRects;
+				a_iMeshIndex = static_cast<uint16_t>(numMeshRects);
 			}
 			m_iTextureIndex = a_iMeshIndex;
 		}

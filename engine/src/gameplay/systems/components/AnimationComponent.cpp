@@ -69,7 +69,7 @@ namespace gallus
 			while (m_iNextKeyFrameIndex < animationTrack->GetKeyFrames().size())
 			{
 				animation::AnimationKeyFrame* keyFrame = animationTrack->GetKeyFrames()[m_iNextKeyFrameIndex];
-				int keyFrameNumber = keyFrame->GetFrame(); // Actual frame number.
+				uint16_t keyFrameNumber = keyFrame->GetFrame(); // Actual frame number.
 				float keyFrameTime = keyFrameNumber * FRAME_TIME;
 
 				if (m_fAccumulatedTime >= keyFrameTime)

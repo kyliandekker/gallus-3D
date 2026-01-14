@@ -305,7 +305,7 @@ namespace gallus
 			mutable std::mutex m_MessagesMutex; /// The mutex used for synchronization between the threads for stopping or initializing.
 			std::condition_variable m_MessageCondVar; /// Used for lazy thread.
 
-			LogSeverity m_AssertLevel = LogSeverity::LOGSEVERITY_ERROR;
+			LogSeverity m_AssertLevel = LogSeverity::LOGSEVERITY_ASSERT;
 			bool m_bLogToFile = false;
 			LogType m_LogType = LogType::LOGTYPE_WITH_PARENT_FOLDER;
 		};

@@ -142,7 +142,7 @@ namespace gallus
 			}
 
 			// Check that no other key is down
-			for (int k = ImGuiKey_NamedKey_BEGIN; k < ImGuiKey_COUNT; k++)
+			for (size_t k = ImGuiKey_NamedKey_BEGIN; k < ImGuiKey_COUNT; k++)
 			{
 				ImGuiKey currentKey = static_cast<ImGuiKey>(k);
 
@@ -164,7 +164,7 @@ namespace gallus
 
 		inline bool IsAnyKeyDown()
 		{
-			for (int k = ImGuiKey_NamedKey_BEGIN; k < ImGuiKey_COUNT; k++)
+			for (size_t k = ImGuiKey_NamedKey_BEGIN; k < ImGuiKey_COUNT; k++)
 			{
 				ImGuiKey currentKey = static_cast<ImGuiKey>(k);
 

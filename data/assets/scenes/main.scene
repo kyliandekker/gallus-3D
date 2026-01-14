@@ -40,6 +40,8 @@
             "isActive": true,
             "components": {
                 "sprite": {
+                    "pixelShader": "pixelShader.hlsl",
+                    "vertexShader": "vertexShader.hlsl",
                     "static": true,
                     "order": 1,
                     "color": {

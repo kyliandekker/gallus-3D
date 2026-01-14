@@ -22,11 +22,9 @@ namespace gallus
 	{
 		FieldSerializationType_None,
 		FieldSerializationType_Float,
-		FieldSerializationType_Int,
 		FieldSerializationType_Int8,
 		FieldSerializationType_Int16,
 		FieldSerializationType_Int32,
-		FieldSerializationType_Int64,
 		FieldSerializationType_Enum,
 		FieldSerializationType_Bool,
 		FieldSerializationType_LongSwitch,
@@ -77,7 +75,7 @@ namespace gallus
 		std::function<void(void* arrayPtr, size_t index)> removeElement = nullptr;
 		std::function<void(void* arrayPtr, size_t amount)> reserve = nullptr;
 		std::function<void(void* arrayPtr)> clear = nullptr;
-		FieldSerializationType arrayType;
+		FieldSerializationType arrayType = FieldSerializationType::FieldSerializationType_None;
 	};
 
 	struct GizmoOptions

@@ -324,7 +324,7 @@ namespace gallus
 				return changed;
 			}
 
-			bool ShowTexturePreview(const std::string& a_sId, graphics::dx12::Texture* a_pTexture, int a_iSpriteIndex, const ImVec2& a_vSize)
+			bool ShowTexturePreview(const std::string& a_sId, graphics::dx12::Texture* a_pTexture, uint8_t a_iSpriteIndex, const ImVec2& a_vSize)
 			{
 				if (!a_pTexture)
 				{
@@ -413,23 +413,6 @@ namespace gallus
 							if (changed)
 							{
 								*value = static_cast<int32_t>(temp);
-							}
-							return changed;
-						};
-					break;
-				}
-				case FieldSerializationType::FieldSerializationType_Int64:
-				{
-					func = [ptr, &a_Field, &fieldId]
-						{
-							int64_t* value = reinterpret_cast<int64_t*>(ptr);
-							int temp = *value;
-
-							bool changed = ShowDragInt(fieldId, temp, a_Field);
-							ImGui::ShowTooltip(a_Field.m_sDescription);
-							if (changed)
-							{
-								*value = temp;
 							}
 							return changed;
 						};

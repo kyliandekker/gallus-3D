@@ -166,25 +166,25 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		void EditorSettings::SetLastSceneOperation(int a_iLastSceneOperation)
+		void EditorSettings::SetLastSceneOperation(uint16_t a_iLastSceneOperation)
 		{
 			m_iLastSceneOperation = a_iLastSceneOperation;
 		}
 
 		//---------------------------------------------------------------------
-		int EditorSettings::GetLastSceneOperation() const
+		uint16_t EditorSettings::GetLastSceneOperation() const
 		{
 			return m_iLastSceneOperation;
 		}
 		
 		//---------------------------------------------------------------------
-		void EditorSettings::SetExplorerViewMode(int a_iExplorerViewMode)
+		void EditorSettings::SetExplorerViewMode(uint8_t a_iExplorerViewMode)
 		{
 			m_iExplorerViewMode = a_iExplorerViewMode;
 		}
 		
 		//---------------------------------------------------------------------
-		int EditorSettings::GetExplorerViewMode() const
+		uint8_t EditorSettings::GetExplorerViewMode() const
 		{
 			return m_iExplorerViewMode;
 		}
@@ -221,25 +221,25 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-        void EditorSettings::SetDimensionDrawMode(int a_iDimensionDrawMode)
+        void EditorSettings::SetDimensionDrawMode(uint8_t a_iDimensionDrawMode)
         {
 			m_iDimensionDrawMode = a_iDimensionDrawMode;
 		}
 
 		//---------------------------------------------------------------------
-		int EditorSettings::GetDimensionDrawMode() const
+		uint8_t EditorSettings::GetDimensionDrawMode() const
 		{
 			return m_iDimensionDrawMode;
 		}
 
 		//---------------------------------------------------------------------
-		void EditorSettings::SetShadingDrawMode(int a_iShadingDrawMode)
+		void EditorSettings::SetShadingDrawMode(uint8_t a_iShadingDrawMode)
 		{
 			m_iShadingDrawMode = a_iShadingDrawMode;
 		}
 
 		//---------------------------------------------------------------------
-		int EditorSettings::GetShadingDrawMode() const
+		uint8_t EditorSettings::GetShadingDrawMode() const
 		{
 			return m_iShadingDrawMode;
 		}

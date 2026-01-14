@@ -86,15 +86,15 @@ namespace gallus
 	};
 
 	// IVector2
-	class IVector2 : public BaseVector2<int>
+	class IVector2 : public BaseVector2<int32_t>
 	{
 	public:
 		IVector2() = default;
-		IVector2(int x, int y) : BaseVector2(x, y)
+		IVector2(int32_t x, int32_t y) : BaseVector2(x, y)
 		{}
 		IVector2(const DirectX::XMINT2& v) : BaseVector2(v.x, v.y)
 		{}
-		IVector2(const ImVec2& v) : BaseVector2(static_cast<int>(v.x), static_cast<int>(v.y))
+		IVector2(const ImVec2& v) : BaseVector2(static_cast<int32_t>(v.x), static_cast<int32_t>(v.y))
 		{}
 
 		operator DirectX::XMINT2() const

@@ -63,10 +63,10 @@ namespace gallus
 				uint32_t height = 0;
 
 				BEGIN_SERIALIZE(SpriteRect)
-					SERIALIZE_FIELD(x, "x", "", .type = gallus::FieldSerializationType::FieldSerializationType_Int64)
-					SERIALIZE_FIELD(y, "y", "", .type = gallus::FieldSerializationType::FieldSerializationType_Int64)
-					SERIALIZE_FIELD(width, "width", "", .type = gallus::FieldSerializationType::FieldSerializationType_Int64)
-					SERIALIZE_FIELD(height, "height", "", .type = gallus::FieldSerializationType::FieldSerializationType_Int64)
+					SERIALIZE_FIELD(x, "x", "", .type = gallus::FieldSerializationType::FieldSerializationType_Int32)
+					SERIALIZE_FIELD(y, "y", "", .type = gallus::FieldSerializationType::FieldSerializationType_Int32)
+					SERIALIZE_FIELD(width, "width", "", .type = gallus::FieldSerializationType::FieldSerializationType_Int32)
+					SERIALIZE_FIELD(height, "height", "", .type = gallus::FieldSerializationType::FieldSerializationType_Int32)
 				END_SERIALIZE(SpriteRect)
 			};
 
@@ -266,7 +266,7 @@ namespace gallus
 				/// </summary>
 				/// <param name="a_iIndex">The sprite index.</param>
 				/// <returns>The sprite uvs calculated from the rect.</returns>
-				SpriteUV GetSpriteUV(int a_iIndex) const;
+				SpriteUV GetSpriteUV(uint16_t a_iIndex) const;
 
 				~Texture();
 			private:

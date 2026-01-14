@@ -59,7 +59,7 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		bool SrcData::GetInt(const std::string& a_sKey, int& a_iInt) const
+		bool SrcData::GetInt(const std::string& a_sKey, int32_t& a_iInt) const
 		{
 			if (m_Document.HasParseError() || m_Document.IsNull())
 			{
@@ -435,7 +435,7 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		void SrcData::SetInt(const std::string& a_sKey, int a_iInt)
+		void SrcData::SetInt(const std::string& a_sKey, int32_t a_iInt)
 		{
 			rapidjson::SetOrAddMember(m_Document, a_sKey.c_str(), a_iInt, m_Document.GetAllocator());
 		}

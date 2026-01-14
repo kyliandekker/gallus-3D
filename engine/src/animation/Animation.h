@@ -120,7 +120,7 @@ namespace gallus
 			/// <summary>
 			/// Sets the amount of frames in the animation track.
 			/// </summary>
-			void SetFrameCount(int a_iFrameCount)
+			void SetFrameCount(uint16_t a_iFrameCount)
 			{
 				m_iFrameCount = a_iFrameCount;
 			}
@@ -129,7 +129,7 @@ namespace gallus
 			/// Retrieves the amount of frames in the animation track.
 			/// </summary>
 			/// <returns>The number of frames.</returns>
-			int GetFrameCount() const
+			uint16_t GetFrameCount() const
 			{
 				return m_iFrameCount;
 			}
@@ -144,7 +144,7 @@ namespace gallus
 			std::vector<AnimationKeyFrame*> m_aKeyFrames;
 			std::set<std::string> m_aActiveTags;
 
-			int m_iFrameCount = 0;
+			uint16_t m_iFrameCount = 0;
 			bool m_bIsLooping = false;
 
 			BEGIN_SERIALIZE_PARENT(Animation, resources::EngineResource)

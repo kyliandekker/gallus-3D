@@ -197,25 +197,25 @@ namespace gallus
 			/// Sets the scene operation.
 			/// </summary>
 			/// <param name="a_iLastSceneOperation">The index of the scene operation.</param>
-			void SetLastSceneOperation(int a_iLastSceneOperation);
+			void SetLastSceneOperation(uint16_t a_iLastSceneOperation);
 
 			/// <summary>
 			/// Determines the operation used in the scene for object transformation.
 			/// </summary>
 			/// <returns>Integer representing the scene operation index.</returns>
-			int GetLastSceneOperation() const;
+			uint16_t GetLastSceneOperation() const;
 
 			/// <summary>
 			/// Sets the view mode in explorer (list, grid, etc).
 			/// </summary>
 			/// <param name="a_iExplorerViewMode">The index of the grid mode.</param>
-			void SetExplorerViewMode(int a_iExplorerViewMode);
+			void SetExplorerViewMode(uint8_t a_iExplorerViewMode);
 
 			/// <summary>
 			/// Determines the view mode in the explorer (list, grid, etc).
 			/// </summary>
 			/// <returns>Integer representing the view mode.</returns>
-			int GetExplorerViewMode() const;
+			uint8_t GetExplorerViewMode() const;
 
 			/// <summary>
 			/// Sets whether FPS should be shown in decimals.
@@ -245,25 +245,25 @@ namespace gallus
 			/// Sets the dimension draw mode (2D, 3D, both).
 			/// </summary>
 			/// <param name="a_iDimensionDrawMode">The type of the dimension draw mode.</param>
-			void SetDimensionDrawMode(int a_iDimensionDrawMode);
+			void SetDimensionDrawMode(uint8_t a_iDimensionDrawMode);
 
 			/// <summary>
 			/// Determines whether the editor should render only 2D, 3D or both.
 			/// </summary>
 			/// <returns>Integer representing the dimension draw mode.</returns>
-			int GetDimensionDrawMode() const;
+			uint8_t GetDimensionDrawMode() const;
 
 			/// <summary>
 			/// Sets the shading draw mode (wireframes, unlit, shaded, etc).
 			/// </summary>
 			/// <param name="a_iShadingDrawMode">The type of the shading draw mode.</param>
-			void SetShadingDrawMode(int a_iShadingDrawMode);
+			void SetShadingDrawMode(uint8_t a_iShadingDrawMode);
 
 			/// <summary>
 			/// Determines whether the editor should render only wireframes, unlit, etc.
 			/// </summary>
 			/// <returns>Integer representing the shading draw mode.</returns>
-			int GetShadingDrawMode() const;
+			uint8_t GetShadingDrawMode() const;
 		private:
 			bool m_bScrollToBottom = false; /// Auto-scroll setting for the console.
 			bool m_bShowInfo = true; /// Check for info log messages.
@@ -279,16 +279,16 @@ namespace gallus
 			bool m_bFullScreenPlayMode = false;
 			float m_fSceneZoom = 1.0f;
 			Vector2 m_vScenePanOffset = Vector2(0.0f, 0.0f);
-			int m_iLastSceneOperation = 7;
+			uint16_t m_iLastSceneOperation = 7;
 
-			int m_iExplorerViewMode = 0;
+			uint8_t m_iExplorerViewMode = 0;
 
 			bool m_bFPSPrecision = false;
 
 			std::vector<OpenedScene> m_aLastOpenedScenes;
 
-			int m_iDimensionDrawMode = 0;
-			int m_iShadingDrawMode = 0;
+			uint8_t m_iDimensionDrawMode = 0;
+			uint8_t m_iShadingDrawMode = 0;
 
 			BEGIN_SERIALIZE_PARENT(EditorSettings, Settings)
 				SERIALIZE_FIELD(m_bScrollToBottom, "Scroll To Bottom", "",
@@ -319,18 +319,18 @@ namespace gallus
 				SERIALIZE_FIELD(m_vScenePanOffset, "Pan Offset", "",
 					.type = FieldSerializationType::FieldSerializationType_Vector2)
 				SERIALIZE_FIELD(m_iLastSceneOperation, "Last Scene Operation", "",
-					.type = FieldSerializationType::FieldSerializationType_Int)
+					.type = FieldSerializationType::FieldSerializationType_Int16)
 
 				SERIALIZE_FIELD(m_iExplorerViewMode, "Explorer View Mode", "",
-					.type = FieldSerializationType::FieldSerializationType_Int)
+					.type = FieldSerializationType::FieldSerializationType_Int8)
 
 				SERIALIZE_FIELD(m_bFPSPrecision, "Fps Precision", "",
 					.type = FieldSerializationType::FieldSerializationType_Bool)
 
 				SERIALIZE_FIELD(m_iDimensionDrawMode, "Dimension Draw Mode", "",
-					.type = FieldSerializationType::FieldSerializationType_Int)
+					.type = FieldSerializationType::FieldSerializationType_Int8)
 				SERIALIZE_FIELD(m_iShadingDrawMode, "Shading Draw Mode", "",
-					.type = FieldSerializationType::FieldSerializationType_Int)
+					.type = FieldSerializationType::FieldSerializationType_Int8)
 
 				SERIALIZE_FIELD_OPTIONS(m_aLastOpenedScenes, "Last Scenes Opened", "Saves the last opened scenes.", MakeArrayFieldSerializationOptions<OpenedScene>())
 			END_SERIALIZE(Settings)

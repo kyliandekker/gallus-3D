@@ -60,7 +60,9 @@ namespace gallus
 				return false;
 			}
 
-			srcData.GetInt(ANIMATION_TRACK_FRAME_COUNT_VAR, m_iFrameCount);
+			int32_t frameCount = 0;
+			srcData.GetInt(ANIMATION_TRACK_FRAME_COUNT_VAR, frameCount);
+			m_iFrameCount = static_cast<uint16_t>(frameCount);
 			srcData.GetBool(ANIMATION_TRACK_LOOP_VAR, m_bIsLooping);
 
 			resources::SrcData keyFramesSrcData;

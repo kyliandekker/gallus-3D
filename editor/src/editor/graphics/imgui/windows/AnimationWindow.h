@@ -91,7 +91,7 @@ namespace gallus
 				void RemoveKeyFrame(size_t a_iIndex);
 				void AddKeyFrame(size_t a_iIndex);
 
-				void SetCurrentFrame(int a_iIndex);
+				void SetCurrentFrame(int16_t a_iIndex);
 
 				std::shared_ptr<graphics::dx12::Texture> m_pPreviewTexture = nullptr;
 				gallus::resources::FileResource* m_pFile = nullptr;

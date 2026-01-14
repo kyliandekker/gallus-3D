@@ -195,7 +195,7 @@ namespace gallus
 
 			std::vector<AbstractECSSystem*> m_aSystems;
 			std::vector<std::shared_ptr<Entity>> m_aEntities;
-			unsigned int m_iNextID = 0;
+			size_t m_iNextID = 0;
 		};
 	}
 }

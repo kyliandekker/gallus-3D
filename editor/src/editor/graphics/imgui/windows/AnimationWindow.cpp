@@ -499,9 +499,9 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			void AnimationWindow::SetCurrentFrame(int a_iIndex)
+			void AnimationWindow::SetCurrentFrame(int16_t a_iIndex)
 			{
-				int index = std::clamp(a_iIndex, -1, m_Animation.GetFrameCount());
+				int index = std::clamp(a_iIndex, static_cast<int16_t>(-1), static_cast<int16_t>(m_Animation.GetFrameCount()));
 				if (index == -1)
 				{
 					core::EDITOR_ENGINE->GetEditor().SetSelectable(nullptr);

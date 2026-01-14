@@ -44,6 +44,8 @@ namespace gallus
 			// cache is in the init function of component.
 			Component::Init();
 
+			OnShadersChanged();
+
 			// cache
 			m_pRootSignature = core::ENGINE->GetDX12().GetRootSignature().Get();
 			m_pTransformSystem = &m_pECS->GetSystem<gameplay::TransformSystem>();
@@ -64,7 +66,20 @@ namespace gallus
 		//---------------------------------------------------------------------
 		void SpriteComponent::Render(std::shared_ptr<graphics::dx12::CommandList> a_pCommandList, const EntityID& a_EntityID, const graphics::dx12::Camera& a_Camera)
 		{
-			return;
+			if (!m_pECS)
+			{
+				return;
+			}
+			
+			if (!m_pPipelineState)
+			{
+				return;
+			}
+			
+			if (!m_pRootSignature)
+			{
+				return;
+			}
 
 			auto ent = core::ENGINE->GetECS().GetEntity(m_EntityID).lock();
 			if (!ent || !ent->IsActive())
@@ -155,6 +170,12 @@ namespace gallus
 				a_iSpriteIndex = numSpriteRects;
 			}
 			m_iSpriteIndex = a_iSpriteIndex;
+		}
+
+		//---------------------------------------------------------------------
+		void SpriteComponent::OnShadersChanged()
+		{
+			m_pPipelineState = graphics::dx12::PipelineStateCache::GetOrCreate(m_pPixelShader, m_pVertexShader, DXGI_FORMAT_D32_FLOAT);
 		}
 	}
 }

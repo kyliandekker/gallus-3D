@@ -23,7 +23,7 @@ namespace gallus
 			/// Constructs an entity with a given ID.
 			/// </summary>
 			/// <param name="a_iID">The id.</param>
-			EntityID(unsigned int a_iID) : m_iID(a_iID)
+			EntityID(size_t a_iID) : m_iID(a_iID)
 			{};
 
 			/// <summary>
@@ -52,7 +52,7 @@ namespace gallus
 			/// Retrieves the ID (as an integer).
 			/// </summary>
 			/// <returns>An integer containing the entity id.</returns>
-			unsigned int GetID() const
+			size_t GetID() const
 			{
 				return m_iID;
 			}
@@ -72,11 +72,11 @@ namespace gallus
 				return m_iID < a_Other.m_iID;
 			}
 		protected:
-			enum ID_State : unsigned int
+			enum ID_State : size_t
 			{
 				INVALID = 0
 			};
-			unsigned int m_iID = INVALID;
+			size_t m_iID = INVALID;
 		};
 	}
 }
