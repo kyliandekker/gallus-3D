@@ -204,9 +204,9 @@ namespace gallus
 		//---------------------------------------------------------------------
 		void EditorSettings::AddSceneToRecentScenes(const std::string& a_sName)
 		{
-			for (const OpenedScene& name : m_aLastOpenedScenes)
+			for (const std::string& name : m_aLastOpenedScenes)
 			{
-				if (a_sName == name.name)
+				if (a_sName == name)
 				{
 					return;
 				}
@@ -215,7 +215,7 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		const std::vector<OpenedScene>& EditorSettings::GetLastOpenedScenes() const
+		const std::vector<std::string>& EditorSettings::GetLastOpenedScenes() const
 		{
 			return m_aLastOpenedScenes;
 		}

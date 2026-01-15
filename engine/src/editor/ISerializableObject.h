@@ -70,7 +70,7 @@ namespace gallus
 		size_t indent = 0;
 
 		std::function<size_t(void* arrayPtr)> getSize = nullptr;
-		std::function<ISerializableObject* (void* arrayPtr, size_t index)> getElement = nullptr;
+		std::function<void* (void* arrayPtr, size_t index)> getElement = nullptr;
 		std::function<size_t(void* arrayPtr)> addElement = nullptr;
 		std::function<void(void* arrayPtr, size_t index)> removeElement = nullptr;
 		std::function<void(void* arrayPtr, size_t amount)> reserve = nullptr;
@@ -207,12 +207,11 @@ namespace gallus
 	}
 
 	template<typename T>
-	FieldSerializationOptions MakeArrayFieldSerializationOptions()
+	FieldSerializationOptions MakeArrayFieldSerializationOptions(FieldSerializationType a_FieldSerializationType = FieldSerializationType::FieldSerializationType_Object)
 	{
-		static_assert(std::is_base_of<ISerializableObject, T>::value);
-
 		FieldSerializationOptions opts;
 		opts.type = FieldSerializationType::FieldSerializationType_Array;
+		opts.arrayType = a_FieldSerializationType;
 
 		opts.getSize = [](void* arrayPtr) -> size_t
 			{
@@ -223,7 +222,7 @@ namespace gallus
 		opts.getElement = [](void* arrayPtr, size_t index)
 			{
 				auto& vec = *static_cast<std::vector<T>*>(arrayPtr);
-				return static_cast<ISerializableObject*>(&vec[index]);
+				return static_cast<void*>(&vec[index]);
 			};
 
 		opts.addElement = [](void* arrayPtr)

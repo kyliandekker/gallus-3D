@@ -26,6 +26,8 @@ namespace gallus
 			SrcData(const core::Data& a_Data);
 			SrcData(const rapidjson::Value& a_Value);
 
+			void DocOrMember(const std::string& a_sKey, rapidjson::Document& a_Document) const;
+
 			// getters
 			bool GetInt(const std::string& a_sKey, int32_t& a_iInt) const;
 			template <typename T>
@@ -58,13 +60,13 @@ namespace gallus
 			void SetObject();
 			void SetArray();
 			void SetInt(const std::string& a_sKey, int32_t a_iInt);
-			void SetBool(const std::string& a_sKey, bool a_iBool);
+			void SetBool(const std::string& a_sKey, bool a_bBool);
 			template <typename T>
 			void SetEnum(const std::string& a_sKey, T a_Enum)
 			{
 				SetInt(a_sKey, static_cast<int32_t>(a_Enum));
 			}
-			void SetFloat(const std::string& a_sKey, float a_iFloat);
+			void SetFloat(const std::string& a_sKey, float a_fFloat);
 
 			void SetString(const std::string& a_sKey, const std::string& a_sString);
 			void SetVector2(const std::string& a_sKey, const Vector2& a_vVector);

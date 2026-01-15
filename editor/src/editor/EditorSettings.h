@@ -8,22 +8,6 @@ namespace gallus
 {
 	namespace editor
 	{
-		class OpenedScene : public ISerializableObject
-		{
-		public:
-			OpenedScene() : ISerializableObject()
-			{}
-			OpenedScene(const std::string& a_sName) : ISerializableObject(),
-				name(a_sName)
-			{}
-
-			std::string name;
-
-			BEGIN_SERIALIZE(OpenedScene)
-				SERIALIZE_FIELD(name, "name", "", .type = gallus::FieldSerializationType::FieldSerializationType_String)
-			END_SERIALIZE(OpenedScene)
-		};
-
 		//---------------------------------------------------------------------
 		// EditorSettings
 		//---------------------------------------------------------------------
@@ -239,7 +223,7 @@ namespace gallus
 			/// Retrieves an array of scenes that got opened last.
 			/// </summary>
 			/// <returns>An array containing OpenedScenes.</param>
-			const std::vector<OpenedScene>& GetLastOpenedScenes() const;
+			const std::vector<std::string>& GetLastOpenedScenes() const;
 
 			/// <summary>
 			/// Sets the dimension draw mode (2D, 3D, both).
@@ -285,7 +269,7 @@ namespace gallus
 
 			bool m_bFPSPrecision = false;
 
-			std::vector<OpenedScene> m_aLastOpenedScenes;
+			std::vector<std::string> m_aLastOpenedScenes;
 
 			uint8_t m_iDimensionDrawMode = 0;
 			uint8_t m_iShadingDrawMode = 0;
@@ -332,7 +316,7 @@ namespace gallus
 				SERIALIZE_FIELD(m_iShadingDrawMode, "Shading Draw Mode", "",
 					.type = FieldSerializationType::FieldSerializationType_Int8)
 
-				SERIALIZE_FIELD_OPTIONS(m_aLastOpenedScenes, "Last Scenes Opened", "Saves the last opened scenes.", MakeArrayFieldSerializationOptions<OpenedScene>())
+				SERIALIZE_FIELD_OPTIONS(m_aLastOpenedScenes, "Last Scenes Opened", "Saves the last opened scenes.", MakeArrayFieldSerializationOptions<std::string>(FieldSerializationType::FieldSerializationType_String))
 			END_SERIALIZE(Settings)
 		};
 	}

@@ -44,6 +44,26 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
+		void SrcData::DocOrMember(const std::string& a_sKey, rapidjson::Document& a_Document) const
+		{
+			if (a_sKey.empty())
+			{
+				a_Document.CopyFrom(m_Document, a_Document.GetAllocator());
+			}
+			else
+			{
+				if (m_Document.IsObject() && m_Document.HasMember(a_sKey.c_str()))
+				{
+					a_Document.CopyFrom(m_Document[a_sKey.c_str()], a_Document.GetAllocator());
+				}
+				else
+				{
+					a_Document.SetObject();
+				}
+			}
+		}
+
+		//---------------------------------------------------------------------
 		SrcData::SrcData(const core::Data& a_Data)
 		{
 			m_Document.Parse(a_Data.dataAs<const char>(), a_Data.size());
@@ -67,7 +87,9 @@ namespace gallus
 				return false;
 			}
 
-			if (!rapidjson::GetInt(m_Document, a_sKey, a_iInt))
+			rapidjson::Document doc;
+			DocOrMember(a_sKey, doc);
+			if (!rapidjson::GetInt(doc, a_iInt))
 			{
 				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" is not present or not an integer.", a_sKey.c_str());
 				return false;
@@ -85,7 +107,9 @@ namespace gallus
 				return false;
 			}
 
-			if (!rapidjson::GetBool(m_Document, a_sKey, a_bBool))
+			rapidjson::Document doc;
+			DocOrMember(a_sKey, doc);
+			if (!rapidjson::GetBool(doc, a_bBool))
 			{
 				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" is not present or not a boolean.", a_sKey.c_str());
 				return false;
@@ -103,7 +127,9 @@ namespace gallus
 				return false;
 			}
 
-			if (!rapidjson::GetFloat(m_Document, a_sKey, a_fFloat))
+			rapidjson::Document doc;
+			DocOrMember(a_sKey, doc);
+			if (!rapidjson::GetFloat(doc, a_fFloat))
 			{
 				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" is not present or not a float.", a_sKey.c_str());
 				return false;
@@ -121,7 +147,9 @@ namespace gallus
 				return false;
 			}
 
-			if (!rapidjson::GetString(m_Document, a_sKey, a_sString))
+			rapidjson::Document doc;
+			DocOrMember(a_sKey, doc);
+			if (!rapidjson::GetString(doc, a_sString))
 			{
 				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" is not present or not a string.", a_sKey.c_str());
 				return false;
@@ -144,13 +172,15 @@ namespace gallus
 				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" is not present or not an object/vector.", a_sKey.c_str());
 				return false;
 			}
-
-			if (!rapidjson::GetFloat(m_Document[a_sKey.c_str()], SRC_DATA_VECTOR_X, a_vVector.x))
+			
+			rapidjson::Document doc;
+			DocOrMember(a_sKey, doc);
+			if (!rapidjson::GetFloat(doc, SRC_DATA_VECTOR_X, a_vVector.x))
 			{
 				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" does not have an x axis.", a_sKey.c_str());
 				return false;
 			}
-			if (!rapidjson::GetFloat(m_Document[a_sKey.c_str()], SRC_DATA_VECTOR_Y, a_vVector.y))
+			if (!rapidjson::GetFloat(doc, SRC_DATA_VECTOR_Y, a_vVector.y))
 			{
 				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" does not have an y axis.", a_sKey.c_str());
 				return false;
@@ -174,12 +204,14 @@ namespace gallus
 				return false;
 			}
 
-			if (!rapidjson::GetInt(m_Document[a_sKey.c_str()], SRC_DATA_VECTOR_X, a_vVector.x))
+			rapidjson::Document doc;
+			DocOrMember(a_sKey, doc);
+			if (!rapidjson::GetInt(doc, SRC_DATA_VECTOR_X, a_vVector.x))
 			{
 				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" does not have an x axis.", a_sKey.c_str());
 				return false;
 			}
-			if (!rapidjson::GetInt(m_Document[a_sKey.c_str()], SRC_DATA_VECTOR_Y, a_vVector.y))
+			if (!rapidjson::GetInt(doc, SRC_DATA_VECTOR_Y, a_vVector.y))
 			{
 				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" does not have an y axis.", a_sKey.c_str());
 				return false;
@@ -437,19 +469,40 @@ namespace gallus
 		//---------------------------------------------------------------------
 		void SrcData::SetInt(const std::string& a_sKey, int32_t a_iInt)
 		{
-			rapidjson::SetOrAddMember(m_Document, a_sKey.c_str(), a_iInt, m_Document.GetAllocator());
+			if (a_sKey.empty())
+			{
+				m_Document.SetInt(a_iInt);
+			}
+			else
+			{
+				rapidjson::SetOrAddMember(m_Document, a_sKey.c_str(), a_iInt, m_Document.GetAllocator());
+			}
 		}
 
 		//---------------------------------------------------------------------
-		void SrcData::SetBool(const std::string& a_sKey, bool a_iBool)
+		void SrcData::SetBool(const std::string& a_sKey, bool a_bBool)
 		{
-			rapidjson::SetOrAddMemberBool(m_Document, a_sKey.c_str(), a_iBool, m_Document.GetAllocator());
+			if (a_sKey.empty())
+			{
+				m_Document.SetBool(a_bBool);
+			}
+			else
+			{
+				rapidjson::SetOrAddMemberBool(m_Document, a_sKey.c_str(), a_bBool, m_Document.GetAllocator());
+			}
 		}
 
 		//---------------------------------------------------------------------
-		void SrcData::SetFloat(const std::string& a_sKey, float a_iFloat)
+		void SrcData::SetFloat(const std::string& a_sKey, float a_fFloat)
 		{
-			rapidjson::SetOrAddMemberFloat(m_Document, a_sKey.c_str(), a_iFloat, m_Document.GetAllocator());
+			if (a_sKey.empty())
+			{
+				m_Document.SetFloat(a_fFloat);
+			}
+			else
+			{
+				rapidjson::SetOrAddMemberFloat(m_Document, a_sKey.c_str(), a_fFloat, m_Document.GetAllocator());
+			}
 		}
 
 		//---------------------------------------------------------------------
@@ -534,7 +587,14 @@ namespace gallus
 		//---------------------------------------------------------------------
 		void SrcData::SetString(const std::string& a_sKey, const std::string& a_sString)
 		{
-			rapidjson::SetOrAddMember(m_Document, a_sKey.c_str(), a_sString.c_str(), m_Document.GetAllocator());
+			if (a_sKey.empty())
+			{
+				m_Document.SetString(a_sString.c_str(), a_sString.size());
+			}
+			else
+			{
+				rapidjson::SetOrAddMember(m_Document, a_sKey.c_str(), a_sString.c_str(), m_Document.GetAllocator());
+			}
 		}
 
 		//---------------------------------------------------------------------
