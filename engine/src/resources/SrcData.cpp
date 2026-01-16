@@ -4,9 +4,11 @@
 #include <rapidjson/utils.h>
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/prettywriter.h>
+#include <rapidjson/error/en.h>
 
 // core
 #include "core/Data.h"
+#include "core/DataStream.h"
 
 // logger
 #include "logger/Logger.h"
@@ -33,34 +35,26 @@ namespace gallus
 		{
 			m_Document.CopyFrom(a_Value, m_Document.GetAllocator());
 
-			if (m_Document.HasParseError() || m_Document.IsNull())
+			m_bIsValid = false;
+
+			if (m_Document.IsNull())
 			{
 				LOG(LOGSEVERITY_ERROR, LOG_CATEGORY_RESOURCES, "Something went wrong when trying to load src data.");
+				return;
 			}
-			else
-			{
-				m_bIsValid = true;
-			}
-		}
 
-		//---------------------------------------------------------------------
-		void SrcData::DocOrMember(const std::string& a_sKey, rapidjson::Document& a_Document) const
-		{
-			if (a_sKey.empty())
+			if (m_Document.HasParseError())
 			{
-				a_Document.CopyFrom(m_Document, a_Document.GetAllocator());
+				rapidjson::ParseErrorCode errorCode = m_Document.GetParseError();
+				size_t errorOffset = m_Document.GetErrorOffset();
+
+				const char* errorMessage = rapidjson::GetParseError_En(errorCode);
+
+				LOGF(LOGSEVERITY_ERROR, LOG_CATEGORY_RESOURCES, "Something went wrong when trying to load src data: %s.", errorMessage);
+				return;
 			}
-			else
-			{
-				if (m_Document.IsObject() && m_Document.HasMember(a_sKey.c_str()))
-				{
-					a_Document.CopyFrom(m_Document[a_sKey.c_str()], a_Document.GetAllocator());
-				}
-				else
-				{
-					a_Document.SetObject();
-				}
-			}
+
+			m_bIsValid = true;
 		}
 
 		//---------------------------------------------------------------------
@@ -68,18 +62,30 @@ namespace gallus
 		{
 			m_Document.Parse(a_Data.dataAs<const char>(), a_Data.size());
 
-			if (m_Document.HasParseError() || m_Document.IsNull())
+			m_bIsValid = false;
+
+			if (m_Document.IsNull())
 			{
 				LOG(LOGSEVERITY_ERROR, LOG_CATEGORY_RESOURCES, "Something went wrong when trying to load src data.");
+				return;
 			}
-			else
-			{
-				m_bIsValid = true;
-			}
-		}
 
+			if (m_Document.HasParseError())
+			{
+				rapidjson::ParseErrorCode errorCode = m_Document.GetParseError();
+				size_t errorOffset = m_Document.GetErrorOffset();
+
+				const char* errorMessage = rapidjson::GetParseError_En(errorCode);
+
+				LOGF(LOGSEVERITY_ERROR, LOG_CATEGORY_RESOURCES, "Something went wrong when trying to load src data: %s.", errorMessage);
+				return;
+			}
+
+			m_bIsValid = true;
+		}
+		
 		//---------------------------------------------------------------------
-		bool SrcData::GetInt(const std::string& a_sKey, int32_t& a_iInt) const
+		bool SrcData::GetBool(bool& a_bBool, const std::string a_sPropertyName) const
 		{
 			if (m_Document.HasParseError() || m_Document.IsNull())
 			{
@@ -87,133 +93,20 @@ namespace gallus
 				return false;
 			}
 
-			rapidjson::Document doc;
-			DocOrMember(a_sKey, doc);
-			if (!rapidjson::GetInt(doc, a_iInt))
+			if (!a_sPropertyName.empty() && !m_Document.HasMember(a_sPropertyName.c_str()))
 			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" is not present or not an integer.", a_sKey.c_str());
-				return false;
-			}
-
-			return true;
-		}
-
-		//---------------------------------------------------------------------
-		bool SrcData::GetBool(const std::string& a_sKey, bool& a_bBool) const
-		{
-			if (m_Document.HasParseError() || m_Document.IsNull())
-			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Document is empty.");
-				return false;
-			}
-
-			rapidjson::Document doc;
-			DocOrMember(a_sKey, doc);
-			if (!rapidjson::GetBool(doc, a_bBool))
-			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" is not present or not a boolean.", a_sKey.c_str());
-				return false;
-			}
-
-			return true;
-		}
-
-		//---------------------------------------------------------------------
-		bool SrcData::GetFloat(const std::string& a_sKey, float& a_fFloat) const
-		{
-			if (m_Document.HasParseError() || m_Document.IsNull())
-			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Document is empty.");
-				return false;
-			}
-
-			rapidjson::Document doc;
-			DocOrMember(a_sKey, doc);
-			if (!rapidjson::GetFloat(doc, a_fFloat))
-			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" is not present or not a float.", a_sKey.c_str());
-				return false;
-			}
-
-			return true;
-		}
-
-		//---------------------------------------------------------------------
-		bool SrcData::GetString(const std::string& a_sKey, std::string& a_sString) const
-		{
-			if (m_Document.HasParseError() || m_Document.IsNull())
-			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Document is empty.");
-				return false;
-			}
-
-			rapidjson::Document doc;
-			DocOrMember(a_sKey, doc);
-			if (!rapidjson::GetString(doc, a_sString))
-			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" is not present or not a string.", a_sKey.c_str());
-				return false;
-			}
-
-			return true;
-		}
-
-		//---------------------------------------------------------------------
-		bool SrcData::GetVector2(const std::string& a_sKey, Vector2& a_vVector) const
-		{
-			if (m_Document.HasParseError() || m_Document.IsNull())
-			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Document is empty.");
-				return false;
-			}
-
-			if (!m_Document.HasMember(a_sKey.c_str()) || !m_Document[a_sKey.c_str()].IsObject())
-			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" is not present or not an object/vector.", a_sKey.c_str());
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Property name \"%s\" does not exist.", a_sPropertyName);
 				return false;
 			}
 			
-			rapidjson::Document doc;
-			DocOrMember(a_sKey, doc);
-			if (!rapidjson::GetFloat(doc, SRC_DATA_VECTOR_X, a_vVector.x))
+			if (!rapidjson::GetBool(
+				a_sPropertyName.empty() ? 
+					m_Document : 
+					m_Document[a_sPropertyName.c_str()], 
+				a_bBool
+			))
 			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" does not have an x axis.", a_sKey.c_str());
-				return false;
-			}
-			if (!rapidjson::GetFloat(doc, SRC_DATA_VECTOR_Y, a_vVector.y))
-			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" does not have an y axis.", a_sKey.c_str());
-				return false;
-			}
-
-			return true;
-		}
-
-		//---------------------------------------------------------------------
-		bool SrcData::GetIVector2(const std::string& a_sKey, IVector2& a_vVector) const
-		{
-			if (m_Document.HasParseError() || m_Document.IsNull())
-			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Document is empty.");
-				return false;
-			}
-
-			if (!m_Document.HasMember(a_sKey.c_str()) || !m_Document[a_sKey.c_str()].IsObject())
-			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" is not present or not an object/vector.", a_sKey.c_str());
-				return false;
-			}
-
-			rapidjson::Document doc;
-			DocOrMember(a_sKey, doc);
-			if (!rapidjson::GetInt(doc, SRC_DATA_VECTOR_X, a_vVector.x))
-			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" does not have an x axis.", a_sKey.c_str());
-				return false;
-			}
-			if (!rapidjson::GetInt(doc, SRC_DATA_VECTOR_Y, a_vVector.y))
-			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" does not have an y axis.", a_sKey.c_str());
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Deserialization failed: Document was not a boolean. Property name: \"%s\".", a_sPropertyName.c_str());
 				return false;
 			}
 
@@ -221,7 +114,7 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		bool SrcData::GetVector3(const std::string& a_sKey, Vector3& a_vVector) const
+		bool SrcData::GetInt(int32_t& a_iInt, const std::string& a_sPropertyName) const
 		{
 			if (m_Document.HasParseError() || m_Document.IsNull())
 			{
@@ -229,25 +122,20 @@ namespace gallus
 				return false;
 			}
 
-			if (!m_Document.HasMember(a_sKey.c_str()) || !m_Document[a_sKey.c_str()].IsObject())
+			if (!a_sPropertyName.empty() && !m_Document.HasMember(a_sPropertyName.c_str()))
 			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" is not present or not an object/vector.", a_sKey.c_str());
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Property name \"%s\" does not exist.", a_sPropertyName.c_str());
 				return false;
 			}
 
-			if (!rapidjson::GetFloat(m_Document[a_sKey.c_str()], SRC_DATA_VECTOR_X, a_vVector.x))
+			if (!rapidjson::GetInt(
+				a_sPropertyName.empty() ?
+					m_Document :
+					m_Document[a_sPropertyName.c_str()],
+				a_iInt
+			))
 			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" does not have an x axis.", a_sKey.c_str());
-				return false;
-			}
-			if (!rapidjson::GetFloat(m_Document[a_sKey.c_str()], SRC_DATA_VECTOR_Y, a_vVector.y))
-			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" does not have an y axis.", a_sKey.c_str());
-				return false;
-			}
-			if (!rapidjson::GetFloat(m_Document[a_sKey.c_str()], SRC_DATA_VECTOR_Z, a_vVector.z))
-			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" does not have an z axis.", a_sKey.c_str());
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Deserialization failed: Document was not an int. Property name: \"%s\".", a_sPropertyName.c_str());
 				return false;
 			}
 
@@ -255,7 +143,7 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		bool SrcData::GetVector4(const std::string& a_sKey, Vector4& a_vVector) const
+		bool SrcData::GetFloat(float& a_fFloat, const std::string& a_sPropertyName) const
 		{
 			if (m_Document.HasParseError() || m_Document.IsNull())
 			{
@@ -263,30 +151,20 @@ namespace gallus
 				return false;
 			}
 
-			if (!m_Document.HasMember(a_sKey.c_str()) || !m_Document[a_sKey.c_str()].IsObject())
+			if (!a_sPropertyName.empty() && !m_Document.HasMember(a_sPropertyName.c_str()))
 			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" is not present or not an object/vector.", a_sKey.c_str());
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Property name \"%s\" does not exist.", a_sPropertyName.c_str());
 				return false;
 			}
 
-			if (!rapidjson::GetFloat(m_Document[a_sKey.c_str()], SRC_DATA_VECTOR_X, a_vVector.x))
+			if (!rapidjson::GetFloat(
+				a_sPropertyName.empty() ?
+					m_Document :
+					m_Document[a_sPropertyName.c_str()],
+				a_fFloat
+			))
 			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" does not have an x axis.", a_sKey.c_str());
-				return false;
-			}
-			if (!rapidjson::GetFloat(m_Document[a_sKey.c_str()], SRC_DATA_VECTOR_Y, a_vVector.y))
-			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" does not have an y axis.", a_sKey.c_str());
-				return false;
-			}
-			if (!rapidjson::GetFloat(m_Document[a_sKey.c_str()], SRC_DATA_VECTOR_Z, a_vVector.z))
-			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" does not have an z axis.", a_sKey.c_str());
-				return false;
-			}
-			if (!rapidjson::GetFloat(m_Document[a_sKey.c_str()], SRC_DATA_VECTOR_W, a_vVector.w))
-			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" does not have an w axis.", a_sKey.c_str());
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Deserialization failed: Document was not a float. Property name: \"%s\".", a_sPropertyName.c_str());
 				return false;
 			}
 
@@ -294,7 +172,7 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		bool SrcData::GetColor(const std::string& a_sKey, Color4& a_vVector) const
+		bool SrcData::GetString(std::string& a_sString, const std::string& a_sPropertyName) const
 		{
 			if (m_Document.HasParseError() || m_Document.IsNull())
 			{
@@ -302,30 +180,290 @@ namespace gallus
 				return false;
 			}
 
-			if (!m_Document.HasMember(a_sKey.c_str()) || !m_Document[a_sKey.c_str()].IsObject())
+			if (!a_sPropertyName.empty() && !m_Document.HasMember(a_sPropertyName.c_str()))
 			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" is not present or not an object/vector.", a_sKey.c_str());
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Property name \"%s\" does not exist.", a_sPropertyName.c_str());
 				return false;
 			}
 
-			if (!rapidjson::GetFloat(m_Document[a_sKey.c_str()], SRC_DATA_VECTOR_R, a_vVector.r))
+			if (!rapidjson::GetString(
+				a_sPropertyName.empty() ?
+					m_Document :
+					m_Document[a_sPropertyName.c_str()],
+				a_sString
+			))
 			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" does not have an r axis.", a_sKey.c_str());
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Deserialization failed: Document was not a string. Property name: \"%s\".", a_sPropertyName.c_str());
 				return false;
 			}
-			if (!rapidjson::GetFloat(m_Document[a_sKey.c_str()], SRC_DATA_VECTOR_G, a_vVector.g))
+
+			return true;
+		}
+
+		//---------------------------------------------------------------------
+		bool SrcData::GetVector2(Vector2& a_vVector, const std::string& a_sPropertyName) const
+		{
+			if (m_Document.HasParseError() || m_Document.IsNull())
 			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" does not have an g axis.", a_sKey.c_str());
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Document is empty.");
 				return false;
 			}
-			if (!rapidjson::GetFloat(m_Document[a_sKey.c_str()], SRC_DATA_VECTOR_B, a_vVector.b))
+
+			if (!a_sPropertyName.empty() && !m_Document.HasMember(a_sPropertyName.c_str()))
 			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" does not have an b axis.", a_sKey.c_str());
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Property name \"%s\" does not exist.", a_sPropertyName);
 				return false;
 			}
-			if (!rapidjson::GetFloat(m_Document[a_sKey.c_str()], SRC_DATA_VECTOR_A, a_vVector.a))
+
+			if (!rapidjson::GetFloat(
+				a_sPropertyName.empty() ?
+				m_Document :
+				m_Document[a_sPropertyName.c_str()],
+				SRC_DATA_VECTOR_X,
+				a_vVector.x
+			))
 			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" does not have an a axis.", a_sKey.c_str());
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" does not have an x axis.", a_sPropertyName.c_str());
+				return false;
+			}
+
+			if (!rapidjson::GetFloat(
+				a_sPropertyName.empty() ?
+				m_Document :
+				m_Document[a_sPropertyName.c_str()],
+				SRC_DATA_VECTOR_Y,
+				a_vVector.y
+			))
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" does not have a y axis.", a_sPropertyName.c_str());
+				return false;
+			}
+
+			return true;
+		}
+
+		//---------------------------------------------------------------------
+		bool SrcData::GetIVector2(IVector2& a_vVector, const std::string& a_sPropertyName) const
+		{
+			if (m_Document.HasParseError() || m_Document.IsNull())
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Document is empty.");
+				return false;
+			}
+
+			if (!a_sPropertyName.empty() && !m_Document.HasMember(a_sPropertyName.c_str()))
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Property name \"%s\" does not exist.", a_sPropertyName);
+				return false;
+			}
+
+			if (!rapidjson::GetInt(
+				a_sPropertyName.empty() ?
+					m_Document :
+					m_Document[a_sPropertyName.c_str()],
+				SRC_DATA_VECTOR_X,
+				a_vVector.x
+			))
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" does not have an x axis.", a_sPropertyName.c_str());
+				return false;
+			}
+
+			if (!rapidjson::GetInt(
+				a_sPropertyName.empty() ?
+					m_Document :
+					m_Document[a_sPropertyName.c_str()],
+				SRC_DATA_VECTOR_Y,
+				a_vVector.y
+			))
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" does not have a y axis.", a_sPropertyName.c_str());
+				return false;
+			}
+
+			return true;
+		}
+
+		//---------------------------------------------------------------------
+		bool SrcData::GetVector3(Vector3& a_vVector, const std::string& a_sPropertyName) const
+		{
+			if (m_Document.HasParseError() || m_Document.IsNull())
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Document is empty.");
+				return false;
+			}
+
+			if (!a_sPropertyName.empty() && !m_Document.HasMember(a_sPropertyName.c_str()))
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Property name \"%s\" does not exist.", a_sPropertyName);
+				return false;
+			}
+
+			if (!rapidjson::GetFloat(
+				a_sPropertyName.empty() ?
+					m_Document :
+					m_Document[a_sPropertyName.c_str()],
+				SRC_DATA_VECTOR_X,
+				a_vVector.x
+			))
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" does not have an x axis.", a_sPropertyName.c_str());
+				return false;
+			}
+
+			if (!rapidjson::GetFloat(
+				a_sPropertyName.empty() ?
+					m_Document :
+					m_Document[a_sPropertyName.c_str()],
+				SRC_DATA_VECTOR_Y,
+				a_vVector.y
+			))
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" does not have a y axis.", a_sPropertyName.c_str());
+				return false;
+			}
+
+			if (!rapidjson::GetFloat(
+				a_sPropertyName.empty() ?
+					m_Document :
+					m_Document[a_sPropertyName.c_str()],
+				SRC_DATA_VECTOR_Z,
+				a_vVector.z
+			))
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" does not have a z axis.", a_sPropertyName.c_str());
+				return false;
+			}
+
+			return true;
+		}
+
+		//---------------------------------------------------------------------
+		bool SrcData::GetVector4(Vector4& a_vVector, const std::string& a_sPropertyName) const
+		{
+			if (m_Document.HasParseError() || m_Document.IsNull())
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Document is empty.");
+				return false;
+			}
+
+			if (!a_sPropertyName.empty() && !m_Document.HasMember(a_sPropertyName.c_str()))
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Property name \"%s\" does not exist.", a_sPropertyName);
+				return false;
+			}
+
+			if (!rapidjson::GetFloat(
+				a_sPropertyName.empty() ?
+				m_Document :
+				m_Document[a_sPropertyName.c_str()],
+				SRC_DATA_VECTOR_X,
+				a_vVector.x
+				))
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" does not have an x axis.", a_sPropertyName.c_str());
+				return false;
+			}
+
+			if (!rapidjson::GetFloat(
+				a_sPropertyName.empty() ?
+				m_Document :
+				m_Document[a_sPropertyName.c_str()],
+				SRC_DATA_VECTOR_Y,
+				a_vVector.y
+				))
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" does not have a y axis.", a_sPropertyName.c_str());
+				return false;
+			}
+
+			if (!rapidjson::GetFloat(
+				a_sPropertyName.empty() ?
+				m_Document :
+				m_Document[a_sPropertyName.c_str()],
+				SRC_DATA_VECTOR_Z,
+				a_vVector.z
+				))
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" does not have a z axis.", a_sPropertyName.c_str());
+				return false;
+			}
+
+			if (!rapidjson::GetFloat(
+				a_sPropertyName.empty() ?
+					m_Document :
+					m_Document[a_sPropertyName.c_str()],
+				SRC_DATA_VECTOR_W,
+				a_vVector.w
+			))
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" does not have a w axis.", a_sPropertyName.c_str());
+				return false;
+			}
+
+			return true;
+		}
+
+		//---------------------------------------------------------------------
+		bool SrcData::GetColor(Color4& a_vVector, const std::string& a_sPropertyName) const
+		{
+			if (m_Document.HasParseError() || m_Document.IsNull())
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Document is empty.");
+				return false;
+			}
+
+			if (!a_sPropertyName.empty() && !m_Document.HasMember(a_sPropertyName.c_str()))
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Property name \"%s\" does not exist.", a_sPropertyName);
+				return false;
+			}
+
+			if (!rapidjson::GetFloat(
+				a_sPropertyName.empty() ?
+				m_Document :
+				m_Document[a_sPropertyName.c_str()],
+				SRC_DATA_VECTOR_R,
+				a_vVector.r
+				))
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" does not have an r axis.", a_sPropertyName.c_str());
+				return false;
+			}
+
+			if (!rapidjson::GetFloat(
+				a_sPropertyName.empty() ?
+				m_Document :
+				m_Document[a_sPropertyName.c_str()],
+				SRC_DATA_VECTOR_G,
+				a_vVector.g
+				))
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" does not have a g axis.", a_sPropertyName.c_str());
+				return false;
+			}
+
+			if (!rapidjson::GetFloat(
+				a_sPropertyName.empty() ?
+				m_Document :
+				m_Document[a_sPropertyName.c_str()],
+				SRC_DATA_VECTOR_B,
+				a_vVector.b
+				))
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" does not have a b axis.", a_sPropertyName.c_str());
+				return false;
+			}
+
+			if (!rapidjson::GetFloat(
+				a_sPropertyName.empty() ?
+				m_Document :
+				m_Document[a_sPropertyName.c_str()],
+				SRC_DATA_VECTOR_A,
+				a_vVector.a
+				))
+			{
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Key \"%s\" does not have an a axis.", a_sPropertyName.c_str());
 				return false;
 			}
 
@@ -452,18 +590,6 @@ namespace gallus
 				a_aMembers.push_back(it->name.GetString());
 			}
 			return true;
-		}
-
-		//---------------------------------------------------------------------
-		void SrcData::SetObject()
-		{
-			m_Document.SetObject();
-		}
-
-		//---------------------------------------------------------------------
-		void SrcData::SetArray()
-		{
-			m_Document.SetArray();
 		}
 
 		//---------------------------------------------------------------------

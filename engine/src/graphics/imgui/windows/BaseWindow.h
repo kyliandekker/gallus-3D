@@ -98,6 +98,7 @@ namespace gallus
 				bool m_bEnabled = true; /// Whether the window is enabled or not.
 				bool m_bRenderWindowItself = false; /// Whether the window only needs to render the elements or the window around it.
 				bool m_bFocusMyWindow = false;
+				bool m_bInitialized = false;
 			};
 		}
 	}

@@ -223,6 +223,11 @@ namespace gallus
 					SaveMetaData(a_FileEditorSelectable.GetFileResource(), texture.get());
 				}
 
+				if (ImGui::Button("Test"))
+				{
+					SaveMetaData(a_FileEditorSelectable.GetFileResource(), texture.get());
+				}
+
 				ImVec2 size = m_Window.GetHeaderSize();
 				std::string id = ImGui::IMGUI_FORMAT_ID(" Show Info",
 					FOLDOUT_ID, "TEX_SHOW_INFO_INSPECTOR");

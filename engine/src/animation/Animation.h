@@ -147,6 +147,7 @@ namespace gallus
 			uint16_t m_iFrameCount = 0;
 			bool m_bIsLooping = false;
 
+			// TODO: Serialize this. Why is this not using the default serialization????
 			BEGIN_SERIALIZE_PARENT(Animation, resources::EngineResource)
 			END_SERIALIZE(Animation)
 		};

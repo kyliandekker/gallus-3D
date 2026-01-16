@@ -149,7 +149,7 @@ namespace gallus
 				}
 
 				std::string name = ecs.GetUniqueName("New GameObject");
-				if (!entitySrc.GetString(JSON_SCENE_ENTITIES_VAR_NAME, name))
+				if (!entitySrc.GetString(name, JSON_SCENE_ENTITIES_VAR_NAME))
 				{
 					LOGF(LOGSEVERITY_WARNING, LOG_CATEGORY_GAME, "Could not read name of entity index %i in scene data. Defaulting to using name \"\".", i, name.c_str());
 				}
@@ -170,7 +170,7 @@ namespace gallus
 				}
 
 				bool isActive = true;
-				if (!entitySrc.GetBool(JSON_SCENE_ENTITIES_VAR_ACTIVE, isActive))
+				if (!entitySrc.GetBool(isActive, JSON_SCENE_ENTITIES_VAR_ACTIVE))
 				{
 					LOGF(LOGSEVERITY_WARNING, LOG_CATEGORY_GAME, "Could not read active state of entity index %i in scene data. Defaulting to true.", i);
 				}

@@ -204,28 +204,27 @@ namespace gallus
 #endif // _LOAD_BY_PATH
 
 			BEGIN_SERIALIZE(EngineResource)
-			// 	SERIALIZE_FIELD(m_bIsDestroyable, "Is Destroyable", "Indicates if this resource can be destroyed or deleted.",
-			// 		.type = FieldSerializationType::FieldSerializationType_Bool,
-			// 		.disabled = true,
-			// 		.internal = true)
-			// 	SERIALIZE_FIELD(m_bIsLocked, "Is Locked", "Indicates if this resource is locked from modifications.",
-			// 		.type = FieldSerializationType::FieldSerializationType_Bool,
-			// 		.disabled = true,
-			// 		.internal = true)
-			// 	SERIALIZE_FIELD(m_bIsUnique, "Is Unique", "Specifies if this resource is unique and cannot have duplicates.",
-			// 		.type = FieldSerializationType::FieldSerializationType_Bool,
-			// 		.disabled = true,
-			// 		.internal = true)
-			// 	SERIALIZE_FIELD(m_ResourceCategory, "Resource Category", "The category this resource belongs to, used for organizational purposes.",
-			// 		.type = FieldSerializationType::FieldSerializationType_Enum,
-			// 		.enumToStringFunc = MakeEnumToStringFunc<EngineResourceCategory>(EngineResourceCategoryToString),
-			// 		.disabled = true,
-			// 		.internal = true)
-			// 	SERIALIZE_FIELD(m_AssetType, "Asset Type", "The specific type of asset this resource represents.",
-			// 		.type = FieldSerializationType::FieldSerializationType_Enum,
-			// 		.enumToStringFunc = MakeEnumToStringFunc<AssetType>(AssetTypeToString),
-			// 		.disabled = true,
-			// 		.internal = true)
+			 	SERIALIZE_FIELD(m_bIsDestroyable, "Is Destroyable", "Indicates if this resource can be destroyed or deleted.",
+			 		.type = FieldSerializationType::FieldSerializationType_Bool,
+			 		.disabled = true,
+			 		.internal = true)
+			 	SERIALIZE_FIELD(m_bIsLocked, "Is Locked", "Indicates if this resource is locked from modifications.",
+			 		.type = FieldSerializationType::FieldSerializationType_Bool,
+			 		.disabled = true,
+			 		.internal = true)
+			 	SERIALIZE_FIELD(m_bIsUnique, "Is Unique", "Specifies if this resource is unique and cannot have duplicates.",
+			 		.type = FieldSerializationType::FieldSerializationType_Bool,
+			 		.disabled = true,
+			 		.internal = true)
+			 	SERIALIZE_FIELD(m_ResourceCategory, "Resource Category", "The category this resource belongs to, used for organizational purposes.",
+			 		.type = FieldSerializationType::FieldSerializationType_Enum,
+			 		.enumToStringFunc = MakeEnumToStringFunc<EngineResourceCategory>(EngineResourceCategoryToString),
+			 		.disabled = true,
+			 		.internal = true)
+			 	SERIALIZE_FIELD(m_AssetType, "Asset Type", "The specific type of asset this resource represents.",
+			 		.type = FieldSerializationType::FieldSerializationType_Enum,
+			 		.enumToStringFunc = MakeEnumToStringFunc<AssetType>(AssetTypeToString),
+			 		.disabled = true)
 			END_SERIALIZE(EngineResource)
 		};
 	}

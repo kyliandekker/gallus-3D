@@ -97,7 +97,7 @@ namespace gallus
 				if (file::LoadFile(m_Path.generic_string() + ".meta", data))
 				{
 					resources::SrcData srcData(data);
-					if (!srcData.IsValid() || !srcData.GetEnum("assetType", m_AssetType))
+					if (!srcData.IsValid() || !srcData.GetEnum(m_AssetType, "assetType"))
 					{
 						LOGF(LOGSEVERITY_WARNING, "%s has no asset type in its meta data.", m_Path.generic_string().c_str());
 					}

@@ -114,89 +114,89 @@ namespace gallus
 		{
 			case FieldSerializationType::FieldSerializationType_Float:
 			{
-				a_SrcData.GetFloat(a_sPropertyName, *(float*) a_pPtr);
+				a_SrcData.GetFloat(*(float*) a_pPtr, a_sPropertyName);
 				break;
 			}
 			case FieldSerializationType::FieldSerializationType_Int8:
 			{
 				int32_t value = 0;
-				a_SrcData.GetInt(a_sPropertyName, value);
+				a_SrcData.GetInt(value, a_sPropertyName);
 				*(int8_t*) a_pPtr = static_cast<int8_t>(value);
 				break;
 			}
 			case FieldSerializationType::FieldSerializationType_Int16:
 			{
 				int32_t value = 0;
-				a_SrcData.GetInt(a_sPropertyName, value);
+				a_SrcData.GetInt(value, a_sPropertyName);
 				*(int16_t*) a_pPtr = static_cast<int16_t>(value);
 				break;
 			}
 			case FieldSerializationType::FieldSerializationType_Int32:
 			{
 				int32_t value = 0;
-				a_SrcData.GetInt(a_sPropertyName, value);
+				a_SrcData.GetInt(value, a_sPropertyName);
 				*(int32_t*) a_pPtr = value;
 				break;
 			}
 			case FieldSerializationType::FieldSerializationType_Enum:
 			{
 				int32_t value = 0;
-				a_SrcData.GetInt(a_sPropertyName, value);
+				a_SrcData.GetInt(value, a_sPropertyName);
 				*(int32_t*) a_pPtr = value;
 				break;
 			}
 			case FieldSerializationType::FieldSerializationType_Bool:
 			case FieldSerializationType::FieldSerializationType_Switch:
 			{
-				a_SrcData.GetBool(a_sPropertyName, *(bool*) a_pPtr);
+				a_SrcData.GetBool(*(bool*) a_pPtr, a_sPropertyName);
 				break;
 			}
 			case FieldSerializationType::FieldSerializationType_LongSwitch:
 			{
 				int32_t value = 0;
-				a_SrcData.GetInt(a_sPropertyName, value);
+				a_SrcData.GetInt(value, a_sPropertyName);
 				*(int32_t*) a_pPtr = value;
 				break;
 			}
 			case FieldSerializationType::FieldSerializationType_Vector2:
 			{
 				Vector2 vec2;
-				a_SrcData.GetVector2(a_sPropertyName, vec2);
+				a_SrcData.GetVector2(vec2, a_sPropertyName);
 				*(DirectX::XMFLOAT2*) a_pPtr = vec2;
 				break;
 			}
 			case FieldSerializationType::FieldSerializationType_IVector2:
 			{
 				IVector2 ivec2;
-				a_SrcData.GetIVector2(a_sPropertyName, ivec2);
+				a_SrcData.GetIVector2(ivec2, a_sPropertyName);
 				*(DirectX::XMINT2*) a_pPtr = ivec2;
 				break;
 			}
 			case FieldSerializationType::FieldSerializationType_Vector3:
 			{
 				Vector3 vec3;
-				a_SrcData.GetVector3(a_sPropertyName, vec3);
+				a_SrcData.GetVector3(vec3, a_sPropertyName);
 				*(DirectX::XMFLOAT3*) a_pPtr = vec3;
 				break;
 			}
 			case FieldSerializationType::FieldSerializationType_Color:
 			{
 				Color4 col;
-				a_SrcData.GetColor(a_sPropertyName, col);
+				a_SrcData.GetColor(col, a_sPropertyName);
 				*(DirectX::XMFLOAT4*) a_pPtr = col;
 				break;
 			}
 			case FieldSerializationType::FieldSerializationType_Quaternion:
 			{
 				Vector4 vec4;
-				a_SrcData.GetVector4(a_sPropertyName, vec4);
+				a_SrcData.GetVector4(vec4, a_sPropertyName);
 				*(DirectX::XMFLOAT4*) a_pPtr = vec4;
 				break;
 			}
 			case FieldSerializationType::FieldSerializationType_EngineResource:
 			{
 				std::string assetName = "";
-				if (!a_SrcData.GetString(a_sPropertyName, assetName))
+				if (!a_SrcData.GetString(assetName, a_sPropertyName))
 				{
 					return;
 				}
@@ -209,15 +209,15 @@ namespace gallus
 			{
 				ISerializableObject* editorObject = dynamic_cast<ISerializableObject*>(reinterpret_cast<ISerializableObject*>(a_pPtr));
 
-				resources::SrcData objectSrcData;
-				objectSrcData.SetObject();
-
 				if (a_Options.type == FieldSerializationType::FieldSerializationType_Array)
 				{
 					DeserializeFields(editorObject, a_SrcData);
 				}
 				else
 				{
+					resources::SrcData objectSrcData;
+					objectSrcData.SetObject();
+
 					std::string objectPropertyName = TypeNameToPropertyName(editorObject->GetTypeName());
 					if (!a_SrcData.GetSrcObject(objectPropertyName, objectSrcData))
 					{
@@ -234,18 +234,24 @@ namespace gallus
 				ISerializableObject** ppEditorObject = reinterpret_cast<ISerializableObject**>(a_pPtr);
 				ISerializableObject* pEditorObject = (ppEditorObject ? *ppEditorObject : nullptr);
 
-				resources::SrcData objectSrcData;
-				objectSrcData.SetObject();
-
-				if (!pEditorObject)
+				if (a_Options.type == FieldSerializationType::FieldSerializationType_Array)
 				{
-					return;
+					DeserializeFields(pEditorObject, a_SrcData);
+				}
+				else
+				{
+					resources::SrcData objectSrcData;
+					objectSrcData.SetObject();
+
+					std::string objectPropertyName = TypeNameToPropertyName(pEditorObject->GetTypeName());
+					if (!a_SrcData.GetSrcObject(objectPropertyName, objectSrcData))
+					{
+						return;
+					}
+
+					DeserializeFields(pEditorObject, objectSrcData);
 				}
 
-				std::string objectPropertyName = TypeNameToPropertyName(pEditorObject->GetTypeName());
-				a_SrcData.GetSrcObject(objectPropertyName, objectSrcData);
-
-				DeserializeFields(pEditorObject, objectSrcData);
 				break;
 			}
 			case FieldSerializationType::FieldSerializationType_Array:
@@ -282,7 +288,7 @@ namespace gallus
 			case FieldSerializationType::FieldSerializationType_String:
 			{
 				std::string value;
-				if (a_SrcData.GetString(a_sPropertyName, value))
+				if (a_SrcData.GetString(value, a_sPropertyName))
 				{
 					*(std::string*) a_pPtr = value;
 				}
@@ -436,13 +442,21 @@ namespace gallus
 			{
 				const ISerializableObject* editorObject = dynamic_cast<const ISerializableObject*>(reinterpret_cast<const ISerializableObject*>(a_pPtr));
 
-				resources::SrcData objectSrcData;
-				objectSrcData.SetObject();
+				if (a_Options.type == FieldSerializationType::FieldSerializationType_Array)
+				{
+					SerializeFields(editorObject, a_SrcData);
+				}
+				else
+				{
+					resources::SrcData objectSrcData;
+					objectSrcData.SetObject();
 
-				SerializeFields(editorObject, objectSrcData);
+					SerializeFields(editorObject, objectSrcData);
 
-				std::string objectPropertyName = TypeNameToPropertyName(editorObject->GetTypeName());
-				a_SrcData.SetSrcObject(objectPropertyName, objectSrcData);
+					std::string objectPropertyName = TypeNameToPropertyName(editorObject->GetTypeName());
+					a_SrcData.SetSrcObject(objectPropertyName, objectSrcData);
+				}
+
 				break;
 			}
 			case FieldSerializationType::FieldSerializationType_ObjectPtr:
@@ -450,13 +464,21 @@ namespace gallus
 				const ISerializableObject* const* ppEditorObject = reinterpret_cast<const ISerializableObject* const*>(a_pPtr);
 				const ISerializableObject* pEditorObject = (ppEditorObject ? *ppEditorObject : nullptr);
 
-				resources::SrcData objectSrcData;
-				objectSrcData.SetObject();
+				if (a_Options.type == FieldSerializationType::FieldSerializationType_Array)
+				{
+					SerializeFields(pEditorObject, a_SrcData);
+				}
+				else
+				{
+					resources::SrcData objectSrcData;
+					objectSrcData.SetObject();
 
-				SerializeFields(pEditorObject, objectSrcData);
+					SerializeFields(pEditorObject, objectSrcData);
 
-				std::string objectPropertyName = TypeNameToPropertyName(pEditorObject->GetTypeName());
-				a_SrcData.SetSrcObject(objectPropertyName, objectSrcData);
+					std::string objectPropertyName = TypeNameToPropertyName(pEditorObject->GetTypeName());
+					a_SrcData.SetSrcObject(objectPropertyName, objectSrcData);
+				}
+
 				break;
 			}
 			case FieldSerializationType::FieldSerializationType_Array:

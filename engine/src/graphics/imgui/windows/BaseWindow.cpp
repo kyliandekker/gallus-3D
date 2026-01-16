@@ -33,7 +33,8 @@ namespace gallus
 			//---------------------------------------------------------------------
 			bool BaseWindow::Initialize()
 			{
-				return true;
+				m_bInitialized = true;
+				return m_bInitialized;
 			}
 
 			//---------------------------------------------------------------------
@@ -79,7 +80,7 @@ namespace gallus
 					m_bFocusMyWindow = false;
 				}
 
-				if (showRender)
+				if (showRender && m_bInitialized)
 				{
 					Render();
 				}

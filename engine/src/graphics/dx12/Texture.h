@@ -61,12 +61,14 @@ namespace gallus
 				uint32_t y = 0;
 				uint32_t width = 0;
 				uint32_t height = 0;
+				Vector2 test;
 
 				BEGIN_SERIALIZE(SpriteRect)
 					SERIALIZE_FIELD(x, "x", "", .type = gallus::FieldSerializationType::FieldSerializationType_Int32)
 					SERIALIZE_FIELD(y, "y", "", .type = gallus::FieldSerializationType::FieldSerializationType_Int32)
 					SERIALIZE_FIELD(width, "width", "", .type = gallus::FieldSerializationType::FieldSerializationType_Int32)
 					SERIALIZE_FIELD(height, "height", "", .type = gallus::FieldSerializationType::FieldSerializationType_Int32)
+					SERIALIZE_FIELD(test, "test", "", .type = gallus::FieldSerializationType::FieldSerializationType_Vector2)
 				END_SERIALIZE(SpriteRect)
 			};
 

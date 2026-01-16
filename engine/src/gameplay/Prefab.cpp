@@ -122,7 +122,7 @@ namespace gallus
 
 			gameplay::EntityComponentSystem& ecs = core::ENGINE->GetECS();
 			std::string name = ecs.GetUniqueName("New GameObject");
-			if (!srcData.GetString(JSON_SCENE_ENTITIES_VAR_NAME, name))
+			if (!srcData.GetString(name, JSON_SCENE_ENTITIES_VAR_NAME))
 			{
 				LOGF(LOGSEVERITY_WARNING, LOG_CATEGORY_GAME, "Could not read name of entity in prefab data. Defaulting to using name \"\".", name.c_str());
 			}
@@ -143,7 +143,7 @@ namespace gallus
 			}
 
 			bool isActive = true;
-			if (!srcData.GetBool(JSON_SCENE_ENTITIES_VAR_ACTIVE, isActive))
+			if (!srcData.GetBool(isActive, JSON_SCENE_ENTITIES_VAR_ACTIVE))
 			{
 				LOGF(LOGSEVERITY_WARNING, LOG_CATEGORY_GAME, "Could not read active state of entity in prefab data. Defaulting to true.");
 			}
