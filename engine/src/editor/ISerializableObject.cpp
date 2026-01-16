@@ -301,7 +301,7 @@ namespace gallus
 		}
 	}
 
-	void DeserializeFields(ISerializableObject* a_pObject, const resources::SrcData& a_SrcData)
+	void DeserializeFields(ISerializableObject* a_pObject, const resources::SrcData& a_SrcData, SerializationMethod a_SerializationMethod)
 	{
 		for (const FieldSerializationInfo& field : a_pObject->GetEditorFields())
 		{
@@ -314,6 +314,11 @@ namespace gallus
 			}
 
 			if (field.m_Options.internal)
+			{
+				continue;
+			}
+
+			if (field.m_Options.serializationMethod != a_SerializationMethod)
 			{
 				continue;
 			}
@@ -514,7 +519,7 @@ namespace gallus
 		}
 	}
 
-	void SerializeFields(const ISerializableObject* a_pObject, resources::SrcData& a_SrcData)
+	void SerializeFields(const ISerializableObject* a_pObject, resources::SrcData& a_SrcData, SerializationMethod a_SerializationMethod)
 	{
 		for (const FieldSerializationInfo& field : a_pObject->GetEditorFields())
 		{
@@ -527,6 +532,11 @@ namespace gallus
 			}
 
 			if (!field.m_Options.serialize)
+			{
+				continue;
+			}
+
+			if (field.m_Options.serializationMethod != a_SerializationMethod)
 			{
 				continue;
 			}

@@ -147,8 +147,13 @@ namespace gallus
 			uint16_t m_iFrameCount = 0;
 			bool m_bIsLooping = false;
 
-			// TODO: Serialize this. Why is this not using the default serialization????
 			BEGIN_SERIALIZE_PARENT(Animation, resources::EngineResource)
+				SERIALIZE_FIELD(m_iFrameCount, "Frame count", "The amount of frames the animation should be (length of the animation).",
+					.type = FieldSerializationType::FieldSerializationType_Int16,
+					.serializationMethod = SerializationMethod::SerializationMethod_File)
+				SERIALIZE_FIELD(m_bIsLooping, "Is Looping", "Whether the animation loops or not.",
+					.type = FieldSerializationType::FieldSerializationType_Bool,
+					.serializationMethod = SerializationMethod::SerializationMethod_File)
 			END_SERIALIZE(Animation)
 		};
 	}

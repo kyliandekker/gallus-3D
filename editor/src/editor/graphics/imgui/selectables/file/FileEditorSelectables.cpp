@@ -36,13 +36,13 @@ namespace gallus
 	{
 		namespace imgui
 		{
-			void SaveMetaData(resources::FileResource& a_FileResource, ISerializableObject* a_pObject, bool a_bSaveToFile = false)
+			void SaveMetaData(resources::FileResource& a_FileResource, ISerializableObject* a_pObject, SerializationMethod a_SerializationMethod = SerializationMethod::SerializationMethod_Metadata)
 			{
 				resources::SrcData srcData;
 				srcData.SetObject();
-				SerializeFields(a_pObject, srcData);
+				SerializeFields(a_pObject, srcData, a_SerializationMethod);
 
-				fs::path path = a_FileResource.GetPath().generic_string() + (a_bSaveToFile ? "" : ".meta");
+				fs::path path = a_FileResource.GetPath().generic_string() + (a_SerializationMethod == SerializationMethod::SerializationMethod_File ? "" : ".meta");
 
 				core::Data data;
 				srcData.GetData(data);
@@ -513,7 +513,7 @@ namespace gallus
 
 				if (RenderObjectFields(material.get(), false))
 				{
-					SaveMetaData(a_FileEditorSelectable.GetFileResource(), material.get(), true);
+					SaveMetaData(a_FileEditorSelectable.GetFileResource(), material.get(), SerializationMethod::SerializationMethod_File);
 				}
 			}
 		}

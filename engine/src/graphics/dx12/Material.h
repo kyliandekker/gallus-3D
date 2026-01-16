@@ -80,13 +80,17 @@ protected:
 
 				BEGIN_SERIALIZE_PARENT(Material, resources::EngineResource)
 				 	SERIALIZE_FIELD(m_MaterialData.EnableLighting, "Enable Lighting", "",
-				 		.type = gallus::FieldSerializationType::FieldSerializationType_LongSwitch)
+				 		.type = gallus::FieldSerializationType::FieldSerializationType_LongSwitch,
+						.serializationMethod = SerializationMethod::SerializationMethod_File)
 				 	SERIALIZE_FIELD(m_MaterialData.DiffuseColor, "Diffuse Color", "",
-				 		.type = gallus::FieldSerializationType::FieldSerializationType_Color)
+				 		.type = gallus::FieldSerializationType::FieldSerializationType_Color,
+						.serializationMethod = SerializationMethod::SerializationMethod_File)
 				 	SERIALIZE_FIELD(m_MaterialData.Metallic, "Metallic", "",
-				 		.type = gallus::FieldSerializationType::FieldSerializationType_Float)
+				 		.type = gallus::FieldSerializationType::FieldSerializationType_Float,
+						.serializationMethod = SerializationMethod::SerializationMethod_File)
 				 	SERIALIZE_FIELD(m_MaterialData.Smoothness, "Smoothness", "",
-				 		.type = gallus::FieldSerializationType::FieldSerializationType_Float)
+				 		.type = gallus::FieldSerializationType::FieldSerializationType_Float,
+						.serializationMethod = SerializationMethod::SerializationMethod_File)
 				END_SERIALIZE(Material)
 			};
 		}

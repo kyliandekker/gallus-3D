@@ -50,6 +50,13 @@ namespace gallus
 		EditorGizmoType_Direction
 	};
 
+	enum class SerializationMethod
+	{
+		SerializationMethod_Metadata,
+		SerializationMethod_File,
+		SerializationMethod_Both // THIS SHOULD BE ONLY FOR INTERNAL USE, NOT FOR FIELD DEFINITIONS.
+	};
+
 	class ISerializableObject;
 
 	struct FieldSerializationOptions
@@ -68,6 +75,7 @@ namespace gallus
 		bool serialize = true;									// If false, stops serialization to data.
 		size_t relatedIndexFieldOffset = 0;
 		size_t indent = 0;
+		SerializationMethod serializationMethod = SerializationMethod::SerializationMethod_Metadata;
 
 		std::function<size_t(void* arrayPtr)> getSize = nullptr;
 		std::function<void* (void* arrayPtr, size_t index)> getElement = nullptr;
@@ -254,9 +262,9 @@ namespace gallus
 	}
 	void DeserializeResource(std::weak_ptr<gallus::resources::EngineResource>* a_pWeak, resources::AssetType a_FieldAssetType, resources::AssetType a_AssetType, const std::string& a_sFileName);
 
-	void DeserializeFields(ISerializableObject* a_pObject, const resources::SrcData& a_SrcData);
+	void DeserializeFields(ISerializableObject* a_pObject, const resources::SrcData& a_SrcData, SerializationMethod a_SerializationMethod = SerializationMethod::SerializationMethod_Metadata);
 
 #ifdef _EDITOR
-	void SerializeFields(const ISerializableObject* a_pObject, resources::SrcData& a_SrcData);
+	void SerializeFields(const ISerializableObject* a_pObject, resources::SrcData& a_SrcData, SerializationMethod a_SerializationMethod = SerializationMethod::SerializationMethod_Metadata);
 #endif
 		}

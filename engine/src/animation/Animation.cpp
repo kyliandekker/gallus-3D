@@ -153,40 +153,46 @@ namespace gallus
 		{
 			resources::SrcData srcData;
 			srcData.SetObject();
-
-			srcData.SetInt(ANIMATION_TRACK_FRAME_COUNT_VAR, m_iFrameCount);
-			srcData.SetBool(ANIMATION_TRACK_LOOP_VAR, m_bIsLooping);
-
-			resources::SrcData keyFramesSrcData;
-			keyFramesSrcData.SetObject();
-
-			for (AnimationKeyFrame* keyFrame : m_aKeyFrames)
-			{
-				resources::SrcData keyFrameSrcData;
-				keyFrameSrcData.SetObject();
-				
-				resources::SrcData componentsSrcData;
-				componentsSrcData.SetObject();
-
-				for (auto* component : keyFrame->GetComponents())
-				{
-					resources::SrcData componentSrcData;
-					componentSrcData.SetObject();
-
-					SerializeFields(component, componentSrcData);
-					componentsSrcData.SetSrcObject(component->GetPropertyName(), componentSrcData);
-				}
-
-				keyFrameSrcData.SetSrcObject(ANIMATION_TRACK_COMPONENTS_VAR, componentsSrcData);
-
-				std::string frameStr = std::to_string(keyFrame->GetFrame());
-				keyFramesSrcData.SetSrcObject(frameStr, keyFrameSrcData);
-			}
-
-			srcData.SetSrcObject(ANIMATION_TRACK_KEY_FRAMES_VAR, keyFramesSrcData);
+			SerializeFields(this, srcData, SerializationMethod::SerializationMethod_File);
 
 			core::Data data;
 			srcData.GetData(data);
+
+			// TODO: Serialize the key frames.
+			// 
+			// 
+			//file::SaveFile(a_Path, data);
+
+			//resources::SrcData keyFramesSrcData;
+			//keyFramesSrcData.SetObject();
+
+			//for (AnimationKeyFrame* keyFrame : m_aKeyFrames)
+			//{
+			//	resources::SrcData keyFrameSrcData;
+			//	keyFrameSrcData.SetObject();
+			//	
+			//	resources::SrcData componentsSrcData;
+			//	componentsSrcData.SetObject();
+
+			//	for (auto* component : keyFrame->GetComponents())
+			//	{
+			//		resources::SrcData componentSrcData;
+			//		componentSrcData.SetObject();
+
+			//		SerializeFields(component, componentSrcData);
+			//		componentsSrcData.SetSrcObject(component->GetPropertyName(), componentSrcData);
+			//	}
+
+			//	keyFrameSrcData.SetSrcObject(ANIMATION_TRACK_COMPONENTS_VAR, componentsSrcData);
+
+			//	std::string frameStr = std::to_string(keyFrame->GetFrame());
+			//	keyFramesSrcData.SetSrcObject(frameStr, keyFrameSrcData);
+			//}
+
+			//srcData.SetSrcObject(ANIMATION_TRACK_KEY_FRAMES_VAR, keyFramesSrcData);
+
+			//core::Data data;
+			//srcData.GetData(data);
 			return file::SaveFile(a_Path, data);
 		}
 
