@@ -54,7 +54,6 @@ namespace gallus
 	{
 		SerializationMethod_Metadata,
 		SerializationMethod_File,
-		SerializationMethod_Both // THIS SHOULD BE ONLY FOR INTERNAL USE, NOT FOR FIELD DEFINITIONS.
 	};
 
 	class ISerializableObject;
@@ -214,52 +213,45 @@ namespace gallus
 			};
 	}
 
-	template<typename T>
-	FieldSerializationOptions MakeArrayFieldSerializationOptions(FieldSerializationType a_FieldSerializationType = FieldSerializationType::FieldSerializationType_Object)
-	{
-		FieldSerializationOptions opts;
-		opts.type = FieldSerializationType::FieldSerializationType_Array;
-		opts.arrayType = a_FieldSerializationType;
-
-		opts.getSize = [](void* arrayPtr) -> size_t
-			{
-				auto& vec = *static_cast<std::vector<T>*>(arrayPtr);
-				return vec.size();
-			};
-
-		opts.getElement = [](void* arrayPtr, size_t index)
-			{
-				auto& vec = *static_cast<std::vector<T>*>(arrayPtr);
-				return static_cast<void*>(&vec[index]);
-			};
-
-		opts.addElement = [](void* arrayPtr)
-			{
-				auto& vec = *static_cast<std::vector<T>*>(arrayPtr);
-				vec.emplace_back();
-				return vec.size() - 1;
-			};
-
-		opts.removeElement = [](void* arrayPtr, size_t index)
-			{
-				auto& vec = *static_cast<std::vector<T>*>(arrayPtr);
-				vec.erase(vec.begin() + index);
-			};
-
-		opts.reserve = [](void* arrayPtr, size_t size)
-			{
-				auto& vec = *static_cast<std::vector<T>*>(arrayPtr);
-				vec.reserve(size);
-			};
-
-		opts.clear = [](void* arrayPtr)
-			{
-				auto& vec = *static_cast<std::vector<T>*>(arrayPtr);
-				vec.clear();
-			};
-
-		return opts;
-	}
+#define MakeArrayFieldSerializationOptions(T, ARRAY_TYPE, ...) \
+	([&]() -> FieldSerializationOptions \
+	{ \
+		FieldSerializationOptions opts{ __VA_ARGS__ }; \
+		opts.type = FieldSerializationType::FieldSerializationType_Array; \
+		opts.arrayType = ARRAY_TYPE; \
+		opts.getSize = [](void* arrayPtr) -> size_t \
+		{ \
+			auto& vec = *static_cast<std::vector<T>*>(arrayPtr); \
+			return vec.size(); \
+		}; \
+		opts.getElement = [](void* arrayPtr, size_t index) \
+		{ \
+			auto& vec = *static_cast<std::vector<T>*>(arrayPtr); \
+			return static_cast<void*>(&vec[index]); \
+		}; \
+		opts.addElement = [arrayType = opts.arrayType](void* arrayPtr) \
+		{ \
+			auto& vec = *static_cast<std::vector<T>*>(arrayPtr); \
+			vec.emplace_back(); \
+			return vec.size() - 1; \
+		}; \
+		opts.removeElement = [](void* arrayPtr, size_t index) \
+		{ \
+			auto& vec = *static_cast<std::vector<T>*>(arrayPtr); \
+			vec.erase(vec.begin() + index); \
+		}; \
+		opts.reserve = [](void* arrayPtr, size_t size) \
+		{ \
+			auto& vec = *static_cast<std::vector<T>*>(arrayPtr); \
+			vec.reserve(size); \
+		}; \
+		opts.clear = [](void* arrayPtr) \
+		{ \
+			auto& vec = *static_cast<std::vector<T>*>(arrayPtr); \
+			vec.clear(); \
+		}; \
+		return opts; \
+	}())
 	void DeserializeResource(std::weak_ptr<gallus::resources::EngineResource>* a_pWeak, resources::AssetType a_FieldAssetType, resources::AssetType a_AssetType, const std::string& a_sFileName);
 
 	void DeserializeFields(ISerializableObject* a_pObject, const resources::SrcData& a_SrcData, SerializationMethod a_SerializationMethod = SerializationMethod::SerializationMethod_Metadata);

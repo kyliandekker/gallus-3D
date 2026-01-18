@@ -46,25 +46,24 @@ namespace gallus
 			core::Data data;
 			if (!file::LoadFile(a_Path, data))
 			{
-				LOGF(LOGSEVERITY_ERROR, LOG_CATEGORY_ANIMATION, "Failed loading data in animation file \"%s\".", a_Path.generic_string().c_str());
+				LOGF(LOGSEVERITY_ERROR, LOG_CATEGORY_ANIMATION, "Failed loading animation file \"%s\".", a_Path.generic_string().c_str());
 				return false;
 			}
-
-			m_Path = a_Path;
-			m_sName = a_Path.filename().generic_string();
-
 			resources::SrcData srcData(data);
+
 			if (!srcData.IsValid())
 			{
 				LOGF(LOGSEVERITY_ERROR, LOG_CATEGORY_ANIMATION, "Failed loading data in animation file \"%s\".", a_Path.generic_string().c_str());
 				return false;
 			}
 
-			int32_t frameCount = 0;
-			srcData.GetInt(frameCount, ANIMATION_TRACK_FRAME_COUNT_VAR);
-			m_iFrameCount = static_cast<uint16_t>(frameCount);
-			srcData.GetBool(m_bIsLooping, ANIMATION_TRACK_LOOP_VAR);
+			DeserializeFields(this, srcData, SerializationMethod::SerializationMethod_File);
 
+			m_Path = a_Path;
+			m_sName = a_Path.filename().generic_string();
+
+			// Manually extract the key frame information.
+			// TODO: This would be possible with a key frame factory if I want automatic serialization and deserialization.
 			resources::SrcData keyFramesSrcData;
 			keyFramesSrcData.SetObject();
 
@@ -154,45 +153,40 @@ namespace gallus
 			resources::SrcData srcData;
 			srcData.SetObject();
 			SerializeFields(this, srcData, SerializationMethod::SerializationMethod_File);
+			
+			// Manually extract the key frame information.
+			// TODO: This would be possible with a key frame factory if I want automatic serialization and deserialization.
+			resources::SrcData keyFramesSrcData;
+			keyFramesSrcData.SetObject();
+
+			for (AnimationKeyFrame* keyFrame : m_aKeyFrames)
+			{
+				resources::SrcData keyFrameSrcData;
+				keyFrameSrcData.SetObject();
+				
+				resources::SrcData componentsSrcData;
+				componentsSrcData.SetObject();
+
+				for (auto* component : keyFrame->GetComponents())
+				{
+					resources::SrcData componentSrcData;
+					componentSrcData.SetObject();
+
+					SerializeFields(component, componentSrcData);
+					componentsSrcData.SetSrcObject(component->GetPropertyName(), componentSrcData);
+				}
+
+				keyFrameSrcData.SetSrcObject(ANIMATION_TRACK_COMPONENTS_VAR, componentsSrcData);
+
+				std::string frameStr = std::to_string(keyFrame->GetFrame());
+				keyFramesSrcData.SetSrcObject(frameStr, keyFrameSrcData);
+			}
+
+			srcData.SetSrcObject(ANIMATION_TRACK_KEY_FRAMES_VAR, keyFramesSrcData);
 
 			core::Data data;
 			srcData.GetData(data);
 
-			// TODO: Serialize the key frames.
-			// 
-			// 
-			//file::SaveFile(a_Path, data);
-
-			//resources::SrcData keyFramesSrcData;
-			//keyFramesSrcData.SetObject();
-
-			//for (AnimationKeyFrame* keyFrame : m_aKeyFrames)
-			//{
-			//	resources::SrcData keyFrameSrcData;
-			//	keyFrameSrcData.SetObject();
-			//	
-			//	resources::SrcData componentsSrcData;
-			//	componentsSrcData.SetObject();
-
-			//	for (auto* component : keyFrame->GetComponents())
-			//	{
-			//		resources::SrcData componentSrcData;
-			//		componentSrcData.SetObject();
-
-			//		SerializeFields(component, componentSrcData);
-			//		componentsSrcData.SetSrcObject(component->GetPropertyName(), componentSrcData);
-			//	}
-
-			//	keyFrameSrcData.SetSrcObject(ANIMATION_TRACK_COMPONENTS_VAR, componentsSrcData);
-
-			//	std::string frameStr = std::to_string(keyFrame->GetFrame());
-			//	keyFramesSrcData.SetSrcObject(frameStr, keyFrameSrcData);
-			//}
-
-			//srcData.SetSrcObject(ANIMATION_TRACK_KEY_FRAMES_VAR, keyFramesSrcData);
-
-			//core::Data data;
-			//srcData.GetData(data);
 			return file::SaveFile(a_Path, data);
 		}
 

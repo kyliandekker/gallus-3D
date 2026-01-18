@@ -316,7 +316,7 @@ namespace gallus
 				SERIALIZE_FIELD(m_iShadingDrawMode, "Shading Draw Mode", "",
 					.type = FieldSerializationType::FieldSerializationType_Int8)
 
-				SERIALIZE_FIELD_OPTIONS(m_aLastOpenedScenes, "Last Scenes Opened", "Saves the last opened scenes.", MakeArrayFieldSerializationOptions<std::string>(FieldSerializationType::FieldSerializationType_String))
+				SERIALIZE_FIELD_OPTIONS(m_aLastOpenedScenes, "Last Scenes Opened", "Saves the last opened scenes.", MakeArrayFieldSerializationOptions(std::string, FieldSerializationType::FieldSerializationType_String))
 			END_SERIALIZE(Settings)
 		};
 	}

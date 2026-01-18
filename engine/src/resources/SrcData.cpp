@@ -211,7 +211,7 @@ namespace gallus
 
 			if (!a_sPropertyName.empty() && !m_Document.HasMember(a_sPropertyName.c_str()))
 			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Property name \"%s\" does not exist.", a_sPropertyName);
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Property name \"%s\" does not exist.", a_sPropertyName.c_str());
 				return false;
 			}
 
@@ -253,7 +253,7 @@ namespace gallus
 
 			if (!a_sPropertyName.empty() && !m_Document.HasMember(a_sPropertyName.c_str()))
 			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Property name \"%s\" does not exist.", a_sPropertyName);
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Property name \"%s\" does not exist.", a_sPropertyName.c_str());
 				return false;
 			}
 
@@ -295,7 +295,7 @@ namespace gallus
 
 			if (!a_sPropertyName.empty() && !m_Document.HasMember(a_sPropertyName.c_str()))
 			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Property name \"%s\" does not exist.", a_sPropertyName);
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Property name \"%s\" does not exist.", a_sPropertyName.c_str());
 				return false;
 			}
 
@@ -349,7 +349,7 @@ namespace gallus
 
 			if (!a_sPropertyName.empty() && !m_Document.HasMember(a_sPropertyName.c_str()))
 			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Property name \"%s\" does not exist.", a_sPropertyName);
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Property name \"%s\" does not exist.", a_sPropertyName.c_str());
 				return false;
 			}
 
@@ -415,7 +415,7 @@ namespace gallus
 
 			if (!a_sPropertyName.empty() && !m_Document.HasMember(a_sPropertyName.c_str()))
 			{
-				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Property name \"%s\" does not exist.", a_sPropertyName);
+				LOGF(LogSeverity::LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Property name \"%s\" does not exist.", a_sPropertyName.c_str());
 				return false;
 			}
 

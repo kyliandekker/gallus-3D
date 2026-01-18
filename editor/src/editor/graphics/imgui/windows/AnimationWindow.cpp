@@ -102,6 +102,19 @@ namespace gallus
 						}
 					}
 				));
+
+				// Looping button.
+				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_Window,
+
+					[this]()
+					{
+						if (ImGui::TextButton(
+							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_SAVE), BUTTON_ID, "SAVE_ANIMATION_MODAL").c_str(), "Toggles looping for the animation track.", m_Window.GetHeaderSize()))
+						{
+							m_Animation.Save(m_Animation.GetPath());
+						}
+					}
+				));
 			}
 
 			//---------------------------------------------------------------------

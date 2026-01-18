@@ -145,7 +145,7 @@ namespace gallus
 					return;
 				}
 
-				DeserializeFields(this, srcData);
+				DeserializeFields(this, srcData, SerializationMethod::SerializationMethod_File);
 			}
 
 			//---------------------------------------------------------------------

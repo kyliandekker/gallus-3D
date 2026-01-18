@@ -228,7 +228,7 @@ namespace gallus
 				/// <summary>
 				/// Loads texture metadata.
 				/// </summary>
-				void LoadMetaData();
+				bool LoadMetaData();
 
 				/// <summary>
 				/// Retrieves the texture type.
@@ -283,7 +283,7 @@ namespace gallus
 					SERIALIZE_FIELD(m_TextureType, "Texture Type", "The type of texture. Sprite sheet for multiple sprites, or texture for only 1.",
 						.type = FieldSerializationType::FieldSerializationType_Enum,
 						.enumToStringFunc = MakeEnumToStringFunc<TextureType>(TextureTypeToString))
-					SERIALIZE_FIELD_OPTIONS(m_aSpriteRects, "Sprite Rects", "Enables multiple sprites from one image.", MakeArrayFieldSerializationOptions<SpriteRect>())
+					SERIALIZE_FIELD_OPTIONS(m_aSpriteRects, "Sprite Rects", "Enables multiple sprites from one image.", MakeArrayFieldSerializationOptions(SpriteRect, FieldSerializationType::FieldSerializationType_Object))
 				END_SERIALIZE(Texture)
 			};
 		}

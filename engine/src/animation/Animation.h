@@ -9,6 +9,8 @@
 // utils
 #include "utils/FILEPCH.h"
 
+#include "animation/AnimationKeyFrame.h"
+
 namespace gallus
 {
 	namespace gameplay
@@ -19,8 +21,6 @@ namespace gallus
 	constexpr float FRAME_TIME = 1 / 60.0f;
 	namespace animation
 	{
-		class AnimationKeyFrame;
-
 		enum class AnimationEvent;
 		class Animation : public resources::EngineResource
 		{

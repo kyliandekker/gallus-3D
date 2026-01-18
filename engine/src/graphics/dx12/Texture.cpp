@@ -152,7 +152,10 @@ namespace gallus
 
 				m_AssetType = resources::AssetType::Sprite;
 
-				LoadMetaData();
+				if (!LoadMetaData())
+				{
+					LOG(LOGSEVERITY_WARNING, LOG_CATEGORY_DX12, "Failed loading texture meta data. Sprite sheets will not work.");
+				}
 
 				auto dCommandQueue = core::ENGINE->GetDX12().GetCommandQueue();
 				auto dCommandList = dCommandQueue->GetCommandList();
@@ -342,20 +345,26 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			void Texture::LoadMetaData()
+			bool Texture::LoadMetaData()
 			{
 				if (m_Path.empty())
 				{
-					return;
+				return false;
 				}
 
 				core::Data data;
-				file::LoadFile(m_Path.generic_string() + ".meta", data);
+				if (!file::LoadFile(m_Path.generic_string() + ".meta", data))
+				{
+					LOGF(LOGSEVERITY_ERROR, LOG_CATEGORY_ANIMATION, "Failed loading meta file \"%s\".", m_Path.generic_string().c_str());
+				return false;
+				}
+
 				resources::SrcData srcData(data);
 
 				if (!srcData.IsValid())
 				{
-					return;
+					LOGF(LOGSEVERITY_ERROR, LOG_CATEGORY_ANIMATION, "Failed loading data in meta file \"%s\".", m_Path.generic_string().c_str());
+				return false;
 				}
 
 				DeserializeFields(this, srcData);
