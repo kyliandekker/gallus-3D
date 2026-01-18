@@ -7,76 +7,59 @@ namespace gallus
 {
 	namespace gameplay
 	{
-		class TransformComponent;
-
 		//---------------------------------------------------------------------
 		// EntityID
 		//---------------------------------------------------------------------
 		struct EntityID
 		{
-			/// <summary>
-			/// Constructs an empty entity ID.
-			/// </summary>
+		public:
 			EntityID() = default;
 
-			/// <summary>
-			/// Constructs an entity with a given ID.
-			/// </summary>
-			/// <param name="a_iID">The id.</param>
-			EntityID(size_t a_iID) : m_iID(a_iID)
-			{};
+			EntityID(uint32_t a_iIndex, uint32_t a_iGeneration)
+				: m_iIndex(a_iIndex)
+				, m_iGeneration(a_iGeneration)
+			{}
 
-			/// <summary>
-			/// Deconstructs an entity ID.
-			/// </summary>
-			~EntityID() = default;
-
-			/// <summary>
-			/// Checks whether the entity is valid or not.
-			/// </summary>
-			/// <returns>True if the entity was valid, otherwise false.</returns>
 			bool IsValid() const
 			{
-				return m_iID != INVALID;
-			};
-
-			/// <summary>
-			/// Sets the entity to invalid.
-			/// </summary>
-			void SetInvalid()
-			{
-				m_iID = INVALID;
+				return m_iIndex != INVALID_INDEX;
 			}
 
-			/// <summary>
-			/// Retrieves the ID (as an integer).
-			/// </summary>
-			/// <returns>An integer containing the entity id.</returns>
-			size_t GetID() const
+			uint32_t GetIndex() const
 			{
-				return m_iID;
+				return m_iIndex;
 			}
 
-			bool operator==(const EntityID& a_Other) const
+			uint32_t GetGeneration() const
 			{
-				return m_iID == a_Other.m_iID;
+				return m_iGeneration;
 			}
 
 			bool operator!=(const EntityID& a_Other) const
 			{
-				return m_iID != a_Other.m_iID;
+				return !(*this == a_Other);
 			}
 
 			bool operator<(const EntityID& a_Other) const
 			{
-				return m_iID < a_Other.m_iID;
+				if (m_iIndex != a_Other.m_iIndex)
+				{
+					return m_iIndex < a_Other.m_iIndex;
+				}
+
+				return m_iGeneration < a_Other.m_iGeneration;
 			}
-		protected:
-			enum ID_State : size_t
+
+			bool operator==(const EntityID& a_Other) const
 			{
-				INVALID = 0
-			};
-			size_t m_iID = INVALID;
+				return m_iIndex == a_Other.m_iIndex &&
+					m_iGeneration == a_Other.m_iGeneration;
+			}
+		private:
+			static constexpr uint32_t INVALID_INDEX = 0xFFFFFFFFu;
+
+			uint32_t m_iIndex = INVALID_INDEX;
+			uint32_t m_iGeneration = 0;
 		};
 	}
 }

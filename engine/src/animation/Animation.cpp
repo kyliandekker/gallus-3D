@@ -96,7 +96,7 @@ namespace gallus
 					continue;
 				}
 
-				for (auto* sys : core::ENGINE->GetECS().GetSystem<gameplay::AnimationSystem>().GetSystems())
+				for (auto* sys : core::ENGINE->GetECS().GetSystem<gameplay::AnimationSystem>()->GetSystems())
 				{
 					resources::SrcData sysSrcData;
 					if (!componentsSrcData.GetSrcObject(sys->GetPropertyName(), sysSrcData))
@@ -125,12 +125,7 @@ namespace gallus
 			{
 				case AnimationEvent::AnimationEvent_Delete:
 				{
-					auto ent = core::ENGINE->GetECS().GetEntity(a_EntityID).lock();
-					if (!ent)
-					{
-						return;
-					}
-					ent->Destroy();
+					core::ENGINE->GetECS().DeleteEntity(a_EntityID);
 				}
 				default:
 				case AnimationEvent::AnimationEvent_None:

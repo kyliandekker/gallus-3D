@@ -52,7 +52,6 @@ namespace gallus
 		gameplay::EntityID g_CreateEntity(const std::string& a_sName)
 		{
 			gameplay::EntityID entityID;
-			entityID.SetInvalid();
 
 			if (a_sName.empty())
 			{

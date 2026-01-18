@@ -3,6 +3,7 @@
 
 // core
 #include "core/DataStream.h"
+#include "core/Engine.h"
 
 // logger
 #include "logger/Logger.h"
@@ -70,9 +71,10 @@ namespace gallus
 			auto entities = ecs.GetEntities();
 			if (!entities.empty())
 			{
-				std::weak_ptr<gameplay::Entity> entity = entities[0];
-				auto ent = entity.lock();
-				if (!ent)
+				gameplay::EntityID entityID = entities[0];
+				std::weak_ptr<gameplay::Entity> entity = ecs.GetEntity(entityID);
+				std::shared_ptr<gameplay::Entity> ent = entity.lock();
+				if (!entity.lock())
 				{
 					return core::Data();
 				}
@@ -83,12 +85,12 @@ namespace gallus
 				resources::SrcData componentsSrc = resources::SrcData();
 				componentsSrc.SetObject();
 
-				for (gameplay::AbstractECSSystem* system : ecs.GetSystemsContainingEntity(ent->GetEntityID()))
+				for (gameplay::AbstractECSSystem* system : ecs.GetSystemsContainingEntity(entityID))
 				{
 					resources::SrcData componentSrc = resources::SrcData();
 					componentSrc.SetObject();
 
-					const gameplay::Component* component = system->GetBaseComponent(ent->GetEntityID());
+					const gameplay::Component* component = system->GetBaseComponent(entityID);
 					component->Serialize(componentSrc);
 
 					componentsSrc.SetSrcObject(system->GetPropertyName(), componentSrc);
@@ -105,19 +107,11 @@ namespace gallus
 		//---------------------------------------------------------------------
 		gameplay::EntityID Prefab::Instantiate() const
 		{
-			gameplay::EntityID id;
-			id.SetInvalid();
-
-			if (m_Data.empty())
-			{
-				return id;
-			}
-			
 			resources::SrcData srcData(m_Data);
 			if (!srcData.IsValid())
 			{
 				LOG(LOGSEVERITY_ERROR, LOG_CATEGORY_GAME, "Something went wrong when trying to load scene data.");
-				return false;
+				return EntityID();
 			}
 
 			gameplay::EntityComponentSystem& ecs = core::ENGINE->GetECS();
@@ -127,7 +121,7 @@ namespace gallus
 				LOGF(LOGSEVERITY_WARNING, LOG_CATEGORY_GAME, "Could not read name of entity in prefab data. Defaulting to using name \"\".", name.c_str());
 			}
 
-			id = ecs.CreateEntity(ecs.GetUniqueName(name));
+			EntityID id = ecs.CreateEntity(ecs.GetUniqueName(name));
 			if (!id.IsValid())
 			{
 				LOGF(LOGSEVERITY_WARNING, LOG_CATEGORY_GAME, "Could not spawn entity.");

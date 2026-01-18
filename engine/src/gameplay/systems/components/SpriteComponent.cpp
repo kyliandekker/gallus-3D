@@ -48,7 +48,9 @@ namespace gallus
 
 			// cache
 			m_pRootSignature = core::ENGINE->GetDX12().GetRootSignature().Get();
-			m_pTransformSystem = &m_pECS->GetSystem<gameplay::TransformSystem>();
+			m_pTransformSystem = m_pECS->GetSystem<gameplay::TransformSystem>();
+
+			OnOrderChanged();
 		}
 
 		//---------------------------------------------------------------------
@@ -88,9 +90,10 @@ namespace gallus
 			}
 
 			graphics::dx12::Transform transform;
-			if (m_pTransformSystem->HasComponent(a_EntityID))
+			TransformSystem* transformSys = core::ENGINE->GetECS().GetSystem<TransformSystem>();
+			if (gameplay::TransformComponent* transformComponent = transformSys->TryGetComponent(a_EntityID))
 			{
-				transform = m_pTransformSystem->GetComponent(a_EntityID).GetTransform();
+				transform = transformComponent->GetTransform();
 			}
 
 			if (transform.GetCameraType() == graphics::dx12::CameraType_Screen)

@@ -24,11 +24,6 @@ namespace gallus
 		//---------------------------------------------------------------------
 		bool EntityComponentSystem::Destroy()
 		{
-			for (AbstractECSSystem* system : m_aSystems)
-			{
-				system->Destroy();
-				delete system;
-			}
 			m_aSystems.clear();
 			LOG(LOGSEVERITY_SUCCESS, LOG_CATEGORY_ECS, "ECS destroyed.");
 			return System::Destroy();
@@ -40,37 +35,8 @@ namespace gallus
 		{
 			std::lock_guard<std::recursive_mutex> lock(m_EntityMutex);
 
-			for (const std::weak_ptr<Entity> entity : m_aEntities)
-			{
-				if (auto ent = entity.lock())
-				{
-					for (AbstractECSSystem* sys : m_aSystems)
-					{
-						if (ent->IsDestroyed())
-						{
-							sys->DeleteComponent(ent->GetEntityID());
-						}
-					}
-				}
-			}
-
-			size_t oldSize = m_aEntities.size();
-			m_aEntities.erase(
-				std::remove_if(m_aEntities.begin(), m_aEntities.end(),
-				[](std::shared_ptr<Entity> e)
-				{
-					return e->IsDestroyed();
-				}),
-				m_aEntities.end()
-			);
-
-			if (oldSize != m_aEntities.size())
-			{
-				m_eOnEntitiesUpdated();
-				m_eOnEntityComponentsUpdated();
-			}
-
-			for (auto& sys : m_aSystems)
+			// Update components.
+			for (std::unique_ptr<AbstractECSSystem>& sys : m_aSystems)
 			{
 				sys->UpdateComponents();
 			}
@@ -99,38 +65,71 @@ namespace gallus
 		//---------------------------------------------------------------------
 		EntityID EntityComponentSystem::CreateEntity(const std::string& a_sName)
 		{
-			std::lock_guard<std::recursive_mutex> lock(m_EntityMutex);
+			uint32_t index;
+			if (!m_aFreeIndices.empty())
+			{
+				index = m_aFreeIndices.back();
+				m_aFreeIndices.pop_back();
+			}
+			else
+			{
+				index = static_cast<uint32_t>(m_aEntitySlots.size());
+				m_aEntitySlots.emplace_back();
+			}
 
-			const EntityID id(++m_iNextID);
-			m_aEntities.push_back(std::make_shared<Entity>(id, a_sName));
-			
-			m_eOnEntitiesUpdated();
-			m_eOnEntityComponentsUpdated();
+			EntitySlot& slot = m_aEntitySlots[index];
+			slot.m_pEntity = std::make_shared<Entity>(EntityID(index, slot.m_iGeneration), a_sName);
 
-			return id;
+			m_eOnEntitiesUpdated.invoke();
+			m_eOnEntityComponentsUpdated.invoke();
+
+			return EntityID(index, slot.m_iGeneration);
 		}
 
 		//---------------------------------------------------------------------
 		bool EntityComponentSystem::IsEntityValid(const EntityID& a_ID) const
 		{
-			std::lock_guard<std::recursive_mutex> lock(m_EntityMutex);
+			if (!a_ID.IsValid())
+			{
+				return false;
+			}
 
-			return a_ID.IsValid();
+			if (a_ID.GetIndex() >= m_aEntitySlots.size())
+			{
+				return false;
+			}
+
+			const EntitySlot& slot = m_aEntitySlots[a_ID.GetIndex()];
+			return slot.m_iGeneration == a_ID.GetGeneration() &&
+				slot.m_pEntity != nullptr;
 		}
 
 		//---------------------------------------------------------------------
 		void EntityComponentSystem::DeleteEntity(const EntityID& a_ID)
 		{
-			std::lock_guard<std::recursive_mutex> lock(m_EntityMutex);
-
-			for (const std::shared_ptr<Entity>& ent : m_aEntities)
+			if (!IsEntityValid(a_ID))
 			{
-				if (ent->GetEntityID() == a_ID)
-				{
-					ent->Destroy();
-					return;
-				}
+				return;
 			}
+
+			EntitySlot& slot = m_aEntitySlots[a_ID.GetIndex()];
+			slot.m_pEntity.reset();
+			slot.m_iGeneration++;
+			m_aFreeIndices.push_back(a_ID.GetIndex());
+
+			m_eOnEntitiesUpdated.invoke();
+			m_eOnEntityComponentsUpdated.invoke();
+		}
+
+		//---------------------------------------------------------------------
+		std::weak_ptr<Entity> EntityComponentSystem::GetEntity(const EntityID& a_ID) const
+		{
+			if (!IsEntityValid(a_ID))
+			{
+				return std::weak_ptr<Entity>();
+			}
+
+			return m_aEntitySlots[a_ID.GetIndex()].m_pEntity;
 		}
 
 		//---------------------------------------------------------------------
@@ -138,11 +137,16 @@ namespace gallus
 		{
 			std::lock_guard<std::recursive_mutex> lock(m_EntityMutex);
 
-			for (const std::shared_ptr<Entity>& ent : m_aEntities)
+			for (const EntitySlot& slot : m_aEntitySlots)
 			{
-				if (ent->GetName() == a_sName)
+				if (!slot.m_pEntity)
 				{
-					return ent;
+					continue;
+				}
+
+				if (slot.m_pEntity->GetName() == a_sName)
+				{
+					return slot.m_pEntity;
 				}
 			}
 
@@ -150,17 +154,39 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
+		std::weak_ptr<Entity> EntityComponentSystem::GetEntity(const EntityID& a_ID)
+		{
+			return static_cast<const EntityComponentSystem*>(this)->GetEntity(a_ID);
+		}
+
+		//---------------------------------------------------------------------
 		void EntityComponentSystem::Clear()
 		{
 			std::lock_guard<std::recursive_mutex> lock(m_EntityMutex);
 
-			for (std::weak_ptr<Entity> entity : m_aEntities)
+			m_aFreeIndices.clear();
+
+			for (uint32_t i = 0; i < m_aEntitySlots.size(); ++i)
 			{
-				if (auto ent = entity.lock())
+				EntitySlot& slot = m_aEntitySlots[i];
+
+				if (slot.m_pEntity)
 				{
-					ent->Destroy();
+					// If component systems listen to entity destruction, call DeleteComponent here.
+					for (std::unique_ptr<AbstractECSSystem>& sys : m_aSystems)
+					{
+						sys->DeleteComponent(EntityID(i, slot.m_iGeneration));
+					}
+
+					slot.m_pEntity.reset();
 				}
+
+				slot.m_iGeneration++;          // Invalidate old IDs
+				m_aFreeIndices.push_back(i);   // Mark slot as free
 			}
+
+			m_eOnEntitiesUpdated.invoke();
+			m_eOnEntityComponentsUpdated.invoke();
 		}
 
 		//---------------------------------------------------------------------
@@ -168,42 +194,49 @@ namespace gallus
 		{
 			std::lock_guard<std::recursive_mutex> lock(m_EntityMutex);
 
-			std::string name = a_sName;
+			std::string candidate = a_sName;
+			uint32_t counter = 1;
+			bool exists = true;
 
-			bool found = true;
-			size_t i = 0;
-			while (found)
+			while (exists)
 			{
-				found = false;
-				for (std::weak_ptr<Entity> entity : m_aEntities)
+				exists = false;
+
+				for (const EntitySlot& slot : m_aEntitySlots)
 				{
-					if (auto ent = entity.lock())
+					if (!slot.m_pEntity)
 					{
-						if (ent->GetName() == name)
-						{
-							i++;
-							if (i != 0)
-							{
-								name = a_sName + " (" + std::to_string(i) + ")";
-								found = true;
-							}
-						}
+						continue;
+					}
+
+					if (slot.m_pEntity->GetName() == candidate)
+					{
+						candidate = a_sName + " (" + std::to_string(counter++) + ")";
+						exists = true;
+						break;
 					}
 				}
 			}
-			return name;
+
+			return candidate;
 		}
 
 		//---------------------------------------------------------------------
-		std::vector<std::weak_ptr<Entity>> EntityComponentSystem::GetEntities()
+		std::vector<EntityID> EntityComponentSystem::GetEntities() const
 		{
-			std::vector<std::weak_ptr<Entity>> entities;
+			std::vector<EntityID> result;
 			std::lock_guard<std::recursive_mutex> lock(m_EntityMutex);
-			for (auto sharedPtr : m_aEntities)
+
+			for (uint32_t i = 0; i < m_aEntitySlots.size(); ++i)
 			{
-				entities.push_back(sharedPtr);
+				const EntitySlot& slot = m_aEntitySlots[i];
+				if (slot.m_pEntity)
+				{
+					result.emplace_back(i, slot.m_iGeneration);
+				}
 			}
-			return entities;
+
+			return result;
 		}
 
 		//---------------------------------------------------------------------
@@ -212,11 +245,11 @@ namespace gallus
 			std::lock_guard<std::recursive_mutex> lock(m_EntityMutex);
 
 			std::vector<AbstractECSSystem*> systems;
-			for (AbstractECSSystem* system : m_aSystems)
+			for (std::unique_ptr<AbstractECSSystem>& sys : m_aSystems)
 			{
-				if (system->HasComponent(a_ID))
+				if (sys->HasComponent(a_ID))
 				{
-					systems.push_back(system);
+					systems.push_back(sys.get());
 				}
 			}
 			return systems;
@@ -227,7 +260,12 @@ namespace gallus
 		{
 			std::lock_guard<std::recursive_mutex> lock(m_EntityMutex);
 
-			return m_aSystems;
+			std::vector<AbstractECSSystem*> systems;
+			for (std::unique_ptr<AbstractECSSystem>& sys : m_aSystems)
+			{
+				systems.push_back(sys.get());
+			}
+			return systems;
 		}
 	}
 }

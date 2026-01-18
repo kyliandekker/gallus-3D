@@ -42,7 +42,7 @@ namespace gallus
 					ent->Destroy();
 				}
 
-				gameplay::EntityID& entityId = ent->GetEntityID();
+				gameplay::EntityID entityId = ent->GetEntityID();
 
 				for (auto* sys : core::EDITOR_ENGINE->GetECS().GetSystems())
 				{

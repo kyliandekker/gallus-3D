@@ -959,7 +959,12 @@ namespace gallus
 				a_pCommandList->GetCommandList()->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
 				std::lock_guard<std::recursive_mutex> lock(core::ENGINE->GetECS().m_EntityMutex);
-				for (auto& pair : core::ENGINE->GetECS().GetSystem<gameplay::MeshSystem>().GetComponents())
+				gameplay::MeshSystem* meshSys = core::ENGINE->GetECS().GetSystem<gameplay::MeshSystem>();
+				if (!meshSys)
+				{
+					return;
+				}
+				for (auto& pair : meshSys->GetComponents())
 				{
 					pair.second.Render(a_pCommandList, pair.first, *m_pActiveCamera);
 				}
@@ -1056,10 +1061,14 @@ namespace gallus
 				// m_aOrderedSprites stores pointers
 				m_aOrderedSprites.clear();
 
+				gameplay::SpriteSystem* spriteSys = core::ENGINE->GetECS().GetSystem<gameplay::SpriteSystem>();
+				if (!spriteSys)
+				{
+					return;
+				}
+
 				// Collect pointers to components
-				for (auto& pair : core::ENGINE->GetECS()
-					.GetSystem<gameplay::SpriteSystem>()
-					.GetComponents())
+				for (auto& pair : spriteSys->GetComponents())
 				{
 					m_aOrderedSprites.push_back(&pair.second); // take address of the ref
 				}

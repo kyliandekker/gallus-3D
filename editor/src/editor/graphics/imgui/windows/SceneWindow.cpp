@@ -65,7 +65,7 @@ namespace gallus
 				graphics::dx12::DX12System& dx12System = core::EDITOR_ENGINE->GetDX12();
 				graphics::dx12::Camera* cam = &dx12System.GetCamera();
 				editor::Editor& editor = core::EDITOR_ENGINE->GetEditor();
-				if ((!isStarted || (isStarted && isPaused)) && editor.GetCameraMode() == editor::CameraMode::CAMERA_MODE_SCENE)
+				if (editor.GetCameraMode() == editor::CameraMode::CAMERA_MODE_SCENE)
 				{
 					cam = &editor.GetEditorCamera();
 				}
@@ -985,6 +985,10 @@ namespace gallus
 				{
 					return;
 				}
+
+				graphics::dx12::DX12System& dx12System = core::EDITOR_ENGINE->GetDX12();
+				graphics::dx12::Camera* cam = &dx12System.GetCamera();
+				dx12System.SetActiveCamera(*cam);
 
 				ImRect sceneViewRect = GetRenderTextureRect(tex);
 				DrawSceneBackground(sceneViewRect);

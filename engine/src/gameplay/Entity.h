@@ -35,15 +35,6 @@ namespace gallus
 			{}
 
 			/// <summary>
-			/// Gets a reference to the entity�s unique identifier.
-			/// </summary>
-			/// <returns>Reference to the entity ID.</returns>
-			EntityID& GetEntityID()
-			{
-				return m_EntityID;
-			}
-
-			/// <summary>
 			/// Gets a constant reference to the entity�s unique identifier.
 			/// </summary>
 			/// <returns>Constant reference to the entity ID.</returns>
@@ -71,21 +62,9 @@ namespace gallus
 			}
 
 			/// <summary>
-			/// Checks if the entity has been destroyed.
+			/// Destroys the entity.
 			/// </summary>
-			/// <returns>True if the entity is destroyed, false otherwise.</returns>
-			bool IsDestroyed() const
-			{
-				return m_bIsDestroyed;
-			}
-
-			/// <summary>
-			/// Marks the entity as destroyed.
-			/// </summary>
-			void Destroy()
-			{
-				m_bIsDestroyed = true;
-			}
+			void Destroy();
 
 			/// <summary>
 			/// Checks if the entity is currently active.
@@ -108,7 +87,6 @@ namespace gallus
 		private:
 			EntityID m_EntityID;
 			std::string m_sName;
-			bool m_bIsDestroyed = false;
 			bool m_bIsActive = true;
 		};
 	}

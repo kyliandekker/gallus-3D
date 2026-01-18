@@ -270,16 +270,17 @@ namespace gallus
 			entitiesSrc.SetArray();
 
 			gameplay::EntityComponentSystem& ecs = core::ENGINE->GetECS();
-			for (std::weak_ptr<gameplay::Entity> entity : ecs.GetEntities())
+			for (gameplay::EntityID entityID : ecs.GetEntities())
 			{
-				auto ent = entity.lock();
-				if (!ent)
+				resources::SrcData entitySrc = resources::SrcData();
+				entitySrc.SetObject();
+
+				std::weak_ptr<gameplay::Entity> entity = ecs.GetEntity(entityID);
+				std::shared_ptr<gameplay::Entity> ent = entity.lock();
+				if (!entity.lock())
 				{
 					continue;
 				}
-
-				resources::SrcData entitySrc = resources::SrcData();
-				entitySrc.SetObject();
 
 				entitySrc.SetString(JSON_SCENE_ENTITIES_VAR_NAME, ent->GetName());
 				entitySrc.SetBool(JSON_SCENE_ENTITIES_VAR_ACTIVE, ent->IsActive());

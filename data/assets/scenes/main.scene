@@ -79,28 +79,6 @@
                         },
                         "cameraType": 1
                     }
-                },
-                "health": {
-                    "health": 100.0,
-                    "maxHealth": 100.0
-                },
-                "collision": {
-                    "offset": {
-                        "x": 0.0,
-                        "y": 0.0
-                    },
-                    "size": {
-                        "x": 1.0,
-                        "y": 1.0
-                    }
-                },
-                "animation": {
-                    "startingAnimation": "player_walk_down.anim"
-                },
-                "rigidbody": {
-                    "useGravity": false,
-                    "mass": 1.0,
-                    "linearDamping": 0.9800000190734863
                 }
             }
         },
@@ -178,6 +156,46 @@
                             "x": 0.0,
                             "y": -0.5,
                             "z": 0.0
+                        },
+                        "cameraType": 0
+                    }
+                }
+            }
+        },
+        {
+            "name": "New GameObject (1)",
+            "isActive": true,
+            "components": {
+                "mesh": {
+                    "pixelShader": "pixelShaderUvDebug.hlsl",
+                    "vertexShader": "vertexShader.hlsl",
+                    "material": "1.mat",
+                    "mesh": "mod_missing.glb",
+                    "texture": "tex_missing.png",
+                    "textureIndex": 0
+                },
+                "transform": {
+                    "transform": {
+                        "position": {
+                            "x": -1.6175308227539063,
+                            "y": 1.3766255378723145,
+                            "z": 1.1920928955078126e-7
+                        },
+                        "scale": {
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
+                        },
+                        "rotation": {
+                            "x": -0.0,
+                            "y": 0.0,
+                            "z": -0.0,
+                            "w": 1.0
+                        },
+                        "pivot": {
+                            "x": -0.5,
+                            "y": -0.5,
+                            "z": -0.5
                         },
                         "cameraType": 0
                     }

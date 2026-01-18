@@ -39,25 +39,25 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		std::vector<CollisionInfo> CollisionSystem::GetCollisions(EntityID a_EntityID) const
-		{
-			std::vector<CollisionInfo> results;
+		//std::vector<CollisionInfo> CollisionSystem::GetCollisions(EntityID a_EntityID) const
+		//{
+		//	std::vector<CollisionInfo> results;
 
-			for (auto& [pair, info] : m_mCollisions)
-			{
-				if (pair.a == a_EntityID)
-				{
-					results.push_back({ info.a, info.b, info.m_CollisionType, info.m_vNormal });
-				}
-			}
+		//	for (auto& [pair, info] : m_mCollisions)
+		//	{
+		//		if (pair.a == a_EntityID)
+		//		{
+		//			results.push_back({ info.a, info.b, info.m_CollisionType, info.m_vNormal });
+		//		}
+		//	}
 
-			return results;
-		}
+		//	return results;
+		//}
 
 		//---------------------------------------------------------------------
 		void CollisionSystem::Collide(ColliderComponent& a_ColliderA, ColliderComponent& a_ColliderB, const DirectX::XMFLOAT2& a_vNormal)
 		{
-			m_mNewCollisions.insert({ a_ColliderA.GetEntityID(), a_ColliderB.GetEntityID(), CollisionType::COLLISION_TYPE_NONE, a_vNormal });
+			//m_mNewCollisions.insert({ a_ColliderA.GetEntityID(), a_ColliderB.GetEntityID(), CollisionType::COLLISION_TYPE_NONE, a_vNormal });
 		}
 
 		//---------------------------------------------------------------------

@@ -13,12 +13,17 @@
 
 // gameplay
 #include "gameplay/Entity.h"
+#include "gameplay/ECSBaseSystem.h"
 
 namespace gallus
 {
 	namespace gameplay
 	{
-		class AbstractECSSystem;
+		struct EntitySlot
+		{
+			std::shared_ptr<Entity> m_pEntity;
+			uint32_t m_iGeneration = 0;
+		};
 
 		/// <summary>
 		/// Class that contains all gameplay elements in the engine.
@@ -70,20 +75,7 @@ namespace gallus
 			/// Gets entity info from a specific entity.
 			/// </summary>
 			/// <param name="a_ID">The entity.</param>
-			std::weak_ptr<Entity> GetEntity(const EntityID& a_ID) const
-			{
-				std::lock_guard<std::recursive_mutex> lock(m_EntityMutex);
-
-				for (const std::shared_ptr<Entity>& ent : m_aEntities)
-				{
-					if (ent->GetEntityID() == a_ID)
-					{
-						return ent;
-					}
-				}
-
-				return std::weak_ptr<Entity>();
-			}
+			std::weak_ptr<Entity> GetEntity(const EntityID& a_ID) const;
 
 			/// <summary>
 			/// Gets entity info from a specific entity.
@@ -94,10 +86,7 @@ namespace gallus
 			/// Gets entity info from a specific entity.
 			/// </summary>
 			/// <param name="a_ID">The entity.</param>
-			std::weak_ptr<Entity> GetEntity(const EntityID& a_ID)
-			{
-				return static_cast<const EntityComponentSystem*>(this)->GetEntity(a_ID);
-			}
+			std::weak_ptr<Entity> GetEntity(const EntityID& a_ID);
 
 			/// <summary>
 			/// Clears all entities and deletes all components.
@@ -117,19 +106,15 @@ namespace gallus
 			/// <typeparam name="T">The system class.</typeparam>
 			/// <returns>A reference to the created system.</returns>
 			template <class T>
-			T& CreateSystem()
+			T* CreateSystem()
 			{
-				for (AbstractECSSystem* sys : m_aSystems)
+				T* system = GetSystem<T>();
+				if (system)
 				{
-					T* result = dynamic_cast<T*>(sys);
-					if (result)
-					{
-						return *result;
-					}
+					return system;
 				}
-				T* system = new T();
-				m_aSystems.push_back(system);
-				return *system;
+				m_aSystems.emplace_back(std::make_unique<T>());
+				return dynamic_cast<T*>(m_aSystems[m_aSystems.size() - 1].get());
 			}
 
 			/// <summary>
@@ -138,24 +123,24 @@ namespace gallus
 			/// <typeparam name="T">The system class.</typeparam>
 			/// <returns>A reference to the created system.</returns>
 			template <class T>
-			T& GetSystem()
+			T* GetSystem()
 			{
-				for (AbstractECSSystem* sys : m_aSystems)
+				for (std::unique_ptr<AbstractECSSystem>& sys : m_aSystems)
 				{
-					T* result = dynamic_cast<T*>(sys);
+					T* result = dynamic_cast<T*>(sys.get());
 					if (result)
 					{
-						return *result;
+						return result;
 					}
 				}
-				return CreateSystem<T>();
+				return nullptr;
 			};
 
 			/// <summary>
 			/// Retrieves all entities in the ECS.
 			/// </summary>
 			/// <returns>A vector containing all entities in the ECS.</returns>
-			std::vector<std::weak_ptr<Entity>> GetEntities();
+			std::vector<EntityID> GetEntities() const;
 
 			/// <summary>
 			/// Retrieves all systems that have components for the specified entity id.
@@ -193,9 +178,11 @@ namespace gallus
 			Event<> m_eOnEntitiesUpdated;
 			Event<> m_eOnEntityComponentsUpdated;
 
-			std::vector<AbstractECSSystem*> m_aSystems;
-			std::vector<std::shared_ptr<Entity>> m_aEntities;
+			std::vector<std::unique_ptr<AbstractECSSystem>> m_aSystems;
 			size_t m_iNextID = 0;
+
+			std::vector<EntitySlot> m_aEntitySlots;
+			std::vector<uint32_t> m_aFreeIndices;
 		};
 	}
 }

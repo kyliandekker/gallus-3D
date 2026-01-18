@@ -35,14 +35,14 @@ namespace gallus
 			m_Scene.SetResourceCategory(resources::EngineResourceCategory::Game);
 
 			gameplay::EntityComponentSystem& ecs = core::ENGINE->GetECS();
-			ecs.CreateSystem<MeshSystem>().Initialize();
-			ecs.CreateSystem<SpriteSystem>().Initialize();
-			ecs.CreateSystem<TransformSystem>().Initialize();
-			ecs.CreateSystem<HealthSystem>().Initialize();
-			ecs.CreateSystem<CollisionSystem>().Initialize();
-			ecs.CreateSystem<ProjectileSystem>().Initialize();
-			ecs.CreateSystem<AnimationSystem>().Initialize();
-			ecs.CreateSystem<RigidbodySystem>().Initialize();
+			ecs.CreateSystem<MeshSystem>()->Initialize();
+			ecs.CreateSystem<SpriteSystem>()->Initialize();
+			ecs.CreateSystem<TransformSystem>()->Initialize();
+			ecs.CreateSystem<HealthSystem>()->Initialize();
+			ecs.CreateSystem<CollisionSystem>()->Initialize();
+			ecs.CreateSystem<ProjectileSystem>()->Initialize();
+			ecs.CreateSystem<AnimationSystem>()->Initialize();
+			ecs.CreateSystem<RigidbodySystem>()->Initialize();
 
 			core::ENGINE->GetWindow().OnQuit() += std::bind(&Game::Shutdown, this);
 

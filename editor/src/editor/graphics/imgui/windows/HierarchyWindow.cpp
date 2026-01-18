@@ -205,15 +205,9 @@ namespace gallus
 					m_aEntities.clear();
 					m_aFilteredEntities.clear();
 
-					for (auto& entity : core::EDITOR_ENGINE->GetECS().GetEntities())
+					for (gameplay::EntityID entity : core::EDITOR_ENGINE->GetECS().GetEntities())
 					{
-						auto ent = entity.lock();
-						if (!ent)
-						{
-							return;
-						}
-
-						m_aEntities.emplace_back(m_Window, ent->GetEntityID());
+						m_aEntities.emplace_back(m_Window, entity);
 					}
 
 					std::string searchString = string_extensions::StringToLower(m_sSearchBarText);
@@ -370,17 +364,17 @@ namespace gallus
 						}
 						if (doubleClicked)
 						{
-							gameplay::TransformSystem& transformSys = core::ENGINE->GetECS().GetSystem<gameplay::TransformSystem>();
-							if (transformSys.HasComponent(view->GetEntityID()))
-							{
-								gameplay::TransformComponent& transformComponent = transformSys.GetComponent(view->GetEntityID());
-								DirectX::XMFLOAT3 pos = { 
-									transformComponent.GetTransform().GetPosition().x - (graphics::dx12::RENDER_TEX_SIZE.x / 2), 
-									transformComponent.GetTransform().GetPosition().y - (graphics::dx12::RENDER_TEX_SIZE.y / 2),
-									transformComponent.GetTransform().GetPosition().z
-								};
-								core::EDITOR_ENGINE->GetEditor().GetEditorCamera().GetTransform().SetPosition(pos);
-							}
+							//gameplay::TransformSystem& transformSys = core::ENGINE->GetECS().GetSystem<gameplay::TransformSystem>();
+							//if (transformSys.HasComponent(view->GetEntityID()))
+							//{
+							//	gameplay::TransformComponent& transformComponent = transformSys.GetComponent(view->GetEntityID());
+							//	DirectX::XMFLOAT3 pos = { 
+							//		transformComponent.GetTransform().GetPosition().x - (graphics::dx12::RENDER_TEX_SIZE.x / 2), 
+							//		transformComponent.GetTransform().GetPosition().y - (graphics::dx12::RENDER_TEX_SIZE.y / 2),
+							//		transformComponent.GetTransform().GetPosition().z
+							//	};
+							//	core::EDITOR_ENGINE->GetEditor().GetEditorCamera().GetTransform().SetPosition(pos);
+							//}
 						}
 					}
 					ImGui::PopStyleVar();
@@ -420,24 +414,18 @@ namespace gallus
 					{
 						std::shared_ptr<graphics::dx12::CommandQueue> cCommandQueue = core::ENGINE->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
 						
-						gameplay::MeshSystem& meshSystem = core::EDITOR_ENGINE->GetECS().GetSystem<gameplay::MeshSystem>();
-						if (meshSystem.HasComponent(a_EntityID))
+						gameplay::MeshSystem* meshSystem = core::EDITOR_ENGINE->GetECS().GetSystem<gameplay::MeshSystem>();
+						if (meshSystem->HasComponent(a_EntityID))
 						{
-							gameplay::MeshComponent* component = editor::g_CreateComponentOfType<gameplay::MeshComponent>(&meshSystem, a_EntityID);
-							if (!component)
-							{
-								return;
-							}
-							
-							component->SetTexture(
+							meshSystem->TryGetComponent(a_EntityID)->SetTexture(
 								core::EDITOR_ENGINE->GetResourceAtlas().LoadTexture(a_sFileName, cCommandQueue)
 							);
 						}
 						else
 						{
-							gameplay::SpriteSystem& spriteSystem = core::EDITOR_ENGINE->GetECS().GetSystem<gameplay::SpriteSystem>();
+							gameplay::SpriteSystem* spriteSystem = core::EDITOR_ENGINE->GetECS().GetSystem<gameplay::SpriteSystem>();
 							
-							gameplay::SpriteComponent* component = editor::g_CreateComponentOfType<gameplay::SpriteComponent>(&spriteSystem, a_EntityID);
+							gameplay::SpriteComponent* component = editor::g_CreateComponentOfType<gameplay::SpriteComponent>(spriteSystem, a_EntityID);
 							if (!component)
 							{
 								return;
@@ -481,9 +469,9 @@ namespace gallus
 					{
 						std::shared_ptr<graphics::dx12::CommandQueue> cCommandQueue = core::ENGINE->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
 						
-						gameplay::MeshSystem& meshSystem = core::EDITOR_ENGINE->GetECS().GetSystem<gameplay::MeshSystem>();
+						gameplay::MeshSystem* meshSystem = core::EDITOR_ENGINE->GetECS().GetSystem<gameplay::MeshSystem>();
 
-						gameplay::MeshComponent* component = editor::g_CreateComponentOfType<gameplay::MeshComponent>(&meshSystem, a_EntityID);
+						gameplay::MeshComponent* component = editor::g_CreateComponentOfType<gameplay::MeshComponent>(meshSystem, a_EntityID);
 						if (!component)
 						{
 							return;
@@ -498,9 +486,9 @@ namespace gallus
 					{
 						std::shared_ptr<graphics::dx12::CommandQueue> cCommandQueue = core::ENGINE->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
 
-						gameplay::MeshSystem& meshSystem = core::EDITOR_ENGINE->GetECS().GetSystem<gameplay::MeshSystem>();
+						gameplay::MeshSystem* meshSystem = core::EDITOR_ENGINE->GetECS().GetSystem<gameplay::MeshSystem>();
 
-						gameplay::MeshComponent* component = editor::g_CreateComponentOfType<gameplay::MeshComponent>(&meshSystem, a_EntityID);
+						gameplay::MeshComponent* component = editor::g_CreateComponentOfType<gameplay::MeshComponent>(meshSystem, a_EntityID);
 						if (!component)
 						{
 							return;
@@ -543,7 +531,7 @@ namespace gallus
 				const EntityEditorSelectable* derivedPtr = dynamic_cast<const EntityEditorSelectable*>(newVal);
 				if (!derivedPtr) // New selectable is NOT an entity, so we must reset the previous folder path.
 				{
-					m_PreviousEntityID.SetInvalid();
+					m_PreviousEntityID = gameplay::EntityID();
 				}
 				else // New selectable is an entity, set folder path.
 				{

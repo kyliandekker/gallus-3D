@@ -9,7 +9,6 @@
 #include <vector>
 
 // core
-#include "core/Engine.h"
 #include "core/FlagEnum.h"
 
 // resources
@@ -138,7 +137,7 @@ namespace gallus
 					comp.SetDefaults(a_ID);
 					comp.Deserialize(a_SrcData);
 				}
-				core::ENGINE->GetECS().OnEntityComponentsUpdated().invoke();
+				//core::ENGINE->GetECS().OnEntityComponentsUpdated().invoke();
 				return &comp;
 			}
 
@@ -166,14 +165,15 @@ namespace gallus
 			/// </summary>
 			/// <param name="a_ID">The entity that will be checked.</param>
 			/// <returns>Reference to the component if the entity existed, otherwise it gets created and returns that.</returns>
-			ComponentType& GetComponent(const EntityID& a_ID)
+			ComponentType* TryGetComponent(const EntityID& a_ID)
 			{
-				if (HasComponent(a_ID))
+				auto it = m_mComponents.find(a_ID);
+				if (it == m_mComponents.end())
 				{
-					return m_mComponents.at(a_ID);
+					return nullptr;
 				}
 
-				return CreateComponent(a_ID);
+				return &it->second;
 			}
 
 			/// <summary>
@@ -196,16 +196,9 @@ namespace gallus
 			/// Deletes a component from the system.
 			/// </summary>
 			/// <param name="a_ID">The entity ID that needs to get deleted.</param>
-			void DeleteComponent(const EntityID& a_ID)
+			void DeleteComponent(const EntityID& a_ID) override
 			{
-				auto it = std::find_if(m_mComponents.begin(), m_mComponents.end(), [&](auto& e)
-					{
-						return e.first == a_ID;
-					});
-				if (it != m_mComponents.end())
-				{
-					it->second.Destroy();
-				}
+				m_mComponents.erase(a_ID);
 			}
 
 			/// <summary>
@@ -223,8 +216,8 @@ namespace gallus
 			/// <returns>Pointer to the component if the entity existed, otherwise nullptr.</returns>
 			Component* GetBaseComponent(const EntityID& a_ID) override
 			{
-				ComponentType& comp = GetComponent(a_ID);
-				return &comp;
+				ComponentType* comp = TryGetComponent(a_ID);
+				return comp;
 			};
 
 			/// <summary>
@@ -232,16 +225,6 @@ namespace gallus
 			/// </summary>
 			void UpdateComponents() override
 			{
-				size_t oldSize = m_mComponents.size();
-				std::erase_if(m_mComponents, [](auto& pair)
-					{
-						return pair.second.IsDestroyed();
-					});
-
-				if (oldSize != m_mComponents.size())
-				{
-					core::ENGINE->GetECS().OnEntityComponentsUpdated().invoke();
-				}
 			}
 
 			/// <summary>

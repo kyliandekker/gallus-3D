@@ -10,6 +10,8 @@
 #include <map>
 #include <memory>
 
+#include "gameplay/EntityID.h"
+
 // editor
 #include "editor/graphics/imgui/EditorSelectable.h"
 
@@ -17,7 +19,6 @@ namespace gallus
 {
 	namespace gameplay
 	{
-		class EntityID;
 		class Entity;
 	}
 	namespace graphics
@@ -58,7 +59,7 @@ namespace gallus
 
 				std::string GetIcon() const override;
 			private:
-				gameplay::EntityID& m_EntityID;
+				gameplay::EntityID m_EntityID;
 				std::string m_sIcon;
 
 				std::weak_ptr<gameplay::Entity> m_pEntity = {};

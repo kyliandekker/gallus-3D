@@ -1,5 +1,7 @@
 #include "animation/AnimationKeyFrameSpriteComponent.h"
 
+#include "core/Engine.h"
+
 // resources
 #include "resources/SrcData.h"
 
@@ -13,9 +15,11 @@ namespace gallus
 		//---------------------------------------------------------------------
 		void AnimationKeyFrameSpriteComponent::Activate(gameplay::EntityID& a_EntityID)
 		{
-			gameplay::SpriteComponent& spriteComp = core::ENGINE->GetECS().GetSystem<gameplay::SpriteSystem>().GetComponent(a_EntityID);
-			spriteComp.SetSpriteIndex(m_iSpriteIndex);
-			spriteComp.SetTexture(m_pSprite);
+			if (gameplay::SpriteComponent* spriteComp = core::ENGINE->GetECS().GetSystem<gameplay::SpriteSystem>()->TryGetComponent(a_EntityID))
+			{
+				spriteComp->SetSpriteIndex(m_iSpriteIndex);
+				spriteComp->SetTexture(m_pSprite);
+			}
 		}
 
 		//---------------------------------------------------------------------

@@ -128,7 +128,7 @@ namespace gallus
 				ImGui::SetNextWindowSize(ImVec2(width, 0));
 				if (ImGui::BeginPopup(ImGui::IMGUI_FORMAT_ID("", POPUP_WINDOW_ID, "ADD_KEY_FRAME_COMPONENT_MENU_INSPECTOR").c_str()))
 				{
-					for (auto* sys : core::EDITOR_ENGINE->GetECS().GetSystem<gameplay::AnimationSystem>().GetSystems())
+					for (auto* sys : core::EDITOR_ENGINE->GetECS().GetSystem<gameplay::AnimationSystem>()->GetSystems())
 					{
 						bool found = false;
 						for (animation::AnimationKeyFrameComponentBase* component : m_KeyFrame.GetComponents())

@@ -368,6 +368,8 @@ namespace gallus
 				}
 
 				DeserializeFields(this, srcData);
+
+				return true;
 			}
 
 			//---------------------------------------------------------------------
