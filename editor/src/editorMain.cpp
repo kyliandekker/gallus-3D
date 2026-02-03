@@ -8,6 +8,11 @@
 #include "resource.h"
 #include "core/ArgProcessor.h"
 
+// graphics
+#include "graphics/dx12/DX12System.h"
+
+#include "graphics/win32/Window.h"
+
 // logger
 #include "logger/Logger.h"
 
@@ -41,21 +46,34 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR lp
 	std::string name = "Gallus Engine";
 	std::string saveDirPath = gallus::file::GetAppDataPath().generic_string() + "/engine";
 	gallus::core::EDITOR_ENGINE = new gallus::core::EditorEngine();
+	gallus::core::ENGINE = gallus::core::EDITOR_ENGINE;
 	gallus::core::EDITOR_ENGINE->SetSaveDirectory(saveDirPath);
 	gallus::core::EDITOR_ENGINE->SetDefaultArguments();
 
 	gallus::core::ARGS.ProcessArguments(cmdLine);
 
-	gallus::graphics::imgui::ImGuiWindow& imguiWindow = gallus::core::EDITOR_ENGINE->GetDX12().GetImGuiWindow();
+	gallus::graphics::dx12::DX12System* dx12System = gallus::core::ENGINE->GetDX12();
+	if (!dx12System)
+	{
+		return 0;
+	}
+
+	gallus::graphics::imgui::ImGuiWindow& imguiWindow = dx12System->GetImGuiWindow();
 	imguiWindow.SetWindowsConfig<gallus::graphics::imgui::EditorWindowsConfig>();
 
 	gallus::core::EDITOR_ENGINE->Initialize(hInstance, name);
 
+	gallus::graphics::win32::Window* window = gallus::core::ENGINE->GetWindow();
+	if (!window)
+	{
+		return 0;
+	}
+
 	// Load icons.
 	HICON hIconLarge = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));
 	HICON hIconSmall = (HICON) LoadImage(hInstance, MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON, 16, 16, 0); // 16x16
-	SendMessage(gallus::core::EDITOR_ENGINE->GetWindow().GetHWnd(), WM_SETICON, ICON_BIG, (LPARAM) hIconLarge);
-	SendMessage(gallus::core::EDITOR_ENGINE->GetWindow().GetHWnd(), WM_SETICON, ICON_SMALL, (LPARAM) hIconSmall);
+	SendMessage(window->GetHWnd(), WM_SETICON, ICON_BIG, (LPARAM) hIconLarge);
+	SendMessage(window->GetHWnd(), WM_SETICON, ICON_SMALL, (LPARAM) hIconSmall);
 
 	// Game
 	gallus::gameplay::GAME.Initialize();

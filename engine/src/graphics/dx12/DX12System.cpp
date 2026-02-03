@@ -19,8 +19,12 @@
 #include "logger/Logger.h"
 
 // gameplay
+#include "gameplay/EntityComponentSystem.h"
 #include "gameplay/systems/SpriteSystem.h"
 #include "gameplay/systems/MeshSystem.h"
+
+// resources
+#include "resources/ResourceAtlas.h"
 
 namespace gallus
 {
@@ -179,15 +183,21 @@ namespace gallus
 				m_ImGuiWindow.Initialize();
 #endif // IMGUI_DISABLE
 
-				std::weak_ptr<Texture> texturePtr = core::ENGINE->GetResourceAtlas().LoadTexture("tex_missing.png", cCommandQueue); // Default texture.
+				resources::ResourceAtlas* resourceAtlas = core::ENGINE->GetResourceAtlas();
+				if (!resourceAtlas)
+				{
+					return false;
+				}
+
+				std::weak_ptr<Texture> texturePtr = resourceAtlas->LoadTexture("tex_missing.png", cCommandQueue); // Default texture.
 				if (auto tex = texturePtr.lock())
 				{
 					tex->SetResourceCategory(resources::EngineResourceCategory::Missing);
 					tex->SetIsDestroyable(false);
 				}
 
-				std::shared_ptr<PixelShader> pixelShaderPtr = core::ENGINE->GetResourceAtlas().LoadPixelShader("pixelShader.hlsl"); // Default shader.
-				std::shared_ptr<VertexShader> vertexShaderPtr = core::ENGINE->GetResourceAtlas().LoadVertexShader("vertexShader.hlsl"); // Default shader.
+				std::shared_ptr<PixelShader> pixelShaderPtr = resourceAtlas->LoadPixelShader("pixelShader.hlsl"); // Default shader.
+				std::shared_ptr<VertexShader> vertexShaderPtr = resourceAtlas->LoadVertexShader("vertexShader.hlsl"); // Default shader.
 
 				pixelShaderPtr->SetResourceCategory(resources::EngineResourceCategory::Missing);
 				pixelShaderPtr->SetIsDestroyable(false);
@@ -197,8 +207,8 @@ namespace gallus
 
 				PipelineStateCache::GetOrCreate(pixelShaderPtr, vertexShaderPtr, DXGI_FORMAT_D32_FLOAT);
 
-				std::shared_ptr<PixelShader> renderTexPixelShaderPtr = core::ENGINE->GetResourceAtlas().LoadPixelShader("renderTexPixelShader.hlsl"); // Default render tex shader.
-				std::shared_ptr<VertexShader> renderTexVertexShaderPtr = core::ENGINE->GetResourceAtlas().LoadVertexShader("renderTexVertexShader.hlsl"); // Default render tex shader.
+				std::shared_ptr<PixelShader> renderTexPixelShaderPtr = resourceAtlas->LoadPixelShader("renderTexPixelShader.hlsl"); // Default render tex shader.
+				std::shared_ptr<VertexShader> renderTexVertexShaderPtr = resourceAtlas->LoadVertexShader("renderTexVertexShader.hlsl"); // Default render tex shader.
 				renderTexPixelShaderPtr->SetResourceCategory(resources::EngineResourceCategory::Missing);
 				renderTexPixelShaderPtr->SetIsDestroyable(false);
 				renderTexVertexShaderPtr->SetResourceCategory(resources::EngineResourceCategory::Missing);
@@ -206,14 +216,14 @@ namespace gallus
 
 				m_pRenderTextureShaderBind = PipelineStateCache::GetOrCreate(renderTexPixelShaderPtr, renderTexVertexShaderPtr, DXGI_FORMAT_UNKNOWN);
 
-				std::weak_ptr<Mesh> meshPtr = core::ENGINE->GetResourceAtlas().LoadMesh("mod_missing.glb", cCommandQueue); // Default mesh.
+				std::weak_ptr<Mesh> meshPtr = resourceAtlas->LoadMesh("mod_missing.glb", cCommandQueue); // Default mesh.
 				if (auto mesh = meshPtr.lock())
 				{
 					mesh->SetResourceCategory(resources::EngineResourceCategory::Missing);
 					mesh->SetIsDestroyable(false);
 				}
 
-				std::weak_ptr<Mesh> squareMeshPtr = core::ENGINE->GetResourceAtlas().LoadMeshEmpty("square"); // Square mesh.
+				std::weak_ptr<Mesh> squareMeshPtr = resourceAtlas->LoadMeshEmpty("square"); // Square mesh.
 				if (auto mesh = squareMeshPtr.lock())
 				{
 					MeshPartData& squarePrimitive = s_PRIMITIVES[(int) PRIMITIVES::SQUARE];
@@ -222,7 +232,7 @@ namespace gallus
 					mesh->SetIsDestroyable(false);
 				}
 
-				std::weak_ptr<Mesh> cubeMeshPtr = core::ENGINE->GetResourceAtlas().LoadMeshEmpty("cube"); // Cube mesh.
+				std::weak_ptr<Mesh> cubeMeshPtr = resourceAtlas->LoadMeshEmpty("cube"); // Cube mesh.
 				if (auto mesh = cubeMeshPtr.lock())
 				{
 					MeshPartData& squarePrimitive = s_PRIMITIVES[(int) PRIMITIVES::CUBE];
@@ -231,7 +241,7 @@ namespace gallus
 					mesh->SetIsDestroyable(false);
 				}
 
-				std::weak_ptr<Mesh> cylinderMeshPtr = core::ENGINE->GetResourceAtlas().LoadMeshEmpty("cylinder"); // Cylinder mesh.
+				std::weak_ptr<Mesh> cylinderMeshPtr = resourceAtlas->LoadMeshEmpty("cylinder"); // Cylinder mesh.
 				if (auto mesh = cylinderMeshPtr.lock())
 				{
 					MeshPartData& squarePrimitive = s_PRIMITIVES[(int) PRIMITIVES::CYLINDER];
@@ -240,7 +250,7 @@ namespace gallus
 					mesh->SetIsDestroyable(false);
 				}
 
-				m_pMaterial = core::ENGINE->GetResourceAtlas().LoadMaterialEmpty("default"); // Cylinder mesh.
+				m_pMaterial = resourceAtlas->LoadMaterialEmpty("default"); // Cylinder mesh.
 				if (auto material = m_pMaterial.lock())
 				{
 					material->SetColor({1, 1, 1, 1});
@@ -280,8 +290,14 @@ namespace gallus
 				
 				m_pDirectionalLight = std::make_shared<DirectionalLight>();
 
-				core::ENGINE->GetECS().OnEntitiesUpdated() += std::bind(&DX12System::ReorderSpriteComponents, this);
-				core::ENGINE->GetECS().OnEntityComponentsUpdated() += std::bind(&DX12System::ReorderSpriteComponents, this);
+				gameplay::EntityComponentSystem* ecs = core::ENGINE->GetECS();
+				if (!ecs)
+				{
+					return false;
+				}
+
+				ecs->OnEntitiesUpdated() += std::bind(&DX12System::ReorderSpriteComponents, this);
+				ecs->OnEntityComponentsUpdated() += std::bind(&DX12System::ReorderSpriteComponents, this);
 				ReorderSpriteComponents();
 
 				m_FpsCounter.Initialize();
@@ -834,8 +850,7 @@ namespace gallus
 
 				auto dsv = m_DSV.GetCPUDescriptorHandleForHeapStart();
 
-				commandList->GetCommandList()->SetGraphicsRootSignature(
-					core::ENGINE->GetDX12().GetRootSignature().Get());
+				commandList->GetCommandList()->SetGraphicsRootSignature(m_pRootSignature.Get());
 
 				// 1. Render 2D scene into RenderTexture
 				auto renderTex = m_pRenderTexture.lock();
@@ -940,7 +955,13 @@ namespace gallus
 			//---------------------------------------------------------------------
 			void DX12System::RenderObjects(std::shared_ptr<CommandQueue> a_pCommandQueue, std::shared_ptr<CommandList> a_pCommandList, D3D12_CPU_DESCRIPTOR_HANDLE a_RTVHandle)
 			{
-				if (!core::ENGINE->GetECS().Running())
+				gameplay::EntityComponentSystem* ecs = core::ENGINE->GetECS();
+				if (!ecs)
+				{
+					return;
+				}
+
+				if (!ecs->Running())
 				{
 					return;
 				}
@@ -958,8 +979,8 @@ namespace gallus
 				ID3D12DescriptorHeap* descriptorHeaps[] = { m_SRV.GetHeap().Get() };
 				a_pCommandList->GetCommandList()->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
-				std::lock_guard<std::recursive_mutex> lock(core::ENGINE->GetECS().m_EntityMutex);
-				gameplay::MeshSystem* meshSys = core::ENGINE->GetECS().GetSystem<gameplay::MeshSystem>();
+				std::lock_guard<std::recursive_mutex> lock(ecs->m_EntityMutex);
+				gameplay::MeshSystem* meshSys = ecs->GetSystem<gameplay::MeshSystem>();
 				if (!meshSys)
 				{
 					return;
@@ -1048,7 +1069,13 @@ namespace gallus
 				texDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
 				texDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
 
-				m_pRenderTexture = core::ENGINE->GetResourceAtlas().LoadTextureByDescription("RenderTexture", texDesc);
+				resources::ResourceAtlas* resourceAtlas = core::ENGINE->GetResourceAtlas();
+				if (!resourceAtlas)
+				{
+					return;
+				}
+
+				m_pRenderTexture = resourceAtlas->LoadTextureByDescription("RenderTexture", texDesc);
 				if (auto renderTex = m_pRenderTexture.lock())
 				{
 					renderTex->SetResourceCategory(resources::EngineResourceCategory::System);
@@ -1061,7 +1088,13 @@ namespace gallus
 				// m_aOrderedSprites stores pointers
 				m_aOrderedSprites.clear();
 
-				gameplay::SpriteSystem* spriteSys = core::ENGINE->GetECS().GetSystem<gameplay::SpriteSystem>();
+				gameplay::EntityComponentSystem* ecs = core::ENGINE->GetECS();
+				if (!ecs)
+				{
+					return;
+				}
+
+				gameplay::SpriteSystem* spriteSys = ecs->GetSystem<gameplay::SpriteSystem>();
 				if (!spriteSys)
 				{
 					return;

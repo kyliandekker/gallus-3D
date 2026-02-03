@@ -1,5 +1,13 @@
 #include "EngineResource.h"
 
+#include "core/Data.h"
+
+#include "logger/Logger.h"
+
+#include "resources/SrcData.h"
+
+#include "utils/file_abstractions.h"
+
 namespace gallus
 {
 	namespace resources
@@ -126,6 +134,42 @@ namespace gallus
 		}
 
 #ifdef _LOAD_BY_PATH
+		
+		//---------------------------------------------------------------------
+		bool EngineResource::LoadMetaData()
+		{
+			core::Data data;
+			if (file::LoadFile(m_Path.generic_string() + ".meta", data))
+			{
+				resources::SrcData srcData(data);
+
+				if (!srcData.IsValid())
+				{
+					LOGF(LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Failed loading data in meta file \"%s\".", m_Path.generic_string().c_str());
+				}
+				else
+				{
+					DeserializeFields(this, srcData);
+				}
+			}
+
+			if (file::LoadFile(m_Path, data))
+			{
+				resources::SrcData srcData(data);
+
+				if (!srcData.IsValid())
+				{
+					LOGF(LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Failed loading data in meta file \"%s\".", m_Path.generic_string().c_str());
+				}
+				else
+				{
+					DeserializeFields(this, srcData, SerializationMethod::SerializationMethod_File);
+				}
+			}
+
+			return true;
+		}
+
 		//---------------------------------------------------------------------
 		bool EngineResource::LoadByPath(const fs::path & a_Path)
 		{

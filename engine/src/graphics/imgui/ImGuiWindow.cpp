@@ -59,7 +59,13 @@ namespace gallus
 
 				CreateImGui();
 
-				core::ENGINE->GetWindow().m_eOnWinProc += std::bind(&ImGuiWindow::UpdateMouseCursor, this);
+				graphics::win32::Window* window = core::ENGINE->GetWindow();
+				if (!window)
+				{
+					return false;
+				}
+
+				window->m_eOnWinProc += std::bind(&ImGuiWindow::UpdateMouseCursor, this);
 
 				LOG(LOGSEVERITY_SUCCESS, LOG_CATEGORY_EDITOR, "Initialized ImGui.");
 
@@ -76,7 +82,13 @@ namespace gallus
 			//---------------------------------------------------------------------
 			bool ImGuiWindow::Destroy()
 			{
-				core::ENGINE->GetWindow().m_eOnWinProc -= std::bind(&ImGuiWindow::UpdateMouseCursor, this);
+				graphics::win32::Window* window = core::ENGINE->GetWindow();
+				if (!window)
+				{
+					return false;
+				}
+
+				window->m_eOnWinProc -= std::bind(&ImGuiWindow::UpdateMouseCursor, this);
 
 				ImGui_ImplDX12_Shutdown();
 				ImGui_ImplWin32_Shutdown();
@@ -91,7 +103,13 @@ namespace gallus
 			//---------------------------------------------------------------------
 			bool ImGuiWindow::CreateContextWin32()
 			{
-				if (!ImGui_ImplWin32_Init(core::ENGINE->GetWindow().GetHWnd()))
+				graphics::win32::Window* window = core::ENGINE->GetWindow();
+				if (!window)
+				{
+					return false;
+				}
+
+				if (!ImGui_ImplWin32_Init(window->GetHWnd()))
 				{
 					LOG(LOGSEVERITY_ERROR, LOG_CATEGORY_EDITOR, "Failed creating WIN32 context for ImGui.");
 					return false;
@@ -104,13 +122,18 @@ namespace gallus
 			//---------------------------------------------------------------------
 			bool ImGuiWindow::CreateContextDX12()
 			{
-				dx12::DX12System& dx12window = core::ENGINE->GetDX12();
-				m_iSrvIndex = dx12window.GetSRV().Allocate();
+				graphics::dx12::DX12System* dx12System = core::ENGINE->GetDX12();
+				if (!dx12System)
+				{
+					return false;
+				}
 
-				if (!ImGui_ImplDX12_Init(dx12window.GetDevice().Get(), dx12::g_iBufferCount,
-					DXGI_FORMAT_R8G8B8A8_UNORM, dx12window.GetSRV().GetHeap().Get(),
-					dx12window.GetSRV().GetCPUHandle(m_iSrvIndex),
-					dx12window.GetSRV().GetGPUHandle(m_iSrvIndex)))
+				m_iSrvIndex = dx12System->GetSRV().Allocate();
+
+				if (!ImGui_ImplDX12_Init(dx12System->GetDevice().Get(), dx12::g_iBufferCount,
+					DXGI_FORMAT_R8G8B8A8_UNORM, dx12System->GetSRV().GetHeap().Get(),
+					dx12System->GetSRV().GetCPUHandle(m_iSrvIndex),
+					dx12System->GetSRV().GetGPUHandle(m_iSrvIndex)))
 				{
 					LOG(LOGSEVERITY_ERROR, LOG_CATEGORY_EDITOR, "Failed creating DX12 context for ImGui.");
 					return false;
@@ -129,8 +152,14 @@ namespace gallus
 
 				(void) io;
 
+				graphics::win32::Window* window = core::ENGINE->GetWindow();
+				if (!window)
+				{
+					return;
+				}
+
 				// On Windows 8.1+:
-				UINT dpi = GetDpiForWindow(core::ENGINE->GetWindow().GetHWnd()); // returns DPI, e.g., 96, 120, 144
+				UINT dpi = GetDpiForWindow(window->GetHWnd()); // returns DPI, e.g., 96, 120, 144
 				float dp = dpi / 96.0f; // 96 is the default DPI (100%)
 
 				m_fFontSize *= dp;

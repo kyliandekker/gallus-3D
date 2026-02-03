@@ -143,6 +143,7 @@ namespace gallus
 
 				fs::path texturePath = fileResource->GetPath().lexically_normal();
 				texture->LoadByPath(texturePath, a_pCommandQueue);
+				texture->LoadMetaData();
 //#else
 // 
 //#endif // _EDITOR
@@ -190,6 +191,7 @@ namespace gallus
 
 				fs::path pixelShaderPath = fileResource->GetPath().lexically_normal();
 				shader->LoadByPath(pixelShaderPath);
+				shader->LoadMetaData();
 //#else
 // 
 //#endif // _EDITOR
@@ -213,6 +215,7 @@ namespace gallus
 
 				fs::path vertexShaderPath = fileResource->GetPath().lexically_normal();
 				shader->LoadByPath(vertexShaderPath);
+				shader->LoadMetaData();
 //#else
 // 
 //#endif // _EDITOR
@@ -245,6 +248,7 @@ namespace gallus
 
 			fs::path scenePath = fileResource->GetPath();
 			a_Scene.LoadByPath(scenePath);
+			a_Scene.LoadMetaData();
 
 			return true;
 //#else
@@ -278,6 +282,7 @@ namespace gallus
 
 				fs::path meshPath = fileResource->GetPath().lexically_normal();
 				mesh->LoadByPath(meshPath, a_pCommandQueue);
+				mesh->LoadMetaData();
 				//#else
 				// 
 				//#endif // _EDITOR
@@ -301,6 +306,7 @@ namespace gallus
 
 				fs::path meshPath = fileResource->GetPath().lexically_normal();
 				material->LoadByPath(meshPath);
+				material->LoadMetaData();
 				//#else
 				// 
 				//#endif // _EDITOR
@@ -335,6 +341,7 @@ namespace gallus
 
 				fs::path vertexShaderPath = fileResource->GetPath().lexically_normal();
 				prefab->LoadByPath(vertexShaderPath);
+				prefab->LoadMetaData();
 				//#else
 				// 
 				//#endif // _EDITOR
@@ -358,6 +365,7 @@ namespace gallus
 
 				fs::path vertexShaderPath = fileResource->GetPath().lexically_normal();
 				animation->LoadByPath(vertexShaderPath);
+				animation->LoadMetaData();
 				//#else
 				// 
 				//#endif // _EDITOR

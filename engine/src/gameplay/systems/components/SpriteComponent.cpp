@@ -4,6 +4,7 @@
 #include "core/Engine.h"
 
 // graphics
+#include "graphics/dx12/DX12System.h"
 #include "graphics/dx12/Texture.h"
 #include "graphics/dx12/Mesh.h"
 #include "graphics/dx12/Shader.h"
@@ -15,11 +16,14 @@
 #include "graphics/dx12/ShaderFactory.h"
 
 // resources
+#include "resources/ResourceAtlas.h"
 #include "resources/SrcData.h"
 
 // gameplay
+#include "gameplay/EntityComponentSystem.h"
 #include "gameplay/systems/TransformSystem.h"
 
+// logger
 #include "logger/Logger.h"
 
 namespace gallus
@@ -33,8 +37,14 @@ namespace gallus
 		{
 			Component::SetDefaults(a_EntityID);
 
-			m_pSprite = core::ENGINE->GetResourceAtlas().GetDefaultTexture();
-			m_pMesh = core::ENGINE->GetResourceAtlas().LoadMesh("square");
+			resources::ResourceAtlas* resourceAtlas = core::ENGINE->GetResourceAtlas();
+			if (!resourceAtlas)
+			{
+				return;
+			}
+
+			m_pSprite = resourceAtlas->GetDefaultTexture();
+			m_pMesh = resourceAtlas->LoadMesh("square");
 			m_vColor = { 1, 1, 1, 1 };
 		}
 
@@ -47,7 +57,14 @@ namespace gallus
 			OnShadersChanged();
 
 			// cache
-			m_pRootSignature = core::ENGINE->GetDX12().GetRootSignature().Get();
+			graphics::dx12::DX12System* dx12 = core::ENGINE->GetDX12();
+			if (!dx12)
+			{
+				return;
+			}
+
+			m_pDX12System = dx12;
+			m_pRootSignature = dx12->GetRootSignature().Get();
 			m_pTransformSystem = m_pECS->GetSystem<gameplay::TransformSystem>();
 
 			OnOrderChanged();
@@ -83,29 +100,34 @@ namespace gallus
 				return;
 			}
 
-			auto ent = core::ENGINE->GetECS().GetEntity(m_EntityID).lock();
+			// TODO: Possible to cache this and improve performance.
+			auto ent = m_pECS->GetEntity(m_EntityID).lock();
 			if (!ent || !ent->IsActive())
 			{
 				return;
 			}
 
+			if (!m_pTransformSystem)
+			{
+				return;
+			}
+
 			graphics::dx12::Transform transform;
-			TransformSystem* transformSys = core::ENGINE->GetECS().GetSystem<TransformSystem>();
-			if (gameplay::TransformComponent* transformComponent = transformSys->TryGetComponent(a_EntityID))
+			if (gameplay::TransformComponent* transformComponent = m_pTransformSystem->TryGetComponent(a_EntityID))
 			{
 				transform = transformComponent->GetTransform();
 			}
 
 			if (transform.GetCameraType() == graphics::dx12::CameraType_Screen)
 			{
-				if (core::ENGINE->GetDX12().GetDimensionDrawMode() != graphics::dx12::DimensionDrawMode::DimensionDrawMode_2D && core::ENGINE->GetDX12().GetDimensionDrawMode() != graphics::dx12::DimensionDrawMode::DimensionDrawMode_2D3D)
+				if (m_pDX12System->GetDimensionDrawMode() != graphics::dx12::DimensionDrawMode::DimensionDrawMode_2D && m_pDX12System->GetDimensionDrawMode() != graphics::dx12::DimensionDrawMode::DimensionDrawMode_2D3D)
 				{
 					return;
 				}
 			}
 			else if (transform.GetCameraType() == graphics::dx12::CameraType_World)
 			{
-				if (core::ENGINE->GetDX12().GetDimensionDrawMode() != graphics::dx12::DimensionDrawMode::DimensionDrawMode_3D && core::ENGINE->GetDX12().GetDimensionDrawMode() != graphics::dx12::DimensionDrawMode::DimensionDrawMode_2D3D)
+				if (m_pDX12System->GetDimensionDrawMode() != graphics::dx12::DimensionDrawMode::DimensionDrawMode_3D && m_pDX12System->GetDimensionDrawMode() != graphics::dx12::DimensionDrawMode::DimensionDrawMode_2D3D)
 				{
 					return;
 				}
@@ -125,7 +147,13 @@ namespace gallus
 				mvpMatrix = mMatrix * viewMatrix * projectionMatrix;
 			}
 
-			if (auto material = core::ENGINE->GetResourceAtlas().GetDefaultMaterial().lock())
+			resources::ResourceAtlas* resourceAtlas = core::ENGINE->GetResourceAtlas();
+			if (!resourceAtlas)
+			{
+				return;
+			}
+
+			if (auto material = resourceAtlas->GetDefaultMaterial().lock())
 			{
 				material->Bind(a_pCommandList);
 			}
@@ -153,7 +181,7 @@ namespace gallus
 		//---------------------------------------------------------------------
 		void SpriteComponent::OnOrderChanged()
 		{
-			core::ENGINE->GetDX12().ReorderSpriteComponents();
+			m_pDX12System->ReorderSpriteComponents();
 		}
 		
 		//---------------------------------------------------------------------

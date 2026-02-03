@@ -3,6 +3,13 @@
 // core
 #include "core/ArgProcessor.h"
 
+// systems
+#include "graphics/dx12/DX12System.h"
+#include "graphics/win32/Window.h"
+#include "input/InputSystem.h"
+#include "resources/ResourceAtlas.h"
+#include "gameplay/EntityComponentSystem.h"
+
 // logger
 #include "logger/Logger.h"
 
@@ -25,21 +32,23 @@ namespace gallus
 
 			LOG(LOGSEVERITY_INFO, LOG_CATEGORY_ENGINE, "Initializing engine.");
 
-			m_ResourceAtlas.Initialize();
+			m_pResourceAtlas->Initialize();
 
-			// We initialize the window first and set the size and title after it has been created.
-			m_Window.Initialize(true, a_hInstance);
-			m_Window.SetTitle(a_sName);
+			if (!m_pWindow->Initialize(true, a_hInstance))
+			{
+				return false;
+			}
+			m_pWindow->SetTitle(a_sName);
 
-			const IVector2 size = m_Window.GetRealSize();
-			if (!m_DX12.Initialize(true, m_Window.GetHWnd(), size, &m_Window))
+			const IVector2 size = m_pWindow->GetRealSize();
+			if (!m_pDX12->Initialize(true, m_pWindow->GetHWnd(), size, m_pWindow.get()))
 			{
 				return false;
 			}
 
-			m_ECS.Initialize();
+			m_pECS->Initialize();
 
-			m_InputSystem.Initialize(false);
+			m_pInputSystem->Initialize(false);
 
 			System::Initialize();
 
@@ -62,19 +71,30 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
+		Engine::Engine()
+		{
+			m_pResourceAtlas = std::make_unique<resources::ResourceAtlas>();
+			m_pWindow = std::make_unique<graphics::win32::Window>();
+			m_pDX12 = std::make_unique<graphics::dx12::DX12System>();
+			m_pECS = std::make_unique<gameplay::EntityComponentSystem>();
+			m_pInputSystem = std::make_unique<input::InputSystem>();
+		}
+
+		//---------------------------------------------------------------------
+		Engine::~Engine() = default;
+
+		//---------------------------------------------------------------------
 		bool Engine::Destroy()
 		{
 			LOG(LOGSEVERITY_INFO, LOG_CATEGORY_ENGINE, "Destroying engine.");
 
-			m_ECS.Destroy();
+			m_pECS->Destroy();
 
-			m_ECS.Destroy();
+			m_pDX12->Destroy();
 
-			m_DX12.Destroy();
+			m_pWindow->Destroy();
 
-			m_Window.Destroy();
-
-			m_ResourceAtlas.Destroy();
+			m_pResourceAtlas->Destroy();
 
 			// Destroy the logger last so we can see possible error messages from other systems.
 			logger::LOGGER.Destroy();
@@ -83,35 +103,36 @@ namespace gallus
 		}
 
 		//---------------------------------------------------------------------
-		resources::ResourceAtlas& Engine::GetResourceAtlas()
+		resources::ResourceAtlas* Engine::GetResourceAtlas()
 		{
-			return m_ResourceAtlas;
+			return m_pResourceAtlas.get();
 		}
 
 		//---------------------------------------------------------------------
-		graphics::win32::Window& Engine::GetWindow()
+		graphics::win32::Window* Engine::GetWindow()
 		{
-			return m_Window;
+			return m_pWindow.get();
 		}
 
 		//---------------------------------------------------------------------
-		graphics::dx12::DX12System& Engine::GetDX12()
+		graphics::dx12::DX12System* Engine::GetDX12()
 		{
-			return m_DX12;
+			return m_pDX12.get();
 		}
 
 		//---------------------------------------------------------------------
-		input::InputSystem& Engine::GetInputSystem()
+		input::InputSystem* Engine::GetInputSystem()
 		{
-			return m_InputSystem;
+			return m_pInputSystem.get();
 		}
 
 		//---------------------------------------------------------------------
-		gameplay::EntityComponentSystem& Engine::GetECS()
+		gameplay::EntityComponentSystem* Engine::GetECS()
 		{
-			return m_ECS;
+			return m_pECS.get();
 		}
 
+		//---------------------------------------------------------------------
 		void Engine::SetDefaultArguments() const
 		{
 			gallus::core::ARGS.AddArgument<std::string>(ASSET_PATH_ARG, "");

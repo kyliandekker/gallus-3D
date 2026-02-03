@@ -5,24 +5,36 @@
 // external
 #include <wtypes.h>
 
-// graphics
-#include "graphics/dx12/DX12System.h"
-#include "graphics/win32/Window.h"
-
-// input
-#include "input/InputSystem.h"
-
 // utils
 #include "utils/file_abstractions.h"
 
-// resources
-#include "resources/ResourceAtlas.h"
-
-// gameplay
-#include "gameplay/EntityComponentSystem.h"
-
 namespace gallus
 {
+	namespace graphics
+	{
+		namespace dx12
+		{
+			class DX12System;
+		}
+		namespace win32
+		{
+			class Window;
+		}
+	}
+
+	namespace input
+	{
+		class InputSystem;
+	}
+	namespace gameplay
+	{
+		class EntityComponentSystem;
+	}
+	namespace resources
+	{
+		class ResourceAtlas;
+	}
+
 	namespace core
 	{
 		//---------------------------------------------------------------------
@@ -37,7 +49,9 @@ namespace gallus
 			/// <summary>
 			/// Constructs the engine.
 			/// </summary>
-			Engine() = default;
+			Engine();
+
+			virtual ~Engine();
 
 			/// <summary>
 			/// Initializes the engine and all necessary subsystems with the specified parameters.
@@ -57,31 +71,31 @@ namespace gallus
 			/// Retrieves the resource atlas.
 			/// </summary>
 			/// <returns>Reference to the resource atlas.</returns>
-			resources::ResourceAtlas& GetResourceAtlas();
+			resources::ResourceAtlas* GetResourceAtlas();
 
 			/// <summary>
 			/// Retrieves the window.
 			/// </summary>
 			/// <returns>Reference to the window.</returns>
-			graphics::win32::Window& GetWindow();
+			graphics::win32::Window* GetWindow();
 
 			/// <summary>
 			/// Retrieves the dx12 system.
 			/// </summary>
 			/// <returns>Reference to the dx12 system.</returns>
-			graphics::dx12::DX12System& GetDX12();
+			graphics::dx12::DX12System* GetDX12();
 
 			/// <summary>
 			/// Retrieves the input system.
 			/// </summary>
 			/// <returns>Reference to the input system.</returns>
-			input::InputSystem& GetInputSystem();
+			input::InputSystem* GetInputSystem();
 
 			/// <summary>
 			/// Retrieves the ecs.
 			/// </summary>
 			/// <returns>Reference to the ecs.</returns>
-			gameplay::EntityComponentSystem& GetECS();
+			gameplay::EntityComponentSystem* GetECS();
 
 			/// <summary>
 			/// Retrieves the save directory of the application.
@@ -107,11 +121,11 @@ namespace gallus
 			/// </summary>
 			virtual void SetDefaultArguments() const;
 		private:
-			resources::ResourceAtlas m_ResourceAtlas;
-			graphics::win32::Window m_Window;
-			graphics::dx12::DX12System m_DX12;
-			input::InputSystem m_InputSystem;
-			gameplay::EntityComponentSystem m_ECS;
+			std::unique_ptr<resources::ResourceAtlas> m_pResourceAtlas = nullptr;
+			std::unique_ptr<graphics::win32::Window> m_pWindow = nullptr;
+			std::unique_ptr<graphics::dx12::DX12System> m_pDX12 = nullptr;
+			std::unique_ptr<input::InputSystem> m_pInputSystem = nullptr;
+			std::unique_ptr<gameplay::EntityComponentSystem> m_pECS = nullptr;
 
 			std::filesystem::path m_sSaveDirectory;
 		};

@@ -20,7 +20,13 @@ namespace gallus
 			//---------------------------------------------------------------------
 			HeapAllocation::HeapAllocation(const D3D12_DESCRIPTOR_HEAP_DESC& a_Desc) : m_Type(a_Desc.Type)
 			{
-				Microsoft::WRL::ComPtr<ID3D12Device2>& device = core::ENGINE->GetDX12().GetDevice();
+				graphics::dx12::DX12System* dx12System = core::ENGINE->GetDX12();
+				if (!dx12System)
+				{
+					return;
+				}
+
+				Microsoft::WRL::ComPtr<ID3D12Device2>& device = dx12System->GetDevice();
 				HRESULT hr = device->CreateDescriptorHeap(&a_Desc, IID_PPV_ARGS(&m_pHeap));
 				if (FAILED(hr))
 				{

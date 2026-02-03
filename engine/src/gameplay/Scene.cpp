@@ -5,6 +5,9 @@
 #include "core/Engine.h"
 #include "core/DataStream.h"
 
+// graphics
+#include "graphics/dx12/DX12System.h"
+
 // logger
 #include "logger/Logger.h"
 
@@ -15,6 +18,7 @@
 #include "resources/SrcData.h"
 
 // gameplay
+#include "gameplay/EntityComponentSystem.h"
 #include "gameplay/ECSBaseSystem.h"
 
 namespace gallus
@@ -66,9 +70,14 @@ namespace gallus
 		bool Scene::LoadData()
 		{
 			// Clear all entities.
-			gameplay::EntityComponentSystem& ecs = core::ENGINE->GetECS();
-			ecs.Clear();
-			while (!ecs.GetEntities().empty())
+			gameplay::EntityComponentSystem* ecs = core::ENGINE->GetECS();
+			if (!ecs)
+			{
+				return false;
+			}
+
+			ecs->Clear();
+			while (!ecs->GetEntities().empty())
 			{
 			}
 
@@ -87,9 +96,13 @@ namespace gallus
 			resources::SrcData cameraSrcData;
 			cameraSrcData.SetObject();
 			
-			graphics::dx12::DX12System& dx12 = core::ENGINE->GetDX12();
+			graphics::dx12::DX12System* dx12 = core::ENGINE->GetDX12();
+			if (!dx12)
+			{
+				return false;
+			}
 
-			graphics::dx12::Camera& camera = dx12.GetCamera();
+			graphics::dx12::Camera& camera = dx12->GetCamera();
 			camera.GetTransform().SetRotation(DirectX::XMQuaternionIdentity());
 			camera.Init(graphics::dx12::RENDER_TEX_SIZE.x, graphics::dx12::RENDER_TEX_SIZE.y);
 			if (!srcData.GetSrcObject(JSON_SCENE_CAMERA_VAR, cameraSrcData))
@@ -108,7 +121,7 @@ namespace gallus
 			{
 				LOGF(LOGSEVERITY_WARNING, LOG_CATEGORY_GAME, "Could not read directional light settings in scene data.");
 			}
-			else if (auto directionalLight = dx12.GetDirectionalLight().lock())
+			else if (auto directionalLight = dx12->GetDirectionalLight().lock())
 			{
 				DeserializeFields(directionalLight.get(), directionalLightSrcData);
 			}
@@ -148,20 +161,20 @@ namespace gallus
 					continue;
 				}
 
-				std::string name = ecs.GetUniqueName("New GameObject");
+				std::string name = ecs->GetUniqueName("New GameObject");
 				if (!entitySrc.GetString(name, JSON_SCENE_ENTITIES_VAR_NAME))
 				{
 					LOGF(LOGSEVERITY_WARNING, LOG_CATEGORY_GAME, "Could not read name of entity index %i in scene data. Defaulting to using name \"\".", i, name.c_str());
 				}
 
-				gameplay::EntityID id = ecs.CreateEntity(ecs.GetUniqueName(name));
+				gameplay::EntityID id = ecs->CreateEntity(ecs->GetUniqueName(name));
 				if (!id.IsValid())
 				{
 					LOGF(LOGSEVERITY_WARNING, LOG_CATEGORY_GAME, "Could not spawn entity index %i.", i);
 					continue;
 				}
 
-				std::weak_ptr<gameplay::Entity> entity = ecs.GetEntity(id);
+				std::weak_ptr<gameplay::Entity> entity = ecs->GetEntity(id);
 				auto ent = entity.lock();
 				if (!ent)
 				{
@@ -184,7 +197,7 @@ namespace gallus
 				}
 
 				// Create all components.
-				for (gameplay::AbstractECSSystem* system : ecs.GetSystems())
+				for (gameplay::AbstractECSSystem* system : ecs->GetSystems())
 				{
 					if (componentsSrc.HasSrcObject(system->GetPropertyName()))
 					{
@@ -246,12 +259,17 @@ namespace gallus
 			resources::SrcData srcData = resources::SrcData();
 			srcData.SetObject();
 
-			graphics::dx12::DX12System& dx12 = core::ENGINE->GetDX12();
+			graphics::dx12::DX12System* dx12 = core::ENGINE->GetDX12();
+			if (!dx12)
+			{
+				return core::Data();
+			}
+
 			{
 				resources::SrcData cameraSrcData;
 				cameraSrcData.SetObject();
 
-				SerializeFields(&dx12.GetCamera(), cameraSrcData);
+				SerializeFields(&dx12->GetCamera(), cameraSrcData);
 				srcData.SetSrcObject(JSON_SCENE_CAMERA_VAR, cameraSrcData);
 			}
 
@@ -259,7 +277,7 @@ namespace gallus
 				resources::SrcData directionalLightSrcData;
 				directionalLightSrcData.SetObject();
 
-				if (auto directionalLight = dx12.GetDirectionalLight().lock())
+				if (auto directionalLight = dx12->GetDirectionalLight().lock())
 				{
 					SerializeFields(directionalLight.get(), directionalLightSrcData);
 					srcData.SetSrcObject(JSON_SCENE_DIRECTIONAL_LIGHT_VAR, directionalLightSrcData);
@@ -269,13 +287,18 @@ namespace gallus
 			resources::SrcData entitiesSrc = resources::SrcData();
 			entitiesSrc.SetArray();
 
-			gameplay::EntityComponentSystem& ecs = core::ENGINE->GetECS();
-			for (gameplay::EntityID entityID : ecs.GetEntities())
+			gameplay::EntityComponentSystem* ecs = core::ENGINE->GetECS();
+			if (!ecs)
+			{
+				return core::Data();
+			}
+
+			for (gameplay::EntityID entityID : ecs->GetEntities())
 			{
 				resources::SrcData entitySrc = resources::SrcData();
 				entitySrc.SetObject();
 
-				std::weak_ptr<gameplay::Entity> entity = ecs.GetEntity(entityID);
+				std::weak_ptr<gameplay::Entity> entity = ecs->GetEntity(entityID);
 				std::shared_ptr<gameplay::Entity> ent = entity.lock();
 				if (!entity.lock())
 				{
@@ -288,7 +311,7 @@ namespace gallus
 				resources::SrcData componentsSrc = resources::SrcData();
 				componentsSrc.SetObject();
 
-				for (gameplay::AbstractECSSystem* system : ecs.GetSystemsContainingEntity(ent->GetEntityID()))
+				for (gameplay::AbstractECSSystem* system : ecs->GetSystemsContainingEntity(ent->GetEntityID()))
 				{
 					resources::SrcData componentSrc = resources::SrcData();
 					componentSrc.SetObject();

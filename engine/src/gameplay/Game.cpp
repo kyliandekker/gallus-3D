@@ -4,6 +4,7 @@
 #include "core/Engine.h"
 
 // graphics
+#include "graphics/win32/Window.h"
 #include "graphics/dx12/CommandQueue.h"
 #include "graphics/dx12/CommandList.h"
 #include "graphics/dx12/Texture.h"
@@ -12,6 +13,7 @@
 #include "logger/Logger.h"
 
 // gameplay
+#include "gameplay/EntityComponentSystem.h"
 #include "gameplay/systems/MeshSystem.h"
 #include "gameplay/systems/SpriteSystem.h"
 #include "gameplay/systems/TransformSystem.h"
@@ -34,17 +36,28 @@ namespace gallus
 
 			m_Scene.SetResourceCategory(resources::EngineResourceCategory::Game);
 
-			gameplay::EntityComponentSystem& ecs = core::ENGINE->GetECS();
-			ecs.CreateSystem<MeshSystem>()->Initialize();
-			ecs.CreateSystem<SpriteSystem>()->Initialize();
-			ecs.CreateSystem<TransformSystem>()->Initialize();
-			ecs.CreateSystem<HealthSystem>()->Initialize();
-			ecs.CreateSystem<CollisionSystem>()->Initialize();
-			ecs.CreateSystem<ProjectileSystem>()->Initialize();
-			ecs.CreateSystem<AnimationSystem>()->Initialize();
-			ecs.CreateSystem<RigidbodySystem>()->Initialize();
+			gameplay::EntityComponentSystem* ecs = core::ENGINE->GetECS();
+			if (!ecs)
+			{
+				return false;
+			}
 
-			core::ENGINE->GetWindow().OnQuit() += std::bind(&Game::Shutdown, this);
+			ecs->CreateSystem<MeshSystem>()->Initialize();
+			ecs->CreateSystem<SpriteSystem>()->Initialize();
+			ecs->CreateSystem<TransformSystem>()->Initialize();
+			ecs->CreateSystem<HealthSystem>()->Initialize();
+			ecs->CreateSystem<CollisionSystem>()->Initialize();
+			ecs->CreateSystem<ProjectileSystem>()->Initialize();
+			ecs->CreateSystem<AnimationSystem>()->Initialize();
+			ecs->CreateSystem<RigidbodySystem>()->Initialize();
+
+			graphics::win32::Window* window = core::ENGINE->GetWindow();
+			if (!window)
+			{
+				return false;
+			}
+
+			window->OnQuit() += std::bind(&Game::Shutdown, this);
 
 			m_bStarted = false;
 
@@ -86,7 +99,13 @@ namespace gallus
 			m_eOnNewFrame(m_FpsCounter.GetFPS());
 
 			bool updateRealtime = m_bStarted && !m_bPaused;
-			core::ENGINE->GetECS().Update(a_fDeltaTime, updateRealtime);
+			gameplay::EntityComponentSystem* ecs = core::ENGINE->GetECS();
+			if (!ecs)
+			{
+				return;
+			}
+
+			ecs->Update(a_fDeltaTime, updateRealtime);
 
 			if (updateRealtime)
 			{

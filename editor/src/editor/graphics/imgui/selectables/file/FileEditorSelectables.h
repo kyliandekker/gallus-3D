@@ -9,9 +9,6 @@
 #include "graphics/imgui/views/DataTypes/StringDropdown.h"
 #include "graphics/dx12/Material.h"
 
-// audio
-#include "audio/ChunkCollection.h"
-
 namespace gallus
 {
 	namespace resources
@@ -133,10 +130,7 @@ namespace gallus
 
 				void Render(FileEditorSelectable& a_FileEditorSelectable) override;
 			protected:
-				bool LoadAudioData(FileEditorSelectable& a_FileEditorSelectable);
-
 				StringDropdown<resources::AssetType> m_AssetTypeDropdown; /// Drop down UI element for selecting asset types.
-				audio::ChunkCollection m_SongData;
 			};
 
 			class MaterialFileEditorSelectables : public FileEditorSelectables

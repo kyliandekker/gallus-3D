@@ -6,6 +6,7 @@
 #include "resources/SrcData.h"
 
 // gameplay
+#include "gameplay/EntityComponentSystem.h"
 #include "gameplay/systems/SpriteSystem.h"
 
 namespace gallus
@@ -15,7 +16,13 @@ namespace gallus
 		//---------------------------------------------------------------------
 		void AnimationKeyFrameSpriteComponent::Activate(gameplay::EntityID& a_EntityID)
 		{
-			if (gameplay::SpriteComponent* spriteComp = core::ENGINE->GetECS().GetSystem<gameplay::SpriteSystem>()->TryGetComponent(a_EntityID))
+			gameplay::EntityComponentSystem* ecs = core::ENGINE->GetECS();
+			if (!ecs)
+			{
+				return;
+			}
+
+			if (gameplay::SpriteComponent* spriteComp = ecs->GetSystem<gameplay::SpriteSystem>()->TryGetComponent(a_EntityID))
 			{
 				spriteComp->SetSpriteIndex(m_iSpriteIndex);
 				spriteComp->SetTexture(m_pSprite);

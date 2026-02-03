@@ -18,7 +18,7 @@ namespace gallus
 		public:
 			EditorEngine();
 
-			~EditorEngine() = default;
+			~EditorEngine();
 
 			/// <summary>
 			/// Initializes the engine and all necessary subsystems with the specified parameters.

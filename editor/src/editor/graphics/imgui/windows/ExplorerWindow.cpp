@@ -19,6 +19,7 @@
 #include "utils/file_abstractions.h"
 
 // resources
+#include "resources/ResourceAtlas.h"
 #include "resources/FileResource.h"
 
 // gameplay
@@ -317,6 +318,12 @@ namespace gallus
 					return;
 				}
 
+				resources::ResourceAtlas* resourceAtlas = core::ENGINE->GetResourceAtlas();
+				if (!resourceAtlas)
+				{
+					return;
+				}
+
 				if (m_bNeedsRescan)
 				{
 					m_pViewedFolder = nullptr;
@@ -324,8 +331,8 @@ namespace gallus
 					m_aFilteredExplorerItems.clear();
 					m_aExplorerItems.clear();
 
-					m_aExplorerItems.reserve(gallus::core::EDITOR_ENGINE->GetResourceAtlas().GetResourceFolder().GetChildren().size());
-					for (gallus::resources::FileResource& fileResource : gallus::core::EDITOR_ENGINE->GetResourceAtlas().GetResourceFolder().GetChildren())
+					m_aExplorerItems.reserve(resourceAtlas->GetResourceFolder().GetChildren().size());
+					for (gallus::resources::FileResource& fileResource : resourceAtlas->GetResourceFolder().GetChildren())
 					{
 						m_aExplorerItems.emplace_back(m_Window, fileResource);
 					}

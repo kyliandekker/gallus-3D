@@ -61,14 +61,12 @@ namespace gallus
 				uint32_t y = 0;
 				uint32_t width = 0;
 				uint32_t height = 0;
-				Vector2 test;
 
 				BEGIN_SERIALIZE(SpriteRect)
 					SERIALIZE_FIELD(x, "x", "", .type = gallus::FieldSerializationType::FieldSerializationType_Int32)
 					SERIALIZE_FIELD(y, "y", "", .type = gallus::FieldSerializationType::FieldSerializationType_Int32)
 					SERIALIZE_FIELD(width, "width", "", .type = gallus::FieldSerializationType::FieldSerializationType_Int32)
 					SERIALIZE_FIELD(height, "height", "", .type = gallus::FieldSerializationType::FieldSerializationType_Int32)
-					SERIALIZE_FIELD(test, "test", "", .type = gallus::FieldSerializationType::FieldSerializationType_Vector2)
 				END_SERIALIZE(SpriteRect)
 			};
 
@@ -226,11 +224,6 @@ namespace gallus
 				void AddSpriteRect(const SpriteRect& a_Rect);
 
 				/// <summary>
-				/// Loads texture metadata.
-				/// </summary>
-				bool LoadMetaData();
-
-				/// <summary>
 				/// Retrieves the texture type.
 				/// </summary>
 				/// <returns>The texture type.</returns>
@@ -271,6 +264,8 @@ namespace gallus
 				SpriteUV GetSpriteUV(uint16_t a_iIndex) const;
 
 				~Texture();
+
+				bool LoadMetaData() override;
 			private:
 				Microsoft::WRL::ComPtr<ID3D12Resource> m_pResourceUploadHeap = nullptr;
 				int32_t m_iSRVIndex = -1;

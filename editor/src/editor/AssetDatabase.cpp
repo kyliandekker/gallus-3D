@@ -6,6 +6,9 @@
 // logger
 #include "logger/Logger.h"
 
+// resources
+#include "resources/ResourceAtlas.h"
+
 namespace gallus
 {
 	namespace editor
@@ -48,7 +51,13 @@ namespace gallus
 		//---------------------------------------------------------------------
 		bool AssetDatabase::Scan()
 		{
-			if (core::ENGINE->GetResourceAtlas().GetResourceFolder().Scan())
+			resources::ResourceAtlas* resourceAtlas = core::ENGINE->GetResourceAtlas();
+			if (!resourceAtlas)
+			{
+				return false;
+			}
+
+			if (resourceAtlas->GetResourceFolder().Scan())
 			{
 				LOG(LOGSEVERITY_INFO, LOG_CATEGORY_EDITOR, "Scanned asset database.");
 				m_eOnScanCompleted();

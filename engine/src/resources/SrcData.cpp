@@ -39,7 +39,7 @@ namespace gallus
 
 			if (m_Document.IsNull())
 			{
-				LOG(LOGSEVERITY_ERROR, LOG_CATEGORY_RESOURCES, "Something went wrong when trying to load src data.");
+				LOG(LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Something went wrong when trying to load src data.");
 				return;
 			}
 
@@ -66,7 +66,7 @@ namespace gallus
 
 			if (m_Document.IsNull())
 			{
-				LOG(LOGSEVERITY_ERROR, LOG_CATEGORY_RESOURCES, "Something went wrong when trying to load src data.");
+				LOG(LOGSEVERITY_WARNING, LOG_CATEGORY_RESOURCES, "Something went wrong when trying to load src data.");
 				return;
 			}
 

@@ -6,7 +6,11 @@
 // resources
 #include "resources/SrcData.h"
 
+// logger
 #include "logger/Logger.h"
+
+// gameplay
+#include "gameplay/EntityComponentSystem.h"
 
 namespace gallus
 {

@@ -11,6 +11,7 @@
 #include "utils/string_extensions.h"
 
 // graphics
+#include "graphics/dx12/DX12System.h"
 #include "graphics/dx12/Transform.h"
 #include "graphics/dx12/Texture.h"
 #include "graphics/dx12/Shader.h"
@@ -19,6 +20,7 @@
 
 // resources
 #include "resources/SrcData.h"
+#include "resources/FileResource.h"
 
 // editor
 #include "editor/core/EditorEngine.h"
@@ -196,14 +198,20 @@ namespace gallus
 				strncpy_s(buf, sizeof(buf), name.c_str(), sizeof(buf) - 1);
 				buf[sizeof(buf) - 1] = '\0';
 
+				graphics::dx12::DX12System* dx12System = core::ENGINE->GetDX12();
+				if (!dx12System)
+				{
+					return false;
+				}
+
 				ImVec2 buttonSize = ImVec2(
-					core::EDITOR_ENGINE->GetDX12().GetImGuiWindow().GetFontSize() * 2,
-					core::EDITOR_ENGINE->GetDX12().GetImGuiWindow().GetFontSize() * 2);
+					dx12System->GetImGuiWindow().GetFontSize() * 2,
+					dx12System->GetImGuiWindow().GetFontSize() * 2);
 
 				ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,
 					ImVec2(
-						core::EDITOR_ENGINE->GetDX12().GetImGuiWindow().GetFontSize() / 2,
-						core::EDITOR_ENGINE->GetDX12().GetImGuiWindow().GetFontSize() / 2));
+						dx12System->GetImGuiWindow().GetFontSize() / 2,
+						dx12System->GetImGuiWindow().GetFontSize() / 2));
 
 				ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
 				ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x - buttonSize.x);
@@ -232,8 +240,8 @@ namespace gallus
 					changed = true;
 
 					FilePickerModal& filePickerModal =
-						core::EDITOR_ENGINE->GetDX12().GetImGuiWindow()
-						.GetWindowsConfig<EditorWindowsConfig>().GetFilePickerModal();
+						dx12System->GetImGuiWindow()
+							.GetWindowsConfig<EditorWindowsConfig>().GetFilePickerModal();
 
 					filePickerModal.SetData(
 						[a_pWeak, &a_Field, a_pObject](int success, const std::string& resourceName)
@@ -356,266 +364,273 @@ namespace gallus
 				std::string fieldId = ImGui::IMGUI_FORMAT_ID("", INPUT_ID, string_extensions::StringToUpper(a_Field.m_sUIName) + "_INSPECTOR");
 				switch (a_Field.m_Options.type)
 				{
-				case FieldSerializationType::FieldSerializationType_Float:
-				{
-					float* value = reinterpret_cast<float*>(ptr);
-					func = [value, &a_Field, &fieldId]
-						{
-							bool val = ShowDragFloat(fieldId, value, a_Field);
-							ImGui::ShowTooltip(a_Field.m_sDescription);
-							return val;
-						};
-					break;
-				}
-				case FieldSerializationType::FieldSerializationType_Int8:
-				{
-					func = [ptr, &a_Field, &fieldId]
-						{
-							int8_t* value = reinterpret_cast<int8_t*>(ptr);
-							int temp = static_cast<int64_t>(*value);
-
-							bool changed = ShowDragInt(fieldId, temp, a_Field);
-							ImGui::ShowTooltip(a_Field.m_sDescription);
-							if (changed)
+					case FieldSerializationType::FieldSerializationType_Float:
+					{
+						float* value = reinterpret_cast<float*>(ptr);
+						func = [value, &a_Field, &fieldId]
 							{
-								*value = static_cast<int8_t>(temp);
-							}
-							return changed;
-						};
-					break;
-				}
-				case FieldSerializationType::FieldSerializationType_Int16:
-				{
-					func = [ptr, &a_Field, &fieldId]
-						{
-							int16_t* value = reinterpret_cast<int16_t*>(ptr);
-							int temp = static_cast<int64_t>(*value);
-
-							bool changed = ShowDragInt(fieldId, temp, a_Field);
-							ImGui::ShowTooltip(a_Field.m_sDescription);
-							if (changed)
+								bool val = ShowDragFloat(fieldId, value, a_Field);
+								ImGui::ShowTooltip(a_Field.m_sDescription);
+								return val;
+							};
+						break;
+					}
+					case FieldSerializationType::FieldSerializationType_Int8:
+					{
+						func = [ptr, &a_Field, &fieldId]
 							{
-								*value = static_cast<int16_t>(temp);
-							}
-							return changed;
-						};
-					break;
-				}
-				case FieldSerializationType::FieldSerializationType_Int32:
-				{
-					func = [ptr, &a_Field, &fieldId]
-						{
-							int32_t* value = reinterpret_cast<int32_t*>(ptr);
-							int temp = static_cast<int64_t>(*value);
+								int8_t* value = reinterpret_cast<int8_t*>(ptr);
+								int temp = static_cast<int64_t>(*value);
 
-							bool changed = ShowDragInt(fieldId, temp, a_Field);
-							ImGui::ShowTooltip(a_Field.m_sDescription);
-							if (changed)
-							{
-								*value = static_cast<int32_t>(temp);
-							}
-							return changed;
-						};
-					break;
-				}
-				case FieldSerializationType::FieldSerializationType_Bool:
-				{
-					bool* value = reinterpret_cast<bool*>(ptr);
-					func = [&a_Field, &fieldId, value]
-						{
-							bool val = ImGui::Checkbox(fieldId.c_str(), value);
-							ImGui::ShowTooltip(a_Field.m_sDescription);
-							return val;
-						};
-					break;
-				}
-				case FieldSerializationType::FieldSerializationType_Switch:
-				{
-					int32_t* value = reinterpret_cast<int32_t*>(ptr);
-
-					bool bValue = *value;
-					func = [&a_Field, &fieldId, &bValue, value]
-						{
-							bool val = ImGui::Toggle(fieldId.c_str(), &bValue);
-							*value = bValue;
-							ImGui::ShowTooltip(a_Field.m_sDescription);
-							return val;
-						};
-					break;
-				}
-				case FieldSerializationType::FieldSerializationType_LongSwitch:
-				{
-					uint32_t* pValue = reinterpret_cast<uint32_t*>(ptr);
-
-					func = [&a_Field, &fieldId, pValue]()
-						{
-							bool bValue = (*pValue != 0);
-
-							bool bChanged = ImGui::Toggle(fieldId.c_str(), &bValue);
-							ImGui::ShowTooltip(a_Field.m_sDescription);
-
-							if (bChanged)
-							{
-								*pValue = bValue ? 1u : 0u;
-							}
-
-							return bChanged;
-						};
-
-					break;
-				}
-				case FieldSerializationType::FieldSerializationType_Vector2:
-				{
-					DirectX::XMFLOAT2* value = reinterpret_cast<DirectX::XMFLOAT2*>(ptr);
-					func = [&a_Field, &fieldId, value]
-						{
-							bool val = ShowVector2(fieldId, *value, a_Field);
-							ImGui::ShowTooltip(a_Field.m_sDescription);
-							return val;
-						};
-					break;
-				}
-				case FieldSerializationType::FieldSerializationType_Vector3:
-				{
-					DirectX::XMFLOAT3* value = reinterpret_cast<DirectX::XMFLOAT3*>(ptr);
-					func = [&a_Field, &fieldId, value]
-						{
-							bool val = ShowVector3(fieldId, *value, a_Field);
-							ImGui::ShowTooltip(a_Field.m_sDescription);
-							return val;
-						};
-					break;
-				}
-				case FieldSerializationType::FieldSerializationType_Color:
-				{
-					DirectX::XMFLOAT3* value = reinterpret_cast<DirectX::XMFLOAT3*>(ptr);
-					func = [&a_Field, &fieldId, value]
-						{
-							ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
-							bool val = ImGui::ColorEdit4(fieldId.c_str(),
-								reinterpret_cast<float*>(value)
-							);
-							ImGui::ShowTooltip(a_Field.m_sDescription);
-							return val;
-						};
-					break;
-				}
-				case FieldSerializationType::FieldSerializationType_Quaternion:
-				{
-					DirectX::XMVECTOR* value = reinterpret_cast<DirectX::XMVECTOR*>(ptr);
-
-					func = [&a_Field, &fieldId, value]
-						{
-							bool val = ShowQuaternion(fieldId, *value, a_Field);
-							ImGui::ShowTooltip(a_Field.m_sDescription);
-							return val;
-						};
-					break;
-				}
-				case FieldSerializationType::FieldSerializationType_EngineResource:
-				{
-					std::weak_ptr<gallus::resources::EngineResource>* pWeak =
-						reinterpret_cast<std::weak_ptr<gallus::resources::EngineResource>*>(ptr);
-
-					func = [&a_Field, &fieldId, pWeak, a_pObject]()
-						{
-							std::shared_ptr<gallus::resources::EngineResource> locked;
-							if (pWeak)
-							{
-								locked = pWeak->lock();
-							}
-
-							gallus::resources::EngineResource* pLocked =
-								(locked.get()) ? locked.get() : nullptr;
-
-							return ShowAssetPicker(fieldId, pLocked, pWeak, a_pObject, a_Field);
-						};
-
-					break;
-				}
-				case FieldSerializationType::FieldSerializationType_Object:
-				{
-					showTable = true;
-					ISerializableObject* editorObject = dynamic_cast<ISerializableObject*>(reinterpret_cast<ISerializableObject*>(ptr));
-
-					return ShowObject(editorObject, a_bInternal);
-					break;
-				}
-				case FieldSerializationType::FieldSerializationType_ObjectPtr:
-				{
-					showTable = true;
-
-					ISerializableObject** ppEditorObject = reinterpret_cast<ISerializableObject**>(ptr);
-					ISerializableObject* pEditorObject = (ppEditorObject ? *ppEditorObject : nullptr);
-
-					return ShowObject(pEditorObject, a_bInternal);
-					break;
-				}
-				case FieldSerializationType::FieldSerializationType_Enum:
-				{
-					func = [ptr, &a_Field, &fieldId]
-						{
-							int* enumValue = reinterpret_cast<int*>(ptr);
-							int temp = *enumValue;
-
-							bool changed = ShowEnumDropdown(fieldId, &temp, a_Field);
-							if (changed)
-							{
-								*enumValue = temp;
-							}
-							return changed;
-						};
-					break;
-				}
-				case FieldSerializationType::FieldSerializationType_TexturePreview:
-				{
-					func = [ptr, &a_Field, a_pObject]()
-						{
-							// texture pointer
-							graphics::dx12::Texture* tex = *reinterpret_cast<graphics::dx12::Texture**>(ptr);
-
-							// sprite index is int8_t
-							int8_t* spriteIndexPtr = reinterpret_cast<int8_t*>(reinterpret_cast<char*>(a_pObject) + a_Field.m_Options.relatedIndexFieldOffset);
-							int spriteIndex = spriteIndexPtr ? static_cast<int>(*spriteIndexPtr) : 0;
-
-							ShowTexturePreview(a_Field.m_sUIName, tex, spriteIndex);
-							return false;
-						};
-					break;
-				}
-				case FieldSerializationType::FieldSerializationType_Button:
-				{
-					func = [ptr, &a_Field, a_pObject]()
-						{
-							if (ImGui::TextButton(a_Field.m_sUIName, a_Field.m_sDescription))
-							{
-								if (a_Field.m_Options.buttonFunc)
+								bool changed = ShowDragInt(fieldId, temp, a_Field);
+								ImGui::ShowTooltip(a_Field.m_sDescription);
+								if (changed)
 								{
-									a_Field.m_Options.buttonFunc(a_pObject);
+									*value = static_cast<int8_t>(temp);
 								}
-							}
-							return false;
-						};
-					break;
-				}
-				default:
-				{
-					break;
-				}
+								return changed;
+							};
+						break;
+					}
+					case FieldSerializationType::FieldSerializationType_Int16:
+					{
+						func = [ptr, &a_Field, &fieldId]
+							{
+								int16_t* value = reinterpret_cast<int16_t*>(ptr);
+								int temp = static_cast<int64_t>(*value);
+
+								bool changed = ShowDragInt(fieldId, temp, a_Field);
+								ImGui::ShowTooltip(a_Field.m_sDescription);
+								if (changed)
+								{
+									*value = static_cast<int16_t>(temp);
+								}
+								return changed;
+							};
+						break;
+					}
+					case FieldSerializationType::FieldSerializationType_Int32:
+					{
+						func = [ptr, &a_Field, &fieldId]
+							{
+								int32_t* value = reinterpret_cast<int32_t*>(ptr);
+								int temp = static_cast<int64_t>(*value);
+
+								bool changed = ShowDragInt(fieldId, temp, a_Field);
+								ImGui::ShowTooltip(a_Field.m_sDescription);
+								if (changed)
+								{
+									*value = static_cast<int32_t>(temp);
+								}
+								return changed;
+							};
+						break;
+					}
+					case FieldSerializationType::FieldSerializationType_Bool:
+					{
+						bool* value = reinterpret_cast<bool*>(ptr);
+						func = [&a_Field, &fieldId, value]
+							{
+								bool val = ImGui::Checkbox(fieldId.c_str(), value);
+								ImGui::ShowTooltip(a_Field.m_sDescription);
+								return val;
+							};
+						break;
+					}
+					case FieldSerializationType::FieldSerializationType_Switch:
+					{
+						int32_t* value = reinterpret_cast<int32_t*>(ptr);
+
+						bool bValue = *value;
+						func = [&a_Field, &fieldId, &bValue, value]
+							{
+								bool val = ImGui::Toggle(fieldId.c_str(), &bValue);
+								*value = bValue;
+								ImGui::ShowTooltip(a_Field.m_sDescription);
+								return val;
+							};
+						break;
+					}
+					case FieldSerializationType::FieldSerializationType_LongSwitch:
+					{
+						uint32_t* pValue = reinterpret_cast<uint32_t*>(ptr);
+
+						func = [&a_Field, &fieldId, pValue]()
+							{
+								bool bValue = (*pValue != 0);
+
+								bool bChanged = ImGui::Toggle(fieldId.c_str(), &bValue);
+								ImGui::ShowTooltip(a_Field.m_sDescription);
+
+								if (bChanged)
+								{
+									*pValue = bValue ? 1u : 0u;
+								}
+
+								return bChanged;
+							};
+
+						break;
+					}
+					case FieldSerializationType::FieldSerializationType_Vector2:
+					{
+						DirectX::XMFLOAT2* value = reinterpret_cast<DirectX::XMFLOAT2*>(ptr);
+						func = [&a_Field, &fieldId, value]
+							{
+								bool val = ShowVector2(fieldId, *value, a_Field);
+								ImGui::ShowTooltip(a_Field.m_sDescription);
+								return val;
+							};
+						break;
+					}
+					case FieldSerializationType::FieldSerializationType_Vector3:
+					{
+						DirectX::XMFLOAT3* value = reinterpret_cast<DirectX::XMFLOAT3*>(ptr);
+						func = [&a_Field, &fieldId, value]
+							{
+								bool val = ShowVector3(fieldId, *value, a_Field);
+								ImGui::ShowTooltip(a_Field.m_sDescription);
+								return val;
+							};
+						break;
+					}
+					case FieldSerializationType::FieldSerializationType_Color:
+					{
+						DirectX::XMFLOAT3* value = reinterpret_cast<DirectX::XMFLOAT3*>(ptr);
+						func = [&a_Field, &fieldId, value]
+							{
+								ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+								bool val = ImGui::ColorEdit4(fieldId.c_str(),
+									reinterpret_cast<float*>(value)
+								);
+								ImGui::ShowTooltip(a_Field.m_sDescription);
+								return val;
+							};
+						break;
+					}
+					case FieldSerializationType::FieldSerializationType_Quaternion:
+					{
+						DirectX::XMVECTOR* value = reinterpret_cast<DirectX::XMVECTOR*>(ptr);
+
+						func = [&a_Field, &fieldId, value]
+							{
+								bool val = ShowQuaternion(fieldId, *value, a_Field);
+								ImGui::ShowTooltip(a_Field.m_sDescription);
+								return val;
+							};
+						break;
+					}
+					case FieldSerializationType::FieldSerializationType_EngineResource:
+					{
+						std::weak_ptr<gallus::resources::EngineResource>* pWeak =
+							reinterpret_cast<std::weak_ptr<gallus::resources::EngineResource>*>(ptr);
+
+						func = [&a_Field, &fieldId, pWeak, a_pObject]()
+							{
+								std::shared_ptr<gallus::resources::EngineResource> locked;
+								if (pWeak)
+								{
+									locked = pWeak->lock();
+								}
+
+								gallus::resources::EngineResource* pLocked =
+									(locked.get()) ? locked.get() : nullptr;
+
+								return ShowAssetPicker(fieldId, pLocked, pWeak, a_pObject, a_Field);
+							};
+
+						break;
+					}
+					case FieldSerializationType::FieldSerializationType_Object:
+					{
+						showTable = true;
+						ISerializableObject* editorObject = dynamic_cast<ISerializableObject*>(reinterpret_cast<ISerializableObject*>(ptr));
+
+						return ShowObject(editorObject, a_bInternal);
+						break;
+					}
+					case FieldSerializationType::FieldSerializationType_ObjectPtr:
+					{
+						showTable = true;
+
+						ISerializableObject** ppEditorObject = reinterpret_cast<ISerializableObject**>(ptr);
+						ISerializableObject* pEditorObject = (ppEditorObject ? *ppEditorObject : nullptr);
+
+						return ShowObject(pEditorObject, a_bInternal);
+						break;
+					}
+					case FieldSerializationType::FieldSerializationType_Enum:
+					{
+						func = [ptr, &a_Field, &fieldId]
+							{
+								int* enumValue = reinterpret_cast<int*>(ptr);
+								int temp = *enumValue;
+
+								bool changed = ShowEnumDropdown(fieldId, &temp, a_Field);
+								if (changed)
+								{
+									*enumValue = temp;
+								}
+								return changed;
+							};
+						break;
+					}
+					case FieldSerializationType::FieldSerializationType_TexturePreview:
+					{
+						func = [ptr, &a_Field, a_pObject]()
+							{
+								// texture pointer
+								graphics::dx12::Texture* tex = *reinterpret_cast<graphics::dx12::Texture**>(ptr);
+
+								// sprite index is int8_t
+								int8_t* spriteIndexPtr = reinterpret_cast<int8_t*>(reinterpret_cast<char*>(a_pObject) + a_Field.m_Options.relatedIndexFieldOffset);
+								int spriteIndex = spriteIndexPtr ? static_cast<int>(*spriteIndexPtr) : 0;
+
+								ShowTexturePreview(a_Field.m_sUIName, tex, spriteIndex);
+								return false;
+							};
+						break;
+					}
+					case FieldSerializationType::FieldSerializationType_Button:
+					{
+						func = [ptr, &a_Field, a_pObject]()
+							{
+								if (ImGui::TextButton(a_Field.m_sUIName, a_Field.m_sDescription))
+								{
+									if (a_Field.m_Options.buttonFunc)
+									{
+										a_Field.m_Options.buttonFunc(a_pObject);
+									}
+								}
+								return false;
+							};
+						break;
+					}
+					default:
+					{
+						break;
+					}
 				}
 
 				if (showTable)
 				{
 					return ImGui::KeyValue([&a_Field]
 						{
+							graphics::dx12::DX12System* dx12System = core::ENGINE->GetDX12();
+							if (!dx12System)
+							{
+								return false;
+							}
+
 							ImGui::AlignTextToFramePadding();
-							ImGui::DisplayHeader(core::EDITOR_ENGINE->GetDX12().GetImGuiWindow().GetBoldFont(), a_Field.m_sUIName);
+							ImGui::DisplayHeader(dx12System->GetImGuiWindow().GetBoldFont(), a_Field.m_sUIName);
 							ImGui::ShowTooltip(a_Field.m_sDescription);
+
+							return true;
 						}, [func, &a_Field]() {
 							bool wasDisabled = a_Field.m_Options.disabled;
 							if (wasDisabled)
 							{
-
 								ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
 								ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
 							}
@@ -629,7 +644,7 @@ namespace gallus
 							}
 
 							return success;
-							});
+						});
 				}
 
 				return false;
@@ -637,10 +652,15 @@ namespace gallus
 
 			bool RenderObjectFields(ISerializableObject* a_pObject, bool a_bInternal)
 			{
-				const auto& fields = a_pObject->GetEditorFields();
+				graphics::dx12::DX12System* dx12System = core::ENGINE->GetDX12();
+				if (!dx12System)
+				{
+					return false;
+				}
 
+				const auto& fields = a_pObject->GetEditorFields();
 				std::string id = ImGui::IMGUI_FORMAT_ID("", TABLE_ID, string_extensions::StringToUpper(std::string(a_pObject->GetTypeName())) + "_INSPECTOR");
-				bool tableActive = ImGui::StartInspectorKeyVal(id, core::EDITOR_ENGINE->GetDX12().GetImGuiWindow().GetFramePadding());
+				bool tableActive = ImGui::StartInspectorKeyVal(id, dx12System->GetImGuiWindow().GetFramePadding());
 
 				bool changed = false;
 				if (tableActive)
@@ -677,11 +697,17 @@ namespace gallus
 
 			bool ShowTransformGizmo(const ImRect& a_SceneViewRect, graphics::dx12::Transform& a_Transform)
 			{
+				graphics::dx12::DX12System* dx12System = core::ENGINE->GetDX12();
+				if (!dx12System)
+				{
+					return false;
+				}
+
 				DirectX::XMMATRIX pivotOffset = DirectX::XMMatrixTranslation(a_Transform.GetPivot().x, a_Transform.GetPivot().y, 0.0f);
 				DirectX::XMMATRIX objectMat = a_Transform.GetWorldMatrix();
 				objectMat = objectMat * pivotOffset;;
 
-				graphics::dx12::Camera& cam = core::ENGINE->GetDX12().GetActiveCamera();
+				graphics::dx12::Camera& cam = dx12System->GetActiveCamera();
 
 				DirectX::XMMATRIX viewMat = cam.GetViewMatrix(a_Transform.GetCameraType());
 				const DirectX::XMMATRIX& projMat = cam.GetProjectionMatrix(a_Transform.GetCameraType());

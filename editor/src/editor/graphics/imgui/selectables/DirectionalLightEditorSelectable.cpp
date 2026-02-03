@@ -7,12 +7,14 @@
 #include <imgui/imgui_helpers.h>
 
 // graphics
+#include "graphics/dx12/DX12System.h"
 #include "graphics/imgui/font_icon.h"
 
 // utils
 #include "utils/string_extensions.h"
 
 // gameplay
+#include "gameplay/EntityComponentSystem.h"
 #include "gameplay/Game.h"
 #include "gameplay/ECSBaseSystem.h"
 
@@ -33,7 +35,13 @@ namespace gallus
 
 			void DirectionalLightEditorSelectable::RenderEntity(bool& a_bClicked, bool& a_bDoubleClicked, bool a_bSelected)
 			{
-				auto light = core::EDITOR_ENGINE->GetDX12().GetDirectionalLight().lock();
+				graphics::dx12::DX12System* dx12System = core::ENGINE->GetDX12();
+				if (!dx12System)
+				{
+					return;
+				}
+
+				auto light = dx12System->GetDirectionalLight().lock();
 				if (!light)
 				{
 					return;
@@ -141,7 +149,19 @@ namespace gallus
 			{
 				bool changed = false;
 
-				std::lock_guard<std::recursive_mutex> lock(core::EDITOR_ENGINE->GetECS().m_EntityMutex);
+				gameplay::EntityComponentSystem* ecs = core::ENGINE->GetECS();
+				if (!ecs)
+				{
+					return false;
+				}
+
+				graphics::dx12::DX12System* dx12System = core::ENGINE->GetDX12();
+				if (!dx12System)
+				{
+					return false;
+				}
+
+				std::lock_guard<std::recursive_mutex> lock(ecs->m_EntityMutex);
 
 				ImGui::SetCursorPosY(0);
 				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
@@ -167,7 +187,7 @@ namespace gallus
 
 				if (m_bExpanded)
 				{
-					if (auto light = core::EDITOR_ENGINE->GetDX12().GetDirectionalLight().lock())
+					if (auto light = dx12System->GetDirectionalLight().lock())
 
 					if (RenderObjectFields(light.get()))
 					{
@@ -185,7 +205,13 @@ namespace gallus
 
 			bool DirectionalLightEditorSelectable::RenderGizmos(const ImRect& a_SceneViewRect)
 			{
-				if (RenderObjectGizmos(a_SceneViewRect, core::EDITOR_ENGINE->GetDX12().GetDirectionalLight().lock().get()))
+				graphics::dx12::DX12System* dx12System = core::ENGINE->GetDX12();
+				if (!dx12System)
+				{
+					return false;
+				}
+
+				if (RenderObjectGizmos(a_SceneViewRect, dx12System->GetDirectionalLight().lock().get()))
 				{
 					return true;
 				}

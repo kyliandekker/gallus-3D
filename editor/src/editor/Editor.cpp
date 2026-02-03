@@ -71,7 +71,13 @@ namespace gallus
 		//---------------------------------------------------------------------
 		void Editor::CopyGameFoV()
 		{
-			graphics::dx12::Camera& gameCamera = core::EDITOR_ENGINE->GetDX12().GetCamera();
+			graphics::dx12::DX12System* dx12System = core::ENGINE->GetDX12();
+			if (!dx12System)
+			{
+				return;
+			}
+
+			graphics::dx12::Camera& gameCamera = dx12System->GetCamera();
 			if (m_EditorCamera.GetFoV() == gameCamera.GetFoV())
 			{
 				return;
@@ -95,7 +101,13 @@ namespace gallus
 			m_CurrentScene.IsDirty().OnChanged() += std::bind(&Editor::SceneOrPrefabDirtyChanged, this, std::placeholders::_1, std::placeholders::_2);
 			m_Prefab.IsDirty().OnChanged() += std::bind(&Editor::SceneOrPrefabDirtyChanged, this, std::placeholders::_1, std::placeholders::_2);
 
-			core::EDITOR_ENGINE->GetDX12().SetDimensionDrawMode((graphics::dx12::DimensionDrawMode) m_EditorSettings.GetDimensionDrawMode());
+			graphics::dx12::DX12System* dx12System = core::ENGINE->GetDX12();
+			if (!dx12System)
+			{
+				return false;
+			}
+
+			dx12System->SetDimensionDrawMode((graphics::dx12::DimensionDrawMode) m_EditorSettings.GetDimensionDrawMode());
 
 			LOG(LOGSEVERITY_SUCCESS, LOG_CATEGORY_EDITOR, "Initialized editor.");
 

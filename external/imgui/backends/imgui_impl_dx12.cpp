@@ -560,7 +560,7 @@ bool    ImGui_ImplDX12_CreateDeviceObjects()
 
 		// Bilinear sampling is required by default. Set 'io.Fonts->Flags |= ImFontAtlasFlags_NoBakedLines' or 'style.AntiAliasedLinesUseTex = false' to allow point/nearest sampling.
 		D3D12_STATIC_SAMPLER_DESC staticSampler = {};
-		staticSampler.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+		staticSampler.Filter = D3D12_FILTER_MIN_MAG_MIP_POINT;
 		staticSampler.AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
 		staticSampler.AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
 		staticSampler.AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
@@ -873,7 +873,13 @@ static void ImGui_ImplDX12_CreateWindow(ImGuiViewport* viewport)
 	queue_desc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
 	queue_desc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
 
-	auto CQueue = gallus::core::ENGINE->GetDX12().GetCommandQueue();
+	gallus::graphics::dx12::DX12System* dx12System = gallus::core::ENGINE->GetDX12();
+	if (!dx12System)
+	{
+		return;
+	}
+
+	auto CQueue = dx12System->GetCommandQueue();
 	vd->CommandQueue = CQueue->GetCommandQueue().Get();
 	HRESULT res = 0;
 

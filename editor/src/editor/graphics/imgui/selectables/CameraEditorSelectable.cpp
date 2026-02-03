@@ -7,12 +7,14 @@
 #include <imgui/imgui_helpers.h>
 
 // graphics
+#include "graphics/dx12/DX12System.h"
 #include "graphics/imgui/font_icon.h"
 
 // utils
 #include "utils/string_extensions.h"
 
 // gameplay
+#include "gameplay/EntityComponentSystem.h"
 #include "gameplay/Game.h"
 #include "gameplay/ECSBaseSystem.h"
 
@@ -124,7 +126,13 @@ namespace gallus
 			{
 				bool changed = false;
 
-				std::lock_guard<std::recursive_mutex> lock(core::EDITOR_ENGINE->GetECS().m_EntityMutex);
+				gameplay::EntityComponentSystem* ecs = core::ENGINE->GetECS();
+				if (!ecs)
+				{
+					return false;
+				}
+
+				std::lock_guard<std::recursive_mutex> lock(ecs->m_EntityMutex);
 
 				ImGui::SetCursorPosY(0);
 				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
@@ -148,9 +156,15 @@ namespace gallus
 				ImGui::PopStyleVar();
 				ImGui::PopStyleVar();
 
+				graphics::dx12::DX12System* dx12System = core::ENGINE->GetDX12();
+				if (!dx12System)
+				{
+					return false;
+				}
+
 				if (m_bExpanded)
 				{
-					if (RenderObjectFields(&core::EDITOR_ENGINE->GetDX12().GetCamera()))
+					if (RenderObjectFields(&dx12System->GetCamera()))
 					{
 						changed = true;
 					}
@@ -167,7 +181,13 @@ namespace gallus
 			//---------------------------------------------------------------------
 			bool CameraEditorSelectable::RenderGizmos(const ImRect& a_SceneViewRect)
 			{
-				if (RenderObjectGizmos(a_SceneViewRect, &core::EDITOR_ENGINE->GetDX12().GetCamera()))
+				graphics::dx12::DX12System* dx12System = core::ENGINE->GetDX12();
+				if (!dx12System)
+				{
+					return false;
+				}
+
+				if (RenderObjectGizmos(a_SceneViewRect, &dx12System->GetCamera()))
 				{
 					return true;
 				}

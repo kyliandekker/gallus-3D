@@ -129,26 +129,6 @@ namespace gallus
 #endif // _LOAD_BY_PATH
 
 			//---------------------------------------------------------------------
-			void Material::LoadMetaData()
-			{
-				if (m_Path.empty())
-				{
-					return;
-				}
-
-				core::Data data;
-				file::LoadFile(m_Path.generic_string(), data);
-				resources::SrcData srcData(data);
-
-				if (!srcData.IsValid())
-				{
-					return;
-				}
-
-				DeserializeFields(this, srcData, SerializationMethod::SerializationMethod_File);
-			}
-
-			//---------------------------------------------------------------------
 			void Material::Bind(std::shared_ptr<CommandList> a_CommandList)
 			{
 				if (!m_pResource)

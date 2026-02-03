@@ -26,6 +26,9 @@
 #include "editor/core/EditorEngine.h"
 #include "editor/graphics/imgui/RenderSerializableObject.h"
 
+// resources
+#include "resources/ResourceAtlas.h"
+
 namespace gallus
 {
 	namespace graphics
@@ -79,6 +82,12 @@ namespace gallus
 					return;
 				}
 
+				resources::ResourceAtlas* resourceAtlas = core::ENGINE->GetResourceAtlas();
+				if (!resourceAtlas)
+				{
+					return;
+				}
+
 				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, m_Window.GetWindowPadding());
 				ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, m_Window.GetWindowPadding());
 				ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, m_Window.GetWindowPadding());
@@ -103,7 +112,7 @@ namespace gallus
 
 					if (m_bTexturesFoldedOut)
 					{
-						auto& textures = core::EDITOR_ENGINE->GetResourceAtlas().GetTextures();
+						auto& textures = resourceAtlas->GetTextures();
 						for (std::shared_ptr<graphics::dx12::Texture> texture : textures)
 						{
 							ImGui::Indent();
@@ -124,7 +133,7 @@ namespace gallus
 
 					if (m_bMeshesFoldedOut)
 					{
-						auto& meshes = core::EDITOR_ENGINE->GetResourceAtlas().GetMeshes();
+						auto& meshes = resourceAtlas->GetMeshes();
 						for (std::shared_ptr<graphics::dx12::Mesh> mesh : meshes)
 						{
 							ImGui::Indent();
@@ -145,7 +154,7 @@ namespace gallus
 
 					if (m_bMaterialsFoldedOut)
 					{
-						auto& materials = core::EDITOR_ENGINE->GetResourceAtlas().GetMaterials();
+						auto& materials = resourceAtlas->GetMaterials();
 						for (std::shared_ptr<graphics::dx12::Material> material : materials)
 						{
 							ImGui::Indent();
@@ -166,7 +175,7 @@ namespace gallus
 
 					if (m_bPixelShadersFoldedOut)
 					{
-						auto& pixelShaders = core::EDITOR_ENGINE->GetResourceAtlas().GetPixelShaders();
+						auto& pixelShaders = resourceAtlas->GetPixelShaders();
 						for (std::shared_ptr<graphics::dx12::PixelShader> shader : pixelShaders)
 						{
 							ImGui::Indent();
@@ -187,7 +196,7 @@ namespace gallus
 
 					if (m_bVertexShadersFoldedOut)
 					{
-						auto& vertexShaders = core::EDITOR_ENGINE->GetResourceAtlas().GetVertexShaders();
+						auto& vertexShaders = resourceAtlas->GetVertexShaders();
 						for (std::shared_ptr<graphics::dx12::VertexShader> shader : vertexShaders)
 						{
 							ImGui::Indent();

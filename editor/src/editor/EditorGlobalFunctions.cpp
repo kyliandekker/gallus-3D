@@ -3,8 +3,13 @@
 // editor
 #include "editor/core/EditorEngine.h"
 
+// gameplay
+#include "gameplay/EntityComponentSystem.h"
 #include "gameplay/ECSBaseSystem.h"
 #include "gameplay/Prefab.h"
+
+// resources
+#include "resources/ResourceAtlas.h"
 
 namespace gallus
 {
@@ -12,13 +17,19 @@ namespace gallus
 	{
 		void g_SaveScene()
 		{
+			resources::ResourceAtlas* resourceAtlas = core::ENGINE->GetResourceAtlas();
+			if (!resourceAtlas)
+			{
+				return;
+			}
+
 			if (!core::EDITOR_ENGINE->GetEditor().GetScene().IsValid())
 			{
 				fs::path scenePath;
 				if (file::SaveFile(scenePath, {
 					{ L"Scene Files (*.scene)", L"*.scene" },
 					{ L"Prefab Files (*.prefab)", L"*.prefab" },
-					}, core::EDITOR_ENGINE->GetResourceAtlas().GetResourceFolder().GetPath()))
+					}, resourceAtlas->GetResourceFolder().GetPath()))
 				{
 					if (scenePath.extension() == ".scene")
 					{
@@ -53,13 +64,19 @@ namespace gallus
 		{
 			gameplay::EntityID entityID;
 
+			gameplay::EntityComponentSystem* ecs = core::ENGINE->GetECS();
+			if (!ecs)
+			{
+				return entityID;
+			}
+
 			if (a_sName.empty())
 			{
-				entityID = core::EDITOR_ENGINE->GetECS().CreateEntity(core::EDITOR_ENGINE->GetECS().GetUniqueName("New GameObject"));
+				entityID = ecs->CreateEntity(ecs->GetUniqueName("New GameObject"));
 			}
 			else
 			{
-				entityID = core::EDITOR_ENGINE->GetECS().CreateEntity(core::EDITOR_ENGINE->GetECS().GetUniqueName(a_sName));
+				entityID = ecs->CreateEntity(ecs->GetUniqueName(a_sName));
 			}
 
 			core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
@@ -76,13 +93,25 @@ namespace gallus
 
 		void g_DeleteEntity(const gameplay::EntityID& a_EntityID)
 		{
-			core::EDITOR_ENGINE->GetECS().DeleteEntity(a_EntityID);
+			gameplay::EntityComponentSystem* ecs = core::ENGINE->GetECS();
+			if (!ecs)
+			{
+				return;
+			}
+
+			ecs->DeleteEntity(a_EntityID);
 			core::EDITOR_ENGINE->GetEditor().GetScene().SetIsDirty(true);
 		}
 
 		void g_SetEntityActive(const gameplay::EntityID& a_EntityID, bool a_bActive)
 		{
-			auto ent = core::EDITOR_ENGINE->GetECS().GetEntity(a_EntityID).lock();
+			gameplay::EntityComponentSystem* ecs = core::ENGINE->GetECS();
+			if (!ecs)
+			{
+				return;
+			}
+
+			auto ent = ecs->GetEntity(a_EntityID).lock();
 			if (!ent)
 			{
 				return;
@@ -99,7 +128,13 @@ namespace gallus
 
 		void g_RenameEntity(const gameplay::EntityID& a_EntityID, const std::string& a_sName)
 		{
-			auto ent = core::EDITOR_ENGINE->GetECS().GetEntity(a_EntityID).lock();
+			gameplay::EntityComponentSystem* ecs = core::ENGINE->GetECS();
+			if (!ecs)
+			{
+				return;
+			}
+
+			auto ent = ecs->GetEntity(a_EntityID).lock();
 			if (!ent)
 			{
 				return;

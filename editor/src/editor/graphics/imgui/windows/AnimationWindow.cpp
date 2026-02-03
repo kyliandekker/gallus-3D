@@ -26,6 +26,9 @@
 // editor
 #include "editor/core/EditorEngine.h"
 
+// resources
+#include "resources/FileResource.h"
+
 namespace gallus
 {
 	namespace graphics

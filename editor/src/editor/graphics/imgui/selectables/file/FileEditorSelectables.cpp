@@ -4,19 +4,17 @@
 #include <imgui/imgui.h>
 #include <imgui/imgui_helpers.h>
 
+// core
+#include "core/DataStream.h"
+
 // graphics
+#include "graphics/dx12/DX12System.h"
 #include "graphics/dx12/Texture.h"
 
 #include "graphics/imgui/ImGuiWindow.h"
 
-// audio
-#include "audio/WaveReader.h"
-#include "audio/ChunkCollection.h"
-#include "audio/WaveChunks.h"
-#include "audio/ChunkFilter.h"
-#include "audio/AudioUtils.h"
-
 // resources
+#include "resources/ResourceAtlas.h"
 #include "resources/FileResource.h"
 
 // gameplay
@@ -29,6 +27,9 @@
 #include "editor/graphics/imgui/RenderSerializableObject.h"
 
 #include "resources/SrcData.h"
+
+// utils
+#include "utils/file_abstractions.h"
 
 namespace gallus
 {
@@ -132,8 +133,7 @@ namespace gallus
 						bool changed = m_AssetTypeDropdown.Render(ImGui::IMGUI_FORMAT_ID("", COMBO_ID, "ASSETTYPE_SHADER_EXPLORER_ITEM_INSPECTOR").c_str());
 						if (changed)
 						{
-							//a_FileEditorSelectable.GetFileResource().SetAssetType(m_AssetTypeDropdown.GetValue());
-							//a_FileEditorSelectable.GetFileResource().Save(a_FileEditorSelectable.GetFileResource().GetPath());
+							// TODO
 						}
 						return changed;
 					});
@@ -142,11 +142,21 @@ namespace gallus
 
 			SpriteFileEditorSelectables::SpriteFileEditorSelectables(ImGuiWindow& a_Window, FileEditorSelectable& a_FileEditorSelectable) : FileEditorSelectables(a_Window, a_FileEditorSelectable)
 			{
-				auto cCommandQueue =
-					core::EDITOR_ENGINE->GetDX12()
-					.GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
+				graphics::dx12::DX12System* dx12System = core::ENGINE->GetDX12();
+				if (!dx12System)
+				{
+					return;
+				}
 
-				m_pTexture = core::EDITOR_ENGINE->GetResourceAtlas().LoadTexture(a_FileEditorSelectable.GetName(), cCommandQueue);
+				resources::ResourceAtlas* resourceAtlas = core::ENGINE->GetResourceAtlas();
+				if (!resourceAtlas)
+				{
+					return;
+				}
+
+				auto cCommandQueue = dx12System->GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
+
+				m_pTexture = resourceAtlas->LoadTexture(a_FileEditorSelectable.GetName(), cCommandQueue);
 			}
 
 			int GetFormatChannelCount(DXGI_FORMAT format)
@@ -218,14 +228,14 @@ namespace gallus
 					return;
 				}
 
+				graphics::dx12::TextureType textureType = texture->GetTextureType();
 				if (RenderObjectFields(texture.get(), false))
 				{
 					SaveMetaData(a_FileEditorSelectable.GetFileResource(), texture.get());
 				}
-
-				if (ImGui::Button("Test"))
+				if (textureType != texture->GetTextureType())
 				{
-					SaveMetaData(a_FileEditorSelectable.GetFileResource(), texture.get());
+					texture->LoadMetaData();
 				}
 
 				ImVec2 size = m_Window.GetHeaderSize();
@@ -233,50 +243,6 @@ namespace gallus
 					FOLDOUT_ID, "TEX_SHOW_INFO_INSPECTOR");
 				ImGui::FoldOutButton(
 					std::string((m_bShowInfo ? font::ICON_FOLDED_OUT : font::ICON_FOLDED_IN) + id).c_str(), &m_bShowInfo, ImVec2(ImGui::GetContentRegionAvail().x, size.y));
-				
-				if (m_bShowInfo)
-				{
-					ImGui::Indent();
-					ImGui::StartInspectorKeyVal(ImGui::IMGUI_FORMAT_ID("", TABLE_ID, "SPRITE_EXPLORER_ITEM_TABLE_INSPECTOR"), m_Window.GetFramePadding());
-
-					ImGui::KeyValue([this]
-						{
-							ImGui::AlignTextToFramePadding();
-							ImGui::DisplayHeader(m_Window.GetBoldFont(), "Width: ");
-						},
-						[this, texture]
-						{
-							ImGui::Text(std::to_string(texture->GetResourceDesc().Width).c_str());
-							return false;
-						});
-					ImGui::KeyValue([this]
-						{
-							ImGui::AlignTextToFramePadding();
-							ImGui::DisplayHeader(m_Window.GetBoldFont(), "Height: ");
-						},
-						[this, texture]
-						{
-							ImGui::Text(std::to_string(texture->GetResourceDesc().Height).c_str());
-							return false;
-						});
-					ImGui::KeyValue([this]
-						{
-							ImGui::AlignTextToFramePadding();
-							ImGui::DisplayHeader(m_Window.GetBoldFont(), "Channels: ");
-						},
-						[this, texture]
-						{
-							ImGui::Text(std::to_string(GetFormatChannelCount(texture->GetResourceDesc().Format)).c_str());
-							return false;
-						});
-					ImGui::EndInspectorKeyVal(m_Window.GetFramePadding());
-					ImGui::Unindent();
-				}
-
-				float width = ImGui::GetContentRegionAvail().x;
-				if (texture->GetTextureType() == graphics::dx12::TextureType::SpriteSheet && ImGui::TextButton(ImGui::IMGUI_FORMAT_ID(font::ICON_IMAGE + std::string(" Open Sprite Editor"), BUTTON_ID, "OPEN_SPRITE_EDITOR_INSPECTOR").c_str(), "Opens the sprite editor for the selected sprite sheet.", ImVec2(width, 0)))
-				{
-				}
 
 				// Sprite dimensions
 				float spriteW = 0.0f;
@@ -315,26 +281,108 @@ namespace gallus
 				float drawW = spriteW * scale;
 				float drawH = spriteH * scale;
 
-				ShowTexturePreview(ImGui::IMGUI_FORMAT_ID("", "IMAGE", "TEX_PREVIEW_INSPECTOR"), texture.get(), m_iCurrentSpriteIndex, {drawW, drawH});
+				if (m_bShowInfo)
+				{
+					ImGui::Indent();
+					ImGui::StartInspectorKeyVal(ImGui::IMGUI_FORMAT_ID("", TABLE_ID, "SPRITE_EXPLORER_ITEM_TABLE_INSPECTOR"), m_Window.GetFramePadding());
 
-				ImGui::SetCursorScreenPos({ texturePos.x, texturePos.y + (drawH / 2) });
-				if (ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_PREVIOUS, BUTTON_ID, "PREV_TEX_INDEX_PREVIEW_INSPECTOR").c_str()))
-				{
-					m_iCurrentSpriteIndex--;
-					if (m_iCurrentSpriteIndex < 0) m_iCurrentSpriteIndex = texture->GetSpriteRectsSize() - 1; // wrap around
+					ImGui::KeyValue([this]
+						{
+							ImGui::AlignTextToFramePadding();
+							ImGui::DisplayHeader(m_Window.GetBoldFont(), "Width: ");
+						},
+						[this, texture]
+						{
+							ImGui::Text(std::to_string(texture->GetResourceDesc().Width).c_str());
+							return false;
+						});
+					ImGui::KeyValue([this]
+						{
+							ImGui::AlignTextToFramePadding();
+							ImGui::DisplayHeader(m_Window.GetBoldFont(), "Height: ");
+						},
+						[this, texture]
+						{
+							ImGui::Text(std::to_string(texture->GetResourceDesc().Height).c_str());
+							return false;
+						});
+					ImGui::KeyValue([this]
+						{
+							ImGui::AlignTextToFramePadding();
+							ImGui::DisplayHeader(m_Window.GetBoldFont(), "Channels: ");
+						},
+						[this, texture]
+						{
+							ImGui::Text(std::to_string(GetFormatChannelCount(texture->GetResourceDesc().Format)).c_str());
+							return false;
+						});
+
+					if (texture->GetTextureType() == graphics::dx12::TextureType::SpriteSheet)
+					{
+						ImGui::KeyValue([this]
+							{
+								ImGui::AlignTextToFramePadding();
+								ImGui::DisplayHeader(m_Window.GetBoldFont(), "");
+							},
+							[this, &spriteW]
+							{
+								return false;
+							});
+						ImGui::KeyValue([this]
+							{
+								ImGui::AlignTextToFramePadding();
+								ImGui::DisplayHeader(m_Window.GetBoldFont(), "Width: ");
+							},
+							[this, &spriteW]
+							{
+								int width = static_cast<int>(spriteW);
+								ImGui::Text(std::to_string(width).c_str());
+								return false;
+							});
+						ImGui::KeyValue([this]
+							{
+								ImGui::AlignTextToFramePadding();
+								ImGui::DisplayHeader(m_Window.GetBoldFont(), "Height: ");
+							},
+							[this, &spriteH]
+							{
+								int height = static_cast<int>(spriteH);
+								ImGui::Text(std::to_string(height).c_str());
+								return false;
+							});
+					}
+
+					ImGui::EndInspectorKeyVal(m_Window.GetFramePadding());
+					ImGui::Unindent();
 				}
-				ImGui::SetCursorScreenPos({ (texturePos.x + drawW) - size.x, texturePos.y + (drawH / 2)});
-				if (ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_NEXT, BUTTON_ID, "NEXT_TEX_INDEX_PREVIEW_INSPECTOR").c_str()))
+
+				float width = ImGui::GetContentRegionAvail().x;
+				if (texture->GetTextureType() == graphics::dx12::TextureType::SpriteSheet && ImGui::TextButton(ImGui::IMGUI_FORMAT_ID(font::ICON_IMAGE + std::string(" Open Sprite Editor"), BUTTON_ID, "OPEN_SPRITE_EDITOR_INSPECTOR").c_str(), "Opens the sprite editor for the selected sprite sheet.", ImVec2(width, 0)))
 				{
-					m_iCurrentSpriteIndex++;
-					if (m_iCurrentSpriteIndex >= texture->GetSpriteRectsSize()) m_iCurrentSpriteIndex = 0; // wrap around
+				}
+
+				ImGui::Image(texture->GetGPUHandle().ptr, { drawW, drawH }, uv0, uv1);
+
+				if (texture->GetTextureType() == graphics::dx12::TextureType::SpriteSheet)
+				{
+					ImGui::SetCursorScreenPos({ texturePos.x, texturePos.y + (drawH / 2) });
+					if (ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_PREVIOUS, BUTTON_ID, "PREV_TEX_INDEX_PREVIEW_INSPECTOR").c_str()))
+					{
+						m_iCurrentSpriteIndex--;
+					}
+					ImGui::SetCursorScreenPos({ (texturePos.x + drawW) - size.x, texturePos.y + (drawH / 2) });
+					if (ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_NEXT, BUTTON_ID, "NEXT_TEX_INDEX_PREVIEW_INSPECTOR").c_str()))
+					{
+						m_iCurrentSpriteIndex++;
+					}
+					if (m_iCurrentSpriteIndex < 0) m_iCurrentSpriteIndex = texture->GetSpriteRectsSize() - 1; // wrap around
+					if (m_iCurrentSpriteIndex >= texture->GetSpriteRectsSize() || m_iCurrentSpriteIndex < 0) m_iCurrentSpriteIndex = 0; // wrap around
 				}
 			}
 
 			AudioFileEditorSelectables::AudioFileEditorSelectables(ImGuiWindow& a_Window, FileEditorSelectable& a_FileEditorSelectable) : FileEditorSelectables(a_Window, a_FileEditorSelectable),
 				m_AssetTypeDropdown(a_Window)
 			{
-				LoadAudioData(a_FileEditorSelectable);
 			}
 
 			void AudioFileEditorSelectables::Render(FileEditorSelectable& a_FileEditorSelectable)
@@ -355,152 +403,17 @@ namespace gallus
 						}
 						return false;
 					});
-
-				audio::FMT_Chunk fmt_chunk;
-				audio::WAVE_READER_RESULT result = m_SongData.GetChunkFromData(fmt_chunk, audio::FMT_CHUNK_ID);
-				bool hasFmt = !(WAVEREADERFAILED(result));
-				if (hasFmt)
-				{
-					ImGui::KeyValue([this]
-						{
-							ImGui::AlignTextToFramePadding();
-							ImGui::DisplayHeader(m_Window.GetBoldFont(), "Bits per Sample: ");
-						},
-						[&fmt_chunk]
-						{
-							ImGui::Text(std::to_string(fmt_chunk.m_iBitsPerSample).c_str());
-							return false;
-						});
-					ImGui::KeyValue([this]
-						{
-							ImGui::AlignTextToFramePadding();
-							ImGui::DisplayHeader(m_Window.GetBoldFont(), "Channels: ");
-						},
-						[&fmt_chunk]
-						{
-							ImGui::Text(std::to_string(fmt_chunk.m_iNumChannels).c_str());
-							return false;
-						});
-					ImGui::KeyValue([this]
-						{
-							ImGui::AlignTextToFramePadding();
-							ImGui::DisplayHeader(m_Window.GetBoldFont(), "Sample Rate: ");
-						},
-						[&fmt_chunk]
-						{
-							ImGui::Text(std::to_string(fmt_chunk.m_iSampleRate).c_str());
-							return false;
-						});
-					ImGui::KeyValue([this]
-						{
-							ImGui::AlignTextToFramePadding();
-							ImGui::DisplayHeader(m_Window.GetBoldFont(), "Byte Rate: ");
-							return false;
-						},
-						[&fmt_chunk]
-						{
-							ImGui::Text(std::to_string(fmt_chunk.m_iByteRate).c_str());
-							return false;
-						});
-				}
-
-				audio::DATA_Chunk data_chunk;
-				result = m_SongData.GetChunkFromData(data_chunk, audio::DATA_CHUNK_ID);
-				bool hasData = !(WAVEREADERFAILED(result));
-				if (hasData)
-				{
-					ImGui::KeyValue([this]
-						{
-							ImGui::AlignTextToFramePadding();
-							ImGui::DisplayHeader(m_Window.GetBoldFont(), "Data Size: ");
-						},
-						[&data_chunk]
-						{
-							ImGui::Text(std::to_string(data_chunk.ChunkSize()).c_str());
-							return false;
-						});
-				}
-
-				if (hasFmt && hasData)
-				{
-					ImGui::KeyValue([this]
-						{
-							ImGui::AlignTextToFramePadding();
-							ImGui::DisplayHeader(m_Window.GetBoldFont(), "Song Length: ");
-						},
-						[&data_chunk, &fmt_chunk]
-						{
-							ImGui::Text(
-								audio::FormatDuration(audio::PosToSeconds(data_chunk.ChunkSize(), fmt_chunk.m_iByteRate), true).c_str()
-							);
-							return false;
-						});
-				}
-				ImGui::EndInspectorKeyVal(m_Window.GetFramePadding());
-			}
-
-			constexpr int MAX_SAMPLES = 70560;
-			bool AudioFileEditorSelectables::LoadAudioData(FileEditorSelectable& a_FileEditorSelectable)
-			{
-				std::string chunks = "fmt data";
-				audio::ChunkFilter filters{ chunks.c_str(), chunks.size() / audio::CHUNK_ID_SIZE };
-
-				fs::path path = a_FileEditorSelectable.GetFileResource().GetPath().lexically_normal();
-
-				size_t size = 0;
-				audio::WAVE_READER_RESULT result = audio::WaveReader::FTell(path.generic_string().c_str(), size, filters);
-				if (WAVEREADERFAILED(result))
-				{
-					return false;
-				}
-
-				if (size == 0)
-				{
-					return false;
-				}
-
-				m_SongData = audio::ChunkCollection(size);
-				result = audio::WaveReader::LoadWave(path.generic_string().c_str(), m_SongData, filters);
-				if (WAVEREADERFAILED(result))
-				{
-					return false;
-				}
-
-				audio::FMT_Chunk fmt_chunk;
-				result = m_SongData.GetChunkFromData(fmt_chunk, audio::FMT_CHUNK_ID);
-
-				if (WAVEREADERFAILED(result))
-				{
-					return false;
-				}
-
-				if (fmt_chunk.m_iBitsPerSample != audio::WAVE_BITS_PER_SAMPLE_8 && fmt_chunk.m_iBitsPerSample != audio::WAVE_BITS_PER_SAMPLE_16 && fmt_chunk.m_iBitsPerSample != audio::WAVE_BITS_PER_SAMPLE_24 && fmt_chunk.m_iBitsPerSample != audio::WAVE_BITS_PER_SAMPLE_32 && fmt_chunk.m_iBitsPerSample != audio::WAVE_BITS_PER_SAMPLE_64)
-				{
-					return false;
-				}
-				if (fmt_chunk.m_iNumChannels * fmt_chunk.m_iBitsPerSample / 8 != fmt_chunk.m_iBlockAlign)
-				{
-					return false;
-				}
-				if (fmt_chunk.m_iSampleRate * fmt_chunk.m_iNumChannels * fmt_chunk.m_iBitsPerSample / 8 != fmt_chunk.m_iByteRate)
-				{
-					return false;
-				}
-				if (fmt_chunk.m_iNumChannels > audio::WAVE_CHANNELS_STEREO)
-				{
-					return false;
-				}
-				if (fmt_chunk.m_iNumChannels < audio::WAVE_CHANNELS_MONO)
-				{
-					return false;
-				}
-
-				return true;
 			}
 
 			MaterialFileEditorSelectables::MaterialFileEditorSelectables(ImGuiWindow& a_Window, FileEditorSelectable& a_FileEditorSelectable) : FileEditorSelectables(a_Window, a_FileEditorSelectable)
 			{
-				m_pMaterial = core::EDITOR_ENGINE->GetResourceAtlas().LoadMaterial(a_FileEditorSelectable.GetFileResource().GetPath().filename().generic_string());
+				resources::ResourceAtlas* resourceAtlas = core::ENGINE->GetResourceAtlas();
+				if (!resourceAtlas)
+				{
+					return;
+				}
+
+				m_pMaterial = resourceAtlas->LoadMaterial(a_FileEditorSelectable.GetFileResource().GetPath().filename().generic_string());
 			}
 
 			void MaterialFileEditorSelectables::Render(FileEditorSelectable& a_FileEditorSelectable)

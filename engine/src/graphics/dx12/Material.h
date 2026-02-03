@@ -53,8 +53,6 @@ namespace gallus
 				bool LoadByPath(const fs::path& a_MaterialPath) override;
 #endif // _LOAD_BY_PATH
 
-				void LoadMetaData();
-
 				void SetColor(DirectX::XMFLOAT4 a_vColor)
 				{
 					m_MaterialData.DiffuseColor = a_vColor;

@@ -19,6 +19,7 @@
 #include "utils/string_extensions.h"
 
 // gameplay
+#include "gameplay/EntityComponentSystem.h"
 #include "gameplay/Game.h"
 #include "gameplay/ECSBaseSystem.h"
 #include "gameplay/systems/AnimationSystem.h"
@@ -124,11 +125,17 @@ namespace gallus
 					ImGui::OpenPopup(ImGui::IMGUI_FORMAT_ID("", POPUP_WINDOW_ID, "ADD_KEY_FRAME_COMPONENT_MENU_INSPECTOR").c_str());
 				}
 
+				gameplay::EntityComponentSystem* ecs = core::ENGINE->GetECS();
+				if (!ecs)
+				{
+					return false;
+				}
+
 				ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, m_Window.GetFramePadding());
 				ImGui::SetNextWindowSize(ImVec2(width, 0));
 				if (ImGui::BeginPopup(ImGui::IMGUI_FORMAT_ID("", POPUP_WINDOW_ID, "ADD_KEY_FRAME_COMPONENT_MENU_INSPECTOR").c_str()))
 				{
-					for (auto* sys : core::EDITOR_ENGINE->GetECS().GetSystem<gameplay::AnimationSystem>()->GetSystems())
+					for (auto* sys : ecs->GetSystem<gameplay::AnimationSystem>()->GetSystems())
 					{
 						bool found = false;
 						for (animation::AnimationKeyFrameComponentBase* component : m_KeyFrame.GetComponents())

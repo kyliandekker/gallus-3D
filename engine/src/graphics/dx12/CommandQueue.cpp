@@ -32,7 +32,13 @@ namespace gallus
 				desc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
 				desc.NodeMask = 0;
 
-				Microsoft::WRL::ComPtr<ID3D12Device2>& device = core::ENGINE->GetDX12().GetDevice();
+				graphics::dx12::DX12System* dx12System = core::ENGINE->GetDX12();
+				if (!dx12System)
+				{
+					return;
+				}
+
+				Microsoft::WRL::ComPtr<ID3D12Device2>& device = dx12System->GetDevice();
 				if (FAILED(device->CreateCommandQueue(&desc, IID_PPV_ARGS(&m_pCommandQueue))))
 				{
 					LOG(LOGSEVERITY_ERROR, LOG_CATEGORY_DX12, "Failed creating command queue.");
@@ -55,7 +61,13 @@ namespace gallus
 			//---------------------------------------------------------------------
 			std::shared_ptr<CommandList> CommandQueue::GetCommandList()
 			{
-				Microsoft::WRL::ComPtr<ID3D12Device2>& device = core::ENGINE->GetDX12().GetDevice();
+				graphics::dx12::DX12System* dx12System = core::ENGINE->GetDX12();
+				if (!dx12System)
+				{
+					return nullptr;
+				}
+
+				Microsoft::WRL::ComPtr<ID3D12Device2>& device = dx12System->GetDevice();
 				Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator;
 				std::shared_ptr<CommandList> commandList = std::make_shared<CommandList>();
 
@@ -172,7 +184,13 @@ namespace gallus
 			//---------------------------------------------------------------------
 			Microsoft::WRL::ComPtr<ID3D12CommandAllocator> CommandQueue::CreateCommandAllocator()
 			{
-				Microsoft::WRL::ComPtr<ID3D12Device2>& device = core::ENGINE->GetDX12().GetDevice();
+				graphics::dx12::DX12System* dx12System = core::ENGINE->GetDX12();
+				if (!dx12System)
+				{
+					return nullptr;
+				}
+
+				Microsoft::WRL::ComPtr<ID3D12Device2>& device = dx12System->GetDevice();
 				Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator = nullptr;
 				if (FAILED(device->CreateCommandAllocator(m_CommandListType, IID_PPV_ARGS(&commandAllocator))))
 				{

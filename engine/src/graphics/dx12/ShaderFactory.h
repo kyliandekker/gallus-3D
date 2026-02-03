@@ -112,8 +112,14 @@ namespace gallus
 						return nullptr;
 					}
 
+					graphics::dx12::DX12System* dx12System = core::ENGINE->GetDX12();
+					if (!dx12System)
+					{
+						return nullptr;
+					}
+
 					PipelineStateStream pipelineStateStream;
-					pipelineStateStream.pRootSignature = core::ENGINE->GetDX12().GetRootSignature().Get();
+					pipelineStateStream.pRootSignature = dx12System->GetRootSignature().Get();
 					pipelineStateStream.InputLayout = { g_aInputLayout, _countof(g_aInputLayout) };
 					pipelineStateStream.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 					pipelineStateStream.PS = CD3DX12_SHADER_BYTECODE(ps->GetShaderBlob().Get());
@@ -132,7 +138,7 @@ namespace gallus
 					desc.pPipelineStateSubobjectStream = &pipelineStateStream;
 
 					ID3D12PipelineState* pso = nullptr;
-					if (FAILED(core::ENGINE->GetDX12().GetDevice()->CreatePipelineState(&desc, IID_PPV_ARGS(&pso))))
+					if (FAILED(dx12System->GetDevice()->CreatePipelineState(&desc, IID_PPV_ARGS(&pso))))
 					{
 						LOG(LOGSEVERITY_ERROR, LOG_CATEGORY_DX12, "Failed creating pipeline state.");
 						return nullptr;

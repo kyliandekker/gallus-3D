@@ -10,6 +10,8 @@
 // logger
 #include "logger/Logger.h"
 
+// gameplay
+#include "gameplay/EntityComponentSystem.h"
 #include "gameplay/systems/AnimationSystem.h"
 
 // utils
@@ -18,6 +20,7 @@
 // resources
 #include "resources/SrcData.h"
 
+// animation
 #include "animation/AnimationEvents.h"
 #include "animation/AnimationKeyFrame.h"
 
@@ -75,6 +78,12 @@ namespace gallus
 			}
 			m_aKeyFrames.clear();
 
+			gameplay::EntityComponentSystem* ecs = core::ENGINE->GetECS();
+			if (!ecs)
+			{
+				return false;
+			}
+
 			std::vector<std::string> memberNames;
 			keyFramesSrcData.GetAllMemberNames(memberNames);
 			for (const std::string& name : memberNames)
@@ -96,7 +105,7 @@ namespace gallus
 					continue;
 				}
 
-				for (auto* sys : core::ENGINE->GetECS().GetSystem<gameplay::AnimationSystem>()->GetSystems())
+				for (auto* sys : ecs->GetSystem<gameplay::AnimationSystem>()->GetSystems())
 				{
 					resources::SrcData sysSrcData;
 					if (!componentsSrcData.GetSrcObject(sys->GetPropertyName(), sysSrcData))
@@ -125,7 +134,13 @@ namespace gallus
 			{
 				case AnimationEvent::AnimationEvent_Delete:
 				{
-					core::ENGINE->GetECS().DeleteEntity(a_EntityID);
+					gameplay::EntityComponentSystem* ecs = core::ENGINE->GetECS();
+					if (!ecs)
+					{
+						return;
+					}
+
+					ecs->DeleteEntity(a_EntityID);
 				}
 				default:
 				case AnimationEvent::AnimationEvent_None:

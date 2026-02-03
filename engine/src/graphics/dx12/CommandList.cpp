@@ -26,7 +26,13 @@ namespace gallus
 			//---------------------------------------------------------------------
 			bool CommandList::CreateCommandList(Microsoft::WRL::ComPtr<ID3D12CommandAllocator>& a_pAllocator, D3D12_COMMAND_LIST_TYPE a_CommandListType)
 			{
-				Microsoft::WRL::ComPtr<ID3D12Device2>& device = core::ENGINE->GetDX12().GetDevice();
+				graphics::dx12::DX12System* dx12System = core::ENGINE->GetDX12();
+				if (!dx12System)
+				{
+					return false;
+				}
+
+				Microsoft::WRL::ComPtr<ID3D12Device2>& device = dx12System->GetDevice();
 				if (FAILED(device->CreateCommandList(0, a_CommandListType, a_pAllocator.Get(), nullptr, IID_PPV_ARGS(&m_pCommandList))))
 				{
 					LOG(LOGSEVERITY_ERROR, LOG_CATEGORY_DX12, "Failed creating command list.");
@@ -48,8 +54,14 @@ namespace gallus
 				const CD3DX12_HEAP_PROPERTIES defaultHeaptype = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
 				const CD3DX12_RESOURCE_DESC buffer = CD3DX12_RESOURCE_DESC::Buffer(bufferSize, a_Flags);
 
+				graphics::dx12::DX12System* dx12System = core::ENGINE->GetDX12();
+				if (!dx12System)
+				{
+					return;
+				}
+
 				// Create a committed resource for the GPU resource in a default heap.
-				Microsoft::WRL::ComPtr<ID3D12Device2>& device = core::ENGINE->GetDX12().GetDevice();
+				Microsoft::WRL::ComPtr<ID3D12Device2>& device = dx12System->GetDevice();
 				if (FAILED(device->CreateCommittedResource(
 					&defaultHeaptype,
 					D3D12_HEAP_FLAG_NONE,
@@ -67,7 +79,7 @@ namespace gallus
 				{
 					const CD3DX12_HEAP_PROPERTIES uploadHeaptype = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
 					const CD3DX12_RESOURCE_DESC buff = CD3DX12_RESOURCE_DESC::Buffer(bufferSize);
-					Microsoft::WRL::ComPtr<ID3D12Device2>& device = core::ENGINE->GetDX12().GetDevice();
+					Microsoft::WRL::ComPtr<ID3D12Device2>& device = dx12System->GetDevice();
 					if (FAILED(device->CreateCommittedResource(
 						&uploadHeaptype,
 						D3D12_HEAP_FLAG_NONE,

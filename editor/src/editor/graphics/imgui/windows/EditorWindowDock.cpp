@@ -18,6 +18,9 @@
 
 #include "editor/EditorGlobalFunctions.h"
 
+// resources
+#include "resources/ResourceAtlas.h"
+
 namespace gallus
 {
 	namespace graphics
@@ -29,6 +32,12 @@ namespace gallus
 
 			void EditorWindowDock::Render()
 			{
+				resources::ResourceAtlas* resourceAtlas = core::ENGINE->GetResourceAtlas();
+				if (!resourceAtlas)
+				{
+					return;
+				}
+
 				ImGui::BeginMainMenuBar();
 				ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, m_Window.GetFramePadding() * 2);
 				if (ImGui::BeginMenu(ImGui::IMGUI_FORMAT_ID(font::ICON_FILE + std::string(" File"), MENU_ID, "FILE_EDITOR").c_str()))
@@ -47,7 +56,7 @@ namespace gallus
 						if (file::PickFile(scenePath, {
 							{ L"Scene Files (*.scene)", L"*.scene" },
 							{ L"Prefab Files (*.prefab)", L"*.prefab" },
-							}, core::EDITOR_ENGINE->GetResourceAtlas().GetResourceFolder().GetPath()))
+							}, resourceAtlas->GetResourceFolder().GetPath()))
 						{
 							core::Data data;
 							if (file::LoadFile(scenePath, data))

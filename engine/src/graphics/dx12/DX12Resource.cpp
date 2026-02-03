@@ -56,7 +56,13 @@ namespace gallus
 					return false;
 				}
 
-				Microsoft::WRL::ComPtr<ID3D12Device2>& device = core::ENGINE->GetDX12().GetDevice();
+				graphics::dx12::DX12System* dx12System = core::ENGINE->GetDX12();
+				if (!dx12System)
+				{
+					return false;
+				}
+
+				Microsoft::WRL::ComPtr<ID3D12Device2>& device = dx12System->GetDevice();
 				if (device->CreateCommittedResource(
 					&a_Heap,
 					D3D12_HEAP_FLAG_NONE,
@@ -104,7 +110,13 @@ namespace gallus
 					return false;
 				}
 
-				Microsoft::WRL::ComPtr<ID3D12Device2>& device = core::ENGINE->GetDX12().GetDevice();
+				graphics::dx12::DX12System* dx12System = core::ENGINE->GetDX12();
+				if (!dx12System)
+				{
+					return false;
+				}
+
+				Microsoft::WRL::ComPtr<ID3D12Device2>& device = dx12System->GetDevice();
 				if (device->CreateCommittedResource(
 					&a_Heap,
 					D3D12_HEAP_FLAG_NONE,
@@ -181,7 +193,13 @@ namespace gallus
 					m_pResource.Reset();
 				}
 
-				Microsoft::WRL::ComPtr<ID3D12Device2>& device = core::ENGINE->GetDX12().GetDevice();
+				graphics::dx12::DX12System* dx12System = core::ENGINE->GetDX12();
+				if (!dx12System)
+				{
+					return false;
+				}
+
+				Microsoft::WRL::ComPtr<ID3D12Device2>& device = dx12System->GetDevice();
 
 				m_sName = a_sName;
 				if (device->CreateCommittedResource(
@@ -228,7 +246,13 @@ namespace gallus
 			//---------------------------------------------------------------------
 			void DX12Resource::CheckFeatureSupport()
 			{
-				Microsoft::WRL::ComPtr<ID3D12Device2>& device = core::ENGINE->GetDX12().GetDevice();
+				graphics::dx12::DX12System* dx12System = core::ENGINE->GetDX12();
+				if (!dx12System)
+				{
+					return;
+				}
+
+				Microsoft::WRL::ComPtr<ID3D12Device2>& device = dx12System->GetDevice();
 
 				const D3D12_RESOURCE_DESC desc = m_pResource->GetDesc();
 				m_FormatSupport.Format = desc.Format;

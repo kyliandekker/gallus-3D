@@ -7,6 +7,7 @@
 #include "resources/SrcData.h"
 
 // gameplay
+#include "gameplay/EntityComponentSystem.h"
 #include "gameplay/Entity.h"
 
 // utils
@@ -36,7 +37,7 @@ namespace gallus
 		//---------------------------------------------------------------------
 		void Component::Init()
 		{
-			m_pECS = &core::ENGINE->GetECS();
+			m_pECS = core::ENGINE->GetECS();
 			m_bInitialized = true;
 		}
 

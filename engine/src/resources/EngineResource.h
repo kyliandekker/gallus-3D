@@ -162,6 +162,7 @@ namespace gallus
 			/// <returns></returns>
 			virtual bool LoadByName(const std::string& a_sName);
 
+			virtual bool LoadMetaData();
 #ifdef _LOAD_BY_PATH
 			/// <summary>
 			/// Loads a resource by path.

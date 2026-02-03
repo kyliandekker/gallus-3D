@@ -12,6 +12,7 @@
 #include "logger/Logger.h"
 
 // graphics
+#include "graphics/dx12/DX12System.h"
 #include "graphics/dx12/CommandList.h"
 #include "graphics/dx12/CommandQueue.h"
 
@@ -43,7 +44,13 @@ namespace gallus
 				srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
 				SetSRVDesc(srvDesc);
 
-				auto dCommandQueue = core::ENGINE->GetDX12().GetCommandQueue();
+				graphics::dx12::DX12System* dx12System = core::ENGINE->GetDX12();
+				if (!dx12System)
+				{
+					return false;
+				}
+
+				auto dCommandQueue = dx12System->GetCommandQueue();
 				auto dCommandList = dCommandQueue->GetCommandList();
 				if (!CreateSRV(dCommandList))
 				{
@@ -152,12 +159,13 @@ namespace gallus
 
 				m_AssetType = resources::AssetType::Sprite;
 
-				if (!LoadMetaData())
+				graphics::dx12::DX12System* dx12System = core::ENGINE->GetDX12();
+				if (!dx12System)
 				{
-					LOG(LOGSEVERITY_WARNING, LOG_CATEGORY_DX12, "Failed loading texture meta data. Sprite sheets will not work.");
+					return false;
 				}
 
-				auto dCommandQueue = core::ENGINE->GetDX12().GetCommandQueue();
+				auto dCommandQueue = dx12System->GetCommandQueue();
 				auto dCommandList = dCommandQueue->GetCommandList();
 				CreateSRV(dCommandList);
 
@@ -169,10 +177,16 @@ namespace gallus
 			//---------------------------------------------------------------------
 			bool Texture::Destroy()
 			{
-				std::shared_ptr<CommandQueue> commandQueue = core::ENGINE->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_DIRECT);
+				graphics::dx12::DX12System* dx12System = core::ENGINE->GetDX12();
+				if (!dx12System)
+				{
+					return false;
+				}
 
-				uint64_t fenceVal = core::ENGINE->GetDX12().GetCurrentFenceValue();
-				commandQueue->WaitForFenceValue(core::ENGINE->GetDX12().GetCurrentFenceValue());
+				std::shared_ptr<CommandQueue> commandQueue = dx12System->GetCommandQueue(D3D12_COMMAND_LIST_TYPE_DIRECT);
+
+				uint64_t fenceVal = dx12System->GetCurrentFenceValue();
+				commandQueue->WaitForFenceValue(dx12System->GetCurrentFenceValue());
 
 				if (!DX12Resource::Destroy())
 				{
@@ -181,7 +195,7 @@ namespace gallus
 
 				if (IsSrvIndexValid())
 				{
-					core::ENGINE->GetDX12().GetSRV().Deallocate(m_iSRVIndex);
+					dx12System->GetSRV().Deallocate(m_iSRVIndex);
 					m_iSRVIndex = -1;
 				}
 				if (m_pResourceUploadHeap)
@@ -196,6 +210,13 @@ namespace gallus
 			Texture::~Texture()
 			{
 				Destroy();
+			}
+
+			//---------------------------------------------------------------------
+			bool Texture::LoadMetaData()
+			{
+				bool success = EngineResource::LoadMetaData();
+				return success;
 			}
 
 			//---------------------------------------------------------------------
@@ -238,14 +259,20 @@ namespace gallus
 					return false;
 				}
 
+				graphics::dx12::DX12System* dx12System = core::ENGINE->GetDX12();
+				if (!dx12System)
+				{
+					return false;
+				}
+
 				// Only create SRV once
 				if (m_iSRVIndex == -1)
 				{
-					m_iSRVIndex = static_cast<int32_t>(core::ENGINE->GetDX12().GetSRV().Allocate());
-					core::ENGINE->GetDX12().GetDevice()->CreateShaderResourceView(
+					m_iSRVIndex = static_cast<int32_t>(dx12System->GetSRV().Allocate());
+					dx12System->GetDevice()->CreateShaderResourceView(
 						m_pResource.Get(),
 						&m_SrvDesc,
-						core::ENGINE->GetDX12().GetSRV().GetCPUHandle(m_iSRVIndex)
+						dx12System->GetSRV().GetCPUHandle(m_iSRVIndex)
 					);
 				}
 
@@ -260,9 +287,15 @@ namespace gallus
 			//---------------------------------------------------------------------
 			void Texture::Bind(std::shared_ptr<CommandList> a_pCommandList, int8_t a_iSpriteIndex)
 			{
-				a_pCommandList->GetCommandList()->SetDescriptorHeaps(1, core::ENGINE->GetDX12().GetSRV().GetHeap().GetAddressOf());
+				graphics::dx12::DX12System* dx12System = core::ENGINE->GetDX12();
+				if (!dx12System)
+				{
+					return;
+				}
 
-				CD3DX12_GPU_DESCRIPTOR_HANDLE gpuHandle = core::ENGINE->GetDX12().GetSRV().GetGPUHandle(m_iSRVIndex);
+				a_pCommandList->GetCommandList()->SetDescriptorHeaps(1, dx12System->GetSRV().GetHeap().GetAddressOf());
+
+				CD3DX12_GPU_DESCRIPTOR_HANDLE gpuHandle = dx12System->GetSRV().GetGPUHandle(m_iSRVIndex);
 
 				a_pCommandList->GetCommandList()->SetGraphicsRootDescriptorTable(RootParameters::TEX_SRV, gpuHandle);
 
@@ -285,20 +318,38 @@ namespace gallus
 			//---------------------------------------------------------------------
 			CD3DX12_GPU_DESCRIPTOR_HANDLE Texture::GetGPUHandle()
 			{
-				return core::ENGINE->GetDX12().GetSRV().GetGPUHandle(m_iSRVIndex);
+				graphics::dx12::DX12System* dx12System = core::ENGINE->GetDX12();
+				if (!dx12System)
+				{
+					return CD3DX12_GPU_DESCRIPTOR_HANDLE();
+				}
+
+				return dx12System->GetSRV().GetGPUHandle(m_iSRVIndex);
 			}
 
 			//---------------------------------------------------------------------
 			CD3DX12_CPU_DESCRIPTOR_HANDLE Texture::GetCPUHandle()
 			{
-				return core::ENGINE->GetDX12().GetSRV().GetCPUHandle(m_iSRVIndex);
+				graphics::dx12::DX12System* dx12System = core::ENGINE->GetDX12();
+				if (!dx12System)
+				{
+					return CD3DX12_CPU_DESCRIPTOR_HANDLE();
+				}
+
+				return dx12System->GetSRV().GetCPUHandle(m_iSRVIndex);
 			}
 
 			//---------------------------------------------------------------------
 			bool Texture::UploadTexture(const D3D12_HEAP_PROPERTIES& a_UploadHeapProperties, const D3D12_RESOURCE_DESC& a_BufferDescription)
 			{
+				graphics::dx12::DX12System* dx12System = core::ENGINE->GetDX12();
+				if (!dx12System)
+				{
+					return false;
+				}
+
 				UINT64 uploadBufferSize = GetRequiredIntermediateSize(m_pResource.Get(), 0, 1);
-				if (FAILED(core::ENGINE->GetDX12().GetDevice()->CreateCommittedResource(
+				if (FAILED(dx12System->GetDevice()->CreateCommittedResource(
 					&a_UploadHeapProperties,
 					D3D12_HEAP_FLAG_NONE,
 					&a_BufferDescription,
@@ -342,34 +393,6 @@ namespace gallus
 			{
 				m_TextureType = TextureType::SpriteSheet;
 				m_aSpriteRects.push_back(a_Rect);
-			}
-
-			//---------------------------------------------------------------------
-			bool Texture::LoadMetaData()
-			{
-				if (m_Path.empty())
-				{
-				return false;
-				}
-
-				core::Data data;
-				if (!file::LoadFile(m_Path.generic_string() + ".meta", data))
-				{
-					LOGF(LOGSEVERITY_ERROR, LOG_CATEGORY_ANIMATION, "Failed loading meta file \"%s\".", m_Path.generic_string().c_str());
-				return false;
-				}
-
-				resources::SrcData srcData(data);
-
-				if (!srcData.IsValid())
-				{
-					LOGF(LOGSEVERITY_ERROR, LOG_CATEGORY_ANIMATION, "Failed loading data in meta file \"%s\".", m_Path.generic_string().c_str());
-				return false;
-				}
-
-				DeserializeFields(this, srcData);
-
-				return true;
 			}
 
 			//---------------------------------------------------------------------

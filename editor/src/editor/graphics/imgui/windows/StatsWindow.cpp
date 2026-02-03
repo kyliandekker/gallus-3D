@@ -8,6 +8,7 @@
 #include <imgui/implot.h>
 
 // graphics
+#include "graphics/dx12/DX12System.h"
 #include "graphics/imgui/font_icon.h"
 
 // utils
@@ -44,7 +45,13 @@ namespace gallus
 			{
 				PopulateToolbar();
 
-				core::EDITOR_ENGINE->GetDX12().OnNewFrame() += std::bind(&StatsWindow::OnNewGraphicsFrame, this, std::placeholders::_1);
+				graphics::dx12::DX12System* dx12System = core::ENGINE->GetDX12();
+				if (!dx12System)
+				{
+					return false;
+				}
+
+				dx12System->OnNewFrame() += std::bind(&StatsWindow::OnNewGraphicsFrame, this, std::placeholders::_1);
 				gameplay::GAME.OnNewFrame() += std::bind(&StatsWindow::OnNewGameFrame, this, std::placeholders::_1);
 				return BaseWindow::Initialize();
 			}
@@ -98,6 +105,12 @@ namespace gallus
 					return;
 				}
 
+				graphics::dx12::DX12System* dx12System = core::ENGINE->GetDX12();
+				if (!dx12System)
+				{
+					return;
+				}
+
 				DrawToolbar();
 
 				ImGui::SetCursorPos({
@@ -123,11 +136,11 @@ namespace gallus
 					if (gameplay::GAME.IsStarted())
 					{
 						ImGui::Indent();
-						bool tableActive = ImGui::StartInspectorKeyVal(ImGui::IMGUI_FORMAT_ID("", TABLE_ID, "STATS").c_str(), core::EDITOR_ENGINE->GetDX12().GetImGuiWindow().GetFramePadding());
+						bool tableActive = ImGui::StartInspectorKeyVal(ImGui::IMGUI_FORMAT_ID("", TABLE_ID, "STATS").c_str(), dx12System->GetImGuiWindow().GetFramePadding());
 
 						if (tableActive)
 						{
-							float graphicsFPS = core::EDITOR_ENGINE->GetDX12().GetFPS().GetFPS();
+							float graphicsFPS = dx12System->GetFPS().GetFPS();
 							float gameFPS = gameplay::GAME.GetFPS().GetFPS();
 
 							if (roundUpFPS)
@@ -137,8 +150,14 @@ namespace gallus
 							}
 							ImGui::KeyValue([]
 							{
+								graphics::dx12::DX12System* dx12System = core::ENGINE->GetDX12();
+								if (!dx12System)
+								{
+									return;
+								}
+
 								ImGui::AlignTextToFramePadding();
-								ImGui::DisplayHeader(core::EDITOR_ENGINE->GetDX12().GetImGuiWindow().GetBoldFont(), "Graphics FPS");
+								ImGui::DisplayHeader(dx12System->GetImGuiWindow().GetBoldFont(), "Graphics FPS");
 							}, [&graphicsFPS, &roundUpFPS]
 							{
 								if (roundUpFPS)
@@ -153,8 +172,14 @@ namespace gallus
 							});
 							ImGui::KeyValue([]
 							{
+								graphics::dx12::DX12System* dx12System = core::ENGINE->GetDX12();
+								if (!dx12System)
+								{
+									return;
+								}
+
 								ImGui::AlignTextToFramePadding();
-								ImGui::DisplayHeader(core::EDITOR_ENGINE->GetDX12().GetImGuiWindow().GetBoldFont(), "Game FPS");
+								ImGui::DisplayHeader(dx12System->GetImGuiWindow().GetBoldFont(), "Game FPS");
 							}, [&gameFPS, &roundUpFPS]
 							{
 								if (roundUpFPS)
@@ -176,7 +201,7 @@ namespace gallus
 						{
 							ImPlot::SetupAxis(ImAxis_X1, "");
 							ImPlot::SetupAxis(ImAxis_Y1, "");
-							ImPlot::SetupAxisLimits(ImAxis_Y1, 0.f, core::EDITOR_ENGINE->GetDX12().GetFPS().GetTargetFPS() + 15, ImPlotCond_Always);
+							ImPlot::SetupAxisLimits(ImAxis_Y1, 0.f, dx12System->GetFPS().GetTargetFPS() + 15, ImPlotCond_Always);
 							ImPlot::SetupAxisLimits(ImAxis_X1, 0, MAX_GRAPHICS_FRAMES_STATS);
 
 							ImPlot::PlotLine("Graphics FPS",

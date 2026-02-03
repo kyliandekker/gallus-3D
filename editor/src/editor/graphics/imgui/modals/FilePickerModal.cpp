@@ -14,6 +14,7 @@
 #include "utils/string_extensions.h"
 
 // graphics
+#include "graphics/dx12/DX12System.h"
 #include "graphics/dx12/CommandQueue.h"
 #include "graphics/dx12/CommandList.h"
 #include "graphics/dx12/Texture.h"
@@ -23,6 +24,7 @@
 #include "graphics/imgui/ImGuiWindow.h"
 
 // graphics
+#include "resources/ResourceAtlas.h"
 #include "resources/FileResource.h"
 
 // editor
@@ -45,8 +47,20 @@ namespace gallus
 			//---------------------------------------------------------------------
 			void FilePickerModal::LoadTexture(const std::string& a_sName)
 			{
-				auto cCommandQueue = core::EDITOR_ENGINE->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
-				m_pPreviewTexture = core::EDITOR_ENGINE->GetResourceAtlas().LoadTexture(a_sName, cCommandQueue);
+				graphics::dx12::DX12System* dx12System = core::ENGINE->GetDX12();
+				if (!dx12System)
+				{
+					return;
+				}
+
+				resources::ResourceAtlas* resourceAtlas = core::ENGINE->GetResourceAtlas();
+				if (!resourceAtlas)
+				{
+					return;
+				}
+
+				auto cCommandQueue = dx12System->GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
+				m_pPreviewTexture = resourceAtlas->LoadTexture(a_sName, cCommandQueue);
 				if (auto tex = m_pPreviewTexture.lock())
 				{
 					tex->SetResourceCategory(gallus::resources::EngineResourceCategory::Editor);
@@ -229,9 +243,15 @@ namespace gallus
 			//---------------------------------------------------------------------
 			void FilePickerModal::Show()
 			{
+				resources::ResourceAtlas* resourceAtlas = core::ENGINE->GetResourceAtlas();
+				if (!resourceAtlas)
+				{
+					return;
+				}
+
 				m_aResources.clear();
-				m_aResources.reserve(gallus::core::EDITOR_ENGINE->GetResourceAtlas().GetResourceFolder().GetChildren().size());
-				RecursiveFind(gallus::core::EDITOR_ENGINE->GetResourceAtlas().GetResourceFolder(), m_AssetType, m_aResources, m_Window);
+				m_aResources.reserve(resourceAtlas->GetResourceFolder().GetChildren().size());
+				RecursiveFind(resourceAtlas->GetResourceFolder(), m_AssetType, m_aResources, m_Window);
 
 				BaseModal::Show();
 			}
@@ -239,6 +259,12 @@ namespace gallus
 			//---------------------------------------------------------------------
 			void FilePickerModal::SetData(const std::function<void(int, const std::string&)>& a_Callback, gallus::resources::AssetType a_aFileType)
 			{
+				resources::ResourceAtlas* resourceAtlas = core::ENGINE->GetResourceAtlas();
+				if (!resourceAtlas)
+				{
+					return;
+				}
+
 				m_pSelectedResource = nullptr;
 				m_Callback = nullptr;
 
@@ -250,7 +276,7 @@ namespace gallus
 
 				m_aEngineResources.clear();
 				m_aFilteredEngineResources.clear();
-				for (auto resource : core::EDITOR_ENGINE->GetResourceAtlas().GetResourcesOfType(m_AssetType, resources::EngineResourceCategory::System))
+				for (auto resource : resourceAtlas->GetResourcesOfType(m_AssetType, resources::EngineResourceCategory::System))
 				{
 					m_aEngineResources.emplace_back(m_Window, resource);
 				}

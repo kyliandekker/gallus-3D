@@ -1,6 +1,10 @@
 #include "./Entity.h"
 
+// core
 #include "core/Engine.h"
+
+// gameplay
+#include "gameplay/EntityComponentSystem.h"
 
 namespace gallus
 {
@@ -8,7 +12,13 @@ namespace gallus
 	{
 		void Entity::Destroy()
 		{
-			core::ENGINE->GetECS().DeleteEntity(m_EntityID);
+			gameplay::EntityComponentSystem* ecs = core::ENGINE->GetECS();
+			if (!ecs)
+			{
+				return;
+			}
+
+			ecs->DeleteEntity(m_EntityID);
 		}
 	}
 }

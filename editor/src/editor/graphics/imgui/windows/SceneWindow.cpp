@@ -11,6 +11,7 @@
 #include "core/DataStream.h"
 
 // graphics
+#include "graphics/dx12/DX12System.h"
 #include "graphics/dx12/Texture.h"
 
 #include "graphics/imgui/font_icon.h"
@@ -62,14 +63,19 @@ namespace gallus
 				bool isStarted = game.IsStarted();
 				bool isPaused = game.IsPaused();
 
-				graphics::dx12::DX12System& dx12System = core::EDITOR_ENGINE->GetDX12();
-				graphics::dx12::Camera* cam = &dx12System.GetCamera();
+				graphics::dx12::DX12System* dx12System = core::EDITOR_ENGINE->GetDX12();
+				if (!dx12System)
+				{
+					return;
+				}
+
+				graphics::dx12::Camera* cam = &dx12System->GetCamera();
 				editor::Editor& editor = core::EDITOR_ENGINE->GetEditor();
 				if (editor.GetCameraMode() == editor::CameraMode::CAMERA_MODE_SCENE)
 				{
 					cam = &editor.GetEditorCamera();
 				}
-				dx12System.SetActiveCamera(*cam);
+				dx12System->SetActiveCamera(*cam);
 
 				if (editor.GetEditorSettings().GetFullScreenPlayMode())
 				{
@@ -82,6 +88,12 @@ namespace gallus
 			void SceneWindow::Render()
 			{
 				if (!core::EDITOR_ENGINE)
+				{
+					return;
+				}
+
+				graphics::dx12::DX12System* dx12System = core::EDITOR_ENGINE->GetDX12();
+				if (!dx12System)
 				{
 					return;
 				}
@@ -112,19 +124,18 @@ namespace gallus
 						// Draw the scene view.
 						DrawSceneView(tex, sceneViewRect);
 
-						graphics::dx12::DX12System& dx12System = core::EDITOR_ENGINE->GetDX12();
 						graphics::dx12::Camera& editorCamera = core::EDITOR_ENGINE->GetEditor().GetEditorCamera();
 						
 						ImU32 backgroundColor = IM_COL32(255, 255, 255, 255);
 						ImGui::GetWindowDrawList()->AddText(
 							sceneViewRect.Min + m_Window.GetFramePadding(),
 							backgroundColor,
-							&dx12System.GetActiveCamera() != &editorCamera ? "Game Camera" : "Editor Camera"
+							&dx12System->GetActiveCamera() != &editorCamera ? "Game Camera" : "Editor Camera"
 						);
 
 
 						// Handle specific controls like camera.
-						HandleSceneViewControls(core::EDITOR_ENGINE->GetDX12().GetFPS().GetDeltaTime(), sceneViewRect);
+						HandleSceneViewControls(dx12System->GetFPS().GetDeltaTime(), sceneViewRect);
 					}
 
 					ImGui::SetCursorScreenPos(viewportPos);
@@ -312,7 +323,12 @@ namespace gallus
 					
 					[this]()
 					{
-						graphics::dx12::DX12System& dx12System = core::EDITOR_ENGINE->GetDX12();
+						graphics::dx12::DX12System* dx12System = core::EDITOR_ENGINE->GetDX12();
+						if (!dx12System)
+						{
+							return;
+						}
+
 						editor::EditorSettings& editorSettings = core::EDITOR_ENGINE->GetEditor().GetEditorSettings();
 
 						int dimensionDrawMode = editorSettings.GetDimensionDrawMode();
@@ -321,11 +337,11 @@ namespace gallus
 						if (ImGui::CheckboxButton(
 							ImGui::IMGUI_FORMAT_ID(dimensionDrawModeIcon, BUTTON_ID, "DIMENSION_DRAW_MODE_SCENE").c_str(), &isDimensionDrawMode, "Cycles camera rendering between combined 2D and 3D, 3D-only, and 2D-only modes.", m_Window.GetHeaderSize()))
 						{
-							dimensionDrawMode = ++dimensionDrawMode % (graphics::dx12::DimensionDrawMode_3D + 1);
+							dimensionDrawMode = ++dimensionDrawMode % (graphics::dx12::DimensionDrawMode_2D + 1);
 							editorSettings.SetDimensionDrawMode((graphics::dx12::DimensionDrawMode) dimensionDrawMode);
 							editorSettings.Save();
 
-							dx12System.SetDimensionDrawMode((graphics::dx12::DimensionDrawMode) dimensionDrawMode);
+							dx12System->SetDimensionDrawMode((graphics::dx12::DimensionDrawMode) dimensionDrawMode);
 						}
 					}
 				));
@@ -335,7 +351,12 @@ namespace gallus
 					
 					[this]()
 					{
-						graphics::dx12::DX12System& dx12System = core::EDITOR_ENGINE->GetDX12();
+						graphics::dx12::DX12System* dx12System = core::EDITOR_ENGINE->GetDX12();
+						if (!dx12System)
+						{
+							return;
+						}
+
 						editor::EditorSettings& editorSettings = core::EDITOR_ENGINE->GetEditor().GetEditorSettings();
 
 						int shadingDrawMode = editorSettings.GetShadingDrawMode();
@@ -348,7 +369,7 @@ namespace gallus
 							editorSettings.SetShadingDrawMode((graphics::dx12::ShadingDrawMode) shadingDrawMode);
 							editorSettings.Save();
 
-							dx12System.SetShadingDrawMode((graphics::dx12::ShadingDrawMode) shadingDrawMode);
+							dx12System->SetShadingDrawMode((graphics::dx12::ShadingDrawMode) shadingDrawMode);
 						}
 					}
 				));
@@ -448,8 +469,14 @@ namespace gallus
 			//---------------------------------------------------------------------
 			graphics::dx12::Texture* SceneWindow::GetRenderTexture() const
 			{
+				graphics::dx12::DX12System* dx12System = core::EDITOR_ENGINE->GetDX12();
+				if (!dx12System)
+				{
+					return nullptr;
+				}
+
 				// Get the scene render texture.
-				std::weak_ptr<gallus::graphics::dx12::Texture> renderTexture = core::EDITOR_ENGINE->GetDX12().GetRenderTexture();
+				std::weak_ptr<gallus::graphics::dx12::Texture> renderTexture = dx12System->GetRenderTexture();
 				auto tex = renderTexture.lock();
 				if (!tex || !tex->IsValid())
 				{
@@ -528,9 +555,15 @@ namespace gallus
 			//---------------------------------------------------------------------
 			void SceneWindow::SetupSceneGizmos(const ImRect& a_SceneViewRect) const
 			{
+				graphics::dx12::DX12System* dx12System = core::EDITOR_ENGINE->GetDX12();
+				if (!dx12System)
+				{
+					return;
+				}
+
 				ImGuizmo::BeginFrame();
 
-				int dimensionDrawMode = core::EDITOR_ENGINE->GetDX12().GetDimensionDrawMode();
+				int dimensionDrawMode = dx12System->GetDimensionDrawMode();
 				if (dimensionDrawMode == graphics::dx12::DimensionDrawMode_2D)
 				{
 					ImGuizmo::SetOrthographic(true);
@@ -547,13 +580,18 @@ namespace gallus
 			//---------------------------------------------------------------------
 			void SceneWindow::DrawSceneGrid(const ImRect& a_SceneViewRect) const
 			{
+				graphics::dx12::DX12System* dx12System = core::EDITOR_ENGINE->GetDX12();
+				if (!dx12System)
+				{
+					return;
+				}
+
 				if (!core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetShowGrid())
 				{
 					return;
 				}
 
-				graphics::dx12::DX12System& dx12System = core::EDITOR_ENGINE->GetDX12();
-				int dimensionDrawMode = dx12System.GetDimensionDrawMode();
+				int dimensionDrawMode = dx12System->GetDimensionDrawMode();
 				if (dimensionDrawMode == graphics::dx12::DimensionDrawMode_2D)
 				{
 					ImDrawList* drawList = ImGui::GetWindowDrawList();
@@ -565,7 +603,7 @@ namespace gallus
 					const ImU32 axisXColor = IM_COL32(255, 80, 80, 200);
 					const ImU32 axisYColor = IM_COL32(80, 160, 255, 200);
 
-					graphics::dx12::Camera& cam = dx12System.GetActiveCamera();
+					graphics::dx12::Camera& cam = dx12System->GetActiveCamera();
 					const DirectX::XMFLOAT3& cameraPos = cam.GetTransform().GetPosition();
 
 					// Draw vertical grid lines
@@ -618,7 +656,7 @@ namespace gallus
 				}
 				else
 				{
-					const graphics::dx12::Camera& editorCamera = core::EDITOR_ENGINE->GetDX12().GetActiveCamera();
+					const graphics::dx12::Camera& editorCamera = dx12System->GetActiveCamera();
 
 					// Get the camera projection and view matrices
 					DirectX::XMMATRIX camProj = editorCamera.GetProjectionMatrix(graphics::dx12::CameraType_World);
@@ -672,8 +710,13 @@ namespace gallus
 			//---------------------------------------------------------------------
 			void SceneWindow::HandleSceneViewControls(double a_fDeltaTime, const ImRect& a_vSceneRect)
 			{
-				graphics::dx12::DX12System& dx12System = core::EDITOR_ENGINE->GetDX12();
-				graphics::dx12::Camera& camera = dx12System.GetActiveCamera();
+				graphics::dx12::DX12System* dx12System = core::EDITOR_ENGINE->GetDX12();
+				if (!dx12System)
+				{
+					return;
+				}
+
+				graphics::dx12::Camera& camera = dx12System->GetActiveCamera();
 
 				ImGuiIO& io = ImGui::GetIO();
 				ImVec2 mouse = io.MousePos;
@@ -729,7 +772,7 @@ namespace gallus
 					totalMoveSpeed += (m_fMoveSpeed / 2);
 				}
 				float moveDistance = totalMoveSpeed * static_cast<float>(a_fDeltaTime);
-				int dimensionDrawMode = dx12System.GetDimensionDrawMode();
+				int dimensionDrawMode = dx12System->GetDimensionDrawMode();
 
 				float& yaw = s_mCameraRotation[&camera].first;
 				float& pitch = s_mCameraRotation[&camera].second;
@@ -973,6 +1016,12 @@ namespace gallus
 			//---------------------------------------------------------------------
 			void FullSceneWindow::Render()
 			{
+				graphics::dx12::DX12System* dx12System = core::EDITOR_ENGINE->GetDX12();
+				if (!dx12System)
+				{
+					return;
+				}
+
 				if (!core::EDITOR_ENGINE)
 				{
 					return;
@@ -986,9 +1035,8 @@ namespace gallus
 					return;
 				}
 
-				graphics::dx12::DX12System& dx12System = core::EDITOR_ENGINE->GetDX12();
-				graphics::dx12::Camera* cam = &dx12System.GetCamera();
-				dx12System.SetActiveCamera(*cam);
+				graphics::dx12::Camera* cam = &dx12System->GetCamera();
+				dx12System->SetActiveCamera(*cam);
 
 				ImRect sceneViewRect = GetRenderTextureRect(tex);
 				DrawSceneBackground(sceneViewRect);
@@ -1033,10 +1081,16 @@ namespace gallus
 			//---------------------------------------------------------------------
 			void FullSceneWindow::DrawFPS(const ImRect& a_SceneViewRect)
 			{
+				graphics::dx12::DX12System* dx12System = core::EDITOR_ENGINE->GetDX12();
+				if (!dx12System)
+				{
+					return;
+				}
+
 				ImVec2 windowPadding = m_Window.GetWindowPadding();
 				// Draw FPS.
 				{
-					std::string fpsValue = std::to_string(static_cast<uint64_t>(std::round(core::EDITOR_ENGINE->GetDX12().GetFPS().GetFPS()))) + " graphics fps";
+					std::string fpsValue = std::to_string(static_cast<uint64_t>(std::round(dx12System->GetFPS().GetFPS()))) + " graphics fps";
 
 					ImGui::PushFont(m_Window.GetCapitalFont());
 					ImGui::SetCursorScreenPos(ImVec2(a_SceneViewRect.GetTR().x - (ImGui::CalcTextSize(fpsValue.c_str()).x + windowPadding.x), a_SceneViewRect.GetTR().y + windowPadding.y));

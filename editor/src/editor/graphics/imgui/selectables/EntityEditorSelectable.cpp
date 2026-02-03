@@ -13,6 +13,7 @@
 #include "utils/string_extensions.h"
 
 // gameplay
+#include "gameplay/EntityComponentSystem.h"
 #include "gameplay/Game.h"
 #include "gameplay/ECSBaseSystem.h"
 #include "gameplay/systems/SpriteSystem.h"
@@ -35,7 +36,13 @@ namespace gallus
 				m_bShowRename = true;
 				m_bShowDelete = true;
 
-				m_pEntity = core::EDITOR_ENGINE->GetECS().GetEntity(m_EntityID);
+				gameplay::EntityComponentSystem* ecs = core::ENGINE->GetECS();
+				if (!ecs)
+				{
+					return;
+				}
+
+				m_pEntity = ecs->GetEntity(m_EntityID);
 				auto ent = m_pEntity.lock();
 				if (!ent)
 				{
@@ -44,7 +51,7 @@ namespace gallus
 
 				gameplay::EntityID entityId = ent->GetEntityID();
 
-				for (auto* sys : core::EDITOR_ENGINE->GetECS().GetSystems())
+				for (auto* sys : ecs->GetSystems())
 				{
 					if (sys->HasComponent(entityId))
 					{
@@ -187,13 +194,19 @@ namespace gallus
 			//---------------------------------------------------------------------
 			bool EntityEditorSelectable::RenderEditorFields()
 			{
+				gameplay::EntityComponentSystem* ecs = core::ENGINE->GetECS();
+				if (!ecs)
+				{
+					return false;
+				}
+
 				bool changed = false;
-				std::lock_guard<std::recursive_mutex> lock(core::EDITOR_ENGINE->GetECS().m_EntityMutex);
+				std::lock_guard<std::recursive_mutex> lock(ecs->m_EntityMutex);
 
 				ImGui::SetCursorPosY(0);
 				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
 
-				for (auto* sys : core::EDITOR_ENGINE->GetECS().GetSystems())
+				for (auto* sys : ecs->GetSystems())
 				{
 					ImGui::SetCursorPosX(0);
 					float width = ImGui::GetContentRegionAvail().x + m_Window.GetFramePadding().x;
@@ -249,12 +262,11 @@ namespace gallus
 					ImGui::OpenPopup(ImGui::IMGUI_FORMAT_ID("", POPUP_WINDOW_ID, "ADD_COMPONENT_MENU_INSPECTOR").c_str());
 				}
 
-				gameplay::EntityComponentSystem& ecs = core::EDITOR_ENGINE->GetECS();
 				ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, m_Window.GetFramePadding());
 				ImGui::SetNextWindowSize(ImVec2(width, 0));
 				if (ImGui::BeginPopup(ImGui::IMGUI_FORMAT_ID("", POPUP_WINDOW_ID, "ADD_COMPONENT_MENU_INSPECTOR").c_str()))
 				{
-					for (gameplay::AbstractECSSystem* sys : core::EDITOR_ENGINE->GetECS().GetSystems())
+					for (gameplay::AbstractECSSystem* sys : ecs->GetSystems())
 					{
 						if (sys->HasComponent(m_EntityID))
 						{
@@ -277,10 +289,16 @@ namespace gallus
 
 			bool EntityEditorSelectable::RenderGizmos(const ImRect& a_SceneViewRect)
 			{
-				std::lock_guard<std::recursive_mutex> lock(core::EDITOR_ENGINE->GetECS().m_EntityMutex);
+				gameplay::EntityComponentSystem* ecs = core::ENGINE->GetECS();
+				if (!ecs)
+				{
+					return false;
+				}
+
+				std::lock_guard<std::recursive_mutex> lock(ecs->m_EntityMutex);
 
 				bool changed = false;
-				for (auto* sys : core::EDITOR_ENGINE->GetECS().GetSystems())
+				for (auto* sys : ecs->GetSystems())
 				{
 					if (sys->HasComponent(GetEntityID()))
 					{

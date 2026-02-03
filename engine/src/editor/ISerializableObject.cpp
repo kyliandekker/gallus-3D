@@ -4,10 +4,12 @@
 #include "core/Engine.h"
 
 // resources
+#include "resources/ResourceAtlas.h"
 #include "resources/SrcData.h"
 #include "resources/EngineResource.h"
 
 // graphics
+#include "graphics/dx12/DX12System.h"
 #include "graphics/dx12/Transform.h"
 #include "graphics/dx12/Material.h"
 #include "graphics/dx12/Texture.h"
@@ -50,59 +52,60 @@ namespace gallus
 			return;
 		}
 
+		graphics::dx12::DX12System* dx12System = core::ENGINE->GetDX12();
+		if (!dx12System)
+		{
+			return;
+		}
+
+		resources::ResourceAtlas* resourceAtlas = core::ENGINE->GetResourceAtlas();
+		if (!resourceAtlas)
+		{
+			return;
+		}
+
 		switch (a_AssetType)
 		{
 			case resources::AssetType::Sprite:
 			{
-				auto cCommandQueue =
-					core::ENGINE->GetDX12()
-					.GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
+				auto cCommandQueue = dx12System->GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
 
-				*a_pWeak = core::ENGINE->GetResourceAtlas()
-					.LoadTexture(a_sFileName, cCommandQueue);
+				*a_pWeak = resourceAtlas->LoadTexture(a_sFileName, cCommandQueue);
 
 				break;
 			}
 			case resources::AssetType::Mesh:
 			{
-				auto cCommandQueue =
-					core::ENGINE->GetDX12()
-					.GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
+				auto cCommandQueue = dx12System->GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
 
-				*a_pWeak = core::ENGINE->GetResourceAtlas()
-					.LoadMesh(a_sFileName, cCommandQueue);
+				*a_pWeak = resourceAtlas->LoadMesh(a_sFileName, cCommandQueue);
 
 				break;
 			}
 			case resources::AssetType::Material:
 			{
-				*a_pWeak = core::ENGINE->GetResourceAtlas()
-					.LoadMaterial(a_sFileName);
+				*a_pWeak = resourceAtlas->LoadMaterial(a_sFileName);
 
 				break;
 			}
 			case resources::AssetType::PixelShader:
 			{
-				*a_pWeak = core::ENGINE->GetResourceAtlas()
-					.LoadPixelShader(a_sFileName);
+				*a_pWeak = resourceAtlas->LoadPixelShader(a_sFileName);
 				break;
 			}
 			case resources::AssetType::VertexShader:
 			{
-				*a_pWeak = core::ENGINE->GetResourceAtlas()
-					.LoadVertexShader(a_sFileName);
+				*a_pWeak = resourceAtlas->LoadVertexShader(a_sFileName);
 				break;
 			}
 			case resources::AssetType::Prefab:
 			{
-				*a_pWeak = core::ENGINE->GetResourceAtlas()
-					.LoadPrefab(a_sFileName);
+				*a_pWeak = resourceAtlas->LoadPrefab(a_sFileName);
 				break;
 			}
 			case resources::AssetType::Animation:
 			{
-				*a_pWeak = core::ENGINE->GetResourceAtlas()
-					.LoadAnimation(a_sFileName);
+				*a_pWeak = resourceAtlas->LoadAnimation(a_sFileName);
 				break;
 			}
 		}
