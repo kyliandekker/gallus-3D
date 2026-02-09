@@ -17,7 +17,7 @@ file(GLOB_RECURSE HEADERS ${CMAKE_SOURCE_DIR}/game/src/*.h)
 file(GLOB_RECURSE SOURCES ${CMAKE_SOURCE_DIR}/game/src/*.cpp)
 
 # Define executable.
-add_executable(game WIN32 ${HEADERS} ${ICON} ${SOURCES} ${DX12} ${TINY_GLTF})
+add_executable(game WIN32 ${HEADERS} ${ICON} ${SOURCES})
 
 # Define preprocessor definitions for different configurations
 target_compile_definitions(game PRIVATE
@@ -38,37 +38,9 @@ set_target_properties(game PROPERTIES
 )
 
 target_link_libraries(game PRIVATE
-    Shcore.lib dxgi.lib d3d12.lib d3dcompiler.lib dxguid.lib Shlwapi.lib engine_noimgui.lib
+    tiny_gltf dx12_helper Shcore.lib dxgi.lib d3d12.lib d3dcompiler.lib dxguid.lib Shlwapi.lib engine_noimgui.lib
 )
 target_link_libraries(game PRIVATE engine_noimgui)
 target_link_directories(game PRIVATE
     "${CMAKE_SOURCE_DIR}/../$<CONFIG>"
 )
-
-if(MSVC)
-    target_compile_options(game PRIVATE
-        "$<$<CONFIG:${DEBUG}>:/Od>"   # Disable optimizations for Debug
-        "$<$<CONFIG:${RELEASE}>:/O2>"  # Enable optimizations for Release
-    )
-endif()
-
-# For GCC/Clang (if applicable), set optimization level to 0 for debugging
-target_compile_options(game PRIVATE
-    "$<$<CONFIG:${DEBUG}>:-O0>"  # Disable optimizations for Debug
-    "$<$<CONFIG:${RELEASE}>:-O2>"  # Optimize for Release
-)
-
-if(MSVC)
-    target_compile_options(game PRIVATE
-        "$<$<CONFIG:${DEBUG}>:/MTd>"
-        "$<$<CONFIG:${RELEASE}>:/MT>"
-    )
-endif()
-
-if(MSVC)
-    # Set Debug Information Format (/ZI) for Debug configuration
-    set_property(TARGET game APPEND_STRING PROPERTY COMPILE_OPTIONS "/ZI")
-
-    # Set the Linker Debug flag for /DEBUG (for Debug configurations)
-    set_property(TARGET game APPEND_STRING PROPERTY LINK_OPTIONS "/DEBUG")
-endif()

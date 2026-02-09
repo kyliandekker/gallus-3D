@@ -1848,7 +1848,7 @@ struct JsonDocument : public rapidjson::Document {
 	assert(s_pActiveDocument ==
 		   nullptr);  // When using default allocator, only one document can be
 					  // active at a time, if you need multiple active at once,
-					  // define TINYGLTF_USE_RAPIDJSON_CRTALLOCATOR
+					  // define TINYGLTF_USE__CRTALLOCATOR
 	s_pActiveDocument = this;
   }
   JsonDocument(const JsonDocument &) = delete;
