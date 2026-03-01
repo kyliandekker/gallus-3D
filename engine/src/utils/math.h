@@ -2,10 +2,6 @@
 
 #include "graphics/dx12/DX12PCH.h"
 
-#ifdef _EDITOR
-#include <imgui/imgui.h>
-#endif
-
 namespace gallus
 {
 	template <typename T>
@@ -63,23 +59,13 @@ namespace gallus
 		{}
 		Vector2(const DirectX::XMFLOAT2& v) : BaseVector2(v.x, v.y)
 		{}
-		Vector2(const ImVec2& v) : BaseVector2(v.x, v.y)
-		{}
 
 		operator DirectX::XMFLOAT2() const
 		{
 			return { x, y };
 		}
-		operator ImVec2() const
-		{
-			return { x, y };
-		}
 
 		DirectX::XMFLOAT2 DX12Vector() const
-		{
-			return { x, y };
-		}
-		ImVec2 ImVector() const
 		{
 			return { x, y };
 		}
@@ -93,8 +79,6 @@ namespace gallus
 		IVector2(int32_t x, int32_t y) : BaseVector2(x, y)
 		{}
 		IVector2(const DirectX::XMINT2& v) : BaseVector2(v.x, v.y)
-		{}
-		IVector2(const ImVec2& v) : BaseVector2(static_cast<int32_t>(v.x), static_cast<int32_t>(v.y))
 		{}
 
 		operator DirectX::XMINT2() const
@@ -254,10 +238,6 @@ namespace gallus
 		{
 			return { r, g, b };
 		}
-		operator ImVec4() const
-		{
-			return { r, g, b, 1.0f };
-		}
 		operator DirectX::XMFLOAT3() const
 		{
 			return { r, g, b };
@@ -300,10 +280,6 @@ namespace gallus
 		}
 
 		operator Vector4() const
-		{
-			return { r, g, b, a };
-		}
-		operator ImVec4() const
 		{
 			return { r, g, b, a };
 		}

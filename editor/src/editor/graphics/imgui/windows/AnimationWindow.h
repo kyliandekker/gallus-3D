@@ -1,12 +1,9 @@
-#ifndef IMGUI_DISABLE
-#ifdef _EDITOR
-
 #pragma once
 
-#include "graphics/imgui/windows/BaseWindow.h"
+#include "imgui_system/windows/BaseWindow.h"
 
 // graphics
-#include "graphics/imgui/views/DataTypes/StringTextInput.h"
+#include "editor/graphics/imgui/views/StringTextInput.h"
 
 // animation
 #include "animation/Animation.h"
@@ -15,15 +12,10 @@
 #include "resources/AssetType.h"
 
 // editor
-#include "editor/graphics/imgui/selectables/AnimationKeyFrameEditorSelectable.h"
 #include "editor/graphics/imgui/views/Toolbar.h"
 
 namespace gallus
 {
-	namespace resources
-	{
-		class FileResource;
-	}
 	namespace graphics
 	{
 		namespace dx12
@@ -34,8 +26,8 @@ namespace gallus
 
 		namespace imgui
 		{
-			class ImGuiWindow;
-			class FileEditorSelectable;
+			class ImGuiSystem;
+			class AnimationKeyFrameEditorSelectable;
 
 			constexpr float ANIMATION_FRAME_PIXEL_WIDTH_DEFAULT = 25.0f;
 			inline float ANIMATION_FRAME_PIXEL_WIDTH = 25.0f;
@@ -54,8 +46,8 @@ namespace gallus
 				/// <summary>
 				/// Constructs a Animation window.
 				/// </summary>
-				/// <param name="a_Window">The ImGui window for rendering the view.</param>
-				AnimationWindow(ImGuiWindow& a_Window);
+				/// <param name="a_System">The ImGui system for rendering the view.</param>
+				AnimationWindow(ImGuiSystem& a_System);
 
 				/// <summary>
 				/// Cleans up and destroys the Animation window.
@@ -81,8 +73,8 @@ namespace gallus
 				/// <summary>
 				/// Sets the data of the animation modal.
 				/// </summary>
-				/// <param name="a_File">The animation file.</param>
-				void SetData(gallus::resources::FileResource& a_File);
+				/// <param name="a_sID">The id for the resource.</param>
+				void SetData(const std::string a_sID);
 			protected:
 				// Toolbar.
 				void PopulateToolbar();
@@ -91,13 +83,14 @@ namespace gallus
 				void RemoveKeyFrame(size_t a_iIndex);
 				void AddKeyFrame(size_t a_iIndex);
 
+				void SetAnimationDirty();
+
 				void SetCurrentFrame(int16_t a_iIndex);
 
 				std::shared_ptr<graphics::dx12::Texture> m_pPreviewTexture = nullptr;
-				gallus::resources::FileResource* m_pFile = nullptr;
 
 				animation::Animation m_Animation;
-				AnimationKeyFrameEditorSelectable* m_KeyFrameSelectable = nullptr;
+				std::shared_ptr<AnimationKeyFrameEditorSelectable> m_pKeyFrameSelectable;
 
 				int m_iSelectedFrame = 0;
 				int m_iSelectedKeyFrame = -1;
@@ -107,6 +100,3 @@ namespace gallus
 		}
 	}
 }
-
-#endif // _EDITOR
-#endif // IMGUI_DISABLE

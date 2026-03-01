@@ -11,256 +11,297 @@
 // core
 #include "core/FlagEnum.h"
 
+// gameplay
+#include "core/Engine.h"
+#include "gameplay/EntityComponentSystem.h"
+#include "gameplay/EntityID.h"
+#include "gameplay/systems/components/Component.h"
+
 // resources
 #include "resources/SrcData.h"
 
-// gameplay
-#include "gameplay/EntityID.h"
-#include "gameplay/systems/components/Component.h"
-#include "gameplay/systems/UpdateTime.h"
-
-namespace gallus
+namespace gallus::resources
 {
-	namespace gameplay
+	class SrcData;
+}
+namespace gallus::gameplay
+{
+	enum class UpdateTime : uint32_t;
+
+	//---------------------------------------------------------------------
+	// AbstractECSSystem
+	//---------------------------------------------------------------------
+	class AbstractECSSystem : public core::System
 	{
-		//---------------------------------------------------------------------
-		// AbstractECSSystem
-		//---------------------------------------------------------------------
-		class AbstractECSSystem : public core::System
+	public:
+		virtual ~AbstractECSSystem() = default;
+		AbstractECSSystem() = default;
+
+		/// <summary>
+		/// Retrieves the property name of the system (used in serialization).
+		/// </summary>
+		/// <returns>A string containing the property name of the system.</returns>
+		virtual std::string GetPropertyName() const = 0;
+
+		/// <summary>
+		/// Retrieves the name of the system.
+		/// </summary>
+		/// <returns>A string containing the name of the system.</returns>
+		virtual std::string GetSystemName() const = 0;
+
+		/// <summary>
+		/// Clears the system and removes all entities.
+		/// </summary>
+		virtual void Clear() = 0;
+
+		/// <summary>
+		/// Deletes a component from the system.
+		/// </summary>
+		/// <param name="a_ID">The entity ID that needs to get deleted.</param>
+		virtual void DeleteComponent(const EntityID& a_ID) = 0;
+
+		/// <summary>
+		/// Updates the components in the system.
+		/// </summary>
+		virtual void UpdateComponents() = 0;
+
+		/// <summary>
+		/// Updates the system's components.
+		/// </summary>
+		// <param name="a_fDeltaTime">The time it took since last frame.</param>
+		virtual void UpdateComponentsRealtime(float a_fDeltaTime, UpdateTime a_UpdateTime) = 0;
+
+		/// <summary>
+		/// Inits the system's components.
+		/// </summary>
+		virtual void InitComponentsRealtime() = 0;
+
+		/// <summary>
+		/// Checks whether an entity is using the system.
+		/// </summary>
+		/// <param name="a_ID">The entity that will be checked.</param>
+		/// <returns>True if the entity existed, otherwise false.</returns>
+		virtual bool HasComponent(const EntityID& a_ID) = 0;
+
+		/// <summary>
+		/// Retrieves a component by entity id.
+		/// </summary>
+		/// <param name="a_ID">The entity that will be checked.</param>
+		/// <returns>Pointer to the component if the entity existed, otherwise nullptr.</returns>
+		virtual Component* GetBaseComponent(const EntityID& a_ID) = 0;
+
+		/// <summary>
+		/// Updates a component in the entity component system.
+		/// </summary>
+		/// <param name="a_ID">The entity ID.</param>
+		/// <param name="a_SrcData">Optional SrcData to copy to the component.</param>
+		/// <returns>Pointer to the component.</returns>
+		virtual Component* CreateBaseComponent(const EntityID& a_ID, const resources::SrcData& a_SrcData = resources::SrcData()) = 0;
+
+		/// <summary>
+		/// Creates a component in the entity component system.
+		/// </summary>
+		/// <param name="a_ID">The entity ID.</param>
+		/// <param name="a_SrcData">Optional SrcData to copy to the component.</param>
+		/// <returns>Pointer to the component if the entity existed, otherwise nullptr.</returns>
+		virtual Component* UpdateBaseComponent(const EntityID& a_ID, const resources::SrcData& a_SrcData = resources::SrcData()) = 0;
+
+		/// <summary>
+		/// Retrieves the update settings tied to this system.
+		/// </summary>
+		/// <returns>Collection of flags related to this system.</returns>
+		const core::FlagEnum<UpdateTime>& GetUpdateTimes() const
 		{
-		public:
-			virtual ~AbstractECSSystem() = default;
-			AbstractECSSystem() = default;
+			return m_aUpdateTimes;
+		}
+	protected:
+		core::FlagEnum<UpdateTime> m_aUpdateTimes;
+	};
 
-			/// <summary>
-			/// Retrieves the property name of the system (used in serialization).
-			/// </summary>
-			/// <returns>A string containing the property name of the system.</returns>
-			virtual std::string GetPropertyName() const = 0;
-
-			/// <summary>
-			/// Retrieves the name of the system.
-			/// </summary>
-			/// <returns>A string containing the name of the system.</returns>
-			virtual std::string GetSystemName() const = 0;
-
-			/// <summary>
-			/// Clears the system and removes all entities.
-			/// </summary>
-			virtual void Clear() = 0;
-
-			/// <summary>
-			/// Deletes a component from the system.
-			/// </summary>
-			/// <param name="a_ID">The entity ID that needs to get deleted.</param>
-			virtual void DeleteComponent(const EntityID& a_ID) = 0;
-
-			/// <summary>
-			/// Updates the components in the system.
-			/// </summary>
-			virtual void UpdateComponents() = 0;
-
-			/// <summary>
-			/// Updates the system's components.
-			/// </summary>
-			// <param name="a_fDeltaTime">The time it took since last frame.</param>
-			virtual void UpdateComponentsRealtime(float a_fDeltaTime, UpdateTime a_UpdateTime) = 0;
-
-			/// <summary>
-			/// Inits the system's components.
-			/// </summary>
-			virtual void InitComponentsRealtime() = 0;
-
-			/// <summary>
-			/// Checks whether an entity is using the system.
-			/// </summary>
-			/// <param name="a_ID">The entity that will be checked.</param>
-			/// <returns>True if the entity existed, otherwise false.</returns>
-			virtual bool HasComponent(const EntityID& a_ID) = 0;
-
-			/// <summary>
-			/// Retrieves a component by entity id.
-			/// </summary>
-			/// <param name="a_ID">The entity that will be checked.</param>
-			/// <returns>Pointer to the component if the entity existed, otherwise nullptr.</returns>
-			virtual Component* GetBaseComponent(const EntityID& a_ID) = 0;
-
-			/// <summary>
-			/// Creates a component in the entity component system.
-			/// </summary>
-			/// <param name="a_ID"></param>
-			virtual Component* CreateBaseComponent(const EntityID& a_ID, const resources::SrcData& a_SrcData = resources::SrcData()) = 0;
-
-			const core::FlagEnum<UpdateTime>& GetUpdateTimes() const
-			{
-				return m_aUpdateTimes;
-			}
-		protected:
-			core::FlagEnum<UpdateTime> m_aUpdateTimes;
-		};
-
-		//---------------------------------------------------------------------
-		// ECSBaseSystem
-		//---------------------------------------------------------------------
-		template <class ComponentType>
-		class ECSBaseSystem : public AbstractECSSystem
+	//---------------------------------------------------------------------
+	// ECSBaseSystem
+	//---------------------------------------------------------------------
+	template <class ComponentType>
+	class ECSBaseSystem : public AbstractECSSystem
+	{
+		static_assert(std::is_base_of<Component, ComponentType>::value,
+			"ComponentType must be derived from Component");
+	public:
+		/// <summary>
+		/// Destroys the system, releasing resources and performing necessary cleanup.
+		/// </summary>
+		/// <returns>True if the destruction was successful, otherwise false.</returns>
+		bool Destroy() override
 		{
-			static_assert(std::is_base_of<Component, ComponentType>::value,
-				"ComponentType must be derived from Component");
-		public:
-			/// <summary>
-			/// Destroys the system, releasing resources and performing necessary cleanup.
-			/// </summary>
-			/// <returns>True if the destruction was successful, otherwise false.</returns>
-			bool Destroy() override
+			return AbstractECSSystem::Destroy();
+		}
+
+		virtual ~ECSBaseSystem() = default;
+
+		/// <summary>
+		/// Creates a component in the entity component system.
+		/// </summary>
+		/// <param name="a_ID">The entity ID.</param>
+		/// <param name="a_SrcData">Optional SrcData to copy to the component.</param>
+		Component* CreateBaseComponent(const EntityID& a_ID, const resources::SrcData& a_SrcData = resources::SrcData()) override
+		{
+			bool existed = HasComponent(a_ID);
+			if (!existed)
 			{
-				return AbstractECSSystem::Destroy();
+				ComponentType t;
+				m_mComponents.insert(std::make_pair(a_ID, t));
+			}
+			ComponentType& comp = m_mComponents.at(a_ID);
+			if (!existed)
+			{
+				comp.SetDefaults(a_ID);
+				comp.Deserialize(a_SrcData);
 			}
 
-			virtual ~ECSBaseSystem() = default;
+			GetEngine().GetECS()->OnEntityComponentsUpdated().invoke();
+			return &comp;
+		}
 
-			/// <summary>
-			/// Creates a component in the entity component system.
-			/// </summary>
-			/// <param name="a_ID"></param>
-			Component* CreateBaseComponent(const EntityID& a_ID, const resources::SrcData& a_SrcData = resources::SrcData()) override
+		/// <summary>
+		/// Updates a component in the entity component system.
+		/// </summary>
+		/// <param name="a_ID">The entity ID.</param>
+		/// <param name="a_SrcData">Optional SrcData to copy to the component.</param>
+		Component* UpdateBaseComponent(const EntityID& a_ID, const resources::SrcData& a_SrcData = resources::SrcData()) override
+		{
+			bool existed = HasComponent(a_ID);
+			if (!existed)
 			{
-				bool existed = HasComponent(a_ID);
-				if (!existed)
-				{
-					ComponentType t;
-					m_mComponents.insert(std::make_pair(a_ID, t));
-				}
-				ComponentType& comp = m_mComponents.at(a_ID);
-				if (!existed)
-				{
-					comp.SetDefaults(a_ID);
-					comp.Deserialize(a_SrcData);
-				}
-				//core::ENGINE->GetECS().OnEntityComponentsUpdated().invoke();
-				return &comp;
+				return nullptr;
 			}
 
-			/// <summary>
-			/// Retrieves the number of entities using this system.
-			/// </summary>
-			/// <returns>Number representing the amount of entities that use this system.</returns>
-			size_t GetSize() const
+			ComponentType& comp = m_mComponents.at(a_ID);
+			comp.Deserialize(a_SrcData);
+
+			return &comp;
+		}
+
+		/// <summary>
+		/// Retrieves the number of entities using this system.
+		/// </summary>
+		/// <returns>Number representing the amount of entities that use this system.</returns>
+		size_t GetSize() const
+		{
+			return m_mComponents.size();
+		}
+
+		/// <summary>
+		/// Checks whether an entity is using the system.
+		/// </summary>
+		/// <param name="a_ID">The entity that will be checked.</param>
+		/// <returns>True if the entity existed, otherwise false.</returns>
+		bool HasComponent(const EntityID& a_ID)
+		{
+			return m_mComponents.count(a_ID) == 1;
+		}
+
+		/// <summary>
+		/// Retrieves a component by entity id.
+		/// </summary>
+		/// <param name="a_ID">The entity that will be checked.</param>
+		/// <returns>Reference to the component if the entity existed, otherwise it gets created and returns that.</returns>
+		ComponentType* TryGetComponent(const EntityID& a_ID)
+		{
+			auto it = m_mComponents.find(a_ID);
+			if (it == m_mComponents.end())
 			{
-				return m_mComponents.size();
+				return nullptr;
 			}
 
-			/// <summary>
-			/// Checks whether an entity is using the system.
-			/// </summary>
-			/// <param name="a_ID">The entity that will be checked.</param>
-			/// <returns>True if the entity existed, otherwise false.</returns>
-			bool HasComponent(const EntityID& a_ID)
+			return &it->second;
+		}
+
+		/// <summary>
+		/// Retrieves a component by entity id.
+		/// </summary>
+		/// <param name="a_ID">The entity that will be checked.</param>
+		/// <returns>Reference to the component if the entity existed, otherwise it gets created and returns that.</returns>
+		ComponentType& CreateComponent(const EntityID& a_ID, const resources::SrcData& a_SrcData = resources::SrcData())
+		{
+			if (HasComponent(a_ID))
 			{
-				return m_mComponents.count(a_ID) == 1;
-			}
-
-			/// <summary>
-			/// Retrieves a component by entity id.
-			/// </summary>
-			/// <param name="a_ID">The entity that will be checked.</param>
-			/// <returns>Reference to the component if the entity existed, otherwise it gets created and returns that.</returns>
-			ComponentType* TryGetComponent(const EntityID& a_ID)
-			{
-				auto it = m_mComponents.find(a_ID);
-				if (it == m_mComponents.end())
-				{
-					return nullptr;
-				}
-
-				return &it->second;
-			}
-
-			/// <summary>
-			/// Retrieves a component by entity id.
-			/// </summary>
-			/// <param name="a_ID">The entity that will be checked.</param>
-			/// <returns>Reference to the component if the entity existed, otherwise it gets created and returns that.</returns>
-			ComponentType& CreateComponent(const EntityID& a_ID, const resources::SrcData& a_SrcData = resources::SrcData())
-			{
-				if (HasComponent(a_ID))
-				{
-					return m_mComponents.at(a_ID);
-				}
-
-				CreateBaseComponent(a_ID, a_SrcData);
 				return m_mComponents.at(a_ID);
 			}
 
-			/// <summary>
-			/// Deletes a component from the system.
-			/// </summary>
-			/// <param name="a_ID">The entity ID that needs to get deleted.</param>
-			void DeleteComponent(const EntityID& a_ID) override
-			{
-				m_mComponents.erase(a_ID);
-			}
+			CreateBaseComponent(a_ID, a_SrcData);
+			return m_mComponents.at(a_ID);
+		}
 
-			/// <summary>
-			/// Clears the system and removes all entities.
-			/// </summary>
-			void Clear() override
-			{
-				m_mComponents.clear();
-			}
+		/// <summary>
+		/// Deletes a component from the system.
+		/// </summary>
+		/// <param name="a_ID">The entity ID that needs to get deleted.</param>
+		void DeleteComponent(const EntityID& a_ID) override
+		{
+			m_mComponents.erase(a_ID);
 
-			/// <summary>
-			/// Retrieves a component by entity id.
-			/// </summary>
-			/// <param name="a_ID">The entity that will be checked.</param>
-			/// <returns>Pointer to the component if the entity existed, otherwise nullptr.</returns>
-			Component* GetBaseComponent(const EntityID& a_ID) override
-			{
-				ComponentType* comp = TryGetComponent(a_ID);
-				return comp;
-			};
+			GetEngine().GetECS()->OnEntityComponentsUpdated().invoke();
+		}
 
-			/// <summary>
-			/// Updates the system's components.
-			/// </summary>
-			void UpdateComponents() override
-			{
-			}
+		/// <summary>
+		/// Clears the system and removes all entities.
+		/// </summary>
+		void Clear() override
+		{
+			m_mComponents.clear();
+		}
 
-			/// <summary>
-			/// Updates the system's components.
-			/// </summary>
-			virtual void InitComponentsRealtime() override
-			{
-				for (auto& component : m_mComponents)
-				{
-					component.second.InitRealtime();
-				}
-			}
-
-			/// <summary>
-			/// Updates the system's components.
-			/// </summary>
-			// <param name="a_fDeltaTime">The time it took since last frame.</param>
-			virtual void UpdateComponentsRealtime(float a_fDeltaTime, UpdateTime a_UpdateTime) override
-			{
-				for (auto& component : m_mComponents)
-				{
-					component.second.UpdateRealtimeInner(a_fDeltaTime, a_UpdateTime);
-				}
-			}
-
-			/// <summary>
-			/// Retrieves all mesh components.
-			/// </summary>
-			/// <returns>A vector containing the entity info and component data of all entities.</returns>
-			std::map<EntityID, ComponentType>& GetComponents()
-			{
-				return m_mComponents;
-			}
-		protected:
-			// TODO: We can only have one for each entity. If I want multiple components this will be a problem.
-			std::map<EntityID, ComponentType> m_mComponents;
+		/// <summary>
+		/// Retrieves a component by entity id.
+		/// </summary>
+		/// <param name="a_ID">The entity that will be checked.</param>
+		/// <returns>Pointer to the component if the entity existed, otherwise nullptr.</returns>
+		Component* GetBaseComponent(const EntityID& a_ID) override
+		{
+			ComponentType* comp = TryGetComponent(a_ID);
+			return comp;
 		};
-	}
+
+		/// <summary>
+		/// Updates the system's components.
+		/// </summary>
+		void UpdateComponents() override
+		{
+		}
+
+		/// <summary>
+		/// Updates the system's components.
+		/// </summary>
+		virtual void InitComponentsRealtime() override
+		{
+			for (auto& component : m_mComponents)
+			{
+				component.second.InitRealtime();
+			}
+		}
+
+		/// <summary>
+		/// Updates the system's components.
+		/// </summary>
+		// <param name="a_fDeltaTime">The time it took since last frame.</param>
+		virtual void UpdateComponentsRealtime(float a_fDeltaTime, UpdateTime a_UpdateTime) override
+		{
+			for (auto& component : m_mComponents)
+			{
+				component.second.UpdateRealtimeInner(a_fDeltaTime, a_UpdateTime);
+			}
+		}
+
+		/// <summary>
+		/// Retrieves all mesh components.
+		/// </summary>
+		/// <returns>A vector containing the entity info and component data of all entities.</returns>
+		std::map<EntityID, ComponentType>& GetComponents()
+		{
+			return m_mComponents;
+		}
+	protected:
+		// TODO: We can only have one for each entity. If I want multiple components this will be a problem.
+		std::map<EntityID, ComponentType> m_mComponents;
+	};
 }

@@ -12,177 +12,196 @@
 #include "core/Event.h"
 
 // gameplay
-#include "gameplay/Entity.h"
-#include "gameplay/ECSBaseSystem.h"
+#include "gameplay/EntityID.h"
 
-namespace gallus
+namespace gallus::resources
 {
-	namespace gameplay
+	class SrcData;
+}
+namespace gallus::gameplay
+{
+	class AbstractECSSystem;
+	class Entity;
+
+	struct EntitySlot
 	{
-		struct EntitySlot
+		std::shared_ptr<Entity> m_pEntity;
+		uint32_t m_iGeneration = 0;
+	};
+
+	/// <summary>
+	/// Class that contains all gameplay elements in the engine.
+	/// </summary>
+	//---------------------------------------------------------------------
+	// EntityComponentSystem
+	//---------------------------------------------------------------------
+	class EntityComponentSystem : public core::System
+	{
+	public:
+		/// <summary>
+		/// Initializes the system, setting up necessary resources.
+		/// </summary>
+		/// <returns>True if the initialization was successful, otherwise false.</returns>
+		bool Initialize() override;
+
+		/// <summary>
+		/// Destroys the system, releasing resources and performing necessary cleanup.
+		/// </summary>
+		/// <returns>True if the destruction was successful, otherwise false.</returns>
+		bool Destroy() override;
+
+		/// <summary>
+		/// Updates the system.
+		/// </summary>
+		void Update(float a_fDeltaTime, bool a_bUpdateRealtime = false);
+
+		/// <summary>
+		/// Creates an entity.
+		/// </summary>
+		/// <param name="a_sName">The name of the entity.</param>
+		/// <returns>The entity ID that got created.</returns>
+		EntityID CreateEntity(const std::string& a_sName);
+
+		/// <summary>
+		/// Creates an entity with components and properties included.
+		/// </summary>
+		/// <param name="a_SrcData">The entity data.</param>
+		/// <returns>The entity ID that got created.</returns>
+		EntityID CreateEntity(const resources::SrcData& a_SrcData);
+
+		/// <summary>
+		/// Creates an entity with components and properties included.
+		/// </summary>
+		/// <param name="a_SrcData">The entity data.</param>
+		/// <returns>The entity ID that got created.</returns>
+		EntityID UpdateEntity(const resources::SrcData& a_SrcData);
+
+		void SerializeEntity(const EntityID& a_EntityID, resources::SrcData& a_SrcData);
+
+		/// <summary>
+		/// Checks whether an entity is valid.
+		/// </summary>
+		/// <param name="a_ID"></param>
+		/// <returns>True if the entity was valid, otherwise false.</returns>
+		bool IsEntityValid(const EntityID& a_ID) const;
+
+		/// <summary>
+		/// Deletes an entity.
+		/// </summary>
+		/// <param name="a_ID">The entity that will be deleted.</param>
+		void DeleteEntity(const EntityID& a_ID);
+
+		/// <summary>
+		/// Gets entity info from a specific entity.
+		/// </summary>
+		/// <param name="a_ID">The entity.</param>
+		std::weak_ptr<Entity> GetEntity(const EntityID& a_ID) const;
+
+		/// <summary>
+		/// Gets entity info from a specific entity.
+		/// </summary>
+		std::weak_ptr<Entity> GetEntityByName(const std::string& a_sName) const;
+
+		/// <summary>
+		/// Gets entity info from a specific entity.
+		/// </summary>
+		/// <param name="a_ID">The entity.</param>
+		std::weak_ptr<Entity> GetEntity(const EntityID& a_ID);
+
+		/// <summary>
+		/// Clears all entities and deletes all components.
+		/// </summary>
+		void Clear();
+
+		/// <summary>
+		/// Returns a unique name and looks through all entities if a name already exists.
+		/// </summary>
+		/// <param name="a_Name">The name to check against.</param>
+		/// <returns>A string containing a unique name for an entity.</returns>
+		std::string GetUniqueName(const std::string& a_Name);
+
+		/// <summary>
+		/// Creates a system in the ECS.
+		/// </summary>
+		/// <typeparam name="T">The system class.</typeparam>
+		/// <returns>A reference to the created system.</returns>
+		template <class T>
+		T* CreateSystem()
 		{
-			std::shared_ptr<Entity> m_pEntity;
-			uint32_t m_iGeneration = 0;
+			T* system = GetSystem<T>();
+			if (system)
+			{
+				return system;
+			}
+			m_aSystems.emplace_back(std::make_unique<T>());
+			return dynamic_cast<T*>(m_aSystems[m_aSystems.size() - 1].get());
+		}
+
+		/// <summary>
+		/// Retrieves a system from the ECS. Creates one if not present.
+		/// </summary>
+		/// <typeparam name="T">The system class.</typeparam>
+		/// <returns>A reference to the created system.</returns>
+		template <class T>
+		T* GetSystem()
+		{
+			for (std::unique_ptr<AbstractECSSystem>& sys : m_aSystems)
+			{
+				T* result = dynamic_cast<T*>(sys.get());
+				if (result)
+				{
+					return result;
+				}
+			}
+			return nullptr;
 		};
 
 		/// <summary>
-		/// Class that contains all gameplay elements in the engine.
+		/// Retrieves all entities in the ECS.
 		/// </summary>
-		//---------------------------------------------------------------------
-		// EntityComponentSystem
-		//---------------------------------------------------------------------
-		class EntityComponentSystem : public core::System
+		/// <returns>A vector containing all entities in the ECS.</returns>
+		std::vector<EntityID> GetEntities() const;
+
+		/// <summary>
+		/// Retrieves all systems that have components for the specified entity id.
+		/// </summary>
+		/// <param name="a_EntityID">The entity that will be checked.</param>
+		/// <returns>A vector containing all systems that have components for the entity id.</returns>
+		std::vector<AbstractECSSystem*> GetSystemsContainingEntity(const EntityID& a_EntityID);
+
+		/// <summary>
+		/// Retrieves all systems in the ECS.
+		/// </summary>
+		/// <returns>A vector containing all systems in the ECS.</returns>
+		std::vector<AbstractECSSystem*> GetSystems();
+
+		mutable std::recursive_mutex m_EntityMutex;
+
+		/// <summary>
+		/// Retrieves the event that gets called after any entity has been updated.
+		/// </summary>
+		/// <returns>A const reference to the event.</returns>
+		const Event<>& OnEntitiesUpdated() const
 		{
-		public:
-			/// <summary>
-			/// Initializes the system, setting up necessary resources.
-			/// </summary>
-			/// <returns>True if the initialization was successful, otherwise false.</returns>
-			bool Initialize() override;
+			return m_eOnEntitiesUpdated;
+		}
 
-			/// <summary>
-			/// Destroys the system, releasing resources and performing necessary cleanup.
-			/// </summary>
-			/// <returns>True if the destruction was successful, otherwise false.</returns>
-			bool Destroy() override;
+		/// <summary>
+		/// Retrieves the event that gets called after any entity component has been updated.
+		/// </summary>
+		/// <returns>A const reference to the event.</returns>
+		const Event<>& OnEntityComponentsUpdated() const
+		{
+			return m_eOnEntityComponentsUpdated;
+		}
+	private:
+		Event<> m_eOnEntitiesUpdated;
+		Event<> m_eOnEntityComponentsUpdated;
 
-			/// <summary>
-			/// Updates the system.
-			/// </summary>
-			void Update(float a_fDeltaTime, bool a_bUpdateRealtime = false);
+		std::vector<std::unique_ptr<AbstractECSSystem>> m_aSystems;
+		size_t m_iNextID = 0;
 
-			/// <summary>
-			/// Creates an entity.
-			/// </summary>
-			/// <param name="a_sName">The name of the entity.</param>
-			/// <returns>The entity ID that got created.</returns>
-			EntityID CreateEntity(const std::string& a_sName);
-
-			/// <summary>
-			/// Checks whether an entity is valid.
-			/// </summary>
-			/// <param name="a_ID"></param>
-			/// <returns>True if the entity was valid, otherwise false.</returns>
-			bool IsEntityValid(const EntityID& a_ID) const;
-
-			/// <summary>
-			/// Deletes an entity.
-			/// </summary>
-			/// <param name="a_ID">The entity that will be deleted.</param>
-			void DeleteEntity(const EntityID& a_ID);
-
-			/// <summary>
-			/// Gets entity info from a specific entity.
-			/// </summary>
-			/// <param name="a_ID">The entity.</param>
-			std::weak_ptr<Entity> GetEntity(const EntityID& a_ID) const;
-
-			/// <summary>
-			/// Gets entity info from a specific entity.
-			/// </summary>
-			std::weak_ptr<Entity> GetEntityByName(const std::string& a_sName) const;
-
-			/// <summary>
-			/// Gets entity info from a specific entity.
-			/// </summary>
-			/// <param name="a_ID">The entity.</param>
-			std::weak_ptr<Entity> GetEntity(const EntityID& a_ID);
-
-			/// <summary>
-			/// Clears all entities and deletes all components.
-			/// </summary>
-			void Clear();
-
-			/// <summary>
-			/// Returns a unique name and looks through all entities if a name already exists.
-			/// </summary>
-			/// <param name="a_Name">The name to check against.</param>
-			/// <returns>A string containing a unique name for an entity.</returns>
-			std::string GetUniqueName(const std::string& a_Name);
-
-			/// <summary>
-			/// Creates a system in the ECS.
-			/// </summary>
-			/// <typeparam name="T">The system class.</typeparam>
-			/// <returns>A reference to the created system.</returns>
-			template <class T>
-			T* CreateSystem()
-			{
-				T* system = GetSystem<T>();
-				if (system)
-				{
-					return system;
-				}
-				m_aSystems.emplace_back(std::make_unique<T>());
-				return dynamic_cast<T*>(m_aSystems[m_aSystems.size() - 1].get());
-			}
-
-			/// <summary>
-			/// Retrieves a system from the ECS. Creates one if not present.
-			/// </summary>
-			/// <typeparam name="T">The system class.</typeparam>
-			/// <returns>A reference to the created system.</returns>
-			template <class T>
-			T* GetSystem()
-			{
-				for (std::unique_ptr<AbstractECSSystem>& sys : m_aSystems)
-				{
-					T* result = dynamic_cast<T*>(sys.get());
-					if (result)
-					{
-						return result;
-					}
-				}
-				return nullptr;
-			};
-
-			/// <summary>
-			/// Retrieves all entities in the ECS.
-			/// </summary>
-			/// <returns>A vector containing all entities in the ECS.</returns>
-			std::vector<EntityID> GetEntities() const;
-
-			/// <summary>
-			/// Retrieves all systems that have components for the specified entity id.
-			/// </summary>
-			/// <param name="a_EntityID">The entity that will be checked.</param>
-			/// <returns>A vector containing all systems that have components for the entity id.</returns>
-			std::vector<AbstractECSSystem*> GetSystemsContainingEntity(const EntityID& a_EntityID);
-
-			/// <summary>
-			/// Retrieves all systems in the ECS.
-			/// </summary>
-			/// <returns>A vector containing all systems in the ECS.</returns>
-			std::vector<AbstractECSSystem*> GetSystems();
-
-			mutable std::recursive_mutex m_EntityMutex;
-
-			/// <summary>
-			/// Retrieves the event that gets called after any entity has been updated.
-			/// </summary>
-			/// <returns>A const reference to the event.</returns>
-			const Event<>& OnEntitiesUpdated() const
-			{
-				return m_eOnEntitiesUpdated;
-			}
-
-			/// <summary>
-			/// Retrieves the event that gets called after any entity component has been updated.
-			/// </summary>
-			/// <returns>A const reference to the event.</returns>
-			const Event<>& OnEntityComponentsUpdated() const
-			{
-				return m_eOnEntityComponentsUpdated;
-			}
-		private:
-			Event<> m_eOnEntitiesUpdated;
-			Event<> m_eOnEntityComponentsUpdated;
-
-			std::vector<std::unique_ptr<AbstractECSSystem>> m_aSystems;
-			size_t m_iNextID = 0;
-
-			std::vector<EntitySlot> m_aEntitySlots;
-			std::vector<uint32_t> m_aFreeIndices;
-		};
-	}
+		std::vector<EntitySlot> m_aEntitySlots;
+		std::vector<uint32_t> m_aFreeIndices;
+	};
 }

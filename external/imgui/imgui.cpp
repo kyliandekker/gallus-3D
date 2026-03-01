@@ -50,7 +50,7 @@ DOCUMENTATION
 - PROGRAMMER GUIDE
   - READ FIRST
   - HOW TO UPDATE TO A NEWER VERSION OF DEAR IMGUI
-  - GETTING STARTED WITH INTEGRATING DEAR IMGUI IN YOUR CODE/ENGINE
+  - GETTING STARTED WITH INTEGRATING DEAR IMGUI IN YOUR CODE/GetEngine()
   - HOW A SIMPLE APPLICATION MAY LOOK LIKE
   - HOW A SIMPLE RENDERING FUNCTION MAY LOOK LIKE
 - API BREAKING CHANGES (read me when you update!)
@@ -255,7 +255,7 @@ CODE
  - Try to keep your copy of Dear ImGui reasonably up to date!
 
 
- GETTING STARTED WITH INTEGRATING DEAR IMGUI IN YOUR CODE/ENGINE
+ GETTING STARTED WITH INTEGRATING DEAR IMGUI IN YOUR CODE/GetEngine()
  ---------------------------------------------------------------
  - See https://github.com/ocornut/imgui/wiki/Getting-Started.
  - Run and study the examples and demo in imgui_demo.cpp to get acquainted with the library.
@@ -309,7 +309,7 @@ CODE
 	 ImGui_ImplWin32_Shutdown();
 	 ImGui::DestroyContext();
 
- EXHIBIT 2: IMPLEMENTING CUSTOM BACKEND / CUSTOM ENGINE
+ EXHIBIT 2: IMPLEMENTING CUSTOM BACKEND / CUSTOM GetEngine()
 
 	 // Application init: create a dear imgui context, setup some options, load fonts
 	 ImGui::CreateContext();

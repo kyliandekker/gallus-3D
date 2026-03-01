@@ -3,13 +3,13 @@
 #include "graphics/dx12/DX12PCH.h"
 
 // external
-#include <string>
 #include <unordered_map>
 
-#include "core/Engine.h"
-
+// graphics
+#include "graphics/dx12/DX12System.h"
 #include "graphics/dx12/Shader.h"
 
+// logger
 #include "logger/Logger.h"
 
 namespace gallus
@@ -108,18 +108,20 @@ namespace gallus
 
 					if (!ps || !vs)
 					{
-						LOG(LOGSEVERITY_ERROR, LOG_CATEGORY_DX12, "Failed creating pipeline state because pixel shader or vertex shader were null.");
+						LOG(LOGSEVERITY_ERROR, LOG_CATEGORY_DX12, "Failed creating pipeline state: Failed to lock pixel or vertex shader.");
 						return nullptr;
 					}
 
-					graphics::dx12::DX12System* dx12System = core::ENGINE->GetDX12();
-					if (!dx12System)
+					if (!ps->GetShaderBlob() || !vs->GetShaderBlob())
 					{
+						LOG(LOGSEVERITY_ERROR, LOG_CATEGORY_DX12, "Failed creating pipeline state: Failed creating pipeline state because pixel shader or vertex shader was null.");
 						return nullptr;
 					}
+
+					DX12System& dx12System = GetDX12System();
 
 					PipelineStateStream pipelineStateStream;
-					pipelineStateStream.pRootSignature = dx12System->GetRootSignature().Get();
+					pipelineStateStream.pRootSignature = dx12System.GetRootSignature().Get();
 					pipelineStateStream.InputLayout = { g_aInputLayout, _countof(g_aInputLayout) };
 					pipelineStateStream.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 					pipelineStateStream.PS = CD3DX12_SHADER_BYTECODE(ps->GetShaderBlob().Get());
@@ -138,9 +140,9 @@ namespace gallus
 					desc.pPipelineStateSubobjectStream = &pipelineStateStream;
 
 					ID3D12PipelineState* pso = nullptr;
-					if (FAILED(dx12System->GetDevice()->CreatePipelineState(&desc, IID_PPV_ARGS(&pso))))
+					if (FAILED(dx12System.GetDevice()->CreatePipelineState(&desc, IID_PPV_ARGS(&pso))))
 					{
-						LOG(LOGSEVERITY_ERROR, LOG_CATEGORY_DX12, "Failed creating pipeline state.");
+						LOG(LOGSEVERITY_ERROR, LOG_CATEGORY_DX12, "Failed creating pipeline state: Failed creating pipeline state.");
 						return nullptr;
 					}
 

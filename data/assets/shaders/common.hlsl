@@ -6,7 +6,7 @@ cbuffer ShaderTransform : register(b0)
     float4x4 WorldMatrix;
 };
 
-cbuffer SpriteUV : register(b1)
+cbuffer TextureUV : register(b1)
 {
     float4 uv;
 };

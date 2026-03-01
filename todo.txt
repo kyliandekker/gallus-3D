@@ -18,7 +18,7 @@ Editor keybind context ✓
 Drag resources onto resource picker ✓
 Camera isolation mode needs to be saved in editor settings ✓
 
-Sprite modal is awful
+Texture modal is awful
 Turn DX12System into a coordinator class and split up the parts
 Stuff in DX12System should probably be unique_ptrs
 Buffer needs a rewrite

@@ -22,10 +22,10 @@
         "assetType": 0,
         "enabled": 1,
         "lightDirection": {
-            "x": 0.47619327902793887,
-            "y": 0.4588984549045563,
-            "z": -0.13992774486541749,
-            "w": 0.7369345426559448
+            "x": 0.2640981376171112,
+            "y": 0.6063023209571838,
+            "z": 0.15302087366580964,
+            "w": 0.7343257665634155
         },
         "lightColor": {
             "r": 1.0,
@@ -37,39 +37,33 @@
     },
     "entities": [
         {
-            "name": "Player",
+            "name": "New GameObject (1)",
             "isActive": true,
             "components": {
-                "sprite": {
-                    "pixelShader": "pixelShader.hlsl",
-                    "vertexShader": "vertexShader.hlsl",
-                    "static": true,
-                    "order": 1,
-                    "color": {
-                        "r": 1.0,
-                        "g": 1.0,
-                        "b": 1.0,
-                        "a": 1.0
-                    },
-                    "sprite": "tex_walk.png",
-                    "spriteIndex": 1
+                "mesh": {
+                    "pixelShader": "pixelShaderUvDebug.cso",
+                    "vertexShader": "vertexShader.cso",
+                    "material": "mat_lit.mat",
+                    "mesh": "mod_missing.glb",
+                    "texture": "tex_missing.png",
+                    "textureIndex": 0
                 },
                 "transform": {
                     "transform": {
                         "position": {
-                            "x": 1124.115966796875,
-                            "y": 160.84921264648438,
-                            "z": 0.0
+                            "x": -1.6175308227539063,
+                            "y": 1.3766255378723145,
+                            "z": 1.1920928955078126e-7
                         },
                         "scale": {
-                            "x": 696.9682006835938,
-                            "y": 696.9682006835938,
-                            "z": 0.0
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
                         },
                         "rotation": {
-                            "x": 0.0,
+                            "x": -0.0,
                             "y": 0.0,
-                            "z": 0.0,
+                            "z": -0.0,
                             "w": 1.0
                         },
                         "pivot": {
@@ -77,7 +71,47 @@
                             "y": -0.5,
                             "z": -0.5
                         },
-                        "cameraType": 1
+                        "cameraType": 0
+                    }
+                }
+            }
+        },
+        {
+            "name": "New GameObject",
+            "isActive": true,
+            "components": {
+                "mesh": {
+                    "pixelShader": "pixelShader.cso",
+                    "vertexShader": "vertexShader.cso",
+                    "material": "mat_lit.mat",
+                    "mesh": "cube",
+                    "texture": "tex_missing.png",
+                    "textureIndex": 0
+                },
+                "transform": {
+                    "transform": {
+                        "position": {
+                            "x": 1.110291600227356,
+                            "y": 0.04124242067337036,
+                            "z": 0.08554136753082276
+                        },
+                        "scale": {
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
+                        },
+                        "rotation": {
+                            "x": -0.0,
+                            "y": 0.0,
+                            "z": -0.0,
+                            "w": 1.0
+                        },
+                        "pivot": {
+                            "x": 0.0,
+                            "y": -0.5,
+                            "z": 0.0
+                        },
+                        "cameraType": 0
                     }
                 }
             }
@@ -87,9 +121,9 @@
             "isActive": true,
             "components": {
                 "mesh": {
-                    "pixelShader": "pixelShader.hlsl",
-                    "vertexShader": "vertexShader.hlsl",
-                    "material": "1.mat",
+                    "pixelShader": "pixelShader.cso",
+                    "vertexShader": "vertexShader.cso",
+                    "material": "mat_lit.mat",
                     "mesh": "mod_chicken.glb",
                     "texture": "tex_chicken_infected.png",
                     "textureIndex": 0
@@ -123,28 +157,29 @@
             }
         },
         {
-            "name": "New GameObject",
+            "name": "Player",
             "isActive": true,
             "components": {
-                "mesh": {
-                    "pixelShader": "pixelShader.hlsl",
-                    "vertexShader": "vertexShader.hlsl",
-                    "material": "1.mat",
-                    "mesh": "cube",
-                    "texture": "tex_missing.png",
+                "sprite": {
+                    "pixelShader": "pixelShader.cso",
+                    "vertexShader": "vertexShader.cso",
+                    "static": true,
+                    "order": 1,
+                    "material": "mat_unlit.mat",
+                    "texture": "tex_walk.png",
                     "textureIndex": 0
                 },
                 "transform": {
                     "transform": {
                         "position": {
-                            "x": 1.379448413848877,
-                            "y": 0.3901485800743103,
-                            "z": 0.0855414867401123
+                            "x": 1124.115966796875,
+                            "y": 160.84921264648438,
+                            "z": 0.0
                         },
                         "scale": {
-                            "x": 1.0,
-                            "y": 1.0,
-                            "z": 1.0
+                            "x": 696.9682006835938,
+                            "y": 696.9682006835938,
+                            "z": 0.0
                         },
                         "rotation": {
                             "x": 0.0,
@@ -153,51 +188,11 @@
                             "w": 1.0
                         },
                         "pivot": {
-                            "x": 0.0,
-                            "y": -0.5,
-                            "z": 0.0
-                        },
-                        "cameraType": 0
-                    }
-                }
-            }
-        },
-        {
-            "name": "New GameObject (1)",
-            "isActive": true,
-            "components": {
-                "mesh": {
-                    "pixelShader": "pixelShaderUvDebug.hlsl",
-                    "vertexShader": "vertexShader.hlsl",
-                    "material": "1.mat",
-                    "mesh": "mod_missing.glb",
-                    "texture": "tex_missing.png",
-                    "textureIndex": 0
-                },
-                "transform": {
-                    "transform": {
-                        "position": {
-                            "x": -1.6175308227539063,
-                            "y": 1.3766255378723145,
-                            "z": 1.1920928955078126e-7
-                        },
-                        "scale": {
-                            "x": 1.0,
-                            "y": 1.0,
-                            "z": 1.0
-                        },
-                        "rotation": {
-                            "x": -0.0,
-                            "y": 0.0,
-                            "z": -0.0,
-                            "w": 1.0
-                        },
-                        "pivot": {
                             "x": -0.5,
                             "y": -0.5,
                             "z": -0.5
                         },
-                        "cameraType": 0
+                        "cameraType": 1
                     }
                 }
             }

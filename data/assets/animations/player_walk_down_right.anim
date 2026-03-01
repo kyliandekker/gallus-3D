@@ -4,25 +4,25 @@
     "keyFrames": {
         "0": {
             "components": {
-                "sprite": {
-                    "spriteIndex": 15,
-                    "sprite": "tex_walk.png"
+                "texture": {
+                    "textureIndex": 15,
+                    "texture": "tex_walk.png"
                 }
             }
         },
         "10": {
             "components": {
-                "sprite": {
-                    "spriteIndex": 16,
-                    "sprite": "tex_walk.png"
+                "texture": {
+                    "textureIndex": 16,
+                    "texture": "tex_walk.png"
                 }
             }
         },
         "20": {
             "components": {
-                "sprite": {
-                    "spriteIndex": 17,
-                    "sprite": "tex_walk.png"
+                "texture": {
+                    "textureIndex": 17,
+                    "texture": "tex_walk.png"
                 }
             }
         },

@@ -3,53 +3,41 @@
 // external
 #include <DirectXMath.h>
 
-// resources
-#include "resources/SrcData.h"
-
-// gameplay
-#include "gameplay/systems/TransformSystem.h"
-#include "gameplay/EntityID.h"
-
-#include "logger/Logger.h"
-
-namespace gallus
+namespace gallus::gameplay
 {
-	namespace gameplay
+	//---------------------------------------------------------------------
+	// TransformComponent
+	//---------------------------------------------------------------------
+	graphics::dx12::Transform& TransformComponent::GetTransform()
 	{
-		//---------------------------------------------------------------------
-		// TransformComponent
-		//---------------------------------------------------------------------
-		graphics::dx12::Transform& TransformComponent::GetTransform()
+		return m_Transform;
+	}
+
+	//---------------------------------------------------------------------
+	void TransformComponent::Translate(const DirectX::XMFLOAT3& a_vTranslation)
+	{
+		m_vTranslation = {
+			m_vTranslation.x + a_vTranslation.x,
+			m_vTranslation.y + a_vTranslation.y,
+			m_vTranslation.z + a_vTranslation.z
+		};
+	}
+
+	//---------------------------------------------------------------------
+	void TransformComponent::UpdateRealtime(float a_fDeltaTime, UpdateTime a_UpdateTime)
+	{
+		if (m_vTranslation.x == 0.0f && m_vTranslation.y == 0.0)
 		{
-			return m_Transform;
+			return;
 		}
 
-		//---------------------------------------------------------------------
-		void TransformComponent::Translate(const DirectX::XMFLOAT3& a_vTranslation)
-		{
-			m_vTranslation = {
-				m_vTranslation.x + a_vTranslation.x,
-				m_vTranslation.y + a_vTranslation.y,
-				m_vTranslation.z + a_vTranslation.z
-			};
-		}
+		DirectX::XMFLOAT3 newPos = {
+			m_Transform.GetPosition().x + m_vTranslation.x,
+			m_Transform.GetPosition().y + m_vTranslation.y,
+			m_Transform.GetPosition().z + m_vTranslation.z
+		};
+		m_Transform.SetPosition(newPos);
 
-		//---------------------------------------------------------------------
-		void TransformComponent::UpdateRealtime(float a_fDeltaTime, UpdateTime a_UpdateTime)
-		{
-			if (m_vTranslation.x == 0.0f && m_vTranslation.y == 0.0)
-			{
-				return;
-			}
-
-			DirectX::XMFLOAT3 newPos = {
-				m_Transform.GetPosition().x + m_vTranslation.x,
-				m_Transform.GetPosition().y + m_vTranslation.y,
-				m_Transform.GetPosition().z + m_vTranslation.z
-			};
-			m_Transform.SetPosition(newPos);
-
-			m_vTranslation = {};
-		}
+		m_vTranslation = {};
 	}
 }

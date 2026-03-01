@@ -9,7 +9,7 @@ struct ShaderTransform
 	DirectX::XMMATRIX WorldMatrix;
 };
 
-struct SpriteUV
+struct TextureUV
 {
 	DirectX::XMFLOAT4 uv;
 };

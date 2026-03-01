@@ -2,13 +2,12 @@
 
 #include "imgui/imgui_helpers.h"
 
-#include <cmath>
-#include <cstdio>
 #include <string>
-#include <imgui/imgui_internal.h>
 #include <algorithm>
-#include <unordered_set>
 #include <set>
+#include <imgui/imgui_internal.h>
+
+#include "imgui_system/ImGuiSystem.h"
 
 namespace ImGui
 {
@@ -73,13 +72,10 @@ namespace ImGui
 
 	bool ConsoleButton(const std::string& a_Label, bool* a_pValue, const std::string& a_sDescription, const ImVec2& a_vSize, int a_iNumber, const ImVec4& a_vColor, const ImVec4& a_vCircleColor)
 	{
-		ImVec2 startPos = ImGui::GetCursorScreenPos();
-		ImVec2 circlePos = startPos + ImVec2(a_vSize.x * 0.75f, a_vSize.y);
-
-		ImGui::SetCursorScreenPos(startPos);
 		bool success = IconCheckboxButton(a_Label, a_pValue, a_sDescription, a_vSize, a_vColor);
-
-		ImDrawList* pDrawList = ImGui::GetForegroundDrawList();
+		
+		ImVec2 startPos = ImGui::GetItemRectMin();
+		ImVec2 circlePos = startPos + ImVec2(a_vSize.x * 0.75f, a_vSize.y);
 
 		const float circleRadius = 12.5f;
 
@@ -95,8 +91,6 @@ namespace ImGui
 		ImU32 textColor = ImGui::ColorConvertFloat4ToU32(textColorV);
 		ImU32 circleColor = ImGui::ColorConvertFloat4ToU32(circleColorV);
 
-		pDrawList->AddCircleFilled(circlePos, circleRadius, circleColor);
-
 		char numberBuffer[8] = { 0 };
 
 		if (a_iNumber > 99)
@@ -108,13 +102,17 @@ namespace ImGui
 			snprintf(numberBuffer, sizeof(numberBuffer), "%d", a_iNumber);
 		}
 
-		ImVec2 textSize = ImGui::CalcTextSize(numberBuffer);
+		gallus::graphics::imgui::GetOverlayQueue().Push([=](ImDrawList* pDrawList)
+		{
+			pDrawList->AddCircleFilled(circlePos, circleRadius, circleColor);
 
-		ImVec2 textPos;
-		textPos.x = circlePos.x - (textSize.x * 0.5f);
-		textPos.y = circlePos.y - (textSize.y * 0.5f);
+			ImVec2 textSize = ImGui::CalcTextSize(numberBuffer);
+			ImVec2 textPos;
+			textPos.x = circlePos.x - textSize.x * 0.5f;
+			textPos.y = circlePos.y - textSize.y * 0.5f;
 
-		pDrawList->AddText(textPos, textColor, numberBuffer);
+			pDrawList->AddText(textPos, textColor, numberBuffer);
+		});
 
 		return success;
 	}
@@ -289,7 +287,9 @@ namespace ImGui
 	{
 		ImGuiWindow* window = GetCurrentWindow();
 		if (window->SkipItems)
+		{
 			return false;
+		}
 
 		ImGuiContext& g = *GImGui;
 		const ImGuiStyle& style = g.Style;
@@ -302,7 +302,9 @@ namespace ImGui
 		PushID(label.c_str());
 		const bool set_current_color_edit_id = (g.ColorEditCurrentID == 0);
 		if (set_current_color_edit_id)
+		{
 			g.ColorEditCurrentID = window->IDStack.back();
+		}
 
 		const int components = 2;
 		const float w_button = 0.0f;
@@ -310,7 +312,6 @@ namespace ImGui
 		w_full = w_inputs + w_button;
 
 		bool value_changed = false;
-		bool value_changed_as_float = false;
 
 		const ImVec2 pos = window->DC.CursorPos;
 		const float inputs_offset_x = (style.ColorButtonPosition == ImGuiDir_Left) ? w_button : 0.0f;
@@ -337,13 +338,22 @@ namespace ImGui
 		for (int n = 0; n < components; n++)
 		{
 			if (n > 0)
+			{
 				SameLine(0, style.ItemInnerSpacing.x);
+			}
 			float next_split = IM_TRUNC(w_items * (n + 1) / components);
 			SetNextItemWidth(ImMax(next_split - prev_split, 1.0f));
 			prev_split = next_split;
 
 			value_changed |= DragFloat(ids[n], &col[n], a_fSpeed, a_fMin, a_fMax, fmt_table_float[fmt_idx][n]);
-			value_changed_as_float |= value_changed;
+			if (ImGui::IsItemActivated())
+			{
+				value_changed = true;
+			}
+			if (ImGui::IsItemActive())
+			{
+				value_changed = true;
+			}
 		}
 
 		if (label != label_display_end )
@@ -358,14 +368,16 @@ namespace ImGui
 		PopID();
 		EndGroup();
 
-		return value_changed_as_float;
+		return value_changed;
 	}
 
 	bool VectorEdit3(const std::string& label, float col[3], float a_fSpeed, float a_fMin, float a_fMax)
 	{
 		ImGuiWindow* window = GetCurrentWindow();
 		if (window->SkipItems)
+		{
 			return false;
+		}
 
 		ImGuiContext& g = *GImGui;
 		const ImGuiStyle& style = g.Style;
@@ -378,7 +390,9 @@ namespace ImGui
 		PushID(label.c_str());
 		const bool set_current_color_edit_id = (g.ColorEditCurrentID == 0);
 		if (set_current_color_edit_id)
+		{
 			g.ColorEditCurrentID = window->IDStack.back();
+		}
 
 		const int components = 3;
 		const float w_button = 0.0f;
@@ -386,7 +400,6 @@ namespace ImGui
 		w_full = w_inputs + w_button;
 
 		bool value_changed = false;
-		bool value_changed_as_float = false;
 
 		const ImVec2 pos = window->DC.CursorPos;
 		const float inputs_offset_x = (style.ColorButtonPosition == ImGuiDir_Left) ? w_button : 0.0f;
@@ -413,13 +426,22 @@ namespace ImGui
 		for (int n = 0; n < components; n++)
 		{
 			if (n > 0)
+			{
 				SameLine(0, style.ItemInnerSpacing.x);
+			}
 			float next_split = IM_TRUNC(w_items * (n + 1) / components);
 			SetNextItemWidth(ImMax(next_split - prev_split, 1.0f));
 			prev_split = next_split;
 
 			value_changed |= DragFloat(ids[n], &col[n], a_fSpeed, a_fMin, a_fMax, fmt_table_float[fmt_idx][n]);
-			value_changed_as_float |= value_changed;
+			if (ImGui::IsItemActivated())
+			{
+				value_changed = true;
+			}
+			if (ImGui::IsItemActive())
+			{
+				value_changed = true;
+			}
 		}
 
 		if (label != label_display_end )
@@ -434,14 +456,16 @@ namespace ImGui
 		PopID();
 		EndGroup();
 
-		return value_changed_as_float;
+		return value_changed;
 	}
 
 	bool IVectorEdit2(const std::string& label, int col[2])
 	{
 		ImGuiWindow* window = GetCurrentWindow();
 		if (window->SkipItems)
+		{
 			return false;
+		}
 
 		ImGuiContext& g = *GImGui;
 		const ImGuiStyle& style = g.Style;
@@ -454,7 +478,9 @@ namespace ImGui
 		PushID(label.c_str());
 		const bool set_current_color_edit_id = (g.ColorEditCurrentID == 0);
 		if (set_current_color_edit_id)
+		{
 			g.ColorEditCurrentID = window->IDStack.back();
+		}
 
 		const int components = 2;
 		const float w_button = 0.0f;
@@ -465,14 +491,12 @@ namespace ImGui
 		int f[2] = { col[0], col[1] };
 
 		bool value_changed = false;
-		bool value_changed_as_float = false;
 
 		const ImVec2 pos = window->DC.CursorPos;
 		const float inputs_offset_x = (style.ColorButtonPosition == ImGuiDir_Left) ? w_button : 0.0f;
 		window->DC.CursorPos.x = pos.x + inputs_offset_x;
 
-
-			// RGB/HSV 0..255 Sliders
+		// RGB/HSV 0..255 Sliders
 		const float w_items = w_inputs - style.ItemInnerSpacing.x * (components - 1);
 
 		const bool hide_prefix = (IM_TRUNC(w_items / components) <= CalcTextSize("M:0.000").x);
@@ -493,13 +517,22 @@ namespace ImGui
 		for (int n = 0; n < components; n++)
 		{
 			if (n > 0)
+			{
 				SameLine(0, style.ItemInnerSpacing.x);
+			}
 			float next_split = IM_TRUNC(w_items * (n + 1) / components);
 			SetNextItemWidth(ImMax(next_split - prev_split, 1.0f));
 			prev_split = next_split;
 
 			value_changed |= DragInt(ids[n], &f[n], 1.0f / 255.0f, -999999999, 999999999, fmt_table_float[fmt_idx][n]);
-			value_changed_as_float |= value_changed;
+			if (ImGui::IsItemActivated())
+			{
+				value_changed = true;
+			}
+			if (ImGui::IsItemActive())
+			{
+				value_changed = true;
+			}
 		}
 
 		if (label != label_display_end )
@@ -512,7 +545,9 @@ namespace ImGui
 		}
 
 		if (value_changed && g.LastItemData.ID != 0) // In case of ID collision, the second EndGroup() won't catch g.ActiveId
+		{
 			MarkItemEdited(g.LastItemData.ID);
+		}
 
 		PopID();
 		EndGroup();

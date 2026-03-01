@@ -1,8 +1,6 @@
 #include "AnimationKeyFrame.h"
 
-#include "animation/Animation.h"
-
-#include "gameplay/EntityID.h"
+#include "animation/AnimationKeyFrameComponentBase.h"
 
 namespace gallus
 {
@@ -24,6 +22,20 @@ namespace gallus
 			for (AnimationKeyFrameComponentBase* component : m_aAnimationKeyFrameComponents)
 			{
 				component->Activate(a_EntityID);
+			}
+		}
+
+		//---------------------------------------------------------------------
+		void AnimationKeyFrame::RemoveComponent(AnimationKeyFrameComponentBase* a_pAnimationKeyFrameComponent)
+		{
+			size_t i = 0;
+			for (AnimationKeyFrameComponentBase* keyFrame : m_aAnimationKeyFrameComponents)
+			{
+				if (keyFrame == a_pAnimationKeyFrameComponent)
+				{
+					m_aAnimationKeyFrameComponents.erase(m_aAnimationKeyFrameComponents.begin() + i);
+					break;
+				}
 			}
 		}
 	}

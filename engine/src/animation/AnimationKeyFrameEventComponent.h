@@ -2,68 +2,73 @@
 
 #include "AnimationKeyFrameComponentBase.h"
 
+// animation
+#include "animation/AnimationEvents.h"
+
 #define ANIMATION_KEY_FRAME_EVENT_COMPONENT_NAME "Event"
 #define ANIMATION_KEY_FRAME_EVENT_COMPONENT_PROPERTY_NAME "event"
 
-namespace gallus
+namespace gallus::animation
 {
-	namespace animation
+	class AnimationKeyFrameEventComponent : public AnimationKeyFrameComponentBase
 	{
-		enum class AnimationEvent;
+	public:
+		/// <summary>
+		/// Constructs a key frame event component.
+		/// </summary>
+		/// <param name="a_KeyFrame">The key frame this component is attached to.</param>
+		AnimationKeyFrameEventComponent(AnimationKeyFrame& a_KeyFrame) : AnimationKeyFrameComponentBase(a_KeyFrame)
+		{}
 
-		class AnimationKeyFrameEventComponent : public AnimationKeyFrameComponentBase
+		/// <summary>
+		/// Activates the key frame component's behaviour.
+		/// </summary>
+		/// <param name="a_EntityID">The related entity id.</param>
+		void Activate(gameplay::EntityID& a_EntityID) override;
+
+		/// <summary>
+		/// Retrieves the event.
+		/// </summary>
+		/// <returns>The event attached to this key frame.</returns>
+		AnimationEvent GetEvent() const
 		{
-		public:
-			/// <summary>
-			/// Constructs a key frame event component.
-			/// </summary>
-			/// <param name="a_KeyFrame">The key frame this component is attached to.</param>
-			AnimationKeyFrameEventComponent(AnimationKeyFrame& a_KeyFrame) : AnimationKeyFrameComponentBase(a_KeyFrame)
-			{
-			}
+			return m_Event;
+		}
 
-			/// <summary>
-			/// Activates the key frame component's behaviour.
-			/// </summary>
-			/// <param name="a_EntityID">The related entity id.</param>
-			void Activate(gameplay::EntityID& a_EntityID) override;
+		/// <summary>
+		/// Returns the name of the component.
+		/// </summary>
+		/// <returns>A string containing the name of the component.</returns>
+		std::string GetName() const override;
 
-			/// <summary>
-			/// Retrieves the event.
-			/// </summary>
-			/// <returns>The event attached to this key frame.</returns>
-			AnimationEvent GetEvent() const
-			{
-				return m_Event;
-			}
-
-			std::string GetName() const override;
-
-			const std::string GetPropertyName() const override
-			{
-				return ANIMATION_KEY_FRAME_EVENT_COMPONENT_PROPERTY_NAME;
-			}
-		private:
-			AnimationEvent m_Event;
-
-			BEGIN_SERIALIZE_PARENT(AnimationKeyFrameEventComponent, AnimationKeyFrameComponentBase)
-			END_SERIALIZE(AnimationKeyFrameEventComponent)
-		};
-
-		class AnimationKeyFrameEventSystem : public AnimationKeyFrameBaseSystem
+		/// <summary>
+		/// Returns the property name of the component.
+		/// </summary>
+		/// <returns>A string containing the name of the component used in serialization.</returns>
+		const std::string GetPropertyName() const override
 		{
-		public:
-			std::string GetName() const override;
+			return ANIMATION_KEY_FRAME_EVENT_COMPONENT_PROPERTY_NAME;
+		}
+	private:
+		AnimationEvent m_Event = AnimationEvent::AnimationEvent_None;
 
-			const std::string GetPropertyName() const override
-			{
-				return ANIMATION_KEY_FRAME_EVENT_COMPONENT_PROPERTY_NAME;
-			}
+		BEGIN_SERIALIZE_PARENT(AnimationKeyFrameEventComponent, AnimationKeyFrameComponentBase)
+		END_SERIALIZE(AnimationKeyFrameEventComponent)
+	};
 
-			AnimationKeyFrameComponentBase* CreateComponent(AnimationKeyFrame& a_KeyFrame) override
-			{
-				return new AnimationKeyFrameEventComponent(a_KeyFrame);
-			}
-		};
-	}
+	class AnimationKeyFrameEventSystem : public AnimationKeyFrameBaseSystem
+	{
+	public:
+		std::string GetName() const override;
+
+		const std::string GetPropertyName() const override
+		{
+			return ANIMATION_KEY_FRAME_EVENT_COMPONENT_PROPERTY_NAME;
+		}
+
+		AnimationKeyFrameComponentBase* CreateComponent(AnimationKeyFrame& a_KeyFrame) override
+		{
+			return new AnimationKeyFrameEventComponent(a_KeyFrame);
+		}
+	};
 }

@@ -13,13 +13,17 @@ add_executable(editor WIN32 ${HEADERS} ${ICON} ${SOURCES})
 # Preprocessor definitions
 target_compile_definitions(editor PRIVATE
     _EDITOR
-    _LOAD_BY_PATH
     "$<$<CONFIG:${DEBUG}>:${PREDEFINITIONS_EDITOR_DEBUG}>"
     "$<$<CONFIG:${RELEASE}>:${PREDEFINITIONS_EDITOR_RELEASE}>"
 )
 
 # Include directories
-target_include_directories(editor PUBLIC ${CMAKE_SOURCE_DIR}/engine/src ${CMAKE_SOURCE_DIR}/editor/src ${CMAKE_SOURCE_DIR}/external)
+target_include_directories(editor PUBLIC 
+	${CMAKE_SOURCE_DIR}/engine/src 
+	${CMAKE_SOURCE_DIR}/editor/src 
+	${CMAKE_SOURCE_DIR}/imgui_system/src 
+	${CMAKE_SOURCE_DIR}/external
+)
 
 # Conditional editor sources
 target_sources(editor PRIVATE
@@ -31,7 +35,7 @@ target_sources(editor PRIVATE
 set_target_properties(editor PROPERTIES CXX_STANDARD 20)
 
 # Link libraries
-target_link_libraries(editor PRIVATE tiny_gltf dx12_helper imgui Shcore.lib dxgi.lib d3d12.lib d3dcompiler.lib dxguid.lib Shlwapi.lib engine)
+target_link_libraries(editor PRIVATE tiny_gltf dx12_helper imgui imgui_system Shcore.lib dxgi.lib d3d12.lib d3dcompiler.lib dxguid.lib Shlwapi.lib engine)
 
 # Link directories
 target_link_directories(editor PRIVATE "${CMAKE_SOURCE_DIR}/../$<CONFIG>")

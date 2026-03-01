@@ -1,9 +1,6 @@
-#ifndef IMGUI_DISABLE
-#ifdef _EDITOR
-
 #pragma once
 
-#include "graphics/imgui/windows/BaseWindow.h"
+#include "imgui_system/windows/BaseWindow.h"
 
 // external
 #include <imgui/ImGuizmo.h>
@@ -21,7 +18,7 @@ namespace gallus
 		}
 		namespace imgui
 		{
-			class ImGuiWindow;
+			class ImGuiSystem;
 
 			//---------------------------------------------------------------------
 			// SceneWindow
@@ -35,8 +32,8 @@ namespace gallus
 				/// <summary>
 				/// Constructs a scene window.
 				/// </summary>
-				/// <param name="a_Window">The ImGui window for rendering the view.</param>
-				SceneWindow(ImGuiWindow& a_Window);
+				/// <param name="a_System">The ImGui system for rendering the view.</param>
+				SceneWindow(ImGuiSystem& a_System);
 
 				bool Initialize() override;
 
@@ -68,14 +65,14 @@ namespace gallus
 
 				// Render texture.
 				graphics::dx12::Texture* GetRenderTexture() const;
-				virtual ImRect GetRenderTextureRect(gallus::graphics::dx12::Texture* a_pTexture) const;
+				virtual ImRect GetRenderTextureRect(graphics::dx12::Texture* a_pTexture) const;
 
 				// Scene view
-				void DrawSceneView(gallus::graphics::dx12::Texture* a_pTexture, const ImRect& a_SceneViewRect) const;
+				void DrawSceneView(graphics::dx12::Texture* a_pTexture, const ImRect& a_SceneViewRect) const;
 				void DrawSceneBackground(const ImRect& a_SceneViewRect) const;
 				void SetupSceneGizmos( const ImRect& a_SceneViewRect) const;
 				void DrawSceneGrid(const ImRect& a_SceneViewRect) const;
-				void DrawSceneTexture(gallus::graphics::dx12::Texture* a_pTexture, const ImRect& a_SceneViewRect) const;
+				void DrawSceneTexture(graphics::dx12::Texture* a_pTexture, const ImRect& a_SceneViewRect) const;
 				void DrawSceneGizmos( const ImRect& a_SceneViewRect) const;
 				void DrawSceneViewBorder(const ImRect& a_SceneViewRect) const;
 				
@@ -99,8 +96,8 @@ namespace gallus
 				/// <summary>
 				/// Constructs a scene window.
 				/// </summary>
-				/// <param name="a_Window">The ImGui window for rendering the view.</param>
-				FullSceneWindow(ImGuiWindow& a_Window);
+				/// <param name="a_System">The ImGui system for rendering the view.</param>
+				FullSceneWindow(ImGuiSystem& a_System);
 
 				/// <summary>
 				/// Update loop for the window. This is where all ImGui interaction should be like buttons, etc.
@@ -114,13 +111,10 @@ namespace gallus
 			private:
 				void PopulateToolbar() override;
 				
-				ImRect GetRenderTextureRect(gallus::graphics::dx12::Texture* a_pTexture) const override;
+				ImRect GetRenderTextureRect(graphics::dx12::Texture* a_pTexture) const override;
 
 				void DrawFPS(const ImRect& a_SceneViewRect);
 			};
 		}
 	}
 }
-
-#endif // _EDITOR
-#endif // IMGUI_DISABLE

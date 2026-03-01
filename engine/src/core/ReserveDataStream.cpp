@@ -1,122 +1,118 @@
 #include "core/ReserveDataStream.h"
 
 // external
-#include <vcruntime_string.h>
 #include <corecrt_malloc.h>
 
 // core
 #include "core/Memory.h"
 
-namespace gallus
+namespace gallus::core
 {
-	namespace core
+	//---------------------------------------------------------------------
+	// ReserveDataStream
+	//---------------------------------------------------------------------
+	ReserveDataStream::ReserveDataStream(size_t a_iSize) : DataStream(a_iSize), m_iReservedSize(a_iSize)
+	{}
+
+	//---------------------------------------------------------------------
+	ReserveDataStream::ReserveDataStream(const ReserveDataStream& rhs) : DataStream(rhs)
 	{
-		//---------------------------------------------------------------------
-		// ReserveDataStream
-		//---------------------------------------------------------------------
-		ReserveDataStream::ReserveDataStream(size_t a_iSize) : DataStream(a_iSize), m_iReservedSize(a_iSize)
-		{}
+		m_iReservedSize = rhs.m_iReservedSize;
+	}
 
-		//---------------------------------------------------------------------
-		ReserveDataStream::ReserveDataStream(const ReserveDataStream& rhs) : DataStream(rhs)
+	//---------------------------------------------------------------------
+	ReserveDataStream::ReserveDataStream(const DataStream& rhs) : DataStream(rhs)
+	{
+		m_iReservedSize = rhs.size();
+	}
+
+	//---------------------------------------------------------------------
+	ReserveDataStream& ReserveDataStream::operator=(const ReserveDataStream& a_Other)
+	{
+		if (&a_Other != this)
 		{
-			m_iReservedSize = rhs.m_iReservedSize;
+			DataStream::operator=(a_Other);
+			m_iReservedSize = a_Other.m_iReservedSize;
+		}
+		return *this;
+	}
+
+	//---------------------------------------------------------------------
+	void ReserveDataStream::Free()
+	{
+		DataStream::Free();
+		m_iReservedSize = 0;
+	}
+
+	//---------------------------------------------------------------------
+	bool ReserveDataStream::Write(void const* a_pData, size_t a_iSize)
+	{
+		const size_t size = m_iSize;
+		if (m_iPos == m_iReservedSize || m_iPos + a_iSize > m_iReservedSize)
+		{
+			Reallocate(a_iSize);
+		}
+		if (m_iPos == size || m_iPos + a_iSize > size)
+		{
+			m_iSize += a_iSize;
 		}
 
-		//---------------------------------------------------------------------
-		ReserveDataStream::ReserveDataStream(const DataStream& rhs) : DataStream(rhs)
-		{
-			m_iReservedSize = rhs.size();
-		}
+		memcpy(add(m_pData, m_iPos), a_pData, a_iSize);
+		Seek(a_iSize, SEEK_CUR);
+		return true;
+	}
 
-		//---------------------------------------------------------------------
-		ReserveDataStream& ReserveDataStream::operator=(const ReserveDataStream& a_Other)
+	//---------------------------------------------------------------------
+	bool ReserveDataStream::Seek(size_t a_iOffset, size_t a_iWhence)
+	{
+		switch (a_iWhence)
 		{
-			if (&a_Other != this)
+			case SEEK_SET:
 			{
-				DataStream::operator=(a_Other);
-				m_iReservedSize = a_Other.m_iReservedSize;
+				m_iPos = a_iOffset;
+				return true;
 			}
-			return *this;
+			case SEEK_CUR:
+			{
+				m_iPos += a_iOffset;
+				return true;
+			}
+			case SEEK_END:
+			default:
+			{
+				m_iPos = m_iSize - a_iOffset;
+				return true;
+			}
 		}
+		return false;
+	}
 
-		//---------------------------------------------------------------------
-		void ReserveDataStream::Free()
+	//---------------------------------------------------------------------
+	void ReserveDataStream::Reallocate(size_t a_iExtraSize)
+	{
+		if (a_iExtraSize == 0)
 		{
-			DataStream::Free();
-			m_iReservedSize = 0;
+			return;
 		}
-
-		//---------------------------------------------------------------------
-		bool ReserveDataStream::Write(void const* a_pData, size_t a_iSize)
+		const size_t newReservedSize = m_iSize + (a_iExtraSize * 2000);
+		void* newData = malloc(newReservedSize);
+		if (!newData)
 		{
-			const size_t size = m_iSize;
-			if (m_iPos == m_iReservedSize || m_iPos + a_iSize > m_iReservedSize)
-			{
-				Reallocate(a_iSize);
-			}
-			if (m_iPos == size || m_iPos + a_iSize > size)
-			{
-				m_iSize += a_iSize;
-			}
-
-			memcpy(add(m_pData, m_iPos), a_pData, a_iSize);
-			Seek(a_iSize, SEEK_CUR);
-			return true;
+			return;
 		}
+		memcpy(newData, m_pData, m_iSize);
 
-		//---------------------------------------------------------------------
-		bool ReserveDataStream::Seek(size_t a_iOffset, size_t a_iWhence)
+		if (m_pData)
 		{
-			switch (a_iWhence)
-			{
-				case SEEK_SET:
-				{
-					m_iPos = a_iOffset;
-					return true;
-				}
-				case SEEK_CUR:
-				{
-					m_iPos += a_iOffset;
-					return true;
-				}
-				case SEEK_END:
-				default:
-				{
-					m_iPos = m_iSize - a_iOffset;
-					return true;
-				}
-			}
-			return false;
+			free(m_pData);
 		}
+		m_iReservedSize = newReservedSize;
+		m_pData = newData;
+	}
 
-		//---------------------------------------------------------------------
-		void ReserveDataStream::Reallocate(size_t a_iExtraSize)
-		{
-			if (a_iExtraSize == 0)
-			{
-				return;
-			}
-			const size_t newReservedSize = m_iSize + (a_iExtraSize * 2000);
-			void* newData = malloc(newReservedSize);
-			if (!newData)
-			{
-				return;
-			}
-			memcpy(newData, m_pData, m_iSize);
-
-			if (m_pData)
-			{
-				free(m_pData);
-			}
-			m_iReservedSize = newReservedSize;
-			m_pData = newData;
-		}
-
-		//---------------------------------------------------------------------
-		size_t ReserveDataStream::Tell() const
-		{
-			return m_iPos;
-		}
+	//---------------------------------------------------------------------
+	size_t ReserveDataStream::Tell() const
+	{
+		return m_iPos;
 	}
 }

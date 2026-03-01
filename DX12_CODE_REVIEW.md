@@ -346,7 +346,7 @@ bool Texture::LoadByName(const std::string& a_sName, std::shared_ptr<CommandList
     {
         return false;
     }
-    m_AssetType = resources::AssetType::Sprite;
+    m_AssetType = resources::AssetType::Texture;
     return false;  // Always returns false!
 }
 
@@ -387,13 +387,13 @@ inline std::string D3D12_RESOURCE_STATESToString(D3D12_RESOURCE_STATES state) {
 
 **Recommendation:** Remove or implement.
 
-### Issue 5.4: Unimplemented SpriteRect Editor Fields
+### Issue 5.4: Unimplemented TextureRect Editor Fields
 **Severity:** Low | **Files:** Texture.h
 
 ```cpp
-class SpriteRect : public ISerializableObject {
+class TextureRect : public ISerializableObject {
 public:
-    SpriteRect() : ISerializableObject() { }  // Empty constructor body
+    TextureRect() : ISerializableObject() { }  // Empty constructor body
     
     uint32_t x = 0;      // Public member - should use private with accessors
     uint32_t y = 0;
@@ -401,9 +401,9 @@ public:
     uint32_t height = 0;
     
     // Editor exposure is verbose for what should be simple data
-    BEGIN_EXPOSE_FIELDS(SpriteRect)
-        EXPOSE_FIELD(SpriteRect, x, "x", "", { .type = ... })
-        EXPOSE_FIELD(SpriteRect, y, "y", "", { .type = ... })
+    BEGIN_EXPOSE_FIELDS(TextureRect)
+        EXPOSE_FIELD(TextureRect, x, "x", "", { .type = ... })
+        EXPOSE_FIELD(TextureRect, y, "y", "", { .type = ... })
         // ... repeats 4 times
 };
 ```
@@ -747,8 +747,8 @@ void CommandList::UpdateBufferResource(
     }
     
     // Device retrieval could fail:
-    Microsoft::WRL::ComPtr<ID3D12Device2>& device = core::ENGINE->GetDX12().GetDevice();
-    // What if ENGINE is null? What if GetDX12() fails?
+    Microsoft::WRL::ComPtr<ID3D12Device2>& device = GetDX12System().GetDevice();
+    // What if GetEngine() is null? What if GetDX12() fails?
     
     if (FAILED(device->CreateCommittedResource(...))) {
         LOG(LOGSEVERITY_ERROR, ...);
@@ -775,7 +775,7 @@ void CommandList::UpdateBufferResource(
         return;
     }
     
-    Microsoft::WRL::ComPtr<ID3D12Device2>& device = core::ENGINE->GetDX12().GetDevice();
+    Microsoft::WRL::ComPtr<ID3D12Device2>& device = GetDX12System().GetDevice();
     if (!device) {
         LOG(LOGSEVERITY_ERROR, LOG_CATEGORY_DX12, "Device not initialized.");
         return;
@@ -850,7 +850,7 @@ Microsoft::WRL::ComPtr<ID3D12Device2>& GetDevice() {
 }
 
 // This allows:
-core::ENGINE->GetDX12().GetDevice().ReleaseAndGetAddressOf();  // Destroys device!
+GetDX12System().GetDevice().ReleaseAndGetAddressOf();  // Destroys device!
 
 // Better:
 const Microsoft::WRL::ComPtr<ID3D12Device2>& GetDevice() const {

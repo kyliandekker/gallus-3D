@@ -1,38 +1,28 @@
 #include "MeshSystem.h"
 
-// graphics
-#include "graphics/imgui/font_icon.h"
-
 // logger
 #include "logger/Logger.h"
 
-namespace gallus
+namespace gallus::gameplay
 {
-	namespace gameplay
+	//---------------------------------------------------------------------
+	// MeshSystem
+	//---------------------------------------------------------------------
+	bool MeshSystem::Initialize()
 	{
-		//---------------------------------------------------------------------
-		// MeshSystem
-		//---------------------------------------------------------------------
-		bool MeshSystem::Initialize()
-		{
-			LOG_ICON(font::ICON_MODEL, LOGSEVERITY_INFO_SUCCESS, LOG_CATEGORY_ECS, "Mesh system initialized.");
-			return true;
-		}
+		LOG(LOGSEVERITY_INFO_SUCCESS, LOG_CATEGORY_ECS, "Successfully initialized Mesh System.");
+		return true;
+	}
 
-		//---------------------------------------------------------------------
-		std::string MeshSystem::GetPropertyName() const
-		{
-			return "mesh";
-		}
+	//---------------------------------------------------------------------
+	std::string MeshSystem::GetPropertyName() const
+	{
+		return "mesh";
+	}
 
-		//---------------------------------------------------------------------
-		std::string MeshSystem::GetSystemName() const
-		{
-			std::string name = "Mesh";
-#ifdef _EDITOR
-			name = std::string(font::ICON_MODEL) + " " + name;
-#endif // _EDITOR
-			return name;
-		}
+	//---------------------------------------------------------------------
+	std::string MeshSystem::GetSystemName() const
+	{
+		return "Mesh";
 	}
 }

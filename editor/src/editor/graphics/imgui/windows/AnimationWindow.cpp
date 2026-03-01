@@ -1,6 +1,3 @@
-#ifndef IMGUI_DISABLE
-#ifdef _EDITOR
-
 #include "AnimationWindow.h"
 
 // external
@@ -9,13 +6,17 @@
 #include <imgui/imgui_internal.h>
 
 // graphics
-#include "graphics/imgui/font_icon.h"
-#include "graphics/imgui/ImGuiWindow.h"
+#include "imgui_system/font_icon.h"
+#include "imgui_system/ImGuiSystem.h"
 
 // animation
-#include "animation/AnimationKeyFrameSpriteComponent.h"
+#include "animation/AnimationKeyFrameTextureComponent.h"
 #include "animation/AnimationKeyFrameEventComponent.h"
 #include "animation/AnimationKeyFrame.h"
+
+// resources
+#include "resources/SrcData.h"
+#include "resources/ResourceAtlas.h"
 
 // utils
 #include "utils/string_extensions.h"
@@ -25,9 +26,12 @@
 
 // editor
 #include "editor/core/EditorEngine.h"
+#include "editor/Editor.h"
+#include "editor/EditorWorkspace.h"
+#include "editor/graphics/imgui/views/selectables/AnimationKeyFrameEditorSelectable.h"
 
-// resources
-#include "resources/FileResource.h"
+// editor/file
+#include "editor/file/IFileAssetSource.h"
 
 namespace gallus
 {
@@ -38,7 +42,7 @@ namespace gallus
 			//---------------------------------------------------------------------
 			// AnimationWindow
 			//---------------------------------------------------------------------
-			AnimationWindow::AnimationWindow(ImGuiWindow& a_Window) : BaseWindow(a_Window, ImGuiWindowFlags_NoCollapse, std::string(font::ICON_ANIMATION) + " Animation", "Animation")
+			AnimationWindow::AnimationWindow(ImGuiSystem& a_System) : BaseWindow(a_System, ImGuiWindowFlags_NoCollapse, std::string(font::ICON_ANIMATION) + " Animation", "Animation")
 			{}
 
 			//---------------------------------------------------------------------
@@ -57,16 +61,16 @@ namespace gallus
 			//---------------------------------------------------------------------
 			void AnimationWindow::PopulateToolbar()
 			{
-				ImVec2 toolbarSize = ImVec2(0, m_Window.GetHeaderSize().y);
+				ImVec2 toolbarSize = ImVec2(0, m_System.GetHeaderSize().y);
 				m_Toolbar = Toolbar(ImGui::IMGUI_FORMAT_ID("", CHILD_ID, "TOOLBAR_ANIMATION"), toolbarSize);
 
 				// Add keyframe button.
-				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_Window,
+				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_System,
 
 					[this]()
 					{
 						if (ImGui::IconButton(
-							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_ADD_KEYFRAME), BUTTON_ID, "ADD_KEYFRAME_ANIMATION_MODAL").c_str(), "Adds a new keyframe at the currently selected frame.", m_Window.GetHeaderSize(), ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent)))
+							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_ADD_KEYFRAME), BUTTON_ID, "ADD_KEYFRAME_ANIMATION_MODAL").c_str(), "Adds a new keyframe at the currently selected frame.", m_System.GetHeaderSize(), ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent)))
 						{
 							AddKeyFrame(m_iSelectedKeyFrame);
 						}
@@ -74,12 +78,12 @@ namespace gallus
 				));
 
 				// Remove keyframe button.
-				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_Window,
+				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_System,
 
 					[this]()
 					{
 						if (ImGui::IconButton(
-							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_REMOVE_KEYFRAME), BUTTON_ID, "REMOVE_KEYFRAME_ANIMATION_MODAL").c_str(), "Removes the currently selected keyframe from the track.", m_Window.GetHeaderSize(), ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent)))
+							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_REMOVE_KEYFRAME), BUTTON_ID, "REMOVE_KEYFRAME_ANIMATION_MODAL").c_str(), "Removes the currently selected keyframe from the track.", m_System.GetHeaderSize(), ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent)))
 						{
 							RemoveKeyFrame(m_iSelectedKeyFrame);
 						}
@@ -91,31 +95,60 @@ namespace gallus
 				));
 
 				// Looping button.
-				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_Window,
+				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_System,
 
 					[this]()
 					{
 						bool isLooping = m_Animation.IsLooping();
 						if (ImGui::CheckboxButton(
-							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_REFRESH), BUTTON_ID, "IS_LOOPING_ANIMATION_MODAL").c_str(), &isLooping, "Toggles looping for the animation track.", m_Window.GetHeaderSize()))
+							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_REFRESH), BUTTON_ID, "IS_LOOPING_ANIMATION_MODAL").c_str(), &isLooping, "Toggles looping for the animation track.", m_System.GetHeaderSize()))
 						{
 							m_Animation.SetIsLooping(isLooping);
 
-							m_Animation.SetIsDirty(true);
+							SetAnimationDirty();
 						}
 					}
 				));
 
-				// Looping button.
-				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_Window,
+				// Save button.
+				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_System,
 
 					[this]()
 					{
 						if (ImGui::TextButton(
-							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_SAVE), BUTTON_ID, "SAVE_ANIMATION_MODAL").c_str(), "Toggles looping for the animation track.", m_Window.GetHeaderSize()))
+							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_SAVE), BUTTON_ID, "SAVE_ANIMATION_MODAL").c_str(), "Toggles looping for the animation track.", m_System.GetHeaderSize()))
 						{
-							m_Animation.Save(m_Animation.GetPath());
+							if (m_Animation.GetName().empty())
+							{
+								return;
+							}
+
+							editor::EditorWorkspace* editorWorkspace = GetEditorEngine().GetEditorWorkspace();
+							if (!editorWorkspace)
+							{
+								return;
+							}
+
+							resources::SrcData srcData;
+							srcData.SetObject();
+
+							SerializeFields(&m_Animation, srcData, SerializationMethod::SerializationMethod_File);
+
+							core::Data data;
+							srcData.GetData(data);
+
+							editorWorkspace->Save(m_Animation.GetName(), data, false);
 						}
+					},
+					[this]()
+					{
+						editor::EditorWorkspace* editorWorkspace = GetEditorEngine().GetEditorWorkspace();
+						if (!editorWorkspace)
+						{
+							return false;
+						}
+
+						return !editorWorkspace->IsDirty(m_Animation.GetName());
 					}
 				));
 			}
@@ -139,20 +172,39 @@ namespace gallus
 				m_Animation.RemoveKeyFrame(m_iSelectedKeyFrame);
 				SetCurrentFrame(-1);
 
-				m_Animation.SetIsDirty(true);
+				SetAnimationDirty();
 			}
 
 			//---------------------------------------------------------------------
 			void AnimationWindow::AddKeyFrame(size_t a_iIndex)
 			{
 				m_Animation.AddKeyFrame(m_iSelectedFrame);
-				m_Animation.SetIsDirty(true);
+
+				SetAnimationDirty();
+			}
+
+			//---------------------------------------------------------------------
+			void AnimationWindow::SetAnimationDirty()
+			{
+				editor::EditorWorkspace* editorWorkspace = GetEditorEngine().GetEditorWorkspace();
+				if (!editorWorkspace)
+				{
+					return;
+				}
+
+				editorWorkspace->MarkDirty(m_Animation.GetName());
 			}
 
 			//---------------------------------------------------------------------
 			void AnimationWindow::Update()
 			{
-				if (core::EDITOR_ENGINE->GetEditor().GetEditorSettings().GetFullScreenPlayMode())
+				editor::Editor* editor = GetEditorEngine().GetEditor();
+				if (!editor)
+				{
+					return;
+				}
+
+				if (editor->GetEditorSettings().GetFullScreenPlayMode())
 				{
 					return;
 				}
@@ -162,30 +214,25 @@ namespace gallus
 			//---------------------------------------------------------------------
 			void AnimationWindow::Render()
 			{
-				if (!core::EDITOR_ENGINE)
-				{
-					return;
-				}
-
 				DrawToolbar();
 
 				ImGui::SetCursorPos({
-					ImGui::GetCursorPos().x + m_Window.GetFramePadding().x,
-					ImGui::GetCursorPos().y + m_Window.GetFramePadding().y,
+					ImGui::GetCursorPos().x + m_System.GetFramePadding().x,
+					ImGui::GetCursorPos().y + m_System.GetFramePadding().y,
 				});
 
 				int frameCount = m_Animation.GetFrameCount() == 0 ? 100 : m_Animation.GetFrameCount();
 				if (ImGui::BeginChild(
 					ImGui::IMGUI_FORMAT_ID("", CHILD_ID, "MAIN_ANIMATION").c_str(),
 					ImVec2(
-						ImGui::GetContentRegionAvail().x - m_Window.GetFramePadding().x,
-						ImGui::GetContentRegionAvail().y - m_Window.GetFramePadding().y
+						ImGui::GetContentRegionAvail().x - m_System.GetFramePadding().x,
+						ImGui::GetContentRegionAvail().y - m_System.GetFramePadding().y
 					),
 					ImGuiChildFlags_Borders,
 					ImGuiWindowFlags_AlwaysHorizontalScrollbar
 				))
 				{
-					ImVec2 legendPadding = m_Window.GetFramePadding();
+					ImVec2 legendPadding = m_System.GetFramePadding();
 					ImVec2 initialPos = ImGui::GetCursorScreenPos();
 					
 					ImRect legendRect = {
@@ -232,7 +279,7 @@ namespace gallus
 						{
 							int halfModFrameCount = modFrameCount / 2;
 
-							float majorLineHeight = LEGEND_HEIGHT - (m_Window.GetFontSize() + legendPadding.y);
+							float majorLineHeight = LEGEND_HEIGHT - (m_System.GetFontSize() + legendPadding.y);
 							float halfLineHeight = majorLineHeight / 2;
 							float normalLineHeight = halfLineHeight / 2;
 							int lineEnd = legendRect.Max.y - 4;
@@ -381,135 +428,30 @@ namespace gallus
 							if (m_Animation.GetKeyFrameAtFrame(m_iSelectedFrame) == -1)
 							{
 								s_pDraggedKeyFrame->SetFrame(m_iSelectedFrame);
-								s_pDraggedKeyFrame->GetAnimation()->SetIsDirty(true);
+								SetAnimationDirty();
 							}
 						}
 					}
 				}
 
 				ImGui::EndChild();
-
-				return;
-
-
-				//ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
-				//ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0);
-
-				//float topPosY = ImGui::GetCursorPosY();
-
-				//bool wasDirty = m_Animation.IsDirty();
-				//bool wasValid = m_Animation.IsValid();
-				//if (!wasDirty || !wasValid)
-				//{
-				//	ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-				//	ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
-				//}
-
-				//if (ImGui::IconButton(
-				//	ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_SAVE), BUTTON_ID, "SAVE_ANIMATION_MODAL").c_str(), "Saves the current animation track to its file.", m_Window.GetHeaderSize(), ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent)))
-				//{
-				//	m_Animation.Save(m_pFile->GetPath());
-
-				//	m_Animation.SetIsDirty(false);
-
-				//	// TODO: Reload existing resource if loaded in atlas.
-				//	//if (core::EDITOR_ENGINE->GetResourceAtlas().HasTexture(m_pFileResource->GetPath().filename().generic_string()))
-				//	//{
-				//	//	core::EDITOR_ENGINE->GetResourceAtlas().LoadTexture(m_pFileResource->GetPath().filename().generic_string())->LoadMetaData();
-				//	//}
-				//}
-				//
-				//if (!wasDirty || !wasValid)
-				//{
-				//	ImGui::PopItemFlag();
-				//	ImGui::PopStyleVar();
-				//}
-
-				//if (!wasValid)
-				//{
-				//	ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-				//	ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
-				//}
-
-				//ImGui::SameLine();
-
-
-				//if (!wasValid)
-				//{
-				//	ImGui::PopItemFlag();
-				//	ImGui::PopStyleVar();
-				//}
-
-				//bool wasInvalid = m_iSelectedKeyFrame < 0 || m_iSelectedKeyFrame >= m_Animation.GetKeyFrames().size();
-				//if (!wasValid || wasInvalid)
-				//{
-				//	ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-				//	ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
-				//}
-
-				//ImGui::SameLine();
-
-				//if (!wasValid || wasInvalid)
-				//{
-				//	ImGui::PopItemFlag();
-				//	ImGui::PopStyleVar();
-				//}
-
-				//ImGui::SameLine();
-
-				//if (!wasValid)
-				//{
-				//	ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-				//	ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
-				//}
-
-
-				//if (!wasValid)
-				//{
-				//	ImGui::PopItemFlag();
-				//	ImGui::PopStyleVar();
-				//}
-
-				//ImGui::SameLine();
-
-				//int frameCount = m_Animation.GetFrameCount() == 0 ? 100 : m_Animation.GetFrameCount();
-
-				//ImGui::SetNextItemWidth(6.5f * m_Window.GetFontSize());
-				//ImGui::DragInt(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "CURRENT_FRAME_ANIMATION_MODAL").c_str(), &m_iCurrentFrame, 1, 0, frameCount, "Frame %i");
-
-				//ImGui::SameLine();
-
-				//ImGui::SetNextItemWidth(10.5f * m_Window.GetFontSize());
-				//if (ImGui::DragInt(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "FRAME_COUNT_ANIMATION_MODAL").c_str(), &frameCount, 1, 0, frameCount, "Frame Count %i"))
-				//{
-				//	m_Animation.SetFrameCount(frameCount);
-				//}
-
-				//ImVec2 endPos = ImGui::GetCursorPos();
-
-				//ImGui::SetCursorPos(endPos);
-
-				//ImGui::PopStyleVar();
-				//ImGui::PopStyleVar();
-
-				////ImGui::EndToolbar(ImVec2(0, 0));
-
-				//ImGui::SetCursorPos(ImVec2(ImGui::GetCursorPos().x + m_Window.GetFramePadding().x, ImGui::GetCursorPos().y + m_Window.GetFramePadding().y));
-
-				
 			}
 
 			//---------------------------------------------------------------------
-			void AnimationWindow::SetData(gallus::resources::FileResource& a_File)
+			void AnimationWindow::SetData(const std::string a_sID)
 			{
-				m_pFile = &a_File;
-
-				fs::path animationPath = a_File.GetPath();
-				if (!m_Animation.LoadByPath(animationPath))
+				std::shared_ptr<resources::IAssetSource> assetSrc = GetResourceAtlas().GetAssetSource().lock();
+				if (!assetSrc)
 				{
 					return;
 				}
-				
+
+				core::Data data;
+				assetSrc->LoadBinary(a_sID, data);
+
+				m_Animation.LoadData(data);
+				m_Animation.SetName(a_sID);
+
 				m_iSelectedFrame = 0;
 				m_iSelectedKeyFrame = -1;
 			}
@@ -517,20 +459,21 @@ namespace gallus
 			//---------------------------------------------------------------------
 			void AnimationWindow::SetCurrentFrame(int16_t a_iIndex)
 			{
+				editor::Editor* editor = GetEditorEngine().GetEditor();
+				if (!editor)
+				{
+					return;
+				}
+
 				int index = std::clamp(a_iIndex, static_cast<int16_t>(-1), static_cast<int16_t>(m_Animation.GetFrameCount()));
 				if (index == -1)
 				{
-					core::EDITOR_ENGINE->GetEditor().SetSelectable(nullptr);
+					editor->ResetSelectable();
 				}
 				else
 				{
-					AnimationKeyFrameEditorSelectable* previous = m_KeyFrameSelectable;
-					m_KeyFrameSelectable = new AnimationKeyFrameEditorSelectable(m_Window, *m_Animation.GetKeyFrames()[a_iIndex], m_Animation);
-					core::EDITOR_ENGINE->GetEditor().SetSelectable(m_KeyFrameSelectable);
-					if (previous)
-					{
-						delete previous;
-					}
+					m_pKeyFrameSelectable = std::make_shared<AnimationKeyFrameEditorSelectable>(m_System, *m_Animation.GetKeyFrames()[a_iIndex], m_Animation);
+					editor->SetSelectable(m_pKeyFrameSelectable);
 				}
 
 				m_iSelectedKeyFrame = a_iIndex;
@@ -538,6 +481,3 @@ namespace gallus
 		}
 	}
 }
-
-#endif // _EDITOR
-#endif // IMGUI_DISABLE

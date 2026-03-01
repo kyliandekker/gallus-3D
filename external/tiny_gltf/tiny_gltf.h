@@ -4876,7 +4876,7 @@ static bool ParseAccessor(Accessor *accessor, std::string *err,
 #ifdef TINYGLTF_ENABLE_DRACO
 
 static void DecodeIndexBuffer(draco::Mesh *mesh, size_t componentSize,
-							  std::vector<uint8_t> &outBuffer) {
+							  const core::Data& &outBuffer) {
   if (componentSize == 4) {
 	assert(sizeof(mesh->face(draco::FaceIndex(0))[0]) == componentSize);
 	memcpy(outBuffer.data(), &mesh->face(draco::FaceIndex(0))[0],
@@ -4905,7 +4905,7 @@ static void DecodeIndexBuffer(draco::Mesh *mesh, size_t componentSize,
 template <typename T>
 static bool GetAttributeForAllPoints(draco::Mesh *mesh,
 									 const draco::PointAttribute *pAttribute,
-									 std::vector<uint8_t> &outBuffer) {
+									 const core::Data& &outBuffer) {
   size_t byteOffset = 0;
   T values[4] = {0, 0, 0, 0};
   for (draco::PointIndex i(0); i < mesh->num_points(); ++i) {
@@ -4924,7 +4924,7 @@ static bool GetAttributeForAllPoints(draco::Mesh *mesh,
 
 static bool GetAttributeForAllPoints(uint32_t componentType, draco::Mesh *mesh,
 									 const draco::PointAttribute *pAttribute,
-									 std::vector<uint8_t> &outBuffer) {
+									 const core::Data& &outBuffer) {
   bool decodeResult = false;
   switch (componentType) {
 	case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:

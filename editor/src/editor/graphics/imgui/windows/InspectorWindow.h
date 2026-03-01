@@ -1,9 +1,6 @@
-#ifndef IMGUI_DISABLE
-#ifdef _EDITOR
-
 #pragma once
 
-#include "graphics/imgui/windows/BaseWindow.h"
+#include "imgui_system/windows/BaseWindow.h"
 
 // external
 #include <vector>
@@ -11,69 +8,60 @@
 #include <memory>
 
 // graphics
-#include "graphics/imgui/views/DataTypes/StringTextInput.h"
+#include "editor/graphics/imgui/views/StringTextInput.h"
 
 // editor
-#include "editor/graphics/imgui/selectables/FileEditorSelectable.h"
+#include "editor/graphics/imgui/views/selectables/FileEditorSelectable.h"
 #include "editor/graphics/imgui/views/Toolbar.h"
 
-namespace gallus
+namespace gallus::graphics::imgui
 {
-	namespace graphics
+	class ImGuiSystem;
+
+	class InspectorView;
+
+	/// <summary>
+	/// A window that displays the current editor selectable.
+	/// </summary>
+	class InspectorWindow : public BaseWindow
 	{
-		namespace imgui
-		{
-			class ImGuiWindow;
+	public:
+		/// <summary>
+		/// Constructs an inspector window.
+		/// </summary>
+		/// <param name="a_System">The ImGui system for rendering the view.</param>
+		InspectorWindow(ImGuiSystem& a_System);
 
-			class InspectorView;
+		/// <summary>
+		/// Initializes all behaviours and values for the window.
+		/// </summary>
+		/// <returns>True if initialization is successful, otherwise false.</returns>
+		bool Initialize() override;
 
-			/// <summary>
-			/// A window that displays the current editor selectable.
-			/// </summary>
-			class InspectorWindow : public BaseWindow
-			{
-			public:
-				/// <summary>
-				/// Constructs an inspector window.
-				/// </summary>
-				/// <param name="a_Window">The ImGui window for rendering the view.</param>
-				InspectorWindow(ImGuiWindow& a_Window);
+		/// <summary>
+		/// Destroys and disables the inspector window.
+		/// </summary>
+		/// <returns>True if destruction is successful, otherwise false.</returns>
+		bool Destroy() override;
 
-				/// <summary>
-				/// Initializes all behaviours and values for the window.
-				/// </summary>
-				/// <returns>True if initialization is successful, otherwise false.</returns>
-				bool Initialize() override;
+		/// <summary>
+		/// Update loop for the window. This is where all ImGui interaction should be like buttons, etc.
+		/// </summary>
+		void Update() override;
 
-				/// <summary>
-				/// Destroys and disables the inspector window.
-				/// </summary>
-				/// <returns>True if destruction is successful, otherwise false.</returns>
-				bool Destroy() override;
+		/// <summary>
+		/// Renders the inspector window.
+		/// </summary>
+		void Render() override;
+	private:
+		// Toolbar.
+		void PopulateToolbar();
+		void DrawToolbar();
 
-				/// <summary>
-				/// Update loop for the window. This is where all ImGui interaction should be like buttons, etc.
-				/// </summary>
-				void Update() override;
+		StringTextInput m_NameInput; /// Inspector input for editing the entity's name.
 
-				/// <summary>
-				/// Renders the inspector window.
-				/// </summary>
-				void Render() override;
-			private:
-				// Toolbar.
-				void PopulateToolbar();
-				void DrawToolbar();
+		Toolbar m_Toolbar;
 
-				StringTextInput m_NameInput; /// Inspector input for editing the entity's name.
-
-				Toolbar m_Toolbar;
-
-				bool m_bDeleteSelectable = false;
-			};
-		}
-	}
+		bool m_bDeleteSelectable = false;
+	};
 }
-
-#endif // IMGUI_DISABLE
-#endif // _EDITOR
