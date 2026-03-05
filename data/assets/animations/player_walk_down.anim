@@ -4,28 +4,30 @@
     "keyFrames": {
         "0": {
             "components": {
-                "sprite": {
-                    "spriteIndex": 0,
-                    "texture": "tex_walk.png"
+                "texture": {
+                    "texture": "tex_walk.png",
+                    "textureIndex": 0
                 }
             }
         },
         "10": {
             "components": {
-                "sprite": {
-                    "spriteIndex": 1,
-                    "texture": "tex_walk.png"
+                "texture": {
+                    "texture": "tex_walk.png",
+                    "textureIndex": 1
                 }
             }
         },
         "20": {
             "components": {
-                "sprite": {
-                    "spriteIndex": 2,
-                    "texture": "tex_walk.png"
+                "texture": {
+                    "texture": "tex_walk.png",
+                    "textureIndex": 2
                 }
             }
         },
-        "30": {}
+        "30": {
+            "components": {}
+        }
     }
 }

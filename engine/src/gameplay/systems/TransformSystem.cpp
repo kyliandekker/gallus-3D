@@ -1,40 +1,33 @@
 #include "TransformSystem.h"
 
-// graphics
-#include "graphics/imgui/font_icon.h"
-
 // logger
 #include "logger/Logger.h"
 
-namespace gallus
+// gameplay
+#include "gameplay/systems/UpdateTime.h"
+
+namespace gallus::gameplay
 {
-	namespace gameplay
+	//---------------------------------------------------------------------
+	// TransformSystem
+	//---------------------------------------------------------------------
+	bool TransformSystem::Initialize()
 	{
-		//---------------------------------------------------------------------
-		// TransformSystem
-		//---------------------------------------------------------------------
-		bool TransformSystem::Initialize()
-		{
-			m_aUpdateTimes.AddFlag(UpdateTime::UPDATE_TIME_FRAME_APPLY);
+		m_aUpdateTimes.AddFlag(UpdateTime::UPDATE_TIME_FRAME_APPLY);
 
-			LOG_ICON(font::ICON_AXIS, LOGSEVERITY_INFO_SUCCESS, LOG_CATEGORY_ECS, "Transform system initialized.");
-			return true;
-		}
+		LOG(LOGSEVERITY_INFO_SUCCESS, LOG_CATEGORY_ECS, "Successfully initialized Transform System.");
+		return true;
+	}
 
-		//---------------------------------------------------------------------
-		std::string TransformSystem::GetPropertyName() const
-		{
-			return "transform";
-		}
+	//---------------------------------------------------------------------
+	std::string TransformSystem::GetPropertyName() const
+	{
+		return "transform";
+	}
 
-		//---------------------------------------------------------------------
-		std::string TransformSystem::GetSystemName() const
-		{
-			std::string name = "Transform";
-#ifdef _EDITOR
-			name = std::string(font::ICON_AXIS) + " " + name;
-#endif // _EDITOR
-			return name;
-		}
+	//---------------------------------------------------------------------
+	std::string TransformSystem::GetSystemName() const
+	{
+		return "Transform";
 	}
 }

@@ -1,12 +1,26 @@
-Key frame should deserialize inside class instead of animation track
+Key frame should deserialize inside class instead of animation track ✓
 Animation track should be shared with others ✓
-Key frame components are fucking hardcoded now
+Key frame components are fucking hardcoded now ✓
 Top bar for new scene, etc ✓
 Tooltip hovers ✓
-Debug shapes
+Debug shapes ✓
 Input fix ✓
 Weak ptrs for everything instead of raw ptrs ✓
 Scene sys needs refactor because it is awful and illogical ✓
 Whole engine resource needs refactor because it is a mess ✓ 
 Path loading only needs to be editor based ✓
-Sprite modal is awful
+Remove glm completely ✓
+Scene window rewrite ✓
+List/grid mode needs to be saved in editor settings ✓
+Replace toolbars everywhere ✓
+Expose vars the same way as IEditorExposable in EditorSettings, with category ✓
+Editor keybind context ✓
+Drag resources onto resource picker ✓
+Camera isolation mode needs to be saved in editor settings ✓
+
+Texture modal is awful
+Turn DX12System into a coordinator class and split up the parts
+Stuff in DX12System should probably be unique_ptrs
+Buffer needs a rewrite
+
+Loading a scene now loads by path, it should load by name like the rest

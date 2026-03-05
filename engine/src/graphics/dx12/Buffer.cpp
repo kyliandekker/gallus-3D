@@ -1,29 +1,18 @@
 #include "Buffer.h"
 
-namespace gallus
+namespace gallus::graphics::dx12
 {
-	namespace graphics
+	//---------------------------------------------------------------------
+	bool Buffer::LoadByName(const std::string& a_sName, const D3D12_RESOURCE_DESC& a_ResDesc, size_t a_iNumElements, size_t a_iElementSize)
 	{
-		namespace dx12
-		{
-			//---------------------------------------------------------------------
-			bool Buffer::LoadByName(const std::string& a_sName, const D3D12_RESOURCE_DESC& a_ResDesc, size_t a_iNumElements, size_t a_iElementSize)
-			{
-				if (!DX12Resource::LoadByName(a_sName))
-				{
-					return false;
-				}
+		CreateViews(a_iNumElements, a_iElementSize);
 
-				CreateViews(a_iNumElements, a_iElementSize);
+		return true;
+	}
 
-				return true;
-			}
-
-			//---------------------------------------------------------------------
-			void Buffer::CreateViews(size_t a_iNumElements, size_t a_iElementSize)
-			{
-				throw std::exception("Unimplemented function.");
-			}
-		}
+	//---------------------------------------------------------------------
+	void Buffer::CreateViews(size_t a_iNumElements, size_t a_iElementSize)
+	{
+		throw std::exception("Unimplemented function.");
 	}
 }

@@ -1,330 +1,210 @@
 ﻿#include "SpriteComponent.h"
 
-// external
-#include <rapidjson/utils.h>
-
 // core
 #include "core/Engine.h"
 
 // graphics
+#include "graphics/dx12/DX12System.h"
+#include "graphics/dx12/Camera.h"
 #include "graphics/dx12/Texture.h"
 #include "graphics/dx12/Mesh.h"
-#include "graphics/dx12/DX12ShaderBind.h"
 #include "graphics/dx12/Shader.h"
-#include "graphics/dx12/DX12Transform.h"
+#include "graphics/dx12/Transform.h"
+#include "graphics/dx12/Material.h"
 #include "graphics/dx12/CommandList.h"
 #include "graphics/dx12/CommandQueue.h"
 
+#include "graphics/dx12/ShaderFactory.h"
+
 // resources
-#include "resources/SrcData.h"
+#include "resources/ResourceAtlas.h"
 
 // gameplay
+#include "gameplay/Entity.h"
+#include "gameplay/EntityComponentSystem.h"
 #include "gameplay/systems/TransformSystem.h"
 
-#define JSON_SPRITE_COMPONENT_TEX_VAR "texture"
-#define JSON_SPRITE_COMPONENT_TEX_NAME_VAR "name"
-#define JSON_SPRITE_COMPONENT_TEX_SPRITE_INDEX_VAR "spriteIndex"
-#define JSON_SPRITE_COMPONENT_MESH_VAR "mesh"
-#define JSON_SPRITE_COMPONENT_SHADER_VAR "shader"
-#define JSON_SPRITE_COMPONENT_SHADER_PIXEL_VAR "pixel"
-#define JSON_SPRITE_COMPONENT_SHADER_VERTEX_VAR "vertex"
-#define JSON_SPRITE_COMPONENT_MATERIAL_VAR "material"
-#define JSON_SPRITE_COMPONENT_COLOR_VAR "color"
-#define JSON_SPRITE_COMPONENT_COLOR_R_VAR "r"
-#define JSON_SPRITE_COMPONENT_COLOR_G_VAR "g"
-#define JSON_SPRITE_COMPONENT_COLOR_B_VAR "b"
-#define JSON_SPRITE_COMPONENT_COLOR_A_VAR "a"
-
-namespace gallus
+namespace gallus::gameplay
 {
-	namespace gameplay
+	//---------------------------------------------------------------------
+	// SpriteComponent
+	//---------------------------------------------------------------------
+	void SpriteComponent::SetDefaults(const gameplay::EntityID& a_EntityID)
 	{
-		//---------------------------------------------------------------------
-		// SpriteComponent
-		//---------------------------------------------------------------------
-		void SpriteComponent::Init(const gameplay::EntityID& a_EntityID)
-		{
-			Component::Init(a_EntityID);
+		Component::SetDefaults(a_EntityID);
 
-			m_pShaderBind = core::ENGINE->GetResourceAtlas().GetDefaultShaderBind();
-			m_pTexture = core::ENGINE->GetResourceAtlas().GetDefaultTexture();
-			m_pMesh = core::ENGINE->GetResourceAtlas().GetDefaultMesh();
-			m_vColor = { 1, 1, 1, 1 };
+		resources::ResourceAtlas* resourceAtlas = GetEngine().GetResourceAtlas();
+		if (!resourceAtlas)
+		{
+			return;
 		}
 
-		//---------------------------------------------------------------------
-		void SpriteComponent::SetMesh(std::weak_ptr<graphics::dx12::Mesh> a_pMesh)
+		m_pTexture = resourceAtlas->GetDefaultTexture();
+		m_pMesh = resourceAtlas->LoadMesh("square");
+	}
+
+	//---------------------------------------------------------------------
+	void SpriteComponent::Init()
+	{
+		// cache is in the init function of component.
+		Component::Init();
+
+		OnShadersChanged();
+
+		// cache
+		graphics::dx12::DX12System& dx12 = GetDX12System();
+
+		m_pDX12System = &dx12;
+		m_pRootSignature = dx12.GetRootSignature().Get();
+		m_pTransformSystem = m_pECS->GetSystem<gameplay::TransformSystem>();
+
+		OnOrderChanged();
+	}
+
+	//---------------------------------------------------------------------
+	void SpriteComponent::SetMesh(std::weak_ptr<graphics::dx12::Mesh> a_pMesh)
+	{
+		m_pMesh = a_pMesh;
+	}
+
+	//---------------------------------------------------------------------
+	void SpriteComponent::SetTexture(std::weak_ptr<graphics::dx12::Texture> a_pTexture)
+	{
+		m_pTexture = a_pTexture;
+	}
+
+	//---------------------------------------------------------------------
+	void SpriteComponent::Render(std::shared_ptr<graphics::dx12::CommandList> a_pCommandList, const EntityID& a_EntityID, const graphics::dx12::Camera& a_Camera)
+	{
+		if (!m_pECS)
 		{
-			m_pMesh = a_pMesh;
+			return;
+		}
+		
+		if (!m_pPipelineState)
+		{
+			return;
+		}
+		
+		if (!m_pRootSignature)
+		{
+			return;
 		}
 
-		//---------------------------------------------------------------------
-		void SpriteComponent::SetShader(std::weak_ptr<graphics::dx12::DX12ShaderBind> a_pShaderBind)
+		// TODO: Possible to cache this and improve performance.
+		std::shared_ptr<gameplay::Entity> ent = m_pECS->GetEntity(m_EntityID).lock();
+		if (!ent || !ent->IsActive())
 		{
-			m_pShaderBind = a_pShaderBind;
+			return;
 		}
 
-		//---------------------------------------------------------------------
-		void SpriteComponent::SetTexture(std::weak_ptr<graphics::dx12::Texture> a_pTexture)
+		if (!m_pTransformSystem)
 		{
-			m_pTexture = a_pTexture;
+			return;
 		}
 
-		//---------------------------------------------------------------------
-		bool CheckVisibility(const gallus::graphics::dx12::DX12Transform& a_Transform, const graphics::dx12::Camera& a_Camera)
+		graphics::dx12::Transform transform;
+		if (gameplay::TransformComponent* transformComponent = m_pTransformSystem->TryGetComponent(a_EntityID))
 		{
-			const DirectX::XMFLOAT2& pos = a_Transform.GetPosition();
-			const DirectX::XMFLOAT2& scale = a_Transform.GetScale();
-			const DirectX::XMFLOAT2& pivot = a_Transform.GetPivot();
-			float rotation = a_Transform.GetRotation();
-
-			DirectX::XMFLOAT2 corners[4] = {
-				{ (-0.5f) * scale.x, (-0.5f) * scale.y }, // top-left
-				{ (0.5f) * scale.x, (-0.5f) * scale.y }, // top-right
-				{ (0.5f) * scale.x, (0.5f) * scale.y }, // bottom-right
-				{ (-0.5f) * scale.x, (0.5f) * scale.y }  // bottom-left
-			};
-
-			// Rotate corners around pivot and translate to world position
-			float cosR = cos(rotation);
-			float sinR = sin(rotation);
-
-			for (int i = 0; i < 4; ++i)
-			{
-				// relative to pivot
-				float x = corners[i].x - pivot.x * scale.x;
-				float y = corners[i].y - pivot.y * scale.y;
-
-				// rotate
-				float rx = x * cosR - y * sinR;
-				float ry = x * sinR + y * cosR;
-
-				// translate to world
-				corners[i].x = rx + pos.x;
-				corners[i].y = ry + pos.y;
-			}
-
-			// Compute AABB of rotated rectangle
-			float minX = corners[0].x, maxX = corners[0].x;
-			float minY = corners[0].y, maxY = corners[0].y;
-
-			for (int i = 1; i < 4; ++i)
-			{
-				if (corners[i].x < minX)
-				{
-					minX = corners[i].x;
-				}
-				if (corners[i].x > maxX)
-				{
-					maxX = corners[i].x;
-				}
-				if (corners[i].y < minY)
-				{
-					minY = corners[i].y;
-				}
-				if (corners[i].y > maxY)
-				{
-					maxY = corners[i].y;
-				}
-			}
-
-			// Check visibility
-			if (maxX < 0.0f || minX > a_Camera.GetSize().x ||
-				maxY < 0.0f || minY > a_Camera.GetSize().y)
-			{
-				return false;
-			}
-
-			return true;
+			transform = transformComponent->GetTransform();
 		}
 
-		//---------------------------------------------------------------------
-		void SpriteComponent::Render(std::shared_ptr<graphics::dx12::CommandList> a_pCommandList, const EntityID& a_EntityID, const graphics::dx12::Camera& a_Camera)
+		if (transform.GetCameraType() == graphics::dx12::CameraType_Screen)
 		{
-			const DirectX::XMMATRIX viewMatrix = a_Camera.GetViewMatrix();
-			const DirectX::XMMATRIX& projectionMatrix = a_Camera.GetProjectionMatrix();
-
-			graphics::dx12::DX12Transform transform;
-			TransformSystem& transformSys = core::ENGINE->GetECS().GetSystem<TransformSystem>();
-			if (transformSys.HasComponent(a_EntityID))
-			{
-				transform = transformSys.GetComponent(a_EntityID).Transform();
-			}
-			DirectX::XMMATRIX mvpMatrix = transform.GetWorldMatrixWithPivot() * viewMatrix * projectionMatrix;
-
-			// TODO: Culling
-			//if (!CheckVisibility(transform, a_Camera))
-			//{
-			//	return;
-			//}
-
-			if (!core::ENGINE->GetECS().GetEntity(a_EntityID))
+			if (m_pDX12System->GetDimensionDrawMode() != graphics::dx12::DimensionDrawMode::DimensionDrawMode_2D && m_pDX12System->GetDimensionDrawMode() != graphics::dx12::DimensionDrawMode::DimensionDrawMode_2D3D)
 			{
 				return;
 			}
-
-			if (!core::ENGINE->GetECS().GetEntity(a_EntityID)->IsActive())
+		}
+		else if (transform.GetCameraType() == graphics::dx12::CameraType_World)
+		{
+			if (m_pDX12System->GetDimensionDrawMode() != graphics::dx12::DimensionDrawMode::DimensionDrawMode_3D && m_pDX12System->GetDimensionDrawMode() != graphics::dx12::DimensionDrawMode::DimensionDrawMode_2D3D)
 			{
 				return;
 			}
-
-			float colorData[4] = { m_vColor.x, m_vColor.y, m_vColor.z, m_vColor.w };
-			a_pCommandList->GetCommandList()->SetGraphicsRoot32BitConstants(graphics::dx12::RootParameters::SPRITE_COLOR, 4, colorData, 0);
-
-			if (auto tex = m_pTexture.lock())
-			{
-				if (tex->CanBeDrawn())
-				{
-					tex->Bind(a_pCommandList, m_iSpriteIndex);
-				}
-			}
-
-			if (auto shaderBind = m_pShaderBind.lock())
-			{
-				if (shaderBind->IsValid())
-				{
-					shaderBind->Bind(a_pCommandList);
-				}
-			}
-
-			if (auto mesh = m_pMesh.lock())
-			{
-				if (mesh->IsValid())
-				{
-					mesh->Render(a_pCommandList, mvpMatrix);
-				}
-			}
 		}
 
-		//---------------------------------------------------------------------
-#ifdef _EDITOR
-		void SpriteComponent::Serialize(rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator) const
+		const DirectX::XMMATRIX viewMatrix = a_Camera.GetViewMatrix(transform.GetCameraType());
+		const DirectX::XMMATRIX& projectionMatrix = a_Camera.GetProjectionMatrix(transform.GetCameraType());
+		DirectX::XMMATRIX mMatrix = transform.GetWorldMatrixWithPivot();
+
+		DirectX::XMMATRIX mvpMatrix;
+		if (m_bIsStatic)
 		{
-			if (!a_Document.IsObject())
-			{
-				return;
-			}
-
-			{
-				if (auto tex = m_pTexture.lock())
-				{
-					a_Document.AddMember(JSON_SPRITE_COMPONENT_TEX_VAR, rapidjson::Value().SetObject(), a_Allocator);
-					std::string texName = tex->GetName();
-					a_Document[JSON_SPRITE_COMPONENT_TEX_VAR].AddMember(
-						JSON_SPRITE_COMPONENT_TEX_NAME_VAR,
-						rapidjson::Value(texName.c_str(), a_Allocator),
-						a_Allocator
-					);
-				}
-				a_Document[JSON_SPRITE_COMPONENT_TEX_VAR].AddMember(
-					JSON_SPRITE_COMPONENT_TEX_SPRITE_INDEX_VAR,
-					m_iSpriteIndex,
-					a_Allocator
-				);
-			}
-
-			a_Document.AddMember(JSON_SPRITE_COMPONENT_SHADER_VAR, rapidjson::Value().SetObject(), a_Allocator);
-
-			if (auto shaderBind = m_pShaderBind.lock())
-			{
-				if (auto pixelShader = shaderBind->GetPixelShader().lock())
-				{
-					std::string pixelShaderName = pixelShader->GetName();
-					a_Document[JSON_SPRITE_COMPONENT_SHADER_VAR].AddMember(
-						JSON_SPRITE_COMPONENT_SHADER_PIXEL_VAR,
-						rapidjson::Value(pixelShaderName.c_str(), a_Allocator),
-						a_Allocator
-					);
-				}
-				
-				if (auto vertexShader = shaderBind->GetVertexShader().lock())
-				{
-					std::string vertexShaderName = vertexShader->GetName();
-					a_Document[JSON_SPRITE_COMPONENT_SHADER_VAR].AddMember(
-						JSON_SPRITE_COMPONENT_SHADER_VERTEX_VAR,
-						rapidjson::Value(vertexShaderName.c_str(), a_Allocator),
-						a_Allocator
-					);
-				}
-			}
-
-			if (auto mesh = m_pMesh.lock())
-			{
-				std::string meshName = mesh->GetName();
-				a_Document.AddMember(
-					JSON_SPRITE_COMPONENT_MESH_VAR,
-					rapidjson::Value(meshName.c_str(), a_Allocator),
-					a_Allocator
-				);
-			}
-
-			{
-				rapidjson::Document colorDoc;
-				colorDoc.SetObject();
-
-				colorDoc.AddMember(JSON_SPRITE_COMPONENT_COLOR_R_VAR, m_vColor.x, a_Allocator);
-				colorDoc.AddMember(JSON_SPRITE_COMPONENT_COLOR_G_VAR, m_vColor.y, a_Allocator);
-				colorDoc.AddMember(JSON_SPRITE_COMPONENT_COLOR_B_VAR, m_vColor.z, a_Allocator);
-				colorDoc.AddMember(JSON_SPRITE_COMPONENT_COLOR_A_VAR, m_vColor.w, a_Allocator);
-
-				a_Document.AddMember(
-					JSON_SPRITE_COMPONENT_COLOR_VAR,
-					colorDoc,
-					a_Allocator
-				);
-			}
+			mvpMatrix = mMatrix * projectionMatrix;
 		}
-#endif
-
-		//---------------------------------------------------------------------
-		void SpriteComponent::Deserialize(const resources::SrcData& a_SrcData)
+		else
 		{
-			std::string tex = a_SrcData.GetSrc(JSON_SPRITE_COMPONENT_TEX_VAR).GetString(JSON_SPRITE_COMPONENT_TEX_NAME_VAR);
-			SetSpriteIndex(a_SrcData.GetSrc(JSON_SPRITE_COMPONENT_TEX_VAR).GetInt(JSON_SPRITE_COMPONENT_TEX_SPRITE_INDEX_VAR));
-			std::string pixelShader = a_SrcData.GetSrc(JSON_SPRITE_COMPONENT_SHADER_VAR).GetString(JSON_SPRITE_COMPONENT_SHADER_PIXEL_VAR);
-			std::string vertexShader = a_SrcData.GetSrc(JSON_SPRITE_COMPONENT_SHADER_VAR).GetString(JSON_SPRITE_COMPONENT_SHADER_VERTEX_VAR);
-			std::string mesh = a_SrcData.GetString(JSON_SPRITE_COMPONENT_MESH_VAR);
-
-			std::shared_ptr<graphics::dx12::CommandQueue> cCommandQueue = core::ENGINE->GetDX12().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
-			if (!mesh.empty())
-			{
-				SetMesh(core::ENGINE->GetResourceAtlas().LoadMesh(mesh));
-			}
-			if (!tex.empty())
-			{
-				SetTexture(core::ENGINE->GetResourceAtlas().LoadTexture(tex, cCommandQueue));
-			}
-			if (!vertexShader.empty() && !pixelShader.empty())
-			{
-				SetShader(core::ENGINE->GetResourceAtlas().LoadShaderBind(
-					pixelShader,
-					core::ENGINE->GetResourceAtlas().LoadPixelShader(pixelShader),
-					core::ENGINE->GetResourceAtlas().LoadVertexShader(vertexShader)
-				));
-			}
-			cCommandQueue->Flush();
+			mvpMatrix = mMatrix * viewMatrix * projectionMatrix;
 		}
 
-		/// <summary>
-		/// Sets the sprite index.
-		/// </summary>
-		/// <param name="a_iSpriteIndex">The index the sprite should have.</param>
-		void SpriteComponent::SetSpriteIndex(int8_t a_iSpriteIndex)
+		resources::ResourceAtlas* resourceAtlas = GetEngine().GetResourceAtlas();
+		if (!resourceAtlas)
 		{
-			size_t numSpriteRects = 0;
-			if (auto tex = m_pTexture.lock())
-			{
-				numSpriteRects = tex->GetSpriteRectsSize() - 1;
-			}
-			if (a_iSpriteIndex < 0)
-			{
-				a_iSpriteIndex = 0;
-			}
-			else if (a_iSpriteIndex > numSpriteRects)
-			{
-				a_iSpriteIndex = numSpriteRects;
-			}
-			m_iSpriteIndex = a_iSpriteIndex;
+			return;
 		}
+
+		if (std::shared_ptr<graphics::dx12::Material> material = resourceAtlas->GetDefaultMaterial().lock())
+		{
+			material->Bind(a_pCommandList);
+		}
+
+		if (std::shared_ptr<graphics::dx12::Material> material = m_pMaterial.lock())
+		{
+			if (material->IsValid())
+			{
+				material->Bind(a_pCommandList);
+			}
+		}
+
+		if (std::shared_ptr<graphics::dx12::Texture> tex = m_pTexture.lock())
+		{
+			if (tex->CanBeDrawn())
+			{
+				tex->Bind(a_pCommandList, m_iTextureIndex);
+			}
+		}
+
+		a_pCommandList->GetCommandList()->SetPipelineState(m_pPipelineState);
+		a_pCommandList->GetCommandList()->SetGraphicsRootSignature(m_pRootSignature);
+
+		if (std::shared_ptr<graphics::dx12::Mesh> mesh = m_pMesh.lock())
+		{
+			if (mesh->IsValid())
+			{
+				mesh->Render(a_pCommandList, mvpMatrix, mMatrix);
+			}
+		}
+	}
+	
+	//---------------------------------------------------------------------
+	void SpriteComponent::OnOrderChanged()
+	{
+		m_pDX12System->ReorderSpriteComponents();
+	}
+	
+	//---------------------------------------------------------------------
+	void SpriteComponent::SetTextureIndex(int8_t a_iTextureIndex)
+	{
+		size_t numTextureRects = 0;
+		if (std::shared_ptr<graphics::dx12::Texture> tex = m_pTexture.lock())
+		{
+			numTextureRects = tex->GetTextureRectsSize() - 1;
+		}
+		if (a_iTextureIndex < 0)
+		{
+			a_iTextureIndex = 0;
+		}
+		else if (a_iTextureIndex > numTextureRects)
+		{
+			a_iTextureIndex = numTextureRects;
+		}
+		m_iTextureIndex = a_iTextureIndex;
+	}
+
+	//---------------------------------------------------------------------
+	void SpriteComponent::OnShadersChanged()
+	{
+		m_pPipelineState = graphics::dx12::PipelineStateCache::GetOrCreate(m_pPixelShader, m_pVertexShader, DXGI_FORMAT_D32_FLOAT);
 	}
 }

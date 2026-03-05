@@ -59,7 +59,7 @@ namespace gallus
 		/// Invokes all the listeners with the provided arguments.
 		/// </summary>
 		/// <param name="args">The arguments to pass to the listeners when the event is triggered.</param>
-		void operator()(Args... args)
+		void operator()(Args... args) const
 		{
 			invoke(args...);
 		}
@@ -68,7 +68,7 @@ namespace gallus
 		/// Invokes all the listeners with the provided arguments.
 		/// </summary>
 		/// <param name="args">The arguments to pass to the listeners when the event is triggered.</param>
-		void invoke(Args... args)
+		void invoke(Args... args) const
 		{
 			for (auto& listener : m_Listeners)
 			{

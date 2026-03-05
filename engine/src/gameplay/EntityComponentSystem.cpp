@@ -4,258 +4,440 @@
 #include "logger/Logger.h"
 
 // gameplay
+#include "gameplay/Entity.h"
 #include "gameplay/ECSBaseSystem.h"
-#include "gameplay/systems/TransformSystem.h"
-#include "gameplay/systems/SpriteSystem.h"
+#include "gameplay/systems/UpdateTime.h"
 
-namespace gallus
+namespace gallus::gameplay
 {
-	namespace gameplay
+	//---------------------------------------------------------------------
+	// EntityComponentSystem
+	//---------------------------------------------------------------------
+	bool EntityComponentSystem::Initialize()
 	{
-		//---------------------------------------------------------------------
-		// EntityComponentSystem
-		//---------------------------------------------------------------------
-		bool EntityComponentSystem::Initialize()
+		LOG(LOGSEVERITY_SUCCESS, LOG_CATEGORY_ECS, "Successfully initialized ECS.");
+		return System::Initialize();
+	}
+
+	//---------------------------------------------------------------------
+	bool EntityComponentSystem::Destroy()
+	{
+		m_aSystems.clear();
+		LOG(LOGSEVERITY_SUCCESS, LOG_CATEGORY_ECS, "Successfully destroyed ECS.");
+		return System::Destroy();
+	}
+
+	bool previousUpdateRealtimeState = false;
+	//---------------------------------------------------------------------
+	void EntityComponentSystem::Update(float a_fDeltaTime, bool a_bUpdateRealtime)
+	{
+		std::lock_guard<std::recursive_mutex> lock(m_EntityMutex);
+
+		// Update components.
+		for (std::unique_ptr<AbstractECSSystem>& sys : m_aSystems)
 		{
-			LOG(LOGSEVERITY_SUCCESS, LOG_CATEGORY_ECS, "ECS initialized.");
-			return System::Initialize();
+			sys->UpdateComponents();
 		}
 
-		//---------------------------------------------------------------------
-		bool EntityComponentSystem::Destroy()
+		if (a_bUpdateRealtime)
 		{
-			for (AbstractECSSystem* system : m_aSystems)
+			for (std::unique_ptr<AbstractECSSystem>& sys : m_aSystems)
 			{
-				system->Destroy();
-				delete system;
+				sys->InitComponentsRealtime();
 			}
-			m_aSystems.clear();
-			LOG(LOGSEVERITY_SUCCESS, LOG_CATEGORY_ECS, "ECS destroyed.");
-			return System::Destroy();
-		}
-
-		bool previousUpdateRealtimeState = false;
-		//---------------------------------------------------------------------
-		void EntityComponentSystem::Update(float a_fDeltaTime, bool a_bUpdateRealtime)
-		{
-			std::lock_guard<std::recursive_mutex> lock(m_EntityMutex);
-
-			for (const Entity& entity : m_aEntities)
+			for (uint32_t i = 1; i <= static_cast<uint32_t>(UpdateTime::UPDATE_TIME_FRAME_END); i <<= 1)
 			{
-				for (AbstractECSSystem* sys : m_aSystems)
+				UpdateTime updateTime = (UpdateTime)i;
+				for (std::unique_ptr<AbstractECSSystem>& sys : m_aSystems)
 				{
-					if (entity.IsDestroyed())
+					if (sys->GetUpdateTimes().HasFlag(updateTime))
 					{
-						sys->DeleteComponent(entity.GetEntityID());
+						sys->UpdateComponentsRealtime(a_fDeltaTime, updateTime);
 					}
 				}
 			}
+		}
+		previousUpdateRealtimeState = a_bUpdateRealtime;
+	}
 
-			size_t oldSize = m_aEntities.size();
-			m_aEntities.erase(
-				std::remove_if(m_aEntities.begin(), m_aEntities.end(),
-				[](const Entity& e)
-				{
-					return e.IsDestroyed();
-				}),
-				m_aEntities.end()
-			);
-
-			if (oldSize != m_aEntities.size())
-			{
-				m_eOnEntitiesUpdated();
-				m_eOnEntityComponentsUpdated();
-			}
-
-			for (auto& sys : m_aSystems)
-			{
-				sys->UpdateComponents();
-			}
-
-			if (a_bUpdateRealtime)
-			{
-				for (auto& sys : m_aSystems)
-				{
-					sys->InitComponentsRealtime();
-				}
-				for (uint32_t i = 1; i <= static_cast<uint32_t>(UpdateTime::UPDATE_TIME_FRAME_END); i <<= 1)
-				{
-					UpdateTime updateTime = (UpdateTime)i;
-					for (auto& sys : m_aSystems)
-					{
-						if (sys->GetUpdateTimes().HasFlag(updateTime))
-						{
-							sys->UpdateComponentsRealtime(a_fDeltaTime, updateTime);
-						}
-					}
-				}
-			}
-			previousUpdateRealtimeState = a_bUpdateRealtime;
+	//---------------------------------------------------------------------
+	EntityID EntityComponentSystem::CreateEntity(const std::string& a_sName)
+	{
+		uint32_t index;
+		if (!m_aFreeIndices.empty())
+		{
+			index = m_aFreeIndices.back();
+			m_aFreeIndices.pop_back();
+		}
+		else
+		{
+			index = static_cast<uint32_t>(m_aEntitySlots.size());
+			m_aEntitySlots.emplace_back();
 		}
 
-		//---------------------------------------------------------------------
-		EntityID EntityComponentSystem::CreateEntity(const std::string& a_sName)
+		EntitySlot& slot = m_aEntitySlots[index];
+		slot.m_pEntity = std::make_shared<Entity>(EntityID(index, slot.m_iGeneration), GetUniqueName(a_sName));
+
+		m_eOnEntitiesUpdated.invoke();
+
+		return EntityID(index, slot.m_iGeneration);
+	}
+
+	std::string JSON_SCENE_ENTITIES_VAR_NAME = "name";
+	std::string JSON_SCENE_ENTITIES_VAR_ACTIVE = "isActive";
+	std::string JSON_SCENE_ENTITIES_VAR_COMPONENTS = "components";
+
+	//---------------------------------------------------------------------
+	EntityID EntityComponentSystem::CreateEntity(const resources::SrcData& a_SrcData)
+	{
+		gameplay::EntityID id;
+		if (!a_SrcData.IsValid())
 		{
-			std::lock_guard<std::recursive_mutex> lock(m_EntityMutex);
-
-			const EntityID id(++m_iNextID);
-			m_aEntities.emplace_back(id, a_sName);
-
-			m_eOnEntitiesUpdated();
-
+			LOGF(LOGSEVERITY_ERROR, LOG_CATEGORY_GAME, "Failed creating entity: Invalid entity data.");
 			return id;
 		}
 
-		//---------------------------------------------------------------------
-		bool EntityComponentSystem::IsEntityValid(const EntityID& a_ID) const
+		std::string name;
+		if (!a_SrcData.GetString(name, JSON_SCENE_ENTITIES_VAR_NAME))
 		{
-			std::lock_guard<std::recursive_mutex> lock(m_EntityMutex);
-
-			return a_ID.IsValid();
+			LOGF(LOGSEVERITY_WARNING, LOG_CATEGORY_GAME, "Failed creating entity: Could not read name of entity in src data. Defaulting to using name \"\".", name.c_str());
 		}
 
-		//---------------------------------------------------------------------
-		void EntityComponentSystem::DeleteEntity(const EntityID& a_ID)
+		id = CreateEntity(GetUniqueName(name));
+		if (!id.IsValid())
 		{
-			std::lock_guard<std::recursive_mutex> lock(m_EntityMutex);
+			LOGF(LOGSEVERITY_WARNING, LOG_CATEGORY_GAME, "Failed creating entity: Could not create entity with name.");
+			return id;
+		}
 
-			auto it = std::find_if(m_aEntities.begin(), m_aEntities.end(), [&](Entity& e)
+		std::shared_ptr<gameplay::Entity> ent = GetEntityByName(name).lock();
+		if (!ent)
+		{
+			LOGF(LOGSEVERITY_WARNING, LOG_CATEGORY_GAME, "Failed creating entity: Could not get entity properties.");
+			return id;
+		}
+
+		bool isActive = true;
+		if (!a_SrcData.GetBool(isActive, JSON_SCENE_ENTITIES_VAR_ACTIVE))
+		{
+			LOGF(LOGSEVERITY_WARNING, LOG_CATEGORY_GAME, "Failed creating entity: Could not read active state of entity in src data. Defaulting to true.");
+		}
+		ent->SetIsActive(isActive);
+
+		resources::SrcData componentsSrc;
+		if (!a_SrcData.GetSrcObject(JSON_SCENE_ENTITIES_VAR_COMPONENTS, componentsSrc))
+		{
+			LOGF(LOGSEVERITY_WARNING, LOG_CATEGORY_GAME, "Failed creating entity: Entity did not have any components in src data.");
+		}
+
+		// Create all components.
+		for (std::unique_ptr<gameplay::AbstractECSSystem>& system : m_aSystems)
+		{
+			if (componentsSrc.HasSrcObject(system->GetPropertyName()))
+			{
+				resources::SrcData componentSrc;
+				if (!componentsSrc.GetSrcObject(system->GetPropertyName(), componentSrc))
 				{
-					return e.GetEntityID() == a_ID;
-				});
-			if (it != m_aEntities.end())
-			{
-				it->Destroy();
+					continue;
+				}
+
+				system->CreateBaseComponent(id, componentSrc);
 			}
-		}
-
-		//---------------------------------------------------------------------
-		const Entity* EntityComponentSystem::GetEntity(const EntityID& a_ID) const
-		{
-			std::lock_guard<std::recursive_mutex> lock(m_EntityMutex);
-
-			auto it = std::find_if(m_aEntities.begin(), m_aEntities.end(),
-				[&](const Entity& e)
+			else
+			{
+				if (system->HasComponent(id))
 				{
-					return e.GetEntityID() == a_ID;
-				});
-
-			if (it != m_aEntities.end())
-			{
-				return &(*it);
-			}
-
-			return nullptr;
-		}
-
-		const Entity* EntityComponentSystem::GetEntityByName(const std::string& a_sName) const
-		{
-			auto it = std::find_if(m_aEntities.begin(), m_aEntities.end(),
-				[&](const Entity& e)
-			{
-				return e.GetName() == a_sName;
-			});
-
-			if (it != m_aEntities.end())
-			{
-				return &(*it);
-			}
-
-			return nullptr;
-		}
-
-		//---------------------------------------------------------------------
-		Entity* EntityComponentSystem::GetEntity(const EntityID& a_ID)
-		{
-			std::lock_guard<std::recursive_mutex> lock(m_EntityMutex);
-
-			auto it = std::find_if(m_aEntities.begin(), m_aEntities.end(), [&](Entity& e)
-				{
-					return e.GetEntityID() == a_ID;
-				});
-
-			if (it != m_aEntities.end())
-				return &(*it);
-
-			return nullptr;
-		}
-
-		//---------------------------------------------------------------------
-		void EntityComponentSystem::Clear()
-		{
-			std::lock_guard<std::recursive_mutex> lock(m_EntityMutex);
-
-			for (Entity& entity : m_aEntities)
-			{
-				entity.Destroy();
-			}
-		}
-
-		//---------------------------------------------------------------------
-		std::string EntityComponentSystem::GetUniqueName(const std::string& a_sName)
-		{
-			std::lock_guard<std::recursive_mutex> lock(m_EntityMutex);
-
-			std::string name = a_sName;
-
-			bool found = true;
-			int i = 0;
-			while (found)
-			{
-				found = false;
-				for (Entity& entity : m_aEntities)
-				{
-					if (entity.GetName() == name)
-					{
-						i++;
-						if (i != 0)
-						{
-							name = a_sName + " (" + std::to_string(i) + ")";
-							found = true;
-						}
-					}
+					system->DeleteComponent(id);
 				}
 			}
-			return name;
 		}
 
-		//---------------------------------------------------------------------
-		std::vector<Entity>& EntityComponentSystem::GetEntities()
+		return id;
+	}
+
+	//---------------------------------------------------------------------
+	EntityID EntityComponentSystem::UpdateEntity(const resources::SrcData& a_SrcData)
+	{
+		gameplay::EntityID id;
+		if (!a_SrcData.IsValid())
 		{
-			std::lock_guard<std::recursive_mutex> lock(m_EntityMutex);
-			return m_aEntities;
+			LOGF(LOGSEVERITY_ERROR, LOG_CATEGORY_GAME, "Failed creating entity: Invalid entity data.");
+			return id;
 		}
 
-		//---------------------------------------------------------------------
-		std::vector<AbstractECSSystem*> EntityComponentSystem::GetSystemsContainingEntity(const EntityID& a_ID)
+		std::string name;
+		if (!a_SrcData.GetString(name, JSON_SCENE_ENTITIES_VAR_NAME))
 		{
-			std::lock_guard<std::recursive_mutex> lock(m_EntityMutex);
+			LOGF(LOGSEVERITY_WARNING, LOG_CATEGORY_GAME, "Failed creating entity: Could not read name of entity in src data. Defaulting to using name \"\".", name.c_str());
+		}
 
-			std::vector<AbstractECSSystem*> systems;
-			for (AbstractECSSystem* system : m_aSystems)
+		std::weak_ptr<gameplay::Entity> foundEntity = GetEntityByName(name);
+		if (!GetEntityByName(name).lock())
+		{
+			foundEntity = GetEntity(CreateEntity(name));
+		}
+
+		std::shared_ptr<gameplay::Entity> entity = foundEntity.lock();
+		if (!entity)
+		{
+			return id;
+		}
+
+		id = entity->GetEntityID();
+
+		bool isActive = true;
+		if (!a_SrcData.GetBool(isActive, JSON_SCENE_ENTITIES_VAR_ACTIVE))
+		{
+			LOGF(LOGSEVERITY_WARNING, LOG_CATEGORY_GAME, "Failed creating entity: Could not read active state of entity in src data. Defaulting to true.");
+		}
+		entity->SetIsActive(isActive);
+
+		resources::SrcData componentsSrc;
+		if (!a_SrcData.GetSrcObject(JSON_SCENE_ENTITIES_VAR_COMPONENTS, componentsSrc))
+		{
+			LOGF(LOGSEVERITY_WARNING, LOG_CATEGORY_GAME, "Failed creating entity: Entity did not have any components in src data.");
+		}
+
+		// Create all components.
+		for (std::unique_ptr<gameplay::AbstractECSSystem>& system : m_aSystems)
+		{
+			if (componentsSrc.HasSrcObject(system->GetPropertyName()))
 			{
-				if (system->HasComponent(a_ID))
+				resources::SrcData componentSrc;
+				if (!componentsSrc.GetSrcObject(system->GetPropertyName(), componentSrc))
 				{
-					systems.push_back(system);
+					continue;
+				}
+
+				if (system->HasComponent(id))
+				{
+					system->UpdateBaseComponent(id, componentSrc);
+				}
+				else
+				{
+					system->CreateBaseComponent(id, componentSrc);
 				}
 			}
-			return systems;
+			else
+			{
+				if (system->HasComponent(id))
+				{
+					system->DeleteComponent(id);
+				}
+			}
 		}
 
-		//---------------------------------------------------------------------
-		std::vector<AbstractECSSystem*> EntityComponentSystem::GetSystemsContainingEntity(const Entity& a_Entity)
+		return id;
+	}
+
+	//---------------------------------------------------------------------
+	void EntityComponentSystem::SerializeEntity(const EntityID& a_EntityID, resources::SrcData& a_SrcData)
+	{
+		a_SrcData.SetObject();
+
+		std::weak_ptr<gameplay::Entity> entity = GetEntity(a_EntityID);
+		std::shared_ptr<gameplay::Entity> ent = entity.lock();
+		if (!entity.lock())
 		{
-			std::lock_guard<std::recursive_mutex> lock(m_EntityMutex);
-
-			return GetSystemsContainingEntity(a_Entity.GetEntityID());
+			return;
 		}
 
-		//---------------------------------------------------------------------
-		std::vector<AbstractECSSystem*> EntityComponentSystem::GetSystems()
+		a_SrcData.SetString(JSON_SCENE_ENTITIES_VAR_NAME, ent->GetName());
+		a_SrcData.SetBool(JSON_SCENE_ENTITIES_VAR_ACTIVE, ent->IsActive());
+
+		resources::SrcData componentsSrc = resources::SrcData();
+		componentsSrc.SetObject();
+
+		for (gameplay::AbstractECSSystem* system : GetSystemsContainingEntity(ent->GetEntityID()))
 		{
-			std::lock_guard<std::recursive_mutex> lock(m_EntityMutex);
+			resources::SrcData componentSrc = resources::SrcData();
+			componentSrc.SetObject();
+			
+			const gameplay::Component* component = system->GetBaseComponent(ent->GetEntityID());
+			SerializeFields(component, componentSrc);
 
-			return m_aSystems;
+			componentsSrc.SetSrcObject(system->GetPropertyName(), componentSrc);
 		}
+		a_SrcData.SetSrcObject(JSON_SCENE_ENTITIES_VAR_COMPONENTS, componentsSrc);
+	}
+
+	//---------------------------------------------------------------------
+	bool EntityComponentSystem::IsEntityValid(const EntityID& a_ID) const
+	{
+		if (!a_ID.IsValid())
+		{
+			return false;
+		}
+
+		if (a_ID.GetIndex() >= m_aEntitySlots.size())
+		{
+			return false;
+		}
+
+		const EntitySlot& slot = m_aEntitySlots[a_ID.GetIndex()];
+		return slot.m_iGeneration == a_ID.GetGeneration() &&
+			slot.m_pEntity != nullptr;
+	}
+
+	//---------------------------------------------------------------------
+	void EntityComponentSystem::DeleteEntity(const EntityID& a_ID)
+	{
+		if (!IsEntityValid(a_ID))
+		{
+			return;
+		}
+
+		EntitySlot& slot = m_aEntitySlots[a_ID.GetIndex()];
+		slot.m_pEntity.reset();
+		slot.m_iGeneration++;
+		m_aFreeIndices.push_back(a_ID.GetIndex());
+
+		m_eOnEntitiesUpdated.invoke();
+	}
+
+	//---------------------------------------------------------------------
+	std::weak_ptr<Entity> EntityComponentSystem::GetEntity(const EntityID& a_ID) const
+	{
+		if (!IsEntityValid(a_ID))
+		{
+			return std::weak_ptr<Entity>();
+		}
+
+		return m_aEntitySlots[a_ID.GetIndex()].m_pEntity;
+	}
+
+	//---------------------------------------------------------------------
+	std::weak_ptr<Entity> EntityComponentSystem::GetEntityByName(const std::string& a_sName) const
+	{
+		std::lock_guard<std::recursive_mutex> lock(m_EntityMutex);
+
+		for (const EntitySlot& slot : m_aEntitySlots)
+		{
+			if (!slot.m_pEntity)
+			{
+				continue;
+			}
+
+			if (slot.m_pEntity->GetName() == a_sName)
+			{
+				return slot.m_pEntity;
+			}
+		}
+
+		return std::weak_ptr<Entity>();
+	}
+
+	//---------------------------------------------------------------------
+	std::weak_ptr<Entity> EntityComponentSystem::GetEntity(const EntityID& a_ID)
+	{
+		return static_cast<const EntityComponentSystem*>(this)->GetEntity(a_ID);
+	}
+
+	//---------------------------------------------------------------------
+	void EntityComponentSystem::Clear()
+	{
+		std::lock_guard<std::recursive_mutex> lock(m_EntityMutex);
+
+		m_aFreeIndices.clear();
+
+		for (uint32_t i = 0; i < m_aEntitySlots.size(); ++i)
+		{
+			EntitySlot& slot = m_aEntitySlots[i];
+
+			if (slot.m_pEntity)
+			{
+				// If component systems listen to entity destruction, call DeleteComponent here.
+				for (std::unique_ptr<AbstractECSSystem>& sys : m_aSystems)
+				{
+					sys->DeleteComponent(EntityID(i, slot.m_iGeneration));
+				}
+
+				slot.m_pEntity.reset();
+			}
+
+			slot.m_iGeneration++;          // Invalidate old IDs
+			m_aFreeIndices.push_back(i);   // Mark slot as free
+		}
+
+		m_eOnEntitiesUpdated.invoke();
+	}
+
+	//---------------------------------------------------------------------
+	std::string EntityComponentSystem::GetUniqueName(const std::string& a_sName)
+	{
+		std::lock_guard<std::recursive_mutex> lock(m_EntityMutex);
+
+		std::string candidate = a_sName;
+		uint32_t counter = 1;
+		bool exists = true;
+
+		while (exists)
+		{
+			exists = false;
+
+			for (const EntitySlot& slot : m_aEntitySlots)
+			{
+				if (!slot.m_pEntity)
+				{
+					continue;
+				}
+
+				if (slot.m_pEntity->GetName() == candidate)
+				{
+					candidate = a_sName + " (" + std::to_string(counter++) + ")";
+					exists = true;
+					break;
+				}
+			}
+		}
+
+		return candidate;
+	}
+
+	//---------------------------------------------------------------------
+	std::vector<EntityID> EntityComponentSystem::GetEntities() const
+	{
+		std::vector<EntityID> result;
+		std::lock_guard<std::recursive_mutex> lock(m_EntityMutex);
+
+		for (uint32_t i = 0; i < m_aEntitySlots.size(); ++i)
+		{
+			const EntitySlot& slot = m_aEntitySlots[i];
+			if (slot.m_pEntity)
+			{
+				result.emplace_back(i, slot.m_iGeneration);
+			}
+		}
+
+		return result;
+	}
+
+	//---------------------------------------------------------------------
+	std::vector<AbstractECSSystem*> EntityComponentSystem::GetSystemsContainingEntity(const EntityID& a_ID)
+	{
+		std::lock_guard<std::recursive_mutex> lock(m_EntityMutex);
+
+		std::vector<AbstractECSSystem*> systems;
+		for (std::unique_ptr<AbstractECSSystem>& sys : m_aSystems)
+		{
+			if (sys->HasComponent(a_ID))
+			{
+				systems.push_back(sys.get());
+			}
+		}
+		return systems;
+	}
+
+	//---------------------------------------------------------------------
+	std::vector<AbstractECSSystem*> EntityComponentSystem::GetSystems()
+	{
+		std::lock_guard<std::recursive_mutex> lock(m_EntityMutex);
+
+		std::vector<AbstractECSSystem*> systems;
+		for (std::unique_ptr<AbstractECSSystem>& sys : m_aSystems)
+		{
+			systems.push_back(sys.get());
+		}
+		return systems;
 	}
 }

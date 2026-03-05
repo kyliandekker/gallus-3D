@@ -1,0 +1,52 @@
+// @shader_cbuffer(name=ShaderTransform, register=b0)
+cbuffer ShaderTransform
+{
+    float4x4 WorldViewProj;
+    float4x4 WorldMatrix;
+};
+
+// @shader_cbuffer(name=TextureUV, register=b1)
+cbuffer TextureUV
+{
+    float4 uv;
+};
+
+// @shader_cbuffer(name=MaterialData, register=b2)
+cbuffer MaterialData
+{
+	uint EnableLighting;
+    float3 Padding0;
+    float4 DiffuseColor;
+    float Metallic;
+    float Smoothness;
+	float2 Padding1;
+};
+
+// @shader_cbuffer(name=DirectionalLightData, register=b3)
+cbuffer DirectionalLightData
+{
+	uint DirectionalLightEnabled;
+    float3 LightDirection;
+    float4 LightColor;
+	float  AmbientIntensity;
+};
+
+// @shader_vertex_input
+vertex_input VSInput
+{
+    POSITION  float3 POSITION;
+    TEXCOORD0  float2 TEXCOORD;
+    NORMAL    float3 NORMAL;
+    COLOR     float4 COLOR;
+};
+
+// @shader_root_parameters
+root_parameters
+{
+    CBV							b0 cbuffer Transform;
+    SPRITE_UV					b1 cbuffer TextureUV;
+    MATERIAL         			b2 cbuffer Material;
+    DIRECTIONAL_LIGHT			b3 cbuffer DirectionalLight;
+    TEX_SRV						t0 Texture2D spriteTexture;
+    SAMPLER_STATE				s0 SamplerState samplerState;
+};

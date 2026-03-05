@@ -1,4 +1,3 @@
-#include <windows.h>
 #include <Shlwapi.h>
 #include <filesystem>
 #include <ShellScalingApi.h>
@@ -7,19 +6,32 @@
 #include "resource.h"
 #include "core/ArgProcessor.h"
 
-// logger
-#include "logger/Logger.h"
-
-// utils
-#include "utils/file_abstractions.h"
+// graphics
+#include "graphics/win32/WINPCH.h"
+#include "graphics/win32/Window.h"
 
 // gameplay
 #include "gameplay/Game.h"
 
-// editor
-#include "editor/core/EditorEngine.h"
-#include "editor/graphics/imgui/EditorWindowsConfig.h"
+// resources
+#include "resources/ResourceAtlas.h"
 
+// file
+#include "file/file_abstractions.h"
+
+// imgui
+#include "imgui_system/ImGuiSystem.h"
+
+// editor
+#include "editor/editorEntryPoints.h"
+
+#include "editor/Editor.h"
+#include "editor/core/EditorEngine.h"
+
+// editor/file
+#include "editor/file/IFileAssetSource.h"
+
+//---------------------------------------------------------------------
 int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR lpCmdLine, _In_ int nShowCmd)
 {
 	SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE);
@@ -37,34 +49,37 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR lp
 	std::string cmdLine(wstr.begin(), wstr.end());
 
 	// Initialize systems.
-	std::string name = "Gallus 2D Engine";
+	std::string name = "Gallus Engine";
 	std::string saveDirPath = gallus::file::GetAppDataPath().generic_string() + "/engine";
-	gallus::core::EDITOR_ENGINE = new gallus::core::EditorEngine();
-	gallus::core::EDITOR_ENGINE->SetSaveDirectory(saveDirPath);
-	gallus::core::EDITOR_ENGINE->SetDefaultArguments();
+	SetEnginePtr(new gallus::core::EditorEngine());
+	gallus::GetEditorEngine().SetDefaultArguments();
 
 	gallus::core::ARGS.ProcessArguments(cmdLine);
+	gallus::GetEditorEngine().GetResourceAtlas()->SetAssetSource<gallus::file::IFileAssetSource>();
+	gallus::GetEditorEngine().GetWindow()->GetWindowSettings().SetPath(saveDirPath);
+	gallus::GetEditorEngine().GetEditor()->GetEditorSettings().SetPath(saveDirPath);
+	gallus::GetEditorEngine().GetImGuiSystem()->SetIniPath(saveDirPath);
+	gallus::GetEditorEngine().Initialize(hInstance, name);
 
-	gallus::graphics::imgui::ImGuiWindow& imguiWindow = gallus::core::EDITOR_ENGINE->GetDX12().GetImGuiWindow();
-	imguiWindow.SetWindowsConfig<gallus::graphics::imgui::EditorWindowsConfig>();
-
-	gallus::core::EDITOR_ENGINE->Initialize(hInstance, name);
+	gallus::graphics::win32::Window* window = gallus::GetEditorEngine().GetWindow();
+	if (!window)
+	{
+		return 0;
+	}
 
 	// Load icons.
 	HICON hIconLarge = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));
 	HICON hIconSmall = (HICON) LoadImage(hInstance, MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON, 16, 16, 0); // 16x16
-	SendMessage(gallus::core::EDITOR_ENGINE->GetWindow().GetHWnd(), WM_SETICON, ICON_BIG, (LPARAM) hIconLarge);
-	SendMessage(gallus::core::EDITOR_ENGINE->GetWindow().GetHWnd(), WM_SETICON, ICON_SMALL, (LPARAM) hIconSmall);
+	SendMessage(window->GetHWnd(), WM_SETICON, ICON_BIG, (LPARAM) hIconLarge);
+	SendMessage(window->GetHWnd(), WM_SETICON, ICON_SMALL, (LPARAM) hIconSmall);
 
 	// Game
-	gallus::gameplay::GAME.Initialize();
+	gallus::gameplay::GetGame().Initialize();
 
-	imguiWindow.InitializeWindows();
-
-	gallus::gameplay::GAME.Loop();
+	gallus::gameplay::GetGame().Loop();
 
 	// Destroy the tool after loop ends.
-	gallus::core::EDITOR_ENGINE->Destroy();
+	gallus::GetEngine().Destroy();
 
 	return 0;
 }

@@ -1,218 +1,210 @@
 // header
 #include "Scene.h"
 
-// external
-#include <rapidjson/utils.h>
-#include <rapidjson/stringbuffer.h>
-#include <rapidjson/prettywriter.h>
-
 // core
 #include "core/Engine.h"
-#include "core/DataStream.h"
+
+// graphics
+#include "graphics/dx12/Camera.h"
+#include "graphics/dx12/DX12System.h"
+#include "graphics/dx12/DirectionalLight.h"
 
 // logger
 #include "logger/Logger.h"
-
-// utils
-#include "utils/file_abstractions.h"
 
 // resources
 #include "resources/SrcData.h"
 
 // gameplay
+#include "gameplay/Entity.h"
+#include "gameplay/EntityComponentSystem.h"
 #include "gameplay/ECSBaseSystem.h"
 
-namespace gallus
+namespace gallus::gameplay
 {
-	namespace gameplay
+	//---------------------------------------------------------------------
+	// Scene
+	//---------------------------------------------------------------------
+	bool Scene::Destroy()
 	{
-		//---------------------------------------------------------------------
-		// Scene
-		//---------------------------------------------------------------------
-		bool Scene::Destroy()
+		if (!EngineResource::Destroy())
 		{
-			if (!EngineResource::Destroy())
-			{
-				return false;
-			}
-
-			m_Data = core::Data();
-
-			return true;
+			return false;
 		}
 
-		//---------------------------------------------------------------------
-		bool Scene::LoadByName(const std::string& a_sName)
-		{
-			if (!EngineResource::LoadByName(a_sName))
-			{
-				return false;
-			}
-			m_AssetType = resources::AssetType::Scene;
+		m_Data = core::Data();
 
-			return true;
+		return true;
+	}
+
+	//---------------------------------------------------------------------
+    bool Scene::LoadData(const core::Data& a_Data)
+    {
+		m_AssetType = resources::AssetType::Scene;
+
+		m_Data = a_Data;
+
+        return true;
+    }
+
+    //---------------------------------------------------------------------
+	bool Scene::LoadData()
+	{
+		// Clear all entities.
+		gameplay::EntityComponentSystem* ecs = GetEngine().GetECS();
+		if (!ecs)
+		{
+			return false;
 		}
 
-		//---------------------------------------------------------------------
-		bool Scene::LoadByPath(const fs::path& a_Path)
+		ecs->Clear();
+		while (!ecs->GetEntities().empty())
 		{
-			if (!EngineResource::LoadByPath(a_Path))
-			{
-				return false;
-			}
-			m_AssetType = resources::AssetType::Scene;
-			
-			return file::LoadFile(m_Path, m_Data);
 		}
 
-		//---------------------------------------------------------------------
-		bool Scene::LoadData()
+		if (m_Data.empty())
 		{
-			// Clear all entities.
-			core::ENGINE->GetECS().Clear();
-			while (!core::ENGINE->GetECS().GetEntities().empty())
-			{
-			}
-
-			if (m_Data.empty())
-			{
-				return false;
-			}
-
-#ifdef _EDITOR
-			m_bIsDirty = false;
-#endif // _EDITOR
-
-			rapidjson::Document document;
-			document.Parse(m_Data.dataAs<const char>(), m_Data.size());
-
-			if (document.HasParseError())
-			{
-				LOG(LOGSEVERITY_ERROR, LOG_CATEGORY_GAME, "Something went wrong when trying to load scene data.");
-				return false;
-			}
-
-			// Load entities and systems.
-			if (document.HasMember(JSON_SCENE_ENTITIES_VAR) && document[JSON_SCENE_ENTITIES_VAR].IsArray())
-			{
-				for (auto& entityDoc : document[JSON_SCENE_ENTITIES_VAR].GetArray())
-				{
-					if (!entityDoc.IsObject())
-					{
-						continue;
-					}
-
-					std::string name = core::ENGINE->GetECS().GetUniqueName("New GameObject");
-					if (entityDoc.HasMember(JSON_SCENE_ENTITIES_VAR_NAME) && entityDoc[JSON_SCENE_ENTITIES_VAR_NAME].IsString())
-					{
-						name = entityDoc[JSON_SCENE_ENTITIES_VAR_NAME].GetString();
-					}
-
-					gameplay::EntityID id = core::ENGINE->GetECS().CreateEntity(core::ENGINE->GetECS().GetUniqueName(name));
-					gameplay::Entity* entity = core::ENGINE->GetECS().GetEntity(id);
-					if (!entity)
-					{
-						continue;
-					}
-
-					bool isActive = true;
-					if (entityDoc.HasMember(JSON_SCENE_ENTITIES_VAR_ACTIVE) && entityDoc[JSON_SCENE_ENTITIES_VAR_ACTIVE].IsBool())
-					{
-						isActive = entityDoc[JSON_SCENE_ENTITIES_VAR_ACTIVE].GetBool();
-					}
-					entity->SetIsActive(isActive);
-
-					auto componentsDoc = entityDoc[JSON_SCENE_ENTITIES_VAR_COMPONENTS].GetObject();
-					for (gameplay::AbstractECSSystem* system : core::ENGINE->GetECS().GetSystems())
-					{
-						if (componentsDoc.HasMember(system->GetPropertyName().c_str()))
-						{
-							const rapidjson::Value& srcData = componentsDoc[system->GetPropertyName().c_str()];
-							const gameplay::Component* component = system->CreateBaseComponent(id, srcData);
-							if (!component)
-							{
-								continue;
-							}
-						}
-					}
-				}
-			}
-
-			return true;
+			return false;
 		}
 
-#ifdef _EDITOR
-		//---------------------------------------------------------------------
-		bool Scene::Save()
+		resources::SrcData srcData(m_Data);
+		if (!srcData.IsValid())
 		{
-			if (m_Path.empty())
-			{
-				return false;
-			}
-
-			core::Data data = GetSceneData();
-
-			if (!file::SaveFile(m_Path, data))
-			{
-				LOGF(LOGSEVERITY_ERROR, LOG_CATEGORY_GAME, "Something went wrong when trying to save scene file \"%s\".", m_Path.generic_string().c_str());
-				return false;
-			}
-
-#ifdef _EDITOR
-			m_bIsDirty = false;
-#endif // _EDITOR
-			return true;
-		}
-#endif // _EDITOR
-
-		//---------------------------------------------------------------------
-		const core::Data& Scene::GetData() const
-		{
-			return m_Data;
+			LOG(LOGSEVERITY_ERROR, LOG_CATEGORY_GAME, "Failed loading scene data: Something went wrong when trying to load scene data.");
+			return false;
 		}
 
-		//---------------------------------------------------------------------
-#ifdef _EDITOR
-		const core::Data Scene::GetSceneData() const
+		resources::SrcData cameraSrcData;
+		cameraSrcData.SetObject();
+		
+		graphics::dx12::DX12System& dx12 = GetDX12System();
+
+		graphics::dx12::Camera& camera = dx12.GetCamera();
+		camera.GetTransform().SetRotation(DirectX::XMQuaternionIdentity());
+		camera.Init(graphics::dx12::RENDER_TEX_SIZE.x, graphics::dx12::RENDER_TEX_SIZE.y);
+		if (!srcData.GetSrcObject(JSON_SCENE_CAMERA_VAR, cameraSrcData))
 		{
-			rapidjson::Document a_Document;
-			a_Document.SetObject();
-			rapidjson::Document::AllocatorType& allocator = a_Document.GetAllocator();
+			LOGF(LOGSEVERITY_WARNING, LOG_CATEGORY_GAME, "Failed loading scene data: Could not read camera settings in scene data.");
+		}
+		else
+		{
+			DeserializeFields(&camera, cameraSrcData);
+		}
+		
+		resources::SrcData directionalLightSrcData;
+		cameraSrcData.SetObject();
 
-			a_Document.AddMember(JSON_SCENE_ENTITIES_VAR, rapidjson::Value().SetArray(), allocator);
-			for (gameplay::Entity& entity : core::ENGINE->GetECS().GetEntities())
+		if (!srcData.GetSrcObject(JSON_SCENE_DIRECTIONAL_LIGHT_VAR, directionalLightSrcData))
+		{
+			LOGF(LOGSEVERITY_WARNING, LOG_CATEGORY_GAME, "Failed loading scene data: Could not read directional light settings in scene data.");
+		}
+		else if (std::shared_ptr<graphics::dx12::DirectionalLight> directionalLight = dx12.GetDirectionalLight().lock())
+		{
+			DeserializeFields(directionalLight.get(), directionalLightSrcData);
+		}
+		
+		resources::SrcData entitiesSrc;
+		if (!srcData.GetSrcArray(JSON_SCENE_ENTITIES_VAR, entitiesSrc))
+		{
+			LOG(LOGSEVERITY_ERROR, LOG_CATEGORY_GAME, "Failed loading scene data: Could not read entities array in scene data.");
+			return false;
+		}
+		
+		if (!entitiesSrc.IsValid())
+		{
+			LOG(LOGSEVERITY_ERROR, LOG_CATEGORY_GAME, "Failed loading scene data: Invalid entities array in scene data.");
+			return false;
+		}
+
+		size_t arraySize = 0;
+		if (!entitiesSrc.GetArraySize(arraySize))
+		{
+			LOG(LOGSEVERITY_ERROR, LOG_CATEGORY_GAME, "Failed loading scene data: Could not get size of entities array in scene data.");
+			return false;
+		}
+
+		for (size_t i = 0; i < arraySize; i++)
+		{
+			resources::SrcData entitySrc;
+			if (!entitiesSrc.GetSrcArrayElement(i, entitySrc))
 			{
-				rapidjson::Document entityDoc;
-				entityDoc.SetObject();
-
-				rapidjson::SetOrAddMember(entityDoc, JSON_SCENE_ENTITIES_VAR_NAME, entity.GetName().c_str(), allocator);
-				entityDoc.AddMember(JSON_SCENE_ENTITIES_VAR_ACTIVE, entity.IsActive(), allocator);
-
-				rapidjson::Document componentsDoc;
-				componentsDoc.SetObject();
-
-				for (gameplay::AbstractECSSystem* system : core::ENGINE->GetECS().GetSystemsContainingEntity(entity))
-				{
-					rapidjson::Value key(system->GetPropertyName().c_str(), allocator);
-
-					rapidjson::Document componentDoc;
-					componentDoc.SetObject();
-
-					const gameplay::Component* component = system->GetBaseComponent(entity.GetEntityID());
-					componentsDoc.AddMember(key, rapidjson::Value().SetObject(), allocator);
-					component->Serialize(componentsDoc[system->GetPropertyName().c_str()], allocator);
-				}
-
-				entityDoc.AddMember(JSON_SCENE_ENTITIES_VAR_COMPONENTS, componentsDoc, allocator);
-				a_Document[JSON_SCENE_ENTITIES_VAR].PushBack(entityDoc, allocator);
+				LOGF(LOGSEVERITY_ERROR, LOG_CATEGORY_GAME, "Failed loading scene data: Something went wrong when trying to load entity index %i in scene data.", i);
+				continue;
 			}
 
-			rapidjson::StringBuffer buffer;
-			rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
-			a_Document.Accept(writer);
+			if (!entitySrc.IsValid())
+			{
+				LOGF(LOGSEVERITY_ERROR, LOG_CATEGORY_GAME, "Failed loading scene data: Invalid entity data for entity index %i in scene data.", i);
+				continue;
+			}
 
-			return core::DataStream(buffer.GetString(), buffer.GetSize());
+			ecs->CreateEntity(entitySrc);
 		}
-#endif // _EDITOR
+
+		return true;
+	}
+
+	//---------------------------------------------------------------------
+	const core::Data& Scene::GetData() const
+	{
+		return m_Data;
+	}
+
+	//---------------------------------------------------------------------
+	const core::Data Scene::GetSceneData() const
+	{
+		resources::SrcData srcData = resources::SrcData();
+		srcData.SetObject();
+
+		graphics::dx12::DX12System& dx12 = GetDX12System();
+
+		{
+			resources::SrcData cameraSrcData;
+			cameraSrcData.SetObject();
+
+			SerializeFields(&dx12.GetCamera(), cameraSrcData);
+			srcData.SetSrcObject(JSON_SCENE_CAMERA_VAR, cameraSrcData);
+		}
+
+		{
+			resources::SrcData directionalLightSrcData;
+			directionalLightSrcData.SetObject();
+
+			if (auto directionalLight = dx12.GetDirectionalLight().lock())
+			{
+				SerializeFields(directionalLight.get(), directionalLightSrcData);
+				srcData.SetSrcObject(JSON_SCENE_DIRECTIONAL_LIGHT_VAR, directionalLightSrcData);
+			}
+		}
+
+		resources::SrcData entitiesSrc = resources::SrcData();
+		entitiesSrc.SetArray();
+
+		gameplay::EntityComponentSystem* ecs = GetEngine().GetECS();
+		if (!ecs)
+		{
+			return core::Data();
+		}
+
+		for (gameplay::EntityID entityID : ecs->GetEntities())
+		{
+			resources::SrcData entitySrc = resources::SrcData();
+			entitySrc.SetObject();
+
+			ecs->SerializeEntity(entityID, entitySrc);
+			entitiesSrc.PushArraySrcObject(entitySrc);
+		}
+
+		srcData.SetSrcObject(JSON_SCENE_ENTITIES_VAR, entitiesSrc);
+
+		core::Data data;
+		srcData.GetData(data);
+		return data;
+	}
+	
+	//---------------------------------------------------------------------
+	void Scene::SetSceneData(const core::Data& a_Data)
+	{
+		m_Data = a_Data;
 	}
 }

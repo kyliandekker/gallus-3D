@@ -4,85 +4,93 @@
 #include <iostream>
 
 // graphics
-#include "graphics/dx12/DX12System2D.h"
+#include "graphics/dx12/DX12System.h"
+#include "graphics/dx12/Camera.h"
 
 // logger
 #include "logger/Logger.h"
 
 // editor
-#include "editor/graphics/imgui/EditorSelectable.h"
+#include "editor/core/EditorEngine.h"
+#include "editor/graphics/imgui/views/selectables/EditorSelectable.h"
 
-namespace gallus
+namespace gallus::editor
 {
-	namespace editor
+	//---------------------------------------------------------------------
+	// Editor
+	//---------------------------------------------------------------------
+	Editor::Editor() : core::System(),
+		m_EditorSettings("editorsettings.settings")
+	{}
+
+	//---------------------------------------------------------------------
+	Editor::~Editor() = default;
+
+	//---------------------------------------------------------------------
+	bool Editor::Initialize()
 	{
-		//---------------------------------------------------------------------
-		// Editor
-		//---------------------------------------------------------------------
-		Editor::Editor() : core::ThreadedSystem::ThreadedSystem(), 
-			m_EditorSettings("editorsettings.settings")
+		LOG(LOGSEVERITY_INFO, LOG_CATEGORY_EDITOR, "Initializing editor.");
+
+		if (m_EditorSettings.Load())
 		{
-			m_pSelectable = nullptr;
+			LOG(LOGSEVERITY_SUCCESS, LOG_CATEGORY_EDITOR, "Successfully loaded editor settings.");
 		}
 
-		//---------------------------------------------------------------------
-		bool Editor::Initialize(bool a_bWait)
+		m_pEditorCamera = std::make_unique<graphics::dx12::Camera>();
+
+		m_pEditorCamera->Init(graphics::dx12::RENDER_TEX_SIZE.x, graphics::dx12::RENDER_TEX_SIZE.y);
+		m_pEditorCamera->GetTransform().SetPosition({ 0.0f, 1.0f, -2.0f });
+
+		graphics::dx12::DX12System& dx12System = GetDX12System();
+		dx12System.SetDimensionDrawMode((graphics::dx12::DimensionDrawMode) m_EditorSettings.GetDimensionDrawMode());
+
+		LOG(LOGSEVERITY_SUCCESS, LOG_CATEGORY_EDITOR, "Editor initialized.");
+
+		return System::Initialize();
+	}
+
+	//---------------------------------------------------------------------
+	bool Editor::Destroy()
+	{
+		LOG(LOGSEVERITY_INFO, LOG_CATEGORY_EDITOR, "Editor destroyed.");
+		return System::Destroy();
+	}
+
+	//---------------------------------------------------------------------
+	graphics::dx12::Camera& Editor::GetEditorCamera()
+	{
+		return *m_pEditorCamera.get();
+	}
+
+	//---------------------------------------------------------------------
+	void Editor::SetSelectable(std::weak_ptr<graphics::imgui::EditorSelectable> a_pSelectable)
+	{
+		std::shared_ptr<graphics::imgui::EditorSelectable> oldSelectable = m_pSelectable.lock();
+		if (oldSelectable)
 		{
-			m_CurrentScene.SetResourceCategory(resources::EngineResourceCategory::Editor);
-			m_EditorCamera.Init(graphics::dx12::RENDER_TEX_SIZE.x, graphics::dx12::RENDER_TEX_SIZE.y);
-
-			LOG(LOGSEVERITY_INFO, LOG_CATEGORY_EDITOR, "Initializing editor.");
-			LOG(LOGSEVERITY_WARNING, LOG_CATEGORY_EDITOR, "This is a test.");
-
-			return ThreadedSystem::Initialize(a_bWait);
+			oldSelectable->OnDeselect();
+		}
+		m_pSelectable = a_pSelectable;
+		std::shared_ptr<graphics::imgui::EditorSelectable> newSelectable = m_pSelectable.lock();
+		if (newSelectable)
+		{
+			newSelectable->OnSelect();
 		}
 
-		//---------------------------------------------------------------------
-		void Editor::Loop()
-		{
-			std::lock_guard<std::mutex> lock(m_EditorMutex);
-			m_AssetDatabase.CheckAssetDatabase();
-		}
+		m_eOnSelectableChanged(oldSelectable, newSelectable);
+	}
 
-		//---------------------------------------------------------------------
-		bool Editor::Destroy()
-		{
-			LOG(LOGSEVERITY_INFO, LOG_CATEGORY_EDITOR, "Destroying editor.");
-			return ThreadedSystem::Destroy();
-		}
+	//---------------------------------------------------------------------
+    bool Editor::IsSelectable(std::shared_ptr<graphics::imgui::EditorSelectable> a_pSelectable)
+    {
+		std::shared_ptr<graphics::imgui::EditorSelectable> newSelectable = m_pSelectable.lock();
+		return newSelectable.get() == a_pSelectable.get();
+	}
 
-		//---------------------------------------------------------------------
-		void Editor::SetSelectable(graphics::imgui::EditorSelectable* a_pSelectable)
-		{
-			if (m_pSelectable)
-			{
-				m_pSelectable.get()->Deselect();
-			}
-			m_pSelectable = a_pSelectable;
-			if (m_pSelectable)
-			{
-				m_pSelectable.get()->Select();
-			}
-		}
-
-		//---------------------------------------------------------------------
-		bool Editor::InitThreadWorker()
-		{
-			m_AssetDatabase.Initialize();
-
-			m_EditorSettings.Load();
-
-			LOG(LOGSEVERITY_SUCCESS, LOG_CATEGORY_EDITOR, "Initialized editor.");
-
-			return true;
-		}
-
-		//---------------------------------------------------------------------
-		void Editor::Finalize()
-		{
-			m_AssetDatabase.Destroy();
-
-			LOG(LOGSEVERITY_SUCCESS, LOG_CATEGORY_EDITOR, "Destroyed editor.");
-		}
+    //---------------------------------------------------------------------
+	void Editor::ResetSelectable()
+	{
+		std::shared_ptr<graphics::imgui::EditorSelectable> sptr; // null
+		m_pSelectable = sptr;
 	}
 }

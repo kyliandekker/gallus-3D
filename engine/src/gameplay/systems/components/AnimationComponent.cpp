@@ -1,133 +1,86 @@
 #include "AnimationComponent.h"
 
-// external
-#include <rapidjson/utils.h>
-
-// core
-#include "core/Engine.h"
-
 // animation
-#include "animation/AnimationTrack.h"
+#include "animation/Animation.h"
+#include "animation/AnimationKeyFrame.h"
 
-// resources
-#include "resources/SrcData.h"
-
-#define JSON_ANIMATION_COMPONENT_START_ANIMATION_VAR "startingAnimation"
-
-namespace gallus
+namespace gallus::gameplay
 {
-	namespace gameplay
+	//---------------------------------------------------------------------
+	// AnimationComponent
+	//---------------------------------------------------------------------
+	void AnimationComponent::InitRealtime()
 	{
-		//---------------------------------------------------------------------
-		// AnimationComponent
-		//---------------------------------------------------------------------
-		void AnimationComponent::InitRealtime()
+		if (m_bInitialized)
 		{
-			if (m_bInitialized)
-			{
-				return;
-			}
-			if (!m_sStartingAnimation.empty())
-			{
-				LoadAnimation(m_sStartingAnimation);
-				Start();
-			}
-			Component::InitRealtime();
+			return;
+		}
+		if (m_pStartingAnimation.lock())
+		{
+			m_pAnimation = m_pStartingAnimation;
+			Start();
+		}
+		Component::InitRealtime();
+	}
+
+	//---------------------------------------------------------------------
+	void AnimationComponent::UpdateRealtime(float a_fDeltaTime, UpdateTime a_UpdateTime)
+	{
+		if (std::shared_ptr<animation::Animation> animation = m_pAnimation.lock())
+		{
+			animation->Update(m_EntityID, a_fDeltaTime);
+		}
+	}
+
+	//---------------------------------------------------------------------
+	void AnimationComponent::LoadAnimation()
+	{
+		m_iNextKeyFrameIndex = 0;
+		m_fAccumulatedTime = 0.0f;
+	}
+
+	//---------------------------------------------------------------------
+	void AnimationComponent::UpdateRealtimeInner(float a_fDeltaTime, UpdateTime a_UpdateTime)
+	{
+		std::shared_ptr<animation::Animation> animation = m_pAnimation.lock();
+		if (!animation)
+		{
+			return;
 		}
 
-		//---------------------------------------------------------------------
-#ifdef _EDITOR
-		void AnimationComponent::Serialize(rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator) const
+		if (!m_bIsPlaying)
 		{
-			if (!a_Document.IsObject())
-			{
-				return;
-			}
-
-			a_Document.AddMember(
-				JSON_ANIMATION_COMPONENT_START_ANIMATION_VAR,
-				rapidjson::Value(m_sStartingAnimation.c_str(), a_Allocator),
-				a_Allocator
-			);
-		}
-#endif
-
-		//---------------------------------------------------------------------
-		void AnimationComponent::Deserialize(const resources::SrcData& a_SrcData)
-		{
-			m_sStartingAnimation = a_SrcData.GetString(JSON_ANIMATION_COMPONENT_START_ANIMATION_VAR);
+			return;
 		}
 
-		//---------------------------------------------------------------------
-		void AnimationComponent::UpdateRealtime(float a_fDeltaTime, UpdateTime a_UpdateTime)
+		m_fAccumulatedTime += a_fDeltaTime;
+
+		// Loop over keyframes that are due
+		while (m_iNextKeyFrameIndex < animation->GetKeyFrames().size())
 		{
-			auto animationTrack = m_AnimationTrack.lock();
-			if (!animationTrack)
+			animation::AnimationKeyFrame* keyFrame = animation->GetKeyFrames()[m_iNextKeyFrameIndex];
+			uint16_t keyFrameNumber = keyFrame->GetFrame(); // Actual frame number.
+			float keyFrameTime = keyFrameNumber * animation::FRAME_TIME;
+
+			if (m_fAccumulatedTime >= keyFrameTime)
 			{
-				return;
+				keyFrame->Activate(m_EntityID);
+				m_iNextKeyFrameIndex++;  // Only increment after successfully activating a keyframe.
 			}
-			animationTrack->Update(m_EntityID, a_fDeltaTime);
+			else
+			{
+				break; // Next keyframe is not yet due.
+			}
 		}
 
-		//---------------------------------------------------------------------
-		void AnimationComponent::LoadAnimation(const std::string& a_sAnimName)
+		// Reset if animation is done.
+		if (!animation->GetKeyFrames().empty() && m_iNextKeyFrameIndex >= animation->GetKeyFrames().size())
 		{
-			if (auto animationTrack = m_AnimationTrack.lock())
-			{
-				if (animationTrack->GetName() == a_sAnimName)
-				{
-					return;
-				}
-			}
-
-			m_AnimationTrack = core::ENGINE->GetResourceAtlas().LoadAnimationTrack(a_sAnimName);
-			m_iNextKeyFrameIndex = 0;
 			m_fAccumulatedTime = 0.0f;
-		}
-
-		//---------------------------------------------------------------------
-		void AnimationComponent::UpdateRealtimeInner(float a_fDeltaTime, UpdateTime a_UpdateTime)
-		{
-			auto animationTrack = m_AnimationTrack.lock();
-			if (!animationTrack)
+			m_iNextKeyFrameIndex = 0;
+			if (!animation->IsLooping())
 			{
-				return;
-			}
-
-			if (!m_bIsPlaying)
-			{
-				return;
-			}
-
-			m_fAccumulatedTime += a_fDeltaTime;
-
-			// Loop over keyframes that are due
-			while (m_iNextKeyFrameIndex < animationTrack->GetKeyFrames().size())
-			{
-				animation::AnimationKeyFrame* keyFrame = animationTrack->GetKeyFrames()[m_iNextKeyFrameIndex];
-				int keyFrameNumber = keyFrame->GetFrame(); // actual frame number
-				float keyFrameTime = keyFrameNumber * FRAME_TIME;
-
-				if (m_fAccumulatedTime >= keyFrameTime)
-				{
-					keyFrame->Activate(m_EntityID);
-					m_iNextKeyFrameIndex++;  // only increment after successfully activating a keyframe
-				}
-				else
-				{
-					break; // next keyframe is not yet due
-				}
-			}
-
-			// Reset if animation is done
-			if (!animationTrack->GetKeyFrames().empty() && m_iNextKeyFrameIndex >= animationTrack->GetKeyFrames().size())
-			{
-				m_fAccumulatedTime = 0.0f;
-				m_iNextKeyFrameIndex = 0;
-				if (!animationTrack->IsLooping())
-				{
-					m_bIsPlaying = false;
-				}
+				m_bIsPlaying = false;
 			}
 		}
 	}

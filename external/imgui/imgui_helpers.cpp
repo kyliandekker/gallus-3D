@@ -2,17 +2,16 @@
 
 #include "imgui/imgui_helpers.h"
 
-#include <cmath>
-#include <cstdio>
 #include <string>
-#include <imgui/imgui_internal.h>
 #include <algorithm>
-#include <unordered_set>
 #include <set>
+#include <imgui/imgui_internal.h>
+
+#include "imgui_system/ImGuiSystem.h"
 
 namespace ImGui
 {
-	bool CheckboxButton(const char* a_Label, bool* a_pValue, const ImVec2& a_Size, const ImVec4& a_Color)
+	bool CheckboxButton(const std::string& a_Label, bool* a_pValue, const std::string& a_sDescription, const ImVec2& a_Size, const ImVec4& a_Color)
 	{
 		ImVec2 min = ImGui::GetCursorScreenPos();
 		ImVec2 max = ImVec2(min.x + a_Size.x, min.y + a_Size.y);
@@ -30,7 +29,7 @@ namespace ImGui
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0, 0, 0, 0));
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0, 0, 0, 0));
 
-		bool b = TextButton(a_Label, a_Size, a_Color);
+		bool b = TextButton(a_Label, a_sDescription, a_Size, a_Color);
 		if (b)
 		{
 			*a_pValue = !(*a_pValue);
@@ -42,13 +41,14 @@ namespace ImGui
 	}
 
 
-	bool TextButton(const char* a_Label, const ImVec2& a_Size, const ImVec4& a_Color)
+	bool TextButton(const std::string& a_Label, const std::string& a_sDescription, const ImVec2& a_Size, const ImVec4& a_Color)
 	{
 		ImVec2 pos = ImGui::GetCursorScreenPos(); // Get the top-left corner of the button
 
 		ImGui::PushStyleColor(ImGuiCol_Text, a_Color);
-		bool b = ImGui::Button(a_Label, a_Size);
+		bool b = ImGui::Button(a_Label.c_str(), a_Size);
 		ImGui::PopStyleColor();
+		ShowTooltip(a_sDescription);
 
 		ImDrawList* draw_list = ImGui::GetWindowDrawList();
 		ImU32 border_color = ImGui::GetColorU32(ImGuiCol_Border); // Use ImGui border color
@@ -58,19 +58,62 @@ namespace ImGui
 		return b;
 	}
 
-	bool IconButton(const char* a_Label, const ImVec2& a_Size, ImFont* a_Font, const ImVec4& a_Color)
+	bool IconButton(const std::string& a_Label, const std::string& a_sDescription, const ImVec2& a_Size, const ImVec4& a_Color)
 	{
-		ImGui::PushFont(a_Font);
-		bool success = ImGui::TextButton(a_Label, a_Size, a_Color);
-		ImGui::PopFont();
+		bool success = ImGui::TextButton(a_Label, a_sDescription, a_Size, a_Color);
 		return success;
 	}
 
-	bool IconCheckboxButton(const char* a_Label, bool* a_pValue, const ImVec2& a_Size, ImFont* a_Font, const ImVec4& a_Color)
+	bool IconCheckboxButton(const std::string& a_Label, bool* a_pValue, const std::string& a_sDescription, const ImVec2& a_Size, const ImVec4& a_vColor)
 	{
-		ImGui::PushFont(a_Font);
-		bool success = ImGui::CheckboxButton(a_Label, a_pValue, a_Size, a_Color);
-		ImGui::PopFont();
+		bool success = ImGui::CheckboxButton(a_Label, a_pValue, a_sDescription, a_Size, a_vColor);
+		return success;
+	}
+
+	bool ConsoleButton(const std::string& a_Label, bool* a_pValue, const std::string& a_sDescription, const ImVec2& a_vSize, int a_iNumber, const ImVec4& a_vColor, const ImVec4& a_vCircleColor)
+	{
+		bool success = IconCheckboxButton(a_Label, a_pValue, a_sDescription, a_vSize, a_vColor);
+		
+		ImVec2 startPos = ImGui::GetItemRectMin();
+		ImVec2 circlePos = startPos + ImVec2(a_vSize.x * 0.75f, a_vSize.y);
+
+		const float circleRadius = 12.5f;
+
+		ImVec4 textColorV = ImGui::GetStyle().Colors[ImGuiCol_Text];
+		ImVec4 circleColorV = a_vCircleColor;
+
+		if (!(*a_pValue))
+		{
+			textColorV.w = 0.4f;
+			circleColorV.w = 0.4f;
+		}
+
+		ImU32 textColor = ImGui::ColorConvertFloat4ToU32(textColorV);
+		ImU32 circleColor = ImGui::ColorConvertFloat4ToU32(circleColorV);
+
+		char numberBuffer[8] = { 0 };
+
+		if (a_iNumber > 99)
+		{
+			snprintf(numberBuffer, sizeof(numberBuffer), "99");
+		}
+		else
+		{
+			snprintf(numberBuffer, sizeof(numberBuffer), "%d", a_iNumber);
+		}
+
+		gallus::graphics::imgui::GetOverlayQueue().Push([=](ImDrawList* pDrawList)
+		{
+			pDrawList->AddCircleFilled(circlePos, circleRadius, circleColor);
+
+			ImVec2 textSize = ImGui::CalcTextSize(numberBuffer);
+			ImVec2 textPos;
+			textPos.x = circlePos.x - textSize.x * 0.5f;
+			textPos.y = circlePos.y - textSize.y * 0.5f;
+
+			pDrawList->AddText(textPos, textColor, numberBuffer);
+		});
+
 		return success;
 	}
 
@@ -93,20 +136,20 @@ namespace ImGui
 		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + a_Padding.x);
 	}
 
-	void DisplayHeader(ImFont* a_BoldFont, const char* a_Label)
+	void DisplayHeader(ImFont* a_BoldFont, const std::string& a_Label)
 	{
 		ImGui::PushFont(a_BoldFont);
-		ImGui::Text(a_Label);
+		ImGui::Text(a_Label.c_str());
 		ImGui::PopFont();
 	}
 
-	bool InputTextStdString(const char* label, std::string* str, ImGuiInputTextFlags flags)
+	bool InputTextStdString(const std::string& label, std::string* str, ImGuiInputTextFlags flags)
 	{
 		IM_ASSERT((flags & ImGuiInputTextFlags_CallbackResize) == 0);
 		flags |= ImGuiInputTextFlags_CallbackResize;
 
 		ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
-		return ImGui::InputText(label,
+		return ImGui::InputText(label.c_str(),
 			str->data(),
 			str->capacity() + 1,
 			flags,
@@ -240,24 +283,28 @@ namespace ImGui
 		ImGui::PopStyleVar();
 	}
 
-	bool VectorEdit2(const char* label, float col[2], float a_fSpeed, float a_fMin, float a_fMax)
+	bool VectorEdit2(const std::string& label, float col[2], float a_fSpeed, float a_fMin, float a_fMax)
 	{
 		ImGuiWindow* window = GetCurrentWindow();
 		if (window->SkipItems)
+		{
 			return false;
+		}
 
 		ImGuiContext& g = *GImGui;
 		const ImGuiStyle& style = g.Style;
 		const float square_sz = GetFrameHeight();
-		const char* label_display_end = FindRenderedTextEnd(label);
+		const std::string& label_display_end = FindRenderedTextEnd(label.c_str());
 		float w_full = CalcItemWidth();
 		g.NextItemData.ClearFlags();
 
 		BeginGroup();
-		PushID(label);
+		PushID(label.c_str());
 		const bool set_current_color_edit_id = (g.ColorEditCurrentID == 0);
 		if (set_current_color_edit_id)
+		{
 			g.ColorEditCurrentID = window->IDStack.back();
+		}
 
 		const int components = 2;
 		const float w_button = 0.0f;
@@ -265,7 +312,185 @@ namespace ImGui
 		w_full = w_inputs + w_button;
 
 		bool value_changed = false;
-		bool value_changed_as_float = false;
+
+		const ImVec2 pos = window->DC.CursorPos;
+		const float inputs_offset_x = (style.ColorButtonPosition == ImGuiDir_Left) ? w_button : 0.0f;
+		window->DC.CursorPos.x = pos.x + inputs_offset_x;
+
+		// RGB/HSV 0..255 Sliders
+		const float w_items = w_inputs - style.ItemInnerSpacing.x * (components - 1);
+
+		const bool hide_prefix = (IM_TRUNC(w_items / components) <= CalcTextSize("M:0.000").x);
+		static const char* ids[4] = { "##X", "##Y", "##Z", "##W" };
+		static const char* fmt_table_int[3][4] =
+		{
+			{ "%3d", "%3d" }, // Short display
+			{ "X:%3d", "T:%3d" }, // Long display for RGBA
+		};
+		static const char* fmt_table_float[2][2] =
+		{
+			{ "%0.3f", "%0.3f" }, // Short display
+			{ "X:%0.3f", "Y:%0.3f" }, // Long display for RGBA
+		};
+		const int fmt_idx = hide_prefix ? 0 : 1;
+
+		float prev_split = 0.0f;
+		for (int n = 0; n < components; n++)
+		{
+			if (n > 0)
+			{
+				SameLine(0, style.ItemInnerSpacing.x);
+			}
+			float next_split = IM_TRUNC(w_items * (n + 1) / components);
+			SetNextItemWidth(ImMax(next_split - prev_split, 1.0f));
+			prev_split = next_split;
+
+			value_changed |= DragFloat(ids[n], &col[n], a_fSpeed, a_fMin, a_fMax, fmt_table_float[fmt_idx][n]);
+			if (ImGui::IsItemActivated())
+			{
+				value_changed = true;
+			}
+			if (ImGui::IsItemActive())
+			{
+				value_changed = true;
+			}
+		}
+
+		if (label != label_display_end )
+		{
+			// Position not necessarily next to last submitted button (e.g. if style.ColorButtonPosition == ImGuiDir_Left),
+			// but we need to use SameLine() to setup baseline correctly. Might want to refactor SameLine() to simplify this.
+			SameLine(0.0f, style.ItemInnerSpacing.x);
+			window->DC.CursorPos.x = pos.x + (w_full + style.ItemInnerSpacing.x);
+			TextEx(label.c_str(), label_display_end.c_str());
+		}
+
+		PopID();
+		EndGroup();
+
+		return value_changed;
+	}
+
+	bool VectorEdit3(const std::string& label, float col[3], float a_fSpeed, float a_fMin, float a_fMax)
+	{
+		ImGuiWindow* window = GetCurrentWindow();
+		if (window->SkipItems)
+		{
+			return false;
+		}
+
+		ImGuiContext& g = *GImGui;
+		const ImGuiStyle& style = g.Style;
+		const float square_sz = GetFrameHeight();
+		const std::string& label_display_end = FindRenderedTextEnd(label.c_str());
+		float w_full = CalcItemWidth();
+		g.NextItemData.ClearFlags();
+
+		BeginGroup();
+		PushID(label.c_str());
+		const bool set_current_color_edit_id = (g.ColorEditCurrentID == 0);
+		if (set_current_color_edit_id)
+		{
+			g.ColorEditCurrentID = window->IDStack.back();
+		}
+
+		const int components = 3;
+		const float w_button = 0.0f;
+		const float w_inputs = ImMax(w_full - w_button, 1.0f);
+		w_full = w_inputs + w_button;
+
+		bool value_changed = false;
+
+		const ImVec2 pos = window->DC.CursorPos;
+		const float inputs_offset_x = (style.ColorButtonPosition == ImGuiDir_Left) ? w_button : 0.0f;
+		window->DC.CursorPos.x = pos.x + inputs_offset_x;
+
+		// RGB/HSV 0..255 Sliders
+		const float w_items = w_inputs - style.ItemInnerSpacing.x * (components - 1);
+
+		const bool hide_prefix = (IM_TRUNC(w_items / components) <= CalcTextSize("M:0.000").x);
+		static const char* ids[3] = { "##X", "##Y", "##Z" };
+		static const char* fmt_table_int[3][3] =
+		{
+			{ "%3d", "%3d", "%3d" }, // Short display
+			{ "X:%3d", "T:%3d" }, // Long display for RGBA
+		};
+		static const char* fmt_table_float[3][4] =
+		{
+			{ "%0.3f", "%0.3f", "%0.3f" }, // Short display
+			{ "X:%0.3f", "Y:%0.3f", "Z:%0.3f" }, // Long display for RGBA
+		};
+		const int fmt_idx = hide_prefix ? 0 : 1;
+
+		float prev_split = 0.0f;
+		for (int n = 0; n < components; n++)
+		{
+			if (n > 0)
+			{
+				SameLine(0, style.ItemInnerSpacing.x);
+			}
+			float next_split = IM_TRUNC(w_items * (n + 1) / components);
+			SetNextItemWidth(ImMax(next_split - prev_split, 1.0f));
+			prev_split = next_split;
+
+			value_changed |= DragFloat(ids[n], &col[n], a_fSpeed, a_fMin, a_fMax, fmt_table_float[fmt_idx][n]);
+			if (ImGui::IsItemActivated())
+			{
+				value_changed = true;
+			}
+			if (ImGui::IsItemActive())
+			{
+				value_changed = true;
+			}
+		}
+
+		if (label != label_display_end )
+		{
+			// Position not necessarily next to last submitted button (e.g. if style.ColorButtonPosition == ImGuiDir_Left),
+			// but we need to use SameLine() to setup baseline correctly. Might want to refactor SameLine() to simplify this.
+			SameLine(0.0f, style.ItemInnerSpacing.x);
+			window->DC.CursorPos.x = pos.x + (w_full + style.ItemInnerSpacing.x);
+			TextEx(label.c_str(), label_display_end.c_str());
+		}
+
+		PopID();
+		EndGroup();
+
+		return value_changed;
+	}
+
+	bool IVectorEdit2(const std::string& label, int col[2])
+	{
+		ImGuiWindow* window = GetCurrentWindow();
+		if (window->SkipItems)
+		{
+			return false;
+		}
+
+		ImGuiContext& g = *GImGui;
+		const ImGuiStyle& style = g.Style;
+		const float square_sz = GetFrameHeight();
+		const std::string& label_display_end = FindRenderedTextEnd(label.c_str());
+		float w_full = CalcItemWidth();
+		g.NextItemData.ClearFlags();
+
+		BeginGroup();
+		PushID(label.c_str());
+		const bool set_current_color_edit_id = (g.ColorEditCurrentID == 0);
+		if (set_current_color_edit_id)
+		{
+			g.ColorEditCurrentID = window->IDStack.back();
+		}
+
+		const int components = 2;
+		const float w_button = 0.0f;
+		const float w_inputs = ImMax(w_full - w_button, 1.0f);
+		w_full = w_inputs + w_button;
+
+		// Convert to the formats we need
+		int f[2] = { col[0], col[1] };
+
+		bool value_changed = false;
 
 		const ImVec2 pos = window->DC.CursorPos;
 		const float inputs_offset_x = (style.ColorButtonPosition == ImGuiDir_Left) ? w_button : 0.0f;
@@ -292,93 +517,22 @@ namespace ImGui
 		for (int n = 0; n < components; n++)
 		{
 			if (n > 0)
+			{
 				SameLine(0, style.ItemInnerSpacing.x);
-			float next_split = IM_TRUNC(w_items * (n + 1) / components);
-			SetNextItemWidth(ImMax(next_split - prev_split, 1.0f));
-			prev_split = next_split;
-
-			value_changed |= DragFloat(ids[n], &col[n], a_fSpeed, a_fMin, a_fMax, fmt_table_float[fmt_idx][n]);
-			value_changed_as_float |= value_changed;
-		}
-
-		if (label != label_display_end )
-		{
-			// Position not necessarily next to last submitted button (e.g. if style.ColorButtonPosition == ImGuiDir_Left),
-			// but we need to use SameLine() to setup baseline correctly. Might want to refactor SameLine() to simplify this.
-			SameLine(0.0f, style.ItemInnerSpacing.x);
-			window->DC.CursorPos.x = pos.x + (w_full + style.ItemInnerSpacing.x);
-			TextEx(label, label_display_end);
-		}
-
-		PopID();
-		EndGroup();
-
-		return value_changed_as_float;
-	}
-
-	bool IVectorEdit2(const char* label, int col[2])
-	{
-		ImGuiWindow* window = GetCurrentWindow();
-		if (window->SkipItems)
-			return false;
-
-		ImGuiContext& g = *GImGui;
-		const ImGuiStyle& style = g.Style;
-		const float square_sz = GetFrameHeight();
-		const char* label_display_end = FindRenderedTextEnd(label);
-		float w_full = CalcItemWidth();
-		g.NextItemData.ClearFlags();
-
-		BeginGroup();
-		PushID(label);
-		const bool set_current_color_edit_id = (g.ColorEditCurrentID == 0);
-		if (set_current_color_edit_id)
-			g.ColorEditCurrentID = window->IDStack.back();
-
-		const int components = 2;
-		const float w_button = 0.0f;
-		const float w_inputs = ImMax(w_full - w_button, 1.0f);
-		w_full = w_inputs + w_button;
-
-		// Convert to the formats we need
-		int f[2] = { col[0], col[1] };
-
-		bool value_changed = false;
-		bool value_changed_as_float = false;
-
-		const ImVec2 pos = window->DC.CursorPos;
-		const float inputs_offset_x = (style.ColorButtonPosition == ImGuiDir_Left) ? w_button : 0.0f;
-		window->DC.CursorPos.x = pos.x + inputs_offset_x;
-
-
-			// RGB/HSV 0..255 Sliders
-		const float w_items = w_inputs - style.ItemInnerSpacing.x * (components - 1);
-
-		const bool hide_prefix = (IM_TRUNC(w_items / components) <= CalcTextSize("M:0.000").x);
-		static const char* ids[4] = { "##X", "##Y", "##Z", "##W" };
-		static const char* fmt_table_int[3][4] =
-		{
-			{ "%3d", "%3d", "%3d", "%3d" }, // Short display
-			{ "X:%3d", "T:%3d" }, // Long display for RGBA
-		};
-		static const char* fmt_table_float[3][4] =
-		{
-			{ "%0.3f", "%0.3f", "%0.3f", "%0.3f" }, // Short display
-			{ "X:%0.3f", "Y:%0.3f" }, // Long display for RGBA
-		};
-		const int fmt_idx = hide_prefix ? 0 : 1;
-
-		float prev_split = 0.0f;
-		for (int n = 0; n < components; n++)
-		{
-			if (n > 0)
-				SameLine(0, style.ItemInnerSpacing.x);
+			}
 			float next_split = IM_TRUNC(w_items * (n + 1) / components);
 			SetNextItemWidth(ImMax(next_split - prev_split, 1.0f));
 			prev_split = next_split;
 
 			value_changed |= DragInt(ids[n], &f[n], 1.0f / 255.0f, -999999999, 999999999, fmt_table_float[fmt_idx][n]);
-			value_changed_as_float |= value_changed;
+			if (ImGui::IsItemActivated())
+			{
+				value_changed = true;
+			}
+			if (ImGui::IsItemActive())
+			{
+				value_changed = true;
+			}
 		}
 
 		if (label != label_display_end )
@@ -387,11 +541,13 @@ namespace ImGui
 			// but we need to use SameLine() to setup baseline correctly. Might want to refactor SameLine() to simplify this.
 			SameLine(0.0f, style.ItemInnerSpacing.x);
 			window->DC.CursorPos.x = pos.x + (w_full + style.ItemInnerSpacing.x);
-			TextEx(label, label_display_end);
+			TextEx(label.c_str(), label_display_end.c_str());
 		}
 
 		if (value_changed && g.LastItemData.ID != 0) // In case of ID collision, the second EndGroup() won't catch g.ActiveId
+		{
 			MarkItemEdited(g.LastItemData.ID);
+		}
 
 		PopID();
 		EndGroup();
@@ -407,10 +563,36 @@ namespace ImGui
 		}
 		if (ImGui::IsItemHovered())
 		{
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(10, 10));
 			ImGui::BeginTooltip();
 			ImGui::Text(a_sText.c_str());
 			ImGui::EndTooltip();
+			ImGui::PopStyleVar();
 		}
+	}
+
+	void ShowStaticTooltip(const ImVec2& a_vPos, const std::string& a_sText)
+	{
+		ImVec2 textSize = ImGui::CalcTextSize(a_sText.c_str());
+		ImRect textRect = {
+			{ a_vPos.x, a_vPos.y },
+			{ a_vPos.x + textSize.x, a_vPos.y + textSize.y },
+		};
+
+		// Draw background.
+		ImU32 backgroundColor = IM_COL32(0, 0, 0, 255);
+		ImU32 textColor = IM_COL32(255, 255, 255, 255);
+		ImGui::GetForegroundDrawList()->AddRectFilled(
+			textRect.Min,
+			textRect.Max,
+			backgroundColor,
+			0.0f
+		);
+		ImGui::GetForegroundDrawList()->AddText(
+			textRect.Min,
+			textColor,
+			a_sText.c_str()
+		);
 	}
 }
 

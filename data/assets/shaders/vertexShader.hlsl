@@ -4,11 +4,12 @@ PSInput main(VSInput input)
 {
     PSInput output;
 
-    float4 worldPos = float4(input.pos, 0.0f, 1.0f);
+    float4 worldPos = float4(input.POSITION, 1.0f);
 
-    output.pos = mul(WorldViewProj, worldPos);
-
-	output.uv = lerp(uv.xy, uv.zw, input.uv);
+    output.POSITION = mul(WorldViewProj, worldPos);
+	output.TEXCOORD = lerp(uv.xy, uv.zw, input.TEXCOORD);
+    output.NORMAL = normalize(mul((float3x3)WorldMatrix, input.NORMAL));
+    output.COLOR = input.COLOR;
 
     return output;
 }

@@ -3,87 +3,46 @@
 #include "gameplay/systems/components/Component.h"
 
 // graphics
-#include "graphics/dx12/DX12Transform.h"
+#include "graphics/dx12/Transform.h"
 
-#ifdef _EDITOR
-// editor
-#include "editor/EditorExpose.h"
-#endif
-
-namespace gallus
+namespace gallus::gameplay
 {
-	namespace gameplay
+	class TransformSystem;
+
+	//---------------------------------------------------------------------
+	// TransformComponent
+	//---------------------------------------------------------------------
+	class TransformComponent : public Component
 	{
-		//---------------------------------------------------------------------
-		// TransformComponent
-		//---------------------------------------------------------------------
-		class TransformComponent : public Component
-		{
-		public:
-			/// <summary>
-			/// Retrieves the transform.
-			/// </summary>
-			/// <returns>Reference to the transform used in the transform component.</returns>
-			graphics::dx12::DX12Transform& Transform();
+	public:
+		/// <summary>
+		/// Retrieves the transform.
+		/// </summary>
+		/// <returns>Reference to the transform used in the transform component.</returns>
+		graphics::dx12::Transform& GetTransform();
 
-#ifdef _EDITOR
-			/// <summary>
-			/// Serialized the component to a json document.
-			/// </summary>
-			/// <param name="a_Document">The json document that the data will be put into.</param>
-			/// <param name="a_Allocator">The allocator used by the json document.</param>
-			void Serialize(rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator) const override;
-#endif
+		/// <summary>
+		/// Translates the component.
+		/// </summary>
+		/// <param name="a_vTranslation">The movement.</param>
+		void Translate(const DirectX::XMFLOAT3& a_vTranslation);
+	private:
+		/// <summary>
+		/// Updates the components.
+		/// </summary>
+		/// <param name="a_fDeltaTime">Delta time.</param>
+		void UpdateRealtime(float a_fDeltaTime, UpdateTime a_UpdateTime);
 
-			/// <summary>
-			/// Creates an instance based on source data.
-			/// </summary>
-			/// <param name="a_SrcData">The source data.</param>
-			void Deserialize(const resources::SrcData& a_SrcData) override;
+		graphics::dx12::Transform m_Transform;
+		DirectX::XMFLOAT3 m_vTranslation = {};
 
-			/// <summary>
-			/// Retrieves the translation.
-			/// </summary>
-			/// <returns>Reference to the translation vector.</returns>
-			const DirectX::XMFLOAT2& GetTranslation() const
-			{
-				return m_vTranslation;
-			}
+		BEGIN_SERIALIZE_PARENT(TransformComponent, Component)
+			SERIALIZE_FIELD(m_Transform, "Transform", "",
+				.type = FieldSerializationType::FieldSerializationType_Object)
+			EXPOSE_GIZMO(m_Transform, EditorGizmoType::EditorGizmoType_Transform)
+		END_SERIALIZE(TransformComponent)
 
-			/// <summary>
-			/// Translates the component.
-			/// </summary>
-			/// <param name="a_vTranslation">The movement.</param>
-			void SetTranslation(const DirectX::XMFLOAT2& a_vTranslation)
-			{
-				m_vTranslation = a_vTranslation;
-			}
-
-			/// <summary>
-			/// Translates the component.
-			/// </summary>
-			/// <param name="a_vTranslation">The movement.</param>
-			void Translate(const DirectX::XMFLOAT2& a_vTranslation);
-		private:
-			/// <summary>
-			/// Updates the components.
-			/// </summary>
-			/// <param name="a_fDeltaTime">Delta time.</param>
-			void UpdateRealtime(float a_fDeltaTime, UpdateTime a_UpdateTime);
-
-			graphics::dx12::DX12Transform m_Transform;
-			DirectX::XMFLOAT2 m_vTranslation = {};
-
-			void ShowTransformGizmo();
-#ifdef _EDITOR
-			BEGIN_EXPOSE_FIELDS_PARENT(TransformComponent, Component)
-				EXPOSE_FIELD(TransformComponent, m_Transform, "Transform", (FieldOptions{ .type = EditorFieldWidgetType::Object }))
-			END_EXPOSE_FIELDS(TransformComponent)
-			BEGIN_EXPOSE_GIZMOS(TransformComponent)
-				EXPOSE_GIZMO(TransformComponent, m_Transform, (GizmoOptions{ EditorGizmoType::Transform }))
-			END_EXPOSE_GIZMOS(TransformComponent)
-			END_EXPOSE_TO_EDITOR(TransformComponent)
-#endif
-		};
-	}
+		// cache
+		gameplay::TransformSystem* m_pTransformSystem = nullptr;
+	};
 }

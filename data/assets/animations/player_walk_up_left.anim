@@ -4,24 +4,24 @@
     "keyFrames": {
         "0": {
             "components": {
-                "sprite": {
-                    "spriteIndex": 9,
+                "texture": {
+                    "textureIndex": 9,
                     "texture": "tex_walk.png"
                 }
             }
         },
         "10": {
             "components": {
-                "sprite": {
-                    "spriteIndex": 10,
+                "texture": {
+                    "textureIndex": 10,
                     "texture": "tex_walk.png"
                 }
             }
         },
         "20": {
             "components": {
-                "sprite": {
-                    "spriteIndex": 11,
+                "texture": {
+                    "textureIndex": 11,
                     "texture": "tex_walk.png"
                 }
             }

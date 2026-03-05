@@ -1,56 +1,52 @@
 #pragma once
 
+#include "resources/ISerializableObject.h"
+
 // external
 #include <string>
-#include <rapidjson/document.h>
 
-namespace gallus
+namespace gallus::core
 {
-	namespace core
+	//---------------------------------------------------------------------
+	// Settings
+	//---------------------------------------------------------------------
+	/// <summary>
+	/// Base class for managing application settings, providing functionality to load and save settings to persistent storage.
+	/// </summary>
+	class Settings : public ISerializableObject
 	{
-/// Whether DX12 makes a full log of creating devices, resources, etc (spam).
-#define LOG_SETTINGS 0
-		//---------------------------------------------------------------------
-		// Settings
-		//---------------------------------------------------------------------
+	public:
 		/// <summary>
-		/// Manages editor settings, including window size, log visibility filters, 
-		/// and tracking previously opened projects.
+		/// Constructs settings with file name.
 		/// </summary>
-		class Settings
+		/// <param name="a_sPath">The name of the settings file.</param>
+		Settings(const std::string& a_sFileName);
+
+		/// <summary>
+		/// Loads settings from a persistent storage.
+		/// </summary>
+		/// <returns>True if the settings were loaded successfully, otherwise false.</returns>
+		bool Load();
+
+		/// <summary>
+		/// Saves the current settings to persistent storage.
+		/// </summary>
+		/// <returns>True if the settings were saved successfully, otherwise false.</returns>
+		bool Save() const;
+
+		/// <summary>
+		/// Sets the path to the file.
+		/// </summary>
+		/// <param name="a_sPath">The path to the settings file.</param>
+		void SetPath(const std::string& a_sPath)
 		{
-		public:
-			/// <summary>
-			/// Constructs settings with file name.
-			/// </summary>
-			/// <param name="a_sFileName">The name the settings file should have.</param>
-			Settings(const std::string& a_sFileName);
+			m_sPath = a_sPath;
+		}
+	private:
+		std::string m_sFileName;
+		std::string m_sPath;
 
-			/// <summary>
-			/// Loads settings from a persistent storage.
-			/// </summary>
-			/// <returns>True if the settings were loaded successfully, otherwise false.</returns>
-			bool Load();
-
-			/// <summary>
-			/// Saves the current settings to persistent storage.
-			/// </summary>
-			/// <returns>True if the settings were saved successfully, otherwise false.</returns>
-			bool Save() const;
-		private:
-			/// <summary>
-			/// Virtual method for loading specific vars.
-			/// </summary>
-			/// <returns>True if the settings were loaded successfully, otherwise false.</returns>
-			virtual bool LoadVars(const rapidjson::Document& a_Document) = 0;
-
-			/// <summary>
-			/// Virtual method for saving specific vars.
-			/// </summary>
-			/// <returns>True if the settings were saved successfully, otherwise false.</returns>
-			virtual bool SaveVars(rapidjson::Document& a_Document, rapidjson::Document::AllocatorType& a_Allocator) const = 0;
-
-			std::string m_sFileName;
-		};
-	}
+		BEGIN_SERIALIZE(Settings)
+		END_SERIALIZE(Settings)
+	};
 }

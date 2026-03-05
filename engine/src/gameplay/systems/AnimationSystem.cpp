@@ -1,40 +1,54 @@
 #include "AnimationSystem.h"
 
-// graphics
-#include "graphics/imgui/font_icon.h"
-
 // logger
 #include "logger/Logger.h"
 
-namespace gallus
+// animation
+#include "animation/AnimationKeyFrameEventComponent.h"
+#include "animation/AnimationKeyFrameTextureComponent.h"
+#include "animation/AnimationKeyFrameTagComponent.h"
+#include "animation/AnimationKeyFrameSoundComponent.h"
+
+// gameplay
+#include "gameplay/systems/UpdateTime.h"
+
+namespace gallus::gameplay
 {
-	namespace gameplay
+	//---------------------------------------------------------------------
+	// AnimationSystem
+	//---------------------------------------------------------------------
+	AnimationSystem::~AnimationSystem()
 	{
-		//---------------------------------------------------------------------
-		// AnimationSystem
-		//---------------------------------------------------------------------
-		bool AnimationSystem::Initialize()
+		for (animation::AnimationKeyFrameBaseSystem* system : m_aSystems)
 		{
-			m_aUpdateTimes.AddFlag(UpdateTime::UPDATE_TIME_FRAME_END);
-
-			LOG_ICON(font::ICON_ANIMATION, LOGSEVERITY_INFO_SUCCESS, LOG_CATEGORY_ECS, "Animation system initialized.");
-			return true;
+			delete system;
 		}
+		m_aSystems.clear();
+	}
 
-		//---------------------------------------------------------------------
-		std::string AnimationSystem::GetPropertyName() const
-		{
-			return "animation";
-		}
+	//---------------------------------------------------------------------
+	bool AnimationSystem::Initialize()
+	{
+		m_aUpdateTimes.AddFlag(UpdateTime::UPDATE_TIME_FRAME_END);
 
-		//---------------------------------------------------------------------
-		std::string AnimationSystem::GetSystemName() const
-		{
-			std::string name = "Animation";
-#ifdef _EDITOR
-			name = std::string(font::ICON_ANIMATION) + " " + name;
-#endif // _EDITOR
-			return name;
-		}
+		m_aSystems.push_back(new animation::AnimationKeyFrameTagSystem());
+		m_aSystems.push_back(new animation::AnimationKeyFrameTextureSystem());
+		m_aSystems.push_back(new animation::AnimationKeyFrameSoundSystem());
+		m_aSystems.push_back(new animation::AnimationKeyFrameEventSystem());
+		
+		LOG(LOGSEVERITY_INFO_SUCCESS, LOG_CATEGORY_ECS, "Successfully initialized Animation System.");
+		return true;
+	}
+
+	//---------------------------------------------------------------------
+	std::string AnimationSystem::GetPropertyName() const
+	{
+		return "animation";
+	}
+
+	//---------------------------------------------------------------------
+	std::string AnimationSystem::GetSystemName() const
+	{
+		return "Animation";
 	}
 }

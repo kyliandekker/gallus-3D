@@ -17,7 +17,7 @@ IF %ERRORLEVEL% NEQ 0 (
 ) ELSE (
     tasklist /FI "IMAGENAME eq devenv.exe" | find /I "devenv.exe" >nul
     IF ERRORLEVEL 1 (
-        START "" "%OUTPUT_DIR%\game.sln"
+        START "" "%OUTPUT_DIR%\editor.sln"
     ) ELSE (
         ECHO Visual Studio already running; skipping open.
     )

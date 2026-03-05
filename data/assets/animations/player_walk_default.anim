@@ -4,8 +4,8 @@
     "keyFrames": {
         "0": {
             "components": {
-                "sprite": {
-                    "spriteIndex": 1,
+                "texture": {
+                    "textureIndex": 1,
                     "texture": "tex_walk.png"
                 }
             }

@@ -4,138 +4,134 @@
 #include "graphics/dx12/DX12Resource.h"
 
 // external
-#include <string>
 #include <vector>
 #include <cstdint>
 #include <memory>
 
 // graphics
-#include "graphics/dx12/DX12Transform.h"
 #include "graphics/dx12/IndexBuffer.h"
 #include "graphics/dx12/VertexBuffer.h"
 
-// utils
-#include "utils/file_abstractions.h"
-
-namespace gallus
+namespace gallus::core
 {
-	namespace graphics
+	class Data;
+}
+namespace gallus::graphics::dx12
+{
+	//---------------------------------------------------------------------
+	// VertexPosUV
+	//---------------------------------------------------------------------
+	/// <summary>
+	/// A simple vertex format containing a 2D position and texture coordinates (UV).
+	/// </summary>
+	struct VertexPosUV
 	{
-		namespace dx12
-		{
-			//---------------------------------------------------------------------
-			// VertexPosUV
-			//---------------------------------------------------------------------
-			/// <summary>
-			/// A simple vertex format containing a 2D position and texture coordinates (UV).
-			/// </summary>
-			struct VertexPosUV
-			{
-				DirectX::XMFLOAT2 Position;
-				DirectX::XMFLOAT2 UV;
-			};
+		DirectX::XMFLOAT3 Position;
+		DirectX::XMFLOAT2 UV;
+		DirectX::XMFLOAT3 Normal;
+		DirectX::XMFLOAT3 Color = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
+	};
+	
+	//---------------------------------------------------------------------
+	// MeshPartData
+	//---------------------------------------------------------------------
+	/// <summary>
+	/// Represents a part of a mesh, containing vertices, indices, and GPU buffers.
+	/// Useful for meshes that are split into sub-meshes or materials.
+	/// </summary>
+	class MeshPartData
+	{
+	public:
+		MeshPartData() = default;
 
-			//---------------------------------------------------------------------
-			// MeshPartData
-			//---------------------------------------------------------------------
-			/// <summary>
-			/// Represents a part of a mesh, containing vertices, indices, and GPU buffers.
-			/// Useful for meshes that are split into sub-meshes or materials.
-			/// </summary>
-			class MeshPartData
-			{
-			public:
-				MeshPartData(
-					std::vector<VertexPosUV> a_aVertices,
-					std::vector<uint16_t> a_aIndices) :
-					m_aVertices(a_aVertices), m_aIndices(a_aIndices)
-				{}
+		MeshPartData(
+			std::vector<VertexPosUV> a_aVertices,
+			std::vector<uint16_t> a_aIndices) :
+			m_aVertices(a_aVertices), m_aIndices(a_aIndices)
+		{}
 
-				std::vector<VertexPosUV> m_aVertices;
-				std::vector<uint16_t> m_aIndices;
+		std::vector<VertexPosUV> m_aVertices;
 
-				VertexBuffer m_VertexBuffer;
-				IndexBuffer m_IndexBuffer;
+		std::vector<uint16_t> m_aIndices;
 
-				Microsoft::WRL::ComPtr<ID3D12Resource> m_pIntermediateVertexBuffer;
-				Microsoft::WRL::ComPtr<ID3D12Resource> m_pIntermediateIndexBuffer;
-			};
+		VertexBuffer m_VertexBuffer;
+		IndexBuffer m_IndexBuffer;
 
-			enum class PRIMITIVES
-			{
-				SQUARE,
-			};
-			inline std::vector<MeshPartData> s_PRIMITIVES = {
-				MeshPartData(
-					{
-						{ DirectX::XMFLOAT2(-0.5f, -0.5f), DirectX::XMFLOAT2(0.0f, 0.0f) },
-						{ DirectX::XMFLOAT2(0.5f, -0.5f), DirectX::XMFLOAT2(1.0f, 0.0f) },
-						{ DirectX::XMFLOAT2(-0.5f, 0.5f), DirectX::XMFLOAT2(0.0f, 1.0f) },
-						{ DirectX::XMFLOAT2(0.5f, 0.5f), DirectX::XMFLOAT2(1.0f, 1.0f) }
-					},
-					{
-						0, 1, 2,
-						2, 1, 3
-					}
-				)
-			};
+		Microsoft::WRL::ComPtr<ID3D12Resource> m_pIntermediateVertexBuffer;
+		Microsoft::WRL::ComPtr<ID3D12Resource> m_pIntermediateIndexBuffer;
+	};
 
-			class CommandList;
-			class CommandQueue;
+	enum class PRIMITIVES
+	{
+		SQUARE,
+		CUBE,
+		CYLINDER
+	};
 
-			//---------------------------------------------------------------------
-			// Mesh
-			//---------------------------------------------------------------------
-			/// <summary>
-			/// Represents a renderable mesh resource in the engine.
-			/// Contains vertex and index buffers, transformation data, and supports rendering with a command list.
-			/// </summary>
-			class Mesh : public resources::EngineResource
-			{
-			public:
-				/// <summary>
-				/// Constructs an empty mesh.
-				/// </summary>
-				Mesh();
+	MeshPartData CreateCylinder();
 
-				/// <summary>
-				/// Renders the mesh using the specified command list, applying a transform and camera matrices.
-				/// </summary>
-				/// <param name="a_pCommandList">The command list used to issue GPU draw calls.</param>
-				/// <param name="a_MVP">The mvp of the mesh.</param>
-				void Render(std::shared_ptr<CommandList> a_pCommandList, const DirectX::XMMATRIX& a_MVP);
+	extern std::vector<MeshPartData> s_PRIMITIVES;
 
-				/// <summary>
-				/// Checks whether the mesh contains valid data and is ready for rendering.
-				/// </summary>
-				/// <returns>True if the mesh is valid, false otherwise.</returns>
-				bool IsValid() const override;
+	class CommandList;
+	class CommandQueue;
 
-				/// <summary>
-				/// Loads a mesh by its name, typically from a file or resource database, and initializes GPU buffers.
-				/// </summary>
-				/// <param name="a_sName">The name of the mesh to load.</param>
-				/// <param name="a_pCommandList">The command list used for uploading resources to the GPU.</param>
-				/// <returns>True if loading was successful, false otherwise.</returns>
-				bool LoadByName(const std::string& a_sName);
+	//---------------------------------------------------------------------
+	// Mesh
+	//---------------------------------------------------------------------
+	/// <summary>
+	/// Represents a renderable mesh resource in the engine.
+	/// Contains vertex and index buffers, transformation data, and supports rendering with a command list.
+	/// </summary>
+	class Mesh : public resources::EngineResource
+	{
+	public:
+		/// <summary>
+		/// Loads the mesh data.
+		/// </summary>
+		/// <param name="a_Data">A vector containing data in bytes.</param>
+		/// <returns>True when loading was successful, false otherwise.</returns>
+		bool LoadData(const core::Data& a_Data);
+		
+		/// <summary>
+		/// Loads the mesh data.
+		/// </summary>
+		/// <param name="a_Data">A vector containing data in bytes.</param>
+		/// <param name="a_pCommandList">The command list used for updating resources.</param>
+		/// <returns>True when loading was successful, false otherwise.</returns>
+		bool LoadData(const core::Data& a_Data, std::shared_ptr<CommandQueue> a_pCommandQueue);
 
-				/// <summary>
-				/// Sets the mesh data.
-				/// </summary>
-				/// <param name="a_aData">The mesh part data.</param>
-				/// <param name="a_pCommandQueue">The command queue used for uploading.</param>
-				void SetMeshData(const MeshPartData& a_aData, const std::shared_ptr<CommandQueue> a_pCommandQueue);
-			private:
-				std::vector<MeshPartData> m_aMeshData;
+		/// <summary>
+		/// Renders the mesh using the specified command list, applying a transform and camera matrices.
+		/// </summary>
+		/// <param name="a_pCommandList">The command list used to issue GPU draw calls.</param>
+		/// <param name="a_MVP">The mvp of the mesh.</param>
+		/// <param name="a_M">The world matrix of the mesh.</param>
+		void Render(std::shared_ptr<CommandList> a_pCommandList, const DirectX::XMMATRIX& a_MVP, const DirectX::XMMATRIX& a_M);
 
-#ifdef _EDITOR
-				BEGIN_EXPOSE_FIELDS_PARENT(Mesh, resources::EngineResource)
-				END_EXPOSE_FIELDS(Mesh)
-				BEGIN_EXPOSE_GIZMOS(Mesh)
-				END_EXPOSE_GIZMOS(Mesh)
-				END_EXPOSE_TO_EDITOR(Mesh)
-#endif
-			};
-		}
-	}
+		/// <summary>
+		/// Checks whether the mesh contains valid data and is ready for rendering.
+		/// </summary>
+		/// <returns>True if the mesh is valid, false otherwise.</returns>
+		bool IsValid() const override;
+
+		bool GetMeshDataFromModel(const core::Data& a_Data);
+
+		/// <summary>
+		/// Sets the mesh data.
+		/// </summary>
+		/// <param name="a_Data">The mesh part data.</param>
+		/// <param name="a_pCommandQueue">The command queue used for uploading.</param>
+		void SetMeshData(const MeshPartData& a_Data, const std::shared_ptr<CommandQueue> a_pCommandQueue);
+
+		/// <summary>
+		/// Uploads the mesh data.
+		/// </summary>
+		/// <param name="a_pCommandQueue">The command queue used for uploading.</param>
+		void UploadMeshData(const std::shared_ptr<CommandQueue> a_pCommandQueue);
+	private:
+		std::vector<MeshPartData> m_aMeshData;
+
+		BEGIN_SERIALIZE_PARENT(Mesh, resources::EngineResource)
+		END_SERIALIZE(Mesh)
+	};
 }

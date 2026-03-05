@@ -1,61 +1,49 @@
 #include "HealthComponent.h"
 
-// external
-#include <rapidjson/utils.h>
+// gameplay
+#include "gameplay/Entity.h"
+#include "gameplay/EntityComponentSystem.h"
 
-// core
-#include "core/Engine.h"
-
-// resources
-#include "resources/SrcData.h"
-
-#define JSON_HEALTH_COMPONENT_HEALTH_VAR "health"
-#define JSON_HEALTH_COMPONENT_MAX_HEALTH_VAR "maxHealth"
-
-namespace gallus
+namespace gallus::gameplay
 {
-	namespace gameplay
+	//---------------------------------------------------------------------
+	// HealthComponent
+	//---------------------------------------------------------------------
+	void HealthComponent::InitRealtime()
 	{
-		//---------------------------------------------------------------------
-		// HealthComponent
-		//---------------------------------------------------------------------
-		void HealthComponent::InitRealtime()
+		if (m_bInitialized)
 		{
-			if (m_bInitialized)
-			{
-				return;
-			}
-			m_fHealth = m_fMaxHealth;
-			Component::InitRealtime();
+			return;
+		}
+		m_fHealth = m_fMaxHealth;
+
+		Component::InitRealtime();
+	}
+	
+	//---------------------------------------------------------------------
+	void HealthComponent::TakeDamage(float a_fDamage)
+	{
+		m_fHealth -= a_fDamage;
+		if (m_fHealth < 0)
+		{
+			m_fHealth = 0;
+		}
+	}
+
+	//---------------------------------------------------------------------
+	void HealthComponent::UpdateRealtime(float a_fDeltaTime, UpdateTime a_UpdateTime)
+	{
+		if (!m_pECS)
+		{
+			return;
 		}
 
-		//---------------------------------------------------------------------
-#ifdef _EDITOR
-		void HealthComponent::Serialize(rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator) const
+		if (m_fHealth <= 0)
 		{
-			if (!a_Document.IsObject())
+			std::shared_ptr<gameplay::Entity> ent = m_pECS->GetEntity(m_EntityID).lock();
+			if (!ent)
 			{
-				return;
-			}
-
-			a_Document.AddMember(JSON_HEALTH_COMPONENT_HEALTH_VAR, m_fHealth, a_Allocator);
-			a_Document.AddMember(JSON_HEALTH_COMPONENT_MAX_HEALTH_VAR, m_fMaxHealth, a_Allocator);
-		}
-#endif
-
-		//---------------------------------------------------------------------
-		void HealthComponent::Deserialize(const resources::SrcData& a_SrcData)
-		{
-			m_fHealth = a_SrcData.GetFloat(JSON_HEALTH_COMPONENT_HEALTH_VAR);
-			m_fMaxHealth = a_SrcData.GetFloat(JSON_HEALTH_COMPONENT_MAX_HEALTH_VAR);
-		}
-
-		//---------------------------------------------------------------------
-		void HealthComponent::UpdateRealtime(float a_fDeltaTime, UpdateTime a_UpdateTime)
-		{
-			if (m_fHealth <= 0)
-			{
-				core::ENGINE->GetECS().GetEntity(m_EntityID)->Destroy();
+				ent->Destroy();
 			}
 		}
 	}

@@ -4,89 +4,34 @@
 
 // external
 #include <DirectXMath.h>
-#include <array>
 #include <set>
 
-#ifdef _EDITOR
-// editor
-#include "editor/EditorExpose.h"
-#endif
-
-namespace gallus
+namespace gallus::gameplay
 {
-	namespace gameplay
+	//---------------------------------------------------------------------
+	// ColliderComponent
+	//---------------------------------------------------------------------
+	class ColliderComponent : public Component
 	{
-		//---------------------------------------------------------------------
-		// ColliderComponent
-		//---------------------------------------------------------------------
-		class ColliderComponent : public Component
-		{
-		public:
-#ifdef _EDITOR
-			/// <summary>
-			/// Serialized the component to a json document.
-			/// </summary>
-			/// <param name="a_Document">The json document that the data will be put into.</param>
-			/// <param name="a_Allocator">The allocator used by the json document.</param>
-			void Serialize(rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator) const override;
-#endif
+	public:
+		void IgnoreEntity(const gameplay::EntityID& a_EntityID);
+	protected:
+		/// <summary>
+		/// Updates the system's component.
+		/// </summary>
+		// <param name="a_fDeltaTime">The time it took since last frame.</param>
+		void UpdateRealtime(float a_fDeltatime, UpdateTime a_UpdateTime) override;
 
-			/// <summary>
-			/// Deerializes sourcce data and creates an instance based on it.
-			/// </summary>
-			/// <param name="a_SrcData">The src data used for the component.</param>
-			void Deserialize(const resources::SrcData& a_SrcData) override;
+		DirectX::XMFLOAT2 m_vOffset = { 0, 0 };
+		DirectX::XMFLOAT2 m_vSize = { 1, 1 };
 
-			/// <summary>
-			/// Sets the offset of the collider.
-			/// </summary>
-			/// <param name="a_vOffset">A XMFLOAT2 containing the offset.</param>
-			void SetOffset(const DirectX::XMFLOAT2& a_vOffset);
+		std::set<gameplay::EntityID> m_aEntitiesToIgnore;
 
-			/// <summary>
-			/// Sets the size of the collider.
-			/// </summary>
-			/// <param name="a_vSize">A XMFLOAT2 containing the size.</param>
-			void SetSize(const DirectX::XMFLOAT2& a_vSize);
-
-			/// <summary>
-			/// Retrieves the offset of the collider.
-			/// </summary>
-			/// <returns>A XMFLOAT2 containing the offset.</returns>
-			const DirectX::XMFLOAT2& GetOffset() const;
-
-			/// <summary>
-			/// Retrieves the size of the collider.
-			/// </summary>
-			/// <returns>A XMFLOAT2 containing the size.</returns>
-			const DirectX::XMFLOAT2& GetSize() const;
-
-			std::array<DirectX::XMFLOAT2, 4> GetColliderWorldCorners(const DirectX::XMFLOAT2& a_vPos, const DirectX::XMFLOAT2& a_vScale, const DirectX::XMFLOAT2& a_vPivot, float a_fRotation);
-
-			bool IntersectsOBB(const std::array<DirectX::XMFLOAT2, 4>& aA, const std::array<DirectX::XMFLOAT2, 4>& aB);
-
-			void IgnoreEntity(const gameplay::EntityID& a_EntityID);
-		protected:
-			/// <summary>
-			/// Updates the system's component.
-			/// </summary>
-			// <param name="a_fDeltaTime">The time it took since last frame.</param>
-			void UpdateRealtime(float a_fDeltatime, UpdateTime a_UpdateTime) override;
-
-			DirectX::XMFLOAT2 m_vOffset = { 0, 0 };
-			DirectX::XMFLOAT2 m_vSize = { 1, 1 };
-
-			std::set<gameplay::EntityID> m_aEntitiesToIgnore;
-
-#ifdef _EDITOR
-			BEGIN_EXPOSE_FIELDS_PARENT(ColliderComponent, Component)
-				EXPOSE_FIELD(ColliderComponent, m_vOffset, "Offset", (FieldOptions{ .type = EditorFieldWidgetType::Vector2Field, .description = "The local offset of the collider relative to the object�s pivot or position. Adjusts where the collider is positioned without moving the object itself." }))
-				EXPOSE_FIELD(ColliderComponent, m_vSize, "Size", (FieldOptions{ .type = EditorFieldWidgetType::Vector2Field, .description = "The size of the collider in local space. Determines the width and height of the collision area." }))
-			END_EXPOSE_FIELDS(ColliderComponent)
-			BEGIN_EXPOSE_GIZMOS(ColliderComponent)
-			END_EXPOSE_GIZMOS(ColliderComponent)
-			END_EXPOSE_TO_EDITOR(ColliderComponent)
-#endif											   	
-		};
-	}
+		BEGIN_SERIALIZE_PARENT(ColliderComponent, Component)
+			SERIALIZE_FIELD(m_vOffset, "Offset", "The local offset of the collider relative to the object's pivot or position. Adjusts where the collider is positioned without moving the object itself.",
+				.type = FieldSerializationType::FieldSerializationType_Vector2)
+			SERIALIZE_FIELD(m_vSize, "Size", "The size of the collider in local space. Determines the width and height of the collision area.",
+				.type = FieldSerializationType::FieldSerializationType_Vector2)
+		END_SERIALIZE(ColliderComponent)
+	};
 }

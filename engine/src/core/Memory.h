@@ -3,10 +3,8 @@
 // external
 #include <cstdint>
 
-namespace gallus
+namespace gallus::core
 {
-	namespace core
-	{
 #define _KB(x) (x * 1024)
 #define _MB(x) (x * 1024 * 1024)
 
@@ -21,28 +19,27 @@ namespace gallus
 #define _128MB _MB(128)
 #define _256MB _MB(256)
 
-		/// <summary>
-		/// Adds specific size to a pointer.
-		/// </summary>
-		/// <param name="a_pPtr">The pointer that will be offset.</param>
-		/// <param name="a_iSize">The amount that the pointer will be offset with.</param>
-		/// <returns>A pointer with the new offset.</returns>
-		inline void* add(void* a_pPtr, size_t a_iSize)
-		{
-			return reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(a_pPtr) + a_iSize);
-		}
+	/// <summary>
+	/// Adds specific size to a pointer.
+	/// </summary>
+	/// <param name="a_pPtr">The pointer that will be offset.</param>
+	/// <param name="a_iSize">The amount that the pointer will be offset with.</param>
+	/// <returns>A pointer with the new offset.</returns>
+	inline void* add(void* a_pPtr, size_t a_iSize)
+	{
+		return reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(a_pPtr) + a_iSize);
+	}
 
-		/// <summary>
-		/// Adds specific size to a pointer and casts it to a specified type.
-		/// </summary>
-		/// <typeparam name="T">The type the pointer will be cast to.</typeparam>
-		/// <param name="a_pPtr">The pointer that will be offset.</param>
-		/// <param name="a_iSize">The amount that the pointer will be offset with.</param>
-		/// <returns>A pointer of type T with the new offset.</returns>
-		template<typename T>
-		inline T* addAs(T* a_pPtr, size_t a_iSize)
-		{
-			return reinterpret_cast<T*>(add(a_pPtr, a_iSize));
-		}
+	/// <summary>
+	/// Adds specific size to a pointer and casts it to a specified type.
+	/// </summary>
+	/// <typeparam name="T">The type the pointer will be cast to.</typeparam>
+	/// <param name="a_pPtr">The pointer that will be offset.</param>
+	/// <param name="a_iSize">The amount that the pointer will be offset with.</param>
+	/// <returns>A pointer of type T with the new offset.</returns>
+	template<typename T>
+	inline T* addAs(T* a_pPtr, size_t a_iSize)
+	{
+		return reinterpret_cast<T*>(add(a_pPtr, a_iSize));
 	}
 }

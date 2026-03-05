@@ -5,121 +5,58 @@
 // external
 #include <DirectXMath.h>
 
-#ifdef _EDITOR
-// editor
-#include "editor/EditorExpose.h"
-#endif
-
-namespace gallus
+namespace gallus::gameplay
 {
-	namespace gameplay
+	//---------------------------------------------------------------------
+	// RigidbodyComponent
+	//---------------------------------------------------------------------
+	class RigidbodyComponent : public Component
 	{
-		//---------------------------------------------------------------------
-		// RigidbodyComponent
-		//---------------------------------------------------------------------
-		class RigidbodyComponent : public Component
-		{
-		public:
-#ifdef _EDITOR
-			/// <summary>
-			/// Serialized the component to a json document.
-			/// </summary>
-			/// <param name="a_Document">The json document that the data will be put into.</param>
-			/// <param name="a_Allocator">The allocator used by the json document.</param>
-			void Serialize(rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator) const override;
-#endif
+	public:
+		/// <summary>
+		/// Adds force to the rigidbody.
+		/// </summary>
+		/// <param name="a_vForce">Velocity to add.</param>
+		void AddForce(const DirectX::XMFLOAT2& a_vForce);
+		
+		/// <summary>
+		/// Sets the mass.
+		/// </summary>
+		/// <param name="a_fMass">The mass of the rigidbody.</param>
+		void SetMass(float a_fMass);
+		
+		/// <summary>
+		/// Sets the linear damping.
+		/// </summary>
+		/// <param name="a_fLinearDamping">The linear damping of the rigidbody.</param>
+		void SetLinearDamping(float a_fLinearDamping);
+	protected:
+		/// <summary>
+		/// Updates the components.
+		/// </summary>
+		/// <param name="a_fDeltaTime">Delta time.</param>
+		void UpdateRealtime(float a_fDeltaTime, UpdateTime a_UpdateTime) override;
 
-			/// <summary>
-			/// Creates an instance based on source data.
-			/// </summary>
-			/// <param name="a_SrcData">The source data.</param>
-			void Deserialize(const resources::SrcData& a_SrcData) override;
+		bool m_bUseGravity = false;
 
-			/// <summary>
-			/// Retrieves whether the rigidbody should use gravity or not.
-			/// </summary>
-			/// <returns>True if gravity is enabled, false otherwise.</returns>
-			bool UseGravity() const
-			{
-				return m_bUseGravity;
-			}
+		DirectX::XMFLOAT3 m_vVelocity = { 0.0f, 0.0f, 0.0f };
+		DirectX::XMFLOAT3 m_vAcceleration = { 0.0f, 0.0f, 0.0f };
+		DirectX::XMFLOAT3 m_vForce = { 0.0f, 0.0f, 0.0f };
 
-			/// <summary>
-			/// Sets whether the rigidbody should use gravity or not.
-			/// </summary>
-			/// <param name="a_bUseGravity">True to enable gravity, false otherwise.</param>
-			void SetUseGravity(bool a_bUseGravity)
-			{
-				m_bUseGravity = a_bUseGravity;
-			}
+		float m_fMass = 1.0f;
+		float m_fLinearDamping = 0.98f;
 
-			/// <summary>
-			/// Adds force to the rigidbody.
-			/// </summary>
-			/// <param name="a_vForce">Velocity to add.</param>
-			void AddForce(const DirectX::XMFLOAT2& a_vForce)
-			{
-				m_vForce.x += a_vForce.x;
-				m_vForce.y += a_vForce.y;
-			}
-
-			void SetMass(float a_fMass)
-			{
-				if (a_fMass <= 0.0f)
-				{
-					a_fMass = 0.0001f; // Prevent division by zero
-				}
-				m_fMass = a_fMass;
-			}
-
-			float GetMass()
-			{
-				return m_fMass;
-			}
-
-			void SetLinearDamping(float a_fLinearDamping)
-			{
-				if (a_fLinearDamping < 0.0f)
-				{
-					a_fLinearDamping = 0.0f;
-				}
-				else if (a_fLinearDamping > 1.0f)
-				{
-					a_fLinearDamping = 1.0f;
-				}
-				m_fLinearDamping = a_fLinearDamping;
-			}
-
-			float GetLinearDamping()
-			{
-				return m_fLinearDamping;
-			}
-		protected:
-			/// <summary>
-			/// Updates the components.
-			/// </summary>
-			/// <param name="a_fDeltaTime">Delta time.</param>
-			void UpdateRealtime(float a_fDeltaTime, UpdateTime a_UpdateTime) override;
-
-			bool m_bUseGravity = false;
-
-			DirectX::XMFLOAT2 m_vVelocity = { 0.0f, 0.0f };
-			DirectX::XMFLOAT2 m_vAcceleration = { 0.0f, 0.0f };
-			DirectX::XMFLOAT2 m_vForce = { 0.0f, 0.0f };
-
-			float m_fMass = 1.0f;
-			float m_fLinearDamping = 0.98f;
-
-#ifdef _EDITOR
-			BEGIN_EXPOSE_FIELDS_PARENT(RigidbodyComponent, Component)
-				EXPOSE_FIELD(RigidbodyComponent, m_bUseGravity, "Use Gravity", (FieldOptions{ .type = EditorFieldWidgetType::Toggle, .description = "Determines whether the object is affected by gravity. When true, the rigidbody will accelerate downward according to the physics system; when false, it will ignore gravity." }))
-				EXPOSE_FIELD(RigidbodyComponent, m_fMass, "Mass", (FieldOptions{ .type = EditorFieldWidgetType::DragFloat, .min = "0.0001", .max = "9999999", .description = "The mass of the rigidbody. Affects how forces influence the object; higher mass makes it harder to accelerate.  " }))
-				EXPOSE_FIELD(RigidbodyComponent, m_fLinearDamping, "Linear Damping", (FieldOptions{ .type = EditorFieldWidgetType::DragFloat, .min = "0.01", .max = "1.0f", .description = "The linear damping factor applied to the rigidbody�s velocity. Values closer to 1 reduce movement slowly, values closer to 0 slow the object more quickly over time." }))
-			END_EXPOSE_FIELDS(RigidbodyComponent)
-			BEGIN_EXPOSE_GIZMOS(RigidbodyComponent)
-			END_EXPOSE_GIZMOS(RigidbodyComponent)
-			END_EXPOSE_TO_EDITOR(RigidbodyComponent)
-#endif
-		};
-	}
+		BEGIN_SERIALIZE_PARENT(RigidbodyComponent, Component)
+		 	SERIALIZE_FIELD(m_bUseGravity, "Use Gravity", "Determines whether the object is affected by gravity. When true, the rigidbody will accelerate downward according to the physics system; when false, it will ignore gravity.",
+		 		.type = FieldSerializationType::FieldSerializationType_Switch)
+		 	SERIALIZE_FIELD(m_fMass, "Mass", "The mass of the rigidbody. Affects how forces influence the object; higher mass makes it harder to accelerate.",
+		 		.type = FieldSerializationType::FieldSerializationType_Float,
+		 		.min = "0.0001",
+		 		.max = "9999999")
+		 	SERIALIZE_FIELD(m_fLinearDamping, "Linear Damping", "The linear damping factor applied to the rigidbody�s velocity. Values closer to 1 reduce movement slowly, values closer to 0 slow the object more quickly over time.",
+		 		.type = FieldSerializationType::FieldSerializationType_Float,
+		 		.min = "0.01",
+		 		.max = "1.0f")
+		END_SERIALIZE(RigidbodyComponent)
+	};
 }

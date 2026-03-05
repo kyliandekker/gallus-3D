@@ -2,107 +2,74 @@
 
 #include "gameplay/systems/components/Component.h"
 
-namespace gallus
+// external
+#include <memory>
+
+namespace gallus::animation
 {
-	namespace animation
+	class Animation;
+}
+namespace gallus::gameplay
+{
+	//---------------------------------------------------------------------
+	// AnimationComponent
+	//---------------------------------------------------------------------
+	class AnimationComponent : public Component
 	{
-		class AnimationTrack;
-	}
-	namespace gameplay
-	{
-		//---------------------------------------------------------------------
-		// AnimationComponent
-		//---------------------------------------------------------------------
-		class AnimationComponent : public Component
+	public:
+		/// <summary>
+		/// Initializes the component in runtime.
+		/// </summary>
+		void InitRealtime() override;
+
+		/// <summary>
+		/// Updates the components.
+		/// </summary>
+		/// <param name="a_fDeltaTime">Delta time.</param>
+		/// <param name="a_UpdateTime">Which order this update is called in.</param>
+		void UpdateRealtime(float a_fDeltaTime, UpdateTime a_UpdateTime) override;
+
+		/// <summary>
+		/// Resets the animation.
+		/// </summary>
+		void LoadAnimation();
+
+		/// <summary>
+		/// Updates the components.
+		/// </summary>
+		/// <param name="a_fDeltaTime">Delta time.</param>
+		/// <param name="a_UpdateTime">Which order this update is called in.</param>
+		void UpdateRealtimeInner(float a_fDeltaTime, UpdateTime a_UpdateTime) override;
+
+		/// <summary>
+		/// Starts the playback of the component.
+		/// </summary>
+		void Start()
 		{
-		public:
-			/// <summary>
-			/// Initializes the component in runtime.
-			/// </summary>
-			void InitRealtime() override;
+			m_bIsPlaying = true;
+		}
 
-#ifdef _EDITOR
-			/// <summary>
-			/// Serialized the component to a json document.
-			/// </summary>
-			/// <param name="a_Document">The json document that the data will be put into.</param>
-			/// <param name="a_Allocator">The allocator used by the json document.</param>
-			void Serialize(rapidjson::Value& a_Document, rapidjson::Document::AllocatorType& a_Allocator) const override;
-#endif
+		/// <summary>
+		/// Stops the playback of the component.
+		/// </summary>
+		void Stop()
+		{
+			m_bIsPlaying = false;
+		}
+	private:
+		std::weak_ptr<animation::Animation> m_pAnimation;
+		
+		std::weak_ptr<animation::Animation> m_pStartingAnimation;
 
-			/// <summary>
-			/// Deerializes sourcce data and creates an instance based on it.
-			/// </summary>
-			/// <param name="a_SrcData">The src data used for the component.</param>
-			void Deserialize(const resources::SrcData& a_SrcData) override;
+		uint16_t m_iNextKeyFrameIndex = 0;
+		bool m_bIsLooping = false;
+		bool m_bIsPlaying = false;
+		float m_fAccumulatedTime = 0.0f;
 
-			/// <summary>
-			/// Updates the components.
-			/// </summary>
-			/// <param name="a_fDeltaTime">Delta time.</param>
-			/// <param name="a_UpdateTime">Which order this update is called in.</param>
-			void UpdateRealtime(float a_fDeltaTime, UpdateTime a_UpdateTime) override;
-
-			void LoadAnimation(const std::string& a_sAnimName);
-
-			/// <summary>
-			/// Updates the components.
-			/// </summary>
-			/// <param name="a_fDeltaTime">Delta time.</param>
-			/// <param name="a_UpdateTime">Which order this update is called in.</param>
-			void UpdateRealtimeInner(float a_fDeltaTime, UpdateTime a_UpdateTime) override;
-
-			/// <summary>
-			/// Starts the playback of the component.
-			/// </summary>
-			void Start()
-			{
-				m_bIsPlaying = true;
-			}
-
-			/// <summary>
-			/// Stops the playback of the component.
-			/// </summary>
-			void Stop()
-			{
-				m_bIsPlaying = false;
-			}
-
-#ifdef _EDITOR
-			/// <summary>
-			/// Sets the starting animation.
-			/// </summary>
-			/// <param name="a_sStartingAnimation">The starting animation represented as a string.</param>
-			void SetStartingAnimation(const std::string a_sStartingAnimation)
-			{
-				m_sStartingAnimation = a_sStartingAnimation;
-			}
-#endif
-			/// <summary>
-			/// Retrieves the starting animation.
-			/// </summary>
-			/// <returns>A string representing the starting animation.</returns>
-			const std::string& GetStartingAnimation() const
-			{
-				return m_sStartingAnimation;
-			}
-		private:
-			std::weak_ptr<animation::AnimationTrack> m_AnimationTrack = {};
-			
-			std::string m_sStartingAnimation;
-
-			int m_iNextKeyFrameIndex = 0;
-			bool m_bIsLooping = false;
-			bool m_bIsPlaying = false;
-			float m_fAccumulatedTime = 0.0f;
-
-#ifdef _EDITOR	
-			BEGIN_EXPOSE_FIELDS_PARENT(AnimationComponent, Component)
-			END_EXPOSE_FIELDS(AnimationComponent)
-			BEGIN_EXPOSE_GIZMOS(AnimationComponent)
-			END_EXPOSE_GIZMOS(AnimationComponent)
-			END_EXPOSE_TO_EDITOR(AnimationComponent)
-#endif		  	
-		};
-	}
+		BEGIN_SERIALIZE_PARENT(AnimationComponent, Component)
+			SERIALIZE_FIELD(m_pStartingAnimation, "Starting Animation", "If set, the sprite will start with this animation.",
+				.type = FieldSerializationType::FieldSerializationType_EngineResource,
+				.assetType = resources::AssetType::Animation)
+		END_SERIALIZE(AnimationComponent)
+	};
 }
