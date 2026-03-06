@@ -19,6 +19,8 @@ namespace gallus::graphics::dx12
 	class PixelShader;
 	class VertexShader;
 	class Mesh;
+	class Mesh;
+	class SkinnedMesh;
 	class Material;
 
 	class CommandQueue;
@@ -107,12 +109,12 @@ namespace gallus::resources
 		/// Loads a mesh by name from the resource folder.
 		/// </summary>
 		std::weak_ptr<graphics::dx12::Mesh> LoadMesh(const std::string& a_sName, std::shared_ptr<graphics::dx12::CommandQueue> a_pCommandQueue = nullptr);
-
+		
 		/// <summary>
 		/// Loads an empty mesh.
 		/// </summary>
 		std::weak_ptr<graphics::dx12::Mesh> LoadMeshEmpty(const std::string& a_sName);
-		
+
 		/// <summary>
 		/// Loads a material by name from the resource folder.
 		/// </summary>
@@ -201,6 +203,9 @@ namespace gallus::resources
 		/// <returns>Shared pointer to the resource.</returns>
 		template<class T>
 		std::shared_ptr<T> GetResource(std::vector<std::shared_ptr<T>>& a_vVector, const std::string& a_sName);
+
+		template<typename TDerived, typename TBase>
+		std::shared_ptr<TDerived> GetPolymorphicResource(std::vector<std::shared_ptr<TBase>>& a_vVector, const std::string& a_sName);
 
 		/// <summary>
 		/// Checks whether a resource already exists in the given vector.

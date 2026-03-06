@@ -8,7 +8,9 @@
 #include <imgui_helpers.h>
 
 // graphics
+#include "graphics/dx12/DX12System.h"
 #include "graphics/dx12/Texture.h"
+#include "graphics/dx12/Mesh.h"
 #include "graphics/dx12/Material.h"
 #include "graphics/dx12/Shader.h"
 
@@ -439,6 +441,54 @@ namespace gallus::graphics::imgui
 		//		}
 		//		return false;
 		//	});
+	}
+
+	//---------------------------------------------------------------------
+	MeshFileTypeEditorSelectable::MeshFileTypeEditorSelectable(ImGuiSystem& a_System, FileEditorSelectable& a_FileEditorSelectable) : FileTypeEditorSelectable(a_System, a_FileEditorSelectable)
+	{
+		resources::ResourceAtlas* resourceAtlas = GetEditorEngine().GetResourceAtlas();
+		if (!resourceAtlas)
+		{
+			return;
+		}
+
+		graphics::dx12::DX12System* dx12System = GetEditorEngine().GetDX12();
+		if (!dx12System)
+		{
+			return;
+		}
+
+		std::shared_ptr<graphics::dx12::CommandQueue> cCommandQueue = dx12System->GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
+
+		m_pMesh = resourceAtlas->LoadMesh(a_FileEditorSelectable.GetFileResource().GetPath().filename().generic_string(), cCommandQueue);
+	}
+
+	//---------------------------------------------------------------------
+	void MeshFileTypeEditorSelectable::Render(FileEditorSelectable& a_FileEditorSelectable)
+	{
+		std::shared_ptr<graphics::dx12::Mesh> mesh = m_pMesh.lock();
+		if (!mesh)
+		{
+			return;
+		}
+
+		if (RenderObjectFields(mesh.get(), false))
+		{
+			editor::EditorWorkspace* editorWorkspace = GetEditorEngine().GetEditorWorkspace();
+			if (!editorWorkspace)
+			{
+				return;
+			}
+
+			resources::SrcData srcData;
+			srcData.SetObject();
+			SerializeFields(mesh.get(), srcData);
+			
+			core::Data data;
+			srcData.GetData(data);
+
+			editorWorkspace->Save(mesh->GetName(), data);
+		}
 	}
 
 	//---------------------------------------------------------------------

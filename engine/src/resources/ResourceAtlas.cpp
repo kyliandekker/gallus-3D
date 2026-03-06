@@ -74,6 +74,46 @@ namespace gallus::resources
 	}
 
 	//---------------------------------------------------------------------
+	template<typename TDerived, typename TBase>
+	std::shared_ptr<TDerived> ResourceAtlas::GetPolymorphicResource(std::vector<std::shared_ptr<TBase>>& a_vVector, const std::string& a_sName)
+	{
+		int32_t index = HasResource(a_vVector, a_sName);
+
+		if (index != -1)
+		{
+			return std::dynamic_pointer_cast<TDerived>(a_vVector[index]);
+		}
+
+		for (size_t i = 0; i < a_vVector.size(); i++)
+		{
+			if (!a_vVector[i] || !a_vVector[i]->IsValid())
+			{
+				index = static_cast<int32_t>(i);
+				break;
+			}
+		}
+
+		std::shared_ptr<TDerived> resource = std::make_shared<TDerived>();
+		resource->SetName(a_sName);
+
+		if (index == -1)
+		{
+			if (a_vVector.size() >= MAX_RESOURCES)
+			{
+				return std::dynamic_pointer_cast<TDerived>(a_vVector[MISSING]);
+			}
+
+			a_vVector.push_back(resource);
+		}
+		else
+		{
+			a_vVector[index] = resource;
+		}
+
+		return resource;
+	}
+
+	//---------------------------------------------------------------------
 	template<class T>
 	int32_t ResourceAtlas::HasResource(std::vector<std::shared_ptr<T>>& a_aVector, const std::string& a_sName)
 	{
@@ -241,12 +281,26 @@ namespace gallus::resources
 	//---------------------------------------------------------------------
 	std::weak_ptr<graphics::dx12::Mesh> ResourceAtlas::LoadMesh(const std::string& a_sName, std::shared_ptr<graphics::dx12::CommandQueue> a_pCommandQueue)
 	{
-		std::shared_ptr<graphics::dx12::Mesh> mesh = GetResource(m_aMeshes, a_sName);
-		if (!mesh->IsValid())
+		std::shared_ptr<graphics::dx12::Mesh> mesh = GetResource<graphics::dx12::Mesh>(m_aMeshes, a_sName);
+
+		if (mesh && !mesh->IsValid())
 		{
 			if (!m_pAssetSource)
 			{
 				LOGF(LOGSEVERITY_ERROR, LOG_CATEGORY_ECS, "Failed to load mesh \"%s\": Asset Source not set.", a_sName.c_str());
+				return mesh;
+			}
+
+			core::Data metaData;
+			if (!m_pAssetSource->LoadMetaData(a_sName, true, metaData))
+			{
+				LOGF(LOGSEVERITY_ERROR, LOG_CATEGORY_ECS, "Failed to load mesh \"%s\": Could not load meta data binary data.", a_sName.c_str());
+				return mesh;
+			}
+
+			if (!mesh->LoadMetaData(metaData))
+			{
+				LOGF(LOGSEVERITY_ERROR, LOG_CATEGORY_ECS, "Failed to load mesh \"%s\": Mesh could not load meta data binary data.", a_sName.c_str());
 				return mesh;
 			}
 
@@ -256,7 +310,7 @@ namespace gallus::resources
 				LOGF(LOGSEVERITY_ERROR, LOG_CATEGORY_ECS, "Failed to load mesh \"%s\".", a_sName.c_str());
 				return mesh;
 			}
-			
+
 			if (!mesh->LoadData(data, a_pCommandQueue))
 			{
 				LOGF(LOGSEVERITY_ERROR, LOG_CATEGORY_ECS, "Failed to load mesh \"%s\".", a_sName.c_str());
@@ -265,11 +319,11 @@ namespace gallus::resources
 		}
 		return mesh;
 	}
-	
+
 	//---------------------------------------------------------------------
 	std::weak_ptr<graphics::dx12::Mesh> ResourceAtlas::LoadMeshEmpty(const std::string& a_sName)
 	{
-		std::shared_ptr<graphics::dx12::Mesh> mesh = GetResource(m_aMeshes, a_sName);
+		std::shared_ptr<graphics::dx12::Mesh> mesh = GetPolymorphicResource<graphics::dx12::Mesh>(m_aMeshes, a_sName);
 		return mesh;
 	}
 

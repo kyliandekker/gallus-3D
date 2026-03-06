@@ -35,6 +35,8 @@ struct VSInput
     float2 TEXCOORD : TEXCOORD0;
     float3 NORMAL : NORMAL;
     float4 COLOR : COLOR;
+    uint4 JOINTS : JOINTS;
+    float4 WEIGHTS : WEIGHTS;
 };
 
 struct PSInput
@@ -43,6 +45,8 @@ struct PSInput
     float2 TEXCOORD : TEXCOORD0;
     float3 NORMAL : NORMAL;
     float4 COLOR : COLOR;
+    uint4 JOINTS : JOINTS;
+    float4 WEIGHTS : WEIGHTS;
 };
 
 Texture2D spriteTexture : register(t0);

@@ -16,6 +16,7 @@ namespace gallus::graphics::dx12
 {
 	enum class TextureType;
 	class Texture;
+	class Mesh;
 	class Material;
 	class Shader;
 }
@@ -130,6 +131,20 @@ namespace gallus::graphics::imgui
 		void Render(FileEditorSelectable& a_FileEditorSelectable) override;
 	protected:
 		StringDropdown<resources::AssetType> m_AssetTypeDropdown; /// Drop down UI element for selecting asset types.
+	};
+
+	class MeshFileTypeEditorSelectable : public FileTypeEditorSelectable
+	{
+	public:
+		/// <summary>
+		/// Constructs a file editor selectable.
+		/// </summary>
+		/// <param name="a_System">The ImGui system for rendering the view.</param>
+		MeshFileTypeEditorSelectable(ImGuiSystem& a_System, FileEditorSelectable& a_FileEditorSelectable);
+
+		void Render(FileEditorSelectable& a_FileEditorSelectable) override;
+	protected:
+		std::weak_ptr<graphics::dx12::Mesh> m_pMesh = {};
 	};
 
 	class MaterialFileTypeEditorSelectable : public FileTypeEditorSelectable

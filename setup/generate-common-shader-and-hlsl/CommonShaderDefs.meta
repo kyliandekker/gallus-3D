@@ -38,6 +38,8 @@ vertex_input VSInput
     TEXCOORD0  float2 TEXCOORD;
     NORMAL    float3 NORMAL;
     COLOR     float4 COLOR;
+    JOINTS     uint4 JOINTS;
+    WEIGHTS     float4 WEIGHTS;
 };
 
 // @shader_root_parameters
@@ -46,7 +48,7 @@ root_parameters
     CBV							b0 cbuffer Transform;
     SPRITE_UV					b1 cbuffer TextureUV;
     MATERIAL         			b2 cbuffer Material;
-    DIRECTIONAL_LIGHT			b3 cbuffer DirectionalLight;
+    DIRECTIONAL_LIGHT			b3 cbuffer DirectionalLightData;
     TEX_SRV						t0 Texture2D spriteTexture;
     SAMPLER_STATE				s0 SamplerState samplerState;
 };

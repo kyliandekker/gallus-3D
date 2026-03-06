@@ -78,7 +78,7 @@ namespace gallus::graphics::imgui
 			}
 			case resources::AssetType::Mesh:
 			{
-				m_pFileEditorSelectable = nullptr;
+				m_pFileEditorSelectable = new MeshFileTypeEditorSelectable(m_System, *this);
 				break;
 			}
 			case resources::AssetType::Material:
