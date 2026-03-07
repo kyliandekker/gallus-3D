@@ -115,25 +115,25 @@ namespace gallus::gameplay
 			return;
 		}
 
-		graphics::dx12::Transform transform;
-		if (gameplay::TransformComponent* transformComponent = m_pTransformSystem->TryGetComponent(a_EntityID))
-		{
-			transform = transformComponent->GetTransform();
-		}
-
 		if (!m_pDX12System)
 		{
 			return;
 		}
 
-		if (transform.GetCameraType() == graphics::dx12::CameraType_Screen)
+		gameplay::TransformComponent* transformComponent = m_pTransformSystem->TryGetComponent(a_EntityID);
+		if (!transformComponent)
+		{
+			return;
+		}
+
+		if (transformComponent->GetTransform().GetCameraType() == graphics::dx12::CameraType_Screen)
 		{
 			if (m_pDX12System->GetDimensionDrawMode() != graphics::dx12::DimensionDrawMode::DimensionDrawMode_2D && m_pDX12System->GetDimensionDrawMode() != graphics::dx12::DimensionDrawMode::DimensionDrawMode_2D3D)
 			{
 				return;
 			}
 		}
-		else if (transform.GetCameraType() == graphics::dx12::CameraType_World)
+		else if (transformComponent->GetTransform().GetCameraType() == graphics::dx12::CameraType_World)
 		{
 			if (m_pDX12System->GetDimensionDrawMode() != graphics::dx12::DimensionDrawMode::DimensionDrawMode_3D && m_pDX12System->GetDimensionDrawMode() != graphics::dx12::DimensionDrawMode::DimensionDrawMode_2D3D)
 			{
@@ -141,10 +141,10 @@ namespace gallus::gameplay
 			}
 		}
 
-		const DirectX::XMMATRIX viewMatrix = a_Camera.GetViewMatrix(transform.GetCameraType());
-		const DirectX::XMMATRIX& projectionMatrix = a_Camera.GetProjectionMatrix(transform.GetCameraType());
+		const DirectX::XMMATRIX viewMatrix = a_Camera.GetViewMatrix(transformComponent->GetTransform().GetCameraType());
+		const DirectX::XMMATRIX& projectionMatrix = a_Camera.GetProjectionMatrix(transformComponent->GetTransform().GetCameraType());
 
-		DirectX::XMMATRIX mMatrix = transform.GetWorldMatrixWithPivot();
+		DirectX::XMMATRIX mMatrix = transformComponent->GetTransform().GetWorldMatrixWithPivot();
 		DirectX::XMMATRIX mvpMatrix = mMatrix * viewMatrix * projectionMatrix;
 
 		resources::ResourceAtlas* resourceAtlas = GetEngine().GetResourceAtlas();
@@ -177,11 +177,12 @@ namespace gallus::gameplay
 		a_pCommandList->GetCommandList()->SetPipelineState(m_pPipelineState);
 		a_pCommandList->GetCommandList()->SetGraphicsRootSignature(m_pRootSignature);
 
+		std::weak_ptr<graphics::dx12::DX12Resource> transformBuffer = transformComponent->GetMappedTransformBuffer(mvpMatrix, mMatrix);
 		if (std::shared_ptr<graphics::dx12::Mesh> mesh = m_pMesh.lock())
 		{
 			if (mesh->IsValid())
 			{
-				mesh->Render(a_pCommandList, mvpMatrix, mMatrix);
+				mesh->Render(a_pCommandList, transformBuffer);
 			}
 		}
 	}

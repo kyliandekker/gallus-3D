@@ -189,7 +189,7 @@ namespace gallus::graphics::dx12
 		}
 
 		std::weak_ptr<Texture> texturePtr = resourceAtlas->LoadTexture("tex_missing.png", cCommandQueue); // Default texture.
-		if (std::shared_ptr<graphics::dx12::Texture> tex = texturePtr.lock())
+		if (std::shared_ptr<Texture> tex = texturePtr.lock())
 		{
 			tex->SetResourceCategory(resources::EngineResourceCategory::Missing);
 			tex->SetIsDestroyable(false);
@@ -216,14 +216,14 @@ namespace gallus::graphics::dx12
 		m_pRenderTextureShaderBind = PipelineStateCache::GetOrCreate(renderTexPixelShaderPtr, renderTexVertexShaderPtr, DXGI_FORMAT_UNKNOWN);
 
 		std::weak_ptr<Mesh> meshPtr = resourceAtlas->LoadMesh("mod_missing.glb", cCommandQueue); // Default mesh.
-		if (std::shared_ptr<graphics::dx12::Mesh> mesh = meshPtr.lock())
+		if (std::shared_ptr<Mesh> mesh = meshPtr.lock())
 		{
 			mesh->SetResourceCategory(resources::EngineResourceCategory::Missing);
 			mesh->SetIsDestroyable(false);
 		}
 
 		std::weak_ptr<Mesh> squareMeshPtr = resourceAtlas->LoadMeshEmpty("square"); // Square mesh.
-		if (std::shared_ptr<graphics::dx12::Mesh> mesh = squareMeshPtr.lock())
+		if (std::shared_ptr<Mesh> mesh = squareMeshPtr.lock())
 		{
 			MeshPartData& squarePrimitive = s_PRIMITIVES[(int) PRIMITIVES::SQUARE];
 			mesh->SetMeshData(squarePrimitive, cCommandQueue);
@@ -233,7 +233,7 @@ namespace gallus::graphics::dx12
 		}
 
 		std::weak_ptr<Mesh> cubeMeshPtr = resourceAtlas->LoadMeshEmpty("cube"); // Cube mesh.
-		if (std::shared_ptr<graphics::dx12::Mesh> mesh = cubeMeshPtr.lock())
+		if (std::shared_ptr<Mesh> mesh = cubeMeshPtr.lock())
 		{
 			MeshPartData& squarePrimitive = s_PRIMITIVES[(int) PRIMITIVES::CUBE];
 			mesh->SetMeshData(squarePrimitive, cCommandQueue);
@@ -243,7 +243,7 @@ namespace gallus::graphics::dx12
 		}
 
 		std::weak_ptr<Mesh> cylinderMeshPtr = resourceAtlas->LoadMeshEmpty("cylinder"); // Cylinder mesh.
-		if (std::shared_ptr<graphics::dx12::Mesh> mesh = cylinderMeshPtr.lock())
+		if (std::shared_ptr<Mesh> mesh = cylinderMeshPtr.lock())
 		{
 			MeshPartData& squarePrimitive = s_PRIMITIVES[(int) PRIMITIVES::CYLINDER];
 			mesh->SetMeshData(squarePrimitive, cCommandQueue);
@@ -252,14 +252,14 @@ namespace gallus::graphics::dx12
 			mesh->SetIsDestroyable(false);
 		}
 
-		m_pMaterial = resourceAtlas->LoadMaterialEmpty("default"); // Cylinder mesh.
-		if (std::shared_ptr<graphics::dx12::Material> material = m_pMaterial.lock())
+		std::weak_ptr<Material> material = resourceAtlas->LoadMaterialEmpty("default"); // Cylinder mesh.
+		if (std::shared_ptr<Material> mat = material.lock())
 		{
-			material->SetColor({1, 1, 1, 1});
-			material->SetEnableLighting(false);
-			material->SetResourceCategory(resources::EngineResourceCategory::Engine);
-			material->SetAssetType(resources::AssetType::Material);
-			material->SetIsDestroyable(false);
+			mat->SetColor({1, 1, 1, 1});
+			mat->SetEnableLighting(false);
+			mat->SetResourceCategory(resources::EngineResourceCategory::Engine);
+			mat->SetAssetType(resources::AssetType::Material);
+			mat->SetIsDestroyable(false);
 		}
 
 		cCommandQueue->Flush();
@@ -267,7 +267,7 @@ namespace gallus::graphics::dx12
 		UpdateRenderTargetViews();
 
 		// Create RTV for custom render target texture
-		if (std::shared_ptr<graphics::dx12::Texture> renderTex = m_pRenderTexture.lock())
+		if (std::shared_ptr<Texture> renderTex = m_pRenderTexture.lock())
 		{
 			if (renderTex->GetResource())
 			{
@@ -277,7 +277,7 @@ namespace gallus::graphics::dx12
 
 		Resize({0, 0}, m_vSize);
 
-		m_pCamera = std::make_unique<graphics::dx12::Camera>();
+		m_pCamera = std::make_unique<Camera>();
 
 		m_pCamera->Init(RENDER_TEX_SIZE.x, RENDER_TEX_SIZE.y);
 		m_pCamera->GetTransform().SetPosition({ 0.0f, 1.0f, -2.0f });
@@ -296,7 +296,7 @@ namespace gallus::graphics::dx12
 		dCommandQueue->WaitForFenceValue(fenceValue);
 		
 		m_pDirectionalLight = std::make_shared<DirectionalLight>();
-
+		
 		gameplay::EntityComponentSystem* ecs = GetEngine().GetECS();
 		if (!ecs)
 		{
@@ -625,7 +625,8 @@ namespace gallus::graphics::dx12
 		// Define root parameters
 		CD3DX12_ROOT_PARAMETER1 rootParameters[RootParameters::NumRootParameters]{};
 
-		rootParameters[RootParameters::CBV].InitAsConstants(sizeof(ShaderTransform) / 4, RootParameters::CBV, 0, D3D12_SHADER_VISIBILITY_VERTEX);
+		// b0: CBV
+		rootParameters[RootParameters::CBV].InitAsConstantBufferView(0);
 
 		// b1: Texture UV rect
 		rootParameters[RootParameters::SPRITE_UV].InitAsConstants(4, RootParameters::SPRITE_UV);
@@ -803,7 +804,7 @@ namespace gallus::graphics::dx12
 	{
 		if (a_bUseRenderTexture)
 		{
-			if (std::shared_ptr<graphics::dx12::Texture> renderTex = m_pRenderTexture.lock())
+			if (std::shared_ptr<Texture> renderTex = m_pRenderTexture.lock())
 			{
 				if (renderTex->IsValid())
 				{

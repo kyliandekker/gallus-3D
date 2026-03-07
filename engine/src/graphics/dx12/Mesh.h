@@ -277,9 +277,8 @@ namespace gallus::graphics::dx12
 		/// Renders the mesh using the specified command list, applying a transform and camera matrices.
 		/// </summary>
 		/// <param name="a_pCommandList">The command list used to issue GPU draw calls.</param>
-		/// <param name="a_MVP">The mvp of the mesh.</param>
-		/// <param name="a_M">The world matrix of the mesh.</param>
-		void Render(std::shared_ptr<CommandList> a_pCommandList, const DirectX::XMMATRIX& a_MVP, const DirectX::XMMATRIX& a_M);
+		/// <param name="a_pTransformBuffer">The transform buffer.</param>
+		void Render(std::shared_ptr<CommandList> a_pCommandList, std::weak_ptr<graphics::dx12::DX12Resource> a_pTransformBuffer);
 
 		/// <summary>
 		/// Checks whether the mesh contains valid data and is ready for rendering.

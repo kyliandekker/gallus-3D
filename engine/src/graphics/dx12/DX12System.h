@@ -467,7 +467,6 @@ namespace gallus::graphics::dx12
 
 		std::weak_ptr<Texture> m_pRenderTexture = {};
 		ID3D12PipelineState* m_pRenderTextureShaderBind = {};
-		std::weak_ptr<Material> m_pMaterial = {};
 		std::shared_ptr<DirectionalLight> m_pDirectionalLight = {};
 
 		FPSCounter m_FpsCounter = {};
