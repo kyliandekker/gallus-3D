@@ -43,6 +43,7 @@ namespace gallus::graphics::dx12
 	class CommandList;
 	class DX12Resource;
 	class HeapAllocation;
+	class DX12UploadBufferAllocator;
 	class Camera;
 	class Texture;
 	class Material;
@@ -395,6 +396,11 @@ namespace gallus::graphics::dx12
 		{
 			return m_eOnNewFrame;
 		}
+
+		std::shared_ptr<DX12UploadBufferAllocator> GetTransformAllocator()
+		{
+			return m_pTransformAllocation;
+		}
 	protected:
 		/// <summary>
 		/// Called in render when a new frame is presented.
@@ -468,6 +474,8 @@ namespace gallus::graphics::dx12
 		std::weak_ptr<Texture> m_pRenderTexture = {};
 		ID3D12PipelineState* m_pRenderTextureShaderBind = {};
 		std::shared_ptr<DirectionalLight> m_pDirectionalLight = {};
+
+		std::shared_ptr<DX12UploadBufferAllocator> m_pTransformAllocation = {};
 
 		FPSCounter m_FpsCounter = {};
 

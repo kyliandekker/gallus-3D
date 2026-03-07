@@ -9,6 +9,7 @@
 #include "core/Engine.h"
 
 // graphics
+#include "graphics/dx12/DX12UploadBufferAllocator.h"
 #include "graphics/dx12/DX12System.h"
 #include "graphics/dx12/ShaderDefs.h"
 #include "graphics/dx12/CommandList.h"
@@ -38,18 +39,30 @@ namespace gallus::graphics::dx12
 	}
 
 	//---------------------------------------------------------------------
-	void Mesh::Render(std::shared_ptr<CommandList> a_pCommandList, std::weak_ptr<graphics::dx12::DX12Resource> a_pTransformBuffer)
+	void Mesh::Render(std::shared_ptr<CommandList> a_pCommandList, int32_t a_iTransformIndex, const DirectX::XMMATRIX& a_mMvp, const DirectX::XMMATRIX& a_mM)
 	{
-		auto transformBuffer = a_pTransformBuffer.lock();
 		for (MeshPartData& meshData : m_aMeshData)
 		{
 			a_pCommandList->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 			a_pCommandList->GetCommandList()->IASetVertexBuffers(0, 1, &meshData.m_VertexBuffer.GetVertexBufferView());
 			a_pCommandList->GetCommandList()->IASetIndexBuffer(&meshData.m_IndexBuffer.GetIndexBufferView());
 
-			if (transformBuffer)
+			if (a_iTransformIndex > -1)
 			{
-				a_pCommandList->GetCommandList()->SetGraphicsRootConstantBufferView(RootParameters::CBV, transformBuffer->GetResource()->GetGPUVirtualAddress());
+				ShaderTransform* pTransform =
+					reinterpret_cast<ShaderTransform*>(
+						GetDX12System()
+						.GetTransformAllocator()
+						->GetCPUAddress(a_iTransformIndex));
+
+				pTransform->WorldViewProj = a_mMvp;
+				pTransform->WorldMatrix = a_mM;
+
+				a_pCommandList->GetCommandList()->SetGraphicsRootConstantBufferView(
+					RootParameters::TRANSFORM,
+					GetDX12System()
+					.GetTransformAllocator()
+					->GetGPUAddress(a_iTransformIndex));
 			}
 
 			a_pCommandList->GetCommandList()->DrawIndexedInstanced(static_cast<UINT>(meshData.m_aIndices.size()), 1, 0, 0, 0);

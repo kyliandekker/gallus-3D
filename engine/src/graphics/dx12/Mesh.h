@@ -278,7 +278,7 @@ namespace gallus::graphics::dx12
 		/// </summary>
 		/// <param name="a_pCommandList">The command list used to issue GPU draw calls.</param>
 		/// <param name="a_pTransformBuffer">The transform buffer.</param>
-		void Render(std::shared_ptr<CommandList> a_pCommandList, std::weak_ptr<graphics::dx12::DX12Resource> a_pTransformBuffer);
+		void Render(std::shared_ptr<CommandList> a_pCommandList, int32_t a_iTransformIndex, const DirectX::XMMATRIX& a_mMvp, const DirectX::XMMATRIX& a_mM);
 
 		/// <summary>
 		/// Checks whether the mesh contains valid data and is ready for rendering.

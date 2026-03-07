@@ -43,7 +43,7 @@ const D3D12_INPUT_ELEMENT_DESC g_aInputLayout[] = {
 
 enum RootParameters
 {
-    CBV = 0,
+    TRANSFORM = 0,
     SPRITE_UV = 1,
     MATERIAL = 2,
     DIRECTIONAL_LIGHT = 3,

@@ -177,12 +177,11 @@ namespace gallus::gameplay
 		a_pCommandList->GetCommandList()->SetPipelineState(m_pPipelineState);
 		a_pCommandList->GetCommandList()->SetGraphicsRootSignature(m_pRootSignature);
 
-		std::weak_ptr<graphics::dx12::DX12Resource> transformBuffer = transformComponent->GetMappedTransformBuffer(mvpMatrix, mMatrix);
 		if (std::shared_ptr<graphics::dx12::Mesh> mesh = m_pMesh.lock())
 		{
 			if (mesh->IsValid())
 			{
-				mesh->Render(a_pCommandList, transformBuffer);
+				mesh->Render(a_pCommandList, transformComponent->GetTransformIndex(), mvpMatrix, mMatrix);
 			}
 		}
 	}

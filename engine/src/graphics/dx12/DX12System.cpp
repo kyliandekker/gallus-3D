@@ -14,6 +14,7 @@
 #include "graphics/dx12/Mesh.h"
 #include "graphics/dx12/Material.h"
 #include "graphics/dx12/DirectionalLight.h"
+#include "graphics/dx12/DX12UploadBufferAllocator.h"
 
 #include "graphics/dx12/ShaderFactory.h"
 
@@ -289,6 +290,14 @@ namespace gallus::graphics::dx12
 
 		m_pDepthBuffer = std::make_unique<DX12Resource>();
 		ResizeDepthBuffer();
+
+		m_pTransformAllocation = std::make_shared<DX12UploadBufferAllocator>();
+		m_pTransformAllocation->Initialize(
+			m_pDevice.Get(),
+			sizeof(ShaderTransform),
+			1000,
+			256
+		);
 		
 		m_eOnRenderTargetCreate(*this, dCommandList);
 
@@ -625,8 +634,8 @@ namespace gallus::graphics::dx12
 		// Define root parameters
 		CD3DX12_ROOT_PARAMETER1 rootParameters[RootParameters::NumRootParameters]{};
 
-		// b0: CBV
-		rootParameters[RootParameters::CBV].InitAsConstantBufferView(0);
+		// b0: Transform
+		rootParameters[RootParameters::TRANSFORM].InitAsConstantBufferView(RootParameters::TRANSFORM);
 
 		// b1: Texture UV rect
 		rootParameters[RootParameters::SPRITE_UV].InitAsConstants(4, RootParameters::SPRITE_UV);
@@ -639,6 +648,9 @@ namespace gallus::graphics::dx12
 			sizeof(DirectionalLightData) / 4,
 			RootParameters::DIRECTIONAL_LIGHT
 		);
+
+		// b4: CBV
+		//rootParameters[RootParameters::].InitAsConstantBufferView(0);
 
 		// Texture SRV at register t0 (binds a texture)
 		rootParameters[RootParameters::TEX_SRV].InitAsDescriptorTable(1, &descriptorRanges[0], D3D12_SHADER_VISIBILITY_PIXEL);

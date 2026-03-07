@@ -34,18 +34,18 @@ cbuffer DirectionalLightData
 // @shader_vertex_input
 vertex_input VSInput
 {
-    POSITION  float3 POSITION;
-    TEXCOORD0  float2 TEXCOORD;
-    NORMAL    float3 NORMAL;
-    COLOR     float4 COLOR;
-    JOINTS     uint4 JOINTS;
-    WEIGHTS     float4 WEIGHTS;
+    POSITION		float3			POSITION;
+    TEXCOORD0		float2 			TEXCOORD;
+    NORMAL			float3 			NORMAL;
+    COLOR			float4 			COLOR;
+    JOINTS			uint4 			JOINTS;
+    WEIGHTS			float4 			WEIGHTS;
 };
 
 // @shader_root_parameters
 root_parameters
 {
-    CBV							b0 cbuffer Transform;
+    TRANSFORM					b0 cbuffer Transform;
     SPRITE_UV					b1 cbuffer TextureUV;
     MATERIAL         			b2 cbuffer Material;
     DIRECTIONAL_LIGHT			b3 cbuffer DirectionalLightData;

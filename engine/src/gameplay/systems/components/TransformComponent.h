@@ -8,10 +8,6 @@
 // graphics
 #include "graphics/dx12/Transform.h"
 
-namespace gallus::graphics::dx12
-{
-	class DX12Resource;
-}
 namespace gallus::gameplay
 {
 	class TransformSystem;
@@ -28,6 +24,8 @@ namespace gallus::gameplay
 		/// <returns>Reference to the transform used in the transform component.</returns>
 		graphics::dx12::Transform& GetTransform();
 
+		~TransformComponent();
+
 		/// <summary>
 		/// Initializes the component after deserialization.
 		/// </summary>
@@ -39,7 +37,10 @@ namespace gallus::gameplay
 		/// <param name="a_vTranslation">The movement.</param>
 		void Translate(const DirectX::XMFLOAT3& a_vTranslation);
 
-		std::weak_ptr<graphics::dx12::DX12Resource> GetMappedTransformBuffer(const DirectX::XMMATRIX& a_MVP, const DirectX::XMMATRIX& a_M);
+		int32_t GetTransformIndex() const
+		{
+			return m_iTransformIndex;
+		}
 	private:
 		/// <summary>
 		/// Updates the components.
@@ -50,7 +51,7 @@ namespace gallus::gameplay
 		graphics::dx12::Transform m_Transform;
 		DirectX::XMFLOAT3 m_vTranslation = {};
 
-		std::shared_ptr<graphics::dx12::DX12Resource> m_pTransformBuffer;
+		int32_t m_iTransformIndex = -1;
 
 		BEGIN_SERIALIZE_PARENT(TransformComponent, Component)
 			SERIALIZE_FIELD(m_Transform, "Transform", "",

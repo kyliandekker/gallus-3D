@@ -87,6 +87,14 @@ namespace gallus::editor
 			return;
 		}
 
+		gameplay::EntityComponentSystem* ecs = GetEditorEngine().GetECS();
+		if (!ecs)
+		{
+			return;
+		}
+
+		std::lock_guard<std::recursive_mutex> lock(ecs->m_EntityMutex);
+
 		// Reset the game scene.
 		gameplay::GetGame().GetScene().Destroy();
 		gameplay::GetGame().GetScene().LoadData();
