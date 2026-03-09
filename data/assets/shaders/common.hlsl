@@ -29,6 +29,11 @@ cbuffer DirectionalLightData : register(b3)
     float AmbientIntensity;
 };
 
+cbuffer SkinningData : register(b4)
+{
+    row_major float4x4 Bones[64];
+};
+
 struct VSInput
 {
     float3 POSITION : POSITION;

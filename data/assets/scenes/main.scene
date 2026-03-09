@@ -196,6 +196,46 @@
                     }
                 }
             }
+        },
+        {
+            "name": "New GameObject (2)",
+            "isActive": true,
+            "components": {
+                "mesh": {
+                    "pixelShader": "pixelShader.cso",
+                    "vertexShader": "vertexShader.cso",
+                    "material": "mat_lit.mat",
+                    "mesh": "mod_faucet.glb",
+                    "texture": "tex_missing.png",
+                    "textureIndex": 0
+                },
+                "transform": {
+                    "transform": {
+                        "position": {
+                            "x": 0.28694701194763186,
+                            "y": 0.1259205937385559,
+                            "z": 0.5339908003807068
+                        },
+                        "scale": {
+                            "x": 2.069999933242798,
+                            "y": 2.069999933242798,
+                            "z": 2.069999933242798
+                        },
+                        "rotation": {
+                            "x": -0.0,
+                            "y": 0.0,
+                            "z": -0.0,
+                            "w": 1.0
+                        },
+                        "pivot": {
+                            "x": 0.0,
+                            "y": 0.0,
+                            "z": 0.0
+                        },
+                        "cameraType": 0
+                    }
+                }
+            }
         }
     ]
 }

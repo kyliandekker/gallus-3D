@@ -52,7 +52,7 @@ namespace gallus::gameplay
 		 	SERIALIZE_FIELD(m_fMass, "Mass", "The mass of the rigidbody. Affects how forces influence the object; higher mass makes it harder to accelerate.",
 		 		.type = FieldSerializationType::FieldSerializationType_Float,
 		 		.min = "0.0001",
-		 		.max = "9999999")
+		 		.max = "inf")
 		 	SERIALIZE_FIELD(m_fLinearDamping, "Linear Damping", "The linear damping factor applied to the rigidbody�s velocity. Values closer to 1 reduce movement slowly, values closer to 0 slow the object more quickly over time.",
 		 		.type = FieldSerializationType::FieldSerializationType_Float,
 		 		.min = "0.01",

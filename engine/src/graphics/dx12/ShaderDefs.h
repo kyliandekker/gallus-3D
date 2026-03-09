@@ -32,6 +32,11 @@ struct DirectionalLightData
     float AmbientIntensity;
 };
 
+struct SkinningData
+{
+    DirectX::XMFLOAT4X4 Bones[64];
+};
+
 const D3D12_INPUT_ELEMENT_DESC g_aInputLayout[] = {
     { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
     { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
@@ -47,7 +52,8 @@ enum RootParameters
     SPRITE_UV = 1,
     MATERIAL = 2,
     DIRECTIONAL_LIGHT = 3,
-    TEX_SRV = 4,
-    SAMPLER_STATE = 5,
+    SKINNING_DATA = 4,
+    TEX_SRV = 5,
+    SAMPLER_STATE = 6,
     NumRootParameters
 };

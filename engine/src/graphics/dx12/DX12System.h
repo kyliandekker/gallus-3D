@@ -401,6 +401,11 @@ namespace gallus::graphics::dx12
 		{
 			return m_pTransformAllocation;
 		}
+
+		std::shared_ptr<DX12UploadBufferAllocator> GetSkinningDataAllocator()
+		{
+			return m_pSkinningDataAllocation;
+		}
 	protected:
 		/// <summary>
 		/// Called in render when a new frame is presented.
@@ -476,6 +481,7 @@ namespace gallus::graphics::dx12
 		std::shared_ptr<DirectionalLight> m_pDirectionalLight = {};
 
 		std::shared_ptr<DX12UploadBufferAllocator> m_pTransformAllocation = {};
+		std::shared_ptr<DX12UploadBufferAllocator> m_pSkinningDataAllocation = {};
 
 		FPSCounter m_FpsCounter = {};
 

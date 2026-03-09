@@ -174,6 +174,15 @@ namespace gallus::graphics::dx12
 		LOG(LOGSEVERITY_INFO_SUCCESS, LOG_CATEGORY_DX12, "Successfully created root signature.");
 #endif // LOG_DX!2
 
+		m_pSkinningDataAllocation = std::make_shared<DX12UploadBufferAllocator>();
+		m_pSkinningDataAllocation->Initialize(
+			m_pDevice.Get(),
+			sizeof(SkinningData),
+			100,
+			256
+		);
+		m_pSkinningDataAllocation->Allocate();
+
 		// Get the direct command queue.
 		std::shared_ptr<CommandQueue> dCommandQueue = GetCommandQueue();
 		std::shared_ptr<CommandList> dCommandList = dCommandQueue->GetCommandList();
@@ -649,8 +658,8 @@ namespace gallus::graphics::dx12
 			RootParameters::DIRECTIONAL_LIGHT
 		);
 
-		// b4: CBV
-		//rootParameters[RootParameters::].InitAsConstantBufferView(0);
+		// b4: Skinning Data
+		rootParameters[RootParameters::SKINNING_DATA].InitAsConstantBufferView(RootParameters::SKINNING_DATA);
 
 		// Texture SRV at register t0 (binds a texture)
 		rootParameters[RootParameters::TEX_SRV].InitAsDescriptorTable(1, &descriptorRanges[0], D3D12_SHADER_VISIBILITY_PIXEL);
