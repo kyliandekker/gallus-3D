@@ -50,7 +50,10 @@ namespace gallus::graphics::dx12
 			return false;
 		}
 
-		DeserializeFields(this, resources::SrcData(a_Data), SerializationMethod::SerializationMethod_File);
+		if (!a_Data.empty())
+		{
+			DeserializeFields(this, resources::SrcData(a_Data), SerializationMethod::SerializationMethod_File);
+		}
 
 		// Map the constant buffer to update it with material data
 		D3D12_RANGE readRange = { 0, 0 };  // We don't need to read, so set to zero

@@ -62,7 +62,7 @@ namespace gallus::gameplay
 		/// Sets the texture index.
 		/// </summary>
 		/// <param name="a_iTextureIndex">The index the texture should have.</param>
-		void SetTextureIndex(uint16_t a_iTextureIndex);
+		void SetTextureRectIndex(uint16_t a_iTextureIndex);
 
 		/// <summary>
 		/// Sets the material.
@@ -82,7 +82,7 @@ namespace gallus::gameplay
 		std::weak_ptr<graphics::dx12::VertexShader> m_pVertexShader = {};
 		std::weak_ptr<graphics::dx12::Mesh> m_pMesh = {};
 		std::weak_ptr<graphics::dx12::Texture> m_pTexture = {};
-		uint16_t m_iTextureIndex = 0;
+		uint16_t m_iTextureRectIndex = 0;
 		std::weak_ptr<graphics::dx12::Material> m_pMaterial = {};
 
 		void OnShadersChanged();
@@ -110,11 +110,11 @@ namespace gallus::gameplay
 			SERIALIZE_FIELD(m_pTexture, "Texture", "Pointer to the mesh asset used by this Mesh. Can be nullptr if no texture is assigned. Determines the visual appearance of the Mesh.",
 				.type = FieldSerializationType::FieldSerializationType_EngineResource,
 				.assetType = resources::AssetType::Texture)
-			SERIALIZE_FIELD(m_iTextureIndex, "Texture Index", "Index of the Mesh within a texture atlas. Used when the texture contains multiple rects to select which one is displayed.",
+			SERIALIZE_FIELD(m_iTextureRectIndex, "Texture Index", "Index of the Mesh within a texture atlas. Used when the texture contains multiple rects to select which one is displayed.",
 				.type = FieldSerializationType::FieldSerializationType_Int16)
 			SERIALIZE_FIELD(m_pTexture, "Texture Preview", "",
 				.type = FieldSerializationType::FieldSerializationType_TexturePreview,
-				.relatedIndexFieldOffset = offsetof(MeshComponent, m_iTextureIndex))
+				.relatedIndexFieldOffset = offsetof(MeshComponent, m_iTextureRectIndex))
 		END_SERIALIZE(MeshComponent)
 
 		// cache

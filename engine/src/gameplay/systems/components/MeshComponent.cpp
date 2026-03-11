@@ -44,6 +44,7 @@ namespace gallus::gameplay
 
 		m_pTexture = resourceAtlas->GetDefaultTexture();
 		m_pMesh = resourceAtlas->GetDefaultMesh();
+		m_pMaterial = resourceAtlas->GetDefaultMaterial();
 
 		gameplay::EntityComponentSystem* ecs = GetEngine().GetECS();
 		if (!ecs)
@@ -93,12 +94,12 @@ namespace gallus::gameplay
 		{
 			return;
 		}
-		
+
 		if (!m_pPipelineState)
 		{
 			return;
 		}
-		
+
 		if (!m_pRootSignature)
 		{
 			return;
@@ -110,42 +111,47 @@ namespace gallus::gameplay
 			return;
 		}
 
-		if (!m_pTransformSystem)
-		{
-			return;
-		}
-
 		if (!m_pDX12System)
 		{
 			return;
 		}
 
-		gameplay::TransformComponent* transformComponent = m_pTransformSystem->TryGetComponent(a_EntityID);
-		if (!transformComponent)
-		{
-			return;
-		}
+		DirectX::XMMATRIX mMatrix = DirectX::XMMatrixIdentity();
+		int transformIndex = 0;
+		graphics::dx12::CameraType cameraType = graphics::dx12::CameraType::CameraType_World;
 
-		if (transformComponent->GetTransform().GetCameraType() == graphics::dx12::CameraType_Screen)
+		if (m_pTransformSystem)
 		{
-			if (m_pDX12System->GetDimensionDrawMode() != graphics::dx12::DimensionDrawMode::DimensionDrawMode_2D && m_pDX12System->GetDimensionDrawMode() != graphics::dx12::DimensionDrawMode::DimensionDrawMode_2D3D)
+			if (gameplay::TransformComponent* transformComponent = m_pTransformSystem->TryGetComponent(a_EntityID))
 			{
-				return;
+				// Respect camera type dimension filtering
+				if (transformComponent->GetTransform().GetCameraType() == graphics::dx12::CameraType_Screen)
+				{
+					if (m_pDX12System->GetDimensionDrawMode() != graphics::dx12::DimensionDrawMode::DimensionDrawMode_2D &&
+						m_pDX12System->GetDimensionDrawMode() != graphics::dx12::DimensionDrawMode::DimensionDrawMode_2D3D)
+					{
+						return;
+					}
+				}
+				else if (transformComponent->GetTransform().GetCameraType() == graphics::dx12::CameraType_World)
+				{
+					if (m_pDX12System->GetDimensionDrawMode() != graphics::dx12::DimensionDrawMode::DimensionDrawMode_3D &&
+						m_pDX12System->GetDimensionDrawMode() != graphics::dx12::DimensionDrawMode::DimensionDrawMode_2D3D)
+					{
+						return;
+					}
+				}
+
+				mMatrix = transformComponent->GetTransform().GetWorldMatrixWithPivot();
+				transformIndex = transformComponent->GetTransformIndex();
+				cameraType = transformComponent->GetTransform().GetCameraType();
 			}
 		}
-		else if (transformComponent->GetTransform().GetCameraType() == graphics::dx12::CameraType_World)
-		{
-			if (m_pDX12System->GetDimensionDrawMode() != graphics::dx12::DimensionDrawMode::DimensionDrawMode_3D && m_pDX12System->GetDimensionDrawMode() != graphics::dx12::DimensionDrawMode::DimensionDrawMode_2D3D)
-			{
-				return;
-			}
-		}
 
-		const DirectX::XMMATRIX viewMatrix = a_Camera.GetViewMatrix(transformComponent->GetTransform().GetCameraType());
-		const DirectX::XMMATRIX& projectionMatrix = a_Camera.GetProjectionMatrix(transformComponent->GetTransform().GetCameraType());
+		const DirectX::XMMATRIX viewMatrix = a_Camera.GetViewMatrix(cameraType);
+		const DirectX::XMMATRIX& projectionMatrix = a_Camera.GetProjectionMatrix(cameraType);
 
-		DirectX::XMMATRIX mMatrix = transformComponent->GetTransform().GetWorldMatrixWithPivot();
-		DirectX::XMMATRIX mvpMatrix = mMatrix * viewMatrix * projectionMatrix;
+		const DirectX::XMMATRIX mvpMatrix = mMatrix * viewMatrix * projectionMatrix;
 
 		resources::ResourceAtlas* resourceAtlas = GetEngine().GetResourceAtlas();
 		if (!resourceAtlas)
@@ -153,10 +159,8 @@ namespace gallus::gameplay
 			return;
 		}
 
-		if (std::shared_ptr<graphics::dx12::Material> material = resourceAtlas->GetDefaultMaterial().lock())
-		{
-			material->Bind(a_pCommandList);
-		}
+		a_pCommandList->GetCommandList()->SetPipelineState(m_pPipelineState);
+		a_pCommandList->GetCommandList()->SetGraphicsRootSignature(m_pRootSignature);
 
 		if (std::shared_ptr<graphics::dx12::Material> material = m_pMaterial.lock())
 		{
@@ -170,18 +174,15 @@ namespace gallus::gameplay
 		{
 			if (tex->CanBeDrawn())
 			{
-				tex->Bind(a_pCommandList, m_iTextureIndex);
+				tex->Bind(a_pCommandList, m_iTextureRectIndex);
 			}
 		}
-
-		a_pCommandList->GetCommandList()->SetPipelineState(m_pPipelineState);
-		a_pCommandList->GetCommandList()->SetGraphicsRootSignature(m_pRootSignature);
 
 		if (std::shared_ptr<graphics::dx12::Mesh> mesh = m_pMesh.lock())
 		{
 			if (mesh->IsValid())
 			{
-				mesh->Render(a_pCommandList, transformComponent->GetTransformIndex(), mvpMatrix, mMatrix);
+				mesh->Render(a_pCommandList, transformIndex, mvpMatrix, mMatrix);
 			}
 		}
 	}
@@ -193,22 +194,22 @@ namespace gallus::gameplay
 	}
 
 	//---------------------------------------------------------------------
-	void MeshComponent::SetTextureIndex(uint16_t a_iMeshIndex)
+	void MeshComponent::SetTextureRectIndex(uint16_t a_iRectIndex)
 	{
 		size_t numMeshRects = 0;
 		if (std::shared_ptr<graphics::dx12::Texture> tex = m_pTexture.lock())
 		{
 			numMeshRects = tex->GetTextureRectsSize() - 1;
 		}
-		if (a_iMeshIndex < 0)
+		if (a_iRectIndex < 0)
 		{
-			a_iMeshIndex = 0;
+			a_iRectIndex = 0;
 		}
-		else if (a_iMeshIndex > numMeshRects)
+		else if (a_iRectIndex > numMeshRects)
 		{
-			a_iMeshIndex = static_cast<uint16_t>(numMeshRects);
+			a_iRectIndex = static_cast<uint16_t>(numMeshRects);
 		}
-		m_iTextureIndex = a_iMeshIndex;
+		m_iTextureRectIndex = a_iRectIndex;
 	}
 
 	//---------------------------------------------------------------------

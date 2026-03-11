@@ -70,8 +70,6 @@ namespace gallus::graphics::dx12
 		CYLINDER
 	};
 
-	extern MeshPartData CreateCylinder();
-
 	extern std::vector<MeshPartData> s_PRIMITIVES;
 
 	class CommandList;
@@ -106,6 +104,14 @@ namespace gallus::graphics::dx12
 		/// <param name="a_pCommandList">The command list used for updating resources.</param>
 		/// <returns>True when loading was successful, false otherwise.</returns>
 		bool LoadData(const core::Data& a_Data, std::shared_ptr<CommandQueue> a_pCommandQueue);
+		
+		/// <summary>
+		/// Loads the mesh data.
+		/// </summary>
+		/// <param name="a_Data">MeshPartData that will be used by this model.</param>
+		/// <param name="a_pCommandList">The command list used for updating resources.</param>
+		/// <returns>True when loading was successful, false otherwise.</returns>
+		bool LoadData(const MeshPartData& a_Data, std::shared_ptr<CommandQueue> a_pCommandQueue);
 
 		/// <summary>
 		/// Renders the mesh using the specified command list, applying a transform and camera matrices.
@@ -121,25 +127,26 @@ namespace gallus::graphics::dx12
 		bool IsValid() const override;
 
 		/// <summary>
-		/// Loads the mesh data.
-		/// </summary>
-		/// <param name="a_Data">A vector containing data in bytes.</param>
-		/// <returns>True when loading was successful, false otherwise.</returns>
-		bool SetMeshDataFromModel(const core::Data& a_Data);
-
-		/// <summary>
-		/// Sets the mesh data.
-		/// </summary>
-		/// <param name="a_Data">The mesh part data.</param>
-		/// <param name="a_pCommandQueue">The command queue used for uploading.</param>
-		void SetMeshData(const MeshPartData& a_Data, const std::shared_ptr<CommandQueue> a_pCommandQueue);
-
-		/// <summary>
 		/// Uploads the mesh data.
 		/// </summary>
 		/// <param name="a_pCommandQueue">The command queue used for uploading.</param>
 		void UploadMeshData(const std::shared_ptr<CommandQueue> a_pCommandQueue);
 	private:
+		/// <summary>
+		/// Loads the mesh data.
+		/// </summary>
+		/// <param name="a_Data">The file data of the model.</param>
+		/// <param name="a_aOutData">A vector containing mesh parts that got extracted.</param>
+		/// <returns>True when loading was successful, false otherwise.</returns>
+		bool GetMeshDataFromModel(const core::Data& a_Data, std::vector<MeshPartData>& a_aOutData);
+
+		/// <summary>
+		/// Sets the mesh data.
+		/// </summary>
+		/// <param name="a_aData">Array of mesh part data.</param>
+		/// <param name="a_pCommandQueue">The command queue used for uploading.</param>
+		void SetMeshData(const std::vector<MeshPartData>& a_aData, const std::shared_ptr<CommandQueue> a_pCommandQueue);
+
 		std::vector<MeshPartData> m_aMeshData;
 
 		BEGIN_SERIALIZE_PARENT(Mesh, resources::EngineResource)

@@ -51,7 +51,7 @@ namespace gallus::gameplay
 		graphics::dx12::Transform m_Transform;
 		DirectX::XMFLOAT3 m_vTranslation = {};
 
-		int32_t m_iTransformIndex = -1;
+		int16_t m_iTransformIndex = 0; // Default is 0 because 0 is always allocated.
 
 		BEGIN_SERIALIZE_PARENT(TransformComponent, Component)
 			SERIALIZE_FIELD(m_Transform, "Transform", "",

@@ -140,17 +140,9 @@ namespace gallus::graphics::dx12
 	}
 
 	//---------------------------------------------------------------------
-	std::vector<MeshPartData> s_PRIMITIVES = {
-		MeshPartData(
-			{
-				{ DirectX::XMFLOAT3(-0.5f, -0.5f, 0.0f), DirectX::XMFLOAT2(0.0f, 0.0f), DirectX::XMFLOAT3(0.0f, 0.0f, 1.0f) },
-				{ DirectX::XMFLOAT3(0.5f, -0.5f, 0.0f), DirectX::XMFLOAT2(1.0f, 0.0f), DirectX::XMFLOAT3(0.0f, 0.0f, 1.0f) },
-				{ DirectX::XMFLOAT3(-0.5f, 0.5f, 0.0f), DirectX::XMFLOAT2(0.0f, 1.0f), DirectX::XMFLOAT3(0.0f, 0.0f, 1.0f) },
-				{ DirectX::XMFLOAT3(0.5f, 0.5f, 0.0f), DirectX::XMFLOAT2(1.0f, 1.0f), DirectX::XMFLOAT3(0.0f, 0.0f, 1.0f) }
-			},
-			{ 0, 1, 2, 2, 1, 3 }
-		),
-		MeshPartData(
+	MeshPartData CreateCube()
+	{
+		return {
 			{
 				{ DirectX::XMFLOAT3(-0.5f, -0.5f, 0.5f), DirectX::XMFLOAT2(0.0f, 1.0f), DirectX::XMFLOAT3(0.0f, 0.0f, 1.0f) },
 				{ DirectX::XMFLOAT3(0.5f, -0.5f, 0.5f), DirectX::XMFLOAT2(1.0f, 1.0f), DirectX::XMFLOAT3(0.0f, 0.0f, 1.0f) },
@@ -190,7 +182,28 @@ namespace gallus::graphics::dx12
 				16, 17, 18, 18, 19, 16,
 				20, 21, 22, 22, 23, 20
 			}
-		),
+		};
+	}
+
+	//---------------------------------------------------------------------
+	MeshPartData CreateSprite()
+	{
+		return
+			MeshPartData(
+				{
+					{ DirectX::XMFLOAT3(-0.5f, -0.5f, 0.0f), DirectX::XMFLOAT2(0.0f, 0.0f), DirectX::XMFLOAT3(0.0f, 0.0f, 1.0f) },
+				{ DirectX::XMFLOAT3(0.5f, -0.5f, 0.0f), DirectX::XMFLOAT2(1.0f, 0.0f), DirectX::XMFLOAT3(0.0f, 0.0f, 1.0f) },
+				{ DirectX::XMFLOAT3(-0.5f, 0.5f, 0.0f), DirectX::XMFLOAT2(0.0f, 1.0f), DirectX::XMFLOAT3(0.0f, 0.0f, 1.0f) },
+				{ DirectX::XMFLOAT3(0.5f, 0.5f, 0.0f), DirectX::XMFLOAT2(1.0f, 1.0f), DirectX::XMFLOAT3(0.0f, 0.0f, 1.0f) }
+				},
+				{ 0, 1, 2, 2, 1, 3 }
+			);
+	}
+
+	//---------------------------------------------------------------------
+	std::vector<MeshPartData> s_PRIMITIVES = {
+		CreateSprite(),
+		CreateCube(),
 		CreateCylinder()
 	};
 
@@ -204,12 +217,27 @@ namespace gallus::graphics::dx12
 	bool Mesh::LoadData(const core::Data& a_Data, std::shared_ptr<CommandQueue> a_pCommandQueue)
 	{
 		m_AssetType = resources::AssetType::Mesh;
-		
-		if (!SetMeshDataFromModel(a_Data))
+
+		std::vector<MeshPartData> outData;
+		if (!GetMeshDataFromModel(a_Data, outData))
 		{
 			LOGF(LOGSEVERITY_ERROR, LOG_CATEGORY_DX12, "Failed to load mesh \"%s\": Something wrong with mesh data.", m_sName.c_str());
 			return false;
 		}
+		
+		SetMeshData(outData, a_pCommandQueue);
+		UploadMeshData(a_pCommandQueue);
+
+		LOGF(LOGSEVERITY_INFO_SUCCESS, LOG_CATEGORY_DX12, "Successfully loaded mesh \"%s\".", m_sName.c_str());
+		return true;
+	}
+
+	//---------------------------------------------------------------------
+	bool Mesh::LoadData(const MeshPartData& a_Data, std::shared_ptr<CommandQueue> a_pCommandQueue)
+	{
+		m_AssetType = resources::AssetType::Mesh;
+
+		SetMeshData({ a_Data }, a_pCommandQueue);
 		UploadMeshData(a_pCommandQueue);
 
 		LOGF(LOGSEVERITY_INFO_SUCCESS, LOG_CATEGORY_DX12, "Successfully loaded mesh \"%s\".", m_sName.c_str());
@@ -249,55 +277,7 @@ namespace gallus::graphics::dx12
 	}
 
 	//---------------------------------------------------------------------
-	void Mesh::SetMeshData(const MeshPartData& a_Data, const std::shared_ptr<CommandQueue> a_pCommandQueue)
-	{
-		if (!m_bIsDestroyable)
-		{
-			return;
-		}
-
-		size_t index = m_aMeshData.size();
-		m_aMeshData.push_back(a_Data);
-
-		UploadMeshData(a_pCommandQueue);
-	}
-
-	//---------------------------------------------------------------------
-	void Mesh::UploadMeshData(const std::shared_ptr<CommandQueue> a_pCommandQueue)
-	{
-		for (MeshPartData& meshData : m_aMeshData)
-		{
-			std::shared_ptr<CommandList> commandList = a_pCommandQueue->GetCommandList();
-
-			// Upload vertex buffer data.
-			commandList->UpdateBufferResource(
-				&meshData.m_VertexBuffer.GetResource(), &meshData.m_pIntermediateVertexBuffer,
-				meshData.m_aVertices.size(), sizeof(VertexPosUV), meshData.m_aVertices.data());
-
-			// Create the vertex buffer view.
-			meshData.m_VertexBuffer.CreateViews(meshData.m_aVertices.size(), sizeof(VertexPosUV));
-
-			// Upload index buffer data.
-			commandList->UpdateBufferResource(
-				&meshData.m_IndexBuffer.GetResource(), &meshData.m_pIntermediateIndexBuffer,
-				meshData.m_aIndices.size(), sizeof(uint16_t), meshData.m_aIndices.data());
-
-			// Create index buffer view.
-			meshData.m_IndexBuffer.CreateViews(meshData.m_aIndices.size(), sizeof(uint16_t));
-
-			uint64_t fenceValue = a_pCommandQueue->ExecuteCommandList(commandList);
-			a_pCommandQueue->WaitForFenceValue(fenceValue);
-		}
-	}
-
-	//---------------------------------------------------------------------
-	bool Mesh::IsValid() const
-	{
-		return !m_aMeshData.empty();
-	}
-
-	//---------------------------------------------------------------------
-	bool Mesh::SetMeshDataFromModel(const core::Data& a_Data)
+	bool Mesh::GetMeshDataFromModel(const core::Data& a_Data, std::vector<MeshPartData>& a_aOutData)
 	{
 		tinygltf::Model model;
 		tinygltf::TinyGLTF loader;
@@ -313,13 +293,13 @@ namespace gallus::graphics::dx12
 			return false;
 		}
 
-		m_aMeshData.clear();
+		a_aOutData.clear();
 
 		//--------------------------------------------------
 		// LOAD MESHES
 		//--------------------------------------------------
 
-		m_aMeshData.reserve(model.meshes.size());
+		a_aOutData.reserve(model.meshes.size());
 
 		for (const tinygltf::Mesh& mesh : model.meshes)
 		{
@@ -412,42 +392,6 @@ namespace gallus::graphics::dx12
 				}
 
 				//------------------------------------------
-				// JOINTS
-				//------------------------------------------
-
-				const tinygltf::Accessor* jointAccessor = nullptr;
-				const tinygltf::BufferView* jointBufferView = nullptr;
-				const tinygltf::Buffer* jointBuffer = nullptr;
-
-				if (primitive.attributes.find("JOINTS_0") != primitive.attributes.end())
-				{
-					jointAccessor = &model.accessors[primitive.attributes.find("JOINTS_0")->second];
-					jointBufferView = &model.bufferViews[jointAccessor->bufferView];
-					jointBuffer = &model.buffers[jointBufferView->buffer];
-				}
-
-				//------------------------------------------
-				// WEIGHTS
-				//------------------------------------------
-
-				const float* weights = nullptr;
-
-				if (primitive.attributes.find("WEIGHTS_0") != primitive.attributes.end())
-				{
-					const tinygltf::Accessor& weightAccessor =
-						model.accessors[primitive.attributes.find("WEIGHTS_0")->second];
-
-					const tinygltf::BufferView& weightBufferView =
-						model.bufferViews[weightAccessor.bufferView];
-
-					const tinygltf::Buffer& weightBuffer =
-						model.buffers[weightBufferView.buffer];
-
-					weights = reinterpret_cast<const float*>(
-						&weightBuffer.data[weightBufferView.byteOffset + weightAccessor.byteOffset]);
-				}
-
-				//------------------------------------------
 				// INDICES
 				//------------------------------------------
 
@@ -501,9 +445,57 @@ namespace gallus::graphics::dx12
 				}
 			}
 
-			m_aMeshData.push_back(meshData);
+			a_aOutData.push_back(meshData);
 		}
 
 		return true;
+	}
+
+	//---------------------------------------------------------------------
+	void Mesh::SetMeshData(const std::vector<MeshPartData>& a_aData, const std::shared_ptr<CommandQueue> a_pCommandQueue)
+	{
+		if (!m_bIsDestroyable)
+		{
+			return;
+		}
+
+		m_aMeshData.clear();
+		m_aMeshData = a_aData;
+
+		UploadMeshData(a_pCommandQueue);
+	}
+
+	//---------------------------------------------------------------------
+	void Mesh::UploadMeshData(const std::shared_ptr<CommandQueue> a_pCommandQueue)
+	{
+		for (MeshPartData& meshData : m_aMeshData)
+		{
+			std::shared_ptr<CommandList> commandList = a_pCommandQueue->GetCommandList();
+
+			// Upload vertex buffer data.
+			commandList->UpdateBufferResource(
+				&meshData.m_VertexBuffer.GetResource(), &meshData.m_pIntermediateVertexBuffer,
+				meshData.m_aVertices.size(), sizeof(VertexPosUV), meshData.m_aVertices.data());
+
+			// Create the vertex buffer view.
+			meshData.m_VertexBuffer.CreateViews(meshData.m_aVertices.size(), sizeof(VertexPosUV));
+
+			// Upload index buffer data.
+			commandList->UpdateBufferResource(
+				&meshData.m_IndexBuffer.GetResource(), &meshData.m_pIntermediateIndexBuffer,
+				meshData.m_aIndices.size(), sizeof(uint16_t), meshData.m_aIndices.data());
+
+			// Create index buffer view.
+			meshData.m_IndexBuffer.CreateViews(meshData.m_aIndices.size(), sizeof(uint16_t));
+
+			uint64_t fenceValue = a_pCommandQueue->ExecuteCommandList(commandList);
+			a_pCommandQueue->WaitForFenceValue(fenceValue);
+		}
+	}
+
+	//---------------------------------------------------------------------
+	bool Mesh::IsValid() const
+	{
+		return !m_aMeshData.empty();
 	}
 }

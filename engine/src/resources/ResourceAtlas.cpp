@@ -359,6 +359,10 @@ namespace gallus::resources
 	std::weak_ptr<graphics::dx12::Material> ResourceAtlas::LoadMaterialEmpty(const std::string& a_sName)
 	{
 		std::shared_ptr<graphics::dx12::Material> material = GetResource(m_aMaterials, a_sName);
+		if (!material->IsValid())
+		{
+			material->LoadData({});
+		}
 		return material;
 	}
 

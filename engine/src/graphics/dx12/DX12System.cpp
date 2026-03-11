@@ -236,7 +236,7 @@ namespace gallus::graphics::dx12
 		if (std::shared_ptr<Mesh> mesh = squareMeshPtr.lock())
 		{
 			MeshPartData& squarePrimitive = s_PRIMITIVES[(int) PRIMITIVES::SQUARE];
-			mesh->SetMeshData(squarePrimitive, cCommandQueue);
+			mesh->LoadData(squarePrimitive, cCommandQueue);
 			mesh->SetResourceCategory(resources::EngineResourceCategory::Engine);
 			mesh->SetAssetType(resources::AssetType::Mesh);
 			mesh->SetIsDestroyable(false);
@@ -246,7 +246,7 @@ namespace gallus::graphics::dx12
 		if (std::shared_ptr<Mesh> mesh = cubeMeshPtr.lock())
 		{
 			MeshPartData& squarePrimitive = s_PRIMITIVES[(int) PRIMITIVES::CUBE];
-			mesh->SetMeshData(squarePrimitive, cCommandQueue);
+			mesh->LoadData(squarePrimitive, cCommandQueue);
 			mesh->SetResourceCategory(resources::EngineResourceCategory::Engine);
 			mesh->SetAssetType(resources::AssetType::Mesh);
 			mesh->SetIsDestroyable(false);
@@ -256,7 +256,7 @@ namespace gallus::graphics::dx12
 		if (std::shared_ptr<Mesh> mesh = cylinderMeshPtr.lock())
 		{
 			MeshPartData& squarePrimitive = s_PRIMITIVES[(int) PRIMITIVES::CYLINDER];
-			mesh->SetMeshData(squarePrimitive, cCommandQueue);
+			mesh->LoadData(squarePrimitive, cCommandQueue);
 			mesh->SetResourceCategory(resources::EngineResourceCategory::Engine);
 			mesh->SetAssetType(resources::AssetType::Mesh);
 			mesh->SetIsDestroyable(false);
@@ -307,6 +307,7 @@ namespace gallus::graphics::dx12
 			1000,
 			256
 		);
+		m_pTransformAllocation->Allocate(); // default 0, 0, 0 allocation.
 		
 		m_eOnRenderTargetCreate(*this, dCommandList);
 
