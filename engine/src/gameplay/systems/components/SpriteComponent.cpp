@@ -5,6 +5,7 @@
 
 // graphics
 #include "graphics/dx12/DX12System.h"
+#include "graphics/dx12/DX12UploadBufferAllocator.h"
 #include "graphics/dx12/Camera.h"
 #include "graphics/dx12/Texture.h"
 #include "graphics/dx12/Mesh.h"
@@ -149,6 +150,9 @@ namespace gallus::gameplay
 			return;
 		}
 
+		a_pCommandList->GetCommandList()->SetPipelineState(m_pPipelineState);
+		a_pCommandList->GetCommandList()->SetGraphicsRootSignature(m_pRootSignature);
+
 		if (std::shared_ptr<graphics::dx12::Material> material = resourceAtlas->GetDefaultMaterial().lock())
 		{
 			material->Bind(a_pCommandList);
@@ -170,14 +174,39 @@ namespace gallus::gameplay
 			}
 		}
 
-		a_pCommandList->GetCommandList()->SetPipelineState(m_pPipelineState);
-		a_pCommandList->GetCommandList()->SetGraphicsRootSignature(m_pRootSignature);
-
 		if (std::shared_ptr<graphics::dx12::Mesh> mesh = m_pMesh.lock())
 		{
 			if (mesh->IsValid())
 			{
-				mesh->Render(a_pCommandList, transformIndex, mvpMatrix, mMatrix);
+				for (graphics::dx12::MeshPartData& meshData : mesh->GetMeshData())
+				{
+					{
+						D3D12_GPU_VIRTUAL_ADDRESS gpuAddr = GetDX12System().GetSkinningDataAllocator()->GetGPUAddress(0);
+						a_pCommandList->GetCommandList()->SetGraphicsRootConstantBufferView(
+							RootParameters::SKINNING_DATA,
+							gpuAddr);
+
+					}
+
+					{
+						ShaderTransform* pTransform =
+							reinterpret_cast<ShaderTransform*>(
+								GetDX12System()
+								.GetTransformAllocator()
+								->GetCPUAddress(transformIndex));
+
+						pTransform->WorldViewProj = mvpMatrix;
+						pTransform->WorldMatrix = mMatrix;
+
+						a_pCommandList->GetCommandList()->SetGraphicsRootConstantBufferView(
+							RootParameters::TRANSFORM,
+							GetDX12System()
+							.GetTransformAllocator()
+							->GetGPUAddress(transformIndex));
+					}
+
+					mesh->RenderMeshData(meshData, a_pCommandList);
+				}
 			}
 		}
 	}

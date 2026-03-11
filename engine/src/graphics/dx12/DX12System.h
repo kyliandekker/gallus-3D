@@ -490,6 +490,6 @@ namespace gallus::graphics::dx12
 		DimensionDrawMode m_DimensionDrawMode = DimensionDrawMode::DimensionDrawMode_2D3D;
 		ShadingDrawMode m_ShadingDrawMode = ShadingDrawMode::ShadingDrawMode_Shaded;
 
-		std::vector<gameplay::SpriteComponent*> m_aOrderedTextures;
+		std::vector<std::weak_ptr<gameplay::SpriteComponent>> m_aOrderedTextures;
 	};
 }

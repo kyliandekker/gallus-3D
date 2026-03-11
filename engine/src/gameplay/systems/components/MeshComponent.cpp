@@ -5,6 +5,7 @@
 
 // graphics
 #include "graphics/dx12/DX12System.h"
+#include "graphics/dx12/DX12UploadBufferAllocator.h"
 #include "graphics/dx12/Camera.h"
 #include "graphics/dx12/Texture.h"
 #include "graphics/dx12/Mesh.h"
@@ -57,6 +58,8 @@ namespace gallus::gameplay
 		{
 			transform->GetTransform().SetPivot({ 0, 0, 0 });
 		}
+
+		m_iSkinnedMeshIndex = 0;
 	}
 
 	//---------------------------------------------------------------------
@@ -79,6 +82,11 @@ namespace gallus::gameplay
 	void MeshComponent::SetMesh(std::weak_ptr<graphics::dx12::Mesh> a_pMesh)
 	{
 		m_pMesh = a_pMesh;
+
+		if (m_iSkinnedMeshIndex < 1)
+		{
+			m_iSkinnedMeshIndex = GetDX12System().GetSkinningDataAllocator()->Allocate();
+		}
 	}
 
 	//---------------------------------------------------------------------
@@ -182,7 +190,35 @@ namespace gallus::gameplay
 		{
 			if (mesh->IsValid())
 			{
-				mesh->Render(a_pCommandList, transformIndex, mvpMatrix, mMatrix);
+				for (graphics::dx12::MeshPartData& meshData : mesh->GetMeshData())
+				{
+					{
+						D3D12_GPU_VIRTUAL_ADDRESS gpuAddr = GetDX12System().GetSkinningDataAllocator()->GetGPUAddress(m_iSkinnedMeshIndex);
+						a_pCommandList->GetCommandList()->SetGraphicsRootConstantBufferView(
+							RootParameters::SKINNING_DATA,
+							gpuAddr);
+
+					}
+
+					{
+						ShaderTransform* pTransform =
+							reinterpret_cast<ShaderTransform*>(
+								GetDX12System()
+								.GetTransformAllocator()
+								->GetCPUAddress(transformIndex));
+
+						pTransform->WorldViewProj = mvpMatrix;
+						pTransform->WorldMatrix = mMatrix;
+
+						a_pCommandList->GetCommandList()->SetGraphicsRootConstantBufferView(
+							RootParameters::TRANSFORM,
+							GetDX12System()
+							.GetTransformAllocator()
+							->GetGPUAddress(transformIndex));
+					}
+
+					mesh->RenderMeshData(meshData, a_pCommandList);
+				}
 			}
 		}
 	}

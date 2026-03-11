@@ -118,9 +118,9 @@ namespace gallus::gameplay
 		core::FlagEnum<UpdateTime> m_aUpdateTimes;
 	};
 
-	//---------------------------------------------------------------------
-	// ECSBaseSystem
-	//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+// ECSBaseSystem
+//---------------------------------------------------------------------
 	template <class ComponentType>
 	class ECSBaseSystem : public AbstractECSSystem
 	{
@@ -143,23 +143,31 @@ namespace gallus::gameplay
 		/// </summary>
 		/// <param name="a_ID">The entity ID.</param>
 		/// <param name="a_SrcData">Optional SrcData to copy to the component.</param>
+		/// <returns>Pointer to the component.</returns>
 		Component* CreateBaseComponent(const EntityID& a_ID, const resources::SrcData& a_SrcData = resources::SrcData()) override
 		{
 			bool existed = HasComponent(a_ID);
+
+			std::shared_ptr<ComponentType> comp;
+
 			if (!existed)
 			{
-				ComponentType t;
-				m_mComponents.insert(std::make_pair(a_ID, t));
+				comp = std::make_shared<ComponentType>();
+				m_mComponents.insert(std::make_pair(a_ID, comp));
 			}
-			ComponentType& comp = m_mComponents.at(a_ID);
+			else
+			{
+				comp = m_mComponents.at(a_ID);
+			}
+
 			if (!existed)
 			{
-				comp.SetDefaults(a_ID);
-				comp.Deserialize(a_SrcData);
+				comp->SetDefaults(a_ID);
+				comp->Deserialize(a_SrcData);
 			}
 
 			GetEngine().GetECS()->OnEntityComponentsUpdated().invoke();
-			return &comp;
+			return comp.get();
 		}
 
 		/// <summary>
@@ -167,6 +175,7 @@ namespace gallus::gameplay
 		/// </summary>
 		/// <param name="a_ID">The entity ID.</param>
 		/// <param name="a_SrcData">Optional SrcData to copy to the component.</param>
+		/// <returns>Pointer to the component if the entity existed, otherwise nullptr.</returns>
 		Component* UpdateBaseComponent(const EntityID& a_ID, const resources::SrcData& a_SrcData = resources::SrcData()) override
 		{
 			bool existed = HasComponent(a_ID);
@@ -175,10 +184,10 @@ namespace gallus::gameplay
 				return nullptr;
 			}
 
-			ComponentType& comp = m_mComponents.at(a_ID);
-			comp.Deserialize(a_SrcData);
+			std::shared_ptr<ComponentType> comp = m_mComponents.at(a_ID);
+			comp->Deserialize(a_SrcData);
 
-			return &comp;
+			return comp.get();
 		}
 
 		/// <summary>
@@ -213,7 +222,7 @@ namespace gallus::gameplay
 				return nullptr;
 			}
 
-			return &it->second;
+			return it->second.get();
 		}
 
 		/// <summary>
@@ -225,11 +234,11 @@ namespace gallus::gameplay
 		{
 			if (HasComponent(a_ID))
 			{
-				return m_mComponents.at(a_ID);
+				return *m_mComponents.at(a_ID);
 			}
 
 			CreateBaseComponent(a_ID, a_SrcData);
-			return m_mComponents.at(a_ID);
+			return *m_mComponents.at(a_ID);
 		}
 
 		/// <summary>
@@ -266,8 +275,7 @@ namespace gallus::gameplay
 		/// Updates the system's components.
 		/// </summary>
 		void UpdateComponents() override
-		{
-		}
+		{}
 
 		/// <summary>
 		/// Updates the system's components.
@@ -276,7 +284,7 @@ namespace gallus::gameplay
 		{
 			for (auto& component : m_mComponents)
 			{
-				component.second.InitRealtime();
+				component.second->InitRealtime();
 			}
 		}
 
@@ -288,7 +296,7 @@ namespace gallus::gameplay
 		{
 			for (auto& component : m_mComponents)
 			{
-				component.second.UpdateRealtimeInner(a_fDeltaTime, a_UpdateTime);
+				component.second->UpdateRealtimeInner(a_fDeltaTime, a_UpdateTime);
 			}
 		}
 
@@ -296,12 +304,13 @@ namespace gallus::gameplay
 		/// Retrieves all mesh components.
 		/// </summary>
 		/// <returns>A vector containing the entity info and component data of all entities.</returns>
-		std::map<EntityID, ComponentType>& GetComponents()
+		std::map<EntityID, std::shared_ptr<ComponentType>>& GetComponents()
 		{
 			return m_mComponents;
 		}
+
 	protected:
 		// TODO: We can only have one for each entity. If I want multiple components this will be a problem.
-		std::map<EntityID, ComponentType> m_mComponents;
+		std::map<EntityID, std::shared_ptr<ComponentType>> m_mComponents;
 	};
 }

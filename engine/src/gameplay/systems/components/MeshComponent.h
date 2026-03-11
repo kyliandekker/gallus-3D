@@ -85,6 +85,8 @@ namespace gallus::gameplay
 		uint16_t m_iTextureRectIndex = 0;
 		std::weak_ptr<graphics::dx12::Material> m_pMaterial = {};
 
+		int16_t m_iSkinnedMeshIndex = 0;
+
 		void OnShadersChanged();
 
 		BEGIN_SERIALIZE_PARENT(MeshComponent, Component)

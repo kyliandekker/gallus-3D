@@ -245,38 +245,6 @@ namespace gallus::graphics::dx12
 	}
 
 	//---------------------------------------------------------------------
-	void Mesh::Render(std::shared_ptr<CommandList> a_pCommandList, int32_t a_iTransformIndex, const DirectX::XMMATRIX& a_mMvp, const DirectX::XMMATRIX& a_mM)
-	{
-		for (MeshPartData& meshData : m_aMeshData)
-		{
-			a_pCommandList->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-			a_pCommandList->GetCommandList()->IASetVertexBuffers(0, 1, &meshData.m_VertexBuffer.GetVertexBufferView());
-			a_pCommandList->GetCommandList()->IASetIndexBuffer(&meshData.m_IndexBuffer.GetIndexBufferView());
-
-			// Transform.
-			if (a_iTransformIndex > -1)
-			{
-				ShaderTransform* pTransform =
-					reinterpret_cast<ShaderTransform*>(
-						GetDX12System()
-						.GetTransformAllocator()
-						->GetCPUAddress(a_iTransformIndex));
-
-				pTransform->WorldViewProj = a_mMvp;
-				pTransform->WorldMatrix = a_mM;
-
-				a_pCommandList->GetCommandList()->SetGraphicsRootConstantBufferView(
-					RootParameters::TRANSFORM,
-					GetDX12System()
-					.GetTransformAllocator()
-					->GetGPUAddress(a_iTransformIndex));
-			}
-
-			a_pCommandList->GetCommandList()->DrawIndexedInstanced(static_cast<UINT>(meshData.m_aIndices.size()), 1, 0, 0, 0);
-		}
-	}
-
-	//---------------------------------------------------------------------
 	bool Mesh::GetMeshDataFromModel(const core::Data& a_Data, std::vector<MeshPartData>& a_aOutData)
 	{
 		tinygltf::Model model;
@@ -491,6 +459,16 @@ namespace gallus::graphics::dx12
 			uint64_t fenceValue = a_pCommandQueue->ExecuteCommandList(commandList);
 			a_pCommandQueue->WaitForFenceValue(fenceValue);
 		}
+	}
+
+	//---------------------------------------------------------------------
+	void Mesh::RenderMeshData(MeshPartData& a_MeshData, std::shared_ptr<CommandList> a_pCommandList)
+	{
+		a_pCommandList->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		a_pCommandList->GetCommandList()->IASetVertexBuffers(0, 1, &a_MeshData.m_VertexBuffer.GetVertexBufferView());
+		a_pCommandList->GetCommandList()->IASetIndexBuffer(&a_MeshData.m_IndexBuffer.GetIndexBufferView());
+
+		a_pCommandList->GetCommandList()->DrawIndexedInstanced(static_cast<UINT>(a_MeshData.m_aIndices.size()), 1, 0, 0, 0);
 	}
 
 	//---------------------------------------------------------------------

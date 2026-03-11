@@ -1001,11 +1001,14 @@ namespace gallus::graphics::dx12
 		}
 		for (auto& pair : meshSys->GetComponents())
 		{
-			pair.second.Render(a_pCommandList, pair.first, *m_pActiveCamera);
+			pair.second->Render(a_pCommandList, pair.first, *m_pActiveCamera);
 		}
-		for (gameplay::SpriteComponent* sprite : m_aOrderedTextures)
+		for (std::weak_ptr<gameplay::SpriteComponent> sprite : m_aOrderedTextures)
 		{
-			sprite->Render(a_pCommandList, sprite->GetEntityID(), *m_pActiveCamera);
+			if (std::shared_ptr<gameplay::SpriteComponent> spritePtr = sprite.lock())
+			{
+				spritePtr->Render(a_pCommandList, spritePtr->GetEntityID(), *m_pActiveCamera);
+			}
 		}
 	}
 
@@ -1104,7 +1107,6 @@ namespace gallus::graphics::dx12
 	//---------------------------------------------------------------------
 	void DX12System::ReorderSpriteComponents()
 	{
-		// m_aOrderedTextures stores pointers
 		m_aOrderedTextures.clear();
 
 		gameplay::EntityComponentSystem* ecs = GetEngine().GetECS();
@@ -1119,21 +1121,33 @@ namespace gallus::graphics::dx12
 			return;
 		}
 
-		// Collect pointers to components
+		// Collect weak_ptr references to components
 		for (auto& pair : spriteSys->GetComponents())
 		{
-			m_aOrderedTextures.push_back(&pair.second); // take address of the ref
+			m_aOrderedTextures.push_back(pair.second);
 		}
 
 		// Sort back-to-front by order
 		std::sort(
 			m_aOrderedTextures.begin(),
 			m_aOrderedTextures.end(),
-			[](gameplay::SpriteComponent* a, gameplay::SpriteComponent* b)
+			[](const std::weak_ptr<gameplay::SpriteComponent>& a, const std::weak_ptr<gameplay::SpriteComponent>& b)
 			{
-				return a->GetOrder() < b->GetOrder();
+				std::shared_ptr<gameplay::SpriteComponent> aLocked = a.lock();
+				std::shared_ptr<gameplay::SpriteComponent> bLocked = b.lock();
+
+				if (!aLocked)
+				{
+					return false;
+				}
+
+				if (!bLocked)
+				{
+					return true;
+				}
+
+				return aLocked->GetOrder() < bLocked->GetOrder();
 			}
 		);
-
 	}
 }

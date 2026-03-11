@@ -114,13 +114,6 @@ namespace gallus::graphics::dx12
 		bool LoadData(const MeshPartData& a_Data, std::shared_ptr<CommandQueue> a_pCommandQueue);
 
 		/// <summary>
-		/// Renders the mesh using the specified command list, applying a transform and camera matrices.
-		/// </summary>
-		/// <param name="a_pCommandList">The command list used to issue GPU draw calls.</param>
-		/// <param name="a_pTransformBuffer">The transform buffer.</param>
-		void Render(std::shared_ptr<CommandList> a_pCommandList, int32_t a_iTransformIndex, const DirectX::XMMATRIX& a_mMvp, const DirectX::XMMATRIX& a_mM);
-
-		/// <summary>
 		/// Checks whether the mesh contains valid data and is ready for rendering.
 		/// </summary>
 		/// <returns>True if the mesh is valid, false otherwise.</returns>
@@ -131,6 +124,13 @@ namespace gallus::graphics::dx12
 		/// </summary>
 		/// <param name="a_pCommandQueue">The command queue used for uploading.</param>
 		void UploadMeshData(const std::shared_ptr<CommandQueue> a_pCommandQueue);
+
+		std::vector<MeshPartData>& GetMeshData()
+		{
+			return m_aMeshData;
+		}
+
+		void RenderMeshData(MeshPartData& a_MeshData, std::shared_ptr<CommandList> a_pCommandList);
 	private:
 		/// <summary>
 		/// Loads the mesh data.
