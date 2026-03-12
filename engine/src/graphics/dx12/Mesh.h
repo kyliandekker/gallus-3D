@@ -148,6 +148,7 @@ namespace gallus::graphics::dx12
 		void SetMeshData(const std::vector<MeshPartData>& a_aData, const std::shared_ptr<CommandQueue> a_pCommandQueue);
 
 		std::vector<MeshPartData> m_aMeshData;
+		std::vector<std::string> m_aBoneInfo;
 
 		BEGIN_SERIALIZE_PARENT(Mesh, resources::EngineResource)
 		END_SERIALIZE(Mesh)

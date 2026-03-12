@@ -7,8 +7,10 @@ PSInput main(VSInput input)
     float4 pos = float4(input.POSITION, 1.0f);
     float3 normal = input.NORMAL;
 
+    float totalWeight = input.WEIGHTS.x + input.WEIGHTS.y + input.WEIGHTS.z + input.WEIGHTS.w;
+    
     output.POSITION = mul(WorldViewProj, pos);
-    output.NORMAL = normalize(normal); // skip WorldMatrix for bind pose
+    output.NORMAL = normalize(mul((float3x3)WorldMatrix, normal));
     output.TEXCOORD = lerp(uv.xy, uv.zw, input.TEXCOORD);
     output.COLOR = input.COLOR;
 

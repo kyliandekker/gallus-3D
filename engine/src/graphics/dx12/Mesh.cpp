@@ -360,6 +360,66 @@ namespace gallus::graphics::dx12
 				}
 
 				//------------------------------------------
+				// JOINTS (bone indices)
+				//------------------------------------------
+
+				const uint8_t* jointsU8 = nullptr;
+				const uint16_t* jointsU16 = nullptr;
+
+				if (primitive.attributes.find("JOINTS_0") != primitive.attributes.end())
+				{
+					const tinygltf::Accessor& jointAccessor =
+						model.accessors[primitive.attributes.find("JOINTS_0")->second];
+
+					const tinygltf::BufferView& jointBufferView =
+						model.bufferViews[jointAccessor.bufferView];
+
+					const tinygltf::Buffer& jointBuffer =
+						model.buffers[jointBufferView.buffer];
+
+					if (jointAccessor.componentType == TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE)
+					{
+						jointsU8 = reinterpret_cast<const uint8_t*>(
+							&jointBuffer.data[jointBufferView.byteOffset + jointAccessor.byteOffset]);
+					}
+					else if (jointAccessor.componentType == TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT)
+					{
+						jointsU16 = reinterpret_cast<const uint16_t*>(
+							&jointBuffer.data[jointBufferView.byteOffset + jointAccessor.byteOffset]);
+					}
+				}
+
+				//------------------------------------------
+				// WEIGHTS (bone weights)
+				//------------------------------------------
+
+				const float* weightsF32 = nullptr;
+				const uint8_t* weightsU8 = nullptr;
+
+				if (primitive.attributes.find("WEIGHTS_0") != primitive.attributes.end())
+				{
+					const tinygltf::Accessor& weightAccessor =
+						model.accessors[primitive.attributes.find("WEIGHTS_0")->second];
+
+					const tinygltf::BufferView& weightBufferView =
+						model.bufferViews[weightAccessor.bufferView];
+
+					const tinygltf::Buffer& weightBuffer =
+						model.buffers[weightBufferView.buffer];
+
+					if (weightAccessor.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT)
+					{
+						weightsF32 = reinterpret_cast<const float*>(
+							&weightBuffer.data[weightBufferView.byteOffset + weightAccessor.byteOffset]);
+					}
+					else if (weightAccessor.componentType == TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE)
+					{
+						weightsU8 = reinterpret_cast<const uint8_t*>(
+							&weightBuffer.data[weightBufferView.byteOffset + weightAccessor.byteOffset]);
+					}
+				}
+
+				//------------------------------------------
 				// INDICES
 				//------------------------------------------
 
@@ -375,8 +435,20 @@ namespace gallus::graphics::dx12
 				const uint8_t* indices =
 					&indexBuffer.data[indexBufferView.byteOffset + indexAccessor.byteOffset];
 
-				meshData.m_aIndices.resize(indexAccessor.count * sizeof(uint16_t));
-				memcpy(meshData.m_aIndices.data(), indices, indexAccessor.count * sizeof(uint16_t));
+				meshData.m_aIndices.resize(indexAccessor.count);
+				if (indexAccessor.componentType == TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT)
+				{
+					const uint16_t* src = reinterpret_cast<const uint16_t*>(indices);
+					memcpy(meshData.m_aIndices.data(), src, indexAccessor.count * sizeof(uint16_t));
+				}
+				else if (indexAccessor.componentType == TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT)
+				{
+					const uint32_t* src = reinterpret_cast<const uint32_t*>(indices);
+					for (size_t i = 0; i < indexAccessor.count; ++i)
+					{
+						meshData.m_aIndices[i] = static_cast<uint16_t>(src[i]);
+					}
+				}
 
 				//------------------------------------------
 				// VERTICES
@@ -403,10 +475,45 @@ namespace gallus::graphics::dx12
 						DirectX::XMFLOAT4(colors[i * 3], colors[i * 3 + 1], colors[i * 3 + 2], 1.0f) :
 						DirectX::XMFLOAT4(1, 1, 1, 1);
 
-					for (int j = 0; j < 4; j++)
+					if ((jointsU8 || jointsU16) && (weightsF32 || weightsU8))
 					{
-						v.Joints[j] = 0;
-						v.Weights[j] = 0.0f;
+						if (jointsU16)
+						{
+							v.Joints[0] = jointsU16[i * 4];
+							v.Joints[1] = jointsU16[i * 4 + 1];
+							v.Joints[2] = jointsU16[i * 4 + 2];
+							v.Joints[3] = jointsU16[i * 4 + 3];
+						}
+						else if (jointsU8)
+						{
+							v.Joints[0] = jointsU8[i * 4];
+							v.Joints[1] = jointsU8[i * 4 + 1];
+							v.Joints[2] = jointsU8[i * 4 + 2];
+							v.Joints[3] = jointsU8[i * 4 + 3];
+						}
+
+						if (weightsF32)
+						{
+							v.Weights[0] = weightsF32[i * 4];
+							v.Weights[1] = weightsF32[i * 4 + 1];
+							v.Weights[2] = weightsF32[i * 4 + 2];
+							v.Weights[3] = weightsF32[i * 4 + 3];
+						}
+						else if (weightsU8)
+						{
+							v.Weights[0] = weightsU8[i * 4] / 255.0f;
+							v.Weights[1] = weightsU8[i * 4 + 1] / 255.0f;
+							v.Weights[2] = weightsU8[i * 4 + 2] / 255.0f;
+							v.Weights[3] = weightsU8[i * 4 + 3] / 255.0f;
+						}
+					}
+					else
+					{
+						for (int j = 0; j < 4; j++)
+						{
+							v.Joints[j] = 0;
+							v.Weights[j] = (j == 0) ? 1.0f : 0.0f;
+						}
 					}
 
 					meshData.m_aVertices.push_back(v);
@@ -414,6 +521,29 @@ namespace gallus::graphics::dx12
 			}
 
 			a_aOutData.push_back(meshData);
+		}
+
+		//--------------------------------------------------
+		// LOAD BONE INFO
+		//--------------------------------------------------
+		m_aBoneInfo.clear();
+
+		for (const tinygltf::Skin& skin : model.skins)
+		{
+			for (size_t jointIdx = 0; jointIdx < skin.joints.size(); ++jointIdx)
+			{
+				int nodeIdx = skin.joints[jointIdx];
+				if (nodeIdx < 0 || nodeIdx >= (int) model.nodes.size())
+				{
+					continue;
+				}
+
+				const tinygltf::Node& node = model.nodes[nodeIdx];
+
+				// Use node name, or fallback to Bone_0, Bone_1...
+				std::string boneName = node.name.empty() ? std::format("Bone_{}", jointIdx) : node.name;
+				m_aBoneInfo.push_back(boneName);
+			}
 		}
 
 		return true;

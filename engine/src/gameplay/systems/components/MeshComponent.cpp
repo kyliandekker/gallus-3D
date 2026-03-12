@@ -15,6 +15,7 @@
 #include "graphics/dx12/CommandList.h"
 #include "graphics/dx12/CommandQueue.h"
 #include "graphics/dx12/ShaderFactory.h"
+#include "graphics/dx12/ShaderDefs.h"
 
 // resources
 #include "resources/ResourceAtlas.h"
@@ -32,6 +33,12 @@ namespace gallus::gameplay
 {
 	//---------------------------------------------------------------------
 	// MeshComponent
+	//---------------------------------------------------------------------
+	MeshComponent::~MeshComponent()
+	{
+		GetDX12System().GetSkinningDataAllocator()->Deallocate(m_iSkinnedMeshIndex);
+	}
+
 	//---------------------------------------------------------------------
 	void MeshComponent::SetDefaults(const gameplay::EntityID& a_EntityID)
 	{
@@ -76,6 +83,14 @@ namespace gallus::gameplay
 		m_pDX12System = &dx12;
 		m_pRootSignature = dx12.GetRootSignature().Get();
 		m_pTransformSystem = m_pECS->GetSystem<gameplay::TransformSystem>();
+
+		//if (std::shared_ptr<graphics::dx12::Mesh> mesh = m_pMesh.lock())
+		//{
+		//	if (!mesh->GetBoneInfo().empty())
+		//	{
+		//		m_iSkinnedMeshIndex = GetDX12System().GetSkinningDataAllocator()->Allocate();
+		//	}
+		//}
 	}
 
 	//---------------------------------------------------------------------
@@ -83,10 +98,14 @@ namespace gallus::gameplay
 	{
 		m_pMesh = a_pMesh;
 
-		if (m_iSkinnedMeshIndex < 1)
-		{
-			m_iSkinnedMeshIndex = GetDX12System().GetSkinningDataAllocator()->Allocate();
-		}
+		GetDX12System().GetSkinningDataAllocator()->Deallocate(m_iSkinnedMeshIndex);
+		//if (std::shared_ptr<graphics::dx12::Mesh> mesh = m_pMesh.lock())
+		//{
+		//	if (!mesh->GetBoneInfo().empty())
+		//	{
+		//		m_iSkinnedMeshIndex = GetDX12System().GetSkinningDataAllocator()->Allocate();
+		//	}
+		//}
 	}
 
 	//---------------------------------------------------------------------
@@ -197,7 +216,6 @@ namespace gallus::gameplay
 						a_pCommandList->GetCommandList()->SetGraphicsRootConstantBufferView(
 							RootParameters::SKINNING_DATA,
 							gpuAddr);
-
 					}
 
 					{

@@ -178,7 +178,7 @@ namespace gallus::graphics::dx12
 		m_pSkinningDataAllocation->Initialize(
 			m_pDevice.Get(),
 			sizeof(SkinningData),
-			100,
+			1000,
 			256
 		);
 		m_pSkinningDataAllocation->Allocate();

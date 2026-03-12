@@ -76,6 +76,11 @@ namespace gallus::graphics::dx12
 	//---------------------------------------------------------------------
 	void DX12UploadBufferAllocator::Deallocate(size_t a_iIndex)
 	{
+		if (a_iIndex < 0)
+		{
+			return;
+		}
+
 		if (a_iIndex < m_iElementCount)
 		{
 			m_aAllocated[a_iIndex] = false;

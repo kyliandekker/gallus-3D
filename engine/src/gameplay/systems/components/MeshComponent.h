@@ -36,6 +36,8 @@ namespace gallus::gameplay
 	class MeshComponent : public Component
 	{
 	public:
+		~MeshComponent();
+
 		/// <summary>
 		/// Initializes the component.
 		/// </summary>
