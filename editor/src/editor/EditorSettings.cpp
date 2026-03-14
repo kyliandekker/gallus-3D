@@ -128,15 +128,15 @@ namespace gallus::editor
 	}
 
 	//---------------------------------------------------------------------
-	void EditorSettings::SetFullScreenPlayMode(bool a_bFullScreenPlayMode)
-	{
-		m_bFullScreenPlayMode = a_bFullScreenPlayMode;
+    void EditorSettings::SetEditorState(EditorState a_EditorState)
+    {
+		m_EditorState = a_EditorState;
 	}
 
 	//---------------------------------------------------------------------
-	bool EditorSettings::GetFullScreenPlayMode() const
+	EditorState EditorSettings::GetEditorState() const
 	{
-		return m_bFullScreenPlayMode;
+		return m_EditorState;
 	}
 
 	//---------------------------------------------------------------------

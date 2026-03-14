@@ -116,7 +116,7 @@ namespace gallus
 					[this]()
 					{
 						if (ImGui::TextButton(
-							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_SAVE), BUTTON_ID, "SAVE_ANIMATION_MODAL").c_str(), "Toggles looping for the animation track.", m_System.GetHeaderSize()))
+							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_SAVE), BUTTON_ID, "SAVE_ANIMATION_MODAL").c_str(), "Saves the current animation track.", m_System.GetHeaderSize()))
 						{
 							if (m_Animation.GetName().empty())
 							{
@@ -204,7 +204,7 @@ namespace gallus
 					return;
 				}
 
-				if (editor->GetEditorSettings().GetFullScreenPlayMode())
+				if (GetEditorEngine().GetEditor()->GetEditorSettings().GetEditorState() != editor::EditorState::EditorState_Workspace)
 				{
 					return;
 				}

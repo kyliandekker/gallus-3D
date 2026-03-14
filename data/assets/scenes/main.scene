@@ -37,114 +37,34 @@
     },
     "entities": [
         {
-            "name": "New GameObject (1)",
-            "isActive": true,
-            "components": {
-                "mesh": {
-                    "pixelShader": "pixelShaderUvDebug.cso",
-                    "vertexShader": "vertexShader.cso",
-                    "material": "mat_lit.mat",
-                    "mesh": "mod_missing.glb",
-                    "texture": "tex_missing.png",
-                    "textureIndex": 0
-                },
-                "transform": {
-                    "transform": {
-                        "position": {
-                            "x": -1.6175308227539063,
-                            "y": 1.3766255378723145,
-                            "z": 1.1920928955078126e-7
-                        },
-                        "scale": {
-                            "x": 1.0,
-                            "y": 1.0,
-                            "z": 1.0
-                        },
-                        "rotation": {
-                            "x": -0.0,
-                            "y": 0.0,
-                            "z": -0.0,
-                            "w": 1.0
-                        },
-                        "pivot": {
-                            "x": -0.5,
-                            "y": -0.5,
-                            "z": -0.5
-                        },
-                        "cameraType": 0
-                    }
-                }
-            }
-        },
-        {
-            "name": "New GameObject",
+            "name": "New GameObject (2)",
             "isActive": true,
             "components": {
                 "mesh": {
                     "pixelShader": "pixelShader.cso",
                     "vertexShader": "vertexShader.cso",
                     "material": "mat_lit.mat",
-                    "mesh": "cube",
+                    "mesh": "mod_faucet.glb",
                     "texture": "tex_missing.png",
                     "textureIndex": 0
                 },
                 "transform": {
                     "transform": {
                         "position": {
-                            "x": 1.110291600227356,
-                            "y": 0.04124242067337036,
-                            "z": 0.08554136753082276
+                            "x": 0.28694701194763186,
+                            "y": 0.1259205937385559,
+                            "z": 0.5339908003807068
                         },
                         "scale": {
-                            "x": 1.0,
-                            "y": 1.0,
-                            "z": 1.0
+                            "x": 2.069999933242798,
+                            "y": 2.069999933242798,
+                            "z": 2.069999933242798
                         },
                         "rotation": {
                             "x": -0.0,
                             "y": 0.0,
                             "z": -0.0,
                             "w": 1.0
-                        },
-                        "pivot": {
-                            "x": 0.0,
-                            "y": -0.5,
-                            "z": 0.0
-                        },
-                        "cameraType": 0
-                    }
-                }
-            }
-        },
-        {
-            "name": "mod_chicken.glb",
-            "isActive": true,
-            "components": {
-                "mesh": {
-                    "pixelShader": "pixelShader.cso",
-                    "vertexShader": "vertexShader.cso",
-                    "material": "mat_lit.mat",
-                    "mesh": "mod_chicken.glb",
-                    "texture": "tex_chicken_infected.png",
-                    "textureIndex": 0
-                },
-                "transform": {
-                    "transform": {
-                        "position": {
-                            "x": -0.6310473680496216,
-                            "y": 0.08603847026824951,
-                            "z": -1.1920928955078126e-7
-                        },
-                        "scale": {
-                            "x": 2.1800003051757814,
-                            "y": 2.179999589920044,
-                            "z": 2.1800003051757814
-                        },
-                        "rotation": {
-                            "x": -0.0,
-                            "y": -0.21553798019886018,
-                            "z": -0.0,
-                            "w": 0.9764954447746277
                         },
                         "pivot": {
                             "x": 0.0,
@@ -198,28 +118,68 @@
             }
         },
         {
-            "name": "New GameObject (2)",
+            "name": "mod_chicken.glb",
             "isActive": true,
             "components": {
                 "mesh": {
                     "pixelShader": "pixelShader.cso",
                     "vertexShader": "vertexShader.cso",
                     "material": "mat_lit.mat",
-                    "mesh": "mod_faucet.glb",
+                    "mesh": "mod_chicken.glb",
+                    "texture": "tex_chicken_infected.png",
+                    "textureIndex": 0
+                },
+                "transform": {
+                    "transform": {
+                        "position": {
+                            "x": -0.6310473680496216,
+                            "y": 0.08603847026824951,
+                            "z": -1.1920928955078126e-7
+                        },
+                        "scale": {
+                            "x": 2.1800003051757814,
+                            "y": 2.179999589920044,
+                            "z": 2.1800003051757814
+                        },
+                        "rotation": {
+                            "x": -0.0,
+                            "y": -0.21553798019886018,
+                            "z": -0.0,
+                            "w": 0.9764954447746277
+                        },
+                        "pivot": {
+                            "x": 0.0,
+                            "y": 0.0,
+                            "z": 0.0
+                        },
+                        "cameraType": 0
+                    }
+                }
+            }
+        },
+        {
+            "name": "New GameObject",
+            "isActive": true,
+            "components": {
+                "mesh": {
+                    "pixelShader": "pixelShader.cso",
+                    "vertexShader": "vertexShader.cso",
+                    "material": "mat_lit.mat",
+                    "mesh": "cube",
                     "texture": "tex_missing.png",
                     "textureIndex": 0
                 },
                 "transform": {
                     "transform": {
                         "position": {
-                            "x": 0.28694701194763186,
-                            "y": 0.1259205937385559,
-                            "z": 0.5339908003807068
+                            "x": 1.110291600227356,
+                            "y": 0.04124242067337036,
+                            "z": 0.08554136753082276
                         },
                         "scale": {
-                            "x": 2.069999933242798,
-                            "y": 2.069999933242798,
-                            "z": 2.069999933242798
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
                         },
                         "rotation": {
                             "x": -0.0,
@@ -229,8 +189,48 @@
                         },
                         "pivot": {
                             "x": 0.0,
-                            "y": 0.0,
+                            "y": -0.5,
                             "z": 0.0
+                        },
+                        "cameraType": 0
+                    }
+                }
+            }
+        },
+        {
+            "name": "New GameObject (1)",
+            "isActive": true,
+            "components": {
+                "mesh": {
+                    "pixelShader": "pixelShaderUvDebug.cso",
+                    "vertexShader": "vertexShader.cso",
+                    "material": "mat_lit.mat",
+                    "mesh": "mod_missing.glb",
+                    "texture": "tex_missing.png",
+                    "textureIndex": 0
+                },
+                "transform": {
+                    "transform": {
+                        "position": {
+                            "x": -1.6175308227539063,
+                            "y": 1.3766255378723145,
+                            "z": 1.1920928955078126e-7
+                        },
+                        "scale": {
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
+                        },
+                        "rotation": {
+                            "x": -0.0,
+                            "y": 0.0,
+                            "z": -0.0,
+                            "w": 1.0
+                        },
+                        "pivot": {
+                            "x": -0.5,
+                            "y": -0.5,
+                            "z": -0.5
                         },
                         "cameraType": 0
                     }

@@ -329,10 +329,11 @@ namespace gallus::graphics::dx12
 	}
 
 	//---------------------------------------------------------------------
-	void Texture::AddTextureRect(const TextureRect& a_Rect)
+	size_t Texture::AddTextureRect(const TextureRect& a_Rect)
 	{
 		m_TextureType = TextureType::TextureSheet;
 		m_aTextureRects.push_back(a_Rect);
+		return m_aTextureRects.size() - 1;
 	}
 
 	//---------------------------------------------------------------------

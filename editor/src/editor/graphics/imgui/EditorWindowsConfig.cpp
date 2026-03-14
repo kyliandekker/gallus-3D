@@ -14,6 +14,7 @@
 
 #include "editor/graphics/imgui/modals/FilePickerModal.h"
 #include "editor/graphics/imgui/modals/PromptModal.h"
+#include "editor/graphics/imgui/windows/SpriteSheetEditorWindow.h"
 
 namespace gallus::graphics::imgui
 {
@@ -30,6 +31,8 @@ namespace gallus::graphics::imgui
 		m_AnimationWindow = new AnimationWindow(a_System);
 		m_InspectorWindow = new InspectorWindow(a_System);
 		m_SceneWindow = new SceneWindow(a_System);
+		m_FullSceneWindow = new FullSceneWindow(a_System);
+		m_SpriteSheetEditorWindow = new SpriteSheetEditorWindow(a_System);
 
 		m_FilePickerModal = new FilePickerModal(a_System);
 		m_PromptModal = new PromptModal(a_System);
@@ -46,6 +49,8 @@ namespace gallus::graphics::imgui
 		m_AnimationWindow->Initialize();
 		m_InspectorWindow->Initialize();
 		m_SceneWindow->Initialize();
+		m_FullSceneWindow->Initialize();
+		m_SpriteSheetEditorWindow->Initialize();
 
 		m_FilePickerModal->Initialize();
 		m_PromptModal->Initialize();
@@ -62,6 +67,8 @@ namespace gallus::graphics::imgui
 		m_AnimationWindow->Update();
 		m_InspectorWindow->Update();
 		m_SceneWindow->Update();
+		m_FullSceneWindow->Update();
+		m_SpriteSheetEditorWindow->Update();
 
 		m_FilePickerModal->Update();
 		m_PromptModal->Update();

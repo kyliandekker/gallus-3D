@@ -79,7 +79,7 @@ namespace ImGui
 
 	bool VectorEdit2(const std::string& label, float col[2], float a_fSpeed = 1.0f, float a_fMin = -999999999999999, float a_fMax = 9999999999999999);
 	bool VectorEdit3(const std::string& label, float col[3], float a_fSpeed = 1.0f, float a_fMin = -999999999999999, float a_fMax = 9999999999999999);
-	bool IVectorEdit2(const std::string& label, int col[2]);
+	bool IVectorEdit2(const std::string& label, int col[2], int a_iStep = 1, int a_iMin = 0, int a_iMax = 9999999999);
 
 	void ShowTooltip(const std::string& a_sText);
 	void ShowStaticTooltip(const ImVec2& a_vPos, const std::string& a_sText);

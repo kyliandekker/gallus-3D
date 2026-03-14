@@ -9,6 +9,8 @@
 #include <memory>
 #include <cstdint>
 
+#include "utils/math.h"
+
 namespace gallus::graphics::dx12
 {
 	class DX12System;
@@ -60,7 +62,7 @@ namespace gallus::graphics::dx12
 			SERIALIZE_FIELD(y, "y", "", .type = FieldSerializationType::FieldSerializationType_Int32)
 			SERIALIZE_FIELD(width, "width", "", .type = FieldSerializationType::FieldSerializationType_Int32)
 			SERIALIZE_FIELD(height, "height", "", .type = FieldSerializationType::FieldSerializationType_Int32)
-			END_SERIALIZE(TextureRect)
+		END_SERIALIZE(TextureRect)
 	};
 
 	class TextureUVCPU
@@ -193,7 +195,7 @@ namespace gallus::graphics::dx12
 		/// Adds a sprite rect to the rects array.
 		/// </summary>
 		/// <param name="a_Rect">The sprite rect that should be added.</param>
-		void AddTextureRect(const TextureRect& a_Rect);
+		size_t AddTextureRect(const TextureRect& a_Rect);
 
 		/// <summary>
 		/// Retrieves the texture type.
@@ -218,14 +220,19 @@ namespace gallus::graphics::dx12
 		/// </summary>
 		/// <param name="a_iIndex">The sprite index.</param>
 		/// <returns>The sprite rect that was requested.</returns>
-		TextureRect GetTextureRect(int8_t a_iIndex)
+		TextureRect* GetTextureRect(int8_t a_iIndex)
 		{
 			if (a_iIndex >= m_aTextureRects.size())
 			{
-				return TextureRect();
+				return nullptr;
 			}
 
-			return m_aTextureRects[a_iIndex];
+			return &m_aTextureRects[a_iIndex];
+		}
+
+		std::vector<TextureRect>& GetTextureRects()
+		{
+			return m_aTextureRects;
 		}
 
 		/// <summary>
@@ -234,10 +241,24 @@ namespace gallus::graphics::dx12
 		/// <param name="a_iIndex">The sprite index.</param>
 		/// <returns>The sprite uvs calculated from the rect.</returns>
 		TextureUVCPU GetTextureUV(uint16_t a_iIndex) const;
+
+		IVector2 GetSpriteSheetCellSize()
+		{
+			return { static_cast<int>(m_iSpriteSheetCellSizeX), static_cast<int>(m_iSpriteSheetCellSizeY) };
+		}
+
+		void SetSpriteSheetCellSize(const IVector2& a_vSpriteSheetCellSize)
+		{
+			m_iSpriteSheetCellSizeX = static_cast<uint32_t>(a_vSpriteSheetCellSize.x);
+			m_iSpriteSheetCellSizeY = static_cast<uint32_t>(a_vSpriteSheetCellSize.y);
+		}
 	private:
 		Microsoft::WRL::ComPtr<ID3D12Resource> m_pResourceUploadHeap = nullptr;
 		int32_t m_iSRVIndex = -1;
 		D3D12_SHADER_RESOURCE_VIEW_DESC m_SrvDesc;
+
+		uint32_t m_iSpriteSheetCellSizeX = 0;
+		uint32_t m_iSpriteSheetCellSizeY = 0;
 
 		TextureType m_TextureType = TextureType::Texture2D;
 		std::vector<TextureRect> m_aTextureRects;
@@ -247,6 +268,8 @@ namespace gallus::graphics::dx12
 				.type = FieldSerializationType::FieldSerializationType_Enum,
 				.enumToStringFunc = MakeEnumToStringFunc<TextureType>(TextureTypeToString))
 			SERIALIZE_FIELD_OPTIONS(m_aTextureRects, "Texture Rects", "Enables multiple sprites from one image.", MakeArrayFieldSerializationOptions(TextureRect, FieldSerializationType::FieldSerializationType_Object))
+			SERIALIZE_FIELD(m_iSpriteSheetCellSizeX, "Sprite Sheet Size X", "", .type = FieldSerializationType::FieldSerializationType_Int32)
+			SERIALIZE_FIELD(m_iSpriteSheetCellSizeY, "Sprite Sheet Size Y", "", .type = FieldSerializationType::FieldSerializationType_Int32)
 		END_SERIALIZE(Texture)
 	};
 }

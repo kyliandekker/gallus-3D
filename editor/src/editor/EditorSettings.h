@@ -7,6 +7,13 @@
 
 namespace gallus::editor
 {
+	enum class EditorState
+	{
+		EditorState_Workspace,
+		EditorState_FullScene,
+		EditorState_SpriteSheetEditor
+	};
+
 	//---------------------------------------------------------------------
 	// EditorSettings
 	//---------------------------------------------------------------------
@@ -141,16 +148,16 @@ namespace gallus::editor
 		bool GetShowGrid() const;
 
 		/// <summary>
-		/// Sets whether play mode should open in full screen.
+		/// Sets the current state of the editor.
 		/// </summary>
-		/// <param name="a_bFullScreenPlayMode">True to set play mode to full screen, false otherwise.</param>
-		void SetFullScreenPlayMode(bool a_bFullScreenPlayMode);
+		/// <param name="a_EditorState">Enum representing the current editor state.</param>
+		void SetEditorState(EditorState a_EditorState);
 
 		/// <summary>
-		/// Checks if play mode is in full screen.
+		/// Checks the current state of the editor.
 		/// </summary>
-		/// <returns>True if play mode is set to full screen, false otherwise.</param>
-		bool GetFullScreenPlayMode() const;
+		/// <returns>Enum representing the current editor state.</param>
+		EditorState GetEditorState() const;
 
 		/// <summary>
 		/// Sets the scene zoom.
@@ -259,7 +266,7 @@ namespace gallus::editor
 		bool m_bShowAwesome = true; /// Check for "awesome" log messages.
 
 		bool m_bShowGrid = false;
-		bool m_bFullScreenPlayMode = false;
+		EditorState m_EditorState = EditorState::EditorState_Workspace;
 		float m_fSceneZoom = 1.0f;
 		Vector2 m_vScenePanOffset = Vector2(0.0f, 0.0f);
 		uint16_t m_iLastSceneOperation = 7;
@@ -294,8 +301,8 @@ namespace gallus::editor
 				.type = FieldSerializationType::FieldSerializationType_Bool)
 
 			SERIALIZE_FIELD(m_bShowGrid, "Show Grid", "",
-				.type = FieldSerializationType::FieldSerializationType_Bool)
-			SERIALIZE_FIELD(m_bFullScreenPlayMode, "Show Full Screen Play Mode", "",
+				.type = FieldSerializationType::FieldSerializationType_Enum)
+			SERIALIZE_FIELD(m_EditorState, "The state the editor is currently in: I.E. Sprite sheet, workspace, etc.", "",
 				.type = FieldSerializationType::FieldSerializationType_Bool)
 			SERIALIZE_FIELD(m_fSceneZoom, "Scene Zoom", "",
 				.type = FieldSerializationType::FieldSerializationType_Float)

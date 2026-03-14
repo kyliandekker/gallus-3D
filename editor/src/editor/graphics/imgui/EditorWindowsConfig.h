@@ -12,6 +12,8 @@ namespace gallus::graphics::imgui
 	class AnimationWindow;
 	class HierarchyWindow;
 	class SceneWindow;
+	class FullSceneWindow;
+	class SpriteSheetEditorWindow;
 
 	class FilePickerModal;
 	class PromptModal;
@@ -97,6 +99,24 @@ namespace gallus::graphics::imgui
 		}
 
 		/// <summary>
+		/// Retrieves the full scene window.
+		/// </summary>
+		/// <returns>Pointer to the full scene window.</returns>
+		FullSceneWindow* GetFullSceneWindow()
+		{
+			return m_FullSceneWindow;
+		}
+
+		/// <summary>
+		/// Retrieves the sprite sheet editor window.
+		/// </summary>
+		/// <returns>Pointer to the sprite sheet editor window.</returns>
+		SpriteSheetEditorWindow* GetSpriteSheetEditorWindow()
+		{
+			return m_SpriteSheetEditorWindow;
+		}
+
+		/// <summary>
 		/// Retrieves the file picker modal.
 		/// </summary>
 		/// <returns>Pointer to the file picker modal.</returns>
@@ -124,6 +144,8 @@ namespace gallus::graphics::imgui
 		AnimationWindow* m_AnimationWindow = nullptr;
 		InspectorWindow* m_InspectorWindow = nullptr;
 		SceneWindow* m_SceneWindow = nullptr;
+		FullSceneWindow* m_FullSceneWindow = nullptr;
+		SpriteSheetEditorWindow* m_SpriteSheetEditorWindow = nullptr;
 
 		FilePickerModal* m_FilePickerModal = nullptr;
 		PromptModal* m_PromptModal = nullptr;

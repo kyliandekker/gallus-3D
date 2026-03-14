@@ -52,7 +52,7 @@ namespace gallus::graphics::imgui
 	//---------------------------------------------------------------------
 	void ExplorerWindow::Update()
 	{
-		if (GetEditorEngine().GetEditor()->GetEditorSettings().GetFullScreenPlayMode())
+		if (GetEditorEngine().GetEditor()->GetEditorSettings().GetEditorState() != editor::EditorState::EditorState_Workspace)
 		{
 			return;
 		}

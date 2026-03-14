@@ -459,7 +459,7 @@ namespace ImGui
 		return value_changed;
 	}
 
-	bool IVectorEdit2(const std::string& label, int col[2])
+	bool IVectorEdit2(const std::string& label, int col[2], int a_iStep, int a_iMin, int a_iMax)
 	{
 		ImGuiWindow* window = GetCurrentWindow();
 		if (window->SkipItems)
@@ -487,9 +487,6 @@ namespace ImGui
 		const float w_inputs = ImMax(w_full - w_button, 1.0f);
 		w_full = w_inputs + w_button;
 
-		// Convert to the formats we need
-		int f[2] = { col[0], col[1] };
-
 		bool value_changed = false;
 
 		const ImVec2 pos = window->DC.CursorPos;
@@ -503,13 +500,13 @@ namespace ImGui
 		static const char* ids[4] = { "##X", "##Y", "##Z", "##W" };
 		static const char* fmt_table_int[3][4] =
 		{
-			{ "%3d", "%3d", "%3d", "%3d" }, // Short display
-			{ "X:%3d", "T:%3d" }, // Long display for RGBA
+			{ "%3i", "%3i" }, // Short display
+			{ "X:%3i", "T:%3i" }, // Long display for RGBA
 		};
-		static const char* fmt_table_float[3][4] =
+		static const char* fmt_table_float[2][2] =
 		{
-			{ "%0.3f", "%0.3f", "%0.3f", "%0.3f" }, // Short display
-			{ "X:%0.3f", "Y:%0.3f" }, // Long display for RGBA
+			{ "%0.3i", "%0.3i" }, // Short display
+			{ "X:%0.3i", "Y:%0.3i" }, // Long display for RGBA
 		};
 		const int fmt_idx = hide_prefix ? 0 : 1;
 
@@ -524,7 +521,7 @@ namespace ImGui
 			SetNextItemWidth(ImMax(next_split - prev_split, 1.0f));
 			prev_split = next_split;
 
-			value_changed |= DragInt(ids[n], &f[n], 1.0f / 255.0f, -999999999, 999999999, fmt_table_float[fmt_idx][n]);
+			value_changed |= DragInt(ids[n], &col[n], a_iStep, a_iMin, a_iMax, fmt_table_float[fmt_idx][n]);
 			if (ImGui::IsItemActivated())
 			{
 				value_changed = true;
@@ -535,18 +532,13 @@ namespace ImGui
 			}
 		}
 
-		if (label != label_display_end )
+		if (label != label_display_end)
 		{
 			// Position not necessarily next to last submitted button (e.g. if style.ColorButtonPosition == ImGuiDir_Left),
 			// but we need to use SameLine() to setup baseline correctly. Might want to refactor SameLine() to simplify this.
 			SameLine(0.0f, style.ItemInnerSpacing.x);
 			window->DC.CursorPos.x = pos.x + (w_full + style.ItemInnerSpacing.x);
 			TextEx(label.c_str(), label_display_end.c_str());
-		}
-
-		if (value_changed && g.LastItemData.ID != 0) // In case of ID collision, the second EndGroup() won't catch g.ActiveId
-		{
-			MarkItemEdited(g.LastItemData.ID);
 		}
 
 		PopID();

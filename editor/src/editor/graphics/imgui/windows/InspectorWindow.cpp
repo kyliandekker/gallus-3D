@@ -100,7 +100,7 @@ namespace gallus::graphics::imgui
 	//---------------------------------------------------------------------
 	void InspectorWindow::Update()
 	{
-		if (GetEditorEngine().GetEditor()->GetEditorSettings().GetFullScreenPlayMode())
+		if (GetEditorEngine().GetEditor()->GetEditorSettings().GetEditorState() != editor::EditorState::EditorState_Workspace)
 		{
 			return;
 		}

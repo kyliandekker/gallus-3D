@@ -36,6 +36,7 @@
 #include "editor/graphics/imgui/windows/AnimationWindow.h"
 #include "editor/graphics/imgui/EditorWindowsConfig.h"
 #include "editor/graphics/imgui/RenderSerializableObject.h"
+#include "editor/graphics/imgui/windows/SpriteSheetEditorWindow.h"
 
 namespace gallus::graphics::imgui
 {
@@ -177,21 +178,9 @@ namespace gallus::graphics::imgui
 	//---------------------------------------------------------------------
 	TextureFileTypeEditorSelectable::TextureFileTypeEditorSelectable(ImGuiSystem& a_System, FileEditorSelectable& a_FileEditorSelectable) : FileTypeEditorSelectable(a_System, a_FileEditorSelectable)
 	{
-		//graphics::dx12::DX12System* dx12System = core::ENGINE->GetDX12();
-		//if (!dx12System)
-		//{
-		//	return;
-		//}
+		std::shared_ptr<graphics::dx12::CommandQueue> cCommandQueue = GetDX12System().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
 
-		//resources::ResourceAtlas* resourceAtlas = core::ENGINE->GetResourceAtlas();
-		//if (!resourceAtlas)
-		//{
-		//	return;
-		//}
-
-		//auto cCommandQueue = dx12System->GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
-
-		//m_pTexture = resourceAtlas->LoadTexture(a_FileEditorSelectable.GetName(), cCommandQueue);
+		m_pTexture = GetResourceAtlas().LoadTexture(a_FileEditorSelectable.GetName(), cCommandQueue);
 	}
 
 	//---------------------------------------------------------------------
@@ -259,21 +248,29 @@ namespace gallus::graphics::imgui
 	//---------------------------------------------------------------------
 	void TextureFileTypeEditorSelectable::Render(FileEditorSelectable& a_FileEditorSelectable)
 	{
-		//auto texture = m_pTexture.lock();
-		//if (!texture)
-		//{
-		//	return;
-		//}
+		auto texture = m_pTexture.lock();
+		if (!texture)
+		{
+			return;
+		}
 
-		//graphics::dx12::TextureType textureType = texture->GetTextureType();
-		//if (RenderObjectFields(texture.get(), false))
-		//{
-		//	SaveMetaData(a_FileEditorSelectable.GetFileResource(), texture.get());
-		//}
-		//if (textureType != texture->GetTextureType())
-		//{
-		//	texture->LoadMetaData();
-		//}
+		if (RenderObjectFields(texture.get(), false))
+		{
+			editor::EditorWorkspace* editorWorkspace = GetEditorEngine().GetEditorWorkspace();
+			if (!editorWorkspace)
+			{
+				return;
+			}
+
+			resources::SrcData srcData;
+			srcData.SetObject();
+			SerializeFields(texture.get(), srcData);
+
+			core::Data data;
+			srcData.GetData(data);
+
+			editorWorkspace->Save(texture->GetName(), data);
+		}
 
 		//ImVec2 size = m_Window.GetHeaderSize();
 		//std::string id = ImGui::IMGUI_FORMAT_ID(" Show Info",
@@ -393,10 +390,12 @@ namespace gallus::graphics::imgui
 		//	ImGui::Unindent();
 		//}
 
-		//float width = ImGui::GetContentRegionAvail().x;
-		//if (texture->GetTextureType() == graphics::dx12::TextureType::TextureSheet && ImGui::TextButton(ImGui::IMGUI_FORMAT_ID(font::ICON_IMAGE + std::string(" Open Texture Editor"), BUTTON_ID, "OPEN_SPRITE_EDITOR_INSPECTOR").c_str(), "Opens the sprite editor for the selected sprite sheet.", ImVec2(width, 0)))
-		//{
-		//}
+		float width = ImGui::GetContentRegionAvail().x;
+		if (texture->GetTextureType() == graphics::dx12::TextureType::TextureSheet && ImGui::TextButton(ImGui::IMGUI_FORMAT_ID(font::ICON_IMAGE + std::string(" Open Texture Editor"), BUTTON_ID, "OPEN_SPRITE_EDITOR_INSPECTOR").c_str(), "Opens the sprite editor for the selected sprite sheet.", ImVec2(width, 0)))
+		{
+			GetEditorEngine().GetImGuiSystem()->GetWindowsConfig<EditorWindowsConfig>().GetSpriteSheetEditorWindow()->SetData(texture->GetName());
+			GetEditorEngine().GetEditor()->GetEditorSettings().SetEditorState(editor::EditorState::EditorState_SpriteSheetEditor);
+		}
 
 		//ImGui::Image(texture->GetGPUHandle().ptr, { drawW, drawH }, uv0, uv1);
 

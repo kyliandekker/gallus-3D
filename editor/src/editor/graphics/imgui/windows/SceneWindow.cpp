@@ -81,7 +81,7 @@ namespace gallus
 				}
 				dx12System->SetActiveCamera(*cam);
 
-				if (editor->GetEditorSettings().GetFullScreenPlayMode())
+				if (editor->GetEditorSettings().GetEditorState() != editor::EditorState::EditorState_Workspace)
 				{
 					return;
 				}
@@ -221,11 +221,11 @@ namespace gallus
 
 						editor::EditorSettings& editorSettings = editor->GetEditorSettings();
 
-						bool inFullScreen = editorSettings.GetFullScreenPlayMode();
+						bool inFullScreen = editorSettings.GetEditorState() == editor::EditorState::EditorState_FullScene;
 						if (ImGui::CheckboxButton(
 							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_GAMEMODE), BUTTON_ID, "FULL_SCREEN_PLAY_MODE_SCENE").c_str(), &inFullScreen, "Toggles fullscreen play mode, rendering the game view without editor UI overlays.", ImVec2(m_TopToolbar.GetToolbarSize().y, m_TopToolbar.GetToolbarSize().y)))
 						{
-							editorSettings.SetFullScreenPlayMode(inFullScreen);
+							editorSettings.SetEditorState(inFullScreen ? editor::EditorState::EditorState_FullScene : editor::EditorState::EditorState_Workspace);
 							editorSettings.Save();
 						}
 					}
@@ -1115,25 +1115,26 @@ namespace gallus
 			{
 				m_sWindowID = "FullScene";
 				m_sName = "FullScene";
-				m_Flags |= ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings;
+				m_Flags |= ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings;
+				m_bHideCloseButton = false; // Since this is a full screen window, enable the close button.
 			}
 
 			//---------------------------------------------------------------------
 			void FullSceneWindow::Update()
 			{
 				m_bFullScreen = true;
-				editor::Editor* editor = GetEditorEngine().GetEditor();
-				if (!editor)
-				{
-					return;
-				}
-
-				if (!editor->GetEditorSettings().GetFullScreenPlayMode())
+				if (GetEditorEngine().GetEditor()->GetEditorSettings().GetEditorState() != editor::EditorState::EditorState_FullScene)
 				{
 					return;
 				}
 
 				BaseWindow::Update();
+
+				// Check if the close button was pressed, if so return to workspace.
+				if (!m_bEnabled)
+				{
+					GetEditorEngine().GetEditor()->GetEditorSettings().SetEditorState(editor::EditorState::EditorState_Workspace);
+				}
 			}
 
 			//---------------------------------------------------------------------

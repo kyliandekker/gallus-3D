@@ -160,7 +160,7 @@ namespace gallus::graphics::imgui
 	//---------------------------------------------------------------------
 	void HierarchyWindow::Update()
 	{
-		if (GetEditorEngine().GetEditor()->GetEditorSettings().GetFullScreenPlayMode())
+		if (GetEditorEngine().GetEditor()->GetEditorSettings().GetEditorState() != editor::EditorState::EditorState_Workspace)
 		{
 			return;
 		}

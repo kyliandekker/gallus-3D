@@ -37,9 +37,16 @@ namespace gallus::graphics::imgui
 	//---------------------------------------------------------------------
 	bool BaseWindow::WindowBegin()
 	{
+		m_bEnabled = true;
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(m_System.GetIconFont()->FontSize, m_System.GetIconFont()->FontSize));
-		const bool b = ImGui::Begin(ImGui::IMGUI_FORMAT_ID(m_sName, WINDOW_ID, string_extensions::StringToUpper(m_sWindowID)).c_str(), &m_bEnabled, m_Flags);
-		return b;
+		if (m_bHideCloseButton)
+		{
+			return ImGui::Begin(ImGui::IMGUI_FORMAT_ID(m_sName, WINDOW_ID, string_extensions::StringToUpper(m_sWindowID)).c_str(), nullptr, m_Flags);;
+		}
+		else
+		{
+			return ImGui::Begin(ImGui::IMGUI_FORMAT_ID(m_sName, WINDOW_ID, string_extensions::StringToUpper(m_sWindowID)).c_str(), &m_bEnabled, m_Flags);;
+		}
 	}
 
 	//---------------------------------------------------------------------
@@ -61,14 +68,15 @@ namespace gallus::graphics::imgui
 		if (m_bFullScreen)
 		{
 			ImGuiViewport* viewport = ImGui::GetMainViewport();
-			ImGui::SetNextWindowPos(ImVec2(0, 0));
+
+			ImGui::SetNextWindowPos(viewport->Pos);
 			ImGui::SetNextWindowSize(viewport->Size);
 		}
 
-		bool showRender = false;
+		m_bBegin = false;
 		if (!m_bRenderWindowItself)
 		{
-			showRender = WindowBegin();
+			m_bBegin = WindowBegin();
 		}
 
 		if (m_bFocusMyWindow)
@@ -77,7 +85,7 @@ namespace gallus::graphics::imgui
 			m_bFocusMyWindow = false;
 		}
 
-		if (showRender && m_bInitialized)
+		if (m_bBegin && m_bInitialized)
 		{
 			Render();
 		}

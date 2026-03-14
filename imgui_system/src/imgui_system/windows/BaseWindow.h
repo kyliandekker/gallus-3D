@@ -83,6 +83,7 @@ namespace gallus::graphics::imgui
 			m_bFocusMyWindow = true;
 		}
 	protected:
+		bool m_bHideCloseButton = true;
 		ImGuiWindowFlags m_Flags = 0; /// The flags associated with certain window behaviours.
 		ImVec2 m_vSize = ImVec2(0, 0); /// The current size of the window.
 		std::string
@@ -93,5 +94,6 @@ namespace gallus::graphics::imgui
 		bool m_bRenderWindowItself = false; /// Whether the window only needs to render the elements or the window around it.
 		bool m_bFocusMyWindow = false;
 		bool m_bInitialized = false;
+		bool m_bBegin = false;
 	};
 }
