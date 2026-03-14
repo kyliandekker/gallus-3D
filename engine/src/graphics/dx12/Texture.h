@@ -63,7 +63,7 @@ namespace gallus::graphics::dx12
 			END_SERIALIZE(TextureRect)
 	};
 
-	class TextureUV
+	class TextureUVCPU
 	{
 	public:
 		DirectX::XMFLOAT2 uv0 = { 0.0f, 0.0f }; // top-left
@@ -233,7 +233,7 @@ namespace gallus::graphics::dx12
 		/// </summary>
 		/// <param name="a_iIndex">The sprite index.</param>
 		/// <returns>The sprite uvs calculated from the rect.</returns>
-		TextureUV GetTextureUV(uint16_t a_iIndex) const;
+		TextureUVCPU GetTextureUV(uint16_t a_iIndex) const;
 	private:
 		Microsoft::WRL::ComPtr<ID3D12Resource> m_pResourceUploadHeap = nullptr;
 		int32_t m_iSRVIndex = -1;

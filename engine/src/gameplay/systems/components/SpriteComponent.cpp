@@ -100,7 +100,7 @@ namespace gallus::gameplay
 		}
 
 		DirectX::XMMATRIX mMatrix = DirectX::XMMatrixIdentity();
-		int transformIndex = 0;
+		int16_t transformIndex = 0;
 		graphics::dx12::CameraType cameraType = graphics::dx12::CameraType::CameraType_World;
 
 		if (m_pTransformSystem)
@@ -183,14 +183,14 @@ namespace gallus::gameplay
 					{
 						D3D12_GPU_VIRTUAL_ADDRESS gpuAddr = GetDX12System().GetSkinningDataAllocator()->GetGPUAddress(0);
 						a_pCommandList->GetCommandList()->SetGraphicsRootConstantBufferView(
-							RootParameters::SKINNING_DATA,
+							graphics::dx12::RootParameters::SKINNING_DATA,
 							gpuAddr);
 
 					}
 
 					{
-						ShaderTransform* pTransform =
-							reinterpret_cast<ShaderTransform*>(
+						graphics::dx12::ShaderTransform* pTransform =
+							reinterpret_cast<graphics::dx12::ShaderTransform*>(
 								GetDX12System()
 								.GetTransformAllocator()
 								->GetCPUAddress(transformIndex));
@@ -199,7 +199,7 @@ namespace gallus::gameplay
 						pTransform->WorldMatrix = mMatrix;
 
 						a_pCommandList->GetCommandList()->SetGraphicsRootConstantBufferView(
-							RootParameters::TRANSFORM,
+							graphics::dx12::RootParameters::TRANSFORM,
 							GetDX12System()
 							.GetTransformAllocator()
 							->GetGPUAddress(transformIndex));

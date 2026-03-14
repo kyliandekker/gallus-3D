@@ -28,14 +28,14 @@ namespace gallus::graphics::dx12
 		bool Initialize(
 			ID3D12Device* a_pDevice,
 			size_t a_iElementSize,
-			size_t a_iElementCount,
+			int16_t a_iElementCount,
 			size_t a_iAlignment = 256
 		);
 
 		/// <summary>
 		/// Allocates a free element index.
 		/// </summary>
-		size_t Allocate();
+		int16_t Allocate();
 
 		/// <summary>
 		/// Frees a previously allocated element.
@@ -56,7 +56,7 @@ namespace gallus::graphics::dx12
 	private:
 		size_t m_iElementSize = 0;
 		size_t m_iAlignedElementSize = 0;
-		size_t m_iElementCount = 0;
+		int16_t m_iElementCount = 0;
 
 		std::vector<bool> m_aAllocated;
 

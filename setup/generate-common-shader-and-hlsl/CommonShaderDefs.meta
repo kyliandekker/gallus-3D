@@ -1,61 +1,62 @@
-// @shader_cbuffer(name=ShaderTransform, register=b0)
-cbuffer ShaderTransform
+cbuffer ShaderTransform // (register=b0)
 {
-    float4x4 WorldViewProj;
-    float4x4 WorldMatrix;
+    float4x4 			WorldViewProj;
+    float4x4 			WorldMatrix;
 };
 
-// @shader_cbuffer(name=TextureUV, register=b1)
-cbuffer TextureUV
+cbuffer TextureUV // (register=b1)
 {
-    float4 uv;
+    float4 				uv;
 };
 
-// @shader_cbuffer(name=MaterialData, register=b2)
-cbuffer MaterialData
+cbuffer MaterialData // (register=b2)
 {
-	uint EnableLighting;
-    float3 Padding0;
-    float4 DiffuseColor;
-    float Metallic;
-    float Smoothness;
-	float2 Padding1;
+	uint 				EnableLighting;
+    float3 				Padding0;
+    float4 				DiffuseColor;
+    float 				Metallic;
+    float 				Smoothness;
+	float2 				Padding1;
 };
 
-// @shader_cbuffer(name=DirectionalLightData, register=b3)
-cbuffer DirectionalLightData
+cbuffer DirectionalLightData // (register=b3)
 {
-	uint DirectionalLightEnabled;
-    float3 LightDirection;
-    float4 LightColor;
-	float  AmbientIntensity;
+	uint 				DirectionalLightEnabled;
+    float3 				LightDirection;
+    float4 				LightColor;
+	float 				AmbientIntensity;
+	float				Padding2[3];
 };
 
-// @shader_cbuffer(name=SkinningData, register=b4)
-cbuffer SkinningData
+cbuffer SkinningData // (register=b4)
 {
-	float4x4 Bones[64];
+	float4x4 			Bones[64];
 };
 
-// @shader_vertex_input
 vertex_input VSInput
 {
-    POSITION		float3			POSITION;
-    TEXCOORD0		float2 			TEXCOORD;
-    NORMAL			float3 			NORMAL;
-    COLOR			float4 			COLOR;
-    JOINTS			uint4 			JOINTS;
-    WEIGHTS			float4 			WEIGHTS;
+    float3 				POSITION			POSITION;
+    float2 				TEXCOORD			TEXCOORD0;
+    float3 				NORMAL				NORMAL;
+    uint4 				JOINTS				JOINTS;
+    float4 				WEIGHTS				WEIGHTS;
 };
 
-// @shader_root_parameters
+pixel_input PSInput
+{
+    float4 				POSITION			SV_POSITION;
+    float2 				TEXCOORD			TEXCOORD0;
+    float3 				NORMAL				NORMAL;
+    float4 				COLOR				COLOR;
+};
+
 root_parameters
 {
-    TRANSFORM					b0 cbuffer Transform;
-    SPRITE_UV					b1 cbuffer TextureUV;
-    MATERIAL         			b2 cbuffer Material;
-    DIRECTIONAL_LIGHT			b3 cbuffer DirectionalLightData;
-    SKINNING_DATA				b4 cbuffer SkinningData;
-    TEX_SRV						t0 Texture2D spriteTexture;
-    SAMPLER_STATE				s0 SamplerState samplerState;
+    TRANSFORM				transform					b0				cbuffer;
+    SPRITE_UV				textureUV					b1				cbuffer;
+    MATERIAL         		material					b2				cbuffer;
+    DIRECTIONAL_LIGHT		directionalLightData		b3				cbuffer;
+    SKINNING_DATA			skinningData				b4				cbuffer;
+    TEX_SRV					spriteTexture				t0				Texture2D;
+    SAMPLER_STATE			samplerState				s0				SamplerState;
 };

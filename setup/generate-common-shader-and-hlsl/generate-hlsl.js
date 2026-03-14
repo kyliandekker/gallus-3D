@@ -1,295 +1,85 @@
-﻿const fs = require("fs");
-const path = require("path");
+import fs from 'fs';
+import path from 'path';
+
+import { getBuffer } from './modules/buffer.js';
+import { getVSInput } from './modules/vsInput.js';
+import { getPSInput } from './modules/psInput.js';
+import { getRootParameters } from './modules/rootParameter.js';
+import { constructCpp } from './modules/cppFileGenerator.js';
+import { constructHlsl } from './modules/hlslFileGenerator.js';
 
 const INPUT_FILE = "./CommonShaderDefs.meta";
-const OUT_CPP = "../../engine/src/graphics/dx12/ShaderDefs.h";
-const OUT_HLSL = "../../data/assets/shaders/common.hlsl";
 
-const TYPE_MAP_CPP = {
-    float: "float",
-    float2: "DirectX::XMFLOAT2",
-    float3: "DirectX::XMFLOAT3",
-    float4: "DirectX::XMFLOAT4",
-    float4x4: "DirectX::XMMATRIX",
-    bool: "bool",
-    uint: "uint32_t",
-    uint4: "DirectX::XMUINT4"
-};
+// -------------------------------------------------------------------
+var currentGeneratedStruct = [];
 
-const TYPE_MAP_HLSL = {
-    float: "float",
-    float2: "float2",
-    float3: "float3",
-    float4: "float4",
-    float4x4: "float4x4",
-    bool: "bool",
-    uint: "uint",
-    uint4: "uint4"
-};
+// -------------------------------------------------------------------
 
-const TYPE_SIZE = {
-    float: 4,
-    float2: 8,
-    float3: 12,
-    float4: 16,
-    float4x4: 64,
-    uint4: 16
-};
+const rootDir = process.argv[2];
 
-const DXGI_TYPE_MAP = {
-    float: "DXGI_FORMAT_R32_FLOAT",
-    float2: "DXGI_FORMAT_R32G32_FLOAT",
-    float3: "DXGI_FORMAT_R32G32B32_FLOAT",
-    float4: "DXGI_FORMAT_R32G32B32A32_FLOAT",
-    uint4: "DXGI_FORMAT_R32G32B32A32_UINT"
-};
+console.log(`Using root directory: "${rootDir}".`);
+console.log(`Reading file: "${INPUT_FILE}".`);
+const LINES = fs.readFileSync(INPUT_FILE, "utf8").split(/\r?\n/);
 
-function align16(v)
+var BUFFERS = [];
+var VSINPUTS = [];
+var PSINPUTS = [];
+var ROOT_PARAMETERS = [];
+
+for (let raw of LINES)
 {
-    return Math.ceil(v / 16) * 16;
+	const line = raw.trim();
+	if (!line)
+	{
+		continue;
+	}
+	
+	if (line == "{")
+	{
+		continue;
+	}
+	
+	if (line == "};")
+	{
+		var buffer = getBuffer(currentGeneratedStruct);
+		var vsInput = getVSInput(currentGeneratedStruct);
+		var psInput = getPSInput(currentGeneratedStruct);
+		var rootParameters = getRootParameters(currentGeneratedStruct);
+		
+		if (buffer)
+		{
+			BUFFERS.push(buffer);
+		}
+		if (vsInput)
+		{
+			VSINPUTS = vsInput;
+		}
+		if (psInput)
+		{
+			PSINPUTS = psInput;
+		}
+		if (rootParameters)
+		{
+			ROOT_PARAMETERS = rootParameters;
+		}
+	
+		currentGeneratedStruct = [];
+	}
+	else
+	{
+		currentGeneratedStruct.push(line);
+	}
 }
 
-const ir = { cbuffers: {}, vertexInputs: [], rootParams: [] };
-const lines = fs.readFileSync(INPUT_FILE, "utf8").split(/\r?\n/);
+// console.dir(BUFFERS, { depth: null });
 
-let currentCBuffer = null;
-let currentVS = null;
-let skipNextLine = false;
+const cppFileContent = constructCpp(BUFFERS, VSINPUTS, ROOT_PARAMETERS);
+const hlslFileContent = constructHlsl(BUFFERS, VSINPUTS, PSINPUTS, ROOT_PARAMETERS);
 
-for (let raw of lines)
-{
-    const line = raw.trim();
-    if (!line)
-    {
-        continue;
-    }
-
-    let m = line.match(/@shader_cbuffer\s*\(\s*name\s*=\s*(\w+)\s*,\s*register\s*=\s*(\w+)\s*\)/);
-    if (m)
-    {
-        const name = m[1];
-        const reg = m[2];
-
-        currentCBuffer = { name: name, reg: reg, fields: [] };
-        ir.cbuffers[name] = currentCBuffer;
-
-        currentVS = null;
-        skipNextLine = true;
-        continue;
-    }
-
-    if (line.startsWith("// @shader_vertex_input"))
-    {
-        currentVS = { name: "VSInput", fields: [] };
-        ir.vertexInputs.push(currentVS);
-
-        currentCBuffer = null;
-        skipNextLine = true;
-        continue;
-    }
-
-    if (line.startsWith("// @shader_root_parameters"))
-    {
-        currentCBuffer = null;
-        currentVS = null;
-        continue;
-    }
-
-    if (skipNextLine)
-    {
-        skipNextLine = false;
-        continue;
-    }
-
-    if (currentCBuffer)
-    {
-        m = line.match(/^(\w+)\s+(\w+)(?:\[(\d+)\])?;?$/);
-        if (m)
-        {
-            currentCBuffer.fields.push({
-                type: m[1],
-                name: m[2],
-                array: m[3] ? parseInt(m[3]) : 0
-            });
-        }
-        continue;
-    }
-
-    if (currentVS)
-    {
-        const cleanLine = line.replace(/;$/, "");
-        m = cleanLine.match(/^(\w+)\s+(\w+)\s+(\w+)$/);
-
-        if (m)
-        {
-            currentVS.fields.push({
-                semantic: m[1],
-                type: m[2],
-                name: m[3]
-            });
-        }
-        continue;
-    }
-
-    m = line.match(/^(\w+)\s+(\w+)\s+(\w+)\s+(\w+);?$/);
-    if (m)
-    {
-        ir.rootParams.push({
-            name: m[1],
-            reg: m[2],
-            kind: m[3],
-            target: m[4]
-        });
-    }
-}
-
-let cpp = [];
-
-cpp.push("#pragma once");
-cpp.push("#include \"./DX12PCH.h\"");
-cpp.push("");
-cpp.push("// GENERATED FILE - DO NOT EDIT\n");
-
-for (const cb of Object.values(ir.cbuffers))
-{
-    cpp.push(`struct ${cb.name}`);
-    cpp.push("{");
-
-    let offset = 0;
-
-    for (const f of cb.fields)
-    {
-        if (f.array > 0)
-        {
-            cpp.push(`    ${TYPE_MAP_CPP[f.type]} ${f.name}[${f.array}];`);
-            offset += TYPE_SIZE[f.type] * f.array;
-        }
-        else
-        {
-            cpp.push(`    ${TYPE_MAP_CPP[f.type]} ${f.name};`);
-            offset += TYPE_SIZE[f.type];
-        }
-    }
-
-    if (offset % 16 !== 0)
-    {
-        const pad = (align16(offset) - offset) / 4;
-    }
-
-    cpp.push("};\n");
-}
-
-if (ir.vertexInputs.length > 0)
-{
-    const vs = ir.vertexInputs[0];
-
-    cpp.push("const D3D12_INPUT_ELEMENT_DESC g_aInputLayout[] = {");
-
-    for (const f of vs.fields)
-    {
-        cpp.push(`    { "${f.name}", 0, ${DXGI_TYPE_MAP[f.type]}, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },`);
-    }
-
-    cpp.push("};\n");
-}
-
-cpp.push("enum RootParameters");
-cpp.push("{");
-
-ir.rootParams.forEach(function(p, i)
-{
-    cpp.push(`    ${p.name} = ${i},`);
-});
-
-cpp.push("    NumRootParameters");
-cpp.push("};\n");
-
+const OUT_CPP = rootDir + "/engine/src/graphics/dx12/ShaderDefs.h";
 fs.mkdirSync(path.dirname(OUT_CPP), { recursive: true });
-fs.writeFileSync(OUT_CPP, cpp.join("\n"));
+fs.writeFileSync(OUT_CPP, cppFileContent.join("\n"));
 
-let hlsl = [];
-
-hlsl.push("// GENERATED FILE - DO NOT EDIT\n");
-
-for (const cb of Object.values(ir.cbuffers))
-{
-    hlsl.push(`cbuffer ${cb.name} : register(${cb.reg})`);
-    hlsl.push("{");
-
-    let offset = 0;
-
-    for (const f of cb.fields)
-    {
-        const size = TYPE_SIZE[f.type];
-
-        if ((offset % 16) + size > 16)
-        {
-            offset = align16(offset);
-        }
-
-        if (f.array > 0)
-        {
-            hlsl.push(`    ${TYPE_MAP_HLSL[f.type]} ${f.name}[${f.array}];`);
-            offset += size * f.array;
-        }
-        else
-        {
-            hlsl.push(`    ${TYPE_MAP_HLSL[f.type]} ${f.name};`);
-            offset += size;
-        }
-    }
-
-    if (offset % 16 !== 0)
-    {
-        const pad = (align16(offset) - offset) / 4;
-    }
-
-    hlsl.push("};\n");
-}
-
-for (const vs of ir.vertexInputs)
-{
-    hlsl.push(`struct ${vs.name}`);
-    hlsl.push("{");
-
-    for (const f of vs.fields)
-    {
-        hlsl.push(`    ${TYPE_MAP_HLSL[f.type]} ${f.name} : ${f.semantic};`);
-    }
-
-    hlsl.push("};\n");
-
-    hlsl.push("struct PSInput");
-    hlsl.push("{");
-
-    for (const f of vs.fields)
-    {
-        if (f.semantic === "POSITION")
-        {
-            hlsl.push(`    float4 ${f.name} : SV_POSITION;`);
-        }
-        else
-        {
-            hlsl.push(`    ${TYPE_MAP_HLSL[f.type]} ${f.name} : ${f.semantic};`);
-        }
-    }
-
-    hlsl.push("};\n");
-}
-
-for (const r of ir.rootParams)
-{
-    if (r.kind.toLowerCase() === "cbuffer")
-    {
-        continue;
-    }
-
-    hlsl.push(`${r.kind} ${r.target} : register(${r.reg});`);
-}
-
+const OUT_HLSL = rootDir + "/data/assets/shaders/common.hlsl";
 fs.mkdirSync(path.dirname(OUT_HLSL), { recursive: true });
-fs.writeFileSync(OUT_HLSL, hlsl.join("\n"));
-
-console.log("Generated:");
-console.log(" ", OUT_CPP);
-console.log(" ", OUT_HLSL);
+fs.writeFileSync(OUT_HLSL, hlslFileContent.join("\n"));

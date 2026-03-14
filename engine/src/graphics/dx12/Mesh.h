@@ -11,6 +11,7 @@
 // graphics
 #include "graphics/dx12/IndexBuffer.h"
 #include "graphics/dx12/VertexBuffer.h"
+#include "graphics/dx12/ShaderDefs.h"
 
 namespace gallus::core
 {
@@ -18,23 +19,6 @@ namespace gallus::core
 }
 namespace gallus::graphics::dx12
 {
-	//---------------------------------------------------------------------
-	// VertexPosUV
-	//---------------------------------------------------------------------
-	/// <summary>
-	/// A simple vertex format containing a 2D position and texture coordinates (UV).
-	/// </summary>
-	struct VertexPosUV
-	{
-		DirectX::XMFLOAT3 Position;
-		DirectX::XMFLOAT2 UV;
-		DirectX::XMFLOAT3 Normal;
-		DirectX::XMFLOAT4 Color = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-
-		uint32_t Joints[4];
-		float Weights[4];
-	};
-
 	//---------------------------------------------------------------------
 	// MeshPartData
 	//---------------------------------------------------------------------
@@ -48,12 +32,12 @@ namespace gallus::graphics::dx12
 		MeshPartData() = default;
 
 		MeshPartData(
-			std::vector<VertexPosUV> a_aVertices,
+			std::vector<VSInput> a_aVertices,
 			std::vector<uint16_t> a_aIndices) :
 			m_aVertices(a_aVertices), m_aIndices(a_aIndices)
 		{}
 
-		std::vector<VertexPosUV> m_aVertices;
+		std::vector<VSInput> m_aVertices;
 		std::vector<uint16_t> m_aIndices;
 
 		VertexBuffer m_VertexBuffer;

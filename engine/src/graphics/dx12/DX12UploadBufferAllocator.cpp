@@ -16,7 +16,7 @@ namespace gallus::graphics::dx12
 	bool DX12UploadBufferAllocator::Initialize(
 		ID3D12Device* a_pDevice,
 		size_t a_iElementSize,
-		size_t a_iElementCount,
+		int16_t a_iElementCount,
 		size_t a_iAlignment)
 	{
 		m_iElementSize = a_iElementSize;
@@ -59,9 +59,9 @@ namespace gallus::graphics::dx12
 	}
 
 	//---------------------------------------------------------------------
-	size_t DX12UploadBufferAllocator::Allocate()
+	int16_t DX12UploadBufferAllocator::Allocate()
 	{
-		for (size_t i = 0; i < m_iElementCount; ++i)
+		for (int16_t i = 0; i < m_iElementCount; ++i)
 		{
 			if (!m_aAllocated[i])
 			{

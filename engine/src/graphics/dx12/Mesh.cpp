@@ -339,27 +339,6 @@ namespace gallus::graphics::dx12
 				}
 
 				//------------------------------------------
-				// COLOR
-				//------------------------------------------
-
-				const float* colors = nullptr;
-
-				if (primitive.attributes.find("COLOR_0") != primitive.attributes.end())
-				{
-					const tinygltf::Accessor& colorAccessor =
-						model.accessors[primitive.attributes.find("COLOR_0")->second];
-
-					const tinygltf::BufferView& colorBufferView =
-						model.bufferViews[colorAccessor.bufferView];
-
-					const tinygltf::Buffer& colorBuffer =
-						model.buffers[colorBufferView.buffer];
-
-					colors = reinterpret_cast<const float*>(
-						&colorBuffer.data[colorBufferView.byteOffset + colorAccessor.byteOffset]);
-				}
-
-				//------------------------------------------
 				// JOINTS (bone indices)
 				//------------------------------------------
 
@@ -456,63 +435,66 @@ namespace gallus::graphics::dx12
 
 				for (size_t i = 0; i < posAccessor.count; ++i)
 				{
-					VertexPosUV v;
+					VSInput v;
 
-					v.Position = DirectX::XMFLOAT3(
+					v.POSITION = DirectX::XMFLOAT3(
 						positions[i * 3],
 						positions[i * 3 + 1],
 						positions[i * 3 + 2]);
 
-					v.Normal = normals ?
+					v.NORMAL = normals ?
 						DirectX::XMFLOAT3(normals[i * 3], normals[i * 3 + 1], normals[i * 3 + 2]) :
 						DirectX::XMFLOAT3(0, 0, 1);
 
-					v.UV = uvs ?
+					v.TEXCOORD = uvs ?
 						DirectX::XMFLOAT2(uvs[i * 2], uvs[i * 2 + 1]) :
 						DirectX::XMFLOAT2(0, 0);
-
-					v.Color = colors ?
-						DirectX::XMFLOAT4(colors[i * 3], colors[i * 3 + 1], colors[i * 3 + 2], 1.0f) :
-						DirectX::XMFLOAT4(1, 1, 1, 1);
 
 					if ((jointsU8 || jointsU16) && (weightsF32 || weightsU8))
 					{
 						if (jointsU16)
 						{
-							v.Joints[0] = jointsU16[i * 4];
-							v.Joints[1] = jointsU16[i * 4 + 1];
-							v.Joints[2] = jointsU16[i * 4 + 2];
-							v.Joints[3] = jointsU16[i * 4 + 3];
+							v.JOINTS.x = jointsU16[i * 4];
+							v.JOINTS.y = jointsU16[i * 4 + 1];
+							v.JOINTS.z = jointsU16[i * 4 + 2];
+							v.JOINTS.w = jointsU16[i * 4 + 3];
 						}
 						else if (jointsU8)
 						{
-							v.Joints[0] = jointsU8[i * 4];
-							v.Joints[1] = jointsU8[i * 4 + 1];
-							v.Joints[2] = jointsU8[i * 4 + 2];
-							v.Joints[3] = jointsU8[i * 4 + 3];
+							v.JOINTS.x = jointsU8[i * 4];
+							v.JOINTS.y = jointsU8[i * 4 + 1];
+							v.JOINTS.z = jointsU8[i * 4 + 2];
+							v.JOINTS.w = jointsU8[i * 4 + 3];
 						}
 
 						if (weightsF32)
 						{
-							v.Weights[0] = weightsF32[i * 4];
-							v.Weights[1] = weightsF32[i * 4 + 1];
-							v.Weights[2] = weightsF32[i * 4 + 2];
-							v.Weights[3] = weightsF32[i * 4 + 3];
+							v.WEIGHTS.x = weightsF32[i * 4];
+							v.WEIGHTS.y = weightsF32[i * 4 + 1];
+							v.WEIGHTS.z = weightsF32[i * 4 + 2];
+							v.WEIGHTS.w = weightsF32[i * 4 + 3];
 						}
 						else if (weightsU8)
 						{
-							v.Weights[0] = weightsU8[i * 4] / 255.0f;
-							v.Weights[1] = weightsU8[i * 4 + 1] / 255.0f;
-							v.Weights[2] = weightsU8[i * 4 + 2] / 255.0f;
-							v.Weights[3] = weightsU8[i * 4 + 3] / 255.0f;
+							v.WEIGHTS.x = weightsU8[i * 4] / 255.0f;
+							v.WEIGHTS.y = weightsU8[i * 4 + 1] / 255.0f;
+							v.WEIGHTS.z = weightsU8[i * 4 + 2] / 255.0f;
+							v.WEIGHTS.w = weightsU8[i * 4 + 3] / 255.0f;
 						}
 					}
 					else
 					{
 						for (int j = 0; j < 4; j++)
 						{
-							v.Joints[j] = 0;
-							v.Weights[j] = (j == 0) ? 1.0f : 0.0f;
+							v.JOINTS.x = 0;
+							v.JOINTS.y = 0;
+							v.JOINTS.z = 0;
+							v.JOINTS.w = 0;
+
+							v.WEIGHTS.x = (j == 0) ? 1.0f : 0.0f;
+							v.WEIGHTS.y = (j == 0) ? 1.0f : 0.0f;
+							v.WEIGHTS.z = (j == 0) ? 1.0f : 0.0f;
+							v.WEIGHTS.w = (j == 0) ? 1.0f : 0.0f;
 						}
 					}
 
@@ -573,10 +555,10 @@ namespace gallus::graphics::dx12
 			// Upload vertex buffer data.
 			commandList->UpdateBufferResource(
 				&meshData.m_VertexBuffer.GetResource(), &meshData.m_pIntermediateVertexBuffer,
-				meshData.m_aVertices.size(), sizeof(VertexPosUV), meshData.m_aVertices.data());
+				meshData.m_aVertices.size(), sizeof(VSInput), meshData.m_aVertices.data());
 
 			// Create the vertex buffer view.
-			meshData.m_VertexBuffer.CreateViews(meshData.m_aVertices.size(), sizeof(VertexPosUV));
+			meshData.m_VertexBuffer.CreateViews(meshData.m_aVertices.size(), sizeof(VSInput));
 
 			// Upload index buffer data.
 			commandList->UpdateBufferResource(

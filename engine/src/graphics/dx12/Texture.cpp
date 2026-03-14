@@ -249,21 +249,21 @@ namespace gallus::graphics::dx12
 
 		CD3DX12_GPU_DESCRIPTOR_HANDLE gpuHandle = dx12System.GetSRV().GetGPUHandle(m_iSRVIndex);
 
-		a_pCommandList->GetCommandList()->SetGraphicsRootDescriptorTable(RootParameters::TEX_SRV, gpuHandle);
+		a_pCommandList->GetCommandList()->SetGraphicsRootDescriptorTable(graphics::dx12::RootParameters::TEX_SRV, gpuHandle);
 
 		if (m_TextureType == TextureType::TextureSheet && a_iTextureIndex < m_aTextureRects.size())
 		{
-			TextureUV uv = GetTextureUV(a_iTextureIndex);
+			TextureUVCPU uv = GetTextureUV(a_iTextureIndex);
 			float uvData[4] = { uv.uv0.x, uv.uv0.y, uv.uv1.x, uv.uv1.y };
-			a_pCommandList->GetCommandList()->SetGraphicsRoot32BitConstants(RootParameters::SPRITE_UV, 4, uvData, 0);
+			a_pCommandList->GetCommandList()->SetGraphicsRoot32BitConstants(graphics::dx12::RootParameters::SPRITE_UV, 4, uvData, 0);
 		}
 		else
 		{
-			TextureUV uv;
+			TextureUVCPU uv;
 			uv.uv0 = { 0.0f, 0.0f }; 
 			uv.uv1 = { 1.0f, 1.0f }; 
 			float uvData[4] = { uv.uv0.x, uv.uv0.y, uv.uv1.x, uv.uv1.y };
-			a_pCommandList->GetCommandList()->SetGraphicsRoot32BitConstants(RootParameters::SPRITE_UV, 4, uvData, 0);
+			a_pCommandList->GetCommandList()->SetGraphicsRoot32BitConstants(graphics::dx12::RootParameters::SPRITE_UV, 4, uvData, 0);
 		}
 	}
 
@@ -336,9 +336,9 @@ namespace gallus::graphics::dx12
 	}
 
 	//---------------------------------------------------------------------
-	TextureUV Texture::GetTextureUV(uint16_t a_iIndex) const
+	TextureUVCPU Texture::GetTextureUV(uint16_t a_iIndex) const
 	{
-		TextureUV uv;
+		TextureUVCPU uv;
 
 		if (a_iIndex < 0 || a_iIndex >= static_cast<uint16_t>(m_aTextureRects.size()))
 		{

@@ -37,7 +37,7 @@ namespace gallus::gameplay
 		/// <param name="a_vTranslation">The movement.</param>
 		void Translate(const DirectX::XMFLOAT3& a_vTranslation);
 
-		int32_t GetTransformIndex() const
+		int16_t GetTransformIndex() const
 		{
 			return m_iTransformIndex;
 		}
