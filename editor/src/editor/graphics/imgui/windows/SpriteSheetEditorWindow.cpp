@@ -121,20 +121,20 @@ namespace gallus::graphics::imgui
 	//---------------------------------------------------------------------
 	void SpriteSheetEditorWindow::DrawViewportPanel()
 	{
-		const int buttons = 4;
+		float panelPaddingY = 150;
+		ImGui::SetCursorPosY(ImGui::GetCursorPosY() + panelPaddingY);
 
 		ImVec2 windowSize = {
 			300,
-			ImGui::GetContentRegionAvail().y
+			ImGui::GetContentRegionAvail().y - panelPaddingY
 		};
 
-		if (ImGui::BeginChild("Operations", windowSize, 0,
+		if (ImGui::BeginChild("Operations", windowSize, ImGuiChildFlags_Borders,
 			ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse))
 		{
-			ImGui::SetCursorScreenPos(ImVec2(
-				ImGui::GetCursorScreenPos().x,
-				ImGui::GetCursorScreenPos().y + (windowSize.y / 2) - ((buttons * m_System.GetHeaderSize().y) / 2)
-			));
+			// Get child bounding box for outer border
+			ImVec2 childMin = ImGui::GetItemRectMin();
+			ImVec2 childMax = ImGui::GetItemRectMax();
 
 			ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
 			ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0);
@@ -216,6 +216,64 @@ namespace gallus::graphics::imgui
 
 			ImGui::PopStyleVar();
 			ImGui::PopStyleVar();
+
+			ImVec2 padding = m_System.GetFramePadding();
+			ImGui::SetCursorPosY(ImGui::GetCursorPosY() + padding.y);
+
+			if (ImGui::BeginChild("RectsSection"))
+			{
+				if (std::shared_ptr<graphics::dx12::Texture> texture = m_pTexture.lock())
+				{
+					for (size_t i = 0; i < texture->GetTextureRectsSize(); i++)
+					{
+						graphics::dx12::TextureRect* rect = texture->GetTextureRect(i);
+						if (!rect)
+						{
+							continue;
+						}
+
+						const ImVec2 uv0 = ImVec2(texture->GetTextureUV(i).uv0.x, texture->GetTextureUV(i).uv0.y);  // top-left UV
+						const ImVec2 uv1 = ImVec2(texture->GetTextureUV(i).uv1.x, texture->GetTextureUV(i).uv1.y); // bottom-right UV
+
+						float width = static_cast<float>(rect->width);
+						float height = static_cast<float>(rect->height);
+
+						// Get available region for the image
+						ImVec2 avail = ImGui::GetContentRegionAvail();
+
+						// Compute scale to fit while maintaining aspect ratio
+						float scaleX = (avail.x - (padding.x * 2)) / width;
+						ImVec2 imageSize = ImVec2(width * scaleX, height * scaleX);
+
+						// Offset from left for horizontal padding
+						ImGui::SetCursorPosX(ImGui::GetCursorPosX() + padding.x);
+
+						// Draw the image
+						ImGui::Image(texture->GetGPUHandle().ptr, imageSize, uv0, uv1);
+
+						// Draw general white border around each rect
+						ImVec2 topLeft = ImGui::GetItemRectMin();
+						ImVec2 bottomRight = ImGui::GetItemRectMax();
+						ImDrawList* drawList = ImGui::GetWindowDrawList();
+						drawList->AddRect(topLeft, bottomRight, IM_COL32(255, 255, 255, 255), 0.0f, 0, 1.0f);
+
+						// Hover & click detection for selection
+						if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+						{
+							m_iSelectedRect = static_cast<int>(i);
+						}
+
+						// Highlight selected rect with accent color border
+						if (static_cast<int>(i) == m_iSelectedRect)
+						{
+							drawList->AddRect(topLeft, bottomRight, ImColor(GetAccentColor()), 0.0f, 0, 2.0f);
+						}
+					}
+					ImGui::SetCursorPosY(ImGui::GetCursorPosY() + padding.y);
+				}
+			}
+			ImGui::EndChild();
+
 		}
 		ImGui::EndChild();
 	}
@@ -333,45 +391,58 @@ namespace gallus::graphics::imgui
 
 			pDrawList->AddImage(texture->GetGPUHandle().ptr, vMin, vMax);
 
+			static bool bDraggingRect = false;
+			static ImVec2 dragStartMouse;
+			static ImVec2 dragStartRect;
+
 			for (size_t i = 0; i < texture->GetTextureRectsSize(); i++)
 			{
 				graphics::dx12::TextureRect* textureRect = texture->GetTextureRect(i);
-				if (textureRect)
-				{
-					ImVec2 rectMin = ImVec2(vMin.x + textureRect->x * fZoom,
-						vMin.y + textureRect->y * fZoom);
+				if (!textureRect) continue;
 
-					ImVec2 rectMax = ImVec2(rectMin.x + textureRect->width * fZoom,
-						rectMin.y + textureRect->height * fZoom);
-
-					// Check if mouse clicked inside this rect
-					if (bHovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
-					{
-						if (vMouse.x >= rectMin.x && vMouse.x <= rectMax.x &&
-							vMouse.y >= rectMin.y && vMouse.y <= rectMax.y)
-						{
-							m_iSelectedRect = (int) i; // select this rect
-						}
-					}
-
-					if ((int) i != m_iSelectedRect)
-					{
-						pDrawList->AddRect(rectMin, rectMax, IM_COL32(255, 255, 255, 255), 0.0f, 0, 1.0f); // normal = red
-					}
-				}
-			}
-
-			graphics::dx12::TextureRect* textureRect = texture->GetTextureRect(m_iSelectedRect);
-
-			if (textureRect)
-			{
 				ImVec2 rectMin = ImVec2(vMin.x + textureRect->x * fZoom,
 					vMin.y + textureRect->y * fZoom);
-
 				ImVec2 rectMax = ImVec2(rectMin.x + textureRect->width * fZoom,
 					rectMin.y + textureRect->height * fZoom);
 
-				pDrawList->AddRect(rectMin, rectMax, ImColor(GetAccentColor()), 0.0f, 0, 3.0f);
+				// Select rect on click
+				if (bHovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+				{
+					if (vMouse.x >= rectMin.x && vMouse.x <= rectMax.x &&
+						vMouse.y >= rectMin.y && vMouse.y <= rectMax.y)
+					{
+						m_iSelectedRect = (int) i;
+						bDraggingRect = true;
+						dragStartMouse = vMouse;
+						dragStartRect = ImVec2((float) textureRect->x, (float) textureRect->y);
+					}
+				}
+
+				// Highlight selected rect
+				if ((int) i == m_iSelectedRect)
+				{
+					pDrawList->AddRect(rectMin, rectMax, ImColor(GetAccentColor()), 0.0f, 0, 3.0f);
+				}
+				else
+				{
+					pDrawList->AddRect(rectMin, rectMax, IM_COL32(255, 255, 255, 255), 0.0f, 0, 1.0f);
+				}
+			}
+
+			// Dragging logic
+			if (bDraggingRect && m_iSelectedRect >= 0)
+			{
+				graphics::dx12::TextureRect* selRect = texture->GetTextureRect(m_iSelectedRect);
+				if (selRect && ImGui::IsMouseDragging(ImGuiMouseButton_Left))
+				{
+					ImVec2 delta = ImVec2(vMouse.x - dragStartMouse.x, vMouse.y - dragStartMouse.y);
+					selRect->x = std::max(0, (int) (dragStartRect.x + delta.x / fZoom));
+					selRect->y = std::max(0, (int) (dragStartRect.y + delta.y / fZoom));
+				}
+				else if (!ImGui::IsMouseDown(ImGuiMouseButton_Left))
+				{
+					bDraggingRect = false; // release drag
+				}
 			}
 		}
 

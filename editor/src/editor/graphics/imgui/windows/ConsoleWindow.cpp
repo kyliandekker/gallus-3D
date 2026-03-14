@@ -361,7 +361,7 @@ namespace gallus::graphics::imgui
 			ImGui::GetContentRegionAvail().y - m_System.GetFramePadding().y
 			),
 			ImGuiChildFlags_Borders
-			))
+		))
 		{
 			static const float timestamp_width = ImGui::CalcTextSize("00:00:00:0000").x;
 
