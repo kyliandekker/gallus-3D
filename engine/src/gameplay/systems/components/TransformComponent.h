@@ -1,12 +1,11 @@
 #pragma once
 
-// external
-#include <DirectXMath.h>
-
 #include "gameplay/systems/components/Component.h"
 
 // graphics
 #include "graphics/dx12/Transform.h"
+
+#include "utils/math.h"
 
 namespace gallus::gameplay
 {
@@ -37,6 +36,16 @@ namespace gallus::gameplay
 		/// <param name="a_vTranslation">The movement.</param>
 		void Translate(const DirectX::XMFLOAT3& a_vTranslation);
 
+		const Vector3& GetTranslation() const
+		{
+			return m_vTranslation;
+		}
+
+		void SetTranslation(const Vector3& a_vTranslation)
+		{
+			m_vTranslation = a_vTranslation;
+		}
+
 		int16_t GetTransformIndex() const
 		{
 			return m_iTransformIndex;
@@ -49,7 +58,7 @@ namespace gallus::gameplay
 		void UpdateRealtime(float a_fDeltaTime, UpdateTime a_UpdateTime);
 
 		graphics::dx12::Transform m_Transform;
-		DirectX::XMFLOAT3 m_vTranslation = {};
+		Vector3 m_vTranslation = {};
 
 		int16_t m_iTransformIndex = 0; // Default is 0 because 0 is always allocated.
 

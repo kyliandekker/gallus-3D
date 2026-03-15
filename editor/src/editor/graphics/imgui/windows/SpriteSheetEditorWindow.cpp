@@ -67,7 +67,7 @@ namespace gallus::graphics::imgui
 			[this]()
 			{
 				if (ImGui::TextButton(
-					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_SAVE), BUTTON_ID, "SAVE_SPRITE_SHEET_EDITOR").c_str(), "Saves the current sprite sheet.", m_System.GetHeaderSize()))
+					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_SAVE), BUTTON_ID, "SAVE_SPRITE_SHEET_EDITOR").c_str(), "Saves the current sprite sheet.", m_System.GetHeaderSize(), ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent)))
 				{
 					if (std::shared_ptr<graphics::dx12::Texture> texture = m_pTexture.lock())
 					{
@@ -99,6 +99,45 @@ namespace gallus::graphics::imgui
 					if (std::shared_ptr<graphics::dx12::Texture> texture = m_pTexture.lock())
 					{
 						texture->SetSpriteSheetCellSize(m_vCellSize);
+					}
+				}
+			}
+		));
+
+		m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_System,
+			[this]()
+			{
+				if (ImGui::IconButton(
+					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_GIZMO_BOUNDS) + " Generate Rects", BUTTON_ID, "TOOLBAR_SPRITE_SHEET_EDITOR_AUTO_GENERATE").c_str(), "Automatically creates cells based on your cell size.", ImVec2(0, m_System.GetHeaderSize().y)))
+				{
+					if (std::shared_ptr<graphics::dx12::Texture> texture = m_pTexture.lock())
+					{
+						for (int y = 0; y < texture->GetResourceDesc().Height; y += m_vCellSize.y)
+						{
+							for (int x = 0; x < texture->GetResourceDesc().Width; x += m_vCellSize.x)
+							{
+								graphics::dx12::TextureRect r;
+								r.x = x;
+								r.y = y;
+								r.width = m_vCellSize.x;
+								r.height = m_vCellSize.y;
+								texture->GetTextureRects().push_back(r);
+							}
+						}
+					}
+				}
+			}
+		));
+
+		m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_System,
+			[this]()
+			{
+				if (ImGui::IconButton(
+					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_GIZMO_BOUNDS) + " Delete All Rects", BUTTON_ID, "TOOLBAR_SPRITE_SHEET_EDITOR_DELETE_ALL_RECTS").c_str(), "Deletes all rects.", ImVec2(0, m_System.GetHeaderSize().y)))
+				{
+					if (std::shared_ptr<graphics::dx12::Texture> texture = m_pTexture.lock())
+					{
+						texture->GetTextureRects().clear();
 					}
 				}
 			}

@@ -267,9 +267,9 @@ namespace gallus::graphics::dx12
 			SERIALIZE_FIELD(m_TextureType, "Texture Type", "The type of texture. Texture sheet for multiple sprites, or texture for only 1.",
 				.type = FieldSerializationType::FieldSerializationType_Enum,
 				.enumToStringFunc = MakeEnumToStringFunc<TextureType>(TextureTypeToString))
-			SERIALIZE_FIELD_OPTIONS(m_aTextureRects, "Texture Rects", "Enables multiple sprites from one image.", MakeArrayFieldSerializationOptions(TextureRect, FieldSerializationType::FieldSerializationType_Object))
-			SERIALIZE_FIELD(m_iSpriteSheetCellSizeX, "Sprite Sheet Size X", "", .type = FieldSerializationType::FieldSerializationType_Int32)
-			SERIALIZE_FIELD(m_iSpriteSheetCellSizeY, "Sprite Sheet Size Y", "", .type = FieldSerializationType::FieldSerializationType_Int32)
+			SERIALIZE_FIELD_OPTIONS(m_aTextureRects, "Texture Rects", "Enables multiple sprites from one image.", MakeArrayFieldSerializationOptions(TextureRect, FieldSerializationType::FieldSerializationType_Object, .hideInEditor = true))
+			SERIALIZE_FIELD(m_iSpriteSheetCellSizeX, "Sprite Sheet Size X", "", .type = FieldSerializationType::FieldSerializationType_Int32, .hideInEditor = true)
+			SERIALIZE_FIELD(m_iSpriteSheetCellSizeY, "Sprite Sheet Size Y", "", .type = FieldSerializationType::FieldSerializationType_Int32, .hideInEditor = true)
 		END_SERIALIZE(Texture)
 	};
 }

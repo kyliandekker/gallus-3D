@@ -47,6 +47,7 @@ namespace gallus
 	{
 		EditorGizmoType_None,
 		EditorGizmoType_Transform,
+		EditorGizmoType_Collider,
 		EditorGizmoType_Direction
 	};
 

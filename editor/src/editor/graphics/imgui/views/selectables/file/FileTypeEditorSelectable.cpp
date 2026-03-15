@@ -272,123 +272,122 @@ namespace gallus::graphics::imgui
 			editorWorkspace->Save(texture->GetName(), data);
 		}
 
-		//ImVec2 size = m_Window.GetHeaderSize();
-		//std::string id = ImGui::IMGUI_FORMAT_ID(" Show Info",
-		//	FOLDOUT_ID, "TEX_SHOW_INFO_INSPECTOR");
-		//ImGui::FoldOutButton(
-		//	std::string((m_bShowInfo ? font::ICON_FOLDED_OUT : font::ICON_FOLDED_IN) + id).c_str(), &m_bShowInfo, ImVec2(ImGui::GetContentRegionAvail().x, size.y));
+		ImVec2 size = m_System.GetHeaderSize();
+		std::string id = ImGui::IMGUI_FORMAT_ID(" Show Info",
+			FOLDOUT_ID, "TEX_SHOW_INFO_INSPECTOR");
+		ImGui::FoldOutButton(
+			std::string((m_bShowInfo ? font::ICON_FOLDED_OUT : font::ICON_FOLDED_IN) + id).c_str(), &m_bShowInfo, ImVec2(ImGui::GetContentRegionAvail().x, size.y));
 
-		//// Texture dimensions
-		//float spriteW = 0.0f;
-		//float spriteH = 0.0f;
-		//ImVec2 uv0, uv1;
+		// Texture dimensions
+		float spriteW = 0.0f;
+		float spriteH = 0.0f;
+		ImVec2 uv0, uv1;
 
-		//ImVec2 texturePos = ImGui::GetCursorScreenPos();
-		//if (texture->GetTextureType() == graphics::dx12::TextureType::Texture2D)
-		//{
-		//	// Full texture
-		//	spriteW = static_cast<float>(texture->GetResourceDesc().Width);
-		//	spriteH = static_cast<float>(texture->GetResourceDesc().Height);
-		//	uv0 = { 0.0f, 0.0f };
-		//	uv1 = { 1.0f, 1.0f };
-		//}
-		//else
-		//{
-		//	const auto& sprite = texture->GetTextureRect(m_iCurrentTextureIndex);
-		//	spriteW = static_cast<float>(sprite.width);
-		//	spriteH = static_cast<float>(sprite.height);
+		const graphics::dx12::TextureRect* sprite = texture->GetTextureRect(m_iCurrentTextureIndex);
+		if (texture->GetTextureType() == graphics::dx12::TextureType::TextureSheet && sprite)
+		{
+			spriteW = static_cast<float>(sprite->width);
+			spriteH = static_cast<float>(sprite->height);
 
-		//	const float texWidth = static_cast<float>(texture->GetResourceDesc().Width);
-		//	const float texHeight = static_cast<float>(texture->GetResourceDesc().Height);
+			const float texWidth = static_cast<float>(texture->GetResourceDesc().Width);
+			const float texHeight = static_cast<float>(texture->GetResourceDesc().Height);
 
-		//	uv0 = { sprite.x / texWidth, sprite.y / texHeight };                              // top-left
-		//	uv1 = { (sprite.x + sprite.width) / texWidth, (sprite.y + sprite.height) / texHeight }; // bottom-right
-		//}
+			uv0 = { sprite->x / texWidth, sprite->y / texHeight }; // top-left
+			uv1 = { (sprite->x + sprite->width) / texWidth, (sprite->y + sprite->height) / texHeight }; // bottom-right
+		}
+		else
+		{
+			// Full texture
+			spriteW = static_cast<float>(texture->GetResourceDesc().Width);
+			spriteH = static_cast<float>(texture->GetResourceDesc().Height);
+			uv0 = { 0.0f, 0.0f };
+			uv1 = { 1.0f, 1.0f };
+		}
 
-		//ImVec2 avail = ImGui::GetContentRegionAvail() * 0.75f;
-		//ImVec2 padding = ImVec2();
-		//avail.x -= padding.x * 2.0f;
-		//avail.y -= padding.y * 2.0f;
+		ImVec2 avail = ImGui::GetContentRegionAvail() * 0.75f;
+		ImVec2 padding = ImVec2();
+		avail.x -= padding.x * 2.0f;
+		avail.y -= padding.y * 2.0f;
 
-		//// Fit inside available space (keep aspect ratio)
-		//float scale = std::max(avail.x / spriteW, avail.y / spriteH);
-		//float drawW = spriteW * scale;
-		//float drawH = spriteH * scale;
+		// Fit inside available space (keep aspect ratio)
+		float scale = std::max(avail.x / spriteW, avail.y / spriteH);
+		float drawW = spriteW * scale;
+		float drawH = spriteH * scale;
 
-		//if (m_bShowInfo)
-		//{
-		//	ImGui::Indent();
-		//	ImGui::StartInspectorKeyVal(ImGui::IMGUI_FORMAT_ID("", TABLE_ID, "SPRITE_EXPLORER_ITEM_TABLE_INSPECTOR"), m_Window.GetFramePadding());
+		if (m_bShowInfo)
+		{
+			ImGui::Indent();
+			ImGui::StartInspectorKeyVal(ImGui::IMGUI_FORMAT_ID("", TABLE_ID, "SPRITE_EXPLORER_ITEM_TABLE_INSPECTOR"), m_System.GetFramePadding());
 
-		//	ImGui::KeyValue([this]
-		//		{
-		//			ImGui::AlignTextToFramePadding();
-		//			ImGui::DisplayHeader(m_Window.GetBoldFont(), "Width: ");
-		//		},
-		//		[this, texture]
-		//		{
-		//			ImGui::Text(std::to_string(texture->GetResourceDesc().Width).c_str());
-		//			return false;
-		//		});
-		//	ImGui::KeyValue([this]
-		//		{
-		//			ImGui::AlignTextToFramePadding();
-		//			ImGui::DisplayHeader(m_Window.GetBoldFont(), "Height: ");
-		//		},
-		//		[this, texture]
-		//		{
-		//			ImGui::Text(std::to_string(texture->GetResourceDesc().Height).c_str());
-		//			return false;
-		//		});
-		//	ImGui::KeyValue([this]
-		//		{
-		//			ImGui::AlignTextToFramePadding();
-		//			ImGui::DisplayHeader(m_Window.GetBoldFont(), "Channels: ");
-		//		},
-		//		[this, texture]
-		//		{
-		//			ImGui::Text(std::to_string(GetFormatChannelCount(texture->GetResourceDesc().Format)).c_str());
-		//			return false;
-		//		});
+			ImGui::KeyValue([this]
+				{
+					ImGui::AlignTextToFramePadding();
+					ImGui::DisplayHeader(m_System.GetBoldFont(), "Width: ");
+				},
+				[this, texture]
+				{
+					ImGui::Text(std::to_string(texture->GetResourceDesc().Width).c_str());
+					return false;
+				});
+			ImGui::KeyValue([this]
+				{
+					ImGui::AlignTextToFramePadding();
+					ImGui::DisplayHeader(m_System.GetBoldFont(), "Height: ");
+				},
+				[this, texture]
+				{
+					ImGui::Text(std::to_string(texture->GetResourceDesc().Height).c_str());
+					return false;
+				});
+			ImGui::KeyValue([this]
+				{
+					ImGui::AlignTextToFramePadding();
+					ImGui::DisplayHeader(m_System.GetBoldFont(), "Channels: ");
+				},
+				[this, texture]
+				{
+					ImGui::Text(std::to_string(GetFormatChannelCount(texture->GetResourceDesc().Format)).c_str());
+					return false;
+				});
 
-		//	if (texture->GetTextureType() == graphics::dx12::TextureType::TextureSheet)
-		//	{
-		//		ImGui::KeyValue([this]
-		//			{
-		//				ImGui::AlignTextToFramePadding();
-		//				ImGui::DisplayHeader(m_Window.GetBoldFont(), "");
-		//			},
-		//			[this, &spriteW]
-		//			{
-		//				return false;
-		//			});
-		//		ImGui::KeyValue([this]
-		//			{
-		//				ImGui::AlignTextToFramePadding();
-		//				ImGui::DisplayHeader(m_Window.GetBoldFont(), "Width: ");
-		//			},
-		//			[this, &spriteW]
-		//			{
-		//				int width = static_cast<int>(spriteW);
-		//				ImGui::Text(std::to_string(width).c_str());
-		//				return false;
-		//			});
-		//		ImGui::KeyValue([this]
-		//			{
-		//				ImGui::AlignTextToFramePadding();
-		//				ImGui::DisplayHeader(m_Window.GetBoldFont(), "Height: ");
-		//			},
-		//			[this, &spriteH]
-		//			{
-		//				int height = static_cast<int>(spriteH);
-		//				ImGui::Text(std::to_string(height).c_str());
-		//				return false;
-		//			});
-		//	}
+			if (texture->GetTextureType() == graphics::dx12::TextureType::TextureSheet)
+			{
+				ImGui::KeyValue([this]
+					{
+						ImGui::AlignTextToFramePadding();
+						ImGui::DisplayHeader(m_System.GetBoldFont(), "");
+					},
+					[this, &spriteW]
+					{
+						return false;
+					});
+				ImGui::KeyValue([this]
+					{
+						ImGui::AlignTextToFramePadding();
+						ImGui::DisplayHeader(m_System.GetBoldFont(), "Width: ");
+					},
+					[this, &spriteW]
+					{
+						int width = static_cast<int>(spriteW);
+						ImGui::Text(std::to_string(width).c_str());
+						return false;
+					});
+				ImGui::KeyValue([this]
+					{
+						ImGui::AlignTextToFramePadding();
+						ImGui::DisplayHeader(m_System.GetBoldFont(), "Height: ");
+					},
+					[this, &spriteH]
+					{
+						int height = static_cast<int>(spriteH);
+						ImGui::Text(std::to_string(height).c_str());
+						return false;
+					});
+			}
 
-		//	ImGui::EndInspectorKeyVal(m_Window.GetFramePadding());
-		//	ImGui::Unindent();
-		//}
+			ImGui::EndInspectorKeyVal(m_System.GetFramePadding());
+			ImGui::Unindent();
+		}
 
 		float width = ImGui::GetContentRegionAvail().x;
 		if (texture->GetTextureType() == graphics::dx12::TextureType::TextureSheet && ImGui::TextButton(ImGui::IMGUI_FORMAT_ID(font::ICON_IMAGE + std::string(" Open Texture Editor"), BUTTON_ID, "OPEN_SPRITE_EDITOR_INSPECTOR").c_str(), "Opens the sprite editor for the selected sprite sheet.", ImVec2(width, 0)))
@@ -397,23 +396,25 @@ namespace gallus::graphics::imgui
 			GetEditorEngine().GetEditor()->GetEditorSettings().SetEditorState(editor::EditorState::EditorState_SpriteSheetEditor);
 		}
 
-		//ImGui::Image(texture->GetGPUHandle().ptr, { drawW, drawH }, uv0, uv1);
+		ImVec2 texturePos = ImGui::GetCursorScreenPos();
 
-		//if (texture->GetTextureType() == graphics::dx12::TextureType::TextureSheet)
-		//{
-		//	ImGui::SetCursorScreenPos({ texturePos.x, texturePos.y + (drawH / 2) });
-		//	if (ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_PREVIOUS, BUTTON_ID, "PREV_TEX_INDEX_PREVIEW_INSPECTOR").c_str()))
-		//	{
-		//		m_iCurrentTextureIndex--;
-		//	}
-		//	ImGui::SetCursorScreenPos({ (texturePos.x + drawW) - size.x, texturePos.y + (drawH / 2) });
-		//	if (ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_NEXT, BUTTON_ID, "NEXT_TEX_INDEX_PREVIEW_INSPECTOR").c_str()))
-		//	{
-		//		m_iCurrentTextureIndex++;
-		//	}
-		//	if (m_iCurrentTextureIndex < 0) m_iCurrentTextureIndex = texture->GetTextureRectsSize() - 1; // wrap around
-		//	if (m_iCurrentTextureIndex >= texture->GetTextureRectsSize() || m_iCurrentTextureIndex < 0) m_iCurrentTextureIndex = 0; // wrap around
-		//}
+		ImGui::Image(texture->GetGPUHandle().ptr, { drawW, drawH }, uv0, uv1);
+
+		if (texture->GetTextureType() == graphics::dx12::TextureType::TextureSheet && !texture->GetTextureRects().empty())
+		{
+			ImGui::SetCursorScreenPos({ texturePos.x, texturePos.y + (drawH / 2) });
+			if (ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_PREVIOUS, BUTTON_ID, "PREV_TEX_INDEX_PREVIEW_INSPECTOR").c_str()))
+			{
+				m_iCurrentTextureIndex--;
+			}
+			ImGui::SetCursorScreenPos({ (texturePos.x + drawW) - size.x, texturePos.y + (drawH / 2) });
+			if (ImGui::Button(ImGui::IMGUI_FORMAT_ID(font::ICON_NEXT, BUTTON_ID, "NEXT_TEX_INDEX_PREVIEW_INSPECTOR").c_str()))
+			{
+				m_iCurrentTextureIndex++;
+			}
+			if (m_iCurrentTextureIndex < 0) m_iCurrentTextureIndex = texture->GetTextureRectsSize() - 1; // wrap around
+			if (m_iCurrentTextureIndex >= texture->GetTextureRectsSize() || m_iCurrentTextureIndex < 0) m_iCurrentTextureIndex = 0; // wrap around
+		}
 	}
 
 	//---------------------------------------------------------------------

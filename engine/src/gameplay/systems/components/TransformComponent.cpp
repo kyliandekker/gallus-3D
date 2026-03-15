@@ -28,6 +28,7 @@ namespace gallus::gameplay
 	void TransformComponent::Init()
 	{
 		m_iTransformIndex = GetDX12System().GetTransformAllocator()->Allocate();
+		Component::Init();
 	}
 
 	//---------------------------------------------------------------------

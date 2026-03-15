@@ -205,6 +205,12 @@ namespace gallus::graphics::imgui
 				}
 
 				int count = 0;
+
+				ImVec2 viewSize = m_System.GetHeaderSize() * 2.0f;
+
+				int iconsPerRow = static_cast<int>(ImGui::GetContentRegionAvail().x / viewSize.x);
+				iconsPerRow = std::max(1, iconsPerRow);
+
 				for (std::weak_ptr<FileEditorSelectable>& view : m_aFilteredListItems)
 				{
 					bool
@@ -263,11 +269,6 @@ namespace gallus::graphics::imgui
 					}
 					else
 					{
-						ImVec2 viewSize = m_System.GetHeaderSize() * 2.0f;
-
-						int iconsPerRow = static_cast<int>(ImGui::GetContentRegionAvail().x / viewSize.x);
-						iconsPerRow = std::max(1, iconsPerRow);
-
 						explorerItem->RenderGrid(
 							viewSize,
 							clicked,

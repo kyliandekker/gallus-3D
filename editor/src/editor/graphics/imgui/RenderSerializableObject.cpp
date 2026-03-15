@@ -1,5 +1,7 @@
 #include "RenderSerializableObject.h"
 
+#include <array>
+
 // external
 #include <imgui/imgui_internal.h>
 #include <imgui/imgui_toggle.h>
@@ -31,6 +33,9 @@
 
 // gameplay
 #include "gameplay/Prefab.h"
+#include "gameplay/systems/components/ColliderComponent.h"
+#include "gameplay/systems/components/TransformComponent.h"
+#include "gameplay/systems/TransformSystem.h"
 
 // editor
 #include "editor/core/EditorEngine.h"
@@ -721,6 +726,11 @@ namespace gallus::graphics::imgui
 				{
 					continue;
 				}
+				
+				if (field.m_Options.hideInEditor)
+				{
+					continue;
+				}
 
 				for (size_t i = 0; i < field.m_Options.indent; i++)
 				{
@@ -817,44 +827,80 @@ namespace gallus::graphics::imgui
 
 		return editing;
 	}
-	
+
 	//---------------------------------------------------------------------
-	DirectX::XMFLOAT2 WorldToScreen(const DirectX::XMFLOAT3& worldPos, const DirectX::XMMATRIX& view, const DirectX::XMMATRIX& proj, const ImVec2& viewportSize)
+	bool ShowColliderGizmo(const ImRect& a_SceneViewRect, gameplay::ColliderSettings& a_Settings)
 	{
-		using namespace DirectX;
+		gameplay::TransformComponent* pComp = GetEngine().GetECS()->GetSystem<gameplay::TransformSystem>()->TryGetComponent(a_Settings.m_EntityID);
+		if (!pComp)
+		{
+			return false;
+		}
 
-		XMVECTOR vWorld = XMLoadFloat3(&worldPos);
-		XMVECTOR vClip = XMVector3Transform(vWorld, view * proj);
+		graphics::dx12::Camera& cam = GetDX12System().GetActiveCamera();
 
-		// Perspective divide
-		XMFLOAT4 clip;
-		XMStoreFloat4(&clip, vClip);
-		float ndcX = clip.x / clip.w;
-		float ndcY = clip.y / clip.w;
+		// Compute local half size and offset
+		Vector3 halfSize = { a_Settings.m_vSize.x * 0.5f, a_Settings.m_vSize.y * 0.5f, a_Settings.m_vSize.z * 0.5f };
+		Vector3 offset = a_Settings.m_vOffset;
 
-		// Convert NDC to screen
-		XMFLOAT2 screen;
-		screen.x = (ndcX * 0.5f + 0.5f) * viewportSize.x;
-		screen.y = (1.0f - (ndcY * 0.5f + 0.5f)) * viewportSize.y; // ImGui Y is top-left
-		return screen;
-	}
-	
-	//---------------------------------------------------------------------
-	void DrawDirectionalLightGizmo(const graphics::dx12::DirectionalLight& light, const DirectX::XMMATRIX& view, const DirectX::XMMATRIX& proj, const ImVec2& viewportSize)
-	{
-		ImDrawList* drawList = ImGui::GetForegroundDrawList();
+		// Define local corners of the box
+		Vector3 corners[8] =
+		{
+			{ -halfSize.x + offset.x, -halfSize.y + offset.y, -halfSize.z + offset.z },
+			{ halfSize.x + offset.x, -halfSize.y + offset.y, -halfSize.z + offset.z },
+			{ halfSize.x + offset.x, halfSize.y + offset.y, -halfSize.z + offset.z },
+			{ -halfSize.x + offset.x, halfSize.y + offset.y, -halfSize.z + offset.z },
+			{ -halfSize.x + offset.x, -halfSize.y + offset.y, halfSize.z + offset.z },
+			{ halfSize.x + offset.x, -halfSize.y + offset.y, halfSize.z + offset.z },
+			{ halfSize.x + offset.x, halfSize.y + offset.y, halfSize.z + offset.z },
+			{ -halfSize.x + offset.x, halfSize.y + offset.y, halfSize.z + offset.z }
+		};
 
-		DirectX::XMFLOAT2 start = WorldToScreen(light.GetTransform().GetPosition(), view, proj, viewportSize);
+		DirectX::XMMATRIX worldMat = pComp->GetTransform().GetWorldMatrix();
+		DirectX::XMMATRIX viewMat = cam.GetViewMatrix(pComp->GetTransform().m_CameraType);
+		DirectX::XMMATRIX projMat = cam.GetProjectionMatrix(pComp->GetTransform().m_CameraType);
 
-		// End point = start + direction * length
-		DirectX::XMFLOAT3 endWorld;
-		endWorld.x = light.GetTransform().GetPosition().x + light.GetDirectionalLightData().LightDirection.x * 2.0f;
-		endWorld.y = light.GetTransform().GetPosition().y + light.GetDirectionalLightData().LightDirection.y * 2.0f;
-		endWorld.z = light.GetTransform().GetPosition().z + light.GetDirectionalLightData().LightDirection.z * 2.0f;
+		ImVec2 screenCorners[8];
 
-		DirectX::XMFLOAT2 end = WorldToScreen(endWorld, view, proj, viewportSize);
+		for (int i = 0; i < 8; i = i + 1)
+		{
+			DirectX::XMVECTOR v = DirectX::XMVectorSet(corners[i].x, corners[i].y, corners[i].z, 1.0f);
+			v = DirectX::XMVector3TransformCoord(v, worldMat);
+			v = DirectX::XMVector3TransformCoord(v, viewMat);
+			v = DirectX::XMVector3TransformCoord(v, projMat);
 
-		drawList->AddLine(ImVec2(start.x, start.y), ImVec2(end.x, end.y), IM_COL32(255, 255, 255, 255), 2.0f);
+			float ndcX = DirectX::XMVectorGetX(v);
+			float ndcY = DirectX::XMVectorGetY(v);
+
+			// Map from NDC [-1,1] to viewport
+			float screenX = a_SceneViewRect.Min.x + (ndcX + 1.0f) * 0.5f * (a_SceneViewRect.Max.x - a_SceneViewRect.Min.x);
+			float screenY = a_SceneViewRect.Min.y + (1.0f - (ndcY + 1.0f) * 0.5f) * (a_SceneViewRect.Max.y - a_SceneViewRect.Min.y);
+
+			screenCorners[i] = ImVec2(screenX, screenY);
+		}
+
+		ImDrawList* drawList = ImGui::GetWindowDrawList();
+		ImU32 color = IM_COL32(0, 255, 0, 255);
+
+		// Bottom face
+		drawList->AddLine(screenCorners[0], screenCorners[1], color);
+		drawList->AddLine(screenCorners[1], screenCorners[2], color);
+		drawList->AddLine(screenCorners[2], screenCorners[3], color);
+		drawList->AddLine(screenCorners[3], screenCorners[0], color);
+
+		// Top face
+		drawList->AddLine(screenCorners[4], screenCorners[5], color);
+		drawList->AddLine(screenCorners[5], screenCorners[6], color);
+		drawList->AddLine(screenCorners[6], screenCorners[7], color);
+		drawList->AddLine(screenCorners[7], screenCorners[4], color);
+
+		// Vertical edges
+		drawList->AddLine(screenCorners[0], screenCorners[4], color);
+		drawList->AddLine(screenCorners[1], screenCorners[5], color);
+		drawList->AddLine(screenCorners[2], screenCorners[6], color);
+		drawList->AddLine(screenCorners[3], screenCorners[7], color);
+
+		return false;
 	}
 	
 	//---------------------------------------------------------------------
@@ -878,6 +924,15 @@ namespace gallus::graphics::imgui
 				{
 					graphics::dx12::Transform* value = reinterpret_cast<graphics::dx12::Transform*>(ptr);
 					if (ShowTransformGizmo(a_SceneViewRect, *value))
+					{
+						changed = true;
+					}
+					break;
+				}
+				case EditorGizmoType::EditorGizmoType_Collider:
+				{
+					gameplay::ColliderSettings* value = reinterpret_cast<gameplay::ColliderSettings*>(ptr);
+					if (ShowColliderGizmo(a_SceneViewRect, *value))
 					{
 						changed = true;
 					}

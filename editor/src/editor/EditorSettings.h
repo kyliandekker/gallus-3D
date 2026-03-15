@@ -302,7 +302,7 @@ namespace gallus::editor
 
 			SERIALIZE_FIELD(m_bShowGrid, "Show Grid", "",
 				.type = FieldSerializationType::FieldSerializationType_Enum)
-			SERIALIZE_FIELD(m_EditorState, "The state the editor is currently in: I.E. Sprite sheet, workspace, etc.", "",
+			SERIALIZE_FIELD(m_EditorState, "Editor State", "",
 				.type = FieldSerializationType::FieldSerializationType_Bool)
 			SERIALIZE_FIELD(m_fSceneZoom, "Scene Zoom", "",
 				.type = FieldSerializationType::FieldSerializationType_Float)

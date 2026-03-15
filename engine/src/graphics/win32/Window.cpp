@@ -191,12 +191,7 @@ namespace gallus::graphics::win32
 	//---------------------------------------------------------------------
 	void Window::SetSize(const IVector2& a_vSize)
 	{
-		RECT rc = { 0, 0, a_vSize.x, a_vSize.y };
-		AdjustWindowRectEx(&rc, GetWindowLong(m_hWnd, GWL_STYLE), FALSE, GetWindowLong(m_hWnd, GWL_EXSTYLE));
-
-		const IVector2 totalSize(rc.right - rc.left, rc.bottom - rc.top);
-
-		ChangeSize(GetPosition(), totalSize);
+		ChangeSize(GetPosition(), a_vSize);
 	}
 
 	//---------------------------------------------------------------------

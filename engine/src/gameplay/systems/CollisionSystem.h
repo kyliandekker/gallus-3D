@@ -15,6 +15,28 @@ namespace gallus::gameplay
 		COLLISION_TYPE_EXIT
 	};
 
+	struct CollisionEntry
+	{
+		EntityID a;
+		EntityID b;
+
+		bool operator==(const CollisionEntry& other) const noexcept
+		{
+			return a == other.a && b == other.b;
+		}
+
+		bool operator<(const CollisionEntry& other) const noexcept
+		{
+			return std::tie(a, b) < std::tie(other.a, other.b);
+		}
+	};
+
+	struct CollisionInfo : public CollisionEntry
+	{
+		CollisionType m_CollisionType;
+		Vector3 m_vNormal;
+	};
+
 	//---------------------------------------------------------------------
 	// CollisionSystem
 	//---------------------------------------------------------------------
@@ -39,9 +61,9 @@ namespace gallus::gameplay
 		/// <returns>A string containing the name of the system.</returns>
 		std::string GetSystemName() const override;
 
-		//std::vector<CollisionInfo> GetCollisions(EntityID a_EntityID) const;
+		std::vector<CollisionInfo> GetCollisions(EntityID a_EntityID) const;
 
-		void Collide(ColliderComponent& a_ColliderA, ColliderComponent& a_ColliderB, const DirectX::XMFLOAT2& a_vNormal);
+		void Collide(ColliderComponent* a_pColliderA, std::shared_ptr<ColliderComponent> a_pColliderB, const Vector3& a_vNormal);
 
 		/// <summary>
 		/// Updates the system's components.
@@ -49,7 +71,7 @@ namespace gallus::gameplay
 		// <param name="a_fDeltaTime">The time it took since last frame.</param>
 		void UpdateComponentsRealtime(float a_fDeltatime, UpdateTime a_UpdateTime) override;
 	private:
-		//std::map<CollisionEntry, CollisionInfo> m_mCollisions;
-		//std::set<CollisionInfo> m_mNewCollisions;
+		std::map<CollisionEntry, CollisionInfo> m_mCollisions;
+		std::set<CollisionInfo> m_mNewCollisions;
 	};
 }
