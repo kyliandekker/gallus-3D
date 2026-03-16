@@ -829,9 +829,9 @@ namespace gallus::graphics::imgui
 	}
 
 	//---------------------------------------------------------------------
-	bool ShowColliderGizmo(const ImRect& a_SceneViewRect, gameplay::ColliderSettings& a_Settings)
+	bool ShowColliderGizmo(const ImRect& a_SceneViewRect, gameplay::ColliderSettings& a_Settings, const gameplay::EntityID& a_EntityID)
 	{
-		gameplay::TransformComponent* pComp = GetEngine().GetECS()->GetSystem<gameplay::TransformSystem>()->TryGetComponent(a_Settings.m_EntityID);
+		gameplay::TransformComponent* pComp = GetEngine().GetECS()->GetSystem<gameplay::TransformSystem>()->TryGetComponent(a_EntityID);
 		if (!pComp)
 		{
 			return false;
@@ -869,10 +869,15 @@ namespace gallus::graphics::imgui
 			v = DirectX::XMVector3TransformCoord(v, viewMat);
 			v = DirectX::XMVector3TransformCoord(v, projMat);
 
+			// Perspective divide already done by XMVector3TransformCoord
 			float ndcX = DirectX::XMVectorGetX(v);
 			float ndcY = DirectX::XMVectorGetY(v);
 
-			// Map from NDC [-1,1] to viewport
+			// Clamp NDC to [-1,1] to avoid extreme screen positions
+			ndcX = (ndcX < -1.0f) ? -1.0f : (ndcX > 1.0f) ? 1.0f : ndcX;
+			ndcY = (ndcY < -1.0f) ? -1.0f : (ndcY > 1.0f) ? 1.0f : ndcY;
+
+			// Map to viewport
 			float screenX = a_SceneViewRect.Min.x + (ndcX + 1.0f) * 0.5f * (a_SceneViewRect.Max.x - a_SceneViewRect.Min.x);
 			float screenY = a_SceneViewRect.Min.y + (1.0f - (ndcY + 1.0f) * 0.5f) * (a_SceneViewRect.Max.y - a_SceneViewRect.Min.y);
 
@@ -880,7 +885,7 @@ namespace gallus::graphics::imgui
 		}
 
 		ImDrawList* drawList = ImGui::GetWindowDrawList();
-		ImU32 color = IM_COL32(0, 255, 0, 255);
+		ImU32 color = ImColor(GetAccentColor());
 
 		// Bottom face
 		drawList->AddLine(screenCorners[0], screenCorners[1], color);
@@ -904,7 +909,7 @@ namespace gallus::graphics::imgui
 	}
 	
 	//---------------------------------------------------------------------
-	bool RenderObjectGizmos(const ImRect& a_SceneViewRect, ISerializableObject* a_pObject)
+	bool RenderObjectGizmos(const ImRect& a_SceneViewRect, ISerializableObject* a_pObject, const gameplay::EntityID& a_EntityID)
 	{
 		if (!a_pObject)
 		{
@@ -932,7 +937,7 @@ namespace gallus::graphics::imgui
 				case EditorGizmoType::EditorGizmoType_Collider:
 				{
 					gameplay::ColliderSettings* value = reinterpret_cast<gameplay::ColliderSettings*>(ptr);
-					if (ShowColliderGizmo(a_SceneViewRect, *value))
+					if (ShowColliderGizmo(a_SceneViewRect, *value, a_EntityID))
 					{
 						changed = true;
 					}

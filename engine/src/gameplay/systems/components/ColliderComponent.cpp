@@ -148,10 +148,4 @@ namespace gallus::gameplay
 	{
 		m_aEntitiesToIgnore.insert(a_EntityID);
 	}
-
-	void ColliderComponent::Init()
-	{
-		m_ColliderSettings.m_EntityID = m_EntityID;
-		Component::Init();
-	}
 }

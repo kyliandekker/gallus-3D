@@ -14,7 +14,6 @@ namespace gallus::gameplay
 	{
 		Vector3 m_vOffset = { 0, 0, 0 };
 		Vector3 m_vSize = { 1, 1, 1 };
-		EntityID m_EntityID;
 
 		BEGIN_SERIALIZE(ColliderSettings)
 			SERIALIZE_FIELD(m_vOffset, "Offset", "The local offset of the collider relative to the object's pivot or position. Adjusts where the collider is positioned without moving the object itself.",
@@ -32,8 +31,6 @@ namespace gallus::gameplay
 	public:
 		void IgnoreEntity(const gameplay::EntityID& a_EntityID);
 	protected:
-		void Init() override;
-
 		/// <summary>
 		/// Updates the system's component.
 		/// </summary>

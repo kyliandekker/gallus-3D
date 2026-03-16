@@ -369,11 +369,11 @@ namespace gallus::graphics::imgui
 		bool changed = false;
 		for (gameplay::AbstractECSSystem* sys : ecs->GetSystems())
 		{
-			if (sys->HasComponent(GetEntityID()))
+			if (sys->HasComponent(m_EntityID))
 			{
-				gameplay::Component* comp = sys->GetBaseComponent(GetEntityID());
+				gameplay::Component* comp = sys->GetBaseComponent(m_EntityID);
 
-				bool changedField = RenderObjectGizmos(a_SceneViewRect, comp);
+				bool changedField = RenderObjectGizmos(a_SceneViewRect, comp, m_EntityID);
 				if (changedField)
 				{
 					changed = true;
