@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <functional>
 
 // gameplay
 #include "gameplay/EntityID.h"
@@ -12,6 +13,7 @@ namespace gallus::gameplay
 }
 namespace gallus::editor
 {
+	void g_ShowSimplePromptModal(const std::string& a_sQuestion, const std::string& a_sLeftButtonText, const std::string& a_sRightButtonText, std::function<void()> a_ConfirmFunc);
 	void g_TrySetEditorScene(const std::string& a_sID);
 	void g_SetEditorScene(const std::string& a_sID);
 	void g_SetGameSceneToEditor();

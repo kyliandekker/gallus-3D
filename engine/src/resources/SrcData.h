@@ -22,7 +22,10 @@ namespace gallus::resources
 	class SrcData
 	{
 	public:
-		SrcData() = default;
+		SrcData()
+		{
+			SetObject();
+		}
 		SrcData(const core::Data& a_Data);
 		SrcData(const rapidjson::Value& a_Value);
 

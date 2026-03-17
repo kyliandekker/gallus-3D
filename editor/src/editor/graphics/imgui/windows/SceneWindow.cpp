@@ -163,7 +163,7 @@ namespace gallus
 					{
 						bool isStarted = gameplay::GetGame().IsStarted();
 						if (ImGui::CheckboxButton(
-							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_PLAY), BUTTON_ID, "PLAY_SCENE").c_str(), &isStarted, "Starts or stops the game simulation using the currently loaded scene. When stopping, the scene is reloaded to its original editor state.", ImVec2(m_TopToolbar.GetToolbarSize().y, m_TopToolbar.GetToolbarSize().y)))
+							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_PLAY), BUTTON_ID, "TOOLBAR_PLAY_SCENE").c_str(), &isStarted, "Starts or stops the game simulation using the currently loaded scene. When stopping, the scene is reloaded to its original editor state.", ImVec2(m_TopToolbar.GetToolbarSize().y, m_TopToolbar.GetToolbarSize().y)))
 						{
 							editor::Editor* editor = GetEditorEngine().GetEditor();
 							if (!editor)
@@ -196,7 +196,7 @@ namespace gallus
 					{
 						bool isPaused = gameplay::GetGame().IsPaused();
 						if (ImGui::CheckboxButton(
-							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_PAUSE), BUTTON_ID, "PAUSE_SCENE").c_str(), &isPaused, "Pauses or resumes the game simulation while preserving the current runtime state.", ImVec2(m_TopToolbar.GetToolbarSize().y, m_TopToolbar.GetToolbarSize().y)))
+							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_PAUSE), BUTTON_ID, "TOOLBAR_PAUSE_SCENE").c_str(), &isPaused, "Pauses or resumes the game simulation while preserving the current runtime state.", ImVec2(m_TopToolbar.GetToolbarSize().y, m_TopToolbar.GetToolbarSize().y)))
 						{
 							gameplay::GetGame().SetIsPaused(isPaused);
 						}
@@ -223,7 +223,7 @@ namespace gallus
 
 						bool inFullScreen = editorSettings.GetEditorState() == editor::EditorState::EditorState_FullScene;
 						if (ImGui::CheckboxButton(
-							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_GAMEMODE), BUTTON_ID, "FULL_SCREEN_PLAY_MODE_SCENE").c_str(), &inFullScreen, "Toggles fullscreen play mode, rendering the game view without editor UI overlays.", ImVec2(m_TopToolbar.GetToolbarSize().y, m_TopToolbar.GetToolbarSize().y)))
+							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_GAMEMODE), BUTTON_ID, "TOOLBAR_FULL_SCREEN_PLAY_MODE_SCENE").c_str(), &inFullScreen, "Toggles fullscreen play mode, rendering the game view without editor UI overlays.", ImVec2(m_TopToolbar.GetToolbarSize().y, m_TopToolbar.GetToolbarSize().y)))
 						{
 							editorSettings.SetEditorState(inFullScreen ? editor::EditorState::EditorState_FullScene : editor::EditorState::EditorState_Workspace);
 							editorSettings.Save();
@@ -297,7 +297,7 @@ namespace gallus
 
 						bool showGrid = editorSettings.GetShowGrid();
 						if (ImGui::CheckboxButton(
-							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_SCENE), BUTTON_ID, "SHOW_GRID_SCENE").c_str(), &showGrid, "Toggles visibility of the scene grid to assist with spatial alignment and positioning.", ImVec2(m_TopToolbar.GetToolbarSize().y, m_TopToolbar.GetToolbarSize().y)))
+							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_SCENE), BUTTON_ID, "TOOLBAR_SHOW_GRID_SCENE").c_str(), &showGrid, "Toggles visibility of the scene grid to assist with spatial alignment and positioning.", ImVec2(m_TopToolbar.GetToolbarSize().y, m_TopToolbar.GetToolbarSize().y)))
 						{
 							editorSettings.SetShowGrid(showGrid);
 							editorSettings.Save();
@@ -318,79 +318,9 @@ namespace gallus
 
 						bool inGameMode = editor->GetCameraMode() == editor::CameraMode::CAMERA_MODE_GAME;
 						if (ImGui::CheckboxButton(
-							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_CAMERA), BUTTON_ID, "CAMERA_MODE_GAME_SCENE").c_str(), &inGameMode, "Switches between the editor scene camera and the in-game camera view.", ImVec2(m_TopToolbar.GetToolbarSize().y, m_TopToolbar.GetToolbarSize().y)))
+							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_CAMERA), BUTTON_ID, "TOOLBAR_CAMERA_MODE_GAME_SCENE").c_str(), &inGameMode, "Switches between the editor scene camera and the in-game camera view.", ImVec2(m_TopToolbar.GetToolbarSize().y, m_TopToolbar.GetToolbarSize().y)))
 						{
 							editor->SetCameraMode(inGameMode ? editor::CameraMode::CAMERA_MODE_GAME : editor::CameraMode::CAMERA_MODE_SCENE);
-						}
-					}
-				));
-
-				m_TopToolbar.m_aToolbarItems.emplace_back(new ToolbarBreak(m_System, ImVec2(m_TopToolbar.GetToolbarSize().y, m_TopToolbar.GetToolbarSize().y)));
-
-				// Dimension draw mode button.
-				m_TopToolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_System,
-					
-					[this]()
-					{
-						graphics::dx12::DX12System* dx12System = GetEditorEngine().GetDX12();
-						if (!dx12System)
-						{
-							return;
-						}
-
-						editor::Editor* editor = GetEditorEngine().GetEditor();
-						if (!editor)
-						{
-							return;
-						}
-
-						editor::EditorSettings& editorSettings = editor->GetEditorSettings();
-
-						int dimensionDrawMode = editorSettings.GetDimensionDrawMode();
-						bool isDimensionDrawMode = true;
-						std::string dimensionDrawModeIcon = DimensionDrawModeToIcon((graphics::dx12::DimensionDrawMode) dimensionDrawMode);
-						if (ImGui::CheckboxButton(
-							ImGui::IMGUI_FORMAT_ID(dimensionDrawModeIcon, BUTTON_ID, "DIMENSION_DRAW_MODE_SCENE").c_str(), &isDimensionDrawMode, "Cycles camera rendering between combined 2D and 3D, 3D-only, and 2D-only modes.", m_System.GetHeaderSize()))
-						{
-							dimensionDrawMode = ++dimensionDrawMode % (graphics::dx12::DimensionDrawMode_2D + 1);
-							editorSettings.SetDimensionDrawMode((graphics::dx12::DimensionDrawMode) dimensionDrawMode);
-							editorSettings.Save();
-
-							dx12System->SetDimensionDrawMode((graphics::dx12::DimensionDrawMode) dimensionDrawMode);
-						}
-					}
-				));
-
-				// Shading draw mode button.
-				m_TopToolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_System,
-					
-					[this]()
-					{
-						graphics::dx12::DX12System* dx12System = GetEditorEngine().GetDX12();
-						if (!dx12System)
-						{
-							return;
-						}
-
-						editor::Editor* editor = GetEditorEngine().GetEditor();
-						if (!editor)
-						{
-							return;
-						}
-
-						editor::EditorSettings& editorSettings = editor->GetEditorSettings();
-
-						int shadingDrawMode = editorSettings.GetShadingDrawMode();
-						bool isShadingDrawMode = true;
-						std::string shadingDrawModeIcon = ShadingDrawModeToIcon((graphics::dx12::ShadingDrawMode) shadingDrawMode);
-						if (ImGui::CheckboxButton(
-							ImGui::IMGUI_FORMAT_ID(shadingDrawModeIcon, BUTTON_ID, "SHADING_DRAW_MODE_SCENE").c_str(), &isShadingDrawMode, "Cycles mesh rendering between wireframe, shaded wireframe, unlit and shaded.", m_System.GetHeaderSize()))
-						{
-							shadingDrawMode = ++shadingDrawMode % (graphics::dx12::ShadingDrawMode_Shaded + 1);
-							editorSettings.SetShadingDrawMode((graphics::dx12::ShadingDrawMode) shadingDrawMode);
-							editorSettings.Save();
-
-							dx12System->SetShadingDrawMode((graphics::dx12::ShadingDrawMode) shadingDrawMode);
 						}
 					}
 				));
@@ -409,7 +339,7 @@ namespace gallus
 						}
 
 						if (ImGui::TextButton(
-							ImGui::IMGUI_FORMAT_ID(font::ICON_UNDO, BUTTON_ID, "UNDO").c_str(), "Reverts the last action in the active workspace.", m_System.GetHeaderSize()))
+							ImGui::IMGUI_FORMAT_ID(font::ICON_UNDO, BUTTON_ID, "TOOLBAR_UNDO").c_str(), "Reverts the last action.", m_System.GetHeaderSize()))
 						{
 							editorWorkspace->Undo();
 						}
@@ -438,7 +368,7 @@ namespace gallus
 						}
 
 						if (ImGui::TextButton(
-							ImGui::IMGUI_FORMAT_ID(font::ICON_REDO, BUTTON_ID, "REDO").c_str(), "Reapplies the most recently undone action.", m_System.GetHeaderSize()))
+							ImGui::IMGUI_FORMAT_ID(font::ICON_REDO, BUTTON_ID, "TOOLBAR_REDO").c_str(), "Reapplies the most recently undone action.", m_System.GetHeaderSize()))
 						{
 							editorWorkspace->Redo();
 						}

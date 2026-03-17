@@ -40,6 +40,25 @@
 namespace gallus::editor
 {
 	//---------------------------------------------------------------------
+	void g_ShowSimplePromptModal(const std::string& a_sQuestion, const std::string& a_sLeftButtonText, const std::string& a_sRightButtonText, std::function<void()> a_ConfirmFunc)
+	{
+		graphics::imgui::ImGuiSystem* imguiSystem = GetEditorEngine().GetImGuiSystem();
+		if (imguiSystem)
+		{
+			graphics::imgui::PromptModal* promptModal = imguiSystem->GetWindowsConfig<graphics::imgui::EditorWindowsConfig>().GetPromptModal();
+			if (promptModal)
+			{
+				promptModal->SetData(a_sQuestion, {
+					graphics::imgui::PromptButton{ a_sLeftButtonText, []() {} },
+					graphics::imgui::PromptButton{ a_sRightButtonText, a_ConfirmFunc },
+				});
+
+				promptModal->Show();
+			}
+		}
+	}
+
+	//---------------------------------------------------------------------
 	void g_TrySetEditorScene(const std::string& a_sID)
 	{
 		editor::EditorWorkspace* editorWorkspace = GetEditorEngine().GetEditorWorkspace();
@@ -54,22 +73,10 @@ namespace gallus::editor
 			return;
 		}
 
-		graphics::imgui::ImGuiSystem* imguiSystem = GetEditorEngine().GetImGuiSystem();
-		if (imguiSystem)
+		g_ShowSimplePromptModal("Do you want to ignore all unsaved actions and load a new scene?", "No", "Yes", [a_sID]()
 		{
-			graphics::imgui::PromptModal* promptModal = imguiSystem->GetWindowsConfig<graphics::imgui::EditorWindowsConfig>().GetPromptModal();
-			if (promptModal)
-			{
-				promptModal->SetData("Do you want to ignore all unsaved actions and load a new scene?", {
-					graphics::imgui::PromptButton{ "No", []() {} },
-					graphics::imgui::PromptButton{ "Yes", [a_sID]() {
-						g_SetEditorScene(a_sID);
-					}},
-				});
-
-				promptModal->Show();
-			}
-		}
+			g_SetEditorScene(a_sID);
+		});
 	}
 
 	//---------------------------------------------------------------------

@@ -11,18 +11,38 @@ namespace gallus::editor
 {
 	class IEditorCommand;
 
-	class EditorWorkspace
+	struct EditorActionStack
 	{
-	public:
-		void AddAction(std::unique_ptr<IEditorCommand> a_pCommand);
-		void Execute(std::unique_ptr<IEditorCommand> a_pCommand);
+		std::vector<std::unique_ptr<IEditorCommand>> m_aUndoStack;
+		std::vector<std::unique_ptr<IEditorCommand>> m_aRedoStack;
 
 		void Undo();
 		void Redo();
 		void ClearActions();
+	};
 
-		bool CanUndo() const;
-		bool CanRedo() const;
+	enum EditorActionStackCategory
+	{
+		EditorActionStack_General,
+		EditorActionStack_SpriteSheet,
+		EditorActionStack_Animation,
+		EditorActionStack_MAX
+	};
+
+	class EditorWorkspace
+	{
+	public:
+		EditorWorkspace();
+
+		void AddAction(std::unique_ptr<IEditorCommand> a_pCommand, EditorActionStackCategory a_EditorActionStackCategory = EditorActionStackCategory::EditorActionStack_General);
+		void Execute(std::unique_ptr<IEditorCommand> a_pCommand, EditorActionStackCategory a_EditorActionStackCategory = EditorActionStackCategory::EditorActionStack_General);
+
+		void Undo(EditorActionStackCategory a_EditorActionStackCategory = EditorActionStackCategory::EditorActionStack_General);
+		void Redo(EditorActionStackCategory a_EditorActionStackCategory = EditorActionStackCategory::EditorActionStack_General);
+		void ClearActions(EditorActionStackCategory a_EditorActionStackCategory = EditorActionStackCategory::EditorActionStack_General);
+
+		bool CanUndo(EditorActionStackCategory a_EditorActionStackCategory = EditorActionStackCategory::EditorActionStack_General) const;
+		bool CanRedo(EditorActionStackCategory a_EditorActionStackCategory = EditorActionStackCategory::EditorActionStack_General) const;
 
 		void MarkDirty(const std::string& a_sID);
 		bool IsDirty(const std::string& a_sID) const;
@@ -37,8 +57,7 @@ namespace gallus::editor
 	private:
 		std::unordered_set<std::string> m_aDirtyAssets;
 
-		std::vector<std::unique_ptr<IEditorCommand>> m_aUndoStack;
-		std::vector<std::unique_ptr<IEditorCommand>> m_aRedoStack;
+		std::vector<EditorActionStack> m_aEditorActionStacks;
 
 		core::Data m_ClipboardData;
 		std::string m_sClipboardType;

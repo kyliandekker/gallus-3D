@@ -9,6 +9,10 @@
 // editor
 #include "editor/graphics/imgui/views/Toolbar.h"
 
+namespace gallus::editor
+{
+	class IEditorSpriteSheetDataCommand;
+}
 namespace gallus::graphics::dx12
 {
 	class Texture;
@@ -62,5 +66,7 @@ namespace gallus::graphics::imgui
 		int m_iSelectedRect = -1; // -1 = no selection
 
 		IVector2 m_vCellSize = IVector2(32, 32);
+
+		std::unique_ptr<editor::IEditorSpriteSheetDataCommand> m_pEditorCommand;
 	};
 }

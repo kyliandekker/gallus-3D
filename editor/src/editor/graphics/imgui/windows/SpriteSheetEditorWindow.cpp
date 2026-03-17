@@ -20,6 +20,8 @@
 #include "editor/core/EditorEngine.h"
 #include "editor/EditorWorkspace.h"
 #include "editor/Editor.h"
+#include "editor/GlobalEditorFunctions.h"
+#include "editor/commands/IEditorSpriteSheetDataCommand.h"
 
 namespace gallus::graphics::imgui
 {
@@ -112,18 +114,35 @@ namespace gallus::graphics::imgui
 				{
 					if (std::shared_ptr<graphics::dx12::Texture> texture = m_pTexture.lock())
 					{
-						for (int y = 0; y < texture->GetResourceDesc().Height; y += m_vCellSize.y)
+						resources::SrcData oldData;
+						oldData.SetObject();
+						SerializeFields(texture.get(), oldData);
+
+						std::unique_ptr<editor::IEditorSpriteSheetDataCommand> pEditorCommand = std::make_unique<editor::IEditorSpriteSheetDataCommand>();
+						pEditorCommand->SetID(texture->GetName());
+						pEditorCommand->SetOldData(oldData);
+
 						{
-							for (int x = 0; x < texture->GetResourceDesc().Width; x += m_vCellSize.x)
+							for (int y = 0; y < texture->GetResourceDesc().Height; y += m_vCellSize.y)
 							{
-								graphics::dx12::TextureRect r;
-								r.x = x;
-								r.y = y;
-								r.width = m_vCellSize.x;
-								r.height = m_vCellSize.y;
-								texture->GetTextureRects().push_back(r);
+								for (int x = 0; x < texture->GetResourceDesc().Width; x += m_vCellSize.x)
+								{
+									graphics::dx12::TextureRect r;
+									r.x = x;
+									r.y = y;
+									r.width = m_vCellSize.x;
+									r.height = m_vCellSize.y;
+									texture->GetTextureRects().push_back(r);
+								}
 							}
 						}
+
+						resources::SrcData newData;
+						newData.SetObject();
+						SerializeFields(texture.get(), newData);
+						pEditorCommand->SetNewData(newData);
+
+						GetEditorEngine().GetEditorWorkspace()->AddAction(std::move(pEditorCommand), editor::EditorActionStack_SpriteSheet);
 					}
 				}
 			}
@@ -137,9 +156,87 @@ namespace gallus::graphics::imgui
 				{
 					if (std::shared_ptr<graphics::dx12::Texture> texture = m_pTexture.lock())
 					{
-						texture->GetTextureRects().clear();
+						editor::g_ShowSimplePromptModal("Do you want to delete all rects?", "No", "Yes", [texture]()
+						{
+							resources::SrcData oldData;
+							oldData.SetObject();
+							SerializeFields(texture.get(), oldData);
+
+							std::unique_ptr<editor::IEditorSpriteSheetDataCommand> pEditorCommand = std::make_unique<editor::IEditorSpriteSheetDataCommand>();
+							pEditorCommand->SetID(texture->GetName());
+							pEditorCommand->SetOldData(oldData);
+
+							{
+								texture->GetTextureRects().clear();
+							}
+
+							resources::SrcData newData;
+							newData.SetObject();
+							SerializeFields(texture.get(), newData);
+							pEditorCommand->SetNewData(newData);
+
+							GetEditorEngine().GetEditorWorkspace()->AddAction(std::move(pEditorCommand), editor::EditorActionStack_SpriteSheet);
+						});
 					}
 				}
+			}
+		));
+
+		m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarBreak(m_System, ImVec2(m_Toolbar.GetToolbarSize().y, m_Toolbar.GetToolbarSize().y)));
+
+		// Undo.
+		m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_System,
+			[this]()
+			{
+				editor::EditorWorkspace* editorWorkspace = GetEditorEngine().GetEditorWorkspace();
+				if (!editorWorkspace)
+				{
+					return;
+				}
+
+				if (ImGui::TextButton(
+					ImGui::IMGUI_FORMAT_ID(font::ICON_UNDO, BUTTON_ID, "TOOLBAR_SPRITE_SHEET_EDITOR_UNDO").c_str(), "Reverts the last action.", m_System.GetHeaderSize()))
+				{
+					editorWorkspace->Undo(editor::EditorActionStack_SpriteSheet);
+				}
+			},
+			[]()
+			{
+				editor::EditorWorkspace* editorWorkspace = GetEditorEngine().GetEditorWorkspace();
+				if (!editorWorkspace)
+				{
+					return true;
+				}
+
+				return !editorWorkspace->CanUndo(editor::EditorActionStack_SpriteSheet);
+			}
+		));
+
+		// Redo.
+		m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_System,
+			[this]()
+			{
+				editor::EditorWorkspace* editorWorkspace = GetEditorEngine().GetEditorWorkspace();
+				if (!editorWorkspace)
+				{
+					return;
+				}
+
+				if (ImGui::TextButton(
+					ImGui::IMGUI_FORMAT_ID(font::ICON_REDO, BUTTON_ID, "TOOLBAR_SPRITE_SHEET_EDITOR_REDO").c_str(), "Reapplies the most recently undone action.", m_System.GetHeaderSize()))
+				{
+					editorWorkspace->Redo(editor::EditorActionStack_SpriteSheet);
+				}
+			},
+			[]()
+			{
+				editor::EditorWorkspace* editorWorkspace = GetEditorEngine().GetEditorWorkspace();
+				if (!editorWorkspace)
+				{
+					return true;
+				}
+
+				return !editorWorkspace->CanRedo(editor::EditorActionStack_SpriteSheet);
 			}
 		));
 	}
@@ -215,8 +312,25 @@ namespace gallus::graphics::imgui
 				{
 					if (rect)
 					{
-						rect->x = currentRectPos.x;
-						rect->y = currentRectPos.y;
+						resources::SrcData oldData;
+						oldData.SetObject();
+						SerializeFields(texture.get(), oldData);
+
+						std::unique_ptr<editor::IEditorSpriteSheetDataCommand> pEditorCommand = std::make_unique<editor::IEditorSpriteSheetDataCommand>();
+						pEditorCommand->SetID(texture->GetName());
+						pEditorCommand->SetOldData(oldData);
+
+						{
+							rect->x = currentRectPos.x;
+							rect->y = currentRectPos.y;
+						}
+
+						resources::SrcData newData;
+						newData.SetObject();
+						SerializeFields(texture.get(), newData);
+						pEditorCommand->SetNewData(newData);
+
+						GetEditorEngine().GetEditorWorkspace()->AddAction(std::move(pEditorCommand), editor::EditorActionStack_SpriteSheet);
 					}
 				}
 
@@ -225,15 +339,49 @@ namespace gallus::graphics::imgui
 				{
 					if (rect)
 					{
-						rect->width = currentRectSize.x;
-						rect->height = currentRectSize.y;
+						resources::SrcData oldData;
+						oldData.SetObject();
+						SerializeFields(texture.get(), oldData);
+
+						std::unique_ptr<editor::IEditorSpriteSheetDataCommand> pEditorCommand = std::make_unique<editor::IEditorSpriteSheetDataCommand>();
+						pEditorCommand->SetID(texture->GetName());
+						pEditorCommand->SetOldData(oldData);
+
+						{
+							rect->width = currentRectSize.x;
+							rect->height = currentRectSize.y;
+						}
+
+						resources::SrcData newData;
+						newData.SetObject();
+						SerializeFields(texture.get(), newData);
+						pEditorCommand->SetNewData(newData);
+
+						GetEditorEngine().GetEditorWorkspace()->AddAction(std::move(pEditorCommand), editor::EditorActionStack_SpriteSheet);
 					}
 				}
 
 				if (ImGui::TextButton(
 					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_DELETE) + " Delete Rect", BUTTON_ID, "TOOLBAR_SPRITE_SHEET_EDITOR_DELETE").c_str(), "Deletes the current selected sprite rect.", ImVec2(ImGui::GetContentRegionAvail().x, m_System.GetHeaderSize().y)))
 				{
-					texture->GetTextureRects().erase(texture->GetTextureRects().begin() + m_iSelectedRect);
+					resources::SrcData oldData;
+					oldData.SetObject();
+					SerializeFields(texture.get(), oldData);
+
+					std::unique_ptr<editor::IEditorSpriteSheetDataCommand> pEditorCommand = std::make_unique<editor::IEditorSpriteSheetDataCommand>();
+					pEditorCommand->SetID(texture->GetName());
+					pEditorCommand->SetOldData(oldData);
+
+					{
+						texture->GetTextureRects().erase(texture->GetTextureRects().begin() + m_iSelectedRect);
+					}
+
+					resources::SrcData newData;
+					newData.SetObject();
+					SerializeFields(texture.get(), newData);
+					pEditorCommand->SetNewData(newData);
+
+					GetEditorEngine().GetEditorWorkspace()->AddAction(std::move(pEditorCommand), editor::EditorActionStack_SpriteSheet);
 				}
 
 				if (!rect)
@@ -245,11 +393,28 @@ namespace gallus::graphics::imgui
 				if (ImGui::TextButton(
 					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_GIZMO_BOUNDS) + " Add Rect", BUTTON_ID, "TOOLBAR_SPRITE_SHEET_EDITOR_ADD").c_str(), "Adds a new sprite rect.", ImVec2(ImGui::GetContentRegionAvail().x, m_System.GetHeaderSize().y)))
 				{
-					graphics::dx12::TextureRect rect = graphics::dx12::TextureRect();
-					rect.width = m_vCellSize.x;
-					rect.height = m_vCellSize.y;
+					resources::SrcData oldData;
+					oldData.SetObject();
+					SerializeFields(texture.get(), oldData);
 
-					m_iSelectedRect = texture->AddTextureRect(rect);
+					std::unique_ptr<editor::IEditorSpriteSheetDataCommand> pEditorCommand = std::make_unique<editor::IEditorSpriteSheetDataCommand>();
+					pEditorCommand->SetID(texture->GetName());
+					pEditorCommand->SetOldData(oldData);
+
+					{
+						graphics::dx12::TextureRect rect = graphics::dx12::TextureRect();
+						rect.width = m_vCellSize.x;
+						rect.height = m_vCellSize.y;
+
+						m_iSelectedRect = texture->AddTextureRect(rect);
+					}
+
+					resources::SrcData newData;
+					newData.SetObject();
+					SerializeFields(texture.get(), newData);
+					pEditorCommand->SetNewData(newData);
+
+					GetEditorEngine().GetEditorWorkspace()->AddAction(std::move(pEditorCommand), editor::EditorActionStack_SpriteSheet);
 				}
 			}
 
@@ -410,7 +575,7 @@ namespace gallus::graphics::imgui
 				vCanvasPos.y + vOffset.y + iCellY * m_vCellSize.y * fZoom);
 			ImVec2 vMax = ImVec2(vMin.x + m_vCellSize.x * fZoom, vMin.y + m_vCellSize.y * fZoom);
 
-			pDrawList->AddRectFilled(vMin, vMax, IM_COL32(200, 200, 80, 80, 80));
+			pDrawList->AddRectFilled(vMin, vMax, IM_COL32(200, 200, 80, 80));
 			pDrawList->AddRect(vMin, vMax, IM_COL32(255, 255, 120, 255));
 
 			if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
@@ -454,6 +619,14 @@ namespace gallus::graphics::imgui
 						bDraggingRect = true;
 						dragStartMouse = vMouse;
 						dragStartRect = ImVec2((float) textureRect->x, (float) textureRect->y);
+
+						resources::SrcData oldData;
+						oldData.SetObject();
+						SerializeFields(texture.get(), oldData);
+
+						m_pEditorCommand = std::make_unique<editor::IEditorSpriteSheetDataCommand>();
+						m_pEditorCommand->SetID(texture->GetName());
+						m_pEditorCommand->SetOldData(oldData);
 					}
 				}
 
@@ -481,6 +654,18 @@ namespace gallus::graphics::imgui
 				else if (!ImGui::IsMouseDown(ImGuiMouseButton_Left))
 				{
 					bDraggingRect = false; // release drag
+
+					if (m_pEditorCommand)
+					{
+						resources::SrcData newData;
+						newData.SetObject();
+						SerializeFields(texture.get(), newData);
+						m_pEditorCommand->SetNewData(newData);
+
+						GetEditorEngine().GetEditorWorkspace()->AddAction(std::move(m_pEditorCommand), editor::EditorActionStack_SpriteSheet);
+
+						m_pEditorCommand = nullptr;
+					}
 				}
 			}
 		}
@@ -502,5 +687,7 @@ namespace gallus::graphics::imgui
 			IVector2 size = texture->GetSpriteSheetCellSize();
 			m_vCellSize = size;
 		}
+
+		GetEditorEngine().GetEditorWorkspace()->ClearActions(editor::EditorActionStack_SpriteSheet);
 	}
 }

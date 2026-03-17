@@ -20,32 +20,7 @@
 namespace gallus::editor
 {
 	//---------------------------------------------------------------------
-	// EditorWorkspace
-	//---------------------------------------------------------------------
-	void EditorWorkspace::AddAction(std::unique_ptr<IEditorCommand> a_pCommand)
-	{
-		if (!a_pCommand)
-		{
-			return;
-		}
-
-		m_aUndoStack.push_back(std::move(a_pCommand));
-	}
-
-	//---------------------------------------------------------------------
-	void EditorWorkspace::Execute(std::unique_ptr<IEditorCommand> a_pCommand)
-	{
-		if (!a_pCommand)
-		{
-			return;
-		}
-
-		a_pCommand->Redo();
-		m_aUndoStack.push_back(std::move(a_pCommand));
-	}
-
-	//---------------------------------------------------------------------
-	void EditorWorkspace::Undo()
+	void EditorActionStack::Undo()
 	{
 		if (m_aUndoStack.empty())
 		{
@@ -61,7 +36,7 @@ namespace gallus::editor
 	}
 
 	//---------------------------------------------------------------------
-	void EditorWorkspace::Redo()
+	void EditorActionStack::Redo()
 	{
 		if (m_aRedoStack.empty())
 		{
@@ -77,22 +52,96 @@ namespace gallus::editor
 	}
 
 	//---------------------------------------------------------------------
-	void EditorWorkspace::ClearActions()
+	void EditorActionStack::ClearActions()
 	{
 		m_aUndoStack.clear();
 		m_aRedoStack.clear();
 	}
 
 	//---------------------------------------------------------------------
-	bool EditorWorkspace::CanUndo() const
+	EditorWorkspace::EditorWorkspace()
 	{
-		return !m_aUndoStack.empty();
+		for (size_t i = 0; i < EditorActionStack_MAX; i++)
+		{
+			m_aEditorActionStacks.emplace_back();
+		}
 	}
 
 	//---------------------------------------------------------------------
-	bool EditorWorkspace::CanRedo() const
+	// EditorWorkspace
+	//---------------------------------------------------------------------
+	void EditorWorkspace::AddAction(std::unique_ptr<IEditorCommand> a_pCommand, EditorActionStackCategory a_EditorActionStackCategory)
 	{
-		return !m_aRedoStack.empty();
+		if (!a_pCommand)
+		{
+			return;
+		}
+
+		m_aEditorActionStacks[a_EditorActionStackCategory].m_aUndoStack.push_back(std::move(a_pCommand));
+		m_aEditorActionStacks[a_EditorActionStackCategory].m_aRedoStack.clear();
+	}
+
+	//---------------------------------------------------------------------
+	void EditorWorkspace::Execute(std::unique_ptr<IEditorCommand> a_pCommand, EditorActionStackCategory a_EditorActionStackCategory)
+	{
+		if (!a_pCommand)
+		{
+			return;
+		}
+
+		a_pCommand->Redo();
+		m_aEditorActionStacks[a_EditorActionStackCategory].m_aUndoStack.push_back(std::move(a_pCommand));
+	}
+
+	//---------------------------------------------------------------------
+	void EditorWorkspace::Undo(EditorActionStackCategory a_EditorActionStackCategory)
+	{
+		if (m_aEditorActionStacks[a_EditorActionStackCategory].m_aUndoStack.empty())
+		{
+			return;
+		}
+
+		std::unique_ptr<IEditorCommand> command = std::move(m_aEditorActionStacks[a_EditorActionStackCategory].m_aUndoStack.back());
+		m_aEditorActionStacks[a_EditorActionStackCategory].m_aUndoStack.pop_back();
+
+		command->Undo();
+
+		m_aEditorActionStacks[a_EditorActionStackCategory].m_aRedoStack.push_back(std::move(command));
+	}
+
+	//---------------------------------------------------------------------
+	void EditorWorkspace::Redo(EditorActionStackCategory a_EditorActionStackCategory)
+	{
+		if (m_aEditorActionStacks[a_EditorActionStackCategory].m_aRedoStack.empty())
+		{
+			return;
+		}
+
+		std::unique_ptr<IEditorCommand> command = std::move(m_aEditorActionStacks[a_EditorActionStackCategory].m_aRedoStack.back());
+		m_aEditorActionStacks[a_EditorActionStackCategory].m_aRedoStack.pop_back();
+
+		command->Redo();
+
+		m_aEditorActionStacks[a_EditorActionStackCategory].m_aUndoStack.push_back(std::move(command));
+	}
+
+	//---------------------------------------------------------------------
+	void EditorWorkspace::ClearActions(EditorActionStackCategory a_EditorActionStackCategory)
+	{
+		m_aEditorActionStacks[a_EditorActionStackCategory].m_aUndoStack.clear();
+		m_aEditorActionStacks[a_EditorActionStackCategory].m_aRedoStack.clear();
+	}
+
+	//---------------------------------------------------------------------
+	bool EditorWorkspace::CanUndo(EditorActionStackCategory a_EditorActionStackCategory) const
+	{
+		return !m_aEditorActionStacks[a_EditorActionStackCategory].m_aUndoStack.empty();
+	}
+
+	//---------------------------------------------------------------------
+	bool EditorWorkspace::CanRedo(EditorActionStackCategory a_EditorActionStackCategory) const
+	{
+		return !m_aEditorActionStacks[a_EditorActionStackCategory].m_aRedoStack.empty();
 	}
 
 	//---------------------------------------------------------------------

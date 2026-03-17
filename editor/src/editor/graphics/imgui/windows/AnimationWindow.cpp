@@ -62,61 +62,14 @@ namespace gallus
 			void AnimationWindow::PopulateToolbar()
 			{
 				ImVec2 toolbarSize = ImVec2(0, m_System.GetHeaderSize().y);
-				m_Toolbar = Toolbar(ImGui::IMGUI_FORMAT_ID("", CHILD_ID, "TOOLBAR_ANIMATION"), toolbarSize);
-
-				// Add keyframe button.
-				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_System,
-
-					[this]()
-					{
-						if (ImGui::IconButton(
-							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_ADD_KEYFRAME), BUTTON_ID, "ADD_KEYFRAME_ANIMATION_MODAL").c_str(), "Adds a new keyframe at the currently selected frame.", m_System.GetHeaderSize()))
-						{
-							AddKeyFrame(m_iSelectedKeyFrame);
-						}
-					}
-				));
-
-				// Remove keyframe button.
-				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_System,
-
-					[this]()
-					{
-						if (ImGui::IconButton(
-							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_REMOVE_KEYFRAME), BUTTON_ID, "REMOVE_KEYFRAME_ANIMATION_MODAL").c_str(), "Removes the currently selected keyframe from the track.", m_System.GetHeaderSize()))
-						{
-							RemoveKeyFrame(m_iSelectedKeyFrame);
-						}
-					},
-					[this]()
-					{
-						return m_iSelectedKeyFrame == -1;
-					}
-				));
-
-				// Looping button.
-				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_System,
-
-					[this]()
-					{
-						bool isLooping = m_Animation.IsLooping();
-						if (ImGui::CheckboxButton(
-							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_REFRESH), BUTTON_ID, "IS_LOOPING_ANIMATION_MODAL").c_str(), &isLooping, "Toggles looping for the animation track.", m_System.GetHeaderSize()))
-						{
-							m_Animation.SetIsLooping(isLooping);
-
-							SetAnimationDirty();
-						}
-					}
-				));
+				m_Toolbar = Toolbar(ImGui::IMGUI_FORMAT_ID("", CHILD_ID, "TOOLBAR_ANIMATION_EDITOR"), toolbarSize);
 
 				// Save button.
 				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_System,
-
 					[this]()
 					{
 						if (ImGui::TextButton(
-							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_SAVE), BUTTON_ID, "SAVE_ANIMATION_MODAL").c_str(), "Saves the current animation track.", m_System.GetHeaderSize(), ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent)))
+							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_SAVE), BUTTON_ID, "TOOLBAR_ANIMATION_EDITOR_SAVE").c_str(), "Saves the current animation track.", m_System.GetHeaderSize(), ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent)))
 						{
 							if (m_Animation.GetName().empty())
 							{
@@ -140,7 +93,7 @@ namespace gallus
 							editorWorkspace->Save(m_Animation.GetName(), data, false);
 						}
 					},
-					[this]()
+						[this]()
 					{
 						editor::EditorWorkspace* editorWorkspace = GetEditorEngine().GetEditorWorkspace();
 						if (!editorWorkspace)
@@ -149,6 +102,107 @@ namespace gallus
 						}
 
 						return !editorWorkspace->IsDirty(m_Animation.GetName());
+					}
+				));
+
+				// Add keyframe button.
+				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_System,
+					[this]()
+					{
+						if (ImGui::IconButton(
+							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_ADD_KEYFRAME), BUTTON_ID, "TOOLBAR_ANIMATION_EDITOR_ADD_KEYFRAME").c_str(), "Adds a new keyframe at the currently selected frame.", m_System.GetHeaderSize()))
+						{
+							AddKeyFrame(m_iSelectedKeyFrame);
+						}
+					}
+				));
+
+				// Remove keyframe button.
+				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_System,
+					[this]()
+					{
+						if (ImGui::IconButton(
+							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_REMOVE_KEYFRAME), BUTTON_ID, "TOOLBAR_ANIMATION_EDITOR_REMOVE_KEYFRAME").c_str(), "Removes the currently selected keyframe from the track.", m_System.GetHeaderSize()))
+						{
+							RemoveKeyFrame(m_iSelectedKeyFrame);
+						}
+					},
+					[this]()
+					{
+						return m_iSelectedKeyFrame == -1;
+					}
+				));
+
+				// Looping button.
+				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_System,
+					[this]()
+					{
+						bool isLooping = m_Animation.IsLooping();
+						if (ImGui::CheckboxButton(
+							ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_REFRESH), BUTTON_ID, "TOOLBAR_ANIMATION_EDITOR_IS_LOOPING").c_str(), &isLooping, "Toggles looping for the animation track.", m_System.GetHeaderSize()))
+						{
+							m_Animation.SetIsLooping(isLooping);
+
+							SetAnimationDirty();
+						}
+					}
+				));
+
+				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarBreak(m_System, ImVec2(m_Toolbar.GetToolbarSize().y, m_Toolbar.GetToolbarSize().y)));
+
+				// Undo.
+				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_System,
+					[this]()
+					{
+						editor::EditorWorkspace* editorWorkspace = GetEditorEngine().GetEditorWorkspace();
+						if (!editorWorkspace)
+						{
+							return;
+						}
+
+						if (ImGui::TextButton(
+							ImGui::IMGUI_FORMAT_ID(font::ICON_UNDO, BUTTON_ID, "TOOLBAR_ANIMATION_EDITOR_UNDO").c_str(), "Reverts the last action.", m_System.GetHeaderSize()))
+						{
+							editorWorkspace->Undo(editor::EditorActionStack_Animation);
+						}
+					},
+						[]()
+					{
+						editor::EditorWorkspace* editorWorkspace = GetEditorEngine().GetEditorWorkspace();
+						if (!editorWorkspace)
+						{
+							return true;
+						}
+
+						return !editorWorkspace->CanUndo(editor::EditorActionStack_Animation);
+					}
+				));
+
+				// Redo.
+				m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_System,
+					[this]()
+					{
+						editor::EditorWorkspace* editorWorkspace = GetEditorEngine().GetEditorWorkspace();
+						if (!editorWorkspace)
+						{
+							return;
+						}
+
+						if (ImGui::TextButton(
+							ImGui::IMGUI_FORMAT_ID(font::ICON_REDO, BUTTON_ID, "TOOLBAR_ANIMATION_EDITOR_REDO").c_str(), "Reapplies the most recently undone action.", m_System.GetHeaderSize()))
+						{
+							editorWorkspace->Redo(editor::EditorActionStack_Animation);
+						}
+					},
+					[]()
+					{
+						editor::EditorWorkspace* editorWorkspace = GetEditorEngine().GetEditorWorkspace();
+						if (!editorWorkspace)
+						{
+							return true;
+						}
+
+						return !editorWorkspace->CanRedo(editor::EditorActionStack_Animation);
 					}
 				));
 			}
