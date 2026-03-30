@@ -49,7 +49,7 @@ namespace gallus::core
 	m_pWindow->SetTitle(a_sName);
 	
 	const IVector2 size = m_pWindow->GetRealSize();
-	if (!m_pDX12->Initialize(true, m_pWindow->GetHWnd(), size, m_pWindow.get()))
+	if (!m_pDX12->Initialize(true, m_pWindow->GetHWnd(), size, m_pWindow.get(), 3))
 	{
 		LOG(LOGSEVERITY_INFO, LOG_CATEGORY_ENGINE, "Failed initializing engine: DX12 System could not be initialized.");
 		return false;

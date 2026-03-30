@@ -15,6 +15,8 @@
 
 #include "utils/math.h"
 
+#include "resources/ResourceAtlas.h"
+
 // gameplay
 #include "gameplay/Game.h"
 
@@ -254,31 +256,6 @@ namespace gallus
 			}
 
 			//---------------------------------------------------------------------
-			std::string ShadingDrawModeToIcon(graphics::dx12::ShadingDrawMode a_ShadingDrawMode)
-			{
-				switch (a_ShadingDrawMode)
-				{
-					case graphics::dx12::ShadingDrawMode::ShadingDrawMode_Wireframe:
-					{
-						return font::ICON_DRAW_MODE_WIREFRAME;
-					}
-					case graphics::dx12::ShadingDrawMode::ShadingDrawMode_Shaded_Wireframe:
-					{
-						return font::ICON_DRAW_MODE_SHADED_WIREFRAME;
-					}
-					case graphics::dx12::ShadingDrawMode::ShadingDrawMode_Unlit:
-					{
-						return font::ICON_DRAW_MODE_UNLIT;
-					}
-					case graphics::dx12::ShadingDrawMode::ShadingDrawMode_Shaded:
-					{
-						return font::ICON_DRAW_MODE_SHADED;
-					}
-				}
-				return "";
-			}
-
-			//---------------------------------------------------------------------
 			void SceneWindow::PopulateToolbar()
 			{
 				m_TopToolbar.m_aToolbarItems.emplace_back(new ToolbarBreak(m_System, ImVec2(m_TopToolbar.GetToolbarSize().y, m_TopToolbar.GetToolbarSize().y)));
@@ -487,20 +464,19 @@ namespace gallus
 			//---------------------------------------------------------------------
 			graphics::dx12::Texture* SceneWindow::GetRenderTexture() const
 			{
-				graphics::dx12::DX12System* dx12System = GetEditorEngine().GetDX12();
-				if (!dx12System)
-				{
-					return nullptr;
-				}
-
 				// Get the scene render texture.
-				std::shared_ptr<graphics::dx12::Texture> tex = dx12System->GetRenderTexture().lock();
-				if (!tex || !tex->IsValid())
+				std::shared_ptr<graphics::dx12::CommandQueue> cCommandQueue = GetDX12System().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
+				std::weak_ptr<graphics::dx12::Texture> tex = GetResourceAtlas().LoadTexture("RenderTexture", cCommandQueue);
+				
+				if (std::shared_ptr<graphics::dx12::Texture> renderTex = tex.lock())
 				{
-					return nullptr;
+					if (renderTex && renderTex->IsValid())
+					{
+						return renderTex.get();
+					}
 				}
-
-				return tex.get();
+			
+				return nullptr;
 			}
 
 			//---------------------------------------------------------------------
@@ -943,21 +919,27 @@ namespace gallus
 			//---------------------------------------------------------------------
 			void SceneWindow::DrawViewportPanel()
 			{
-				ImVec2 windowSize = {
-					m_System.GetHeaderSize().x,
-					ImGui::GetContentRegionAvail().y
+				const int buttons = 4;
+				const ImVec2 headerSize = m_System.GetHeaderSize();
+
+				const ImVec2 viewportSize = {
+					headerSize.x,
+					buttons * headerSize.y
 				};
 
-				const int buttons = 4;
+				ImVec2 avail = ImGui::GetContentRegionAvail();
 
-				if (ImGui::BeginChild("Operations", windowSize, 0,
+				float offsetY = (avail.y - viewportSize.y) * 0.5f;
+				if (offsetY < 0.0f)
+				{
+					offsetY = 0.0f;
+				}
+
+				ImGui::SetCursorPosY(ImGui::GetCursorPosY() + offsetY);
+
+				if (ImGui::BeginChild("Operations", viewportSize, 0,
 					ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse))
 				{
-					ImGui::SetCursorScreenPos(ImVec2(
-						ImGui::GetCursorScreenPos().x,
-						ImGui::GetCursorScreenPos().y + (windowSize.y / 2) - ((buttons * m_System.GetHeaderSize().y) / 2)
-					));
-
 					ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
 					ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0);
 

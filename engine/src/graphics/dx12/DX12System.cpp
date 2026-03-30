@@ -15,6 +15,7 @@
 #include "graphics/dx12/Material.h"
 #include "graphics/dx12/DirectionalLight.h"
 #include "graphics/dx12/DX12UploadBufferAllocator.h"
+#include "graphics/dx12/RenderView.h"
 
 #include "graphics/dx12/ShaderFactory.h"
 
@@ -40,11 +41,16 @@ namespace gallus::graphics::dx12
 	DX12System::~DX12System() = default;		
 
 	//---------------------------------------------------------------------
-	bool DX12System::Initialize(bool a_bWait, HWND a_hWnd, const IVector2& a_vSize, win32::Window* a_pWindow)
+	bool DX12System::Initialize(bool a_bWait, HWND a_hWnd, const IVector2& a_vSize, win32::Window* a_pWindow, size_t a_iNumViews)
 	{
 		m_vSize = a_vSize;
 		m_hWnd = a_hWnd;
 		m_pWindow = a_pWindow;
+
+		for (size_t i = 0; i < a_iNumViews; i++)
+		{
+			m_aRenderViews.push_back(std::make_shared<RenderView>());
+		}
 
 		LOG(LOGSEVERITY_INFO, LOG_CATEGORY_DX12, "Initializing dx12 System.");
 		return ThreadedSystem::Initialize(a_bWait);
@@ -190,8 +196,6 @@ namespace gallus::graphics::dx12
 		// Get the copy command queue.
 		std::shared_ptr<CommandQueue> cCommandQueue = GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
 
-		CreateRenderTexture({ static_cast<int>(RENDER_TEX_SIZE.x), static_cast<int>(RENDER_TEX_SIZE.y) });
-
 		resources::ResourceAtlas* resourceAtlas = GetEngine().GetResourceAtlas();
 		if (!resourceAtlas)
 		{
@@ -276,15 +280,6 @@ namespace gallus::graphics::dx12
 
 		UpdateRenderTargetViews();
 
-		// Create RTV for custom render target texture
-		if (std::shared_ptr<Texture> renderTex = m_pRenderTexture.lock())
-		{
-			if (renderTex->GetResource())
-			{
-				m_pDevice->CreateRenderTargetView(renderTex->GetResource().Get(), nullptr, m_RTV->GetCPUHandle(g_iBufferCount));
-			}
-		}
-
 		Resize({0, 0}, m_vSize);
 
 		m_pCamera = std::make_unique<Camera>();
@@ -296,9 +291,6 @@ namespace gallus::graphics::dx12
 
 		m_RenderTexViewport = CD3DX12_VIEWPORT(0.0f, 0.0f, RENDER_TEX_SIZE.x, RENDER_TEX_SIZE.y);
 		m_RenderTexScissorRect = CD3DX12_RECT(0, 0, RENDER_TEX_SIZE.x, RENDER_TEX_SIZE.y);
-
-		m_pDepthBuffer = std::make_unique<DX12Resource>();
-		ResizeDepthBuffer();
 
 		m_pTransformAllocation = std::make_shared<DX12UploadBufferAllocator>();
 		m_pTransformAllocation->Initialize(
@@ -542,13 +534,18 @@ namespace gallus::graphics::dx12
 	//---------------------------------------------------------------------
 	void DX12System::CreateRTV()
 	{
-		size_t numBuffers = g_iBufferCount + 1;
+		size_t numBuffers = g_iBufferCount + m_aRenderViews.size();
 
 		D3D12_DESCRIPTOR_HEAP_DESC rtvHeapDesc = {};
 		rtvHeapDesc.NumDescriptors = static_cast<UINT>(numBuffers);
 		rtvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
 		rtvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 		m_RTV = std::make_unique<HeapAllocation>(rtvHeapDesc);
+
+		for (size_t i = 0; i < g_iBufferCount; i++)
+		{
+			m_RTV->Allocate();
+		}
 	}
 
 	//---------------------------------------------------------------------
@@ -566,7 +563,7 @@ namespace gallus::graphics::dx12
 	{
 		// Create the descriptor heap for the depth-stencil view.
 		D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc = {};
-		dsvHeapDesc.NumDescriptors = 1;
+		dsvHeapDesc.NumDescriptors = m_aRenderViews.size();
 		dsvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
 		dsvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 		m_DSV = std::make_unique<HeapAllocation>(dsvHeapDesc);
@@ -605,12 +602,6 @@ namespace gallus::graphics::dx12
 
 			m_BackBuffers[i]->SetResource(backBuffer);
 		}
-	}
-
-	//---------------------------------------------------------------------
-	std::weak_ptr<Texture> DX12System::GetRenderTexture()
-	{
-		return m_pRenderTexture;
 	}
 
 	//---------------------------------------------------------------------
@@ -776,37 +767,36 @@ namespace gallus::graphics::dx12
 	}
 
 	//---------------------------------------------------------------------
-	void DX12System::ResizeDepthBuffer()
+	void DX12System::SetDepthBuffer(std::unique_ptr<DX12Resource>& a_pDepthBuffer)
 	{
+		a_pDepthBuffer = std::make_unique<DX12Resource>();
+		m_DSV->Deallocate(0);
+
+		// Resize screen dependent resources.
+		// Create a depth buffer.
+		D3D12_CLEAR_VALUE optimizedClearValue = {};
+		optimizedClearValue.Format = DXGI_FORMAT_D32_FLOAT;
+		optimizedClearValue.DepthStencil = { 1.0f, 0 };
+
+		CD3DX12_HEAP_PROPERTIES heapType = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
+		CD3DX12_RESOURCE_DESC tex = CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_D32_FLOAT, RENDER_TEX_SIZE.x, RENDER_TEX_SIZE.y,
+			1, 0, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL);
+
+		if (!a_pDepthBuffer->SetResourceData("Depth Buffer", tex, CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_RESOURCE_STATE_DEPTH_WRITE, &optimizedClearValue))
 		{
-			m_DSV->Deallocate(0);
-
-			// Resize screen dependent resources.
-			// Create a depth buffer.
-			D3D12_CLEAR_VALUE optimizedClearValue = {};
-			optimizedClearValue.Format = DXGI_FORMAT_D32_FLOAT;
-			optimizedClearValue.DepthStencil = { 1.0f, 0 };
-
-			CD3DX12_HEAP_PROPERTIES heapType = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
-			CD3DX12_RESOURCE_DESC tex = CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_D32_FLOAT, RENDER_TEX_SIZE.x, RENDER_TEX_SIZE.y,
-				1, 0, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL);
-
-			if (!m_pDepthBuffer->SetResourceData("Depth Buffer", tex, CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_RESOURCE_STATE_DEPTH_WRITE, &optimizedClearValue))
-			{
-				LOG(LOGSEVERITY_ERROR, LOG_CATEGORY_DX12, "Failed resizing depth buffer: Failed creating committed resource.");
-				return;
-			}
-
-			// Update the depth-stencil view.
-			D3D12_DEPTH_STENCIL_VIEW_DESC dsv = {};
-			dsv.Format = DXGI_FORMAT_D32_FLOAT;
-			dsv.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
-			dsv.Texture2D.MipSlice = 0;
-			dsv.Flags = D3D12_DSV_FLAG_NONE;
-
-			m_pDevice->CreateDepthStencilView(m_pDepthBuffer->GetResource().Get(), &dsv,
-				m_DSV->GetCPUHandle(m_DSV->Allocate()));
+			LOG(LOGSEVERITY_ERROR, LOG_CATEGORY_DX12, "Failed resizing depth buffer: Failed creating committed resource.");
+			return;
 		}
+
+		// Update the depth-stencil view.
+		D3D12_DEPTH_STENCIL_VIEW_DESC dsv = {};
+		dsv.Format = DXGI_FORMAT_D32_FLOAT;
+		dsv.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+		dsv.Texture2D.MipSlice = 0;
+		dsv.Flags = D3D12_DSV_FLAG_NONE;
+
+		m_pDevice->CreateDepthStencilView(a_pDepthBuffer->GetResource().Get(), &dsv,
+			m_DSV->GetCPUHandle(m_DSV->Allocate()));
 	}
 
 	//---------------------------------------------------------------------
@@ -822,25 +812,6 @@ namespace gallus::graphics::dx12
 	}
 
 	//---------------------------------------------------------------------
-	D3D12_CPU_DESCRIPTOR_HANDLE DX12System::GetCurrentRenderTargetView(bool a_bUseRenderTexture)
-	{
-		if (a_bUseRenderTexture)
-		{
-			if (std::shared_ptr<Texture> renderTex = m_pRenderTexture.lock())
-			{
-				if (renderTex->IsValid())
-				{
-					size_t backBufferStart = g_iBufferCount;
-
-					return m_RTV->GetCPUHandle(backBufferStart);
-				}
-			}
-		}
-
-		return m_RTV->GetCPUHandle(m_iCurrentBackBufferIndex);
-	}
-
-	//---------------------------------------------------------------------
 	void DX12System::Loop()
 	{
 		if (!m_bInitialized.load())
@@ -849,6 +820,12 @@ namespace gallus::graphics::dx12
 		}
 
 		m_FpsCounter.Update();
+	}
+
+	//---------------------------------------------------------------------
+	std::shared_ptr<RenderView> DX12System::RegisterView(size_t a_iIndex)
+	{
+		return m_aRenderViews[a_iIndex];
 	}
 
 	//---------------------------------------------------------------------
@@ -865,21 +842,19 @@ namespace gallus::graphics::dx12
 		UINT backIndex = GetCurrentBackBufferIndex();
 		const FLOAT clearColor[] = { 0, 0, 0, 0 };
 
-		D3D12_CPU_DESCRIPTOR_HANDLE dsv = m_DSV->GetCPUDescriptorHandleForHeapStart();
-
 		commandList->GetCommandList()->SetGraphicsRootSignature(m_pRootSignature.Get());
 
-		// 1. Render 2D scene into RenderTexture
-		std::shared_ptr<Texture> renderTex = m_pRenderTexture.lock();
-		if (renderTex)
+		for (std::shared_ptr<RenderView>& renderView : m_aRenderViews)
 		{
-			if (renderTex->CanBeDrawn())
+			std::shared_ptr<Texture> renderTex = renderView->m_pRenderTarget.lock();
+			if (renderTex)
 			{
 				// Transition RenderTexture -> RTV
 				renderTex->Transition(commandList, D3D12_RESOURCE_STATE_RENDER_TARGET);
 
-				// Render onto the render tex rtv (true arg does this).
-				D3D12_CPU_DESCRIPTOR_HANDLE rtRtv = GetCurrentRenderTargetView(true);
+				D3D12_CPU_DESCRIPTOR_HANDLE rtRtv = m_RTV->GetCPUHandle(renderView->m_iRTVIndex);
+				D3D12_CPU_DESCRIPTOR_HANDLE dsv = m_DSV->GetCPUHandle(renderView->m_iDSVIndex);
+
 				commandList->GetCommandList()->ClearRenderTargetView(rtRtv, clearColor, 0, nullptr);
 				commandList->GetCommandList()->ClearDepthStencilView(
 					dsv,
@@ -889,20 +864,25 @@ namespace gallus::graphics::dx12
 					0,
 					nullptr
 				);
+
 				commandList->GetCommandList()->OMSetRenderTargets(1, &rtRtv, FALSE, &dsv);
 
-				m_pDirectionalLight->Bind(commandList);
+				commandList->GetCommandList()->RSSetViewports(1, &renderView->m_Viewport);
+				commandList->GetCommandList()->RSSetScissorRects(1, &renderView->m_ScissorRect);
 
-				RenderObjects(commandQueue, commandList, rtRtv);
+				renderView->m_RenderFunc(commandQueue, commandList);
 
 				renderTex->Transition(commandList, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 			}
 		}
 
+		ID3D12DescriptorHeap* descriptorHeaps[] = { m_SRV->GetHeap().Get() };
+		commandList->GetCommandList()->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
+
 		backBuffer->Transition(commandList, D3D12_RESOURCE_STATE_RENDER_TARGET);
 
 		// back buffer rtv.
-		D3D12_CPU_DESCRIPTOR_HANDLE backRtv = GetCurrentRenderTargetView(false);
+		D3D12_CPU_DESCRIPTOR_HANDLE backRtv = m_RTV->GetCPUHandle(m_iCurrentBackBufferIndex);
 		commandList->GetCommandList()->ClearRenderTargetView(backRtv, clearColor, 0, nullptr);
 
 		commandList->GetCommandList()->RSSetViewports(1, &m_WindowViewport);
@@ -913,35 +893,6 @@ namespace gallus::graphics::dx12
 		m_eOnRenderTexReady(commandList);
 
 		Present(commandQueue, commandList);
-	}
-
-	//---------------------------------------------------------------------
-	void DX12System::DrawFullScreen(std::shared_ptr<CommandList> a_pCommandList)
-	{
-		std::shared_ptr<Texture> renderTex = m_pRenderTexture.lock();
-		if (!renderTex)
-		{
-			return;
-		}
-
-		if (renderTex && renderTex->CanBeDrawn())
-		{
-			if (renderTex->CanBeDrawn())
-			{
-				// Bind pipeline + root signature
-				if (m_pRenderTextureShaderBind)
-				{
-					a_pCommandList->GetCommandList()->SetPipelineState(m_pRenderTextureShaderBind);
-				}
-
-				renderTex->Bind(a_pCommandList);
-
-				// Draw fullscreen quad (shader-generated)
-				a_pCommandList->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-				a_pCommandList->GetCommandList()->IASetVertexBuffers(0, 0, nullptr);
-				a_pCommandList->GetCommandList()->DrawInstanced(3, 1, 0, 0);
-			}
-		}
 	}
 
 	//---------------------------------------------------------------------
@@ -1066,42 +1017,6 @@ namespace gallus::graphics::dx12
 	Camera& DX12System::GetCamera()
 	{
 		return *m_pCamera.get();
-	}
-
-	//---------------------------------------------------------------------
-	void DX12System::CreateRenderTexture(const IVector2& a_vSize)
-	{
-		if (std::shared_ptr<Texture> renderTex = m_pRenderTexture.lock())
-		{
-			if (renderTex && renderTex->GetResource())
-			{
-				renderTex->Destroy();
-			}
-		}
-
-		D3D12_RESOURCE_DESC texDesc = {};
-		texDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-		texDesc.Width = a_vSize.x;
-		texDesc.Height = a_vSize.y;
-		texDesc.DepthOrArraySize = 1;
-		texDesc.MipLevels = 1;
-		texDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-		texDesc.SampleDesc.Count = 1;
-		texDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-		texDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
-
-		resources::ResourceAtlas* resourceAtlas = GetEngine().GetResourceAtlas();
-		if (!resourceAtlas)
-		{
-			return;
-		}
-
-		m_pRenderTexture = resourceAtlas->LoadTextureByDescription("RenderTexture", texDesc);
-		if (std::shared_ptr<Texture> renderTex = m_pRenderTexture.lock())
-		{
-			renderTex->SetResourceCategory(resources::EngineResourceCategory::System);
-			renderTex->SetIsDestroyable(false);
-		}
 	}
 	
 	//---------------------------------------------------------------------

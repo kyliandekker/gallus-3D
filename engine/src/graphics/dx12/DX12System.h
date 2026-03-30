@@ -48,20 +48,13 @@ namespace gallus::graphics::dx12
 	class Texture;
 	class Material;
 	class DirectionalLight;
+	class RenderView;
 
 	enum DimensionDrawMode
 	{
 		DimensionDrawMode_2D3D,
 		DimensionDrawMode_3D,
 		DimensionDrawMode_2D,
-	};
-
-	enum ShadingDrawMode
-	{
-		ShadingDrawMode_Wireframe,
-		ShadingDrawMode_Shaded_Wireframe,
-		ShadingDrawMode_Unlit,
-		ShadingDrawMode_Shaded,
 	};
 
 	//---------------------------------------------------------------------
@@ -90,8 +83,9 @@ namespace gallus::graphics::dx12
 		/// <param name="a_hWnd">Handle to the window.</param>
 		/// <param name="a_vSize">Size of the window.</param>
 		/// <param name="a_pWindow">The window.</param>
+		/// <param name="a_iNumViews">Number of views that should be allocated.</param>
 		/// <returns>True if the initialization was successful, otherwise false.</returns>
-		bool Initialize(bool a_bWait, HWND a_hWnd, const IVector2& a_vSize, win32::Window* a_pWindow);
+		bool Initialize(bool a_bWait, HWND a_hWnd, const IVector2& a_vSize, win32::Window* a_pWindow, size_t a_iNumViews);
 
 		/// <summary>
 		/// Cleans up resources and destroys the dx12 window.
@@ -203,11 +197,6 @@ namespace gallus::graphics::dx12
 		void Resize(const IVector2& a_vPos, const IVector2& a_vSize);
 
 		/// <summary>
-		/// Resizes the depth buffer.
-		/// </summary>
-		void ResizeDepthBuffer();
-
-		/// <summary>
 		/// Retrieves the current back buffer.
 		/// </summary>
 		/// <returns>ComPtr to the current back buffer.</returns>
@@ -218,26 +207,18 @@ namespace gallus::graphics::dx12
 		/// </summary>
 		/// <returns>Integer representing the back buffer index.</returns>
 		UINT GetCurrentBackBufferIndex() const;
-
-		/// <summary>
-		/// Retrieves the current render target view.
-		/// </summary>
-		/// <param name="a_bUseRenderTexture">Whether to use the render texture instead of regular rtv.</param>
-		/// <returns>Handle to the render target view.</returns>
-		D3D12_CPU_DESCRIPTOR_HANDLE GetCurrentRenderTargetView(bool a_bUseRenderTexture);
 	public:
 		std::mutex m_RenderMutex;
+
+		/// <summary>
+		/// Resizes the depth buffer.
+		/// </summary>
+		void SetDepthBuffer(std::unique_ptr<DX12Resource>& a_pDepthBuffer);
 
 		/// <summary>
 		/// Loop method for the thread.
 		/// </summary>
 		void Loop() override;
-
-		/// <summary>
-		/// NOTE: DO NOT CALL THIS FROM ANYWHERE ELSE.
-		/// Used for drawing the render tex data to the screen. Should only be called in events from this class.
-		/// </summary>
-		void DrawFullScreen(std::shared_ptr<CommandList> a_pCommandList);
 
 		/// <summary>
 		/// Processes win32 window events.
@@ -357,30 +338,6 @@ namespace gallus::graphics::dx12
 		}
 		
 		/// <summary>
-		/// Sets the shading draw mode, rendering only wireframe, unlit, etc.
-		/// </summary>
-		/// <param name="a_ShadingDrawMode">The shading draw mode.</param>
-		void SetShadingDrawMode(ShadingDrawMode a_ShadingDrawMode)
-		{
-			m_ShadingDrawMode = a_ShadingDrawMode;
-		}
-		
-		/// <summary>
-		/// Retrieves the shading draw mode, rendering only wireframe, unlit, etc.
-		/// </summary>
-		/// <returns>The shading draw mode.</returns>
-		ShadingDrawMode GetShadingDrawMode() const
-		{
-			return m_ShadingDrawMode;
-		}
-
-		/// <summary>
-		/// Retrieves the render texture.
-		/// </summary>
-		/// <returns>Pointer to the render texture.</returns>
-		std::weak_ptr<Texture> GetRenderTexture();
-		
-		/// <summary>
 		/// Reorders all sprite components based on layer index.
 		/// </summary>
 		void ReorderSpriteComponents();
@@ -406,6 +363,8 @@ namespace gallus::graphics::dx12
 		{
 			return m_pSkinningDataAllocation;
 		}
+
+		std::shared_ptr<RenderView> RegisterView(size_t a_iIndex);
 	protected:
 		/// <summary>
 		/// Called in render when a new frame is presented.
@@ -432,16 +391,12 @@ namespace gallus::graphics::dx12
 		bool CreateRootSignature();
 
 		/// <summary>
-		/// Creates the render texture.
-		/// </summary>
-		/// <param name="a_vSize">The size of the render texture.</param>
-		void CreateRenderTexture(const IVector2& a_vSize);
-
-		/// <summary>
 		/// Method called after successful resize.
 		/// </summary>
 		/// <param name="a_vSize">The size of the window.</param>
 		void AfterResize(const IVector2& a_vSize);
+
+		std::vector<std::shared_ptr<RenderView>> m_aRenderViews;
 
 		Microsoft::WRL::ComPtr<IDXGIAdapter4> m_pAdapter = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12Device2> m_pDevice = nullptr;
@@ -453,7 +408,6 @@ namespace gallus::graphics::dx12
 		win32::Window* m_pWindow = nullptr;
 
 		uint64_t m_aFenceValues[g_iBufferCount] = {};
-		std::unique_ptr<DX12Resource> m_pDepthBuffer;
 		std::unique_ptr<HeapAllocation>
 			m_SRV,
 			m_RTV,
@@ -476,7 +430,6 @@ namespace gallus::graphics::dx12
 
 		IVector2 m_vSize = { 1920, 1080 };
 
-		std::weak_ptr<Texture> m_pRenderTexture = {};
 		ID3D12PipelineState* m_pRenderTextureShaderBind = {};
 		std::shared_ptr<DirectionalLight> m_pDirectionalLight = {};
 
@@ -488,7 +441,6 @@ namespace gallus::graphics::dx12
 		std::unique_ptr<Camera> m_pCamera;
 		Camera* m_pActiveCamera = nullptr;
 		DimensionDrawMode m_DimensionDrawMode = DimensionDrawMode::DimensionDrawMode_2D3D;
-		ShadingDrawMode m_ShadingDrawMode = ShadingDrawMode::ShadingDrawMode_Shaded;
 
 		std::vector<std::weak_ptr<gameplay::SpriteComponent>> m_aOrderedTextures;
 	};
