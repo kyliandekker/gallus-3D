@@ -1,105 +1,153 @@
 #pragma once
 
-#include "graphics/imgui/ImGuiWindowsConfig.h"
+#include "imgui_system/ImGuiWindowsConfig.h"
 
-// editor
-#include "editor/graphics/imgui/windows/EditorWindowDock.h"
-#include "editor/graphics/imgui/windows/ResourcesWindow.h"
-#include "editor/graphics/imgui/windows/ConsoleWindow.h"
-#include "editor/graphics/imgui/windows/HierarchyWindow.h"
-#include "editor/graphics/imgui/windows/SceneWindow.h"
-#include "editor/graphics/imgui/windows/ExplorerWindow.h"
-#include "editor/graphics/imgui/windows/InspectorWindow.h"
-#include "editor/graphics/imgui/windows/AnimationWindow.h"
-#include "editor/graphics/imgui/windows/StatsWindow.h"
-
-#include "editor/graphics/imgui/modals/FilePickerModal.h"
-
-namespace gallus
+namespace gallus::graphics::imgui
 {
-	namespace graphics
+	class EditorWindowDock;
+
+	class ConsoleWindow;
+	class ExplorerWindow;
+	class InspectorWindow;
+	class AnimationWindow;
+	class HierarchyWindow;
+	class SceneWindow;
+	class FullSceneWindow;
+	class SpriteSheetEditorWindow;
+
+	class FilePickerModal;
+	class PromptModal;
+
+	class ImGuiSystem;
+
+	class EditorWindowsConfig : public ImGuiWindowsConfig
 	{
-		namespace imgui
+	public:
+		EditorWindowsConfig(ImGuiSystem& a_System);
+
+		/// <summary>
+		/// Initializes the windows config.
+		/// </summary>
+		void Initialize() override;
+
+		/// <summary>
+		/// Renders all windows, modals and docks in the config.
+		/// </summary>
+		void Render() override;
+
+		/// <summary>
+		/// Retrieves the editor window dock.
+		/// </summary>
+		/// <returns>Pointer to the editor window dock.</returns>
+		EditorWindowDock* GetEditorWindowDock()
 		{
-			class ImGuiWindow;
-
-			class EditorWindowsConfig : public ImGuiWindowsConfig
-			{
-			public:
-				EditorWindowsConfig(ImGuiWindow& a_Window);
-
-				void Initialize() override;
-				void Render() override;
-
-				EditorWindowDock& GetEditorWindowDock()
-				{
-					return m_EditorWindowDock;
-				}
-
-				ResourcesWindow& GetResourcesWindow()
-				{
-					return m_ResourcesWindow;
-				}
-
-				ConsoleWindow& GetConsoleWindow()
-				{
-					return m_ConsoleWindow;
-				}
-
-				HierarchyWindow& GetHierarchyWindow()
-				{
-					return m_HierarchyWindow;
-				}
-
-				SceneWindow& GetSceneWindow()
-				{
-					return m_SceneWindow;
-				}
-
-				FullSceneWindow& GetFullSceneWindow()
-				{
-					return m_FullSceneWindow;
-				}
-
-				ExplorerWindow& GetExplorerWindow()
-				{
-					return m_ExplorerWindow;
-				}
-
-				InspectorWindow& GetInspectorWindow()
-				{
-					return m_InspectorWindow;
-				}
-
-				AnimationWindow& GetAnimationWindow()
-				{
-					return m_AnimationWindow;
-				}
-
-				StatsWindow& GetStatsWindow()
-				{
-					return m_StatsWindow;
-				}
-
-				FilePickerModal& GetFilePickerModal()
-				{
-					return m_FilePickerModal;
-				}
-			private:
-				EditorWindowDock m_EditorWindowDock;
-
-				ResourcesWindow m_ResourcesWindow;
-				ConsoleWindow m_ConsoleWindow;
-				HierarchyWindow m_HierarchyWindow;
-				SceneWindow m_SceneWindow;
-				FullSceneWindow m_FullSceneWindow;
-				ExplorerWindow m_ExplorerWindow;
-				InspectorWindow m_InspectorWindow;
-				AnimationWindow m_AnimationWindow;
-				StatsWindow m_StatsWindow;
-
-				FilePickerModal m_FilePickerModal;
-			};
+			return m_EditorWindowDock;
 		}
-	}
+
+		/// <summary>
+		/// Retrieves the console window.
+		/// </summary>
+		/// <returns>Pointer to the console window.</returns>
+		ConsoleWindow* GetConsoleWindow()
+		{
+			return m_ConsoleWindow;
+		}
+
+		/// <summary>
+		/// Retrieves the explorer window.
+		/// </summary>
+		/// <returns>Pointer to the explorer window.</returns>
+		ExplorerWindow* GetExplorerWindow()
+		{
+			return m_ExplorerWindow;
+		}
+
+		/// <summary>
+		/// Retrieves the hierarchy window.
+		/// </summary>
+		/// <returns>Pointer to the hierarchy window.</returns>
+		HierarchyWindow* GetHierarchyWindow()
+		{
+			return m_HierarchyWindow;
+		}
+
+		/// <summary>
+		/// Retrieves the animation window.
+		/// </summary>
+		/// <returns>Pointer to the animation window.</returns>
+		AnimationWindow* GetAnimationWindow()
+		{
+			return m_AnimationWindow;
+		}
+
+		/// <summary>
+		/// Retrieves the inspector window.
+		/// </summary>
+		/// <returns>Pointer to the inspector window.</returns>
+		InspectorWindow* GetInspectorWindow()
+		{
+			return m_InspectorWindow;
+		}
+
+		/// <summary>
+		/// Retrieves the scene window.
+		/// </summary>
+		/// <returns>Pointer to the scene window.</returns>
+		SceneWindow* GetSceneWindow()
+		{
+			return m_SceneWindow;
+		}
+
+		/// <summary>
+		/// Retrieves the full scene window.
+		/// </summary>
+		/// <returns>Pointer to the full scene window.</returns>
+		FullSceneWindow* GetFullSceneWindow()
+		{
+			return m_FullSceneWindow;
+		}
+
+		/// <summary>
+		/// Retrieves the sprite sheet editor window.
+		/// </summary>
+		/// <returns>Pointer to the sprite sheet editor window.</returns>
+		SpriteSheetEditorWindow* GetSpriteSheetEditorWindow()
+		{
+			return m_SpriteSheetEditorWindow;
+		}
+
+		/// <summary>
+		/// Retrieves the file picker modal.
+		/// </summary>
+		/// <returns>Pointer to the file picker modal.</returns>
+		FilePickerModal* GetFilePickerModal()
+		{
+			return m_FilePickerModal;
+		}
+
+		/// <summary>
+		/// Retrieves the prompt modal.
+		/// </summary>
+		/// <returns>Pointer to the prompt modal.</returns>
+		PromptModal* GetPromptModal()
+		{
+			return m_PromptModal;
+		}
+	private:
+		ImGuiSystem& m_ImGuiSystem;
+
+		EditorWindowDock* m_EditorWindowDock = nullptr;
+
+		ConsoleWindow* m_ConsoleWindow = nullptr;
+		ExplorerWindow* m_ExplorerWindow = nullptr;
+		HierarchyWindow* m_HierarchyWindow = nullptr;
+		AnimationWindow* m_AnimationWindow = nullptr;
+		InspectorWindow* m_InspectorWindow = nullptr;
+		SceneWindow* m_SceneWindow = nullptr;
+		FullSceneWindow* m_FullSceneWindow = nullptr;
+		SpriteSheetEditorWindow* m_SpriteSheetEditorWindow = nullptr;
+
+		FilePickerModal* m_FilePickerModal = nullptr;
+		PromptModal* m_PromptModal = nullptr;
+	};
 }

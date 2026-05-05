@@ -1,9 +1,6 @@
-#ifndef IMGUI_DISABLE
-#ifdef _EDITOR
-
 #pragma once
 
-#include "graphics/imgui/windows/MainWindowDock.h"
+#include "imgui_system/windows/MainWindowDock.h"
 
 // external
 #include <vector>
@@ -14,7 +11,7 @@ namespace gallus
 	{
 		namespace imgui
 		{
-			class ImGuiWindow;
+			class ImGuiSystem;
 
 			//---------------------------------------------------------------------
 			// StatsWindow
@@ -28,8 +25,8 @@ namespace gallus
 				/// <summary>
 				/// Constructs the main window.
 				/// </summary>
-				/// <param name="a_Window">The ImGui window for rendering the view.</param>
-				EditorWindowDock(ImGuiWindow& a_Window);
+				/// <param name="a_Window">The ImGui system for rendering the view.</param>
+				EditorWindowDock(ImGuiSystem& a_System);
 
 				/// <summary>
 				/// Renders the element.
@@ -39,6 +36,3 @@ namespace gallus
 		}
 	}
 }
-
-#endif // _EDITOR
-#endif // IMGUI_DISABLE

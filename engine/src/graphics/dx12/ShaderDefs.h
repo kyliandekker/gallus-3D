@@ -1,50 +1,80 @@
 #pragma once
+
 #include "./DX12PCH.h"
 
 // GENERATED FILE - DO NOT EDIT
 
-struct Transform
+namespace gallus::graphics::dx12
 {
-    DirectX::XMMATRIX WorldViewProj;
-};
+	// BUFFERS
 
-struct SpriteUV
-{
-    DirectX::XMFLOAT4 uv;
-};
+	struct ShaderTransform // registered at b0.
+	{
+		DirectX::XMMATRIX WorldViewProj; // 64 bytes.
+		DirectX::XMMATRIX WorldMatrix; // 64 bytes.
+	}; // total size = 128.
 
-struct MaterialData
-{
-    uint32_t EnableLighting;
-    DirectX::XMFLOAT3 Padding0;
-    DirectX::XMFLOAT4 DiffuseColor;
-    float Metallic;
-    float Smoothness;
-    DirectX::XMFLOAT2 Padding1;
-};
+	struct TextureUV // registered at b1.
+	{
+		DirectX::XMFLOAT4 uv; // 16 bytes.
+	}; // total size = 16.
 
-struct DirectionalLightData
-{
-    uint32_t DirectionalLightEnabled;
-    DirectX::XMFLOAT3 LightDirection;
-    DirectX::XMFLOAT4 LightColor;
-    float AmbientIntensity;
-};
+	struct MaterialData // registered at b2.
+	{
+		uint32_t EnableLighting; // 4 bytes.
+		DirectX::XMFLOAT3 Padding0; // 12 bytes.
+		DirectX::XMFLOAT4 DiffuseColor; // 16 bytes.
+		float Metallic; // 4 bytes.
+		float Smoothness; // 4 bytes.
+		DirectX::XMFLOAT2 Padding1; // 8 bytes.
+	}; // total size = 48.
 
-const D3D12_INPUT_ELEMENT_DESC g_aInputLayout[] = {
-    { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-    { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-    { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-    { "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-};
+	struct DirectionalLightData // registered at b3.
+	{
+		uint32_t DirectionalLightEnabled; // 4 bytes.
+		DirectX::XMFLOAT3 LightDirection; // 12 bytes.
+		DirectX::XMFLOAT4 LightColor; // 16 bytes.
+		float AmbientIntensity; // 4 bytes.
+		float Padding2[3]; // 12 bytes.
+	}; // total size = 48.
 
-enum RootParameters
-{
-    CBV = 0,
-    SPRITE_UV = 1,
-    MATERIAL = 2,
-    DIRECTIONAL_LIGHT = 3,
-    TEX_SRV = 4,
-    SAMPLER_STATE = 5,
-    NumRootParameters
-};
+	struct SkinningData // registered at b4.
+	{
+		DirectX::XMMATRIX Bones[64]; // 4096 bytes.
+	}; // total size = 4096.
+
+	// VSInput
+
+	struct VSInput
+	{
+		DirectX::XMFLOAT3 POSITION;
+		DirectX::XMFLOAT2 TEXCOORD;
+		DirectX::XMFLOAT3 NORMAL;
+		DirectX::XMUINT4 JOINTS;
+		DirectX::XMFLOAT4 WEIGHTS;
+	};
+
+	// INPUT
+
+	const D3D12_INPUT_ELEMENT_DESC g_aInputLayout[] = {
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+		{ "JOINTS", 0, DXGI_FORMAT_R32G32B32A32_UINT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+		{ "WEIGHTS", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+	};
+
+	// ROOT PARAMETERS
+
+	enum RootParameters
+	{
+		TRANSFORM = 0, // registered at b0.
+		SPRITE_UV = 1, // registered at b1.
+		MATERIAL = 2, // registered at b2.
+		DIRECTIONAL_LIGHT = 3, // registered at b3.
+		SKINNING_DATA = 4, // registered at b4.
+		TEX_SRV = 5, // registered at t0.
+		SAMPLER_STATE = 6, // registered at s0.
+		NumRootParameters = 8,
+	};
+}

@@ -3,80 +3,112 @@
 // external
 #include <string>
 
-namespace gallus
+namespace gallus::gameplay
 {
-	namespace gameplay
+	//---------------------------------------------------------------------
+	// EntityID
+	//---------------------------------------------------------------------
+	/// <summary>
+	/// Lightweight identifier used to reference entities inside the ECS.
+	/// Combines an index with a generation counter to prevent stale references.
+	/// </summary>
+	struct EntityID
 	{
-		class TransformComponent;
+	public:
+		/// <summary>
+		/// Constructs an invalid entity identifier.
+		/// </summary>
+		EntityID() = default;
 
-		//---------------------------------------------------------------------
-		// EntityID
-		//---------------------------------------------------------------------
-		struct EntityID
+		/// <summary>
+		/// Constructs a valid entity identifier with the specified index and generation.
+		/// </summary>
+		/// <param name="a_iIndex">Index of the entity in the internal storage.</param>
+		/// <param name="a_iGeneration">Generation counter used to validate the entity.</param>
+		EntityID(uint32_t a_iIndex, uint32_t a_iGeneration)
+			: m_iIndex(a_iIndex)
+			, m_iGeneration(a_iGeneration)
+		{}
+
+		/// <summary>
+		/// Determines whether the entity identifier is valid.
+		/// </summary>
+		/// <returns>
+		/// True if the identifier references a valid entity otherwise false.
+		/// </returns>
+		bool IsValid() const
 		{
-			/// <summary>
-			/// Constructs an empty entity ID.
-			/// </summary>
-			EntityID() = default;
+			return m_iIndex != INVALID_INDEX;
+		}
 
-			/// <summary>
-			/// Constructs an entity with a given ID.
-			/// </summary>
-			/// <param name="a_iID">The id.</param>
-			EntityID(unsigned int a_iID) : m_iID(a_iID)
-			{};
+		/// <summary>
+		/// Retrieves the internal entity index.
+		/// </summary>
+		/// <returns>
+		/// The index used to locate the entity in storage.
+		/// </returns>
+		uint32_t GetIndex() const
+		{
+			return m_iIndex;
+		}
 
-			/// <summary>
-			/// Deconstructs an entity ID.
-			/// </summary>
-			~EntityID() = default;
+		/// <summary>
+		/// Retrieves the generation counter.
+		/// </summary>
+		/// <returns>
+		/// The generation value used to validate stale identifiers.
+		/// </returns>
+		uint32_t GetGeneration() const
+		{
+			return m_iGeneration;
+		}
 
-			/// <summary>
-			/// Checks whether the entity is valid or not.
-			/// </summary>
-			/// <returns>True if the entity was valid, otherwise false.</returns>
-			bool IsValid() const
+		/// <summary>
+		/// Compares two entity identifiers for inequality.
+		/// </summary>
+		/// <param name="a_Other">The entity identifier to compare against.</param>
+		/// <returns>
+		/// True if the identifiers differ otherwise false.
+		/// </returns>
+		bool operator!=(const EntityID& a_Other) const
+		{
+			return !(*this == a_Other);
+		}
+
+		/// <summary>
+		/// Provides strict ordering for entity identifiers.
+		/// First compares indices then generations.
+		/// </summary>
+		/// <param name="a_Other">The entity identifier to compare against.</param>
+		/// <returns>
+		/// True if this identifier is considered smaller otherwise false.
+		/// </returns>
+		bool operator<(const EntityID& a_Other) const
+		{
+			if (m_iIndex != a_Other.m_iIndex)
 			{
-				return m_iID != INVALID;
-			};
-
-			/// <summary>
-			/// Sets the entity to invalid.
-			/// </summary>
-			void SetInvalid()
-			{
-				m_iID = INVALID;
+				return m_iIndex < a_Other.m_iIndex;
 			}
 
-			/// <summary>
-			/// Retrieves the ID (as an integer).
-			/// </summary>
-			/// <returns>An integer containing the entity id.</returns>
-			unsigned int GetID() const
-			{
-				return m_iID;
-			}
+			return m_iGeneration < a_Other.m_iGeneration;
+		}
 
-			bool operator==(const EntityID& a_Other) const
-			{
-				return m_iID == a_Other.m_iID;
-			}
+		/// <summary>
+		/// Compares two entity identifiers for equality.
+		/// </summary>
+		/// <param name="a_Other">The entity identifier to compare against.</param>
+		/// <returns>
+		/// True if both index and generation match otherwise false.
+		/// </returns>
+		bool operator==(const EntityID& a_Other) const
+		{
+			return m_iIndex == a_Other.m_iIndex &&
+				m_iGeneration == a_Other.m_iGeneration;
+		}
+	private:
+		static constexpr uint32_t INVALID_INDEX = 0xFFFFFFFFu;
 
-			bool operator!=(const EntityID& a_Other) const
-			{
-				return m_iID != a_Other.m_iID;
-			}
-
-			bool operator<(const EntityID& a_Other) const
-			{
-				return m_iID < a_Other.m_iID;
-			}
-		protected:
-			enum ID_State : unsigned int
-			{
-				INVALID = 0
-			};
-			unsigned int m_iID = INVALID;
-		};
-	}
+		uint32_t m_iIndex = INVALID_INDEX;
+		uint32_t m_iGeneration = 0;
+	};
 }

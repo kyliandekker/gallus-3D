@@ -5,17 +5,23 @@
 
 namespace rapidjson
 {
-	inline bool GetString(const rapidjson::Value& a_Document, const std::string& a_Key, std::string& a_Value)
+	inline bool GetString(const rapidjson::Value& a_Document, std::string& a_Value)
 	{
-		if (!a_Document.HasMember(a_Key.c_str()))
+		if (!a_Document.IsString())
 		{
 			return false;
 		}
-		if (!a_Document[a_Key.c_str()].IsString())
+		a_Value = a_Document.GetString();
+		return true;
+	}
+
+	inline bool GetFloat(const rapidjson::Value& a_Document, float& a_Value)
+	{
+		if (!a_Document.IsFloat())
 		{
 			return false;
 		}
-		a_Value = a_Document[a_Key.c_str()].GetString();
+		a_Value = a_Document.GetFloat();
 		return true;
 	}
 
@@ -33,31 +39,33 @@ namespace rapidjson
 		return true;
 	}
 
-	inline bool GetBool(const rapidjson::Value& a_Document, const std::string& a_Key, bool& a_Value)
+	inline bool GetBool(const rapidjson::Value& a_Document, bool& a_Value)
 	{
-		if (!a_Document.HasMember(a_Key.c_str()))
+		if (!a_Document.IsBool())
 		{
 			return false;
 		}
-		if (!a_Document[a_Key.c_str()].IsBool())
-		{
-			return false;
-		}
-		a_Value = a_Document[a_Key.c_str()].GetBool();
+		a_Value = a_Document.GetBool();
 		return true;
 	}
 
-	inline bool GetLong(const rapidjson::Value& a_Document, const std::string& a_Key, long long& a_Value)
+	inline bool GetLong(const rapidjson::Value& a_Document, long long& a_Value)
 	{
-		if (!a_Document.HasMember(a_Key.c_str()))
+		if (!a_Document.IsInt64())
 		{
 			return false;
 		}
-		if (!a_Document[a_Key.c_str()].IsInt64())
+		a_Value = a_Document.GetInt64();
+		return true;
+	}
+
+	inline bool GetInt(const rapidjson::Value& a_Document, int& a_Value)
+	{
+		if (!a_Document.IsInt())
 		{
 			return false;
 		}
-		a_Value = a_Document[a_Key.c_str()].GetInt64();
+		a_Value = a_Document.GetInt();
 		return true;
 	}
 

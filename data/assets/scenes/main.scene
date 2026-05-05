@@ -1,14 +1,15 @@
 {
     "camera": {
         "position": {
-            "x": 0.0,
-            "y": 1.0,
-            "z": -2.0
+            "x": 2.4059998989105226,
+            "y": 2.0,
+            "z": -1.4789999723434449
         },
         "rotation": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0
+            "x": 0.23447854816913606,
+            "y": -0.23884153366088868,
+            "z": 0.059549979865550998,
+            "w": 0.9404405355453491
         },
         "pivot": {
             "x": -0.5,
@@ -18,11 +19,13 @@
         "fieldofView": 90.0
     },
     "directionalLight": {
+        "assetType": 0,
         "enabled": 1,
         "lightDirection": {
-            "x": 17.200000762939454,
-            "y": -148.6999969482422,
-            "z": -49.599998474121097
+            "x": 0.7477306723594666,
+            "y": 0.16886724531650544,
+            "z": 0.44657739996910097,
+            "w": 0.46146661043167117
         },
         "lightColor": {
             "r": 1.0,
@@ -34,104 +37,34 @@
     },
     "entities": [
         {
-            "name": "Player",
-            "isActive": true,
-            "components": {
-                "sprite": {
-                    "static": true,
-                    "order": 1,
-                    "color": {
-                        "r": 1.0,
-                        "g": 1.0,
-                        "b": 1.0,
-                        "a": 1.0
-                    },
-                    "shaderBind": {
-                        "pixelShader": "pixelShader.hlsl",
-                        "vertexShader": "vertexShader.hlsl"
-                    },
-                    "sprite": "tex_walk.png",
-                    "spriteIndex": 1
-                },
-                "transform": {
-                    "transform": {
-                        "position": {
-                            "x": 1030.203369140625,
-                            "y": 197.8035888671875,
-                            "z": 0.0
-                        },
-                        "scale": {
-                            "x": 696.9682006835938,
-                            "y": 696.9682006835938,
-                            "z": 0.0
-                        },
-                        "rotation": {
-                            "x": 0.0,
-                            "y": 0.0,
-                            "z": -0.8597984910011292
-                        },
-                        "pivot": {
-                            "x": -0.5,
-                            "y": -0.5,
-                            "z": -0.5
-                        },
-                        "cameraType": 1
-                    }
-                },
-                "health": {
-                    "health": 100.0,
-                    "maxHealth": 100.0
-                },
-                "collision": {
-                    "offset": {
-                        "x": 0.0,
-                        "y": 0.0
-                    },
-                    "size": {
-                        "x": 1.0,
-                        "y": 1.0
-                    }
-                },
-                "animation": {
-                    "startingAnimation": "player_walk_down.anim"
-                },
-                "rigidbody": {
-                    "useGravity": false,
-                    "mass": 1.0,
-                    "linearDamping": 0.9800000190734863
-                }
-            }
-        },
-        {
-            "name": "mod_chicken.glb",
+            "name": "New GameObject (2) (1)",
             "isActive": true,
             "components": {
                 "mesh": {
-                    "shaderBind": {
-                        "pixelShader": "pixelShader.hlsl",
-                        "vertexShader": "vertexShader.hlsl"
-                    },
-                    "material": "1.mat",
-                    "mesh": "mod_chicken.glb",
-                    "texture": "tex_chicken_infected.png",
+                    "pixelShader": "pixelShader.cso",
+                    "vertexShader": "vertexShader.cso",
+                    "material": "mat_lit.mat",
+                    "mesh": "mod_faucet.glb",
+                    "texture": "tex_missing.png",
                     "textureIndex": 0
                 },
                 "transform": {
                     "transform": {
                         "position": {
-                            "x": -0.5709999799728394,
-                            "y": 0.414000004529953,
-                            "z": -1.2000000476837159
+                            "x": 1.750876545906067,
+                            "y": -0.21013599634170533,
+                            "z": 0.5700641870498657
                         },
                         "scale": {
-                            "x": 1.9000002145767213,
-                            "y": 1.8000004291534424,
-                            "z": 1.9000004529953004
+                            "x": 2.069999933242798,
+                            "y": 2.069999933242798,
+                            "z": 2.069999933242798
                         },
                         "rotation": {
-                            "x": 0.807913601398468,
+                            "x": 0.0,
                             "y": 0.0,
-                            "z": 0.0
+                            "z": 0.0,
+                            "w": 1.0
                         },
                         "pivot": {
                             "x": 0.0,
@@ -144,40 +77,194 @@
             }
         },
         {
-            "name": "New GameObject",
+            "name": "mod_chicken.glb",
             "isActive": true,
             "components": {
                 "mesh": {
-                    "shaderBind": {
-                        "pixelShader": "pixelShader.hlsl",
-                        "vertexShader": "vertexShader.hlsl"
+                    "pixelShader": "pixelShader.cso",
+                    "vertexShader": "vertexShader.cso",
+                    "material": "mat_lit.mat",
+                    "mesh": "mod_chicken.glb",
+                    "texture": "tex_chicken_infected.png",
+                    "textureIndex": 0
+                },
+                "transform": {
+                    "transform": {
+                        "position": {
+                            "x": 0.0,
+                            "y": 2.8728973865509035,
+                            "z": 1.0
+                        },
+                        "scale": {
+                            "x": 1.9999990463256837,
+                            "y": 2.0,
+                            "z": 1.9999990463256837
+                        },
+                        "rotation": {
+                            "x": -0.0,
+                            "y": 0.31725913286209109,
+                            "z": -0.0,
+                            "w": 0.9483389258384705
+                        },
+                        "pivot": {
+                            "x": 0.0,
+                            "y": 0.0,
+                            "z": 0.0
+                        },
+                        "cameraType": 0
+                    }
+                },
+                "collision": {
+                    "colliderSettings": {
+                        "offset": {
+                            "x": 0.0,
+                            "y": 0.25,
+                            "z": 0.0
+                        },
+                        "size": {
+                            "x": 0.5,
+                            "y": 0.5,
+                            "z": 0.5
+                        }
                     },
-                    "material": "1.mat",
-                    "mesh": "square",
+                    "convex": false
+                },
+                "rigidbody": {
+                    "useGravity": true,
+                    "mass": 1.0,
+                    "linearDamping": 0.9800000190734863
+                }
+            }
+        },
+        {
+            "name": "New GameObject (1)",
+            "isActive": true,
+            "components": {
+                "mesh": {
+                    "pixelShader": "pixelShaderUvDebug.cso",
+                    "vertexShader": "vertexShader.cso",
+                    "material": "mat_lit.mat",
+                    "mesh": "mod_missing.glb",
                     "texture": "tex_missing.png",
                     "textureIndex": 0
                 },
                 "transform": {
                     "transform": {
                         "position": {
-                            "x": -0.17918717861175538,
-                            "y": 1.1444705724716187,
-                            "z": -0.5672531723976135
+                            "x": -1.6175308227539063,
+                            "y": 1.3766255378723145,
+                            "z": 1.1920928955078126e-7
                         },
                         "scale": {
-                            "x": 0.9999937415122986,
-                            "y": 0.9999929070472717,
-                            "z": 0.9999924898147583
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
                         },
                         "rotation": {
-                            "x": 179.9999542236328,
-                            "y": 1.8988578613134134e-13,
-                            "z": 3.185754451351386e-7
+                            "x": -0.0,
+                            "y": 0.0,
+                            "z": -0.0,
+                            "w": 1.0
+                        },
+                        "pivot": {
+                            "x": -0.5,
+                            "y": -0.5,
+                            "z": -0.5
+                        },
+                        "cameraType": 0
+                    }
+                }
+            }
+        },
+        {
+            "name": "New GameObject",
+            "isActive": true,
+            "components": {
+                "mesh": {
+                    "pixelShader": "pixelShader.cso",
+                    "vertexShader": "vertexShader.cso",
+                    "material": "mat_lit.mat",
+                    "mesh": "cube",
+                    "texture": "tex_missing.png",
+                    "textureIndex": 0
+                },
+                "transform": {
+                    "transform": {
+                        "position": {
+                            "x": 0.0,
+                            "y": 0.0,
+                            "z": 1.0
+                        },
+                        "scale": {
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
+                        },
+                        "rotation": {
+                            "x": -0.0,
+                            "y": 0.0,
+                            "z": -0.0,
+                            "w": 1.0
                         },
                         "pivot": {
                             "x": 0.0,
                             "y": 0.0,
                             "z": 0.0
+                        },
+                        "cameraType": 0
+                    }
+                },
+                "collision": {
+                    "colliderSettings": {
+                        "offset": {
+                            "x": 0.0,
+                            "y": 0.0,
+                            "z": 0.0
+                        },
+                        "size": {
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
+                        }
+                    },
+                    "convex": false
+                }
+            }
+        },
+        {
+            "name": "New GameObject (2)",
+            "isActive": true,
+            "components": {
+                "mesh": {
+                    "pixelShader": "pixelShader.cso",
+                    "vertexShader": "vertexShader.cso",
+                    "material": "default",
+                    "mesh": "sphere",
+                    "texture": "tex_missing.png",
+                    "textureIndex": 0
+                },
+                "transform": {
+                    "transform": {
+                        "position": {
+                            "x": -1.2099859714508057,
+                            "y": 0.7713664174079895,
+                            "z": 0.0
+                        },
+                        "scale": {
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
+                        },
+                        "rotation": {
+                            "x": 0.0,
+                            "y": 0.0,
+                            "z": 0.0,
+                            "w": 1.0
+                        },
+                        "pivot": {
+                            "x": -0.5,
+                            "y": -0.5,
+                            "z": -0.5
                         },
                         "cameraType": 0
                     }

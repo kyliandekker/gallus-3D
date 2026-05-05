@@ -1,61 +1,152 @@
 {
-	"assetType": 3,
-	"textureType": 1,
-	"spriteRects": [
-		{ "x": 0,   "y": 0,   "width": 48, "height": 48 },
-		{ "x": 48,  "y": 0,   "width": 48, "height": 48 },
-		{ "x": 96,  "y": 0,   "width": 48, "height": 48 },
-		{ "x": 144, "y": 0,   "width": 48, "height": 48 },
-		{ "x": 192, "y": 0,   "width": 48, "height": 48 },
-		{ "x": 240, "y": 0, "width": 48, "height": 48 },
-
-		{ "x": 0,   "y": 48,  "width": 48, "height": 48 },
-		{ "x": 48,  "y": 48,  "width": 48, "height": 48 },
-		{ "x": 96,  "y": 48,  "width": 48, "height": 48 },
-		{ "x": 144, "y": 48,  "width": 48, "height": 48 },
-		{ "x": 192, "y": 48,  "width": 48, "height": 48 },
-		{ "x": 240, "y": 48,  "width": 48, "height": 48 },
-
-		{ "x": 0,   "y": 96,  "width": 48, "height": 48 },
-		{ "x": 48,  "y": 96,  "width": 48, "height": 48 },
-		{ "x": 96,  "y": 96,  "width": 48, "height": 48 },
-		{ "x": 144, "y": 96,  "width": 48, "height": 48 },
-		{ "x": 192, "y": 96,  "width": 48, "height": 48 },
-		{ "x": 240, "y": 96,  "width": 48, "height": 48 },
-
-		{ "x": 0,   "y": 144, "width": 48, "height": 48 },
-		{ "x": 48,  "y": 144, "width": 48, "height": 48 },
-		{ "x": 96,  "y": 144, "width": 48, "height": 48 },
-		{ "x": 144, "y": 144, "width": 48, "height": 48 },
-		{ "x": 192, "y": 144, "width": 48, "height": 48 },
-		{ "x": 240, "y": 144, "width": 48, "height": 48 },
-
-		{ "x": 0,   "y": 192, "width": 48, "height": 48 },
-		{ "x": 48,  "y": 192, "width": 48, "height": 48 },
-		{ "x": 96,  "y": 192, "width": 48, "height": 48 },
-		{ "x": 144, "y": 192, "width": 48, "height": 48 },
-		{ "x": 192, "y": 192, "width": 48, "height": 48 },
-		{ "x": 240, "y": 192, "width": 48, "height": 48 },
-
-		{ "x": 0,   "y": 240, "width": 48, "height": 48 },
-		{ "x": 48,  "y": 240, "width": 48, "height": 48 },
-		{ "x": 96,  "y": 240, "width": 48, "height": 48 },
-		{ "x": 144, "y": 240, "width": 48, "height": 48 },
-		{ "x": 192, "y": 240, "width": 48, "height": 48 },
-		{ "x": 240, "y": 240, "width": 48, "height": 48 },
-
-		{ "x": 0,   "y": 288, "width": 48, "height": 48 },
-		{ "x": 48,  "y": 288, "width": 48, "height": 48 },
-		{ "x": 96,  "y": 288, "width": 48, "height": 48 },
-		{ "x": 144, "y": 288, "width": 48, "height": 48 },
-		{ "x": 192, "y": 288, "width": 48, "height": 48 },
-		{ "x": 240, "y": 288, "width": 48, "height": 48 },
-
-		{ "x": 0,   "y": 336, "width": 48, "height": 48 },
-		{ "x": 48,  "y": 336, "width": 48, "height": 48 },
-		{ "x": 96,  "y": 336, "width": 48, "height": 48 },
-		{ "x": 144, "y": 336, "width": 48, "height": 48 },
-		{ "x": 192, "y": 336, "width": 48, "height": 48 },
-		{ "x": 240, "y": 336, "width": 48, "height": 48 }
-	]
+    "assetType": 3,
+    "textureType": 1,
+    "textureRects": [
+        {
+            "x": 0,
+            "y": 0,
+            "width": 48,
+            "height": 48
+        },
+        {
+            "x": 48,
+            "y": 0,
+            "width": 48,
+            "height": 48
+        },
+        {
+            "x": 96,
+            "y": 0,
+            "width": 48,
+            "height": 48
+        },
+        {
+            "x": 144,
+            "y": 0,
+            "width": 48,
+            "height": 48
+        },
+        {
+            "x": 192,
+            "y": 0,
+            "width": 48,
+            "height": 48
+        },
+        {
+            "x": 240,
+            "y": 0,
+            "width": 48,
+            "height": 48
+        },
+        {
+            "x": 0,
+            "y": 48,
+            "width": 48,
+            "height": 48
+        },
+        {
+            "x": 48,
+            "y": 48,
+            "width": 48,
+            "height": 48
+        },
+        {
+            "x": 96,
+            "y": 48,
+            "width": 48,
+            "height": 48
+        },
+        {
+            "x": 144,
+            "y": 48,
+            "width": 48,
+            "height": 48
+        },
+        {
+            "x": 192,
+            "y": 48,
+            "width": 48,
+            "height": 48
+        },
+        {
+            "x": 240,
+            "y": 48,
+            "width": 48,
+            "height": 48
+        },
+        {
+            "x": 0,
+            "y": 96,
+            "width": 48,
+            "height": 48
+        },
+        {
+            "x": 48,
+            "y": 96,
+            "width": 48,
+            "height": 48
+        },
+        {
+            "x": 96,
+            "y": 96,
+            "width": 48,
+            "height": 48
+        },
+        {
+            "x": 144,
+            "y": 96,
+            "width": 48,
+            "height": 48
+        },
+        {
+            "x": 192,
+            "y": 96,
+            "width": 48,
+            "height": 48
+        },
+        {
+            "x": 240,
+            "y": 96,
+            "width": 48,
+            "height": 48
+        },
+        {
+            "x": 0,
+            "y": 144,
+            "width": 48,
+            "height": 48
+        },
+        {
+            "x": 48,
+            "y": 144,
+            "width": 48,
+            "height": 48
+        },
+        {
+            "x": 96,
+            "y": 144,
+            "width": 48,
+            "height": 48
+        },
+        {
+            "x": 144,
+            "y": 144,
+            "width": 48,
+            "height": 48
+        },
+        {
+            "x": 192,
+            "y": 144,
+            "width": 48,
+            "height": 48
+        },
+        {
+            "x": 240,
+            "y": 144,
+            "width": 48,
+            "height": 48
+        }
+    ],
+    "spriteSheetSizeX": 48,
+    "spriteSheetSizeY": 48
 }

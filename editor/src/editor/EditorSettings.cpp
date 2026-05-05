@@ -1,283 +1,244 @@
 ﻿#include "EditorSettings.h"
 
 // external
-#include <rapidjson/document.h>
-#include <rapidjson/stringbuffer.h>
-#include <rapidjson/prettywriter.h>
-#include <rapidjson/utils.h>
 #include <string>
 
-#define JSON_EDITOR_SETTINGS_CONSOLE_VAR "console"
-#define JSON_EDITOR_SETTINGS_CONSOLE_SCROLL_TO_BOTTOM_VAR "scrollToBottom"
-#define JSON_EDITOR_SETTINGS_CONSOLE_INFO_VAR "info"
-#define JSON_EDITOR_SETTINGS_CONSOLE_TEST_VAR "test"
-#define JSON_EDITOR_SETTINGS_CONSOLE_WARNING_VAR "warning"
-#define JSON_EDITOR_SETTINGS_CONSOLE_ERROR_VAR "error"
-#define JSON_EDITOR_SETTINGS_CONSOLE_ASSERT_VAR "assert"
-#define JSON_EDITOR_SETTINGS_CONSOLE_SUCCESS_VAR "success"
-#define JSON_EDITOR_SETTINGS_CONSOLE_INFOSUCCESS_VAR "infoSuccess"
-#define JSON_EDITOR_SETTINGS_CONSOLE_AWESOME_VAR "awesome"
-
-#define JSON_EDITOR_SETTINGS_SHOW_GRID_VAR "showGrid"
-#define JSON_EDITOR_SETTINGS_PLAY_MODE_VAR "playMode"
-
-#define JSON_EDITOR_SETTINGS_SCENE_VAR "scene"
-#define JSON_EDITOR_SETTINGS_SCENE_ZOOM "zoom"
-#define JSON_EDITOR_SETTINGS_SCENE_PAN_OFFSET "panOffset"
-#define JSON_EDITOR_SETTINGS_SCENE_PAN_OFFSET_X "x"
-#define JSON_EDITOR_SETTINGS_SCENE_PAN_OFFSET_Y "y"
-#define JSON_EDITOR_SETTINGS_SCENE_LAST_OPERATION "lastOperation"
-#define JSON_EDITOR_SETTINGS_SCENE_DRAW_BOUNDS "drawBounds"
-
-namespace gallus
+namespace gallus::editor
 {
-	namespace editor
+	//---------------------------------------------------------------------
+	// Settings
+	//---------------------------------------------------------------------
+	void EditorSettings::SetScrollToBottom(bool a_bScrollToBottom)
 	{
-		//---------------------------------------------------------------------
-		// Settings
-		//---------------------------------------------------------------------
-		bool EditorSettings::LoadVars(const rapidjson::Document& a_Document)
+		m_bScrollToBottom = a_bScrollToBottom;
+	}
+
+	//---------------------------------------------------------------------
+	bool EditorSettings::GetScrollToBottom() const
+	{
+		return m_bScrollToBottom;
+	}
+
+	//---------------------------------------------------------------------
+	void EditorSettings::SetShowInfo(bool a_bShowInfo)
+	{
+		m_bShowInfo = a_bShowInfo;
+	}
+
+	//---------------------------------------------------------------------
+	bool EditorSettings::GetShowInfo() const
+	{
+		return m_bShowInfo;
+	}
+
+	//---------------------------------------------------------------------
+	void EditorSettings::SetShowTest(bool a_bShowText)
+	{
+		m_bShowTest = a_bShowText;
+	}
+
+	//---------------------------------------------------------------------
+	bool EditorSettings::GetShowTest() const
+	{
+		return m_bShowTest;
+	}
+
+	//---------------------------------------------------------------------
+	void EditorSettings::SetShowWarning(bool a_bShowWarning)
+	{
+		m_bShowWarning = a_bShowWarning;
+	}
+
+	//---------------------------------------------------------------------
+	bool EditorSettings::GetShowWarning() const
+	{
+		return m_bShowWarning;
+	}
+
+	//---------------------------------------------------------------------
+	void EditorSettings::SetShowError(bool a_bShowError)
+	{
+		m_bShowError = a_bShowError;
+	}
+
+	//---------------------------------------------------------------------
+	bool EditorSettings::GetShowError() const
+	{
+		return m_bShowError;
+	}
+
+	//---------------------------------------------------------------------
+	void EditorSettings::SetShowAssert(bool a_bShowAssert)
+	{
+		m_bShowAssert = a_bShowAssert;
+	}
+
+	//---------------------------------------------------------------------
+	bool EditorSettings::GetShowAssert() const
+	{
+		return m_bShowAssert;
+	}
+
+	//---------------------------------------------------------------------
+	void EditorSettings::SetShowSuccess(bool a_bShowSuccess)
+	{
+		m_bShowSuccess = a_bShowSuccess;
+	}
+
+	//---------------------------------------------------------------------
+	bool EditorSettings::GetShowSuccess() const
+	{
+		return m_bShowSuccess;
+	}
+
+	//---------------------------------------------------------------------
+	void EditorSettings::SetShowInfoSuccess(bool a_bShowInfoSuccess)
+	{
+		m_bShowInfoSuccess = a_bShowInfoSuccess;
+	}
+
+	//---------------------------------------------------------------------
+	bool EditorSettings::GetShowInfoSuccess() const
+	{
+		return m_bShowInfoSuccess;
+	}
+
+	//---------------------------------------------------------------------
+	void EditorSettings::SetShowAwesome(bool a_bShowAwesome)
+	{
+		m_bShowAwesome = a_bShowAwesome;
+	}
+
+	//---------------------------------------------------------------------
+	bool EditorSettings::GetShowAwesome() const
+	{
+		return m_bShowAwesome;
+	}
+
+	//---------------------------------------------------------------------
+	void EditorSettings::SetShowGrid(bool a_bShowGrid)
+	{
+		m_bShowGrid = a_bShowGrid;
+	}
+
+	//---------------------------------------------------------------------
+	bool EditorSettings::GetShowGrid() const
+	{
+		return m_bShowGrid;
+	}
+
+	//---------------------------------------------------------------------
+    void EditorSettings::SetEditorState(EditorState a_EditorState)
+    {
+		m_EditorState = a_EditorState;
+	}
+
+	//---------------------------------------------------------------------
+	EditorState EditorSettings::GetEditorState() const
+	{
+		return m_EditorState;
+	}
+
+	//---------------------------------------------------------------------
+	void EditorSettings::SetSceneZoom(float a_fSceneZoom)
+	{
+		m_fSceneZoom = a_fSceneZoom;
+	}
+
+	//---------------------------------------------------------------------
+	float EditorSettings::GetSceneZoom() const
+	{
+		return m_fSceneZoom;
+	}
+
+	//---------------------------------------------------------------------
+	void EditorSettings::SetScenePanOffset(const Vector2& a_vScenePanOffset)
+	{
+		m_vScenePanOffset = a_vScenePanOffset;
+	}
+
+	//---------------------------------------------------------------------
+	const Vector2& EditorSettings::GetScenePanOffset() const
+	{
+		return m_vScenePanOffset;
+	}
+
+	//---------------------------------------------------------------------
+	void EditorSettings::SetLastSceneOperation(uint16_t a_iLastSceneOperation)
+	{
+		m_iLastSceneOperation = a_iLastSceneOperation;
+	}
+
+	//---------------------------------------------------------------------
+	uint16_t EditorSettings::GetLastSceneOperation() const
+	{
+		return m_iLastSceneOperation;
+	}
+	
+	//---------------------------------------------------------------------
+	void EditorSettings::SetExplorerViewMode(uint8_t a_iExplorerViewMode)
+	{
+		m_iExplorerViewMode = a_iExplorerViewMode;
+	}
+	
+	//---------------------------------------------------------------------
+	uint8_t EditorSettings::GetExplorerViewMode() const
+	{
+		return m_iExplorerViewMode;
+	}
+
+	//---------------------------------------------------------------------
+	void EditorSettings::SetFPSPrecision(bool a_bFPSPrecision)
+	{
+		m_bFPSPrecision = a_bFPSPrecision;
+	}
+
+	//---------------------------------------------------------------------
+	bool EditorSettings::GetFPSPrecision() const
+	{
+		return m_bFPSPrecision;
+	}
+
+	//---------------------------------------------------------------------
+	void EditorSettings::AddSceneToRecentScenes(const std::string& a_sName)
+	{
+		for (const std::string& name : m_aLastOpenedScenes)
 		{
-			if (a_Document.HasMember(JSON_EDITOR_SETTINGS_CONSOLE_VAR) && a_Document[JSON_EDITOR_SETTINGS_CONSOLE_VAR].IsObject())
+			if (a_sName == name)
 			{
-				GetBool(a_Document[JSON_EDITOR_SETTINGS_CONSOLE_VAR], JSON_EDITOR_SETTINGS_CONSOLE_SCROLL_TO_BOTTOM_VAR, m_bScrollToBottom);
-
-				GetBool(a_Document[JSON_EDITOR_SETTINGS_CONSOLE_VAR], JSON_EDITOR_SETTINGS_CONSOLE_ASSERT_VAR, m_bShowAssert);
-				GetBool(a_Document[JSON_EDITOR_SETTINGS_CONSOLE_VAR], JSON_EDITOR_SETTINGS_CONSOLE_ERROR_VAR, m_bShowError);
-				GetBool(a_Document[JSON_EDITOR_SETTINGS_CONSOLE_VAR], JSON_EDITOR_SETTINGS_CONSOLE_WARNING_VAR, m_bShowWarning);
-				GetBool(a_Document[JSON_EDITOR_SETTINGS_CONSOLE_VAR], JSON_EDITOR_SETTINGS_CONSOLE_INFO_VAR, m_bShowInfo);
-				GetBool(a_Document[JSON_EDITOR_SETTINGS_CONSOLE_VAR], JSON_EDITOR_SETTINGS_CONSOLE_TEST_VAR, m_bShowTest);
-				GetBool(a_Document[JSON_EDITOR_SETTINGS_CONSOLE_VAR], JSON_EDITOR_SETTINGS_CONSOLE_SUCCESS_VAR, m_bShowSuccess);
-				GetBool(a_Document[JSON_EDITOR_SETTINGS_CONSOLE_VAR], JSON_EDITOR_SETTINGS_CONSOLE_INFOSUCCESS_VAR, m_bShowInfoSuccess);
-				GetBool(a_Document[JSON_EDITOR_SETTINGS_CONSOLE_VAR], JSON_EDITOR_SETTINGS_CONSOLE_AWESOME_VAR, m_bShowAwesome);
+				return;
 			}
-
-			if (a_Document.HasMember(JSON_EDITOR_SETTINGS_SCENE_VAR) && a_Document[JSON_EDITOR_SETTINGS_SCENE_VAR].IsObject())
-			{
-				GetFloat(a_Document[JSON_EDITOR_SETTINGS_SCENE_VAR], JSON_EDITOR_SETTINGS_SCENE_ZOOM, m_fSceneZoom);
-				if (a_Document[JSON_EDITOR_SETTINGS_SCENE_VAR].HasMember(JSON_EDITOR_SETTINGS_SCENE_PAN_OFFSET) && a_Document[JSON_EDITOR_SETTINGS_SCENE_VAR][JSON_EDITOR_SETTINGS_SCENE_PAN_OFFSET].IsObject())
-				{
-					GetFloat(a_Document[JSON_EDITOR_SETTINGS_SCENE_VAR][JSON_EDITOR_SETTINGS_SCENE_PAN_OFFSET], JSON_EDITOR_SETTINGS_SCENE_PAN_OFFSET_X, m_vScenePanOffset.x);
-					GetFloat(a_Document[JSON_EDITOR_SETTINGS_SCENE_VAR][JSON_EDITOR_SETTINGS_SCENE_PAN_OFFSET], JSON_EDITOR_SETTINGS_SCENE_PAN_OFFSET_Y, m_vScenePanOffset.y);
-				}
-				GetInt(a_Document[JSON_EDITOR_SETTINGS_SCENE_VAR], JSON_EDITOR_SETTINGS_SCENE_LAST_OPERATION, m_iLastSceneOperation);
-				GetBool(a_Document[JSON_EDITOR_SETTINGS_SCENE_VAR], JSON_EDITOR_SETTINGS_SHOW_GRID_VAR, m_bShowGrid);
-				GetBool(a_Document[JSON_EDITOR_SETTINGS_SCENE_VAR], JSON_EDITOR_SETTINGS_PLAY_MODE_VAR, m_bFullScreenPlayMode);
-			}
-
-			return true;
 		}
+		m_aLastOpenedScenes.emplace_back(a_sName);
+	}
 
-		//---------------------------------------------------------------------
-		bool EditorSettings::SaveVars(rapidjson::Document& a_Document, rapidjson::Document::AllocatorType& a_Allocator) const
-		{
-			rapidjson::Document consoleDoc;
-			consoleDoc.SetObject();
-			consoleDoc.AddMember(JSON_EDITOR_SETTINGS_CONSOLE_SCROLL_TO_BOTTOM_VAR, m_bScrollToBottom, a_Allocator);
-			consoleDoc.AddMember(JSON_EDITOR_SETTINGS_CONSOLE_ASSERT_VAR, m_bShowAssert, a_Allocator);
-			consoleDoc.AddMember(JSON_EDITOR_SETTINGS_CONSOLE_ERROR_VAR, m_bShowError, a_Allocator);
-			consoleDoc.AddMember(JSON_EDITOR_SETTINGS_CONSOLE_WARNING_VAR, m_bShowWarning, a_Allocator);
-			consoleDoc.AddMember(JSON_EDITOR_SETTINGS_CONSOLE_INFO_VAR, m_bShowInfo, a_Allocator);
-			consoleDoc.AddMember(JSON_EDITOR_SETTINGS_CONSOLE_TEST_VAR, m_bShowTest, a_Allocator);
-			consoleDoc.AddMember(JSON_EDITOR_SETTINGS_CONSOLE_SUCCESS_VAR, m_bShowSuccess, a_Allocator);
-			consoleDoc.AddMember(JSON_EDITOR_SETTINGS_CONSOLE_INFOSUCCESS_VAR, m_bShowInfoSuccess, a_Allocator);
-			consoleDoc.AddMember(JSON_EDITOR_SETTINGS_CONSOLE_AWESOME_VAR, m_bShowAwesome, a_Allocator);
-			a_Document.AddMember(JSON_EDITOR_SETTINGS_CONSOLE_VAR, consoleDoc, a_Allocator);
+	//---------------------------------------------------------------------
+	const std::vector<std::string>& EditorSettings::GetLastOpenedScenes() const
+	{
+		return m_aLastOpenedScenes;
+	}
 
-			rapidjson::Document sceneDoc;
-			sceneDoc.SetObject();
-			sceneDoc.AddMember(JSON_EDITOR_SETTINGS_SCENE_ZOOM, m_fSceneZoom, a_Allocator);
-			rapidjson::Document scenePanOffsetDoc;
-			scenePanOffsetDoc.SetObject();
-			scenePanOffsetDoc.AddMember(JSON_EDITOR_SETTINGS_SCENE_PAN_OFFSET_X, m_vScenePanOffset.x, a_Allocator);
-			scenePanOffsetDoc.AddMember(JSON_EDITOR_SETTINGS_SCENE_PAN_OFFSET_Y, m_vScenePanOffset.y, a_Allocator);
-			sceneDoc.AddMember(JSON_EDITOR_SETTINGS_SCENE_PAN_OFFSET, scenePanOffsetDoc, a_Allocator);
-			sceneDoc.AddMember(JSON_EDITOR_SETTINGS_SCENE_LAST_OPERATION, m_iLastSceneOperation, a_Allocator);
-			sceneDoc.AddMember(JSON_EDITOR_SETTINGS_SHOW_GRID_VAR, m_bShowGrid, a_Allocator);
-			sceneDoc.AddMember(JSON_EDITOR_SETTINGS_PLAY_MODE_VAR, m_bFullScreenPlayMode, a_Allocator);
-			a_Document.AddMember(JSON_EDITOR_SETTINGS_SCENE_VAR, sceneDoc, a_Allocator);
+	//---------------------------------------------------------------------
+    void EditorSettings::SetDimensionDrawMode(uint8_t a_iDimensionDrawMode)
+    {
+		m_iDimensionDrawMode = a_iDimensionDrawMode;
+	}
 
-			return true;
-		}
+	//---------------------------------------------------------------------
+	uint8_t EditorSettings::GetDimensionDrawMode() const
+	{
+		return m_iDimensionDrawMode;
+	}
 
-		//---------------------------------------------------------------------
-		void EditorSettings::SetScrollToBottom(bool a_bScrollToBottom)
-		{
-			m_bScrollToBottom = a_bScrollToBottom;
-		}
+	//---------------------------------------------------------------------
+	void EditorSettings::SetShadingDrawMode(uint8_t a_iShadingDrawMode)
+	{
+		m_iShadingDrawMode = a_iShadingDrawMode;
+	}
 
-		//---------------------------------------------------------------------
-		bool EditorSettings::GetScrollToBottom() const
-		{
-			return m_bScrollToBottom;
-		}
-
-		//---------------------------------------------------------------------
-		void EditorSettings::SetShowInfo(bool a_bShowInfo)
-		{
-			m_bShowInfo = a_bShowInfo;
-		}
-
-		//---------------------------------------------------------------------
-		bool EditorSettings::GetShowInfo() const
-		{
-			return m_bShowInfo;
-		}
-
-		//---------------------------------------------------------------------
-		void EditorSettings::SetShowTest(bool a_bShowText)
-		{
-			m_bShowTest = a_bShowText;
-		}
-
-		//---------------------------------------------------------------------
-		bool EditorSettings::GetShowTest() const
-		{
-			return m_bShowTest;
-		}
-
-		//---------------------------------------------------------------------
-		void EditorSettings::SetShowWarning(bool a_bShowWarning)
-		{
-			m_bShowWarning = a_bShowWarning;
-		}
-
-		//---------------------------------------------------------------------
-		bool EditorSettings::GetShowWarning() const
-		{
-			return m_bShowWarning;
-		}
-
-		//---------------------------------------------------------------------
-		void EditorSettings::SetShowError(bool a_bShowError)
-		{
-			m_bShowError = a_bShowError;
-		}
-
-		//---------------------------------------------------------------------
-		bool EditorSettings::GetShowError() const
-		{
-			return m_bShowError;
-		}
-
-		//---------------------------------------------------------------------
-		void EditorSettings::SetShowAssert(bool a_bShowAssert)
-		{
-			m_bShowAssert = a_bShowAssert;
-		}
-
-		//---------------------------------------------------------------------
-		bool EditorSettings::GetShowAssert() const
-		{
-			return m_bShowAssert;
-		}
-
-		//---------------------------------------------------------------------
-		void EditorSettings::SetShowSuccess(bool a_bShowSuccess)
-		{
-			m_bShowSuccess = a_bShowSuccess;
-		}
-
-		//---------------------------------------------------------------------
-		bool EditorSettings::GetShowSuccess() const
-		{
-			return m_bShowSuccess;
-		}
-
-		//---------------------------------------------------------------------
-		void EditorSettings::SetShowInfoSuccess(bool a_bShowInfoSuccess)
-		{
-			m_bShowInfoSuccess = a_bShowInfoSuccess;
-		}
-
-		//---------------------------------------------------------------------
-		bool EditorSettings::GetShowInfoSuccess() const
-		{
-			return m_bShowInfoSuccess;
-		}
-
-		//---------------------------------------------------------------------
-		void EditorSettings::SetShowAwesome(bool a_bShowAwesome)
-		{
-			m_bShowAwesome = a_bShowAwesome;
-		}
-
-		//---------------------------------------------------------------------
-		bool EditorSettings::GetShowAwesome() const
-		{
-			return m_bShowAwesome;
-		}
-
-		//---------------------------------------------------------------------
-		void EditorSettings::SetShowGrid(bool a_bShowGrid)
-		{
-			m_bShowGrid = a_bShowGrid;
-		}
-
-		//---------------------------------------------------------------------
-		bool EditorSettings::GetShowGrid() const
-		{
-			return m_bShowGrid;
-		}
-
-		//---------------------------------------------------------------------
-		void EditorSettings::SetFullScreenPlayMode(bool a_bFullScreenPlayMode)
-		{
-			m_bFullScreenPlayMode = a_bFullScreenPlayMode;
-		}
-
-		//---------------------------------------------------------------------
-		bool EditorSettings::GetFullScreenPlayMode() const
-		{
-			return m_bFullScreenPlayMode;
-		}
-
-		//---------------------------------------------------------------------
-		void EditorSettings::SetSceneZoom(float a_fSceneZoom)
-		{
-			m_fSceneZoom = a_fSceneZoom;
-		}
-
-		//---------------------------------------------------------------------
-		float EditorSettings::GetSceneZoom() const
-		{
-			return m_fSceneZoom;
-		}
-
-		//---------------------------------------------------------------------
-		void EditorSettings::SetScenePanOffset(const glm::vec2& a_vScenePanOffset)
-		{
-			m_vScenePanOffset = a_vScenePanOffset;
-		}
-
-		//---------------------------------------------------------------------
-		const glm::vec2& EditorSettings::GetScenePanOffset() const
-		{
-			return m_vScenePanOffset;
-		}
-
-		//---------------------------------------------------------------------
-		void EditorSettings::SetLastSceneOperation(int a_iLastSceneOperation)
-		{
-			m_iLastSceneOperation = a_iLastSceneOperation;
-		}
-
-		//---------------------------------------------------------------------
-		int EditorSettings::GetLastSceneOperation() const
-		{
-			return m_iLastSceneOperation;
-		}
-
-		//---------------------------------------------------------------------
-		void EditorSettings::SetFPSPrecision(bool a_bFPSPrecision)
-		{
-			m_bFPSPrecision = a_bFPSPrecision;
-		}
-
-		//---------------------------------------------------------------------
-		bool EditorSettings::GetFPSPrecision() const
-		{
-			return m_bFPSPrecision;
-		}
+	//---------------------------------------------------------------------
+	uint8_t EditorSettings::GetShadingDrawMode() const
+	{
+		return m_iShadingDrawMode;
 	}
 }

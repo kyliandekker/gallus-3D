@@ -2,7 +2,7 @@
 #include "Prefab.h"
 
 // core
-#include "core/DataStream.h"
+#include "core/Engine.h"
 
 // logger
 #include "logger/Logger.h"
@@ -11,163 +11,163 @@
 #include "resources/SrcData.h"
 
 // gameplay
+#include "gameplay/Entity.h"
+#include "gameplay/EntityComponentSystem.h"
 #include "gameplay/ECSBaseSystem.h"
 
-namespace gallus
+namespace gallus::gameplay
 {
-	namespace gameplay
+	//---------------------------------------------------------------------
+    bool Prefab::LoadData(const core::Data& a_Data)
+    {
+		if (!Scene::LoadData(a_Data))
+		{
+			return false;
+		}
+
+		m_AssetType = resources::AssetType::Prefab;
+
+        return true;
+    }
+
+    //---------------------------------------------------------------------
+	bool Prefab::LoadData()
 	{
-		//---------------------------------------------------------------------
-		bool Prefab::LoadByName(const std::string& a_sName)
+		// Clear all entities.
+		gameplay::EntityComponentSystem* ecs = GetEngine().GetECS();
+		if (!ecs)
 		{
-			if (!Scene::LoadByName(a_sName))
-			{
-				return false;
-			}
-			m_AssetType = resources::AssetType::Prefab;
-
-			return true;
+			return false;
 		}
 
-		//---------------------------------------------------------------------
-		bool Prefab::LoadByPath(const fs::path& a_Path)
+		ecs->Clear();
+		while (!ecs->GetEntities().empty())
 		{
-			if (!Scene::LoadByPath(a_Path))
-			{
-				return false;
-			}
-			m_AssetType = resources::AssetType::Prefab;
-
-			return true;
 		}
 
-		//---------------------------------------------------------------------
-		bool Prefab::LoadData()
+		if (!Instantiate().IsValid())
 		{
-			// Clear all entities.
-			core::ENGINE->GetECS().Clear();
-			while (!core::ENGINE->GetECS().GetEntities().empty())
-			{
-			}
-
-			if (!Instantiate().IsValid())
-			{
-				return false;
-			}
-
-			return true;
+			return false;
 		}
 
-		//---------------------------------------------------------------------
-#ifdef _EDITOR
-		const core::Data Prefab::GetSceneData() const
-		{
-			resources::SrcData srcData = resources::SrcData();
-			srcData.SetObject();
+		return true;
+	}
 
-			auto entities = core::ENGINE->GetECS().GetEntities();
-			if (!entities.empty())
-			{
-				std::weak_ptr<gameplay::Entity> entity = entities[0];
-				auto ent = entity.lock();
-				if (!ent)
-				{
-					return core::Data();
-				}
+	//---------------------------------------------------------------------
+	const core::Data Prefab::GetSceneData() const
+	{
+		//resources::SrcData srcData = resources::SrcData();
+		//srcData.SetObject();
 
-				srcData.SetString(JSON_SCENE_ENTITIES_VAR_NAME, ent->GetName());
-				srcData.SetBool(JSON_SCENE_ENTITIES_VAR_ACTIVE, ent->IsActive());
+		//gameplay::EntityComponentSystem* ecs = GetEngine().GetECS();
+		//if (!ecs)
+		//{
+		//	return core::Data();
+		//}
 
-				resources::SrcData componentsSrc = resources::SrcData();
-				componentsSrc.SetObject();
+		//auto entities = ecs->GetEntities();
+		//if (!entities.empty())
+		//{
+		//	gameplay::EntityID entityID = entities[0];
+		//	std::weak_ptr<gameplay::Entity> entity = ecs->GetEntity(entityID);
+		//	std::shared_ptr<gameplay::Entity> ent = entity.lock();
+		//	if (!entity.lock())
+		//	{
+		//		return core::Data();
+		//	}
 
-				for (gameplay::AbstractECSSystem* system : core::ENGINE->GetECS().GetSystemsContainingEntity(ent->GetEntityID()))
-				{
-					resources::SrcData componentSrc = resources::SrcData();
-					componentSrc.SetObject();
+		//	srcData.SetString(JSON_SCENE_ENTITIES_VAR_NAME, ent->GetName());
+		//	srcData.SetBool(JSON_SCENE_ENTITIES_VAR_ACTIVE, ent->IsActive());
 
-					const gameplay::Component* component = system->GetBaseComponent(ent->GetEntityID());
-					component->Serialize(componentSrc);
+		//	resources::SrcData componentsSrc = resources::SrcData();
+		//	componentsSrc.SetObject();
 
-					componentsSrc.SetSrcObject(system->GetPropertyName(), componentSrc);
-				}
-				srcData.SetSrcObject(JSON_SCENE_ENTITIES_VAR_COMPONENTS, componentsSrc);
-			}
-			
-			core::Data data;
-			srcData.GetData(data);
-			return data;
-		}
-#endif // _EDITOR
+		//	for (gameplay::AbstractECSSystem* system : ecs->GetSystemsContainingEntity(entityID))
+		//	{
+		//		resources::SrcData componentSrc = resources::SrcData();
+		//		componentSrc.SetObject();
 
-		//---------------------------------------------------------------------
-		gameplay::EntityID Prefab::Instantiate() const
-		{
-			gameplay::EntityID id;
-			id.SetInvalid();
+		//		const gameplay::Component* component = system->GetBaseComponent(entityID);
+		//		SerializeFields(component, componentSrc);
 
-			if (m_Data.empty())
-			{
-				return id;
-			}
-			
-			resources::SrcData srcData(m_Data);
-			if (!srcData.IsValid())
-			{
-				LOG(LOGSEVERITY_ERROR, LOG_CATEGORY_GAME, "Something went wrong when trying to load scene data.");
-				return false;
-			}
+		//		componentsSrc.SetSrcObject(system->GetPropertyName(), componentSrc);
+		//	}
+		//	srcData.SetSrcObject(JSON_SCENE_ENTITIES_VAR_COMPONENTS, componentsSrc);
+		//}
+		//
+		//core::Data data;
+		//srcData.GetData(data);
+		//return data;
 
-			std::string name = core::ENGINE->GetECS().GetUniqueName("New GameObject");
-			if (!srcData.GetString(JSON_SCENE_ENTITIES_VAR_NAME, name))
-			{
-				LOGF(LOGSEVERITY_WARNING, LOG_CATEGORY_GAME, "Could not read name of entity in prefab data. Defaulting to using name \"\".", name.c_str());
-			}
+		return core::Data();
+	}
 
-			id = core::ENGINE->GetECS().CreateEntity(core::ENGINE->GetECS().GetUniqueName(name));
-			if (!id.IsValid())
-			{
-				LOGF(LOGSEVERITY_WARNING, LOG_CATEGORY_GAME, "Could not spawn entity.");
-				return id;
-			}
+	//---------------------------------------------------------------------
+	gameplay::EntityID Prefab::Instantiate() const
+	{
+		return gameplay::EntityID();
+		//resources::SrcData srcData(m_Data);
+		//if (!srcData.IsValid())
+		//{
+		//	LOG(LOGSEVERITY_ERROR, LOG_CATEGORY_GAME, "Failed prefab instantiation: Something went wrong when trying to load scene data.");
+		//	return EntityID();
+		//}
 
-			std::weak_ptr<gameplay::Entity> entity = core::ENGINE->GetECS().GetEntity(id);
-			auto ent = entity.lock();
-			if (!ent)
-			{
-				LOGF(LOGSEVERITY_WARNING, LOG_CATEGORY_GAME, "Could not spawn entity.");
-				return id;
-			}
+		//gameplay::EntityComponentSystem* ecs = GetEngine().GetECS();
+		//if (!ecs)
+		//{
+		//	return EntityID();
+		//}
 
-			bool isActive = true;
-			if (!srcData.GetBool(JSON_SCENE_ENTITIES_VAR_ACTIVE, isActive))
-			{
-				LOGF(LOGSEVERITY_WARNING, LOG_CATEGORY_GAME, "Could not read active state of entity in prefab data. Defaulting to true.");
-			}
-			ent->SetIsActive(isActive);
-			
-			resources::SrcData componentsSrc;
-			if (!srcData.GetSrcObject(JSON_SCENE_ENTITIES_VAR_COMPONENTS, componentsSrc))
-			{
-				LOGF(LOGSEVERITY_WARNING, LOG_CATEGORY_GAME, "Entity did not have any components in prefab data.");
-			}
+		//std::string name = ecs->GetUniqueName("New GameObject");
+		//if (!srcData.GetString(name, JSON_SCENE_ENTITIES_VAR_NAME))
+		//{
+		//	LOGF(LOGSEVERITY_WARNING, LOG_CATEGORY_GAME, "Failed prefab instantiation: Could not read name of entity in prefab data. Defaulting to using name \"\".", name.c_str());
+		//}
 
-			// Create all components.
-			for (gameplay::AbstractECSSystem* system : core::ENGINE->GetECS().GetSystems())
-			{
-				if (componentsSrc.HasSrcObject(system->GetPropertyName()))
-				{
-					resources::SrcData componentSrc;
-					if (!componentsSrc.GetSrcObject(system->GetPropertyName(), componentSrc))
-					{
-						continue;
-					}
+		//EntityID id = ecs->CreateEntity(ecs->GetUniqueName(name));
+		//if (!id.IsValid())
+		//{
+		//	LOGF(LOGSEVERITY_WARNING, LOG_CATEGORY_GAME, "Failed prefab instantiation: Could not spawn entity.");
+		//	return id;
+		//}
 
-					const gameplay::Component* component = system->CreateBaseComponent(id, componentSrc);
-				}
-			}
+		//std::weak_ptr<gameplay::Entity> entity = ecs->GetEntity(id);
+		//auto ent = entity.lock();
+		//if (!ent)
+		//{
+		//	LOGF(LOGSEVERITY_WARNING, LOG_CATEGORY_GAME, "Failed prefab instantiation: Could not spawn entity.");
+		//	return id;
+		//}
 
-			return id;
-		}
+		//bool isActive = true;
+		//if (!srcData.GetBool(isActive, JSON_SCENE_ENTITIES_VAR_ACTIVE))
+		//{
+		//	LOGF(LOGSEVERITY_WARNING, LOG_CATEGORY_GAME, "Failed prefab instantiation: Could not read active state of entity in prefab data. Defaulting to true.");
+		//}
+		//ent->SetIsActive(isActive);
+		//
+		//resources::SrcData componentsSrc;
+		//if (!srcData.GetSrcObject(JSON_SCENE_ENTITIES_VAR_COMPONENTS, componentsSrc))
+		//{
+		//	LOGF(LOGSEVERITY_WARNING, LOG_CATEGORY_GAME, "Failed prefab instantiation: Entity did not have any components in prefab data.");
+		//}
+
+		//// Create all components.
+		//for (gameplay::AbstractECSSystem* system : ecs->GetSystems())
+		//{
+		//	if (componentsSrc.HasSrcObject(system->GetPropertyName()))
+		//	{
+		//		resources::SrcData componentSrc;
+		//		if (!componentsSrc.GetSrcObject(system->GetPropertyName(), componentSrc))
+		//		{
+		//			continue;
+		//		}
+
+		//		const gameplay::Component* component = system->CreateBaseComponent(id, componentSrc);
+		//	}
+		//}
+
+		//return id;
 	}
 }

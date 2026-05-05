@@ -38,8 +38,6 @@ namespace ImGui
 	bool IconCheckboxButton(const std::string& a_Label, bool* a_pValue, const std::string& a_sDescription, const ImVec2& a_vSize, const ImVec4& a_Color = ImGui::GetStyle().Colors[ImGuiCol_Text]);
 	bool ConsoleButton(const std::string& a_Label, bool* a_pValue, const std::string& a_sDescription, const ImVec2& a_vSize, int a_iNumber, const ImVec4& a_Color = ImGui::GetStyle().Colors[ImGuiCol_Text], const ImVec4& a_vCircleColor = ImGui::GetStyle().Colors[ImGuiCol_TabActive]);
 
-	void BeginToolbar(const ImVec2& a_Size);
-	void EndToolbar(const ImVec2& a_Padding);
 	void DisplayHeader(ImFont* a_BoldFont, const std::string& a_Label);
 
 	bool InputTextStdString(const std::string& label, std::string* str, ImGuiInputTextFlags flags = 0);
@@ -81,9 +79,10 @@ namespace ImGui
 
 	bool VectorEdit2(const std::string& label, float col[2], float a_fSpeed = 1.0f, float a_fMin = -999999999999999, float a_fMax = 9999999999999999);
 	bool VectorEdit3(const std::string& label, float col[3], float a_fSpeed = 1.0f, float a_fMin = -999999999999999, float a_fMax = 9999999999999999);
-	bool IVectorEdit2(const std::string& label, int col[2]);
+	bool IVectorEdit2(const std::string& label, int col[2], int a_iStep = 1, int a_iMin = 0, int a_iMax = 9999999999);
 
 	void ShowTooltip(const std::string& a_sText);
+	void ShowStaticTooltip(const ImVec2& a_vPos, const std::string& a_sText);
 }
 
 #endif

@@ -1,86 +1,64 @@
 #include "Settings.h"
 
-// external
-#include <rapidjson/document.h>
-#include <rapidjson/stringbuffer.h>
-#include <rapidjson/prettywriter.h>
-
 // core
-#include "core/Engine.h"
 #include "core/DataStream.h"
 
 // logger
 #include "logger/Logger.h"
 
-// utils
-#include "utils/file_abstractions.h"
+// resources
+#include "resources/SrcData.h"
 
-namespace gallus
+// file
+#include "file/file_abstractions.h"
+
+namespace gallus::core
 {
-	namespace core
+	//---------------------------------------------------------------------
+	// Settings
+	//---------------------------------------------------------------------
+	Settings::Settings(const std::string& a_sFileName) : m_sFileName(a_sFileName)
+	{}
+
+	//---------------------------------------------------------------------
+	bool Settings::Load()
 	{
-		//---------------------------------------------------------------------
-		// Settings
-		//---------------------------------------------------------------------
-		Settings::Settings(const std::string& a_sFileName) : m_sFileName(a_sFileName)
-		{
+		std::string filePath = m_sPath + "/" + m_sFileName;
 
+		core::Data data;
+		if (!file::LoadFile(filePath, data))
+		{
+			LOGF(LOGSEVERITY_ERROR, LOG_CATEGORY_GAME, "Failed loading settings file: Something went wrong when trying to load settings file \"%s\".", m_sFileName.c_str());
+			return false;
 		}
 
-		//---------------------------------------------------------------------
-		bool Settings::Load()
+		DeserializeFields(this, resources::SrcData(data));
+
+		return true;
+	}
+
+	//---------------------------------------------------------------------
+	bool Settings::Save() const
+	{
+		std::string filePath = m_sPath + "/" + m_sFileName;
+
+		if (filePath.empty())
 		{
-			DataStream data;
-			const fs::path path = ENGINE->GetSaveDirectory().generic_string() + "/" + m_sFileName;
-
-			if (!file::LoadFile(path, data))
-			{
-				Save();
-				return false;
-			}
-
-			rapidjson::Document document;
-			document.Parse(reinterpret_cast<char*>(data.data()), data.size());
-
-			if (document.HasParseError())
-			{
-				Save();
-				return false;
-			}
-
-			if (!LoadVars(document))
-			{
-				return false;
-			}
-
-			return true;
+			return false;
 		}
 
-		//---------------------------------------------------------------------
-		bool Settings::Save() const
+		resources::SrcData srcData;
+		srcData.SetObject();
+		SerializeFields(this, srcData);
+
+		core::Data data;
+		srcData.GetData(data);
+		if (!file::SaveFile(filePath, data))
 		{
-			rapidjson::Document document;
-			document.SetObject();
-			rapidjson::Document::AllocatorType& allocator = document.GetAllocator();
-
-			if (!SaveVars(document, allocator))
-			{
-				return false;
-			}
-
-			rapidjson::StringBuffer buffer;
-			rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
-			document.Accept(writer);
-
-			fs::path path = ENGINE->GetSaveDirectory().generic_string() + "/" + m_sFileName;
-			file::CreateDirectory(path.parent_path());
-			if (!file::SaveFile(path, core::Data(buffer.GetString(), buffer.GetSize())))
-			{
-				LOGF(LOGSEVERITY_ERROR, LOG_CATEGORY_CORE, "Something went wrong when trying to save the settings: \"%s\".", path.filename().generic_string().c_str());
-				return false;
-			}
-
-			return true;
+			LOGF(LOGSEVERITY_ERROR, LOG_CATEGORY_GAME, "Failed saving settings file: Something went wrong when trying to save settings file \"%s\".", m_sFileName.c_str());
+			return false;
 		}
+
+		return true;
 	}
 }

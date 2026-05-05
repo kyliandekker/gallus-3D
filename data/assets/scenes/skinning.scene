@@ -1,0 +1,155 @@
+{
+    "camera": {
+        "position": {
+            "x": 2.4059998989105226,
+            "y": 2.0,
+            "z": -1.4789999723434449
+        },
+        "rotation": {
+            "x": 0.23447854816913606,
+            "y": -0.23884153366088868,
+            "z": 0.059549979865550998,
+            "w": 0.9404405355453491
+        },
+        "pivot": {
+            "x": -0.5,
+            "y": -0.5,
+            "z": -0.5
+        },
+        "fieldofView": 90.0
+    },
+    "directionalLight": {
+        "assetType": 0,
+        "enabled": 1,
+        "lightDirection": {
+            "x": 0.2640981376171112,
+            "y": 0.6063023209571838,
+            "z": 0.15302087366580964,
+            "w": 0.7343257665634155
+        },
+        "lightColor": {
+            "r": 1.0,
+            "g": 1.0,
+            "b": 1.0,
+            "a": 1.0
+        },
+        "ambientIntensity": 0.6000000238418579
+    },
+    "entities": [
+        {
+            "name": "New GameObject",
+            "isActive": true,
+            "components": {
+                "mesh": {
+                    "pixelShader": "pixelShader.cso",
+                    "vertexShader": "vertexShader.cso",
+                    "material": "mat_lit.mat",
+                    "mesh": "cube",
+                    "texture": "tex_missing.png",
+                    "textureIndex": 0
+                },
+                "transform": {
+                    "transform": {
+                        "position": {
+                            "x": 0.0,
+                            "y": 0.0,
+                            "z": 0.0
+                        },
+                        "scale": {
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
+                        },
+                        "rotation": {
+                            "x": -0.0,
+                            "y": 0.0,
+                            "z": -0.0,
+                            "w": 1.0
+                        },
+                        "pivot": {
+                            "x": 0.0,
+                            "y": 0.0,
+                            "z": 0.0
+                        },
+                        "cameraType": 0
+                    }
+                },
+                "collision": {
+                    "colliderSettings": {
+                        "offset": {
+                            "x": 0.0,
+                            "y": 0.0,
+                            "z": 0.0
+                        },
+                        "size": {
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
+                        }
+                    },
+                    "convex": false
+                }
+            }
+        },
+        {
+            "name": "mod_chicken.glb",
+            "isActive": true,
+            "components": {
+                "mesh": {
+                    "pixelShader": "pixelShader.cso",
+                    "vertexShader": "vertexShader.cso",
+                    "material": "mat_lit.mat",
+                    "mesh": "mod_chicken.glb",
+                    "texture": "tex_chicken_infected.png",
+                    "textureIndex": 0
+                },
+                "transform": {
+                    "transform": {
+                        "position": {
+                            "x": 0.0,
+                            "y": 2.8728973865509035,
+                            "z": -1.1920928955078126e-7
+                        },
+                        "scale": {
+                            "x": 2.0,
+                            "y": 2.0,
+                            "z": 2.0
+                        },
+                        "rotation": {
+                            "x": 0.0,
+                            "y": 0.0,
+                            "z": 0.0,
+                            "w": 1.0
+                        },
+                        "pivot": {
+                            "x": 0.0,
+                            "y": 0.0,
+                            "z": 0.0
+                        },
+                        "cameraType": 0
+                    }
+                },
+                "collision": {
+                    "colliderSettings": {
+                        "offset": {
+                            "x": 0.0,
+                            "y": 0.25,
+                            "z": 0.0
+                        },
+                        "size": {
+                            "x": 0.5,
+                            "y": 0.5,
+                            "z": 0.5
+                        }
+                    },
+                    "convex": false
+                },
+                "rigidbody": {
+                    "useGravity": true,
+                    "mass": 1.0,
+                    "linearDamping": 0.9800000190734863
+                }
+            }
+        }
+    ]
+}

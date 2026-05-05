@@ -4,133 +4,132 @@
 
 // external
 #include <memory>
-#include <glm/vec4.hpp>
 
 // graphics
 #include "graphics/dx12/DX12PCH.h"
-#include "graphics/dx12/Camera.h"
 
 // resources
 #include "resources/AssetType.h"
 
-namespace gallus
+namespace gallus::graphics::dx12
 {
-	namespace graphics
-	{
-		namespace dx12
-		{
-			class CommandList;
+	class DX12System;
+	class CommandList;
 
-			class Transform;
-			class Texture;
-			class ShaderBind;
-			class Mesh;
-			class Camera;
+	class Transform;
+	class Texture;
+	class Mesh;
+	class Camera;
+	class PixelShader;
+	class VertexShader;
+	class Material;
+}
+namespace gallus::gameplay
+{
+	struct EntityID;
+	class TransformSystem;
+
+	//---------------------------------------------------------------------
+	// SpriteComponent
+	//---------------------------------------------------------------------
+	class SpriteComponent : public Component
+	{
+	public:
+		/// <summary>
+		/// Initializes the component.
+		/// </summary>
+		void SetDefaults(const gameplay::EntityID& a_EntityID) override;
+
+		/// <summary>
+		/// Initializes the component in runtime.
+		/// </summary>
+		void Init() override;
+
+		/// <summary>
+		/// Sets the mesh used by the mesh component.
+		/// </summary>
+		/// <param name="a_Mesh">Reference to the mesh that the mesh component will use.</param>
+		void SetMesh(std::weak_ptr<graphics::dx12::Mesh> a_pMesh);
+
+		/// <summary>
+		/// Sets the texture used by the mesh component.
+		/// </summary>
+		/// <param name="a_Texture">Reference to the texture that the mesh component will use.</param>
+		void SetTexture(std::weak_ptr < graphics::dx12::Texture> a_pTexture);
+
+		/// <summary>
+		/// Sets the sprite index.
+		/// </summary>
+		/// <param name="a_iTextureIndex">The index the sprite should have.</param>
+		void SetTextureIndex(int8_t a_iTextureIndex);
+		
+		/// <summary>
+		/// Retrieves the layer order.
+		/// </summary>
+		/// <returns>An integer representing the layer order.</returns>
+		int8_t GetOrder() const
+		{
+			return m_iOrder;
 		}
-	}
-	namespace gameplay
-	{
-		struct EntityID;
 
-		//---------------------------------------------------------------------
-		// SpriteComponent
-		//---------------------------------------------------------------------
-		class SpriteComponent : public Component
-		{
-		public:
-			/// <summary>
-			/// Initializes the component.
-			/// </summary>
-			void SetDefaults(const gameplay::EntityID& a_EntityID) override;
+		/// <summary>
+		/// Renders the mesh.
+		/// </summary>
+		/// <param name="a_pCommandList">The command list used for rendering.</param>
+		/// <param name="a_EntityID">The entity ID to get the data from.</param>
+		/// <param name="a_Camera">The camera.</param>
+		void Render(std::shared_ptr<graphics::dx12::CommandList> a_pCommandList, const EntityID& a_EntityID, const graphics::dx12::Camera& a_Camera);
+	private:
+		void OnOrderChanged();
 
-			/// <summary>
-			/// Sets the mesh used by the mesh component.
-			/// </summary>
-			/// <param name="a_Mesh">Reference to the mesh that the mesh component will use.</param>
-			void SetMesh(std::weak_ptr<graphics::dx12::Mesh> a_pMesh);
+		bool m_bIsStatic = false;
+		int8_t m_iOrder = false;
+		
+		std::weak_ptr<graphics::dx12::PixelShader> m_pPixelShader = {};
+		std::weak_ptr<graphics::dx12::VertexShader> m_pVertexShader = {};
+		std::weak_ptr<graphics::dx12::Mesh> m_pMesh = {};
+		std::weak_ptr<graphics::dx12::Texture> m_pTexture = {};
+		uint16_t m_iTextureIndex = 0;
+		std::weak_ptr<graphics::dx12::Material> m_pMaterial = {};
 
-			/// <summary>
-			/// Sets the shader used by the mesh component.
-			/// </summary>
-			/// <param name="a_Shader">Reference to the shader bind that the mesh component will use.</param>
-			void SetShader(std::weak_ptr < graphics::dx12::ShaderBind> a_pShaderBind);
+		void OnShadersChanged();
 
-			/// <summary>
-			/// Sets the texture used by the mesh component.
-			/// </summary>
-			/// <param name="a_Texture">Reference to the texture that the mesh component will use.</param>
-			void SetTexture(std::weak_ptr < graphics::dx12::Texture> a_pTexture);
+		BEGIN_SERIALIZE_PARENT(SpriteComponent, Component)
+			SERIALIZE_FIELD(m_pPixelShader, "Pixel Shader", "Pointer to the pixel shader asset used for rendering this object. Can be nullptr if no specific pixel shader is assigned.",
+				.type = FieldSerializationType::FieldSerializationType_EngineResource,
+				.assetType = resources::AssetType::PixelShader,
+				.onChangeFunc = MakeOnChangeFunc(&SpriteComponent::OnShadersChanged))
+			SERIALIZE_FIELD(m_pVertexShader, "Vertex Shader", "Pointer to the vertex shader asset used for rendering this object. Can be nullptr if no specific vertex shader is assigned.",
+				.type = FieldSerializationType::FieldSerializationType_EngineResource,
+				.assetType = resources::AssetType::VertexShader,
+				.onChangeFunc = MakeOnChangeFunc(&SpriteComponent::OnShadersChanged))
+		 	SERIALIZE_FIELD(m_bIsStatic, "Static", "Determines whether the sprite should stick on the screen or not.",
+		 		.type = FieldSerializationType::FieldSerializationType_Bool)
+		 	SERIALIZE_FIELD(m_iOrder, "Order", "Determines what sprites overlap other sprites.",
+		 		.type = FieldSerializationType::FieldSerializationType_Int8,
+		 		.onChangeFunc = MakeOnChangeFunc(&SpriteComponent::OnOrderChanged))
+			SERIALIZE_FIELD(m_pMaterial, "Material", "Pointer to the material asset used by this Mesh. Can be nullptr if no material is assigned. Determines the visual appearance of the Mesh.",
+				.type = FieldSerializationType::FieldSerializationType_EngineResource,
+				.assetType = resources::AssetType::Material)
+			SERIALIZE_FIELD(m_pMaterial, "MaterialView", "",
+				.type = FieldSerializationType::FieldSerializationType_ObjectPtr,
+				.assetType = resources::AssetType::Material,
+				.serialize = false,
+				.indent = 1)
+		 	SERIALIZE_FIELD(m_pTexture, "Texture", "Pointer to the texture asset used by this sprite. Can be nullptr if no texture is assigned. Determines the visual appearance of the sprite.",
+		 		.type = FieldSerializationType::FieldSerializationType_EngineResource,
+		 		.assetType = resources::AssetType::Texture)
+		 	SERIALIZE_FIELD(m_iTextureIndex, "Texture Index", "Index of the sprite within a texture atlas. Used when the texture contains multiple sprites to select which one is displayed.",
+		 		.type = FieldSerializationType::FieldSerializationType_Int16)
+		 	SERIALIZE_FIELD(m_pTexture, "Texture Preview", "",
+		 		.type = FieldSerializationType::FieldSerializationType_TexturePreview,
+		 		.relatedIndexFieldOffset = offsetof(SpriteComponent, m_iTextureIndex))
+		END_SERIALIZE(SpriteComponent)
 
-			/// <summary>
-			/// Sets the sprite index.
-			/// </summary>
-			/// <param name="a_iSpriteIndex">The index the sprite should have.</param>
-			void SetSpriteIndex(int8_t a_iSpriteIndex);
-			
-			/// <summary>
-			/// Retrieves the layer order.
-			/// </summary>
-			/// <returns>An integer representing the layer order.</returns>
-			int8_t GetOrder() const
-			{
-				return m_iOrder;
-			}
-
-			/// <summary>
-			/// Renders the mesh.
-			/// </summary>
-			/// <param name="a_pCommandList">The command list used for rendering.</param>
-			/// <param name="a_EntityID">The entity ID to get the data from.</param>
-			/// <param name="a_Camera">The camera.</param>
-			void Render(std::shared_ptr<graphics::dx12::CommandList> a_pCommandList, const EntityID& a_EntityID, const graphics::dx12::Camera& a_Camera);
-		private:
-			void OnOrderChanged();
-
-			bool m_bIsStatic = false;
-			int8_t m_iOrder = false;
-
-			std::weak_ptr<graphics::dx12::Mesh> m_pMesh = {};
-			std::weak_ptr<graphics::dx12::ShaderBind> m_pShaderBind = {};
-			std::weak_ptr<graphics::dx12::Texture> m_pSprite = {};
-			int8_t m_iSpriteIndex = 0;
-			DirectX::XMFLOAT4 m_vColor = { 1, 1, 1, 1 };
-
-			BEGIN_EXPOSE_FIELDS_PARENT(SpriteComponent, Component)
-				EXPOSE_FIELD(SpriteComponent, m_bIsStatic, "Static", "Determines whether the sprite should stick on the screen or not.",
-					(FieldOptions{ 
-						.type = EditorFieldWidgetType::EditorFieldWidgetType_Bool
-					}))
-				EXPOSE_FIELD(SpriteComponent, m_iOrder, "Order", "Determines what sprites overlap other sprites.",
-					(FieldOptions{ 
-						.type = EditorFieldWidgetType::EditorFieldWidgetType_Int8, 
-						.onChangeFunc = MakeOnChangeFunc(&SpriteComponent::OnOrderChanged)
-					}))
-				EXPOSE_FIELD(SpriteComponent, m_vColor, "Color", "Determines what color the sprite has.",
-					(FieldOptions{ 
-						.type = EditorFieldWidgetType::EditorFieldWidgetType_Color 
-					}))
-				EXPOSE_FIELD(SpriteComponent, m_pShaderBind, "Shader Bind", "", 
-					(FieldOptions{ 
-						.type = EditorFieldWidgetType::EditorFieldWidgetType_ObjectPtr 
-					}))
-				EXPOSE_FIELD(SpriteComponent, m_pSprite, "Sprite", "Pointer to the texture asset used by this sprite. Can be nullptr if no texture is assigned. Determines the visual appearance of the sprite.",
-					(FieldOptions{
-						.type = EditorFieldWidgetType::EditorFieldWidgetType_EngineResource, 
-						.assetType = resources::AssetType::Sprite, 
-					}))
-				EXPOSE_FIELD(SpriteComponent, m_iSpriteIndex, "Sprite Index", "Index of the sprite within a texture atlas. Used when the texture contains multiple sprites to select which one is displayed.",
-					(FieldOptions{
-						.type = EditorFieldWidgetType::EditorFieldWidgetType_Int8
-					}))
-				EXPOSE_FIELD(SpriteComponent, m_pSprite, "Sprite Preview", "",
-					(FieldOptions{
-						.type = EditorFieldWidgetType::EditorFieldWidgetType_TexturePreview,
-						.relatedIndexFieldOffset = offsetof(SpriteComponent, m_iSpriteIndex)
-					}))
-			END_EXPOSE_FIELDS(SpriteComponent)
-			BEGIN_EXPOSE_GIZMOS(SpriteComponent)
-			END_EXPOSE_GIZMOS(SpriteComponent)
-			END_EXPOSE_TO_EDITOR(SpriteComponent)
-		};
-	}
+		// cache
+		ID3D12PipelineState* m_pPipelineState = nullptr;
+		ID3D12RootSignature* m_pRootSignature = nullptr;
+		gameplay::TransformSystem* m_pTransformSystem = nullptr;
+		graphics::dx12::DX12System* m_pDX12System = nullptr;
+	};
 }

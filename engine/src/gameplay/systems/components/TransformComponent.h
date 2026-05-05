@@ -5,47 +5,70 @@
 // graphics
 #include "graphics/dx12/Transform.h"
 
-namespace gallus
+#include "utils/math.h"
+
+namespace gallus::gameplay
 {
-	namespace gameplay
+	class TransformSystem;
+
+	//---------------------------------------------------------------------
+	// TransformComponent
+	//---------------------------------------------------------------------
+	class TransformComponent : public Component
 	{
-		//---------------------------------------------------------------------
-		// TransformComponent
-		//---------------------------------------------------------------------
-		class TransformComponent : public Component
+	public:
+		/// <summary>
+		/// Retrieves the transform.
+		/// </summary>
+		/// <returns>Reference to the transform used in the transform component.</returns>
+		graphics::dx12::Transform& GetTransform();
+
+		~TransformComponent();
+
+		/// <summary>
+		/// Initializes the component after deserialization.
+		/// </summary>
+		void Init() override;
+
+		/// <summary>
+		/// Translates the component.
+		/// </summary>
+		/// <param name="a_vTranslation">The movement.</param>
+		void Translate(const DirectX::XMFLOAT3& a_vTranslation);
+
+		const Vector3& GetTranslation() const
 		{
-		public:
-			/// <summary>
-			/// Retrieves the transform.
-			/// </summary>
-			/// <returns>Reference to the transform used in the transform component.</returns>
-			graphics::dx12::Transform& GetTransform();
+			return m_vTranslation;
+		}
 
-			/// <summary>
-			/// Translates the component.
-			/// </summary>
-			/// <param name="a_vTranslation">The movement.</param>
-			void Translate(const DirectX::XMFLOAT3& a_vTranslation);
-		private:
-			/// <summary>
-			/// Updates the components.
-			/// </summary>
-			/// <param name="a_fDeltaTime">Delta time.</param>
-			void UpdateRealtime(float a_fDeltaTime, UpdateTime a_UpdateTime);
+		void SetTranslation(const Vector3& a_vTranslation)
+		{
+			m_vTranslation = a_vTranslation;
+		}
 
-			graphics::dx12::Transform m_Transform;
-			DirectX::XMFLOAT3 m_vTranslation = {};
+		int16_t GetTransformIndex() const
+		{
+			return m_iTransformIndex;
+		}
+	private:
+		/// <summary>
+		/// Updates the components.
+		/// </summary>
+		/// <param name="a_fDeltaTime">Delta time.</param>
+		void UpdateRealtime(float a_fDeltaTime, UpdateTime a_UpdateTime);
 
-			BEGIN_EXPOSE_FIELDS_PARENT(TransformComponent, Component)
-				EXPOSE_FIELD(TransformComponent, m_Transform, "Transform", "",
-					(FieldOptions{
-						.type = EditorFieldWidgetType::EditorFieldWidgetType_Object
-					}))
-			END_EXPOSE_FIELDS(TransformComponent)
-			BEGIN_EXPOSE_GIZMOS(TransformComponent)
-			EXPOSE_GIZMO(TransformComponent, m_Transform, (GizmoOptions{ EditorGizmoType::EditorGizmoType_Transform }))
-			END_EXPOSE_GIZMOS(TransformComponent)
-			END_EXPOSE_TO_EDITOR(TransformComponent)
-		};
-	}
+		graphics::dx12::Transform m_Transform;
+		Vector3 m_vTranslation = {};
+
+		int16_t m_iTransformIndex = 0; // Default is 0 because 0 is always allocated.
+
+		BEGIN_SERIALIZE_PARENT(TransformComponent, Component)
+			SERIALIZE_FIELD(m_Transform, "Transform", "",
+				.type = FieldSerializationType::FieldSerializationType_Object)
+			EXPOSE_GIZMO(m_Transform, EditorGizmoType::EditorGizmoType_Transform)
+		END_SERIALIZE(TransformComponent)
+
+		// cache
+		gameplay::TransformSystem* m_pTransformSystem = nullptr;
+	};
 }

@@ -1,11 +1,4 @@
-Texture2D spriteTexture : register(t0);
-SamplerState samplerState : register(s0);
-
-struct PSInput
-{
-    float4 pos : SV_POSITION;
-    float2 uv  : TEXCOORD0;
-};
+#include "Common.hlsl"
 
 float4 main(PSInput input) : SV_TARGET
 {

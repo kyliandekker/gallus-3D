@@ -1,242 +1,222 @@
-#include "Animation.h"
+﻿#include "Animation.h"
 
 // external
 #include <algorithm>
 
 // core
 #include "core/Engine.h"
-#include "core/DataStream.h"
 
 // logger
 #include "logger/Logger.h"
 
+// gameplay
+#include "gameplay/EntityComponentSystem.h"
 #include "gameplay/systems/AnimationSystem.h"
-
-// utils
-#include "utils/file_abstractions.h"
 
 // resources
 #include "resources/SrcData.h"
 
+// animation
 #include "animation/AnimationEvents.h"
+#include "animation/AnimationKeyFrame.h"
 
 #define ANIMATION_TRACK_FRAME_COUNT_VAR "frameCount"
 #define ANIMATION_TRACK_LOOP_VAR "loop"
 #define ANIMATION_TRACK_KEY_FRAMES_VAR "keyFrames"
 #define ANIMATION_TRACK_COMPONENTS_VAR "components"
 
-namespace gallus
+namespace gallus::animation
 {
-	namespace animation
+	//---------------------------------------------------------------------
+	// Animation
+	//---------------------------------------------------------------------
+	Animation::Animation() : EngineResource()
 	{
-        //---------------------------------------------------------------------
-        Animation::~Animation()
-        {
-            for (AnimationKeyFrame* keyFrame : m_aKeyFrames)
-            {
-                delete keyFrame;
-            }
-            m_aKeyFrames.clear();
-        }
-
-        //---------------------------------------------------------------------
-        bool Animation::LoadByPath(const fs::path& a_Path)
+		m_aKeyFrames.reserve(100);
+	}
+	
+	//---------------------------------------------------------------------
+	Animation::~Animation()
+	{
+		for (AnimationKeyFrame* keyFrame : m_aKeyFrames)
 		{
-			core::Data data;
-			if (!file::LoadFile(a_Path, data))
-			{
-                LOGF(LOGSEVERITY_ERROR, LOG_CATEGORY_ANIMATION, "Failed loading data in animation file \"%s\".", a_Path.generic_string().c_str());
-                return false;
-			}
+			delete keyFrame;
+		}
+		m_aKeyFrames.clear();
+	}
 
-            m_Path = a_Path;
-            m_sName = a_Path.filename().generic_string();
+	//---------------------------------------------------------------------
+	bool Animation::LoadData(const core::Data& a_Data)
+	{
+		resources::SrcData srcData(a_Data);
 
-            resources::SrcData srcData(data);
-            if (!srcData.IsValid())
-            {
-                LOGF(LOGSEVERITY_ERROR, LOG_CATEGORY_ANIMATION, "Failed loading data in animation file \"%s\".", a_Path.generic_string().c_str());
-                return false;
-            }
-
-            srcData.GetInt(ANIMATION_TRACK_FRAME_COUNT_VAR, m_iFrameCount);
-            srcData.GetBool(ANIMATION_TRACK_LOOP_VAR, m_bIsLooping);
-
-            resources::SrcData keyFramesSrcData;
-            keyFramesSrcData.SetObject();
-
-            srcData.GetSrcObject(ANIMATION_TRACK_KEY_FRAMES_VAR, keyFramesSrcData);
-
-            for (AnimationKeyFrame* keyFrame : m_aKeyFrames)
-            {
-                delete keyFrame;
-            }
-            m_aKeyFrames.clear();
-
-            std::vector<std::string> memberNames;
-            keyFramesSrcData.GetAllMemberNames(memberNames);
-            for (const std::string& name : memberNames)
-            {
-                int frame = std::stoi(name);
-
-                resources::SrcData keyFrameSrcData;
-                if (!keyFramesSrcData.GetSrcObject(name, keyFrameSrcData) || !keyFrameSrcData.IsValid())
-                {
-                    continue;
-                }
-
-                AnimationKeyFrame* keyFrame = new AnimationKeyFrame(frame, *this);
-                m_aKeyFrames.push_back(keyFrame);
-
-                resources::SrcData componentsSrcData;
-                if (!keyFrameSrcData.GetSrcObject(ANIMATION_TRACK_COMPONENTS_VAR, componentsSrcData))
-                {
-                    continue;
-                }
-
-                for (auto* sys : core::ENGINE->GetECS().GetSystem<gameplay::AnimationSystem>().GetSystems())
-                {
-                    resources::SrcData sysSrcData;
-                    if (!componentsSrcData.GetSrcObject(sys->GetPropertyName(), sysSrcData))
-                    {
-                        continue;
-                    }
-
-                    auto* keyFrameComp = sys->CreateComponent(*keyFrame);
-                    DeserializeEditorExposable(keyFrameComp, sysSrcData);
-                    keyFrame->AddComponent(keyFrameComp);
-                }
-            }
-
-			return true;
+		if (!srcData.IsValid())
+		{
+			LOGF(LOGSEVERITY_ERROR, LOG_CATEGORY_DX12, "Failed loading animation \"%s\": Something wrong with animation data.", m_sName.c_str());
+			return false;
 		}
 
-        //---------------------------------------------------------------------
-        void Animation::Update(gameplay::EntityID& a_EntityID, float a_fDeltaTime)
-        {
-        }
+		DeserializeFields(this, srcData, SerializationMethod::SerializationMethod_File);
 
-        //---------------------------------------------------------------------
-        void Animation::ActivateEvent(gameplay::EntityID& a_EntityID, AnimationEvent a_Event)
-        {
-            switch (a_Event)
-            {
-                case AnimationEvent::AnimationEvent_Delete:
-                {
-                    auto ent = core::ENGINE->GetECS().GetEntity(a_EntityID).lock();
-                    if (!ent)
-                    {
-                        return;
-                    }
-                    ent->Destroy();
-                }
-                default:
-                case AnimationEvent::AnimationEvent_None:
-                {
-                    break;
-                }
-            }
-        }
+		// Manually extract the key frame information.
+		// TODO: This would be possible with a key frame factory if I want automatic serialization and deserialization.
+		resources::SrcData keyFramesSrcData;
+		keyFramesSrcData.SetObject();
 
-        //---------------------------------------------------------------------
-        std::vector<AnimationKeyFrame*>& Animation::GetKeyFrames()
-        {
-            return m_aKeyFrames;
-        }
+		srcData.GetSrcObject(ANIMATION_TRACK_KEY_FRAMES_VAR, keyFramesSrcData);
 
-#ifdef _EDITOR
+		for (AnimationKeyFrame* keyFrame : m_aKeyFrames)
+		{
+			delete keyFrame;
+		}
+		m_aKeyFrames.clear();
 
-        //---------------------------------------------------------------------
-        bool Animation::Save(const fs::path& a_Path) const
-        {
-            resources::SrcData srcData;
-            srcData.SetObject();
+		gameplay::EntityComponentSystem* ecs = GetEngine().GetECS();
+		if (!ecs)
+		{
+			return false;
+		}
 
-            srcData.SetInt(ANIMATION_TRACK_FRAME_COUNT_VAR, m_iFrameCount);
-            srcData.SetBool(ANIMATION_TRACK_LOOP_VAR, m_bIsLooping);
+		std::vector<std::string> memberNames;
+		keyFramesSrcData.GetAllMemberNames(memberNames);
+		for (const std::string& name : memberNames)
+		{
+			int frame = std::stoi(name);
 
-            resources::SrcData keyFramesSrcData;
-            keyFramesSrcData.SetObject();
+			resources::SrcData keyFrameSrcData;
+			if (!keyFramesSrcData.GetSrcObject(name, keyFrameSrcData) || !keyFrameSrcData.IsValid())
+			{
+				continue;
+			}
 
-            for (AnimationKeyFrame* keyFrame : m_aKeyFrames)
-            {
-                resources::SrcData keyFrameSrcData;
-                keyFrameSrcData.SetObject();
-                
-                resources::SrcData componentsSrcData;
-                componentsSrcData.SetObject();
+			AnimationKeyFrame* keyFrame = new AnimationKeyFrame(frame, *this);
+			m_aKeyFrames.push_back(keyFrame);
 
-                for (auto* component : keyFrame->GetComponents())
-                {
-                    resources::SrcData componentSrcData;
-                    componentSrcData.SetObject();
+			resources::SrcData componentsSrcData;
+			if (!keyFrameSrcData.GetSrcObject(ANIMATION_TRACK_COMPONENTS_VAR, componentsSrcData))
+			{
+				continue;
+			}
 
-                    SerializeEditorExposable(component, componentSrcData);
-                    componentsSrcData.SetSrcObject(component->GetPropertyName(), componentSrcData);
-                }
+			for (animation::AnimationKeyFrameBaseSystem* sys : ecs->GetSystem<gameplay::AnimationSystem>()->GetSystems())
+			{
+				resources::SrcData sysSrcData;
+				if (!componentsSrcData.GetSrcObject(sys->GetPropertyName(), sysSrcData))
+				{
+					continue;
+				}
 
-                keyFrameSrcData.SetSrcObject(ANIMATION_TRACK_COMPONENTS_VAR, componentsSrcData);
+				animation::AnimationKeyFrameComponentBase* keyFrameComp = sys->CreateComponent(*keyFrame);
+				DeserializeFields(keyFrameComp, sysSrcData);
+				keyFrame->AddComponent(keyFrameComp);
+			}
+		}
 
-                std::string frameStr = std::to_string(keyFrame->GetFrame());
-                keyFramesSrcData.SetSrcObject(frameStr, keyFrameSrcData);
-            }
+		m_AssetType = resources::AssetType::Animation;
+		
+		LOGF(LOGSEVERITY_INFO_SUCCESS, LOG_CATEGORY_DX12, "Successfully loaded animation \"%s\".", m_sName.c_str());
+		return true;
+	}
 
-            srcData.SetSrcObject(ANIMATION_TRACK_KEY_FRAMES_VAR, keyFramesSrcData);
+	//---------------------------------------------------------------------
+	void Animation::Update(gameplay::EntityID& a_EntityID, float a_fDeltaTime)
+	{
+	}
 
-            core::Data data;
-            srcData.GetData(data);
-            return file::SaveFile(a_Path, data);
-        }
+	//---------------------------------------------------------------------
+	void Animation::ActivateEvent(gameplay::EntityID& a_EntityID, AnimationEvent a_Event)
+	{
+		switch (a_Event)
+		{
+			case AnimationEvent::AnimationEvent_Delete:
+			{
+				gameplay::EntityComponentSystem* ecs = GetEngine().GetECS();
+				if (!ecs)
+				{
+					return;
+				}
 
-        //---------------------------------------------------------------------
-        void Animation::AddKeyFrame(int a_iFrame)
-        {
-            for (AnimationKeyFrame* keyFrame : m_aKeyFrames)
-            {
-                if (keyFrame->GetFrame() == a_iFrame)
-                {
-                    return;
-                }
-            }
-            AnimationKeyFrame* keyFrame = new AnimationKeyFrame(a_iFrame, *this);
-            m_aKeyFrames.push_back(keyFrame);
-            Sort();
-        }
+				ecs->DeleteEntity(a_EntityID);
+			}
+			case AnimationEvent::AnimationEvent_None:
+			{
+				break;
+			}
+			default:
+			{
+				break;
+			}
+		}
+	}
 
-        //---------------------------------------------------------------------
-        void Animation::RemoveKeyFrame(int a_iIndex)
-        {
-            m_aKeyFrames.erase(m_aKeyFrames.begin() + a_iIndex);
-            Sort();
-        }
+	//---------------------------------------------------------------------
+	std::vector<AnimationKeyFrame*>& Animation::GetKeyFrames()
+	{
+		return m_aKeyFrames;
+	}
 
-        //---------------------------------------------------------------------
-        void Animation::RemoveKeyFrame(AnimationKeyFrame& a_KeyFrame)
-        {
-            size_t i = 0;
-            for (AnimationKeyFrame* keyFrame : m_aKeyFrames)
-            {
-                if (&a_KeyFrame == keyFrame)
-                {
-                    RemoveKeyFrame(i);
-                    break;
-                }
-                i++;
-            }
-        }
+	//---------------------------------------------------------------------
+	void Animation::AddKeyFrame(size_t a_iFrame)
+	{
+		for (AnimationKeyFrame* keyFrame : m_aKeyFrames)
+		{
+			if (keyFrame->GetFrame() == a_iFrame)
+			{
+				return;
+			}
+		}
+		AnimationKeyFrame* keyFrame = new AnimationKeyFrame(a_iFrame, *this);
+		m_aKeyFrames.push_back(keyFrame);
+		Sort();
+	}
 
-        //---------------------------------------------------------------------
-        void Animation::Sort()
-        {
-            std::sort(
-                m_aKeyFrames.begin(),
-                m_aKeyFrames.end(),
-                [](const AnimationKeyFrame* a, const AnimationKeyFrame* b)
-                {
-                    return a->GetFrame() < b->GetFrame();
-                }
-            );
-        }
-#endif // _EDITOR
+	//---------------------------------------------------------------------
+	void Animation::RemoveKeyFrame(size_t a_iIndex)
+	{
+		m_aKeyFrames.erase(m_aKeyFrames.begin() + a_iIndex);
+		Sort();
+	}
+
+	//---------------------------------------------------------------------
+	void Animation::RemoveKeyFrame(AnimationKeyFrame& a_KeyFrame)
+	{
+		size_t i = 0;
+		for (AnimationKeyFrame* keyFrame : m_aKeyFrames)
+		{
+			if (&a_KeyFrame == keyFrame)
+			{
+				RemoveKeyFrame(i);
+				break;
+			}
+			i++;
+		}
+	}
+
+	//---------------------------------------------------------------------
+	void Animation::Sort()
+	{
+		std::sort(
+			m_aKeyFrames.begin(),
+			m_aKeyFrames.end(),
+			[](const AnimationKeyFrame* a, const AnimationKeyFrame* b)
+			{
+				return a->GetFrame() < b->GetFrame();
+			}
+		);
+	}
+
+	//---------------------------------------------------------------------
+	int32_t Animation::GetKeyFrameAtFrame(size_t a_iIndex)
+	{
+		size_t i = 0;
+		for (AnimationKeyFrame* keyFrame : m_aKeyFrames)
+		{
+			if (a_iIndex == keyFrame->GetFrame())
+			{
+				return i;
+			}
+			i++;
+		}
+		return -1;
 	}
 }

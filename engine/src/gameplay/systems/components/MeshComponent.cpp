@@ -4,158 +4,197 @@
 #include "core/Engine.h"
 
 // graphics
+#include "graphics/dx12/DX12System.h"
+#include "graphics/dx12/DX12UploadBufferAllocator.h"
+#include "graphics/dx12/Camera.h"
 #include "graphics/dx12/Texture.h"
 #include "graphics/dx12/Mesh.h"
-#include "graphics/dx12/ShaderBind.h"
+#include "graphics/dx12/Material.h"
 #include "graphics/dx12/Shader.h"
 #include "graphics/dx12/Transform.h"
 #include "graphics/dx12/CommandList.h"
 #include "graphics/dx12/CommandQueue.h"
+#include "graphics/dx12/ShaderFactory.h"
+#include "graphics/dx12/ShaderDefs.h"
+#include "graphics/dx12/MeshRenderData.h"
 
 // resources
+#include "resources/ResourceAtlas.h"
 #include "resources/SrcData.h"
 
 // gameplay
+#include "gameplay/Entity.h"
+#include "gameplay/EntityComponentSystem.h"
 #include "gameplay/systems/TransformSystem.h"
 
+// logger
 #include "logger/Logger.h"
 
-namespace gallus
+namespace gallus::gameplay
 {
-	namespace gameplay
+	//---------------------------------------------------------------------
+	// MeshComponent
+	//---------------------------------------------------------------------
+	MeshComponent::~MeshComponent()
 	{
-		//---------------------------------------------------------------------
-		// MeshComponent
-		//---------------------------------------------------------------------
-		void MeshComponent::SetDefaults(const gameplay::EntityID& a_EntityID)
+		GetDX12System().GetSkinningDataAllocator()->Deallocate(m_MeshRenderData.m_iSkinnedMeshIndex);
+	}
+
+	//---------------------------------------------------------------------
+	void MeshComponent::SetDefaults(const gameplay::EntityID& a_EntityID)
+	{
+		Component::SetDefaults(a_EntityID);
+
+		resources::ResourceAtlas* resourceAtlas = GetEngine().GetResourceAtlas();
+		if (!resourceAtlas)
 		{
-			Component::SetDefaults(a_EntityID);
+			return;
+		}
 
-			m_pShaderBind = core::ENGINE->GetResourceAtlas().LoadShaderBind("defaultShaderBind");
-			m_pTexture = core::ENGINE->GetResourceAtlas().GetDefaultTexture();
-			m_pMesh = core::ENGINE->GetResourceAtlas().GetDefaultMesh();
-			m_vColor = { 1, 1, 1, 1 };
+		m_MeshRenderData.m_pTexture = resourceAtlas->GetDefaultTexture();
+		m_MeshRenderData.m_pMesh = resourceAtlas->GetDefaultMesh();
+		m_MeshRenderData.m_pMaterial = resourceAtlas->GetDefaultMaterial();
 
-			TransformSystem& transformSys = core::ENGINE->GetECS().GetSystem<TransformSystem>();
-			if (transformSys.HasComponent(a_EntityID))
+		gameplay::EntityComponentSystem* ecs = GetEngine().GetECS();
+		if (!ecs)
+		{
+			return;
+		}
+
+		TransformSystem* transformSys = ecs->GetSystem<TransformSystem>();
+		if (gameplay::TransformComponent* transform = transformSys->TryGetComponent(a_EntityID))
+		{
+			transform->GetTransform().SetPivot({ 0, 0, 0 });
+		}
+
+		m_MeshRenderData.m_iSkinnedMeshIndex = 0;
+	}
+
+	//---------------------------------------------------------------------
+	void MeshComponent::Init()
+	{
+		// cache is in the init function of component.
+		Component::Init();
+
+		OnShadersChanged();
+
+		// cache
+		graphics::dx12::DX12System& dx12 = GetDX12System();
+
+		m_pDX12System = &dx12;
+		m_MeshRenderData.m_pRootSignature = dx12.GetRootSignature().Get();
+		m_pTransformSystem = m_pECS->GetSystem<gameplay::TransformSystem>();
+
+		//if (std::shared_ptr<graphics::dx12::Mesh> mesh = m_pMesh.lock())
+		//{
+		//	if (!mesh->GetBoneInfo().empty())
+		//	{
+		//		m_iSkinnedMeshIndex = GetDX12System().GetSkinningDataAllocator()->Allocate();
+		//	}
+		//}
+	}
+
+	//---------------------------------------------------------------------
+	void MeshComponent::SetMesh(std::weak_ptr<graphics::dx12::Mesh> a_pMesh)
+	{
+		m_MeshRenderData.m_pMesh = a_pMesh;
+
+		GetDX12System().GetSkinningDataAllocator()->Deallocate(m_MeshRenderData.m_iSkinnedMeshIndex);
+		//if (std::shared_ptr<graphics::dx12::Mesh> mesh = m_pMesh.lock())
+		//{
+		//	if (!mesh->GetBoneInfo().empty())
+		//	{
+		//		m_iSkinnedMeshIndex = GetDX12System().GetSkinningDataAllocator()->Allocate();
+		//	}
+		//}
+	}
+
+	//---------------------------------------------------------------------
+	void MeshComponent::SetTexture(std::weak_ptr<graphics::dx12::Texture> a_pTexture)
+	{
+		m_MeshRenderData.m_pTexture = a_pTexture;
+	}
+
+	//---------------------------------------------------------------------
+	void MeshComponent::Render(std::shared_ptr<graphics::dx12::CommandList> a_pCommandList, const EntityID& a_EntityID, const graphics::dx12::Camera& a_Camera)
+	{
+		if (!m_pECS)
+		{
+			return;
+		}
+
+		std::shared_ptr<gameplay::Entity> ent = m_pECS->GetEntity(m_EntityID).lock();
+		if (!ent || !ent->IsActive())
+		{
+			return;
+		}
+
+		if (!m_pDX12System)
+		{
+			return;
+		}
+
+		graphics::dx12::Transform defaultTransform;
+		uint16_t transformIndex = 0;
+		graphics::dx12::Transform* transform = nullptr;
+		if (m_pTransformSystem)
+		{
+			if (gameplay::TransformComponent* transformComponent = m_pTransformSystem->TryGetComponent(a_EntityID))
 			{
-				graphics::dx12::Transform transform = transformSys.GetComponent(a_EntityID).GetTransform();
-				transform.SetPivot({ 0, 0, 0 });
+				transform = &transformComponent->GetTransform();
+				transformIndex = transformComponent->GetTransformIndex();
+
+				// Respect camera type dimension filtering
+				if (transform->GetCameraType() == graphics::dx12::CameraType_Screen)
+				{
+					if (m_pDX12System->GetDimensionDrawMode() != graphics::dx12::DimensionDrawMode::DimensionDrawMode_2D &&
+						m_pDX12System->GetDimensionDrawMode() != graphics::dx12::DimensionDrawMode::DimensionDrawMode_2D3D)
+					{
+						return;
+					}
+				}
+				else if (transform->GetCameraType() == graphics::dx12::CameraType_World)
+				{
+					if (m_pDX12System->GetDimensionDrawMode() != graphics::dx12::DimensionDrawMode::DimensionDrawMode_3D &&
+						m_pDX12System->GetDimensionDrawMode() != graphics::dx12::DimensionDrawMode::DimensionDrawMode_2D3D)
+					{
+						return;
+					}
+				}
 			}
 		}
 
-		//---------------------------------------------------------------------
-		void MeshComponent::SetMesh(std::weak_ptr<graphics::dx12::Mesh> a_pMesh)
+		m_MeshRenderData.Render(a_pCommandList, transform  ? *transform : defaultTransform, transformIndex, a_Camera);
+	}
+
+	//---------------------------------------------------------------------
+	void MeshComponent::OnShadersChanged()
+	{
+		m_MeshRenderData.m_pPipelineState = graphics::dx12::PipelineStateCache::GetOrCreate(m_MeshRenderData.m_pPixelShader, m_MeshRenderData.m_pVertexShader, DXGI_FORMAT_D32_FLOAT);
+	}
+
+	//---------------------------------------------------------------------
+	void MeshComponent::SetTextureRectIndex(uint16_t a_iRectIndex)
+	{
+		size_t numMeshRects = 0;
+		if (std::shared_ptr<graphics::dx12::Texture> tex = m_MeshRenderData.m_pTexture.lock())
 		{
-			m_pMesh = a_pMesh;
+			numMeshRects = tex->GetTextureRectsSize() - 1;
 		}
-
-		//---------------------------------------------------------------------
-		void MeshComponent::SetShader(std::weak_ptr<graphics::dx12::ShaderBind> a_pShaderBind)
+		if (a_iRectIndex < 0)
 		{
-			m_pShaderBind = a_pShaderBind;
+			a_iRectIndex = 0;
 		}
-
-		//---------------------------------------------------------------------
-		void MeshComponent::SetTexture(std::weak_ptr<graphics::dx12::Texture> a_pTexture)
+		else if (a_iRectIndex > numMeshRects)
 		{
-			m_pTexture = a_pTexture;
+			a_iRectIndex = static_cast<uint16_t>(numMeshRects);
 		}
+		m_MeshRenderData.m_iTextureRectIndex = a_iRectIndex;
+	}
 
-		//---------------------------------------------------------------------
-		void MeshComponent::Render(std::shared_ptr<graphics::dx12::CommandList> a_pCommandList, const EntityID& a_EntityID, const graphics::dx12::Camera& a_Camera)
-		{
-			auto ent = core::ENGINE->GetECS().GetEntity(m_EntityID).lock();
-			if (!ent || !ent->IsActive())
-			{
-				return;
-			}
-
-			graphics::dx12::Transform transform;
-			TransformSystem& transformSys = core::ENGINE->GetECS().GetSystem<TransformSystem>();
-			if (transformSys.HasComponent(a_EntityID))
-			{
-				transform = transformSys.GetComponent(a_EntityID).GetTransform();
-			}
-
-			if (transform.GetCameraType() == graphics::dx12::CameraType_Screen)
-			{
-				if (core::ENGINE->GetDX12().GetCameraIsolationMode() != graphics::dx12::CameraIsolationMode::CameraIsolationMode_2D && core::ENGINE->GetDX12().GetCameraIsolationMode() != graphics::dx12::CameraIsolationMode::CameraIsolationMode_2D3D)
-				{
-					return;
-				}
-			}
-			else if (transform.GetCameraType() == graphics::dx12::CameraType_World)
-			{
-				if (core::ENGINE->GetDX12().GetCameraIsolationMode() != graphics::dx12::CameraIsolationMode::CameraIsolationMode_3D && core::ENGINE->GetDX12().GetCameraIsolationMode() != graphics::dx12::CameraIsolationMode::CameraIsolationMode_2D3D)
-				{
-					return;
-				}
-			}
-
-			const DirectX::XMMATRIX viewMatrix = a_Camera.GetViewMatrix(transform.GetCameraType());
-			const DirectX::XMMATRIX& projectionMatrix = a_Camera.GetProjectionMatrix(transform.GetCameraType());
-
-			DirectX::XMMATRIX mvpMatrix = transform.GetWorldMatrixWithPivot() * viewMatrix * projectionMatrix;
-
-			if (auto material = core::ENGINE->GetResourceAtlas().GetDefaultMaterial().lock())
-			{
-				material->Bind(a_pCommandList);
-			}
-
-			if (auto material = m_pMaterial.lock())
-			{
-				if (material->IsValid())
-				{
-					material->Bind(a_pCommandList);
-				}
-			}
-
-			if (auto tex = m_pTexture.lock())
-			{
-				if (tex->CanBeDrawn())
-				{
-					tex->Bind(a_pCommandList, m_iTextureIndex);
-				}
-			}
-
-			if (auto shaderBind = m_pShaderBind.lock())
-			{
-				if (shaderBind->IsValid())
-				{
-					shaderBind->Bind(a_pCommandList);
-				}
-			}
-
-			if (auto mesh = m_pMesh.lock())
-			{
-				if (mesh->IsValid())
-				{
-					mesh->Render(a_pCommandList, mvpMatrix);
-				}
-			}
-		}
-
-		/// <summary>
-		/// Sets the sprite index.
-		/// </summary>
-		/// <param name="a_iMeshIndex">The index the sprite should have.</param>
-		void MeshComponent::SetTextureIndex(int8_t a_iMeshIndex)
-		{
-			size_t numMeshRects = 0;
-			if (auto tex = m_pTexture.lock())
-			{
-				numMeshRects = tex->GetSpriteRectsSize() - 1;
-			}
-			if (a_iMeshIndex < 0)
-			{
-				a_iMeshIndex = 0;
-			}
-			else if (a_iMeshIndex > numMeshRects)
-			{
-				a_iMeshIndex = numMeshRects;
-			}
-			m_iTextureIndex = a_iMeshIndex;
-		}
+	//---------------------------------------------------------------------
+	void MeshComponent::SetMaterial(std::weak_ptr<graphics::dx12::Material> a_pMaterial)
+	{
+		m_MeshRenderData.m_pMaterial = a_pMaterial;
 	}
 }

@@ -5,18 +5,24 @@
 #include <imgui/imgui_internal.h>
 
 // graphics
-#include "graphics/imgui/ImGuiWindow.h"
-#include "graphics/imgui/font_icon.h"
+#include "imgui_system/ImGuiSystem.h"
+#include "imgui_system/font_icon.h"
 
 // gameplay
 #include "gameplay/Game.h"
 
+// utils
+#include "file/file_abstractions.h"
+
 // editor
 #include "editor/core/EditorEngine.h"
-#include "editor/graphics/imgui/selectables/EntityEditorSelectable.h"
-#include "editor/graphics/imgui/selectables/FileEditorSelectable.h"
+#include "editor/Editor.h"
+#include "editor/AssetDatabase.h"
 
-#include "editor/EditorGlobalFunctions.h"
+#include "editor/GlobalEditorFunctions.h"
+
+// editor/file
+#include "editor/file/FileResource.h"
 
 namespace gallus
 {
@@ -24,50 +30,68 @@ namespace gallus
 	{
 		namespace imgui
 		{
-			EditorWindowDock::EditorWindowDock(ImGuiWindow& a_Window) : MainWindowDock(a_Window)
-			{ }
+			EditorWindowDock::EditorWindowDock(ImGuiSystem& a_System) : MainWindowDock(a_System)
+			{}
 
 			void EditorWindowDock::Render()
 			{
+				editor::AssetDatabase* assetDatabase = GetEditorEngine().GetAssetDatabase();
+				if (!assetDatabase)
+				{
+					return;
+				}
+				
+				editor::Editor* editor = GetEditorEngine().GetEditor();
+				if (!editor)
+				{
+					return;
+				}
+
 				ImGui::BeginMainMenuBar();
-				ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, m_Window.GetFramePadding() * 2);
+				ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, m_System.GetFramePadding() * 2);
 				if (ImGui::BeginMenu(ImGui::IMGUI_FORMAT_ID(font::ICON_FILE + std::string(" File"), MENU_ID, "FILE_EDITOR").c_str()))
 				{
 					if (ImGui::MenuItem(ImGui::IMGUI_FORMAT_ID(font::ICON_SCENE + std::string(" New Scene"), MENU_ITEM_ID, "NEW_SCENE_EDITOR").c_str(), "CTRL+N"))
 					{
-						gameplay::GAME.GetScene().Destroy();
-						gameplay::GAME.GetScene().LoadData();
+						gameplay::GetGame().GetScene().Destroy();
+						gameplay::GetGame().GetScene().LoadData();
+						gameplay::GetGame().GetScene().SetName("");
 
-						core::EDITOR_ENGINE->GetEditor().GetScene().Destroy();
-						core::EDITOR_ENGINE->GetEditor().GetScene().LoadData();
+						editor->GetScene().Destroy();
+						editor->GetScene().LoadData();
 					}
 					if (ImGui::MenuItem(ImGui::IMGUI_FORMAT_ID(font::ICON_FILE_SCENE + std::string(" Open Scene"), MENU_ITEM_ID, "OPEN_SCENE_EDITOR").c_str(), "CTRL+O"))
 					{
 						fs::path scenePath;
 						if (file::PickFile(scenePath, {
-							{ L"Scene Files (*.scene)", L"*.scene" },
-							{ L"Prefab Files (*.prefab)", L"*.prefab" },
-							}, core::EDITOR_ENGINE->GetResourceAtlas().GetResourceFolder().GetPath()))
+								{ L"Scene Files (*.scene)", L"*.scene" },
+							}, assetDatabase->GetResourceFolder()->GetPath()))
 						{
 							core::Data data;
 							if (file::LoadFile(scenePath, data))
 							{
+								std::string assetId = scenePath.filename().generic_string();
+
 								if (scenePath.extension() == ".scene")
 								{
-									editor::g_SetScene(scenePath, editor::EditorMethod::EDITOR_METHOD_SCENE);
+									editor::g_TrySetEditorScene(assetId);
 								}
-								else if (scenePath.extension() == ".prefab")
-								{
-									editor::g_SetScene(scenePath, editor::EditorMethod::EDITOR_METHOD_PREFAB);
-								}
-
-								core::EDITOR_ENGINE->GetEditor().GetScene().LoadByPath(scenePath);
-								core::EDITOR_ENGINE->GetEditor().GetScene().LoadData();
 							}
 						}
 					}
+					if (ImGui::BeginMenu(ImGui::IMGUI_FORMAT_ID(font::ICON_FILE_SCENE + std::string(" Open Recent Scene"), MENU_ID, "OPEN_RECENT_SCENE_EDITOR").c_str()))
+					{
+						for (const std::string& scene : editor->GetEditorSettings().GetLastOpenedScenes())
+						{
+							if (ImGui::MenuItem(ImGui::IMGUI_FORMAT_ID(font::ICON_FILE_SCENE + std::string(" ") + scene, MENU_ITEM_ID, scene + "_EDITOR").c_str(), "CTRL+S"))
+							{
+								editor::g_TrySetEditorScene(scene);
+							}
+						}
+						ImGui::EndMenu();
+					}
 					ImGui::Separator();
-					bool wasDirty = core::EDITOR_ENGINE->GetEditor().GetScene().IsDirty() && !gameplay::GAME.IsStarted();
+					bool wasDirty = editor::g_IsEditorSceneDirty() && !gameplay::GetGame().IsStarted();
 					if (!wasDirty)
 					{
 						ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
@@ -76,45 +100,13 @@ namespace gallus
 
 					if (ImGui::MenuItem(ImGui::IMGUI_FORMAT_ID(font::ICON_SAVE + std::string(" Save Scene"), MENU_ITEM_ID, "SAVE_SCENE_EDITOR").c_str(), "CTRL+S"))
 					{
-						editor::g_SaveScene();
+						editor::g_SaveEditorScene();
 					}
 
 					if (!wasDirty)
 					{
 						ImGui::PopItemFlag();
 						ImGui::PopStyleVar();
-					}
-					ImGui::EndMenu();
-				}
-				// TODO: Edit Icon.
-				if (ImGui::BeginMenu(ImGui::IMGUI_FORMAT_ID(font::ICON_EDIT + std::string(" Edit"), MENU_ID, "CREATE_EDITOR").c_str()))
-				{
-					if (ImGui::MenuItem(ImGui::IMGUI_FORMAT_ID(font::ICON_MODEL + std::string(" Create Entity"), MENU_ITEM_ID, "CREATE_ENTITY_EDITOR").c_str(), "CTRL+SHIFT+N"))
-					{
-						editor::g_CreateEntity();
-					}
-					ImGui::Separator();
-					if (graphics::imgui::EntityEditorSelectable* ent = dynamic_cast<graphics::imgui::EntityEditorSelectable*>(core::EDITOR_ENGINE->GetEditor().GetSelectable().get()))
-					{
-						if (ImGui::MenuItem(ImGui::IMGUI_FORMAT_ID(font::ICON_DELETE + std::string(" Delete Entity"), MENU_ITEM_ID, "DELETE_ENTITY_EDITOR").c_str(), "DELETE"))
-						{
-							ent->OnDelete();
-						}
-						if (ImGui::MenuItem(ImGui::IMGUI_FORMAT_ID(font::ICON_COPY + std::string(" Duplicate Entity"), MENU_ITEM_ID, "DUPLICATE_ENTITY_EDITOR").c_str(), "CTRL+D"))
-						{
-							// TODO: Duplicate
-						}
-					}
-					if (graphics::imgui::FileEditorSelectable* file = dynamic_cast<graphics::imgui::FileEditorSelectable*>(core::EDITOR_ENGINE->GetEditor().GetSelectable().get()))
-					{
-						if (ImGui::MenuItem(ImGui::IMGUI_FORMAT_ID(font::ICON_DELETE + std::string(" Delete File"), MENU_ITEM_ID, "DELETE_ENTITY_EDITOR").c_str(), "DEL"))
-						{
-							file->OnDelete();
-						}
-						if (ImGui::MenuItem(ImGui::IMGUI_FORMAT_ID(font::ICON_FOLDER_SHOW + std::string(" Open File In Explorer"), MENU_ITEM_ID, "DUPLICATE_ENTITY_EDITOR").c_str(), "CTRL+D"))
-						{
-							file->OnShowInExplorer();
-						}
 					}
 					ImGui::EndMenu();
 				}

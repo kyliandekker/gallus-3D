@@ -3,45 +3,45 @@
 // core
 #include "core/Engine.h"
 
-// resources
-#include "resources/SrcData.h"
-
 // gameplay
+#include "gameplay/EntityComponentSystem.h"
 #include "gameplay/Entity.h"
 
-// utils
-#include "utils/string_extensions.h"
-
-namespace gallus
+namespace gallus::gameplay
 {
-	namespace gameplay
+	//---------------------------------------------------------------------
+	void Component::Deserialize(const resources::SrcData& a_SrcData)
 	{
-#ifdef _EDITOR
-		void Component::Serialize(resources::SrcData& a_SrcData) const
+		DeserializeFields(this, a_SrcData);
+		Init();
+	}
+
+	//---------------------------------------------------------------------
+	void Component::Init()
+	{
+		m_pECS = GetEngine().GetECS();
+		m_bInitialized = true;
+	}
+
+	//---------------------------------------------------------------------
+	void Component::UpdateRealtimeInner(float a_fDeltaTime, UpdateTime a_UpdateTime)
+	{
+		if (!m_pECS)
 		{
-			SerializeEditorExposable(this, a_SrcData);
+			return;
 		}
-#endif // _EDITOR
 
-		void Component::Deserialize(const resources::SrcData& a_SrcData)
+		std::shared_ptr<gameplay::Entity> ent = m_pECS->GetEntity(m_EntityID).lock();
+		if (!ent)
 		{
-			DeserializeEditorExposable(this, a_SrcData);
+			return;
 		}
 
-		void Component::UpdateRealtimeInner(float a_fDeltaTime, UpdateTime a_UpdateTime)
+		if (!ent->IsActive())
 		{
-			auto ent = core::ENGINE->GetECS().GetEntity(m_EntityID).lock();
-			if (!ent)
-			{
-				return;
-			}
-
-			if (!ent->IsActive())
-			{
-				return;
-			}
-
-			UpdateRealtime(a_fDeltaTime, a_UpdateTime);
+			return;
 		}
+
+		UpdateRealtime(a_fDeltaTime, a_UpdateTime);
 	}
 }

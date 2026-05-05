@@ -1,0 +1,706 @@
+#include "SpriteSheetEditorWindow.h"
+
+// external
+#include <imgui/imgui_helpers.h>
+#include <imgui/imgui_internal.h>
+
+// graphics
+#include "graphics/dx12/DX12System.h"
+#include "graphics/dx12/Texture.h"
+
+// imgui
+#include "imgui_system/font_icon.h"
+#include "imgui_system/ImGuiSystem.h"
+
+// resources
+#include "resources/ResourceAtlas.h"
+#include "resources/SrcData.h"
+
+// editor
+#include "editor/core/EditorEngine.h"
+#include "editor/EditorWorkspace.h"
+#include "editor/Editor.h"
+#include "editor/GlobalEditorFunctions.h"
+#include "editor/commands/IEditorSpriteSheetDataCommand.h"
+#include "editor/graphics/imgui/EditorInputScope.h"
+
+namespace gallus::graphics::imgui
+{
+	//---------------------------------------------------------------------
+	// SpriteSheetEditorWindow
+	//---------------------------------------------------------------------
+	SpriteSheetEditorWindow::SpriteSheetEditorWindow(ImGuiSystem& a_System) : BaseWindow(a_System, 0, std::string(font::ICON_IMAGE) + " Sprite Sheet Editor", "SpriteSheetEditor")
+	{
+		m_Flags |= ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar;
+		m_bHideCloseButton = false; // Since this is a full screen window, enable the close button.
+	}
+
+	//---------------------------------------------------------------------
+	bool SpriteSheetEditorWindow::Initialize()
+	{
+		PopulateToolbar();
+
+		return BaseWindow::Initialize();
+	}
+
+	//---------------------------------------------------------------------
+	void SpriteSheetEditorWindow::RegisterKeybinds()
+	{
+		graphics::imgui::SetKeybindInputScope(graphics::imgui::Keybind::Keybind_Zoom,
+			static_cast<uint32_t>(graphics::imgui::EditorInputScope::EditorInputScope_SpriteSheetHover));
+	}
+
+	//---------------------------------------------------------------------
+	void SpriteSheetEditorWindow::Update()
+	{
+		m_bFullScreen = true;
+		if (GetEditorEngine().GetEditor()->GetEditorSettings().GetEditorState() != editor::EditorState::EditorState_SpriteSheetEditor)
+		{
+			return;
+		}
+		BaseWindow::Update();
+
+		// Check if the close button was pressed, if so return to workspace.
+		if (!m_bEnabled)
+		{
+			GetEditorEngine().GetEditor()->GetEditorSettings().SetEditorState(editor::EditorState::EditorState_Workspace);
+		}
+	}
+
+	//---------------------------------------------------------------------
+	void SpriteSheetEditorWindow::PopulateToolbar()
+	{
+		ImVec2 toolbarSize = ImVec2(0, m_System.GetHeaderSize().y);
+		m_Toolbar = Toolbar(ImGui::IMGUI_FORMAT_ID("", CHILD_ID, "TOOLBAR_SPRITE_SHEET_EDITOR"), toolbarSize);
+
+		m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_System,
+			[this]()
+			{
+				if (ImGui::TextButton(
+					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_SAVE), BUTTON_ID, "SAVE_SPRITE_SHEET_EDITOR").c_str(), "Saves the current sprite sheet.", m_System.GetHeaderSize(), ImGui::GetStyleColorVec4(ImGuiCol_TextColorAccent)))
+				{
+					if (std::shared_ptr<graphics::dx12::Texture> texture = m_pTexture.lock())
+					{
+						editor::EditorWorkspace* editorWorkspace = GetEditorEngine().GetEditorWorkspace();
+						if (!editorWorkspace)
+						{
+							return;
+						}
+
+						resources::SrcData srcData;
+						srcData.SetObject();
+						SerializeFields(texture.get(), srcData);
+
+						core::Data data;
+						srcData.GetData(data);
+
+						editorWorkspace->Save(texture->GetName(), data);
+					}
+				}
+			}
+		));
+
+		m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_System,
+			[this]()
+			{
+				ImGui::SetNextItemWidth(300);
+				if (ImGui::IVectorEdit2(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "TOOLBAR_SPRITE_SHEET_EDITOR_CELL_SIZE"), (int*) &m_vCellSize))
+				{
+					if (std::shared_ptr<graphics::dx12::Texture> texture = m_pTexture.lock())
+					{
+						texture->SetSpriteSheetCellSize(m_vCellSize);
+					}
+				}
+			}
+		));
+
+		m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_System,
+			[this]()
+			{
+				if (ImGui::IconButton(
+					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_GIZMO_BOUNDS) + " Generate Rects", BUTTON_ID, "TOOLBAR_SPRITE_SHEET_EDITOR_AUTO_GENERATE").c_str(), "Automatically creates cells based on your cell size.", ImVec2(0, m_System.GetHeaderSize().y)))
+				{
+					if (std::shared_ptr<graphics::dx12::Texture> texture = m_pTexture.lock())
+					{
+						resources::SrcData oldData;
+						oldData.SetObject();
+						SerializeFields(texture.get(), oldData);
+
+						std::unique_ptr<editor::IEditorSpriteSheetDataCommand> pEditorCommand = std::make_unique<editor::IEditorSpriteSheetDataCommand>();
+						pEditorCommand->SetID(texture->GetName());
+						pEditorCommand->SetOldData(oldData);
+
+						{
+							for (int y = 0; y < texture->GetResourceDesc().Height; y += m_vCellSize.y)
+							{
+								for (int x = 0; x < texture->GetResourceDesc().Width; x += m_vCellSize.x)
+								{
+									graphics::dx12::TextureRect r;
+									r.x = x;
+									r.y = y;
+									r.width = m_vCellSize.x;
+									r.height = m_vCellSize.y;
+									texture->GetTextureRects().push_back(r);
+								}
+							}
+						}
+
+						resources::SrcData newData;
+						newData.SetObject();
+						SerializeFields(texture.get(), newData);
+						pEditorCommand->SetNewData(newData);
+
+						GetEditorEngine().GetEditorWorkspace()->AddAction(std::move(pEditorCommand), editor::EditorActionStack_SpriteSheet);
+					}
+				}
+			}
+		));
+
+		m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_System,
+			[this]()
+			{
+				if (ImGui::IconButton(
+					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_GIZMO_BOUNDS) + " Delete All Rects", BUTTON_ID, "TOOLBAR_SPRITE_SHEET_EDITOR_DELETE_ALL_RECTS").c_str(), "Deletes all rects.", ImVec2(0, m_System.GetHeaderSize().y)))
+				{
+					if (std::shared_ptr<graphics::dx12::Texture> texture = m_pTexture.lock())
+					{
+						editor::g_ShowSimplePromptModal("Do you want to delete all rects?", "No", "Yes", [texture]()
+						{
+							resources::SrcData oldData;
+							oldData.SetObject();
+							SerializeFields(texture.get(), oldData);
+
+							std::unique_ptr<editor::IEditorSpriteSheetDataCommand> pEditorCommand = std::make_unique<editor::IEditorSpriteSheetDataCommand>();
+							pEditorCommand->SetID(texture->GetName());
+							pEditorCommand->SetOldData(oldData);
+
+							{
+								texture->GetTextureRects().clear();
+							}
+
+							resources::SrcData newData;
+							newData.SetObject();
+							SerializeFields(texture.get(), newData);
+							pEditorCommand->SetNewData(newData);
+
+							GetEditorEngine().GetEditorWorkspace()->AddAction(std::move(pEditorCommand), editor::EditorActionStack_SpriteSheet);
+						});
+					}
+				}
+			}
+		));
+
+		m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarBreak(m_System, ImVec2(m_Toolbar.GetToolbarSize().y, m_Toolbar.GetToolbarSize().y)));
+
+		// Undo.
+		m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_System,
+			[this]()
+			{
+				editor::EditorWorkspace* editorWorkspace = GetEditorEngine().GetEditorWorkspace();
+				if (!editorWorkspace)
+				{
+					return;
+				}
+
+				if (ImGui::TextButton(
+					ImGui::IMGUI_FORMAT_ID(font::ICON_UNDO, BUTTON_ID, "TOOLBAR_SPRITE_SHEET_EDITOR_UNDO").c_str(), "Reverts the last action.", m_System.GetHeaderSize()))
+				{
+					editorWorkspace->Undo(editor::EditorActionStack_SpriteSheet);
+				}
+			},
+			[]()
+			{
+				editor::EditorWorkspace* editorWorkspace = GetEditorEngine().GetEditorWorkspace();
+				if (!editorWorkspace)
+				{
+					return true;
+				}
+
+				return !editorWorkspace->CanUndo(editor::EditorActionStack_SpriteSheet);
+			}
+		));
+
+		// Redo.
+		m_Toolbar.m_aToolbarItems.emplace_back(new ToolbarButton(m_System,
+			[this]()
+			{
+				editor::EditorWorkspace* editorWorkspace = GetEditorEngine().GetEditorWorkspace();
+				if (!editorWorkspace)
+				{
+					return;
+				}
+
+				if (ImGui::TextButton(
+					ImGui::IMGUI_FORMAT_ID(font::ICON_REDO, BUTTON_ID, "TOOLBAR_SPRITE_SHEET_EDITOR_REDO").c_str(), "Reapplies the most recently undone action.", m_System.GetHeaderSize()))
+				{
+					editorWorkspace->Redo(editor::EditorActionStack_SpriteSheet);
+				}
+			},
+			[]()
+			{
+				editor::EditorWorkspace* editorWorkspace = GetEditorEngine().GetEditorWorkspace();
+				if (!editorWorkspace)
+				{
+					return true;
+				}
+
+				return !editorWorkspace->CanRedo(editor::EditorActionStack_SpriteSheet);
+			}
+		));
+	}
+
+	//---------------------------------------------------------------------
+	void SpriteSheetEditorWindow::DrawToolbar()
+	{
+		// Start toolbar.
+		m_Toolbar.StartToolbar();
+
+		// Render toolbar.
+		m_Toolbar.Render();
+
+		// End toolbar.
+		m_Toolbar.EndToolbar();
+	}
+
+	//---------------------------------------------------------------------
+	void SpriteSheetEditorWindow::DrawViewportPanel()
+	{
+		float panelPaddingY = 150;
+		ImGui::SetCursorPosY(ImGui::GetCursorPosY() + panelPaddingY);
+
+		ImVec2 windowSize = {
+			300,
+			ImGui::GetContentRegionAvail().y - panelPaddingY
+		};
+
+		if (ImGui::BeginChild("Operations", windowSize, ImGuiChildFlags_Borders,
+			ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse))
+		{
+			// Get child bounding box for outer border
+			ImVec2 childMin = ImGui::GetItemRectMin();
+			ImVec2 childMax = ImGui::GetItemRectMax();
+
+			ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+			ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0);
+
+			editor::Editor* editor = GetEditorEngine().GetEditor();
+			if (!editor)
+			{
+				return;
+			}
+
+			if (std::shared_ptr<graphics::dx12::Texture> texture = m_pTexture.lock())
+			{
+				graphics::dx12::TextureRect* rect = texture->GetTextureRect(m_iSelectedRect);
+
+				if (!rect)
+				{
+					ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+					ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+				}
+
+				IVector2 
+					currentRectPos,
+					currentRectSize;
+
+				if (rect)
+				{
+					currentRectPos = {
+						static_cast<int>(rect->x),
+						static_cast<int>(rect->y)
+					};
+					currentRectSize = {
+						static_cast<int>(rect->width),
+						static_cast<int>(rect->height)
+					};
+				}
+
+				ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+				if (ImGui::IVectorEdit2(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "TOOLBAR_SPRITE_SHEET_EDITOR_CURRENT_RECT_POS"), (int*) &currentRectPos))
+				{
+					if (rect)
+					{
+						resources::SrcData oldData;
+						oldData.SetObject();
+						SerializeFields(texture.get(), oldData);
+
+						std::unique_ptr<editor::IEditorSpriteSheetDataCommand> pEditorCommand = std::make_unique<editor::IEditorSpriteSheetDataCommand>();
+						pEditorCommand->SetID(texture->GetName());
+						pEditorCommand->SetOldData(oldData);
+
+						{
+							rect->x = currentRectPos.x;
+							rect->y = currentRectPos.y;
+						}
+
+						resources::SrcData newData;
+						newData.SetObject();
+						SerializeFields(texture.get(), newData);
+						pEditorCommand->SetNewData(newData);
+
+						GetEditorEngine().GetEditorWorkspace()->AddAction(std::move(pEditorCommand), editor::EditorActionStack_SpriteSheet);
+					}
+				}
+
+				ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+				if (ImGui::IVectorEdit2(ImGui::IMGUI_FORMAT_ID("", INPUT_ID, "TOOLBAR_SPRITE_SHEET_EDITOR_CURRENT_RECT_SIZE"), (int*) &currentRectSize))
+				{
+					if (rect)
+					{
+						resources::SrcData oldData;
+						oldData.SetObject();
+						SerializeFields(texture.get(), oldData);
+
+						std::unique_ptr<editor::IEditorSpriteSheetDataCommand> pEditorCommand = std::make_unique<editor::IEditorSpriteSheetDataCommand>();
+						pEditorCommand->SetID(texture->GetName());
+						pEditorCommand->SetOldData(oldData);
+
+						{
+							rect->width = currentRectSize.x;
+							rect->height = currentRectSize.y;
+						}
+
+						resources::SrcData newData;
+						newData.SetObject();
+						SerializeFields(texture.get(), newData);
+						pEditorCommand->SetNewData(newData);
+
+						GetEditorEngine().GetEditorWorkspace()->AddAction(std::move(pEditorCommand), editor::EditorActionStack_SpriteSheet);
+					}
+				}
+
+				if (ImGui::TextButton(
+					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_DELETE) + " Delete Rect", BUTTON_ID, "TOOLBAR_SPRITE_SHEET_EDITOR_DELETE").c_str(), "Deletes the current selected sprite rect.", ImVec2(ImGui::GetContentRegionAvail().x, m_System.GetHeaderSize().y)))
+				{
+					resources::SrcData oldData;
+					oldData.SetObject();
+					SerializeFields(texture.get(), oldData);
+
+					std::unique_ptr<editor::IEditorSpriteSheetDataCommand> pEditorCommand = std::make_unique<editor::IEditorSpriteSheetDataCommand>();
+					pEditorCommand->SetID(texture->GetName());
+					pEditorCommand->SetOldData(oldData);
+
+					{
+						texture->GetTextureRects().erase(texture->GetTextureRects().begin() + m_iSelectedRect);
+					}
+
+					resources::SrcData newData;
+					newData.SetObject();
+					SerializeFields(texture.get(), newData);
+					pEditorCommand->SetNewData(newData);
+
+					GetEditorEngine().GetEditorWorkspace()->AddAction(std::move(pEditorCommand), editor::EditorActionStack_SpriteSheet);
+				}
+
+				if (!rect)
+				{
+					ImGui::PopItemFlag();
+					ImGui::PopStyleVar();
+				}
+
+				if (ImGui::TextButton(
+					ImGui::IMGUI_FORMAT_ID(std::string(font::ICON_GIZMO_BOUNDS) + " Add Rect", BUTTON_ID, "TOOLBAR_SPRITE_SHEET_EDITOR_ADD").c_str(), "Adds a new sprite rect.", ImVec2(ImGui::GetContentRegionAvail().x, m_System.GetHeaderSize().y)))
+				{
+					resources::SrcData oldData;
+					oldData.SetObject();
+					SerializeFields(texture.get(), oldData);
+
+					std::unique_ptr<editor::IEditorSpriteSheetDataCommand> pEditorCommand = std::make_unique<editor::IEditorSpriteSheetDataCommand>();
+					pEditorCommand->SetID(texture->GetName());
+					pEditorCommand->SetOldData(oldData);
+
+					{
+						graphics::dx12::TextureRect rect = graphics::dx12::TextureRect();
+						rect.width = m_vCellSize.x;
+						rect.height = m_vCellSize.y;
+
+						m_iSelectedRect = texture->AddTextureRect(rect);
+					}
+
+					resources::SrcData newData;
+					newData.SetObject();
+					SerializeFields(texture.get(), newData);
+					pEditorCommand->SetNewData(newData);
+
+					GetEditorEngine().GetEditorWorkspace()->AddAction(std::move(pEditorCommand), editor::EditorActionStack_SpriteSheet);
+				}
+			}
+
+			ImGui::PopStyleVar();
+			ImGui::PopStyleVar();
+
+			ImVec2 padding = m_System.GetFramePadding();
+			ImGui::SetCursorPosY(ImGui::GetCursorPosY() + padding.y);
+
+			if (ImGui::BeginChild("RectsSection"))
+			{
+				if (std::shared_ptr<graphics::dx12::Texture> texture = m_pTexture.lock())
+				{
+					for (size_t i = 0; i < texture->GetTextureRectsSize(); i++)
+					{
+						graphics::dx12::TextureRect* rect = texture->GetTextureRect(i);
+						if (!rect)
+						{
+							continue;
+						}
+
+						const ImVec2 uv0 = ImVec2(texture->GetTextureUV(i).uv0.x, texture->GetTextureUV(i).uv0.y);  // top-left UV
+						const ImVec2 uv1 = ImVec2(texture->GetTextureUV(i).uv1.x, texture->GetTextureUV(i).uv1.y); // bottom-right UV
+
+						float width = static_cast<float>(rect->width);
+						float height = static_cast<float>(rect->height);
+
+						// Get available region for the image
+						ImVec2 avail = ImGui::GetContentRegionAvail();
+
+						// Compute scale to fit while maintaining aspect ratio
+						float scaleX = (avail.x - (padding.x * 2)) / width;
+						ImVec2 imageSize = ImVec2(width * scaleX, height * scaleX);
+
+						// Offset from left for horizontal padding
+						ImGui::SetCursorPosX(ImGui::GetCursorPosX() + padding.x);
+
+						// Draw the image
+						ImGui::Image(texture->GetGPUHandle().ptr, imageSize, uv0, uv1);
+
+						// Draw general white border around each rect
+						ImVec2 topLeft = ImGui::GetItemRectMin();
+						ImVec2 bottomRight = ImGui::GetItemRectMax();
+						ImDrawList* drawList = ImGui::GetWindowDrawList();
+						drawList->AddRect(topLeft, bottomRight, IM_COL32(255, 255, 255, 255), 0.0f, 0, 1.0f);
+
+						// Hover & click detection for selection
+						if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+						{
+							m_iSelectedRect = static_cast<int>(i);
+						}
+
+						// Highlight selected rect with accent color border
+						if (static_cast<int>(i) == m_iSelectedRect)
+						{
+							drawList->AddRect(topLeft, bottomRight, ImColor(GetAccentColor()), 0.0f, 0, 2.0f);
+						}
+					}
+					ImGui::SetCursorPosY(ImGui::GetCursorPosY() + padding.y);
+				}
+			}
+			ImGui::EndChild();
+
+		}
+		ImGui::EndChild();
+	}
+
+	//---------------------------------------------------------------------
+	void SpriteSheetEditorWindow::Render()
+	{
+		DrawToolbar();
+
+		ImVec2 startPos = ImGui::GetCursorScreenPos();
+
+		ImGui::SetCursorPos(ImVec2(ImGui::GetCursorPos().x + m_System.GetFramePadding().x,
+			ImGui::GetCursorPos().y + m_System.GetFramePadding().y));
+
+		static ImVec2 vOffset = ImVec2(0.0f, 0.0f);
+		static float fZoom = 1.0f;
+
+		ImDrawList* pDrawList = ImGui::GetWindowDrawList();
+		ImVec2 vCanvasPos = ImGui::GetCursorScreenPos();
+		ImVec2 vCanvasSize = ImGui::GetContentRegionAvail();
+
+		if (vCanvasSize.x < 50.0f) vCanvasSize.x = 50.0f;
+		if (vCanvasSize.y < 50.0f) vCanvasSize.y = 50.0f;
+
+		ImVec2 vCanvasEnd = ImVec2(vCanvasPos.x + vCanvasSize.x, vCanvasPos.y + vCanvasSize.y);
+
+		ImGui::InvisibleButton("canvas", vCanvasSize, ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonMiddle);
+		bool bHovered = ImGui::IsItemHovered();
+		ImVec2 vMouse = ImGui::GetIO().MousePos;
+
+		graphics::imgui::ActivateInputScope(graphics::imgui::EditorInputScope::EditorInputScope_SpriteSheetHover, bHovered);
+
+		// PAN
+		if (bHovered && ImGui::IsMouseDragging(ImGuiMouseButton_Middle))
+		{
+			ImVec2 vDelta = ImGui::GetIO().MouseDelta;
+			vOffset.x += vDelta.x;
+			vOffset.y += vDelta.y;
+		}
+
+		// ZOOM
+		if (bHovered)
+		{
+			if (graphics::imgui::CanActivate(graphics::imgui::Keybind::Keybind_Zoom, graphics::imgui::EditorInputScope::EditorInputScope_SpriteSheetHover, false))
+			{
+				float fWheel = ImGui::GetIO().MouseWheel;
+				if (fWheel != 0.0f)
+				{
+					float fOldZoom = fZoom;
+					fZoom *= (fWheel > 0.0f) ? 1.1f : 0.9f;
+					fZoom = std::clamp(fZoom, 0.2f, 5.0f);
+
+					ImVec2 vMouseLocal = ImVec2(vMouse.x - vCanvasPos.x - vOffset.x, vMouse.y - vCanvasPos.y - vOffset.y);
+					float fWorldX = vMouseLocal.x / fOldZoom;
+					float fWorldY = vMouseLocal.y / fOldZoom;
+
+					vOffset.x = vMouse.x - vCanvasPos.x - fWorldX * fZoom;
+					vOffset.y = vMouse.y - vCanvasPos.y - fWorldY * fZoom;
+				}
+			}
+		}
+
+		//-----------------------------------------------------------------
+		// DRAW BACKGROUND
+		//-----------------------------------------------------------------
+		pDrawList->AddRectFilled(vCanvasPos, vCanvasEnd, IM_COL32(40, 40, 40, 255));
+
+		//-----------------------------------------------------------------
+		// DRAW GRID
+		//-----------------------------------------------------------------
+		float fStartX = fmodf(vOffset.x, m_vCellSize.x * fZoom);
+		float fStartY = fmodf(vOffset.y, m_vCellSize.y * fZoom);
+
+		for (float x = fStartX; x < vCanvasSize.x; x += m_vCellSize.x * fZoom)
+		{
+			pDrawList->AddLine(ImVec2(vCanvasPos.x + x, vCanvasPos.y),
+				ImVec2(vCanvasPos.x + x, vCanvasEnd.y),
+				IM_COL32(80, 80, 80, 255));
+		}
+
+		for (float y = fStartY; y < vCanvasSize.y; y += m_vCellSize.y * fZoom)
+		{
+			pDrawList->AddLine(ImVec2(vCanvasPos.x, vCanvasPos.y + y),
+				ImVec2(vCanvasEnd.x, vCanvasPos.y + y),
+				IM_COL32(80, 80, 80, 255));
+		}
+
+		//-----------------------------------------------------------------
+		// HOVER CELL
+		//-----------------------------------------------------------------
+		if (bHovered)
+		{
+			ImVec2 vLocal = ImVec2(vMouse.x - vCanvasPos.x - vOffset.x,
+				vMouse.y - vCanvasPos.y - vOffset.y);
+
+			int iCellX = (int) floor(vLocal.x / (m_vCellSize.x * fZoom));
+			int iCellY = (int) floor(vLocal.y / (m_vCellSize.y * fZoom));
+
+			ImVec2 vMin = ImVec2(vCanvasPos.x + vOffset.x + iCellX * m_vCellSize.x * fZoom,
+				vCanvasPos.y + vOffset.y + iCellY * m_vCellSize.y * fZoom);
+			ImVec2 vMax = ImVec2(vMin.x + m_vCellSize.x * fZoom, vMin.y + m_vCellSize.y * fZoom);
+
+			pDrawList->AddRectFilled(vMin, vMax, IM_COL32(200, 200, 80, 80));
+			pDrawList->AddRect(vMin, vMax, IM_COL32(255, 255, 120, 255));
+
+			if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+			{
+				m_iSelectedRect = -1;
+			}
+		}
+
+		//-----------------------------------------------------------------
+		// DRAW SPRITE SHEET
+		//-----------------------------------------------------------------
+		if (std::shared_ptr<graphics::dx12::Texture> texture = m_pTexture.lock())
+		{
+			ImVec2 vMin = ImVec2(vCanvasPos.x + vOffset.x, vCanvasPos.y + vOffset.y);
+			ImVec2 vMax = ImVec2(vMin.x + texture->GetResourceDesc().Width * fZoom,
+				vMin.y + texture->GetResourceDesc().Height * fZoom);
+
+			pDrawList->AddImage(texture->GetGPUHandle().ptr, vMin, vMax);
+
+			static bool bDraggingRect = false;
+			static ImVec2 dragStartMouse;
+			static ImVec2 dragStartRect;
+
+			for (size_t i = 0; i < texture->GetTextureRectsSize(); i++)
+			{
+				graphics::dx12::TextureRect* textureRect = texture->GetTextureRect(i);
+				if (!textureRect) continue;
+
+				ImVec2 rectMin = ImVec2(vMin.x + textureRect->x * fZoom,
+					vMin.y + textureRect->y * fZoom);
+				ImVec2 rectMax = ImVec2(rectMin.x + textureRect->width * fZoom,
+					rectMin.y + textureRect->height * fZoom);
+
+				// Select rect on click
+				if (bHovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+				{
+					if (vMouse.x >= rectMin.x && vMouse.x <= rectMax.x &&
+						vMouse.y >= rectMin.y && vMouse.y <= rectMax.y)
+					{
+						m_iSelectedRect = (int) i;
+						bDraggingRect = true;
+						dragStartMouse = vMouse;
+						dragStartRect = ImVec2((float) textureRect->x, (float) textureRect->y);
+
+						resources::SrcData oldData;
+						oldData.SetObject();
+						SerializeFields(texture.get(), oldData);
+
+						m_pEditorCommand = std::make_unique<editor::IEditorSpriteSheetDataCommand>();
+						m_pEditorCommand->SetID(texture->GetName());
+						m_pEditorCommand->SetOldData(oldData);
+					}
+				}
+
+				// Highlight selected rect
+				if ((int) i == m_iSelectedRect)
+				{
+					pDrawList->AddRect(rectMin, rectMax, ImColor(GetAccentColor()), 0.0f, 0, 3.0f);
+				}
+				else
+				{
+					pDrawList->AddRect(rectMin, rectMax, IM_COL32(255, 255, 255, 255), 0.0f, 0, 1.0f);
+				}
+			}
+
+			// Dragging logic
+			if (bDraggingRect && m_iSelectedRect >= 0)
+			{
+				graphics::dx12::TextureRect* selRect = texture->GetTextureRect(m_iSelectedRect);
+				if (selRect && ImGui::IsMouseDragging(ImGuiMouseButton_Left))
+				{
+					ImVec2 delta = ImVec2(vMouse.x - dragStartMouse.x, vMouse.y - dragStartMouse.y);
+					selRect->x = std::max(0, (int) (dragStartRect.x + delta.x / fZoom));
+					selRect->y = std::max(0, (int) (dragStartRect.y + delta.y / fZoom));
+				}
+				else if (!ImGui::IsMouseDown(ImGuiMouseButton_Left))
+				{
+					bDraggingRect = false; // release drag
+
+					if (m_pEditorCommand)
+					{
+						resources::SrcData newData;
+						newData.SetObject();
+						SerializeFields(texture.get(), newData);
+						m_pEditorCommand->SetNewData(newData);
+
+						GetEditorEngine().GetEditorWorkspace()->AddAction(std::move(m_pEditorCommand), editor::EditorActionStack_SpriteSheet);
+
+						m_pEditorCommand = nullptr;
+					}
+				}
+			}
+		}
+
+		ImGui::SetCursorScreenPos(startPos);
+
+		DrawViewportPanel();
+	}
+
+	//---------------------------------------------------------------------
+	void SpriteSheetEditorWindow::SetData(const std::string& a_sID)
+	{
+		std::shared_ptr<graphics::dx12::CommandQueue> cCommandQueue = GetDX12System().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
+
+		m_pTexture = GetResourceAtlas().LoadTexture(a_sID, cCommandQueue);
+
+		if (std::shared_ptr<graphics::dx12::Texture> texture = m_pTexture.lock())
+		{
+			IVector2 size = texture->GetSpriteSheetCellSize();
+			m_vCellSize = size;
+		}
+
+		GetEditorEngine().GetEditorWorkspace()->ClearActions(editor::EditorActionStack_SpriteSheet);
+	}
+}

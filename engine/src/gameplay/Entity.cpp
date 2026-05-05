@@ -1,19 +1,21 @@
-#include "Entity.h"
+#include "./Entity.h"
 
+// core
 #include "core/Engine.h"
 
-namespace gallus
+// gameplay
+#include "gameplay/EntityComponentSystem.h"
+
+namespace gallus::gameplay
 {
-	namespace gameplay
+	void Entity::Destroy()
 	{
-		void Entity::Destroy()
+		gameplay::EntityComponentSystem* ecs = GetEngine().GetECS();
+		if (!ecs)
 		{
-			core::ENGINE->GetECS().Destroy(m_EntityID);
+			return;
 		}
 
-		void Entity::SetDestroy()
-		{
-			m_bIsDestroyed = true;
-		}
+		ecs->DeleteEntity(m_EntityID);
 	}
 }
